@@ -6,11 +6,11 @@ title: Quidproquo - Platform-Agnostic Web Framework
 
 # Quidproquo
 
-A functional, action-based web framework built on generators and pure functions that enables complete execution logging, event replay, and platform-agnostic deployments.
+A functional, action-based web framework built on generators and pure functions. Business logic never touches a cloud SDK, so the same code runs on Lambda, on Node, or in a browser. Every execution is logged, and you can replay it later.
 
 ## What is Quidproquo?
 
-Quidproquo (QPQ) is a revolutionary web framework that separates business logic from platform implementation through a unique action/processor pattern. Instead of writing code tied to specific cloud providers or runtime environments, you write pure generator functions ("stories") that yield actions, which are then processed by platform-specific implementations.
+Quidproquo (QPQ) separates business logic from platform implementation using an action/processor pattern. You write pure generator functions, called stories, that yield actions. Platform-specific processors decide how each action actually runs.
 
 ### Core Philosophy
 
