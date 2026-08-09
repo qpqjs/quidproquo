@@ -11,8 +11,8 @@ import './landing.css';
 export const LandingPage = () => (
   <main>
     <Hero />
-    <Features />
     <YieldLoop />
+    <Features />
     <Pipeline />
     <Packages />
     <Footer />

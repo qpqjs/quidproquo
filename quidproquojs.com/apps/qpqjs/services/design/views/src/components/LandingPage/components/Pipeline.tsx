@@ -1,9 +1,9 @@
-interface Stage {
+type Stage = {
   step: string;
   title: string;
   body: string;
   code: string;
-}
+};
 
 const STAGES: Stage[] = [
   {
@@ -29,28 +29,25 @@ const STAGES: Stage[] = [
 export function Pipeline() {
   return (
     <section className="section" id="pipeline">
-      <p className="section__kicker">how it runs</p>
-      <h2 className="section__title">From yield to production</h2>
-      <p className="section__sub">
-        A story never touches a platform API. Actions travel the grid;
-        processors do the work.
-      </p>
+      <div className="section__head">
+        <p className="section__kicker">how it runs</p>
+        <h2 className="section__title">From yield to production</h2>
+        <p className="section__sub">
+          A story never touches a platform API. Actions travel to the runtime,
+          and processors do the work.
+        </p>
+      </div>
 
       <div className="pipeline">
-        {STAGES.map((stage, index) => (
-          <div key={stage.step} className="pipeline__stage-wrap">
-            <article className="pipeline__stage">
-              <span className="pipeline__step">{stage.step}</span>
+        {STAGES.map((stage) => (
+          <article key={stage.step} className="pipeline__stage">
+            <span className="pipeline__step">{stage.step}</span>
+            <div>
               <h3>{stage.title}</h3>
               <p>{stage.body}</p>
-              <code className="pipeline__code">{stage.code}</code>
-            </article>
-            {index < STAGES.length - 1 && (
-              <div aria-hidden="true" className="pipeline__link">
-                <span className="pipeline__packet" />
-              </div>
-            )}
-          </div>
+            </div>
+            <code className="pipeline__code">{stage.code}</code>
+          </article>
         ))}
       </div>
     </section>

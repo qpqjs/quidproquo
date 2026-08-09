@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-interface Feature {
+type Feature = {
   icon: ReactNode;
   title: string;
   body: string;
-}
+};
 
 const iconProps = {
   viewBox: '0 0 24 24',
@@ -26,7 +26,7 @@ const FEATURES: Feature[] = [
       </svg>
     ),
     title: 'Pure stories',
-    body: 'Business logic is a generator function that yields actions. No SDK calls, no mocks to untangle — just intent, in order, readable top to bottom.',
+    body: 'Business logic is a generator function that yields actions. No SDK calls, no mocks to untangle. Just intent, in order, readable top to bottom.',
   },
   {
     icon: (
@@ -35,7 +35,7 @@ const FEATURES: Feature[] = [
       </svg>
     ),
     title: 'Typed actions',
-    body: 'Every side effect — files, queues, auth, websockets, AI — is a typed action with a typed result. The compiler knows exactly what your story can do.',
+    body: 'Every side effect (files, queues, auth, websockets, AI) is a typed action with a typed result. The compiler knows exactly what your story can do.',
   },
   {
     icon: (
@@ -55,19 +55,21 @@ const FEATURES: Feature[] = [
       </svg>
     ),
     title: 'Config-driven deploys',
-    body: 'Describe queues, stores and routes in QPQ config. The CDK package turns it into real AWS infrastructure — no hand-written stacks.',
+    body: 'Describe queues, stores and routes in QPQ config. The CDK package turns it into real AWS infrastructure, with no hand-written stacks.',
   },
 ];
 
 export function Features() {
   return (
     <section className="section" id="stories">
-      <p className="section__kicker">why qpq</p>
-      <h2 className="section__title">One story. Every runtime.</h2>
-      <p className="section__sub">
-        Separate the <em>what</em> from the <em>how</em>, and the how becomes
-        replaceable.
-      </p>
+      <div className="section__head">
+        <p className="section__kicker">why qpq</p>
+        <h2 className="section__title">One story. Every runtime.</h2>
+        <p className="section__sub">
+          Separate the <em>what</em> from the <em>how</em>, and the how becomes
+          replaceable.
+        </p>
+      </div>
 
       <div className="feature-grid">
         {FEATURES.map((feature) => (

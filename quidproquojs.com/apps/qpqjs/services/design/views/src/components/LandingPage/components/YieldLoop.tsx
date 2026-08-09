@@ -20,13 +20,13 @@ enum Phase {
   done = 'done',
 }
 
-interface LoopStep {
+type LoopStep = {
   lineIndex: number;
   action: string;
   result: string;
   platform: string;
   processor: string;
-}
+};
 
 const STEPS: LoopStep[] = [
   {
@@ -88,11 +88,11 @@ const CODE_LINES: ReactNode[] = [
 
 const RETURN_LINE = 4;
 
-interface View {
+type View = {
   step: number;
   phase: Phase;
   completed: boolean[];
-}
+};
 
 export function YieldLoop() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -248,13 +248,15 @@ export function YieldLoop() {
 
   return (
     <section className="section" id="loop">
-      <p className="section__kicker">the loop</p>
-      <h2 className="section__title">Yield out. Flow back.</h2>
-      <p className="section__sub">
-        A story is a paused conversation with the runtime: it yields an action,
-        the infrastructure does the work, and the result resumes the generator —
-        right where it left off.
-      </p>
+      <div className="section__head">
+        <p className="section__kicker">the loop</p>
+        <h2 className="section__title">Yield out. Flow back.</h2>
+        <p className="section__sub">
+          A story is a paused conversation with the runtime: it yields an
+          action, the infrastructure does the work, and the result resumes the
+          generator right where it left off.
+        </p>
+      </div>
 
       <div ref={containerRef} className="loop">
         <svg

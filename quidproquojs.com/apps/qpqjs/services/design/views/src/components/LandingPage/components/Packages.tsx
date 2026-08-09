@@ -1,7 +1,7 @@
-interface PackageGroup {
+type PackageGroup = {
   label: string;
   packages: string[];
-}
+};
 
 const GROUPS: PackageGroup[] = [
   {
@@ -37,11 +37,13 @@ const GROUPS: PackageGroup[] = [
 export function Packages() {
   return (
     <section className="section" id="packages">
-      <p className="section__kicker">the grid</p>
-      <h2 className="section__title">A package for every layer</h2>
-      <p className="section__sub">
-        Every layer is its own package, so you only pull in what you need.
-      </p>
+      <div className="section__head">
+        <p className="section__kicker">packages</p>
+        <h2 className="section__title">A package for every layer</h2>
+        <p className="section__sub">
+          Every layer is its own package, so you only pull in what you need.
+        </p>
+      </div>
 
       <div className="package-groups">
         {GROUPS.map((group) => (

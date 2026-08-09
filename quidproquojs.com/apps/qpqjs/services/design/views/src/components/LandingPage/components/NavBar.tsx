@@ -15,13 +15,29 @@ export function NavBar() {
     <header className="nav">
       <div className="nav__inner">
         <a className="nav__brand" href="#top">
-          <svg aria-hidden="true" className="nav__mark" viewBox="24.4 24.4 465.3 465.3">
+          <svg
+            aria-hidden="true"
+            className="nav__mark"
+            viewBox="24.4 24.4 465.3 465.3"
+          >
             <path
               d="M271.42,489.64h-10.72c-128.68,0-235.74-102.93-236.29-231.61S128.97,23.86,258.03,24.41c128.68.55,231.6,107.61,231.6,236.29v11.61c0,.09-.07.16-.16.16h-109.69c-.09,0-.16-.07-.16-.16v-12.61c0-65.9-53.82-123.71-119.7-125.24-69.89-1.62-127.08,55.57-125.46,125.46,1.53,65.89,59.34,119.71,125.24,119.71h11.72c.09,0,.16.07.16.16v109.69c0,.09-.07.16-.16.16Z"
               fill="#22d3ee"
             />
-            <rect fill="#8df6ff" height="106.91" width="106.91" x="268.31" y="273.22" />
-            <rect fill="#8df6ff" height="106.91" width="106.91" x="375.62" y="380.53" />
+            <rect
+              fill="#8df6ff"
+              height="106.91"
+              width="106.91"
+              x="268.31"
+              y="273.22"
+            />
+            <rect
+              fill="#8df6ff"
+              height="106.91"
+              width="106.91"
+              x="375.62"
+              y="380.53"
+            />
           </svg>
           <span className="nav__name">
             quid<span className="nav__name-accent">pro</span>quo
@@ -29,8 +45,8 @@ export function NavBar() {
         </a>
 
         <nav className="nav__links">
-          <a href="#stories">Stories</a>
-          <a href="#pipeline">Runtime</a>
+          <a href="#loop">The loop</a>
+          <a href="#stories">Why qpq</a>
           <a href="#packages">Packages</a>
           <a href={getDocsUrl()}>Docs</a>
         </nav>

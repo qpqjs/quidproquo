@@ -1,40 +1,29 @@
-import { useRef } from 'react';
-
 import { InstallChip } from './InstallChip';
-import { TronGrid } from './TronGrid';
 
 export function Footer() {
-  const panelRef = useRef<HTMLDivElement>(null);
-
   return (
     <footer className="footer">
       <div className="footer__cta">
-        <TronGrid avoidRefs={[panelRef]} />
-        <div ref={panelRef} className="footer__cta-content">
-          <p className="section__kicker">get started</p>
-          <h2 className="footer__cta-title">
-            Ready to write
-            <br />
-            <span className="hero__title-glow">your first story?</span>
-          </h2>
-          <p className="footer__cta-sub">
-            One command scaffolds a full app — five services, a local dev
-            server, a one-image docker deploy. Yield an action; the runtime
-            handles the rest.
-          </p>
-          <div className="footer__cta-actions">
-            <InstallChip />
-            <a
-              className="btn btn--ghost"
-              href="https://github.com/qpqjs/quidproquo"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Star on GitHub
-            </a>
-          </div>
+        <p className="section__kicker">get started</p>
+        <h2 className="footer__cta-title">Write your first story</h2>
+        <p className="footer__cta-sub">
+          One command scaffolds a full app: five services, a local dev server
+          and a one-image docker deploy. Yield an action, and the runtime takes
+          it from there.
+        </p>
+        <div className="footer__cta-actions">
+          <InstallChip />
+          <a
+            className="btn btn--ghost"
+            href="https://github.com/qpqjs/quidproquo"
+            rel="noreferrer"
+            target="_blank"
+          >
+            Star on GitHub
+          </a>
         </div>
       </div>
+
       <div className="footer__base">
         <div className="footer__base-inner">
           <span>quidproquo · MIT license</span>

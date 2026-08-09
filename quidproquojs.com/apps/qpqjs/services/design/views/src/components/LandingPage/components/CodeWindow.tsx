@@ -8,7 +8,7 @@ const cm = (text: string) => <span className="tok-cm">{text}</span>;
 const pr = (text: string) => <span className="tok-pr">{text}</span>;
 
 const LINES: ReactNode[] = [
-  <>{cm('// pure business logic — no infrastructure')}</>,
+  <>{cm('// pure business logic, no infrastructure')}</>,
   <>
     {kw('export function')}* {fn('askSendWelcomeEmail')}(
   </>,
@@ -37,7 +37,8 @@ const LINES: ReactNode[] = [
   <>&nbsp;</>,
   <>
     {'  '}
-    {kw('yield')}* {fn('askEventBusPublish')}({str("'welcomed'")}, {'{'} userId {'}'});
+    {kw('yield')}* {fn('askEventBusPublish')}({str("'welcomed'")}, {'{'} userId{' '}
+    {'}'});
   </>,
   <>&nbsp;</>,
   <>
@@ -59,7 +60,7 @@ export function CodeWindow() {
       <pre className="code-window__body">
         <code>
           {LINES.map((line, index) => (
-            <span className="code-line" key={index}>
+            <span key={index} className="code-line">
               <span className="code-line__num">{index + 1}</span>
               <span className="code-line__text">{line}</span>
             </span>

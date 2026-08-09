@@ -1,60 +1,52 @@
-import { useRef } from 'react';
-
 import { CodeWindow } from './CodeWindow';
 import { InstallChip } from './InstallChip';
 import { NavBar } from './NavBar';
-import { TronGrid } from './TronGrid';
 
 export function Hero() {
-  const copyRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
   return (
-    <section className="hero" id="top">
-      <TronGrid avoidRefs={[copyRef, panelRef]} />
+    <>
       <NavBar />
 
-      <div className="hero__inner">
-        <div ref={copyRef} className="hero__copy">
-          <span className="hero__badge">
-            <span className="hero__badge-pulse" />
+      <section className="hero" id="top">
+        <div aria-hidden="true" className="hero__grid" />
+        <div aria-hidden="true" className="hero__glow" />
+
+        <div className="hero__inner">
+          <p className="hero__kicker">
             functional · action-based · typescript
-          </span>
+          </p>
 
           <h1 className="hero__title">
             Write pure stories.
             <br />
-            <span className="hero__title-glow">Run them anywhere.</span>
+            <span className="hero__title-dim">Run them anywhere.</span>
           </h1>
 
           <p className="hero__sub">
-            quidproquo is an action-based framework where business logic is a
-            generator function — a <em>story</em> that yields typed actions. The
-            runtime decides how each action executes: AWS Lambda in production,
-            Node on your machine, the browser in your app.
+            Business logic is a generator that yields typed actions. The runtime
+            decides how each one executes: Lambda in production, Node on your
+            machine, the browser in your app.
           </p>
 
           <div className="hero__cta">
-            <a className="btn btn--primary" href="#stories">
-              Get started
+            <InstallChip />
+            <a className="btn btn--ghost" href="#loop">
+              See how it works
               <span className="btn__arrow">→</span>
             </a>
-            <InstallChip />
           </div>
 
-          <div className="hero__meta">
+          <p className="hero__meta">
             <span>MIT licensed</span>
-            <span>zero side effects</span>
+            <span>zero side effects in your logic</span>
             <span>deploys itself with CDK</span>
-          </div>
+          </p>
         </div>
 
-        <div ref={panelRef} className="hero__panel">
+        <div className="hero__panel">
           <CodeWindow />
         </div>
-      </div>
-
-      <div aria-hidden="true" className="hero__fade" />
-    </section>
+      </section>
+    </>
   );
 }
