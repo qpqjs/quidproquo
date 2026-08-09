@@ -8,7 +8,7 @@ const cm = (text: string) => <span className="tok-cm">{text}</span>;
 const pr = (text: string) => <span className="tok-pr">{text}</span>;
 
 const LINES: ReactNode[] = [
-  <>{cm('// pure business logic, no infrastructure')}</>,
+  <>{cm('// no SDK imports, no platform APIs')}</>,
   <>
     {kw('export function')}* {fn('askSendWelcomeEmail')}(
   </>,
@@ -23,7 +23,7 @@ const LINES: ReactNode[] = [
   <>&nbsp;</>,
   <>
     {'  '}
-    {kw('yield')}* {fn('askQueueSendMessage')}({str("'email'")}, {'{'}
+    {kw('yield')}* {fn('askQueueSendMessages')}({str("'email'")}, {'{'}
   </>,
   <>
     {'    '}
@@ -37,8 +37,7 @@ const LINES: ReactNode[] = [
   <>&nbsp;</>,
   <>
     {'  '}
-    {kw('yield')}* {fn('askEventBusPublish')}({str("'welcomed'")}, {'{'} userId{' '}
-    {'}'});
+    {kw('yield')}* {fn('askEventBusSendMessages')}({'{'} userId {'}'});
   </>,
   <>&nbsp;</>,
   <>

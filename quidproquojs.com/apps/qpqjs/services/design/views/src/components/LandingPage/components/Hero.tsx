@@ -12,20 +12,19 @@ export function Hero() {
         <div aria-hidden="true" className="hero__glow" />
 
         <div className="hero__inner">
-          <p className="hero__kicker">
-            functional · action-based · typescript
-          </p>
+          <p className="hero__kicker">functional · action-based · typescript</p>
 
           <h1 className="hero__title">
-            Write pure stories.
+            Pure business logic.
             <br />
-            <span className="hero__title-dim">Run them anywhere.</span>
+            <span className="hero__title-dim">Platform agnostic.</span>
           </h1>
 
           <p className="hero__sub">
-            Business logic is a generator that yields typed actions. The runtime
-            decides how each one executes: Lambda in production, Node on your
-            machine, the browser in your app.
+            Your logic is a generator function (a <em>story</em>) that yields
+            typed actions, never a platform API. A processor per platform
+            decides how each action actually runs: Lambda, a container, the
+            browser.
           </p>
 
           <div className="hero__cta">
@@ -39,7 +38,7 @@ export function Hero() {
           <p className="hero__meta">
             <span>MIT licensed</span>
             <span>zero side effects in your logic</span>
-            <span>deploys itself with CDK</span>
+            <span>infrastructure from config</span>
           </p>
         </div>
 

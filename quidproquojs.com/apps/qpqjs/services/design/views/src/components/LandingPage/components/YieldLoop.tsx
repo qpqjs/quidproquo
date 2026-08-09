@@ -45,7 +45,7 @@ const STEPS: LoopStep[] = [
   },
   {
     lineIndex: 3,
-    action: 'FileWriteContents',
+    action: 'FileWriteTextContents',
     result: 'saved',
     platform: 'S3',
     processor: 'file',
@@ -77,7 +77,7 @@ const CODE_LINES: ReactNode[] = [
   </>,
   <>
     {'  '}
-    {kw('yield')}* {fn('askFileWriteContents')}(receipt);
+    {kw('yield')}* {fn('askFileWriteTextContents')}(receipt);
   </>,
   <>
     {'  '}

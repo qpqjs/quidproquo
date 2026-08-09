@@ -517,12 +517,198 @@ em {
   font-size: 16.5px;
 }
 
-/* -------------------------------- features -------------------------------- */
+/* --------------------------------- replay --------------------------------- */
 
-.feature-grid {
+.replay {
+  margin-top: 56px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.replay__bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-soft);
+}
+
+.replay__badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.replay__code {
+  padding: 18px 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.replay-line {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-left: 2px solid transparent;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.replay-line__text {
+  white-space: pre;
+  color: #cbd3dd;
+}
+
+.replay-line.is-active {
+  background: rgba(34, 211, 238, 0.05);
+  border-left-color: var(--accent);
+}
+
+/* the annotation the trace viewer writes beside each executed statement */
+.replay-line__note {
+  margin-left: 18px;
+  white-space: nowrap;
+  color: var(--faint);
+  animation: note-in 0.3s ease;
+}
+
+/* an action that completed but produced no local, so the trace shows the
+   outcome instead of a value */
+.replay-line__note--effect {
+  color: rgba(110, 231, 165, 0.68);
+}
+
+.replay-line__note--return {
+  color: var(--good);
+}
+
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replay__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-soft);
+}
+
+.replay__stat {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.replay__foot-note {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* ------------------------- split code panels ------------------------------ */
+
+.split {
   margin-top: 56px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.split__panel {
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.split__panel-head {
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-soft);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.split__code {
+  padding: 16px 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.95;
+}
+
+.split-line {
+  display: block;
+  padding: 0 18px;
+  white-space: pre;
+  color: #cbd3dd;
+}
+
+/* ----------------------------- infrastructure ----------------------------- */
+
+.resource-list {
+  list-style: none;
+  padding: 6px 0;
+}
+
+.resource {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--line-faint);
+}
+
+.resource:last-child {
+  border-bottom: none;
+}
+
+.resource__name {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.resource__detail {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.mapping-row {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1px;
   background: var(--line-soft);
   border: 1px solid var(--line-soft);
@@ -530,41 +716,73 @@ em {
   overflow: hidden;
 }
 
-/* a hairline-separated slab rather than four floating cards: reads as one
-   object, and there is nothing left to glow on hover */
-.feature-card {
-  padding: 30px 26px 34px;
+.mapping {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  background: var(--bg);
+}
+
+.mapping__define {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.mapping__produces {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* --------------------------------- actions -------------------------------- */
+
+.action-grid {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--line-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.action-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 20px;
   background: var(--bg);
   transition: background 0.2s ease;
 }
 
-.feature-card:hover {
+.action-cell:hover {
   background: var(--panel);
 }
 
-.feature-card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--line-soft);
-  color: var(--accent);
+.action-cell__domain {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
-.feature-card h3 {
+.action-cell__requester {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-note {
   margin-top: 20px;
-  font-family: var(--font-display);
-  font-size: 17.5px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
-
-.feature-card p {
-  margin-top: 10px;
-  font-size: 14.5px;
-  color: var(--muted);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--faint);
 }
 
 /* ------------------------------- yield loop ------------------------------- */
@@ -799,105 +1017,6 @@ em {
   color: var(--faint);
 }
 
-/* -------------------------------- pipeline -------------------------------- */
-
-/* numbered rows on hairlines instead of three connected cards: the loop
-   diagram above already carries the motion, so this stays completely still */
-.pipeline {
-  margin-top: 56px;
-  border-top: 1px solid var(--line-soft);
-}
-
-.pipeline__stage {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) minmax(0, 0.85fr);
-  align-items: baseline;
-  gap: 24px;
-  padding: 28px 4px;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.pipeline__step {
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-
-.pipeline__stage h3 {
-  font-family: var(--font-display);
-  font-size: 17.5px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
-
-.pipeline__stage p {
-  margin-top: 8px;
-  font-size: 14.5px;
-  color: var(--muted);
-}
-
-.pipeline__code {
-  padding: 9px 12px;
-  border-radius: 7px;
-  border: 1px solid var(--line-soft);
-  background: var(--panel);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* -------------------------------- packages -------------------------------- */
-
-.package-groups {
-  margin-top: 56px;
-  border-top: 1px solid var(--line-soft);
-}
-
-.package-group {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 4px;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.package-group__label {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
-.package-group__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.package-chip {
-  padding: 5px 12px;
-  border-radius: 7px;
-  border: 1px solid var(--line-soft);
-  background: var(--panel);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--muted);
-  transition:
-    border-color 0.18s ease,
-    color 0.18s ease;
-}
-
-.package-chip:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  color: var(--text);
-}
-
 /* --------------------------------- footer --------------------------------- */
 
 .footer {
@@ -1000,17 +1119,12 @@ em {
     flex: 1 1 150px;
   }
 
-  .pipeline__stage {
-    grid-template-columns: 40px minmax(0, 1fr);
-  }
-
-  .pipeline__code {
-    grid-column: 2;
-  }
-
-  .package-group {
+  .split {
     grid-template-columns: 1fr;
-    gap: 10px;
+  }
+
+  .replay__foot-note {
+    margin-left: 0;
   }
 
   .footer__cta {
@@ -1024,7 +1138,8 @@ em {
   }
 
   .loop__hub.is-active .loop__hub-ring,
-  .loop-line__result {
+  .loop-line__result,
+  .replay-line__note {
     animation: none;
   }
 }

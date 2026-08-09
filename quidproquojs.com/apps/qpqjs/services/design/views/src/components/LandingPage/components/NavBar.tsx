@@ -46,8 +46,9 @@ export function NavBar() {
 
         <nav className="nav__links">
           <a href="#loop">The loop</a>
-          <a href="#stories">Why qpq</a>
-          <a href="#packages">Packages</a>
+          <a href="#replay">Replay</a>
+          <a href="#infra">Deploys</a>
+          <a href="#actions">Actions</a>
           <a href={getDocsUrl()}>Docs</a>
         </nav>
 
