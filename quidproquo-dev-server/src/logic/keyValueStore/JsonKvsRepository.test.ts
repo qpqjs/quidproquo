@@ -33,13 +33,15 @@ describe('JsonKvsRepository persistence', () => {
 
   const storeFilePath = () => path.join(runtimePath, 'kvs', 'test-module', 'users.json');
 
-  it('writes a pretty-printed JSON file containing the items after a flush', async () => {
+  it('writes a one-row-per-line JSON file containing the items after a flush', async () => {
     const repo = makeRepo([defineKeyValueStore('users', { key: 'id', type: 'string' })]);
     await repo.upsert('users', { id: 'u1', name: 'Joe' });
     await repo.flush();
 
+    // Streamed item-by-item (see writeStoreFile): compact rows, one per line, so the
+    // serialized size of the whole store never passes through a single JSON.stringify.
     const raw = fs.readFileSync(storeFilePath(), 'utf-8');
-    expect(raw).toBe(JSON.stringify({ items: [{ id: 'u1', name: 'Joe' }] }, null, 2));
+    expect(raw).toBe('{\n  "items": [\n    {"id":"u1","name":"Joe"}\n  ]\n}\n');
     expect(JSON.parse(raw)).toEqual({ items: [{ id: 'u1', name: 'Joe' }] });
   });
 

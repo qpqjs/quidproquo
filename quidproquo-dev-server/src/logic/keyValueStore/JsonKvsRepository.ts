@@ -10,6 +10,7 @@ import {
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { StringDecoder } from 'string_decoder';
 
 import { applyUpdateToItem } from './applyKvsUpdates';
 import { evaluateKvsQueryOperation, validateKvsQueryOperation } from './evaluateKvsQueryOperation';
@@ -102,6 +103,65 @@ export class JsonKvsRepository implements KvsRepository {
     }
   }
 
+  // Chunked, line-by-line read of a store file too large for one readFileSync string —
+  // the read-side twin of writeStoreFile's streamed serialization (V8 caps strings at
+  // ~512MB, and readFileSync returns ONE string). Only ever invoked for files past that
+  // scale, and any file that large was necessarily written by the streamed writer, so the
+  // one-row-per-line layout can be assumed: every line that opens a JSON object is one
+  // item (trailing comma trimmed); the wrapper lines ('{', '"items": [', ']', '}') carry
+  // no data. Synchronous on purpose - getStore is the lazy first-touch load and every
+  // caller reaches it synchronously.
+  private readLargeStoreFileItems(filePath: string): any[] {
+    const READ_CHUNK_BYTES = 8 * 1024 * 1024;
+
+    const items: any[] = [];
+    const buffer = Buffer.alloc(READ_CHUNK_BYTES);
+    // Chunk boundaries can split a multi-byte UTF-8 character; the decoder carries the
+    // partial sequence across reads.
+    const decoder = new StringDecoder('utf8');
+    const fd = fs.openSync(filePath, 'r');
+
+    const parseLine = (line: string): void => {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('{') || trimmed === '{') {
+        return;
+      }
+
+      const rowJson = trimmed.endsWith(',') ? trimmed.slice(0, -1) : trimmed;
+
+      try {
+        items.push(JSON.parse(rowJson));
+      } catch (error: any) {
+        throw new Error(`Invalid JSON row in large KVS store file '${filePath}': ${error.message}`);
+      }
+    };
+
+    try {
+      let remainder = '';
+
+      for (;;) {
+        const bytesRead = fs.readSync(fd, buffer, 0, READ_CHUNK_BYTES, null);
+        if (bytesRead === 0) {
+          break;
+        }
+
+        const text = remainder + decoder.write(buffer.subarray(0, bytesRead));
+        const lines = text.split('\n');
+        remainder = lines.pop() ?? '';
+
+        for (const line of lines) {
+          parseLine(line);
+        }
+      }
+
+      parseLine(remainder + decoder.end());
+    } finally {
+      fs.closeSync(fd);
+    }
+
+    return items;
+  }
+
   private getStore(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, scope?: string): KvsStoreState {
     // Scope can never contain '/' (validated upstream), so this key is unambiguous.
     const stateKey = scope ? `${scope}/${keyValueStoreName}` : keyValueStoreName;
@@ -115,8 +175,17 @@ export class JsonKvsRepository implements KvsRepository {
     const items = new Map<string, any>();
 
     if (fs.existsSync(filePath)) {
-      const parsed = this.parseStoreFile(fs.readFileSync(filePath, 'utf-8'), filePath);
-      for (const item of parsed.items) {
+      // Files past readFileSync's single-string ceiling (~512MB) take the chunked
+      // line reader; everything smaller — including legacy pretty-printed files,
+      // which are all under the ceiling or they could never have been written —
+      // parses as one document.
+      const LARGE_FILE_BYTES = 400 * 1024 * 1024;
+      const { size } = fs.statSync(filePath);
+
+      const storedItems =
+        size >= LARGE_FILE_BYTES ? this.readLargeStoreFileItems(filePath) : this.parseStoreFile(fs.readFileSync(filePath, 'utf-8'), filePath).items;
+
+      for (const item of storedItems) {
         items.set(this.buildStorageKey(item, storeConfig), item);
       }
     }
@@ -143,8 +212,52 @@ export class JsonKvsRepository implements KvsRepository {
       compareKvsItemKeys(getPk(a, storeConfig), getSk(a, storeConfig), getPk(b, storeConfig), getSk(b, storeConfig)),
     );
 
+    // Streamed, item-by-item serialization of the same `{ "items": [...] }` document.
+    //
+    // One JSON.stringify over the whole store dies with `RangeError: Invalid string length`
+    // the moment a store's serialized form crosses V8's max string (~512MB) — which real
+    // stores reach (a bulk event-doc copy fans out through the snapshot projector into
+    // hundreds of multi-MB snapshot rows). Serializing per item keeps every stringify
+    // bounded by one row, so the FILE size has no ceiling. One row per line (compact)
+    // stays greppable and halves the old pretty-printed footprint, which also keeps the
+    // read path (one readFileSync string) well clear of the same limit.
     const tmpPath = `${filePath}.tmp`;
-    await fs.promises.writeFile(tmpPath, JSON.stringify({ items } as KvsStoreFile, null, 2));
+    const stream = fs.createWriteStream(tmpPath);
+
+    // write() with a callback resolves once the chunk is flushed, so awaiting it is the
+    // backpressure handling. Rows are batched into ~4MB chunks so a million-row store
+    // doesn't pay a promise round-trip per row.
+    const writeChunk = (chunk: string): Promise<void> =>
+      new Promise<void>((resolve, reject) => {
+        stream.write(chunk, (error) => (error ? reject(error) : resolve()));
+      });
+
+    const CHUNK_TARGET_BYTES = 4 * 1024 * 1024;
+
+    try {
+      let buffer = '{\n  "items": [';
+
+      for (let index = 0; index < items.length; index++) {
+        buffer += `${index === 0 ? '' : ','}\n    ${JSON.stringify(items[index])}`;
+
+        if (buffer.length >= CHUNK_TARGET_BYTES) {
+          await writeChunk(buffer);
+          buffer = '';
+        }
+      }
+
+      buffer += `${items.length === 0 ? '' : '\n  '}]\n}\n`;
+      await writeChunk(buffer);
+
+      await new Promise<void>((resolve, reject) => {
+        stream.on('error', reject);
+        stream.end(() => resolve());
+      });
+    } catch (error) {
+      stream.destroy();
+      throw error;
+    }
+
     await fs.promises.rename(tmpPath, filePath);
   }
 
