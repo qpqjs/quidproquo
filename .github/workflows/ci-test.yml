@@ -1,0 +1,28 @@
+name: ci-test
+
+# Reusable: the monorepo unit suite across supported node versions.
+#
+# Called by test.yml on branches and pull requests, and by deploy-site.yml as a
+# gate before it deploys. Both paths run this one definition, so the checks that
+# guard a release are the same checks that ran on the branch.
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [24, 25, 26]
+    name: node ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      # Cross-package imports resolve to each package's built lib/, so the
+      # suite needs the monorepo built before vitest can load the test files.
+      - run: npm run build
+      - run: npm test

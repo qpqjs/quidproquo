@@ -1,6 +1,10 @@
 name: smoke
 
-on: [push]
+# main and develop are deliberately excluded: deploy-site runs the same
+# reusable workflow as a gate before it deploys those branches.
+on:
+  push:
+    branches-ignore: [main, develop]
 
 concurrency:
   group: smoke-${{ github.ref }}
@@ -8,15 +12,4 @@ concurrency:
 
 jobs:
   smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      # Build the whole monorepo: the scaffold's file: refs pull built lib/
-      # outputs, and create-qpq-app's bin has to exist before the smoke runs.
-      - run: npm run build
-      - run: npm run smoke
+    uses: ./.github/workflows/ci-smoke.yml

@@ -1,6 +1,12 @@
 name: test
 
-on: [push, pull_request]
+# main and develop are deliberately excluded: deploy-site runs the same
+# reusable workflow as a gate before it deploys those branches, and running
+# here too would duplicate a three-version matrix on every release push.
+on:
+  push:
+    branches-ignore: [main, develop]
+  pull_request:
 
 concurrency:
   group: test-${{ github.ref }}
@@ -8,19 +14,4 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [24, 25, 26]
-    name: node ${{ matrix.node }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: ${{ matrix.node }}
-      - run: npm ci
-      # Cross-package imports resolve to each package's built lib/, so the
-      # suite needs the monorepo built before vitest can load the test files.
-      - run: npm run build
-      - run: npm test
+    uses: ./.github/workflows/ci-test.yml

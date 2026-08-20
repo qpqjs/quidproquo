@@ -1,11 +1,14 @@
 name: deploy-site
 
-# Deploy quidproquojs.com. Every push to main auto-deploys the DEVELOPMENT
-# environment. Production (and staging) are manual only — run from the Actions
-# tab ("Run workflow") and pick the environment.
+# Deploy quidproquojs.com.
+#   push to develop -> development
+#   push to main    -> production
+# Any environment can also be deployed by hand from the Actions tab
+# ("Run workflow") — that is the only route to staging, and the way to redeploy
+# an environment out of band.
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
     inputs:
       env:
@@ -14,25 +17,50 @@ on:
         default: production
         options: [development, staging, production]
 
-# Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
+# Default for every job, including the reusable test/smoke workflows called
+# below. Only the deploy job widens this to mint an OIDC token.
 permissions:
-  id-token: write
   contents: read
 
-# Serialize deploys per environment so rapid pushes queue instead of racing.
-# Never cancel a running deploy — a half-applied CloudFormation stack is worse
-# than waiting.
-concurrency:
-  group: deploy-site-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
-  cancel-in-progress: false
-
 jobs:
-  deploy:
+  # Gates. Same reusable workflows test.yml/smoke.yml run on branches and pull
+  # requests, so nothing reaches an environment on checks it has not passed.
+  test:
+    uses: ./.github/workflows/ci-test.yml
+
+  smoke:
+    uses: ./.github/workflows/ci-smoke.yml
+
+  # The target environment is resolved once, in its own job, because neither
+  # `environment:` nor job-level `concurrency:` can read step outputs — each
+  # would otherwise need its own copy of the branch mapping. Three copies that
+  # can drift is how a deploy ends up running against production while holding
+  # the development concurrency lock.
+  resolve:
     runs-on: ubuntu-latest
-    # push -> development; manual dispatch -> the chosen environment. The GitHub
-    # Environment supplies the per-account role ARN + region, and is where you
-    # add required reviewers to gate production behind a manual approval.
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
+    outputs:
+      env: ${{ steps.pick.outputs.env }}
+    steps:
+      - id: pick
+        run: |
+          echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || 'development') }}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: [resolve, test, smoke]
+    runs-on: ubuntu-latest
+    # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
+    permissions:
+      id-token: write
+      contents: read
+    # The GitHub Environment supplies the per-account role ARN + region, and is
+    # where required reviewers go to gate production behind a manual approval.
+    environment: ${{ needs.resolve.outputs.env }}
+    # Serialize deploys per environment so rapid pushes queue instead of racing.
+    # Never cancel a running deploy — a half-applied CloudFormation stack is
+    # worse than waiting.
+    concurrency:
+      group: deploy-site-${{ needs.resolve.outputs.env }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v5
 
@@ -62,5 +90,5 @@ jobs:
       # Fully non-interactive deploy: all services, all stacks (inf -> api ->
       # web -> views), in parallel via docker. The AWS_* creds set by the step
       # above are passed through to the deploy containers.
-      - run: npx qpq go:docker all all --app qpqjs --env ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
+      - run: npx qpq go:docker all all --app qpqjs --env ${{ needs.resolve.outputs.env }}
         working-directory: quidproquojs.com
