@@ -16,11 +16,11 @@ import { toKvsCompositeKey, toKvsStreamKeys } from '../../../logic/keyValueStore
 import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { ResolvedDevServerConfig } from '../../../types';
 
-// The batch sibling of Upsert: ONE action over the same repository the single
-// processor uses (its writes are debounced and coalesce on disk, so looping here
-// costs memory ops, not file writes). Per-item stream emission is kept — AWS
-// streams emit one record per item regardless of how it was written, and local
-// projectors must see the same shape. Unconditional, like BatchWriteItem.
+// The batch sibling of Upsert: one repository call, so the whole batch lands
+// as a single unit (one transaction on an engine that has them). Per-item
+// stream emission is kept - AWS streams emit one record per item regardless of
+// how it was written, and local projectors must see the same shape.
+// Unconditional, like BatchWriteItem.
 const getProcessKeyValueStoreUpsertMany = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
@@ -33,8 +33,8 @@ const getProcessKeyValueStoreUpsertMany = (
       // Validate EVERY item (scope rules + in-batch duplicate keys) before the
       // first write, for AWS parity: the awslambda processor maps/checks the
       // whole batch eagerly, so a bad item at position 3 means NOTHING lands.
-      // Interleaving validation with the write loop would leave items 1-2
-      // written and stream-emitted locally where prod writes nothing.
+      // Interleaving validation with the writes would leave items 1-2 written
+      // and stream-emitted locally where prod writes nothing.
       const seenKeys = new Set<string>();
       for (const item of items) {
         validateScopedKvsItemOrThrow(qpqConfig, keyValueStoreName, scope, item);
@@ -49,20 +49,19 @@ const getProcessKeyValueStoreUpsertMany = (
         seenKeys.add(itemKey);
       }
 
-      for (const item of items) {
-        // Read first only to tell an insert from a modify — keeps eventType honest
-        // for a generic consumer, exactly as the single Upsert does.
-        const existing = await repository.get(keyValueStoreName, toKvsCompositeKey(qpqConfig, keyValueStoreName, item), scope);
-        await repository.upsert(keyValueStoreName, item, {}, scope);
+      const results = await repository.upsertMany(keyValueStoreName, items, scope);
 
-        // Stand in for the change stream, AFTER the write has committed - see emitKvsStreamEvent.
+      // Stand in for the change stream, AFTER the batch has committed - see
+      // emitKvsStreamEvent. upsertMany reports what each write replaced, so
+      // Insert vs Modify stays right per item without re-reading.
+      for (const { item, oldItem } of results) {
         await emitKvsStreamEvent(qpqConfig, session, {
           keyValueStoreName,
-          eventType: existing ? KvsStreamEventType.Modify : KvsStreamEventType.Insert,
+          eventType: oldItem ? KvsStreamEventType.Modify : KvsStreamEventType.Insert,
           scope,
           keys: toKvsStreamKeys(qpqConfig, keyValueStoreName, item),
           newImage: item,
-          oldImage: existing ?? undefined,
+          oldImage: oldItem ?? undefined,
         });
       }
 

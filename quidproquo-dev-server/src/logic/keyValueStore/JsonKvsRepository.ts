@@ -14,7 +14,7 @@ import { StringDecoder } from 'string_decoder';
 
 import { applyUpdateToItem } from './applyKvsUpdates';
 import { evaluateKvsQueryOperation, validateKvsQueryOperation } from './evaluateKvsQueryOperation';
-import { KvsRepository } from './KvsRepository';
+import { KvsRepository, KvsUpsertManyResult } from './KvsRepository';
 import { getKvsItemPk } from './getKvsItemPk';
 import { getKvsItemSk } from './getKvsItemSk';
 import { compareKvsItemKeys, paginateKvsItems } from './paginateKvsItems';
@@ -392,6 +392,22 @@ export class JsonKvsRepository implements KvsRepository {
     this.scheduleFlush(state, storeConfig);
 
     return item;
+  }
+
+  async upsertMany(keyValueStoreName: string, items: any[], scope?: string): Promise<KvsUpsertManyResult[]> {
+    const storeConfig = this.getStoreConfig(keyValueStoreName);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
+
+    const results = items.map((item) => {
+      const storageKey = this.buildStorageKey(item, storeConfig);
+      const oldItem = state.items.get(storageKey) ?? null;
+      state.items.set(storageKey, item);
+      return { item, oldItem };
+    });
+
+    this.scheduleFlush(state, storeConfig);
+
+    return results;
   }
 
   async update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any> {
