@@ -15,7 +15,9 @@ import { StringDecoder } from 'string_decoder';
 import { applyUpdateToItem } from './applyKvsUpdates';
 import { evaluateKvsQueryOperation, validateKvsQueryOperation } from './evaluateKvsQueryOperation';
 import { KvsRepository } from './KvsRepository';
-import { compareKvsItemKeys, getPk, getSk, paginateKvsItems } from './paginateKvsItems';
+import { getKvsItemPk } from './getKvsItemPk';
+import { getKvsItemSk } from './getKvsItemSk';
+import { compareKvsItemKeys, paginateKvsItems } from './paginateKvsItems';
 
 interface KvsStoreState {
   keyValueStoreName: string;
@@ -90,8 +92,8 @@ export class JsonKvsRepository implements KvsRepository {
   }
 
   private buildStorageKey(item: any, storeConfig: KeyValueStoreQPQConfigSetting): string {
-    const pk = getPk(item, storeConfig);
-    const sk = getSk(item, storeConfig);
+    const pk = getKvsItemPk(item, storeConfig);
+    const sk = getKvsItemSk(item, storeConfig);
     return sk === null ? String(pk) : `${pk}#${sk}`;
   }
 
@@ -209,7 +211,7 @@ export class JsonKvsRepository implements KvsRepository {
     await fs.promises.mkdir(dir, { recursive: true });
 
     const items = [...state.items.values()].sort((a, b) =>
-      compareKvsItemKeys(getPk(a, storeConfig), getSk(a, storeConfig), getPk(b, storeConfig), getSk(b, storeConfig)),
+      compareKvsItemKeys(getKvsItemPk(a, storeConfig), getKvsItemSk(a, storeConfig), getKvsItemPk(b, storeConfig), getKvsItemSk(b, storeConfig)),
     );
 
     // Streamed, item-by-item serialization of the same `{ "items": [...] }` document.

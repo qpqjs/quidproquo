@@ -1,14 +1,12 @@
 import { KeyValueStoreQPQConfigSetting, QpqPagedData } from 'quidproquo-core';
 
+import { getKvsItemPk } from './getKvsItemPk';
+import { getKvsItemSk } from './getKvsItemSk';
+import { decodeKvsPageCursor, encodeKvsPageCursor } from './kvsPageCursor';
+
 // Items are held in memory with their native JS types (a numeric sort key is a
 // real `number`, not a stringified column), so plain `<`/`>` already orders
-// numeric and string keys correctly - no separate numeric-vs-lexical branch
-// needed, unlike the sqlite engine's CAST(sk AS REAL).
-export const getPk = (item: any, storeConfig: KeyValueStoreQPQConfigSetting): any => item[storeConfig.partitionKey.key];
-
-export const getSk = (item: any, storeConfig: KeyValueStoreQPQConfigSetting): any =>
-  storeConfig.sortKeys.length > 0 ? item[storeConfig.sortKeys[0].key] : null;
-
+// numeric and string keys correctly - no separate numeric-vs-lexical branch.
 const compareValues = (a: any, b: any): number => {
   if (a === b) {
     return 0;
@@ -21,19 +19,10 @@ export const compareKvsItemKeys = (aPk: any, aSk: any, bPk: any, bSk: any): numb
   return pkCmp !== 0 ? pkCmp : compareValues(aSk, bSk);
 };
 
-interface KvsPageCursor {
-  pk: any;
-  sk: any;
-}
-
-const decodeCursor = (nextPageKey: string): KvsPageCursor => JSON.parse(Buffer.from(nextPageKey, 'base64').toString());
-
-const encodeCursor = (item: any, storeConfig: KeyValueStoreQPQConfigSetting): string =>
-  Buffer.from(JSON.stringify({ pk: getPk(item, storeConfig), sk: getSk(item, storeConfig) } as KvsPageCursor)).toString('base64');
-
-// Sorts by pk then sk (ascending or descending) and applies opaque base64
-// {pk, sk} cursor pagination, fetching one extra row to detect `hasMore` -
-// same cursor format and limit+1 detection as SqliteKvsRepository.
+/**
+ * Sort by pk then sk (either direction) and apply {pk, sk} cursor pagination,
+ * fetching one extra row to detect hasMore.
+ */
 export const paginateKvsItems = (
   items: any[],
   storeConfig: KeyValueStoreQPQConfigSetting,
@@ -42,14 +31,14 @@ export const paginateKvsItems = (
   limit?: number,
 ): QpqPagedData<any> => {
   const sorted = [...items].sort((a, b) => {
-    const cmp = compareKvsItemKeys(getPk(a, storeConfig), getSk(a, storeConfig), getPk(b, storeConfig), getSk(b, storeConfig));
+    const cmp = compareKvsItemKeys(getKvsItemPk(a, storeConfig), getKvsItemSk(a, storeConfig), getKvsItemPk(b, storeConfig), getKvsItemSk(b, storeConfig));
     return sortAscending ? cmp : -cmp;
   });
 
-  const cursor = nextPageKey ? decodeCursor(nextPageKey) : undefined;
+  const cursor = nextPageKey ? decodeKvsPageCursor(nextPageKey) : undefined;
   const afterCursor = cursor
     ? sorted.filter((item) => {
-        const cmp = compareKvsItemKeys(getPk(item, storeConfig), getSk(item, storeConfig), cursor.pk, cursor.sk);
+        const cmp = compareKvsItemKeys(getKvsItemPk(item, storeConfig), getKvsItemSk(item, storeConfig), cursor.pk, cursor.sk);
         return sortAscending ? cmp > 0 : cmp < 0;
       })
     : sorted;
@@ -61,6 +50,6 @@ export const paginateKvsItems = (
 
   return {
     items: resultItems,
-    nextPageKey: hasMore ? encodeCursor(resultItems[resultItems.length - 1], storeConfig) : undefined,
+    nextPageKey: hasMore ? encodeKvsPageCursor(resultItems[resultItems.length - 1], storeConfig) : undefined,
   };
 };
