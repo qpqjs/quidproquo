@@ -1,5 +1,5 @@
 # Runtime image for `qpq go` on the docker platform: the QPQ dev server
-# (a full local platform emulation — JSON-file KVS, file storage, queues,
+# (a full local platform emulation — sqlite KVS, file storage, queues,
 # websockets) hosting every service of the app, plus the pre-built views.
 #
 # The server bundle externalizes bare packages (native modules must load from

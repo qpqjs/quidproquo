@@ -28,6 +28,17 @@ describe('getDevServerRspackConfig', () => {
     expect(config.output?.path).toBe(path.join(root, 'dist', 'qpq', 'dev-server'));
   });
 
+  it('externalises node:sqlite to the runtime builtin (the dev-server kvs engine loads it)', async () => {
+    const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
+    const externalise = (config.externals as any[])[0] as (data: any, callback: (err?: Error, result?: string) => void) => void;
+
+    const resolved = await new Promise((resolve, reject) => {
+      externalise({ request: 'node:sqlite', context: root }, (error?: Error, result?: string) => (error ? reject(error) : resolve(result)));
+    });
+
+    expect(resolved).toBe('commonjs node:sqlite');
+  });
+
   it('includes the shared backend swc TS rules (same as the lambda builds)', () => {
     const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
     const rules = (config.module?.rules ?? []) as RuleSetRule[];

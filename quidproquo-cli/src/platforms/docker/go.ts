@@ -10,7 +10,7 @@
 //      and the locally-built quidproquo packages as a vendor overlay.
 //   4. docker build, then print the run command.
 //
-// Not production-grade (single process, JSON-file KVS, in-memory queues) —
+// Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
 

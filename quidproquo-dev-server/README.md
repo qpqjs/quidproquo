@@ -16,9 +16,11 @@ The point of the dev server is that local behaviour matches deployed behaviour. 
 
 ## Where local data lives
 
-Key value store data is one JSON file per store, under `<runtimePath>/kvs/<serviceName>/<storeName>.json`, where `runtimePath` defaults to `.qpq-runtime`. Each file is a pretty-printed `{ "items": [...] }` you can open, diff, or hand-edit.
+Key value store data lives in one sqlite database at `<runtimePath>/kvs/kvs.db`, where `runtimePath` defaults to `.qpq-runtime`. One table per store (`qpq_kvs_<ownerModule>_<storeName>`), with a `scope` column for tenant partitions and the raw item JSON in `data`. Writes commit straight to disk, so there is no flush window and every service sees current data.
 
-Data is held in memory while the server runs and flushed to disk on a short debounce, so edits made while the server is running will be overwritten by the next flush. Stop the server before editing a store file by hand.
+To inspect it, use anything that speaks sqlite: `sqlite3 .qpq-runtime/kvs/kvs.db`, TablePlus, DB Browser, or the VS Code sqlite extension. The db is safe to read while the server runs (WAL mode); stop the server before writing to it by hand.
+
+The engine is Node's built-in `node:sqlite`, which needs Node 22.13 or newer (no flag from 22.13, no experimental warning from 24). Leftover `kvs/**/*.json` files from the previous json engine are not read or migrated; the server prints a one-time note and you can delete them.
 
 ## Status
 
