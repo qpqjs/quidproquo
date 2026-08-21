@@ -10,10 +10,11 @@ import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
-// Regression guard for getKvsRepository's singleton-per-service cache: if the
-// upsert and get processors ever went back to holding independent repository
-// instances, this write-through-one-read-through-another test would fail
-// (or, with an in-memory JSON engine, silently see stale data).
+// Pins write-through-one-processor-read-through-another at the processor
+// level. The sqlite engine makes this hold even across repository instances
+// (every handle sees committed data), so unlike in the json-engine days the
+// getKvsRepository cache is no longer load-bearing for correctness - this
+// guards the processor wiring itself.
 describe('KVS processors share one repository instance per service', () => {
   const moduleName = 'shared-kvs-repository-test';
   let runtimePath: string;

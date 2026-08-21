@@ -17,8 +17,9 @@ import { ResolvedDevServerConfig } from '../../../types';
 // Every row in the store, across every scope, each tagged with the scope it came from.
 // Migration-only: see askKeyValueStoreScanAllScopes for why this exception exists.
 //
-// The json backend partitions by FILE rather than by composed key, so crossing scopes means
-// walking the scope folders and reading each partition, plus the unscoped one. Items come
+// The sqlite engine partitions by a scope COLUMN rather than by composed key, so crossing
+// scopes means listing the scopes with data and reading each partition, plus the unscoped
+// one. Items come
 // back raw either way, so a caller sees the same shape as the DynamoDB processor produces
 // after it decomposes the key.
 //

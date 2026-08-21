@@ -4,7 +4,8 @@ import { askRunPendingMigrations } from 'quidproquo-webserver';
 import * as crypto from 'crypto';
 import path from 'path';
 
-import { getKvsRepository } from './logic/keyValueStore/getKvsRepository';
+import { closeAllKvsRepositories } from './logic/keyValueStore/getKvsRepository';
+import { warnIfLegacyJsonKvsStores } from './logic/keyValueStore/warnIfLegacyJsonKvsStores';
 import {
   apiImplementation,
   awaitQueueIdle,
@@ -59,10 +60,22 @@ const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfi
   };
 };
 
+// Checkpoint the kvs WAL on the way out (SIGINT from a terminal, SIGTERM from
+// docker). Durability never needs this - sqlite commits at the statement - it
+// just folds kvs.db-wal back into kvs.db so a stopped server leaves one file.
+const closeKvsRepositoriesAndExit = (): void => {
+  void closeAllKvsRepositories().finally(() => process.exit(0));
+};
+
 export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
   console.log('Starting QPQ Dev Server!!! - this is a note');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
+
+  warnIfLegacyJsonKvsStores(resolvedDevServerConfig.runtimePath);
+
+  process.once('SIGINT', closeKvsRepositoriesAndExit);
+  process.once('SIGTERM', closeKvsRepositoriesAndExit);
 
   await Promise.all([
     apiImplementation(resolvedDevServerConfig),
@@ -128,14 +141,9 @@ export const runMigrations = async (
     ran[serviceName] = result.result ?? [];
   }
 
-  // Kvs writes are debounced behind an unref'd timer, so without this a one-shot command can
-  // report a successful migration and exit with the rows still only in memory. Found the hard
-  // way: the last service migrated always lost its writes.
-  //
-  // One repository per service, so every config has to be flushed, not just the first.
-  await Promise.all(
-    resolvedDevServerConfig.qpqConfigs.map((serviceQpqConfig) => getKvsRepository(serviceQpqConfig, resolvedDevServerConfig).flushAll()),
-  );
+  // Sqlite commits at the statement, so every migration write is already on
+  // disk; closing just checkpoints the WAL before the one-shot process exits.
+  await closeAllKvsRepositories();
 
   return ran;
 };

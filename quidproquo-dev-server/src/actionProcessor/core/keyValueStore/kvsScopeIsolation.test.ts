@@ -10,6 +10,7 @@ import {
 } from 'quidproquo-core';
 
 import * as fs from 'fs';
+import { DatabaseSync } from 'node:sqlite';
 import * as os from 'os';
 import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -23,9 +24,9 @@ import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryAct
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
-// End-to-end scope isolation through the real JSON repository: an item written
-// under one scope must be invisible to other scopes and to unscoped access,
-// and callers must never see the composed pk form.
+// End-to-end scope isolation through the real sqlite repository: an item
+// written under one scope must be invisible to other scopes and to unscoped
+// access, and callers must never see the composed pk form.
 describe('KVS scope isolation', () => {
   // getKvsRepository caches one repository per service name for the process
   // lifetime, so each test gets its own module name to isolate its store data.
@@ -82,24 +83,25 @@ describe('KVS scope isolation', () => {
     expect(resolveActionResult(unscoped)).toBeNull();
   });
 
-  it('lays scoped stores out as per-scope json files on disk', async () => {
+  it('partitions scoped and unscoped rows by the scope column in one table', async () => {
     const { upsert } = await getProcessors();
 
     await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
     await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' } });
 
-    await getKvsRepository(qpqConfig(), devServerConfig()).close();
+    const db = new DatabaseSync(path.join(runtimePath, 'kvs', 'kvs.db'));
+    try {
+      const rows = db.prepare(`SELECT scope, data FROM "qpq_kvs_${moduleName}_widgets" ORDER BY scope`).all() as any[];
 
-    const scopedFile = path.join(runtimePath, 'kvs', moduleName, 'tenant-a', 'widgets.json');
-    const unscopedFile = path.join(runtimePath, 'kvs', moduleName, 'widgets.json');
-
-    expect(fs.existsSync(scopedFile)).toBe(true);
-    expect(fs.existsSync(unscopedFile)).toBe(true);
-
-    // Items are stored RAW - the file boundary is the partition, so the json
-    // stays human-readable with no composed key values.
-    expect(JSON.parse(fs.readFileSync(scopedFile, 'utf-8')).items).toEqual([{ id: 'w1', name: 'A' }]);
-    expect(JSON.parse(fs.readFileSync(unscopedFile, 'utf-8')).items).toEqual([{ id: 'w2', name: 'B' }]);
+      // Items are stored RAW - the scope column is the partition, so the data
+      // json carries no composed key values ('' means unscoped).
+      expect(rows).toEqual([
+        { scope: '', data: JSON.stringify({ id: 'w2', name: 'B' }) },
+        { scope: 'tenant-a', data: JSON.stringify({ id: 'w1', name: 'A' }) },
+      ]);
+    } finally {
+      db.close();
+    }
   });
 
   it('keeps unscoped items invisible to scoped reads', async () => {

@@ -10,8 +10,9 @@ import {
 import { getNestedValue } from './applyKvsUpdates';
 
 // 'pk' and 'sk' are literal key names the query DSL uses to mean "the store's
-// configured partition/sort key attribute", not real attribute names - mirrors
-// the pk/sk column mapping SqliteKvsRepository.buildWhereClause performs.
+// configured partition/sort key attribute", not real attribute names - the
+// same aliases buildKvsKeyNarrowing recognizes when it maps them to the
+// sqlite key columns.
 const getConditionValue = (item: any, key: string, storeConfig: KeyValueStoreQPQConfigSetting): any => {
   if (key === 'pk') {
     return item[storeConfig.partitionKey.key];
@@ -70,9 +71,9 @@ const evaluateCondition = (item: any, condition: KvsQueryCondition, storeConfig:
   }
 };
 
-// Throws eagerly on an unsupported operation type, independent of what data (if
-// any) is in the store - matches SqliteKvsRepository, which fails while building
-// the SQL WHERE clause rather than while scanning rows.
+// Throws eagerly on an unsupported operation type, independent of what data
+// (if any) is in the store, so a bad query fails loudly even against an empty
+// store.
 export const validateKvsQueryOperation = (operation: KvsQueryOperation): void => {
   if ('conditions' in operation) {
     (operation as KvsLogicalOperator).conditions.forEach(validateKvsQueryOperation);
@@ -85,6 +86,9 @@ export const validateKvsQueryOperation = (operation: KvsQueryOperation): void =>
   }
 };
 
+// The query-semantics authority: every candidate row passes through here,
+// whatever SQL narrowing ran first, so there is exactly one implementation of
+// the operators to keep correct (see buildKvsKeyNarrowing).
 export const evaluateKvsQueryOperation = (item: any, operation: KvsQueryOperation, storeConfig: KeyValueStoreQPQConfigSetting): boolean => {
   if ('conditions' in operation) {
     const logicalOp = operation as KvsLogicalOperator;

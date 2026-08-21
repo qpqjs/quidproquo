@@ -716,5 +716,147 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
         expect(await repo.get('user-sessions', 's1')).toEqual({ id: 's1', active: true });
       });
     });
+
+    describe('scope', () => {
+      it('isolates a scoped item from other scopes and from unscoped access', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'A' }, undefined, 'tenant-a');
+
+        expect(await repo.get('users', 'u1', 'tenant-a')).toEqual({ id: 'u1', name: 'A' });
+        expect(await repo.get('users', 'u1', 'tenant-b')).toBeNull();
+        expect(await repo.get('users', 'u1')).toBeNull();
+      });
+
+      it('keeps unscoped items invisible to scoped reads', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'Global' });
+
+        expect(await repo.get('users', 'u1', 'tenant-a')).toBeNull();
+      });
+
+      it('holds independent items for the same key under two scopes', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'A' }, undefined, 'tenant-a');
+        await repo.upsert('users', { id: 'u1', name: 'B' }, undefined, 'tenant-b');
+
+        expect(await repo.get('users', 'u1', 'tenant-a')).toEqual({ id: 'u1', name: 'A' });
+        expect(await repo.get('users', 'u1', 'tenant-b')).toEqual({ id: 'u1', name: 'B' });
+      });
+
+      it('restricts query, scan and getAll to the scope', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'A' }, undefined, 'tenant-a');
+        await repo.upsert('users', { id: 'u2', name: 'B' }, undefined, 'tenant-b');
+        await repo.upsert('users', { id: 'u3', name: 'C' });
+
+        const queried = await repo.query(
+          'users',
+          { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'u1' },
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          true,
+          'tenant-a',
+        );
+        expect(queried.items).toEqual([{ id: 'u1', name: 'A' }]);
+
+        const scanned = await repo.scan('users', undefined, undefined, undefined, 'tenant-a');
+        expect(scanned.items).toEqual([{ id: 'u1', name: 'A' }]);
+
+        expect(await repo.getAll('users', 'tenant-a')).toEqual([{ id: 'u1', name: 'A' }]);
+        expect(await repo.getAll('users')).toEqual([{ id: 'u3', name: 'C' }]);
+      });
+
+      it('deletes only within the scope', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'A' }, undefined, 'tenant-a');
+        await repo.upsert('users', { id: 'u1', name: 'B' }, undefined, 'tenant-b');
+
+        expect(await repo.delete('users', 'u1', 'tenant-a')).toBe(true);
+
+        expect(await repo.get('users', 'u1', 'tenant-a')).toBeNull();
+        expect(await repo.get('users', 'u1', 'tenant-b')).toEqual({ id: 'u1', name: 'B' });
+      });
+
+      it('scopes upsertMany and reports replaced rows per scope', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'old' }, undefined, 'tenant-a');
+
+        const results = await repo.upsertMany(
+          'users',
+          [
+            { id: 'u1', name: 'new' },
+            { id: 'u2', name: 'B' },
+          ],
+          'tenant-a',
+        );
+
+        expect(results).toEqual([
+          { item: { id: 'u1', name: 'new' }, oldItem: { id: 'u1', name: 'old' } },
+          { item: { id: 'u2', name: 'B' }, oldItem: null },
+        ]);
+        expect(await repo.get('users', 'u1')).toBeNull();
+        expect(await repo.get('users', 'u2', 'tenant-a')).toEqual({ id: 'u2', name: 'B' });
+      });
+    });
+
+    describe('listScopes', () => {
+      it('lists only the scopes holding data for the store, excluding unscoped', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1' });
+        await repo.upsert('users', { id: 'u2' }, undefined, 'tenant-a');
+        await repo.upsert('users', { id: 'u3' }, undefined, 'tenant-b');
+
+        expect((await repo.listScopes('users')).sort()).toEqual(['tenant-a', 'tenant-b']);
+      });
+
+      it('returns an empty list for a store with no scoped data', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1' });
+
+        expect(await repo.listScopes('users')).toEqual([]);
+      });
+
+      it('lists scopes for a store owned by another module', async () => {
+        // Regression: the json engine listed scopes under the application
+        // module's directory while reads and writes used the owner module's,
+        // so scan-all-scopes over a shared store silently saw only unscoped
+        // data. In the contract so no engine reintroduces the split.
+        const repo = make([defineKeyValueStore('widgets', { key: 'id', type: 'string' }, [], { owner: { module: 'other-service' } })]);
+        await repo.upsert('widgets', { id: 'w1' }, undefined, 'tenant-a');
+
+        expect(await repo.listScopes('widgets')).toEqual(['tenant-a']);
+      });
+    });
+
+    describe('cross-instance visibility', () => {
+      // One repository per service over one shared runtime path means a store
+      // owned by A and read by B crosses instances on every request, so
+      // committed writes must be visible across instances immediately.
+      it('sees another instance write through a second repository over the same runtime path', async () => {
+        const settings = [defineKeyValueStore('users', { key: 'id', type: 'string' })];
+        const writer = make(settings);
+        const reader = make(settings);
+
+        await writer.upsert('users', { id: 'u1', version: 1 });
+        expect(await reader.get('users', 'u1')).toEqual({ id: 'u1', version: 1 });
+
+        // The original staleness bug: the reader has already touched the
+        // store; a later write through the other instance must still come
+        // back, not a cached first-read snapshot.
+        await writer.upsert('users', { id: 'u1', version: 2 });
+        expect(await reader.get('users', 'u1')).toEqual({ id: 'u1', version: 2 });
+      });
+    });
+
+    describe('durability', () => {
+      it('makes a resolved write visible to a freshly constructed repository, with no close and no flush', async () => {
+        const settings = [defineKeyValueStore('users', { key: 'id', type: 'string' })];
+        await make(settings).upsert('users', { id: 'u1', name: 'A' });
+
+        expect(await make(settings).get('users', 'u1')).toEqual({ id: 'u1', name: 'A' });
+      });
+    });
   });
 }

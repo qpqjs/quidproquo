@@ -15,7 +15,7 @@ export const toKvsStreamKeys = (qpqConfig: QPQConfig, keyValueStoreName: string,
   return Object.fromEntries(keyAttributes.map((attribute) => [attribute.key, item[attribute.key]]));
 };
 
-// The composite key the json backend stores an item under: `pk` alone, or `pk#sk`. Mirrors
+// The composite key string the dev server addresses an item by: `pk` alone, or `pk#sk`. Mirrors
 // what the get/delete processors build from an explicit key + sortKey, but derived from a
 // whole item, which is what an upsert has to work with.
 export const toKvsCompositeKey = (qpqConfig: QPQConfig, keyValueStoreName: string, item: Record<string, unknown>): string => {

@@ -22,8 +22,8 @@ const getProcessKeyValueStoreScan = (
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
 
-      // The json backend partitions per-scope at the FILE level, so a scoped
-      // scan just iterates the scope's own file - no injected filter needed.
+      // The sqlite engine partitions per-scope at the ROW level, so a scoped
+      // scan just iterates the scope's own rows - no injected filter needed.
       if (scope !== undefined) {
         resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
       }

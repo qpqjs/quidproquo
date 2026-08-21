@@ -22,8 +22,8 @@ const getProcessKeyValueStoreQuery = (
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
 
-      // The json backend partitions per-scope at the FILE level, so the query
-      // conditions run unmodified against the scope's own file. The validation
+      // The sqlite engine partitions per-scope at the ROW level, so the query
+      // conditions run unmodified against the scope's own rows. The validation
       // is pure dynamo parity: a query that only works locally must fail here
       // too, not in production - a scoped query must constrain the real pk
       // attribute (the local DSL's 'pk' alias is unknown to the dynamo

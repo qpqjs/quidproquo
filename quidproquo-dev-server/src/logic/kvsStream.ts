@@ -35,9 +35,9 @@ export type KvsStreamEmission = {
  * - ONE record per write. There is no batching, so `coalesceByPartitionKey` has nothing to
  *   collapse and a burst of writes runs the handler once each. Slower, never wrong: handlers
  *   have to be idempotent to survive stream retries anyway.
- * - Keys and images are already raw. The json backend stores items verbatim and partitions by
- *   scope at the FILE level, so there is no composed partition key to take apart the way the
- *   DynamoDB processor must. The scope travels as its own field instead, which lands the
+ * - Keys and images are already raw. The sqlite engine stores items verbatim and partitions
+ *   by scope at the ROW level, so there is no composed partition key to take apart the way
+ *   the DynamoDB processor must. The scope travels as its own field instead, which lands the
  *   handler in exactly the same shape.
  */
 export const emitKvsStreamEvent = async (qpqConfig: QPQConfig, session: StorySession, emission: KvsStreamEmission): Promise<void> => {

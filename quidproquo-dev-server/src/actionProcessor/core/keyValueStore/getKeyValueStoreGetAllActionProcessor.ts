@@ -22,8 +22,8 @@ const getProcessKeyValueStoreGetAll = (
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
 
-      // The json backend partitions per-scope at the FILE level, so a scoped
-      // get-all just reads the scope's own file - the validation here is kept
+      // The sqlite engine partitions per-scope at the ROW level, so a scoped
+      // get-all just reads the scope's own rows - the validation here is kept
       // purely for dynamo error parity.
       if (scope !== undefined) {
         resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);

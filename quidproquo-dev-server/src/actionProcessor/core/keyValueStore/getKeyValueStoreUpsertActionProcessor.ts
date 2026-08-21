@@ -25,11 +25,12 @@ const getProcessKeyValueStoreUpsert = (
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
 
-      // The json backend partitions per-scope at the FILE level, so the item is
-      // stored raw - the scope just selects which file the store writes to.
-      // The item's pk value is still validated for AWS parity: a write prod
-      // rejects (bad scope, or the reserved scope delimiter in the raw value,
-      // scoped or not) must fail locally too.
+      // The sqlite engine partitions per-scope at the ROW level (a scope
+      // column in the primary key), so the item is stored raw - the scope just
+      // selects which rows the store writes. The item's pk value is still
+      // validated for AWS parity: a write prod rejects (bad scope, or the
+      // reserved scope delimiter in the raw value, scoped or not) must fail
+      // locally too.
       validateScopedKvsItemOrThrow(qpqConfig, keyValueStoreName, scope, item);
 
       // Read first only to tell an insert from a modify, the one thing the write itself does
