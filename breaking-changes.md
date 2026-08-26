@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.17
+
 - `HTTPNetworkResponse` (`quidproquo-core`, returned by `askNetworkRequest`) gains a required `setCookies: string[]` field carrying every raw `Set-Cookie` line in order. Code constructing an `HTTPNetworkResponse` by hand must add this field (`[]` if not applicable).
 - `askClaudeAiMessagesApi`, `ClaudeAiActionType`, `defineClaudeAI`, `ClaudeAIModelSize`, `ClaudeAIQPQConfigSetting`, `QPQConfigAdvancedClaudeAISettings`, and `getAllClaudeAiConfigs` (`quidproquo-core`) are removed with no direct replacement. Use the provider-agnostic `askAiPrompt`/`askAiPromptStream` actions with `defineAi` instead, or call the Anthropic API yourself via `askNetworkRequest`.
 - `ConfigGetSecretErrorTypeEnum` (`quidproquo-core`) is removed; use `askConfigGetSecret.errorTypeEnum` instead (e.g. `askConfigGetSecret.errorTypeEnum.ResourceNotFound`).

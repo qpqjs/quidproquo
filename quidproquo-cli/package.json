@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-cli",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "The qpq CLI — build, dev and deploy orchestration for QPQ apps",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -44,21 +44,21 @@
     "@rspack/dev-server": "^2.1.0",
     "aws-cdk": "^2.1132.1",
     "madge": "^8.0.0",
-    "quidproquo": "0.1.16",
-    "quidproquo-actionprocessor-awslambda": "0.1.16",
-    "quidproquo-config-aws": "0.1.16",
-    "quidproquo-core": "0.1.16",
-    "quidproquo-deploy-awscdk": "0.1.16",
-    "quidproquo-deploy-rspack": "0.1.16",
-    "quidproquo-dev-server": "0.1.16",
-    "quidproquo-webserver": "0.1.16",
+    "quidproquo": "0.1.17",
+    "quidproquo-actionprocessor-awslambda": "0.1.17",
+    "quidproquo-config-aws": "0.1.17",
+    "quidproquo-core": "0.1.17",
+    "quidproquo-deploy-awscdk": "0.1.17",
+    "quidproquo-deploy-rspack": "0.1.17",
+    "quidproquo-dev-server": "0.1.17",
+    "quidproquo-webserver": "0.1.17",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
     "@rspack/core": "^2.1.2",
     "@types/node": "^22.13.13",
-    "quidproquo-tsconfig": "0.1.16"
+    "quidproquo-tsconfig": "0.1.17"
   },
   "bin": {
     "qpq": "./lib/commonjs/bin/qpq.js"

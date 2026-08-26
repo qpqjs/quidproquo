@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.17
+
+- core: `createActionRequester` and `createActionProcessor` factories, and every built-in action across the packages is migrated to them. A requester now carries its own payload type and error enum (`askX.errorTypeEnum`), and a processor types its handler as `ProcessorFor<typeof askX>`
+- `askNetworkRequest` responses expose every raw `Set-Cookie` line in order via a new `setCookies` field
+- dev-server: the kvs engine moves from a json file to sqlite (node:sqlite) and batches upsert-many writes, so large stores no longer hit the string-size limit
+- core: `askBatch` skips yielding an action for empty input
+- readmes and package repo urls point at the qpqjs org, and all packages publish with public access
+
+### Breaking changes
+
+- `HTTPNetworkResponse` gains a required `setCookies: string[]` field
+- the claudeAi action and config (`askClaudeAiMessagesApi`, `defineClaudeAI` and friends) are removed; use `askAiPrompt` with `defineAi`
+- per-action type exports (`*ActionPayload`, `*Action`, `*ActionProcessor`, `*ActionRequester`) and standalone error enums are removed across all domains; use `ProcessorFor<typeof askX>` and `askX.errorTypeEnum`
+
 ## 0.1.16
 
 - event docs: paging an ascending event list no longer races a snapshot written between pages (the continuation dropped the stale lower bound that could push the cursor outside the key condition and trip a DynamoDB ValidationException)
