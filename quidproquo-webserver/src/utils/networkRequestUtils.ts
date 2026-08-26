@@ -138,6 +138,11 @@ const parseResponseData = async (payload: NetworkRequestActionPayload<any>, resp
   }
 };
 
+// Headers.forEach yields only the last set-cookie value; the full list is only reachable
+// via getSetCookie(). Guarded because not every runtime's Headers implements it
+// (older node, some fetch polyfills); those degrade to [] rather than throwing.
+const getSetCookies = (headers: Headers): string[] => (typeof headers.getSetCookie === 'function' ? headers.getSetCookie() : []);
+
 const headersToRecord = (headers: Headers): Record<string, string> => {
   const record: Record<string, string> = {};
 
@@ -161,6 +166,7 @@ export const executeNetworkRequest = async <R>(payload: NetworkRequestActionPayl
 
     return {
       headers: headersToRecord(response.headers),
+      setCookies: getSetCookies(response.headers),
       status: response.status,
       statusText: response.statusText,
       data: await parseResponseData(payload, response),

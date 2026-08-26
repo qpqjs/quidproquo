@@ -10,6 +10,7 @@ export const preformNetworkRequest = async <R>(payload: NetworkRequestActionPayl
 
     const errorResponse: HTTPNetworkResponse<R> = {
       headers: {},
+      setCookies: [],
       status: 500,
       statusText: 'Internal Server Error',
       data: err.stack,

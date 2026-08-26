@@ -9,7 +9,8 @@ const fetchMock = vi.fn();
 interface FakeResponseInit {
   status?: number;
   statusText?: string;
-  headers?: Record<string, string>;
+  // Array-of-pairs form allows repeated header names (multiple Set-Cookie lines).
+  headers?: Record<string, string> | [string, string][];
   body?: unknown;
 }
 
@@ -60,6 +61,7 @@ describe('executeNetworkRequest', () => {
 
     expect(result).toEqual({
       headers: { 'content-type': 'application/json' },
+      setCookies: [],
       status: 200,
       statusText: 'OK',
       data: { hello: 'world' },
@@ -194,5 +196,42 @@ describe('executeNetworkRequest', () => {
     fetchMock.mockRejectedValue(new Error('network down'));
 
     await expect(executeNetworkRequest(buildPayload())).rejects.toThrow('network down');
+  });
+
+  // Headers.forEach collapses repeated set-cookie to the last value, so `headers` cannot
+  // carry a multi-cookie login (session + CSRF); `setCookies` must preserve every line.
+  it('returns every set-cookie line in order via setCookies', async () => {
+    fetchMock.mockResolvedValue(
+      fakeResponse({
+        headers: [
+          ['set-cookie', 'neilsens_session=abc123; Path=/; HttpOnly'],
+          ['set-cookie', 'XSRF-TOKEN=xyz789; Path=/; SameSite=Lax'],
+          ['content-type', 'application/json'],
+        ],
+        body: { ok: true },
+      }),
+    );
+
+    const result = await executeNetworkRequest(buildPayload());
+
+    expect(result.setCookies).toEqual(['neilsens_session=abc123; Path=/; HttpOnly', 'XSRF-TOKEN=xyz789; Path=/; SameSite=Lax']);
+  });
+
+  it('returns an empty setCookies list when the response sets no cookies', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ headers: { 'content-type': 'application/json' }, body: { ok: true } }));
+
+    const result = await executeNetworkRequest(buildPayload());
+
+    expect(result.setCookies).toEqual([]);
+  });
+
+  it('degrades setCookies to an empty list when the runtime Headers lacks getSetCookie', async () => {
+    const response = fakeResponse({ headers: [['set-cookie', 'sid=abc; Path=/']], body: { ok: true } });
+    (response.headers as unknown as Record<string, unknown>).getSetCookie = undefined;
+    fetchMock.mockResolvedValue(response);
+
+    const result = await executeNetworkRequest(buildPayload());
+
+    expect(result.setCookies).toEqual([]);
   });
 });

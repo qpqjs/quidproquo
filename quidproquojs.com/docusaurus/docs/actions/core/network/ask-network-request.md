@@ -64,6 +64,7 @@ function* askNetworkRequest<T, R>(
 | `status` | `number` | The HTTP status code. |
 | `statusText` | `string` | The HTTP status text. |
 | `headers` | `Record<string, string>` | The response headers. |
+| `setCookies` | `string[]` | Every raw `Set-Cookie` header line, attributes intact, in response order. `headers` can only carry the last one (`fetch` collapses duplicates), so a multi-cookie response (e.g. session + CSRF) needs this list instead. Always `[]` in browser runtimes, since `Set-Cookie` is a forbidden response header there. |
 
 The response is returned for any completed HTTP exchange, including non-2xx statuses — inspect `status` yourself; a `404` or `500` does not throw.
 
