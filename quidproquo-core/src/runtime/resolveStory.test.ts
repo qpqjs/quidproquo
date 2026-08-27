@@ -31,6 +31,21 @@ const run = (story: any, args: any[], processors: any, callerSession = buildTest
     noopDynamicModuleLoader as any,
   );
 
+const runWithRuntimeInfo = (story: any, args: any[], processors: any, dynamicModuleLoader: any, qpqFunctionRuntimeInfo: any) =>
+  resolveStory(
+    story,
+    args,
+    qpqConfig,
+    buildTestStorySession(),
+    buildActionProcessorResolver(processors),
+    getTestTimeNow,
+    logger,
+    'corr-run',
+    QpqRuntimeType.UNIT_TEST,
+    dynamicModuleLoader,
+    qpqFunctionRuntimeInfo,
+  );
+
 describe('resolveStory', () => {
   it('runs a story to completion and records history per action', async () => {
     function* story(): AskResponse<string> {
@@ -121,6 +136,56 @@ describe('resolveStory', () => {
 
     expect(result.error?.errorType).toBe(ErrorTypeEnum.GenericError);
     expect(result.error?.errorText).toContain('Story depth exceeded');
+  });
+
+  it('merges runtime-attached action processor overrides over the base list', async () => {
+    function* story(): AskResponse<string> {
+      const base: string = yield { type: 'BaseOnly' };
+      const overridden: string = yield { type: 'Overridden' };
+      return `${base}-${overridden}`;
+    }
+
+    // The runtime attaches one override source; the loader resolves it to a
+    // resolver providing a replacement for the Overridden action only.
+    const loadOverrideSource = async () => async () => ({
+      Overridden: async () => actionResult('override'),
+    });
+
+    const runtimeInfo = {
+      basePath: '/service/src',
+      relativePath: '/overrides::getOverrides',
+      functionName: 'getOverrides',
+      actionProcessors: [{ basePath: '/service/src', relativePath: '/overrides/impl::getOverrides', functionName: 'getOverrides' }],
+    };
+
+    const result = await runWithRuntimeInfo(
+      story,
+      [],
+      {
+        BaseOnly: async () => actionResult('base'),
+        Overridden: async () => actionResult('service-wide'),
+      },
+      loadOverrideSource,
+      runtimeInfo,
+    );
+
+    expect(result.error).toBeUndefined();
+    expect(result.result).toBe('base-override');
+  });
+
+  it('does not load overrides for a runtime with none attached', async () => {
+    function* story(): AskResponse<string> {
+      const value: string = yield { type: 'Ping' };
+      return value;
+    }
+
+    const loader = vi.fn();
+
+    const result = await runWithRuntimeInfo(story, [], { Ping: async () => actionResult('pong') }, loader, '/plain/relative::runtime');
+
+    expect(result.error).toBeUndefined();
+    expect(result.result).toBe('pong');
+    expect(loader).not.toHaveBeenCalled();
   });
 
   it('captures an uncaught throw as a GenericError', async () => {

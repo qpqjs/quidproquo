@@ -567,6 +567,22 @@ describe('qpqCoreUtils', () => {
       expect(entries).toEqual(expect.arrayContaining(['/ap/get::handler', '/s/daily::run', '/q/created::run', '/inline/run::handler']));
     });
 
+    it('sweeps runtime-attached action processor override sources into the entries', () => {
+      // A missing override source here means the bundler never builds it, the deployed
+      // bundle omits it, and the dynamic load fails at runtime.
+      const overrideSource = { basePath: '/svc/src', relativePath: '/smoke/processors::getAuthOverrides', functionName: 'getAuthOverrides' };
+      const withOverrides = buildTestQpqConfig([
+        defineInlineFunction({
+          basePath: '/svc/src',
+          relativePath: '/inline/run::handler',
+          functionName: 'handler',
+          actionProcessors: [overrideSource],
+        }),
+      ]);
+
+      expect(getAllSrcEntries(withOverrides)).toContainEqual(overrideSource);
+    });
+
     it("includes a store's change-stream handler", () => {
       // Anything missing here is never bundled, so its handler cannot be resolved at runtime
       // and simply never runs. Nothing throws — the only symptom is whatever it maintained

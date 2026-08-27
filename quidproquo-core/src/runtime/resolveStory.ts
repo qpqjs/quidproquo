@@ -6,7 +6,8 @@ import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { Action, ActionProcessorList } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
-import { isQpqFunctionRuntimeAdvanced } from '../utils';
+import { getGlobalsFromQpqFunctionRuntime } from '../utils';
+import { mergeRuntimeActionProcessors } from './mergeRuntimeActionProcessors';
 import { processAction } from './processAction';
 
 export async function resolveStory<TArgs extends Array<any>>(
@@ -24,11 +25,21 @@ export async function resolveStory<TArgs extends Array<any>>(
   initialTags?: string[],
   streamRegistry?: StreamRegistry,
 ): Promise<StoryResult<any>> {
-  const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig, dynamicModuleLoader);
+  // Runtime-attached action processor overrides merge over the base list, last
+  // wins. In-process nested executions (EXECUTE_STORY, EXECUTE_IMPLEMENTATION_STORY)
+  // inherit the caller's merged list for free: their processors pass it through as
+  // this call's getActionProcessors. Transport boundaries build the base list fresh
+  // from their own runtime's registration.
+  const actionProcessors: ActionProcessorList = await mergeRuntimeActionProcessors(
+    qpqConfig,
+    qpqFunctionRuntimeInfo,
+    await getActionProcessors(qpqConfig, dynamicModuleLoader),
+    dynamicModuleLoader,
+  );
   const registry = streamRegistry ?? createStreamRegistry();
   const reader = story(...args);
 
-  const runtimeGlobals = qpqFunctionRuntimeInfo && isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.globals : undefined;
+  const runtimeGlobals = getGlobalsFromQpqFunctionRuntime(qpqFunctionRuntimeInfo);
 
   let storyProgress: IteratorResult<Action<any>, any> | null = null;
   let storySession: StorySession = {
