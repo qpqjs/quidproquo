@@ -408,6 +408,12 @@ export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctions
   return getOwnedItems(getAllDynamicFunctions(qpqConfig), qpqConfig);
 };
 
+// Runtime-attached action processor override sources must join the bundler sweep,
+// or the deployed bundle omits them and the dynamic load fails at runtime.
+export const expandSrcEntriesWithActionProcessors = (runtimes: QpqFunctionRuntime[]): QpqFunctionRuntime[] => {
+  return runtimes.flatMap((runtime) => [runtime, ...((isQpqFunctionRuntimeAdvanced(runtime) && runtime.actionProcessors) || [])]);
+};
+
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   const result = [
@@ -428,7 +434,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
   ];
 
-  return result;
+  return expandSrcEntriesWithActionProcessors(result);
 };
 
 export const getApiBuildPath = (qpqConfig: QPQConfig): string => {

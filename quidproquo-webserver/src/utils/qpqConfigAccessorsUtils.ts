@@ -75,13 +75,13 @@ export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRunt
 // Used in bundlers to know where and what to build and index
 // Events, routes, etc
 export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
-  return [
+  return qpqCoreUtils.expandSrcEntriesWithActionProcessors([
     ...getAllRoutes(configs).map((r) => r.runtime),
     // ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.runtime),
     ...getAllServiceFunctions(configs).map((sf) => sf.runtime),
     ...getAllWebsocketSrcEntries(configs),
-  ];
+  ]);
 };
 
 export const getDomainName = (configs: QPQConfig): string => {
