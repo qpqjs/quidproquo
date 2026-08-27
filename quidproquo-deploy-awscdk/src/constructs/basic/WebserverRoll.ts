@@ -126,6 +126,31 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: [`arn:aws:logs:*:${accountId}:log-group:*`],
       },
 
+      // Tags are the authorization boundary for the owned-resource grants (the
+      // aws:ResourceTag-conditioned statements built from getOwnedResourceTagConditions):
+      // anything that can retag a resource can move that boundary. The runtime role never
+      // needs to mutate tags, and none of the allow statements grant these actions, so
+      // today the boundary holds by omission. The explicit deny below would make that
+      // load-bearing, but it is commented out to save inline-policy bytes (the 10,240
+      // cap is the whole reason for the tag-based grants). Re-enable it if the role
+      // ever gets headroom, and never add tag-mutation actions to any allow list here.
+      // {
+      //   sid: 'DenyTagMutation',
+      //   effect: aws_iam.Effect.DENY,
+      //   actions: [
+      //     'dynamodb:TagResource',
+      //     'dynamodb:UntagResource',
+      //     's3:PutBucketTagging',
+      //     'ssm:AddTagsToResource',
+      //     'ssm:RemoveTagsFromResource',
+      //     'secretsmanager:TagResource',
+      //     'secretsmanager:UntagResource',
+      //     'tag:TagResources',
+      //     'tag:UntagResources',
+      //   ],
+      //   resources: ['*'],
+      // },
+
       // Required for VPC-attached Lambdas to manage their ENIs.
       {
         sid: 'EC2NetworkInterfacePermissions',

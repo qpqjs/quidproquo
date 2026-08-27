@@ -171,18 +171,40 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     }
   }
 
-  public static authorizeActionsForRole(
-    scope: Construct,
-    role: aws_iam.IRole,
-    qpqConfig: QPQConfig,
-    ownedStorageDrives: QpqCoreStorageDriveConstruct[],
-  ) {
-    // CDK-known ARNs for drives created in this stack.
-    const ownedArns = ownedStorageDrives.flatMap((sd) => [sd.bucket.bucketArn, sd.bucket.arnForObjects('*')]);
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig) {
+    const driveActions = ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'];
+
+    // Unlike DynamoDB / SSM / Secrets Manager, S3 bucket tags are invisible to IAM
+    // authorization (aws:ResourceTag never matches a bucket), so "every drive this
+    // service owns" is expressed through the naming convention instead:
+    // <resourceName>-<app>-<service>-<env>[-<feature>], resource segment wildcarded.
+    // Built by the same helper that names the buckets, so the pattern can't drift.
+    //
+    // Known edge: a service literally named `<app>-<otherService>` would produce bucket
+    // names that also match the other service's suffix pattern. The interior hyphens
+    // make an accidental collision effectively impossible for normal names; revisit
+    // with a synth-time assertion if service naming ever gets that exotic.
+    const ownedBucketPattern = awsNamingUtils.getConfigRuntimeResourceName(
+      '*',
+      qpqCoreUtils.getApplicationName(qpqConfig),
+      qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+      qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+    );
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: driveActions,
+        resources: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
+      }),
+    );
 
     // Deterministically-computed ARNs for drives declared in this service's
     // config but owned by another service. Uses the same naming path as
     // `resolveStorageDriveBucketName` so no CDK cross-stack ref is created.
+    // Cross-service access stays as exact ARNs on purpose: this short list is
+    // the part of the policy a human should be reviewing.
     const allDriveConfigs = qpqCoreUtils.getStorageDrives(qpqConfig);
     const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDrives(qpqConfig);
     const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
@@ -197,18 +219,10 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       return [bucketArn, `${bucketArn}/*`];
     });
 
-    const resources = [...ownedArns, ...foreignArns];
-    if (resources.length === 0) return;
-
-    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies — the
-    // drive ARN list grows with every eventDoc collection's asset bucket.
-    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
-      scope,
-      role,
-      'webserverStorageDriveAccess',
-      ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
-      resources,
-    );
+    if (foreignArns.length > 0) {
+      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
+      qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverStorageDriveAccess', driveActions, foreignArns);
+    }
 
     // Grant KMS permissions for any encrypted drives (owned or foreign) whose
     // customer-managed key is declared in this service's config.

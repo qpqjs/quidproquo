@@ -168,13 +168,42 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
   }
 
-  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig, ownedKvsList: QpqCoreKeyValueStoreConstruct[]) {
-    // CDK-known ARNs for tables created in this stack (+ GSI ARNs).
-    const ownedArns = ownedKvsList.flatMap((kvs) => [kvs.table.tableArn, `${kvs.table.tableArn}/index/*`]);
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig) {
+    const kvsActions = [
+      'dynamodb:GetItem',
+      'dynamodb:PutItem',
+      'dynamodb:BatchWriteItem',
+      'dynamodb:Query',
+      'dynamodb:Scan',
+      'dynamodb:UpdateItem',
+      'dynamodb:DeleteItem',
+    ];
+
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
+
+    // Owned tables are granted as a single tag-conditioned statement instead of one ARN
+    // pair per table: applyEnvironmentTags stamps every owned table, and DynamoDB ABAC
+    // evaluates the table's tags for its index sub-resources too. This keeps the policy
+    // a fixed size no matter how many KVSs (eventDoc collections especially) the service
+    // accumulates. A table brought in via getDynamoTableNameOverrride is imported, not
+    // created here, so it only matches if whoever created it applied the same tags.
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: kvsActions,
+        resources: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
+        conditions: {
+          StringEquals: qpqDeployAwsCdkUtils.getOwnedResourceTagConditions(qpqConfig),
+        },
+      }),
+    );
 
     // Deterministically-computed ARNs for KVSs declared in this service's
     // config but owned by another service. Uses the same naming path as
     // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
+    // Cross-service access stays as exact ARNs on purpose: this short list is
+    // the part of the policy a human should be reviewing.
     const allKvsConfigs = qpqCoreUtils.getAllKeyValueStores(qpqConfig);
     const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig);
     const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
@@ -185,16 +214,9 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       return [tableArn, `${tableArn}/index/*`];
     });
 
-    const resources = [...ownedArns, ...foreignArns];
-    if (resources.length === 0) return;
-
-    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
-      scope,
-      role,
-      'webserverKeyValueStoreAccess',
-      ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:BatchWriteItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-      resources,
-    );
+    if (foreignArns.length > 0) {
+      qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverKeyValueStoreAccess', kvsActions, foreignArns);
+    }
 
     // Grant KMS permissions for any encrypted KVSs (owned or foreign) whose
     // customer-managed key is declared in this service's config.
