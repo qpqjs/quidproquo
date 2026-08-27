@@ -6,6 +6,7 @@ import {
   generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
+  mergeRuntimeActionProcessors,
   ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
@@ -54,7 +55,12 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEve
       routeAuthSettings: matchResult.config?.routeAuthSettings,
     };
 
-    const [authValid, authError] = await validateAuth(authPayload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader);
+    // The matched route's processor overrides must be visible HERE, in the
+    // framework preamble: auth decode runs before the route story, so without
+    // this merge a per-route auth override would never see its own requests.
+    const mergedActionProcessorList = await mergeRuntimeActionProcessors(qpqConfig, matchResult.runtime, actionProcessorList, dynamicModuleLoader);
+
+    const [authValid, authError] = await validateAuth(authPayload, session, mergedActionProcessorList, logger, updateSession, dynamicModuleLoader);
 
     if (authError || !authValid) {
       return actionResult({

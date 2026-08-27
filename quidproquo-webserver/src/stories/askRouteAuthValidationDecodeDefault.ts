@@ -1,32 +1,35 @@
-import { askCatch, AskResponse, askUserDirectoryDecodeAccessToken, DecodedAccessToken } from 'quidproquo-core';
+import { askCatch, AskResponse, askUserDirectoryDecodeAccessToken } from 'quidproquo-core';
 
-import { RouteAuthValidationDecodeActionPayload } from '../actions/routeAuthValidation';
+import { RouteAuthDecodeOutcome, RouteAuthDecodeResult, RouteAuthValidationDecodeActionPayload } from '../actions/routeAuthValidation';
 import { getHeaderValue } from '../utils/headerUtils';
 
 export function* askRouteAuthValidationDecodeDefault({
   event,
   routeAuthSettings,
   ignoreExpiration,
-}: RouteAuthValidationDecodeActionPayload): AskResponse<DecodedAccessToken | null> {
+}: RouteAuthValidationDecodeActionPayload): AskResponse<RouteAuthDecodeResult> {
+  // No user directory means the route has no token auth under the default
+  // processor: not applicable, the request passes as anonymous. A per-route
+  // override that implements its own auth never reaches this story.
   if (!routeAuthSettings.userDirectoryName) {
-    return null;
+    return { outcome: RouteAuthDecodeOutcome.notApplicable };
   }
 
   const authHeader = getHeaderValue('Authorization', event.headers);
   if (!authHeader) {
-    return null;
+    return { outcome: RouteAuthDecodeOutcome.invalid };
   }
 
   const [authType, accessToken] = authHeader.split(' ');
   if (authType !== 'Bearer' || !accessToken) {
-    return null;
+    return { outcome: RouteAuthDecodeOutcome.invalid };
   }
 
   const result = yield* askCatch(askUserDirectoryDecodeAccessToken(routeAuthSettings.userDirectoryName, ignoreExpiration, accessToken));
 
-  if (!result.success) {
-    return null;
+  if (!result.success || !result.result.wasValid) {
+    return { outcome: RouteAuthDecodeOutcome.invalid };
   }
 
-  return result.result;
+  return { outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: result.result };
 }

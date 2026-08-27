@@ -1,6 +1,6 @@
 import { AskResponse, StorySession } from 'quidproquo-core';
 
-import { askRouteAuthValidationDecode } from '../actions/routeAuthValidation';
+import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from '../actions/routeAuthValidation';
 import { RouteAuthSettings } from '../config/settings/route';
 import { HTTPEvent } from '../types/HTTPEvent';
 import { getAccessTokenFromHeaders } from '../utils/headerUtils';
@@ -17,46 +17,49 @@ export function* askGetHttpApiEventStorySession({
   routeAuthSettings,
   session,
 }: GetHttpApiEventStorySessionPayload): AskResponse<StorySession | undefined> {
+  // Always yield the decode, mirroring askValidateRouteAuth, so a per-route
+  // processor override's identity reaches the session. Auth already ran in the
+  // auto-respond preamble, hence ignoreExpiration: true.
+  const decodeResult = yield* askRouteAuthValidationDecode(event, routeAuthSettings || {}, true);
+
+  if (decodeResult.outcome === RouteAuthDecodeOutcome.valid) {
+    return {
+      ...session,
+
+      decodedAccessToken: decodeResult.decodedAccessToken,
+    };
+  }
+
+  // Normally unreachable: an invalid request already 401'd in the preamble.
+  if (decodeResult.outcome === RouteAuthDecodeOutcome.invalid) {
+    return void 0;
+  }
+
+  // Not applicable: no token auth configured for this route. If an access token
+  // was sent anyway, extract info for the logs only, marked wasValid: false.
   const accessToken = getAccessTokenFromHeaders(event.headers);
 
   if (!accessToken) {
     return void 0;
   }
 
-  // If this endpoint has no auth settings, BUT we do have an access token
-  // then we want to just attempt to extract info for logs, but we will say that its wasValid = false
-  if (!routeAuthSettings?.userDirectoryName) {
-    const info = unsafeDecodeJWTPayload<{
-      sub?: string;
-      userId?: string;
-      username?: string;
-      id?: string;
-      exp?: number;
-    }>(accessToken);
-
-    return {
-      ...session,
-
-      decodedAccessToken: {
-        exp: info?.exp || 0,
-        userDirectory: '',
-        userId: info?.sub || info?.id || info?.userId || info?.username || '',
-        username: info?.username || info?.userId || info?.sub || info?.id || '',
-        wasValid: false,
-      },
-    };
-  }
-
-  // Auth was already validated in auto-respond, so we can use ignoreExpiration: true
-  const decoded = yield* askRouteAuthValidationDecode(event, routeAuthSettings, true);
-
-  if (!decoded) {
-    return void 0;
-  }
+  const info = unsafeDecodeJWTPayload<{
+    sub?: string;
+    userId?: string;
+    username?: string;
+    id?: string;
+    exp?: number;
+  }>(accessToken);
 
   return {
     ...session,
 
-    decodedAccessToken: decoded,
+    decodedAccessToken: {
+      exp: info?.exp || 0,
+      userDirectory: '',
+      userId: info?.sub || info?.id || info?.userId || info?.username || '',
+      username: info?.username || info?.userId || info?.sub || info?.id || '',
+      wasValid: false,
+    },
   };
 }
