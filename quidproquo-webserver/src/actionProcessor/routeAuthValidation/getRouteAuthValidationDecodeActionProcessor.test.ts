@@ -14,7 +14,7 @@ import {
 
 import { describe, expect, it } from 'vitest';
 
-import { RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
+import { RouteAuthDecodeOutcome, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
 import { HTTPEvent } from '../../types/HTTPEvent';
 import { getRouteAuthValidationDecodeActionProcessor } from './getRouteAuthValidationDecodeActionProcessor';
 
@@ -41,22 +41,22 @@ const buildPayload = (headers: Record<string, string>) => ({
 });
 
 describe('getRouteAuthValidationDecodeActionProcessor', () => {
-  it('returns the decoded token when the inner story succeeds', async () => {
+  it('returns a valid outcome with the decoded token when the inner story succeeds', async () => {
     const decoded = { wasValid: true, userId: 'u1' };
     const [result] = await invoke(buildPayload({ Authorization: 'Bearer token' }), () => actionResult(decoded));
 
-    expect(result).toEqual(decoded);
+    expect(result).toEqual({ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: decoded });
   });
 
-  it('returns null when no user directory is configured', async () => {
+  it('returns notApplicable when no user directory is configured', async () => {
     const [result] = await invoke({ event: { headers: {} }, routeAuthSettings: {}, ignoreExpiration: false }, () => actionResult(null));
 
-    expect(result).toBeNull();
+    expect(result).toEqual({ outcome: RouteAuthDecodeOutcome.notApplicable });
   });
 
-  it('returns null when the decode action errors', async () => {
+  it('returns invalid (fails closed) when the decode action errors', async () => {
     const [result] = await invoke(buildPayload({ Authorization: 'Bearer token' }), () => actionResultError(ErrorTypeEnum.GenericError, 'boom'));
 
-    expect(result).toBeNull();
+    expect(result).toEqual({ outcome: RouteAuthDecodeOutcome.invalid });
   });
 });

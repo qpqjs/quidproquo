@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { RouteAuthSettings } from '../../config/settings/route';
 import { HTTPEvent } from '../../types/HTTPEvent';
 import { askRouteAuthValidationDecode } from './askRouteAuthValidationDecode';
+import { RouteAuthDecodeOutcome } from './RouteAuthDecodeOutcome';
+import { RouteAuthDecodeResult } from './RouteAuthDecodeResult';
 import { RouteAuthValidationActionType } from './RouteAuthValidationActionType';
 
 const event = { headers: {}, path: '/' } as unknown as HTTPEvent;
@@ -20,16 +22,20 @@ describe('askRouteAuthValidationDecode', () => {
     });
   });
 
-  it('returns the decoded token the runtime resolves', () => {
-    const decoded = { userId: 'u1', username: 'user', exp: 0, userDirectory: 'users', wasValid: true };
-    const { returned } = captureRequester(askRouteAuthValidationDecode(event, routeAuthSettings, false), decoded);
+  it('returns the valid decode result the runtime resolves', () => {
+    const decodeResult: RouteAuthDecodeResult = {
+      outcome: RouteAuthDecodeOutcome.valid,
+      decodedAccessToken: { userId: 'u1', username: 'user', exp: 0, userDirectory: 'users', wasValid: true },
+    };
+    const { returned } = captureRequester(askRouteAuthValidationDecode(event, routeAuthSettings, false), decodeResult);
 
-    expect(returned).toBe(decoded);
+    expect(returned).toBe(decodeResult);
   });
 
-  it('returns null when the runtime resolves no valid token', () => {
-    const { returned } = captureRequester(askRouteAuthValidationDecode(event, routeAuthSettings, false), null);
+  it('returns the invalid decode result the runtime resolves', () => {
+    const decodeResult: RouteAuthDecodeResult = { outcome: RouteAuthDecodeOutcome.invalid };
+    const { returned } = captureRequester(askRouteAuthValidationDecode(event, routeAuthSettings, false), decodeResult);
 
-    expect(returned).toBeNull();
+    expect(returned).toBe(decodeResult);
   });
 });

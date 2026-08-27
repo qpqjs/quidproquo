@@ -6,6 +6,7 @@ import {
   generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
+  mergeRuntimeActionProcessors,
   ProcessorFor,
   QPQConfig,
   StorySession,
@@ -36,7 +37,17 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       session,
     };
 
-    const [storySession, error] = await getSession(payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader);
+    // Same merge as the auto-respond preamble: the session-seeding decode must
+    // also see the matched route's processor overrides, or a custom validator's
+    // decoded identity would never reach the story session.
+    const mergedActionProcessorList = await mergeRuntimeActionProcessors(
+      qpqConfig,
+      matchStoryResult.runtime,
+      actionProcessorList,
+      dynamicModuleLoader,
+    );
+
+    const [storySession, error] = await getSession(payload, session, mergedActionProcessorList, logger, updateSession, dynamicModuleLoader);
 
     if (error) {
       return actionResult(void 0);

@@ -1,6 +1,6 @@
 import { actionResult, createActionProcessor, generateUuid, getProcessCustomImplementation, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-import { askRouteAuthValidationDecode, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
+import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
 import { askRouteAuthValidationDecodeDefault } from '../../stories/askRouteAuthValidationDecodeDefault';
 
 const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): ProcessorFor<typeof askRouteAuthValidationDecode> => {
@@ -16,11 +16,13 @@ const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): ProcessorFor
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const [result, error] = await decodeAuth(payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry);
 
-    if (error) {
-      return actionResult(null);
+    // A decode that errored (or returned nothing) is invalid, never
+    // notApplicable: failing open here would skip token auth entirely.
+    if (error || !result) {
+      return actionResult({ outcome: RouteAuthDecodeOutcome.invalid });
     }
 
-    return actionResult(result ?? null);
+    return actionResult(result);
   };
 };
 

@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `askRouteAuthValidationDecode` (`quidproquo-webserver`) now returns a `RouteAuthDecodeResult` tri-state (`{ outcome: RouteAuthDecodeOutcome.notApplicable }` / `{ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken }` / `{ outcome: RouteAuthDecodeOutcome.invalid }`) instead of `DecodedAccessToken | null`, and the action is now always yielded regardless of whether `routeAuthSettings.userDirectoryName` is set. A custom processor implementing this action must return the new shape (`notApplicable` for "no token auth configured", `invalid` for a failed/absent token, `valid` with `decodedAccessToken` on success) instead of `null`/a decoded token.
+
 ## 0.1.17
 
 - `HTTPNetworkResponse` (`quidproquo-core`, returned by `askNetworkRequest`) gains a required `setCookies: string[]` field carrying every raw `Set-Cookie` line in order. Code constructing an `HTTPNetworkResponse` by hand must add this field (`[]` if not applicable).

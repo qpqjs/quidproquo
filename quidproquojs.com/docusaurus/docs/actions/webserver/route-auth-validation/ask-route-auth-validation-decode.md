@@ -1,26 +1,30 @@
 ---
 title: askRouteAuthValidationDecode
-description: Decode and validate a route's incoming auth token against its route auth settings, returning the decoded access token.
+description: Decode and validate a route's incoming auth token against its route auth settings, returning a tri-state outcome.
 ---
 
 # askRouteAuthValidationDecode
 
-Decodes and validates the **auth token on an incoming HTTP request** against a route's auth settings, and returns the decoded access token (or `null` when there is no valid token). This is the action the webserver runs to authenticate a route before its handler story executes; the decoding is driven by the service's auth system (see `defineAuthSystem`).
+Decodes and validates the **auth token on an incoming HTTP request** against a route's auth settings, and returns a tri-state result: not applicable (no token auth configured for the route), valid (with the decoded access token), or invalid. This is the action the webserver runs to authenticate a route before its handler story executes; the decoding is driven by the service's auth system (see `defineAuthSystem`). It is always yielded, even for routes with no `userDirectoryName`, so a per-route processor override can implement completely custom auth.
 
 - **Action type:** `RouteAuthValidationActionType.Decode`
 
 ```typescript
-import { askRouteAuthValidationDecode } from 'quidproquo-webserver';
+import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from 'quidproquo-webserver';
 
 export function* askAuthenticateRequest(event, routeAuthSettings) {
-  const decoded = yield* askRouteAuthValidationDecode(event, routeAuthSettings, false);
+  const decodeResult = yield* askRouteAuthValidationDecode(event, routeAuthSettings, false);
 
-  if (!decoded || !decoded.wasValid) {
-    // no token, or token failed validation
+  if (decodeResult.outcome === RouteAuthDecodeOutcome.invalid) {
     return null;
   }
 
-  return decoded; // { userId, username, roles, ... }
+  if (decodeResult.outcome === RouteAuthDecodeOutcome.valid) {
+    return decodeResult.decodedAccessToken; // { userId, username, roles, ... }
+  }
+
+  // notApplicable: no token auth configured for this route
+  return null;
 }
 ```
 
@@ -31,7 +35,7 @@ function* askRouteAuthValidationDecode(
   event: HTTPEvent,
   routeAuthSettings: RouteAuthSettings,
   ignoreExpiration: boolean,
-): AskResponse<DecodedAccessToken | null>;
+): AskResponse<RouteAuthDecodeResult>;
 ```
 
 ## Parameters
@@ -44,9 +48,14 @@ function* askRouteAuthValidationDecode(
 
 ## Returns
 
-`DecodedAccessToken | null` — `null` when there is no token to decode. Otherwise the decoded token:
+`RouteAuthDecodeResult` — a tri-state outcome:
 
 ```typescript
+type RouteAuthDecodeResult =
+  | { outcome: RouteAuthDecodeOutcome.notApplicable }
+  | { outcome: RouteAuthDecodeOutcome.valid; decodedAccessToken: DecodedAccessToken }
+  | { outcome: RouteAuthDecodeOutcome.invalid };
+
 interface DecodedAccessToken {
   userId: string;
   username: string;
@@ -57,7 +66,9 @@ interface DecodedAccessToken {
 }
 ```
 
-Always check `wasValid` — a token can be decoded but still have failed validation.
+- `notApplicable` — no token auth is configured for the route; the request passes with an anonymous session.
+- `valid` — the token decoded and validated; `decodedAccessToken` carries the identity.
+- `invalid` — token auth applies and the request did not satisfy it.
 
 ## Related
 

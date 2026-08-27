@@ -1,7 +1,8 @@
-import { createActionRequester, DecodedAccessToken } from 'quidproquo-core';
+import { createActionRequester } from 'quidproquo-core';
 
 import { RouteAuthSettings } from '../../config/settings/route';
 import { HTTPEvent } from '../../types/HTTPEvent';
+import { RouteAuthDecodeResult } from './RouteAuthDecodeResult';
 import { RouteAuthValidationActionType } from './RouteAuthValidationActionType';
 
 export interface RouteAuthValidationDecodeActionPayload {
@@ -10,7 +11,7 @@ export interface RouteAuthValidationDecodeActionPayload {
   ignoreExpiration: boolean;
 }
 
-export const askRouteAuthValidationDecode = createActionRequester<DecodedAccessToken | null>()({
+export const askRouteAuthValidationDecode = createActionRequester<RouteAuthDecodeResult>()({
   actionType: RouteAuthValidationActionType.Decode,
   getPayload: (event: HTTPEvent, routeAuthSettings: RouteAuthSettings, ignoreExpiration: boolean) => ({ event, routeAuthSettings, ignoreExpiration }),
 });

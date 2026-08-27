@@ -14,7 +14,7 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import { ApiKeyValidationActionType } from '../../actions/apiKeyValidation';
-import { RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
+import { RouteAuthDecodeOutcome, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
 import { defineDns } from '../../config/settings/dns';
 import { RouteOptions } from '../../config/settings/route';
 import { FileUploadErrorTypeEnum, HTTPEvent } from '../../types/HTTPEvent';
@@ -22,17 +22,30 @@ import { getHttpApiEventAutoRespondActionProcessor } from './getHttpApiEventAuto
 
 const qpqConfig = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
 
-const invoke = async (qpqEventRecord: Partial<HTTPEvent>, config: RouteOptions, processors: Record<string, any> = {}) => {
-  const map = await getHttpApiEventAutoRespondActionProcessor(qpqConfig, noopDynamicModuleLoader);
+const invalid = { outcome: RouteAuthDecodeOutcome.invalid };
+const valid = { outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: { wasValid: true, userId: 'u1' } };
+
+// The decode action is always yielded now, so tests exercising the api key path
+// need the platform-registered decode processor stood in by a notApplicable stub.
+const notApplicableDecode = { [RouteAuthValidationActionType.Decode]: async () => actionResult({ outcome: RouteAuthDecodeOutcome.notApplicable }) };
+
+const invoke = async (
+  qpqEventRecord: Partial<HTTPEvent>,
+  config: RouteOptions,
+  processors: Record<string, any> = {},
+  matchResultExtras: Record<string, any> = {},
+  dynamicModuleLoader: any = noopDynamicModuleLoader,
+) => {
+  const map = await getHttpApiEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader);
   const processor = map[EventActionType.AutoRespond];
 
   return processor(
-    { qpqEventRecord, matchResult: { config } },
+    { qpqEventRecord, matchResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
     buildActionProcessorList(processors),
     createStubLogger(),
     () => {},
-    noopDynamicModuleLoader,
+    dynamicModuleLoader,
     createStreamRegistry(),
   );
 };
@@ -55,7 +68,7 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'GET', headers: {} },
       { routeAuthSettings: { userDirectoryName: 'users' } },
-      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ wasValid: false }) },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult(invalid) },
     );
 
     expect(response.status).toBe(401);
@@ -65,7 +78,7 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'GET', headers: {} },
       { routeAuthSettings: { userDirectoryName: 'users' } },
-      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ wasValid: true, userId: 'u1' }) },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult(valid) },
     );
 
     expect(response).toBeNull();
@@ -86,7 +99,7 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'GET', headers: {} },
       { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
-      { [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
+      { ...notApplicableDecode, [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
     );
 
     expect(response.status).toBe(401);
@@ -96,7 +109,7 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'GET', headers: { 'x-api-key': 'wrong' } },
       { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
-      { [ApiKeyValidationActionType.Validate]: async () => actionResult(false) },
+      { ...notApplicableDecode, [ApiKeyValidationActionType.Validate]: async () => actionResult(false) },
     );
 
     expect(response.status).toBe(401);
@@ -106,7 +119,7 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'GET', headers: { 'x-api-key': 'right' } },
       { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
-      { [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
+      { ...notApplicableDecode, [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
     );
 
     expect(response).toBeNull();
@@ -143,9 +156,55 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     const [response] = await invoke(
       { method: 'POST', headers: {}, fileUploadError: { errorType: FileUploadErrorTypeEnum.fileTooLarge, message: 'too big' } },
       { routeAuthSettings: { userDirectoryName: 'users' } },
-      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ wasValid: false }) },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult(invalid) },
     );
 
     expect(response.status).toBe(401);
+  });
+
+  it('responds 401 when the matched runtime attaches a decode override that rejects', async () => {
+    // The base processor list would pass this request; the route's own override
+    // must win in the preamble merge, giving that one route custom auth.
+    const rejectEverything = async () => actionResult(invalid);
+    const loadOverrideSource = async () => async () => ({ [RouteAuthValidationActionType.Decode]: rejectEverything });
+
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: {} },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ outcome: RouteAuthDecodeOutcome.notApplicable }) },
+      {
+        runtime: {
+          basePath: '/svc/src',
+          relativePath: '/auth::getOverrides',
+          functionName: 'getOverrides',
+          actionProcessors: [{ basePath: '/svc/src', relativePath: '/auth/impl::getOverrides', functionName: 'getOverrides' }],
+        },
+      },
+      loadOverrideSource,
+    );
+
+    expect(response.status).toBe(401);
+  });
+
+  it('passes through (null) when the matched runtime attaches a decode override that validates', async () => {
+    const acceptWithIdentity = async () => actionResult(valid);
+    const loadOverrideSource = async () => async () => ({ [RouteAuthValidationActionType.Decode]: acceptWithIdentity });
+
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult(invalid) },
+      {
+        runtime: {
+          basePath: '/svc/src',
+          relativePath: '/auth::getOverrides',
+          functionName: 'getOverrides',
+          actionProcessors: [{ basePath: '/svc/src', relativePath: '/auth/impl::getOverrides', functionName: 'getOverrides' }],
+        },
+      },
+      loadOverrideSource,
+    );
+
+    expect(response).toBeNull();
   });
 });
