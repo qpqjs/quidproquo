@@ -35,7 +35,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     }).role;
 
     // Build the storage drives
-    const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
       (setting) =>
         new QpqCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -46,7 +46,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
         }),
     );
-    QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig, storageDrives);
+    QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);
     // end storage drives
 
     // Build the parameters
@@ -130,7 +130,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // key value store
-    const keyValueStores = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map(
       (setting) =>
         new QpqCoreKeyValueStoreConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -138,7 +138,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
-    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig, keyValueStores);
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);
     // end key value store
 
     // Graph Databases

@@ -25,6 +25,23 @@ export const applyEnvironmentTags = (scope: IConstruct, qpqConfig: QPQConfig) =>
   }
 };
 
+// applyEnvironmentTags stamps these on every owned resource, so a single
+// aws:ResourceTag-conditioned statement can mean "every resource this service deployed"
+// without enumerating ARNs (which is what was blowing the inline-policy byte cap).
+// application + module + environment (+ feature) together are the ownership boundary:
+// this account hosts multiple applications, so a same-named module in another app, or
+// the same module in another environment, must not match.
+export const getOwnedResourceTagConditions = (qpqConfig: QPQConfig): Record<string, string> => {
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return {
+    'aws:ResourceTag/application': qpqCoreUtils.getApplicationName(qpqConfig),
+    'aws:ResourceTag/module': qpqCoreUtils.getApplicationModuleName(qpqConfig),
+    'aws:ResourceTag/environment': qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
+  };
+};
+
 // A role's INLINE policies are capped at 10,240 bytes in aggregate, and the
 // resource-scoped grants (S3 drives, DynamoDB tables, SSM params, secrets — owned
 // + foreign, two exact ARNs apiece) blow that cap as a service accumulates stores

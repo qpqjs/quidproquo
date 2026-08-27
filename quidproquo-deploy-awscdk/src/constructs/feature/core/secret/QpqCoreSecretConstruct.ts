@@ -1,6 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { QPQConfig, SecretQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, SecretQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -57,7 +57,30 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   }
 
   public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, secretConfigs: SecretQPQConfigSetting[], qpqConfig: QPQConfig) {
-    const resources = secretConfigs.map((secretConfig) => {
+    const secretActions = ['secretsmanager:GetSecretValue'];
+
+    // Owned secrets are granted as a single tag-conditioned statement instead of one
+    // ARN per secret: applyEnvironmentTags stamps every owned secret, so the policy
+    // stays a fixed size no matter how many secrets the service declares.
+    const { awsRegion: ownRegion, awsAccountId: ownAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: secretActions,
+        resources: [`arn:aws:secretsmanager:${ownRegion}:${ownAccountId}:secret:*`],
+        conditions: {
+          StringEquals: qpqDeployAwsCdkUtils.getOwnedResourceTagConditions(qpqConfig),
+        },
+      }),
+    );
+
+    // Cross-service secrets stay as exact ARNs on purpose: this short list is
+    // the part of the policy a human should be reviewing.
+    const ownedConfigs = qpqCoreUtils.getOwnedItems(secretConfigs, qpqConfig);
+    const foreignConfigs = secretConfigs.filter((cfg) => !ownedConfigs.includes(cfg));
+
+    const foreignArns = foreignConfigs.map((secretConfig) => {
       const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
 
       const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
@@ -65,9 +88,9 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
       return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
     });
 
-    if (resources.length === 0) return;
-
-    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverSecretAccess', ['secretsmanager:GetSecretValue'], resources);
+    if (foreignArns.length > 0) {
+      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
+      qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverSecretAccess', secretActions, foreignArns);
+    }
   }
 }

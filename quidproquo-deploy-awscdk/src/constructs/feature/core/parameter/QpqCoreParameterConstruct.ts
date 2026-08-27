@@ -1,6 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { ParameterQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -59,7 +59,30 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
   }
 
   public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, parameterConfigs: ParameterQPQConfigSetting[], qpqConfig: QPQConfig) {
-    const resources = parameterConfigs.map((parameterConfig) => {
+    const parameterActions = ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'];
+
+    // Owned parameters are granted as a single tag-conditioned statement instead of one
+    // ARN per parameter: applyEnvironmentTags stamps every owned parameter, so the
+    // policy stays a fixed size no matter how many parameters the service declares.
+    const { awsRegion: ownRegion, awsAccountId: ownAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: parameterActions,
+        resources: [`arn:aws:ssm:${ownRegion}:${ownAccountId}:parameter/*`],
+        conditions: {
+          StringEquals: qpqDeployAwsCdkUtils.getOwnedResourceTagConditions(qpqConfig),
+        },
+      }),
+    );
+
+    // Cross-service parameters stay as exact ARNs on purpose: this short list is
+    // the part of the policy a human should be reviewing.
+    const ownedConfigs = qpqCoreUtils.getOwnedItems(parameterConfigs, qpqConfig);
+    const foreignConfigs = parameterConfigs.filter((cfg) => !ownedConfigs.includes(cfg));
+
+    const foreignArns = foreignConfigs.map((parameterConfig) => {
       const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
 
       const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
@@ -67,15 +90,9 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
       return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
     });
 
-    if (resources.length === 0) return;
-
-    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
-      scope,
-      role,
-      'webserverParameterAccess',
-      ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
-      resources,
-    );
+    if (foreignArns.length > 0) {
+      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
+      qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverParameterAccess', parameterActions, foreignArns);
+    }
   }
 }
