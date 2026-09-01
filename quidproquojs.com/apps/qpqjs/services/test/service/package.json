@@ -1,0 +1,9 @@
+{
+  "name": "@qpqjs/test-service",
+  "version": "0.0.1",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "validate-ts": "tsc -p tsconfig.app.json --noEmit"
+  }
+}

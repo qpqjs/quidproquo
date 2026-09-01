@@ -3,6 +3,7 @@ export enum QpqjsServiceEnum {
   Auth = 'auth',
   Design = 'design',
   Shell = 'shell',
+  Test = 'test',
 }
 
 export type QpqjsServiceEnumValues = `${QpqjsServiceEnum}`;
