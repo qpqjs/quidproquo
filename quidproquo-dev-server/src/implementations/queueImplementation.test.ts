@@ -8,6 +8,9 @@ import { queueImplementation } from './queueImplementation';
 vi.mock('../logic', () => ({
   eventBus: { on: vi.fn(), publish: vi.fn() },
   processEvent: vi.fn(),
+  // Passthrough: the in-flight registry has its own tests, and what this file
+  // cares about is that tracking does not disturb the FIFO group chaining.
+  trackInFlight: <T>(work: T): T => work,
 }));
 
 const buildDevServerConfig = (settings: any[] = []): any => ({

@@ -9,6 +9,7 @@ import * as util from 'util';
 import * as vm from 'vm';
 
 import { getDevServerActionProcessors } from '../actionProcessor';
+import { requestDevServerShutdown } from '../logic';
 import { ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from '../types';
 import { getDevServerLogger } from './logger';
 
@@ -315,9 +316,17 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         // }
       });
 
-      replServer.on('exit', () => {
+      // `.exit` and ctrl+d used to call process.exit outright, which dropped
+      // whatever the session had just written and any projection it triggered
+      // - the same data-loss bug as an unhandled SIGTERM, in a second place.
+      const handleReplExit = async (): Promise<void> => {
         console.log('\n👋 Goodbye from QPQ Tinker!');
+        await requestDevServerShutdown();
         process.exit(0);
+      };
+
+      replServer.on('exit', () => {
+        void handleReplExit();
       });
 
       // Force display the prompt immediately

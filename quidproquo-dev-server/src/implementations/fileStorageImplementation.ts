@@ -6,7 +6,9 @@ import * as fs from 'fs/promises';
 import multer from 'multer';
 import * as path from 'path';
 
+import { closeHttpServerGracefully } from '../logic';
 import { delayForAction } from '../logic/withProcessorDelay';
+import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
 const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
@@ -14,7 +16,7 @@ const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
   await fs.mkdir(parentDir, { recursive: true });
 };
 
-export const fileStorageImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const fileStorageImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const app: Express = express();
   const upload = multer({ storage: multer.memoryStorage() });
 
@@ -200,10 +202,14 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
   });
 
   // Start the server
-  app.listen(port, () => {
+  const httpServer = app.listen(port, () => {
     const fullStoragePath = path.join(devServerConfig.runtimePath, devServerConfig.fileStorageConfig.storagePath);
     console.log(`QPQ File Storage Server listening on port ${port}`);
     console.log(`Runtime path: ${devServerConfig.runtimePath}`);
     console.log(`Storage base path: ${fullStoragePath}`);
   });
+
+  // An upload in flight is a file half written; let it land before the watcher
+  // and the stores are torn down.
+  return () => closeHttpServerGracefully(httpServer);
 };

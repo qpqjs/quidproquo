@@ -2,6 +2,10 @@
 // generates the dev-server entry, builds the rspack config, then runs rspack
 // in watch mode, restarting the server process on every successful rebuild.
 //
+// A restart is not instant: the server drains in-flight work and checkpoints
+// its stores on the way out (typically tens of ms, 5s worst case), and this
+// command waits for that before starting the replacement.
+//
 // The one thing NOT hot-reloaded is the qpq configs themselves: each service's
 // infrastructure.ts is evaluated once at launch and baked into the
 // `quidproquo-dynamic-loader` virtual module — config changes need a full
@@ -16,6 +20,7 @@ import { rspack } from '@rspack/core';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
+import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
@@ -70,7 +75,11 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
       restartQueued = false;
       startServer();
     });
-    child.kill();
+
+    // Not a bare kill: the server drains in-flight work before it exits, so it
+    // needs asking properly and then a hard backstop if it wedges. Waiting for
+    // the exit is what keeps the ports free for the replacement.
+    void killChildWithEscalation(child);
   };
 
   console.log('Bundling dev server (watch mode)...');
@@ -96,9 +105,20 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     restartServer();
   });
 
-  process.on('SIGINT', () => {
+  // Wait for the server to finish draining before tearing the watcher down and
+  // exiting: closing the compiler first would exit the parent while the child
+  // is still writing, which is the race this whole path exists to close.
+  const handleSigint = async (): Promise<void> => {
     restartQueued = true; // suppress the crash log / rebuild-restart on our own kill
-    child?.kill();
+
+    if (child) {
+      await killChildWithEscalation(child);
+    }
+
     compiler.close(() => process.exit(0));
+  };
+
+  process.on('SIGINT', () => {
+    void handleSigint();
   });
 };

@@ -8,7 +8,8 @@ import path from 'path';
 
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
-import { processEvent } from '../logic';
+import { closeHttpServerGracefully, processEvent } from '../logic';
+import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
@@ -43,7 +44,7 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const allServiceConfig = getAllServiceConfigs(devServerConfig);
 
   const app: Express = express();
@@ -191,9 +192,13 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
     }
   });
 
-  app.listen(devServerConfig.serverPort, '0.0.0.0', () => {
+  const httpServer = app.listen(devServerConfig.serverPort, '0.0.0.0', () => {
     const baseDomain = getServiceBaseDomain(allServiceConfig[0], devServerConfig);
 
     console.log(`⚡️⚡️⚡️[Qpq - Dev Server]⚡️⚡️⚡️: Server is running at [http://${baseDomain}]`);
   });
+
+  // A request still running when shutdown starts gets to finish, and whatever
+  // it writes is still ahead of the Persist phase.
+  return () => closeHttpServerGracefully(httpServer);
 };

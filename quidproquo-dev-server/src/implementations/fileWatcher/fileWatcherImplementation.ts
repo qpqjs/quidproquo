@@ -8,6 +8,8 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 
 import { getDevServerActionProcessors } from '../../actionProcessor';
+import { trackInFlight } from '../../logic';
+import { DevServerPluginStop } from '../../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerLogger } from '../logger';
 
@@ -20,7 +22,7 @@ interface FileEventPayload {
 
 const getDateNow = () => new Date().toISOString();
 
-export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const storagePath = devServerConfig.fileStorageConfig.storagePath;
 
   // Ensure storage directory exists
@@ -198,23 +200,33 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     }
   };
 
-  // Set up event listeners
-  watcher
-    .on('add', async (filePath) => {
-      // Only handle files, not directories
-      try {
-        const stats = await fs.stat(filePath);
-        if (stats.isFile()) {
-          await handleFileCreate(filePath);
-        }
-      } catch (error) {
-        // File might have been deleted already
-        console.debug('Could not stat file:', filePath);
+  const handleWatcherAdd = async (filePath: string): Promise<void> => {
+    // Only handle files, not directories
+    try {
+      const stats = await fs.stat(filePath);
+      if (stats.isFile()) {
+        await handleFileCreate(filePath);
       }
+    } catch (error) {
+      // File might have been deleted already
+      console.debug('Could not stat file:', filePath);
+    }
+  };
+
+  const handleWatcherUnlink = async (filePath: string): Promise<void> => {
+    console.log(`File deleted: ${filePath}`);
+    await handleFileDelete(filePath);
+  };
+
+  // Set up event listeners. Chokidar does not await its listeners either, so a
+  // storage-drive handler is in-flight work exactly like a queue message is:
+  // without tracking it, a restart kills a drive event mid-story.
+  watcher
+    .on('add', (filePath) => {
+      void trackInFlight(handleWatcherAdd(filePath));
     })
-    .on('unlink', async (filePath) => {
-      console.log(`File deleted: ${filePath}`);
-      await handleFileDelete(filePath);
+    .on('unlink', (filePath) => {
+      void trackInFlight(handleWatcherUnlink(filePath));
     })
     .on('error', (error) => {
       console.error('File watcher error:', error);
@@ -223,9 +235,10 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       console.log(`File watcher ready. Watching: ${storagePath}`);
     });
 
-  // Return cleanup function
-  return async () => {
+  const closeWatcher = async (): Promise<void> => {
     await watcher.close();
     console.log('File watcher closed');
   };
+
+  return closeWatcher;
 };

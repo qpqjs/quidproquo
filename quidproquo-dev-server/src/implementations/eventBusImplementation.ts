@@ -3,6 +3,9 @@
 // import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 // import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
 // import { eventBus } from '../logic';
+import { Nullable } from 'quidproquo-core';
+
+import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
 /*
@@ -55,7 +58,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
 };
 */
 
-export const eventBusImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const eventBusImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   // eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
   //   console.log('Event Buss Ready to process!');
   //   for (const qpqConfig of devServerConfig.qpqConfigs) {
@@ -63,6 +66,11 @@ export const eventBusImplementation = async (devServerConfig: ResolvedDevServerC
   //   }
   // });
 
-  // Never ends
-  await new Promise(() => {});
+  // NOTE: this plugin currently does nothing. Its whole body is the commented
+  // block above, and the only live line used to be an `await new Promise(() =>
+  // {})` that existed to stop the caller's Promise.all resolving. Queue fan-out
+  // for event-bus messages is done by queueImplementation instead. Kept in the
+  // list so the change is visible rather than silently dropped; delete it, or
+  // finish it, as a follow-up.
+  return null;
 };
