@@ -1,3 +1,4 @@
+export * from './SmokeProbeRecord';
 export * from './SmokeRun';
 export * from './SmokeRunStatus';
 export * from './SmokeRunSummary';

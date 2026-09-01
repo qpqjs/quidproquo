@@ -11,8 +11,9 @@ import {
   kvsUpdate,
 } from 'quidproquo';
 
-import { SMOKE_PROBE_STORE } from '../../constants/smokeProbe';
-import { SmokeProbeRecord } from '../../models/SmokeProbeRecord';
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
+
 import { askSmokeAssert } from '../askSmokeAssert';
 
 // Every DynamoDB action the owned-table grant covers (PutItem, GetItem,

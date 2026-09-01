@@ -8,7 +8,8 @@ import {
   AskResponse,
 } from 'quidproquo';
 
-import { SMOKE_PROBE_DRIVE } from '../../constants/smokeProbe';
+import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
+
 import { askSmokeAssert } from '../askSmokeAssert';
 
 // Every S3 action the owned-drive grant covers (PutObject, GetObject,

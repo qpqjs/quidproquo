@@ -1,3 +1,5 @@
+import { askRunCrossServiceKeyValueStoreTest } from './crossService/askRunCrossServiceKeyValueStoreTest';
+import { askRunCrossServiceStorageDriveTest } from './crossService/askRunCrossServiceStorageDriveTest';
 import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
 import { askRunKeyValueStoreTest } from './keyValueStore/askRunKeyValueStoreTest';
 import { askRunNoopTest } from './noop/askRunNoopTest';
@@ -16,4 +18,12 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
   { name: 'secret', askRun: askRunSecretTest },
   { name: 'storageDrive', askRun: askRunStorageDriveTest },
   { name: 'eventBus', askRun: askRunEventBusTest },
+  {
+    name: 'crossServiceKeyValueStore',
+    askRun: askRunCrossServiceKeyValueStoreTest,
+  },
+  {
+    name: 'crossServiceStorageDrive',
+    askRun: askRunCrossServiceStorageDriveTest,
+  },
 ];

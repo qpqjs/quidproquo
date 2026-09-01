@@ -9,13 +9,14 @@ import {
   Nullable,
 } from 'quidproquo';
 
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
+
 import {
   SMOKE_PROBE_EVENT_BUS,
   SMOKE_PROBE_EVENT_TYPE,
-  SMOKE_PROBE_STORE,
 } from '../../constants/smokeProbe';
 import { SmokeProbeEventPayload } from '../../models/SmokeProbeEventQueueEvent';
-import { SmokeProbeRecord } from '../../models/SmokeProbeRecord';
 import { askSmokeAssert } from '../askSmokeAssert';
 
 const POLL_ATTEMPTS = 15;
