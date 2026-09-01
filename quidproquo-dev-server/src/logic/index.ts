@@ -6,5 +6,6 @@ export * from './inFlight';
 export * from './jsonFileStore';
 export * from './kvsStream';
 export * from './processEvent';
+export * from './readiness';
 export * from './shutdown';
 export * from './withProcessorDelay';

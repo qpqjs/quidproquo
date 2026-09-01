@@ -8,7 +8,7 @@ import path from 'path';
 
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
-import { closeHttpServerGracefully, processEvent } from '../logic';
+import { closeHttpServerGracefully, isDevServerReady, processEvent } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
 
@@ -68,6 +68,19 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   // Admin page
   app.use('/admin', express.static(adminFrontend));
+
+  // Readiness, for anything that has to wait for the dev server before it can
+  // do useful work: a CI script about to POST, a docker HEALTHCHECK.
+  //
+  // 503 until every plugin has started, not just this one. This route answers
+  // as soon as the port is bound, which is exactly the window the caller needs
+  // told about - a TCP connect would say "up" here and be wrong.
+  app.get('/admin/service/ready', (req, res) => {
+    const ready = isDevServerReady();
+
+    res.status(ready ? 200 : 503).json({ ready });
+  });
+
   app.get('/admin/service/log/list', (req, res) => {
     // Manually set CORS headers
     res.header('Access-Control-Allow-Headers', '*');

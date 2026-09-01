@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import path from 'path';
 
 import { createTinkerInterface } from './implementations';
-import { awaitDevServerIdle, installDevServerShutdownHandlers, runDevServerShutdown } from './logic';
+import { awaitDevServerIdle, installDevServerShutdownHandlers, markDevServerReady, runDevServerShutdown } from './logic';
 import { apiPlugin, DEV_SERVER_PLUGINS, DevServerPlugin, MIGRATION_DEV_SERVER_PLUGINS, startDevServerPlugins } from './plugins';
 import { DevServerConfig, DevServerConfigOverrides, ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from './types';
 
@@ -57,6 +57,9 @@ const startPluginsWithShutdown = async (plugins: DevServerPlugin[], resolvedDevS
   const shutdownTasks = await startDevServerPlugins(plugins, resolvedDevServerConfig);
 
   installDevServerShutdownHandlers(() => runDevServerShutdown(shutdownTasks));
+
+  // Every plugin is up. Anything waiting on GET /admin/service/ready can go.
+  markDevServerReady();
 };
 
 export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
