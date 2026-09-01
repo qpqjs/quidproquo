@@ -1,14 +1,16 @@
 name: deploy-site
 
 # Deploy quidproquojs.com.
-#   push to develop -> development
 #   push to main    -> production
+#   push to uat     -> staging
+#   push elsewhere  -> development (every feature branch, serialized, last writer wins)
 # Any environment can also be deployed by hand from the Actions tab
-# ("Run workflow") — that is the only route to staging, and the way to redeploy
-# an environment out of band.
+# ("Run workflow"), the way to redeploy an environment out of band.
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - '**'
+      - '!dependabot/**'
   workflow_dispatch:
     inputs:
       env:
@@ -43,7 +45,7 @@ jobs:
     steps:
       - id: pick
         run: |
-          echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || 'development') }}" >> "$GITHUB_OUTPUT"
+          echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || (github.ref_name == 'uat' && 'staging' || 'development')) }}" >> "$GITHUB_OUTPUT"
 
   deploy:
     needs: [resolve, test, smoke]
@@ -92,3 +94,34 @@ jobs:
       # above are passed through to the deploy containers.
       - run: npx qpq go:docker all all --app qpqjs --env ${{ needs.resolve.outputs.env }}
         working-directory: quidproquojs.com
+
+  # Verify the deployment end to end: mint a GitHub OIDC token with the
+  # qpq-smoke audience, start a smoke run on the deployed test service, poll it
+  # to completion. The smoke endpoint validates the token against this repo's
+  # immutable id and the job's `environment:` claim, so only this workflow can
+  # call it. Non-production only: prod has no CI smoke path.
+  deployed-smoke:
+    needs: [resolve, deploy]
+    # An explicit `if` drops the implicit success() check, so spell it out or
+    # this would run against a failed deploy.
+    if: success() && needs.resolve.outputs.env != 'production'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    # Declaring the environment stamps the OIDC token's `environment` claim,
+    # which the endpoint pins - same convention as the deploy role trust.
+    environment: ${{ needs.resolve.outputs.env }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: quidproquojs.com/.nvmrc
+
+      # The runner is a dependency-free node script, so no install step. It
+      # derives the api url from the environment plus the app's deploy config.
+      - run: node scripts/deployedSmoke.mjs
+        working-directory: quidproquojs.com
+        env:
+          SMOKE_ENVIRONMENT: ${{ needs.resolve.outputs.env }}
