@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.18
+
 - `askRouteAuthValidationDecode` (`quidproquo-webserver`) now returns a `RouteAuthDecodeResult` tri-state (`{ outcome: RouteAuthDecodeOutcome.notApplicable }` / `{ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken }` / `{ outcome: RouteAuthDecodeOutcome.invalid }`) instead of `DecodedAccessToken | null`, and the action is now always yielded regardless of whether `routeAuthSettings.userDirectoryName` is set. A custom processor implementing this action must return the new shape (`notApplicable` for "no token auth configured", `invalid` for a failed/absent token, `valid` with `decodedAccessToken` on success) instead of `null`/a decoded token.
 
 ## 0.1.17

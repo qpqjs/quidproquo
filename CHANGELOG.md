@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.18
+
+- core: a function runtime can carry its own `actionProcessors` (a list of getActionProcessors-style sources); they merge over the platform and service-wide processors for that function's whole execution, last wins, and in-process nested executions inherit the merged list
+- webserver: route auth decode runs on every request, with or without a `userDirectoryName`, and reports `notApplicable`/`valid`/`invalid`, so a per-route processor override can supply its own token validation (e.g. a github oidc endpoint)
+- deploy-awscdk: lambda role grants for owned kvs tables, parameters, secrets and storage drives are conditioned on the application/module/environment tags instead of listing two exact arns per resource, so a service with many stores no longer blows the 10,240 byte inline-policy cap
+
+### Breaking changes
+
+- `askRouteAuthValidationDecode` returns a `RouteAuthDecodeResult` tri-state instead of `DecodedAccessToken | null`, and is always yielded; custom processors must return the new shape
+
 ## 0.1.17
 
 - core: `createActionRequester` and `createActionProcessor` factories, and every built-in action across the packages is migrated to them. A requester now carries its own payload type and error enum (`askX.errorTypeEnum`), and a processor types its handler as `ProcessorFor<typeof askX>`
