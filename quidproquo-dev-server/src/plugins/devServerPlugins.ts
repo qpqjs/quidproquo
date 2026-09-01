@@ -7,6 +7,7 @@ import { inFlightPlugin } from './inFlightPlugin';
 import { kvsPlugin } from './kvsPlugin';
 import { kvsStreamPlugin } from './kvsStreamPlugin';
 import { queuePlugin } from './queuePlugin';
+import { schedulePlugin } from './schedulePlugin';
 import { serviceFunctionPlugin } from './serviceFunctionPlugin';
 import { webSocketPlugin } from './webSocketPlugin';
 
@@ -29,6 +30,8 @@ export const DEV_SERVER_PLUGINS: DevServerPlugin[] = [
   queuePlugin,
   kvsStreamPlugin,
   serviceFunctionPlugin,
+
+  schedulePlugin,
 
   apiPlugin,
   webSocketPlugin,

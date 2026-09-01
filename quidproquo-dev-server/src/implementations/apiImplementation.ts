@@ -39,6 +39,16 @@ const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: Resolved
   return apiDomains;
 };
 
+// The admin routes are called from the admin frontend, which is served from
+// this same server but reached on whatever host the developer typed. Wide open
+// on purpose: this is a local tool, and nothing here is reachable off the box.
+const allowAnyOrigin = (res: Response): void => {
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'false');
+};
+
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
@@ -82,11 +92,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
   });
 
   app.get('/admin/service/log/list', (req, res) => {
-    // Manually set CORS headers
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', 'false');
+    allowAnyOrigin(res);
 
     const serviceList = allServiceConfig.map((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig)).map((name) => `api/${name}`);
 
@@ -96,31 +102,19 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
   app.use(express.json());
 
   app.options('/admin/service/log/execute', async (req, res) => {
-    // Manually set CORS headers
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', 'false');
+    allowAnyOrigin(res);
 
     res.json({ done: true });
   });
 
   app.get('/mf-manifest-location.json', async (req, res) => {
-    // Manually set CORS headers
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', 'false');
+    allowAnyOrigin(res);
 
     res.json({ location: 'http://localhost:3005/mf-manifest.json' });
   });
 
   app.post('/admin/service/log/execute', async (req, res) => {
-    // Manually set CORS headers
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', 'false');
+    allowAnyOrigin(res);
 
     // TODO: Get list of services from config dynamically
     const serviceLog: StoryResult<any> = req.body;

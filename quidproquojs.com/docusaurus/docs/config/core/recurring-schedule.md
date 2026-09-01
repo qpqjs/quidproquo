@@ -1,20 +1,21 @@
 ---
 title: defineRecurringSchedule
-description: Define a recurring schedule — a cron-driven trigger that runs a story on a timetable.
+description: Define a recurring schedule, a trigger that runs a story on a timetable.
 ---
 
 # defineRecurringSchedule
 
-Defines a **recurring schedule**: a time-based trigger that runs a story on a cron timetable, with no incoming request. Use it for periodic work — nightly cleanups, polling, report generation, cache warming. Like a [queue](./queue.md) or [event bus](./event-bus.md), a schedule is an **event source**: each fire delivers a `ScheduledEvent` to the target story through the same [askProcessEvent](../../actions/core/event/ask-process-event.md) pipeline.
+Defines a **recurring schedule**: a time-based trigger that runs a story on a timetable, with no incoming request. Use it for periodic work — nightly cleanups, polling, report generation, cache warming. Like a [queue](./queue.md) or [event bus](./event-bus.md), a schedule is an **event source**: each fire delivers a `ScheduledEvent` to the target story through the same [askProcessEvent](../../actions/core/event/ask-process-event.md) pipeline.
 
-- **On AWS:** deploys an **EventBridge rule** with a cron schedule expression and a **consumer Lambda** as its target (`QpqCoreRecurringScheduleConstruct` in `quidproquo-deploy-awscdk`). The rule fires on the cron cadence and invokes the Lambda, passing the schedule's `metadata` as the event `detail`. The Lambda has a 15-minute timeout, and `maxConcurrentExecutions` (when set) becomes the Lambda's reserved concurrent executions.
+- **Locally:** the dev server ticks once a minute and runs any schedule whose recurrence matches that UTC minute. See [Locally](#locally) below.
+- **On AWS:** deploys an **EventBridge rule** whose cron expression is rendered from the recurrence and a **consumer Lambda** as its target (`QpqCoreRecurringScheduleConstruct` in `quidproquo-deploy-awscdk`). The rule fires on the cron cadence and invokes the Lambda, passing the schedule's `metadata` as the event `detail`. The Lambda has a 15-minute timeout, and `maxConcurrentExecutions` (when set) becomes the Lambda's reserved concurrent executions.
 
 ```typescript
 import { defineRecurringSchedule } from 'quidproquo-core';
 
 export default [
-  // Every day at 3 AM (server time)
-  defineRecurringSchedule('0 0 3 * * ? *', '/entry/schedule/onNightlyCleanup::onNightlyCleanup'),
+  // Every day at 3am UTC
+  defineRecurringSchedule({ dailyAtUtc: { hour: 3, minute: 0 } }, '/entry/schedule/onNightlyCleanup::onNightlyCleanup'),
 ];
 ```
 
@@ -22,7 +23,7 @@ export default [
 
 ```typescript
 function defineRecurringSchedule(
-  cronExpression: string,
+  recurrence: ScheduleRecurrence,
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedScheduleSettings,
 ): ScheduleQPQConfigSetting;
@@ -30,29 +31,21 @@ function defineRecurringSchedule(
 
 ## Parameters
 
-### `cronExpression` — `string` (required)
+### `recurrence` — `ScheduleRecurrence` (required)
 
-The cron expression that controls when the schedule fires. On AWS this is wrapped as `cron(<cronExpression>)` in the EventBridge rule, so it uses the six-field AWS EventBridge cron syntax:
+When the schedule fires, declared as intent rather than as a cron string. It is deliberately platform-neutral: an AWS EventBridge cron expression is one *rendering* of it, produced at deploy time, and the dev server matches the same declaration against the clock.
 
-```
-minutes hours day-of-month month day-of-week year
-```
+| Recurrence | Fires |
+| --- | --- |
+| `{ everyMinutes: n }` | every `n` minutes, on the hour. `n` must divide 60 |
+| `{ everyHours: n, atMinute?: m }` | every `n` hours at minute `m` (default 0). `n` must divide 24 |
+| `{ dailyAtUtc: { hour, minute } }` | once a day |
+| `{ weeklyAtUtc: { day, hour, minute } }` | once a week, `day` being a `DayOfWeek` |
+| `{ monthlyAtUtc: { dayOfMonth, hour, minute } }` | once a month. A date past the end of a short month simply does not occur that month |
 
-| Field | Values | Wildcards |
-| --- | --- | --- |
-| Minutes | `0-59` | `,` `-` `*` `/` |
-| Hours | `0-23` | `,` `-` `*` `/` |
-| Day-of-month | `1-31` | `,` `-` `*` `?` `/` `L` `W` |
-| Month | `1-12` or `JAN-DEC` | `,` `-` `*` `/` |
-| Day-of-week | `1-7` or `SUN-SAT` | `,` `-` `*` `?` `L` `#` |
-| Year | `1970-2199` | `,` `-` `*` `/` |
+**Every time is UTC.** The deployed scheduler evaluates in UTC, so there is no local-timezone option: 3am in Brisbane is `{ dailyAtUtc: { hour: 17, minute: 0 } }`, and saying so in the config beats a comment that goes stale twice a year.
 
-You cannot use `*` in both the day-of-month and day-of-week fields at once — put `?` in the one you don't want to constrain. Examples:
-
-- `'* * * * ? *'` — every minute
-- `'0/10 * * * ? *'` — every 10 minutes
-- `'0 0 3 * * ? *'` — every day at 3 AM
-- `'0 0 3 ? * 1 *'` — every Monday at 3 AM
+An interval that cannot be scheduled evenly (`{ everyMinutes: 7 }`) throws an `InvalidScheduleRecurrenceError` when the config is evaluated, so it fails at synth and at dev-server boot rather than at some unlucky hour in production. The reason it is refused rather than approximated: AWS renders an interval as `0/n`, which restarts at the top of every hour, so seven-minute steps would fire at :00 :07 ... :56 and then leave a four-minute gap.
 
 ### `runtime` — `QpqFunctionRuntime` (required)
 
@@ -99,14 +92,24 @@ import { defineRecurringSchedule } from 'quidproquo-core';
 
 export default [
   // Poll an upstream every 10 minutes
-  defineRecurringSchedule('0/10 * * * ? *', '/entry/schedule/onPoll::onPoll'),
+  defineRecurringSchedule({ everyMinutes: 10 }, '/entry/schedule/onPoll::onPoll'),
 
   // Nightly report, capped to a single concurrent run, with metadata
-  defineRecurringSchedule('0 0 2 * * ? *', '/entry/schedule/onNightlyReport::onNightlyReport', {
+  defineRecurringSchedule({ dailyAtUtc: { hour: 2, minute: 0 } }, '/entry/schedule/onNightlyReport::onNightlyReport', {
     maxConcurrentExecutions: 1,
     metadata: { report: 'daily-summary' },
   }),
 ];
+```
+
+## Locally
+
+The dev server arms every schedule its services own and ticks once a minute, running any whose recurrence matches that UTC minute. It lists what it armed at boot:
+
+```
+[schedule] 2 schedule(s) armed (utc):
+[schedule]   flow/onPoll {"everyMinutes":10}
+[schedule]   flow/onNightlyReport {"dailyAtUtc":{"hour":2,"minute":0}}
 ```
 
 ## Related
@@ -114,4 +117,4 @@ export default [
 - [askProcessEvent](../../actions/core/event/ask-process-event.md) — the pipeline that runs the target story for each schedule fire.
 - [defineQueue](./queue.md) and [defineEventBus](./event-bus.md) — the other core event sources.
 - [defineDeployEvent](./deploy-event.md) — a related time/lifecycle-based trigger that runs at deploy time rather than on a timetable.
-- **AWS implementation:** `QpqCoreRecurringScheduleConstruct` (EventBridge rule + target Lambda) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqCoreRecurringScheduleConstruct` (EventBridge rule + target Lambda) in `quidproquo-deploy-awscdk`. `renderAwsCronExpression`, alongside it, is the only place in the codebase that knows the EventBridge cron dialect.

@@ -21,10 +21,11 @@ import { smokeTestRegistry } from '../../tests/smokeTestRegistry';
 // Runs one registered test, returning its completed result entry.
 function* askRunSmokeTest(
   test: SmokeTestDefinition,
-  pending: SmokeTestResult
+  pending: SmokeTestResult,
+  runId: string
 ): AskResponse<SmokeTestResult> {
   const startedAt = yield* askDateNow();
-  const outcome = yield* askCatch(test.askRun());
+  const outcome = yield* askCatch(test.askRun(runId));
   const finishedAt = yield* askDateNow();
 
   return {
@@ -53,7 +54,8 @@ export function* askExecuteSmokeRun(runId: string): AskResponse<SmokeRun> {
   for (let index = 0; index < smokeTestRegistry.length; index += 1) {
     const result = yield* askRunSmokeTest(
       smokeTestRegistry[index],
-      smokeRun.tests[index]
+      smokeRun.tests[index],
+      runId
     );
 
     smokeRun = {

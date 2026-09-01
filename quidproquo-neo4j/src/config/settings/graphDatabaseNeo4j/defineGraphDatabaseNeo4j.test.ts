@@ -27,7 +27,7 @@ describe('defineGraphDatabaseNeo4j', () => {
     const settings = defineGraphDatabaseNeo4j('myDb');
     const schedule = settings[3] as any;
 
-    expect(schedule.cronExpression).toBe('0 0 * * ? *');
+    expect(schedule.recurrence).toEqual({ dailyAtUtc: { hour: 0, minute: 0 } });
     expect(schedule.metadata).toEqual({ databaseName: 'myDb' });
   });
 });

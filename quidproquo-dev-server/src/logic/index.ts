@@ -7,5 +7,6 @@ export * from './jsonFileStore';
 export * from './kvsStream';
 export * from './processEvent';
 export * from './readiness';
+export * from './schedule';
 export * from './shutdown';
 export * from './withProcessorDelay';

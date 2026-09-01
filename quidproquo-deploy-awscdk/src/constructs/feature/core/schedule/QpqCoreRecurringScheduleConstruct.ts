@@ -1,11 +1,12 @@
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
-import { ScheduleQPQConfigSetting } from 'quidproquo-core';
+import { resolveScheduleFields, ScheduleQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
+import { renderAwsCronExpression } from './renderAwsCronExpression';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
   scheduleConfig: ScheduleQPQConfigSetting;
@@ -39,9 +40,11 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    // EventBridge rule which runs every five minutes
+    // The declared recurrence, rendered into the dialect EventBridge speaks.
+    // This is the only place that conversion happens; the config itself is
+    // platform-neutral so the dev server can honour the same declaration.
     const cronRule = new aws_events.Rule(this, 'cron', {
-      schedule: aws_events.Schedule.expression(`cron(${props.scheduleConfig.cronExpression})`),
+      schedule: aws_events.Schedule.expression(`cron(${renderAwsCronExpression(resolveScheduleFields(props.scheduleConfig.recurrence))})`),
     });
 
     // Set the target as lambda function

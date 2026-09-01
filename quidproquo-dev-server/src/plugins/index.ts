@@ -7,6 +7,7 @@ export * from './inFlightPlugin';
 export * from './kvsPlugin';
 export * from './kvsStreamPlugin';
 export * from './queuePlugin';
+export * from './schedulePlugin';
 export * from './serviceFunctionPlugin';
 export * from './startDevServerPlugins';
 export * from './types';

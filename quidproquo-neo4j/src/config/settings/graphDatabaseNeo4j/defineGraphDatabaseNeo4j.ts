@@ -48,7 +48,7 @@ export const defineGraphDatabaseNeo4j = (databaseName: string, options?: QPQConf
     defineActionProcessors(buildQpqFunctionRuntime(`../../../actionProcessor/graphDatabaseOverride/${version}`, 'getGraphDatabaseActionProcessor')),
 
     defineRecurringSchedule(
-      '0 0 * * ? *', // 12am every day (UTC)
+      { dailyAtUtc: { hour: 0, minute: 0 } },
       buildQpqFunctionRuntime('../../../entry/scheduledEvents/keepAlive', 'keepAlive'),
       {
         metadata: {

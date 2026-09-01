@@ -7,8 +7,8 @@ import { Construct } from 'constructs';
 import {
   ApiQpqWebserverApiConstruct,
   LambdaLayers,
-  QpqApiCoreQueueConstruct,
   QpqApiCoreKeyValueStoreStreamConstruct,
+  QpqApiCoreQueueConstruct,
   QpqApiCoreStorageDriveConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
