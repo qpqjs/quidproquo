@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
 import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { createServer } from 'http';
@@ -8,7 +8,8 @@ import { RawData, WebSocket, WebSocketServer } from 'ws';
 // file back through the webserver websocket processors, and entering that loop
 // barrel-first breaks module init. The deep path keeps the graph acyclic.
 import { getWsWebsocketEventEventProcessor } from '../../actionProcessor/core/event/ws/websocket';
-import { processEvent } from '../../logic';
+import { closeHttpServerGracefully, processEvent } from '../../logic';
+import { DevServerPluginStop } from '../../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../../types';
 import { WsEvent } from './types';
 import { findRegisteredWebSocketServer, getRegisteredWebSocketServers, setRegisteredWebSocketServers } from './webSocketConnectionRegistry';
@@ -153,9 +154,9 @@ const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): Web
     );
 };
 
-export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   if (!devServerConfig.webSocketPort) {
-    return;
+    return null;
   }
 
   const webSocketQPQWebServerConfigSettingMaps = getWebSocketQPQWebServerConfigSettingMaps(devServerConfig.qpqConfigs);
@@ -180,6 +181,26 @@ export const webSocketImplementation = async (devServerConfig: ResolvedDevServer
 
   server.listen(devServerConfig.webSocketPort, 'localhost');
 
-  // Never ends
-  await new Promise(() => {});
+  // Close the ws servers before the http server they upgraded from: that sends
+  // a proper close frame, so a browser reconnects against the restarted server
+  // instead of sitting on a socket that is quietly dead.
+  const closeWebSocketServers = async (): Promise<void> => {
+    await Promise.all(
+      getRegisteredWebSocketServers().map((registered) => {
+        // ws's close() waits for every client to disconnect and will never
+        // resolve on its own while a browser tab is still open, so close the
+        // sockets first. The close frame is what tells the client to reconnect
+        // rather than treat it as a dropped connection.
+        registered.server.clients.forEach((client) => client.close());
+
+        return new Promise<void>((resolve) => {
+          registered.server.close(() => resolve());
+        });
+      }),
+    );
+
+    await closeHttpServerGracefully(server);
+  };
+
+  return closeWebSocketServers;
 };

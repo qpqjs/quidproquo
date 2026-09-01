@@ -4,23 +4,14 @@ import { askRunPendingMigrations } from 'quidproquo-webserver';
 import * as crypto from 'crypto';
 import path from 'path';
 
-import { closeAllKvsRepositories } from './logic/keyValueStore/getKvsRepository';
-import { warnIfLegacyJsonKvsStores } from './logic/keyValueStore/warnIfLegacyJsonKvsStores';
-import {
-  apiImplementation,
-  awaitQueueIdle,
-  createTinkerInterface,
-  eventBusImplementation,
-  fileStorageImplementation,
-  fileWatcherImplementation,
-  kvsStreamImplementation,
-  queueImplementation,
-  serviceFunctionImplementation,
-  webSocketImplementation,
-} from './implementations';
+import { createTinkerInterface } from './implementations';
+import { awaitDevServerIdle, installDevServerShutdownHandlers, runDevServerShutdown } from './logic';
+import { apiPlugin, DEV_SERVER_PLUGINS, DevServerPlugin, MIGRATION_DEV_SERVER_PLUGINS, startDevServerPlugins } from './plugins';
 import { DevServerConfig, DevServerConfigOverrides, ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from './types';
 
 export * from './implementations';
+export * from './logic/inFlight';
+export * from './plugins';
 
 export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?: DevServerConfigOverrides): QPQConfig[] => {
   return qpqConfigs.map((qpqConfig) => {
@@ -60,38 +51,28 @@ const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfi
   };
 };
 
-// Checkpoint the kvs WAL on the way out (SIGINT from a terminal, SIGTERM from
-// docker). Durability never needs this - sqlite commits at the statement - it
-// just folds kvs.db-wal back into kvs.db so a stopped server leaves one file.
-const closeKvsRepositoriesAndExit = (): void => {
-  void closeAllKvsRepositories().finally(() => process.exit(0));
+// Start a set of plugins and wire the signals that stop them again. Every
+// entry point does exactly this; only the plugin list differs.
+const startPluginsWithShutdown = async (plugins: DevServerPlugin[], resolvedDevServerConfig: ResolvedDevServerConfig): Promise<void> => {
+  const shutdownTasks = await startDevServerPlugins(plugins, resolvedDevServerConfig);
+
+  installDevServerShutdownHandlers(() => runDevServerShutdown(shutdownTasks));
 };
 
 export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
-  console.log('Starting QPQ Dev Server!!! - this is a note');
+  console.log('Starting QPQ Dev Server');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
 
-  warnIfLegacyJsonKvsStores(resolvedDevServerConfig.runtimePath);
+  await startPluginsWithShutdown(DEV_SERVER_PLUGINS, resolvedDevServerConfig);
 
-  process.once('SIGINT', closeKvsRepositoriesAndExit);
-  process.once('SIGTERM', closeKvsRepositoriesAndExit);
-
-  await Promise.all([
-    apiImplementation(resolvedDevServerConfig),
-
-    serviceFunctionImplementation(resolvedDevServerConfig),
-
-    eventBusImplementation(resolvedDevServerConfig),
-
-    kvsStreamImplementation(resolvedDevServerConfig),
-    queueImplementation(resolvedDevServerConfig),
-
-    webSocketImplementation(resolvedDevServerConfig),
-
-    fileStorageImplementation(resolvedDevServerConfig),
-    fileWatcherImplementation(resolvedDevServerConfig),
-  ]);
+  // Park forever. Every plugin's start resolves once it is up, so there is
+  // nothing left to await; the process ends through the signal handlers
+  // installed above. This is the ONE place that blocks - it used to be four
+  // implementations each ending in the same trick to stop a Promise.all
+  // resolving, which is what stranded their handles and made shutdown
+  // impossible in the first place.
+  await new Promise<void>(() => {});
 };
 
 /**
@@ -111,16 +92,9 @@ export const runMigrations = async (
 ): Promise<Record<string, string[]>> => {
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
 
-  // The queue is what actually executes a migration, and the kvs stream keeps projections in
-  // step with whatever it writes. Nothing else is needed: no http server, no websockets.
-  // NOT awaited: these block forever by design (startDevServer runs them inside Promise.all
-  // alongside the http server). Awaiting one hangs the whole command silently.
-  void queueImplementation(resolvedDevServerConfig);
-  void kvsStreamImplementation(resolvedDevServerConfig);
-
-  // Let them register their bus listeners before anything is published, exactly as
-  // startTinker does.
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  // Awaited, unlike before: a plugin's start resolves once its listeners are
+  // registered, so there is no window to sleep through any more.
+  const shutdownTasks = await startDevServerPlugins(MIGRATION_DEV_SERVER_PLUGINS, resolvedDevServerConfig);
 
   const tinker = createTinkerInterface(resolvedDevServerConfig);
   const ran: Record<string, string[]> = {};
@@ -135,15 +109,16 @@ export const runMigrations = async (
     }
 
     // Enqueueing is not running: wait for the handlers themselves before calling this service
-    // done, or a failure would surface after we had already reported success.
-    await awaitQueueIdle();
+    // done, or a failure would surface after we had already reported success. That includes
+    // the kvs-stream projections a migration's writes trigger, not just the queue.
+    await awaitDevServerIdle();
 
     ran[serviceName] = result.result ?? [];
   }
 
-  // Sqlite commits at the statement, so every migration write is already on
-  // disk; closing just checkpoints the WAL before the one-shot process exits.
-  await closeAllKvsRepositories();
+  // The same teardown a signal would run: drain anything still going, then
+  // checkpoint the stores before this one-shot process exits.
+  await runDevServerShutdown(shutdownTasks);
 
   return ran;
 };
@@ -157,22 +132,12 @@ export const startTinker = async (
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
 
-  // Start all implementations without awaiting (they run forever)
-  // Just fire them off in the background
-  if (tinkerOptions?.includeHttpServer) {
-    apiImplementation(resolvedDevServerConfig);
-  }
+  // A tinker session runs the same stories against the same subsystems, so
+  // ctrl+c and `.exit` have the same work to lose. The api server is the one
+  // thing a session does not need unless it asks for it.
+  const plugins = tinkerOptions?.includeHttpServer ? DEV_SERVER_PLUGINS : DEV_SERVER_PLUGINS.filter((plugin) => plugin !== apiPlugin);
 
-  serviceFunctionImplementation(resolvedDevServerConfig);
-  eventBusImplementation(resolvedDevServerConfig);
-  kvsStreamImplementation(resolvedDevServerConfig);
-  queueImplementation(resolvedDevServerConfig);
-  webSocketImplementation(resolvedDevServerConfig);
-  fileStorageImplementation(resolvedDevServerConfig);
-  fileWatcherImplementation(resolvedDevServerConfig);
-
-  // Give implementations a moment to initialize
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await startPluginsWithShutdown(plugins, resolvedDevServerConfig);
 
   // Create and return the tinker interface
   return createTinkerInterface(resolvedDevServerConfig, tinkerOptions);

@@ -36,16 +36,36 @@ export const isQpqCliCommand = (command: string): boolean =>
 // one (a real child can sit as a zombie answering `kill(pid, 0)` until this
 // process's own event loop reaps it, which a tight sync loop would starve;
 // doesn't apply to a process we didn't spawn).
-const waitForPidGone = (pid: number, timeoutMs = 3000): void => {
+//
+// The default covers the dev server's graceful shutdown (drain in-flight work,
+// then checkpoint the stores) with room to spare — it used to be 3s, which was
+// fine when the server died instantly and is not now. Returns whether the pid
+// actually went, because a caller about to bind these ports has to escalate
+// rather than hope: giving up while the old server still holds 8080 is exactly
+// the EADDRINUSE this file exists to prevent.
+const waitForPidGone = (pid: number, timeoutMs = 8000): boolean => {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
       process.kill(pid, 0);
     } catch {
-      return; // throws once the pid no longer exists
+      return true; // throws once the pid no longer exists
     }
     execSync('sleep 0.05');
   }
+
+  return false;
+};
+
+// Last resort for a process that ignored, or wedged during, its graceful stop.
+const killPidHard = (pid: number): void => {
+  console.warn(`Process ${pid} did not exit gracefully — sending SIGKILL.`);
+  try {
+    process.kill(pid, 'SIGKILL');
+  } catch {
+    return; // raced us and exited after all
+  }
+  waitForPidGone(pid, 2000);
 };
 
 // realpath'd: lsof reports the canonical path (e.g. /private/tmp on macOS,
@@ -127,7 +147,9 @@ export const killOtherQpqDevProcesses = (root: string): void => {
 
     console.log(`Killing other qpq dev process for this repo (pid ${pid}): ${command}`);
     process.kill(pid, 'SIGINT');
-    waitForPidGone(pid);
+    if (!waitForPidGone(pid)) {
+      killPidHard(pid);
+    }
   }
 };
 
@@ -156,7 +178,9 @@ export const killStaleListeners = (ports: number[], isOurs: (command: string) =>
       if (isOurs(command)) {
         console.log(`Killing stale dev server on port ${port} (pid ${pid})`);
         process.kill(pid);
-        waitForPidGone(pid);
+        if (!waitForPidGone(pid)) {
+          killPidHard(pid);
+        }
       } else {
         console.warn(`Port ${port} is in use by an unrelated process (pid ${pid}: ${command}) — not killing it.`);
       }

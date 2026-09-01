@@ -1,9 +1,19 @@
-import { EventBusActionType, generateUuid, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, QueueActionType } from 'quidproquo-core';
+import {
+  EventBusActionType,
+  generateUuid,
+  Nullable,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqFunctionRuntime,
+  QpqRuntimeType,
+  QueueActionType,
+} from 'quidproquo-core';
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
-import { eventBus, processEvent } from '../logic';
+import { eventBus, processEvent, trackInFlight } from '../logic';
+import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
@@ -122,38 +132,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   // console.log('------------------------');
 };
 
-// Messages currently being processed. The bus is fire-and-forget (emit does not await its
-// listeners), which is right for emulating a queue but leaves a one-shot caller no way to know
-// when the work is done. A long-running dev server never asks; `qpq migrate` has to, or it
-// exits mid-migration and reports success.
-const inFlight = new Set<Promise<void>>();
-
-const trackInFlight = <T>(work: Promise<T>): Promise<T> => {
-  const tracked = work.then(
-    () => undefined,
-    () => undefined,
-  );
-
-  inFlight.add(tracked);
-  void tracked.finally(() => inFlight.delete(tracked));
-
-  return work;
-};
-
-/**
- * Resolve once nothing is being processed.
- *
- * Loops rather than awaiting once, because a message can enqueue more work while it runs and
- * the set can refill after the first await settles. Draining to empty is the only honest
- * answer to "is it finished".
- */
-export const awaitQueueIdle = async (): Promise<void> => {
-  while (inFlight.size > 0) {
-    await Promise.all([...inFlight]);
-  }
-};
-
-export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   // Fail fast when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
   for (const qpqConfig of devServerConfig.qpqConfigs) {
     qpqCoreUtils.assertFifoQueueEventBusSubscriptionsAreValid(qpqConfig);
@@ -198,6 +177,7 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     }
   });
 
-  // Never ends
-  await new Promise(() => {});
+  // Nothing to take down: the messages themselves are in-flight work, drained
+  // by the in-flight plugin, and the bus outlives every listener on it.
+  return null;
 };

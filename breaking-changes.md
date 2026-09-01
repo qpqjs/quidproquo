@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- `awaitQueueIdle` (`quidproquo-dev-server`) is renamed to `awaitDevServerIdle` and moves from `implementations/queueImplementation` to `logic/inFlight/inFlightWork`. It is still exported from the package root, and now waits on kvs-stream projections and storage-drive handlers as well as queue messages, so the old name no longer described it. No shim is kept: rename the call.
+- Every `*Implementation` function (`quidproquo-dev-server`: `apiImplementation`, `queueImplementation`, `webSocketImplementation`, `fileWatcherImplementation`, `fileStorageImplementation`, `kvsStreamImplementation`, `serviceFunctionImplementation`, `eventBusImplementation`) now **resolves once its subsystem is up**, returning a `DevServerPluginStop` (or `null` when it owns no resource), instead of never resolving. Four of them used to end in `await new Promise(() => {})` so a caller's `Promise.all` would not resolve; anything relying on that must now park itself. They are composed through the new internal `DevServerPlugin` contract (`DEV_SERVER_PLUGINS`), which is where a subsystem's teardown and its shutdown phase are declared.
+
 ## 0.1.18
 
 - `askRouteAuthValidationDecode` (`quidproquo-webserver`) now returns a `RouteAuthDecodeResult` tri-state (`{ outcome: RouteAuthDecodeOutcome.notApplicable }` / `{ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken }` / `{ outcome: RouteAuthDecodeOutcome.invalid }`) instead of `DecodedAccessToken | null`, and the action is now always yielded regardless of whether `routeAuthSettings.userDirectoryName` is set. A custom processor implementing this action must return the new shape (`notApplicable` for "no token auth configured", `invalid` for a failed/absent token, `valid` with `decodedAccessToken` on success) instead of `null`/a decoded token.
