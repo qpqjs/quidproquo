@@ -5,6 +5,7 @@ export * from './fileWatcher';
 export * from './kvsStreamImplementation';
 export * from './logger';
 export * from './queueImplementation';
+export * from './schedule';
 export * from './serviceFunctionImplementation';
 export * from './tinkerImplementation';
 export * from './webSocket';

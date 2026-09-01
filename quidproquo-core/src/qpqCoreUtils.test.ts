@@ -535,8 +535,10 @@ describe('qpqCoreUtils', () => {
 
   describe('schedules', () => {
     const config = buildTestQpqConfig([
-      defineRecurringSchedule('cron(0 0 * * ? *)', '/s/daily::run'),
-      defineRecurringSchedule('cron(0 1 * * ? *)', '/s/foreign::run', { owner: { module: 'other-module', recurringSchedule: 'foreign' } }),
+      defineRecurringSchedule({ dailyAtUtc: { hour: 0, minute: 0 } }, '/s/daily::run'),
+      defineRecurringSchedule({ dailyAtUtc: { hour: 1, minute: 0 } }, '/s/foreign::run', {
+        owner: { module: 'other-module', recurringSchedule: 'foreign' },
+      }),
     ]);
 
     it('lists all schedule events', () => {
@@ -551,7 +553,7 @@ describe('qpqCoreUtils', () => {
   describe('inline functions and src entries', () => {
     const config = buildTestQpqConfig([
       defineActionProcessors('/ap/get::handler'),
-      defineRecurringSchedule('cron(0 0 * * ? *)', '/s/daily::run'),
+      defineRecurringSchedule({ dailyAtUtc: { hour: 0, minute: 0 } }, '/s/daily::run'),
       defineQueue('jobs', { created: '/q/created::run' }),
       defineInlineFunction('/inline/run::handler'),
     ]);
