@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-features",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -35,13 +35,13 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "0.1.18",
-    "quidproquo-webserver": "0.1.18",
+    "quidproquo-core": "0.1.19",
+    "quidproquo-webserver": "0.1.19",
     "zod": "^3.25.76",
     "zod-validation-error": "^1.1.0"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.1.18",
+    "quidproquo-tsconfig": "0.1.19",
     "typescript": "^5.8.2"
   }
 }

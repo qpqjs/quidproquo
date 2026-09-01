@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-core",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -36,7 +36,7 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
     "@types/node": "^24.2.1",
-    "quidproquo-tsconfig": "0.1.18",
+    "quidproquo-tsconfig": "0.1.19",
     "typescript": "^5.8.2"
   },
   "dependencies": {

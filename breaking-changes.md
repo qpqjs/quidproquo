@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.19
+
 - `defineRecurringSchedule` (`quidproquo-core`) takes a structured `ScheduleRecurrence` instead of an AWS cron string: `defineRecurringSchedule('0 0 3 * * ? *', runtime)` becomes `defineRecurringSchedule({ dailyAtUtc: { hour: 3, minute: 0 } }, runtime)`. The variants are `{ everyMinutes }` (must divide 60), `{ everyHours, atMinute? }` (must divide 24), `{ dailyAtUtc }`, `{ weeklyAtUtc }` and `{ monthlyAtUtc }`, all UTC. An interval that cannot be scheduled evenly now throws an `InvalidScheduleRecurrenceError` while the config is evaluated. Cron is no longer a core concept: `renderAwsCronExpression` in `quidproquo-deploy-awscdk` is the only place that knows the EventBridge dialect, which is what lets the dev server fire the same schedules locally.
 - `ScheduleQPQConfigSetting.cronExpression` (`quidproquo-core`) is replaced by `recurrence: ScheduleRecurrence`. Anything reading the setting to get a cron string should call `resolveScheduleFields(setting.recurrence)` and render from that.
 - `awaitQueueIdle` (`quidproquo-dev-server`) is renamed to `awaitDevServerIdle` and moves from `implementations/queueImplementation` to `logic/inFlight/inFlightWork`. It is still exported from the package root, and now waits on kvs-stream projections and storage-drive handlers as well as queue messages, so the old name no longer described it. No shim is kept: rename the call.

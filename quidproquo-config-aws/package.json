@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-config-aws",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -35,8 +35,8 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "quidproquo-core": "0.1.18",
-    "quidproquo-tsconfig": "0.1.18",
+    "quidproquo-core": "0.1.19",
+    "quidproquo-tsconfig": "0.1.19",
     "typescript": "^5.8.2"
   }
 }

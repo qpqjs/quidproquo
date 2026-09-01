@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-eslint-config",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "eslint config for quidproquo projects.",
   "main": "eslint.config.mjs",
   "publishConfig": {
