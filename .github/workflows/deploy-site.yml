@@ -38,7 +38,7 @@ jobs:
     uses: ./.github/workflows/ci-scaffold.yml
 
   # The target environment is resolved once, in its own job, because neither
-  # `environment:` nor job-level `concurrency:` can read step outputs — each
+  # `environment:` nor job-level `concurrency:` can read step outputs, so each
   # would otherwise need its own copy of the branch mapping. Three copies that
   # can drift is how a deploy ends up running against production while holding
   # the development concurrency lock.
@@ -62,7 +62,7 @@ jobs:
     # where required reviewers go to gate production behind a manual approval.
     environment: ${{ needs.resolve.outputs.env }}
     # Serialize deploys per environment so rapid pushes queue instead of racing.
-    # Never cancel a running deploy — a half-applied CloudFormation stack is
+    # Never cancel a running deploy: a half-applied CloudFormation stack is
     # worse than waiting.
     concurrency:
       group: deploy-site-${{ needs.resolve.outputs.env }}
@@ -79,7 +79,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # Install the site (links the file: deps) and build the docs site — the
+      # Install the site (links the file: deps) and build the docs site: the
       # web stack uploads docusaurus/build, and qpq does not build it for us.
       - run: npm ci
         working-directory: quidproquojs.com
