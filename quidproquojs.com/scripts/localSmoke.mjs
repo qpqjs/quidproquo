@@ -148,11 +148,17 @@ const main = async () => {
     smokeError = error;
   }
 
-  const code = await stopServer(server);
-  log(`dev server exited with ${code}`);
+  const { code, signal } = await stopServer(server);
+  log(`dev server exited with code=${code} signal=${signal}`);
 
   if (smokeError) {
     throw smokeError;
+  }
+
+  if (signal) {
+    throw new Error(
+      `dev server was killed by ${signal} instead of shutting down, so its teardown never ran`
+    );
   }
 
   if (code !== 0) {

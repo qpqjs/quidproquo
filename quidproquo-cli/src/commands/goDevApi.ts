@@ -108,7 +108,23 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   // Wait for the server to finish draining before tearing the watcher down and
   // exiting: closing the compiler first would exit the parent while the child
   // is still writing, which is the race this whole path exists to close.
-  const handleSigint = async (): Promise<void> => {
+  //
+  // SIGTERM as well as SIGINT, and it is load-bearing rather than symmetry for
+  // its own sake. This process is a WRAPPER: the dev server that handles
+  // signals and drains its work is the child it spawned. Without a handler
+  // here, SIGTERM (what `docker stop` sends, and what any script stopping this
+  // programmatically sends) kills the wrapper outright on the default
+  // disposition, the child never gets asked to stop, and every guarantee the
+  // dev server's shutdown sequence makes is bypassed. go:dev:web already
+  // handles both.
+  let shuttingDown = false;
+
+  const handleShutdownSignal = async (): Promise<void> => {
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+
     restartQueued = true; // suppress the crash log / rebuild-restart on our own kill
 
     if (child) {
@@ -119,6 +135,10 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   };
 
   process.on('SIGINT', () => {
-    void handleSigint();
+    void handleShutdownSignal();
+  });
+
+  process.on('SIGTERM', () => {
+    void handleShutdownSignal();
   });
 };
