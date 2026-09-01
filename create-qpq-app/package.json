@@ -26,7 +26,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:bin-perms": "node -e \"require('fs').chmodSync('lib/commonjs/bin/createQpqApp.js', 0o755)\"",
     "snapshot-template": "node ./scripts/snapshotTemplate.mjs",
-    "smoke-test": "node ./scripts/smokeTest.mjs",
+    "scaffold-test": "node ./scripts/scaffoldTest.mjs",
     "prepack": "npm run snapshot-template",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
