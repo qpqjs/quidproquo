@@ -10,7 +10,7 @@
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
-    "patch": "npm version patch --ws && npx tsx ./scripts/applyPatch.ts && npm install",
+    "patch": "npm version patch --ws --no-workspaces-update && npx tsx ./scripts/applyPatch.ts && npm install",
     "smoke": "npm run smoke-test -w create-qpq-app",
     "changelog": "claude -p \"/changes\" --permission-mode acceptEdits --allowedTools \"Bash(git:*)\"",
     "release": "VERSION=$(node -p \"require('./quidproquo-core/package.json').version\") && git add -A && git commit -m \"bump: $VERSION\" && git tag \"$VERSION\"",
