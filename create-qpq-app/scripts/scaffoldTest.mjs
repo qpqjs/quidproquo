@@ -3,7 +3,7 @@
 // dev server and hit the health endpoint. Run it after template or step
 // changes (and in CI):
 //
-//   npm run build -w create-qpq-app && npm run smoke-test -w create-qpq-app
+//   npm run build -w create-qpq-app && npm run scaffold-test -w create-qpq-app
 //
 // The file: ref swap mirrors what CI must do pre-publish: the scaffolded
 // pins point at registry versions that may not exist yet.
@@ -22,7 +22,7 @@ const DEV_SERVER_PORTS = [8080, 8888, 3001];
 const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
 const BOOT_TIMEOUT_MS = 180_000;
 
-const log = (message) => console.log(`\x1b[36m[smoke]\x1b[0m ${message}`);
+const log = (message) => console.log(`\x1b[36m[scaffold]\x1b[0m ${message}`);
 
 const run = (command, args, cwd) =>
   new Promise((resolve, reject) => {
@@ -65,7 +65,7 @@ const clearDevServerPorts = () => {
 };
 
 // The scaffolded app pins registry versions; point every quidproquo dep at
-// this checkout instead so the smoke test exercises unpublished code.
+// this checkout instead so the scaffold test exercises unpublished code.
 const useLocalQuidproquoRefs = (appDir) => {
   const packageJsonPath = path.join(appDir, 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
@@ -94,8 +94,8 @@ const waitForHealthy = async (deadlineMs) => {
   throw new Error(`dev server did not report healthy within ${deadlineMs / 1000}s`);
 };
 
-const smokeTestLanguage = async (workDir, language) => {
-  const appName = `smoke${language === 'javascript' ? 'js' : 'ts'}`;
+const scaffoldTestLanguage = async (workDir, language) => {
+  const appName = `scaffold${language === 'javascript' ? 'js' : 'ts'}`;
   const appDir = path.join(workDir, appName);
 
   log(`--- ${language}: scaffolding ${appName}`);
@@ -111,7 +111,7 @@ const smokeTestLanguage = async (workDir, language) => {
 
   log(`--- ${language}: booting dev server`);
   clearDevServerPorts();
-  // qpq go:dev:api, not the `dev` script (qpq go:dev): the smoke test only
+  // qpq go:dev:api, not the `dev` script (qpq go:dev): the scaffold test only
   // asserts the API health endpoint, and the views dev servers would add
   // minutes of Rspack compile plus a fleet of ports this script doesn't sweep.
   const devServer = spawn('npx', ['--no-install', 'qpq', 'go:dev:api'], { cwd: appDir, shell: true, detached: true, stdio: 'ignore' });
@@ -132,7 +132,7 @@ const smokeTestLanguage = async (workDir, language) => {
 const main = async () => {
   const nodeMajor = Number(process.versions.node.split('.')[0]);
   if (nodeMajor < 24) {
-    throw new Error(`smoke test needs node >= 24 (you are on ${process.versions.node})`);
+    throw new Error(`scaffold test needs node >= 24 (you are on ${process.versions.node})`);
   }
   if (!fs.existsSync(binPath)) {
     throw new Error(`${binPath} missing. Build create-qpq-app first.`);
@@ -141,15 +141,15 @@ const main = async () => {
   log('refreshing template snapshot');
   await run('node', [path.join(packageRoot, 'scripts', 'snapshotTemplate.mjs')], packageRoot);
 
-  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cqa-smoke-'));
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cqa-scaffold-'));
   log(`working in ${workDir}`);
 
   try {
-    await smokeTestLanguage(workDir, 'typescript');
-    await smokeTestLanguage(workDir, 'javascript');
+    await scaffoldTestLanguage(workDir, 'typescript');
+    await scaffoldTestLanguage(workDir, 'javascript');
   } catch (error) {
-    console.error(`\n[smoke] FAILED: ${error.message}`);
-    console.error(`[smoke] scaffolds kept for inspection: ${workDir}`);
+    console.error(`\n[scaffold] FAILED: ${error.message}`);
+    console.error(`[scaffold] scaffolds kept for inspection: ${workDir}`);
     process.exit(1);
   }
 

@@ -1,0 +1,25 @@
+name: ci-scaffold
+
+# Reusable: scaffolds an app with create-qpq-app and checks it still builds.
+# This is the create-qpq-app template rot guard, not to be confused with the
+# post-deploy smoke run (the "deployed smoke" step in deploy-site.yml).
+#
+# Called by deploy-site.yml alongside the tests on every push. It never gates
+# a deploy; it is meant to block merging to main.
+on:
+  workflow_call:
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Build the whole monorepo: the scaffold's file: refs pull built lib/
+      # outputs, and create-qpq-app's bin has to exist before the check runs.
+      - run: npm run build
+      - run: npm run scaffold
