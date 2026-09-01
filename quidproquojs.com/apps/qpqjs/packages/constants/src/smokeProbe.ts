@@ -2,7 +2,8 @@
 // by testa (which declares them with owner: { module: test }). App-level
 // because both services must agree on the names.
 export const SMOKE_PROBE_STORE = 'smokeProbe';
-export const SMOKE_PROBE_DRIVE = 'smokeProbe';
+// Lowercase with a hyphen: this becomes an S3 bucket name, which must be lowercase.
+export const SMOKE_PROBE_DRIVE = 'smoke-probe';
 
 // The testa service functions the cross-service smoke tests invoke, one per
 // foreign grant (the store and the drive are separate IAM statements).
