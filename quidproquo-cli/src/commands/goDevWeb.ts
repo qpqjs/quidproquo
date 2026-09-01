@@ -15,9 +15,11 @@ import { rspack } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
+import { hasArgFlag } from '../lib/args';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { getRoot } from '../lib/discovery';
-import { isQpqCliCommand, killStaleListeners } from '../lib/killStaleListeners';
+import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
+import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 export type GoDevWebOptions = {
@@ -48,10 +50,15 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
     process.exit(1);
   }
 
-  killStaleListeners(
-    views.map((v) => v.port),
-    isQpqCliCommand,
-  );
+  // See goDevApi for why this is opt-out rather than always-on.
+  if (hasArgFlag(argv, KEEP_OTHER_DEV_SERVERS_FLAG)) {
+    reportPortHolders(views.map((v) => v.port));
+  } else {
+    killStaleListeners(
+      views.map((v) => v.port),
+      isQpqCliCommand,
+    );
+  }
 
   // Every RspackDevServer.start() registers its own SIGINT/SIGTERM handler on
   // process — with a dozen views servers in one process that trips node's

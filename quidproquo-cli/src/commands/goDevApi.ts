@@ -17,11 +17,13 @@ import fs from 'fs';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
+import { hasArgFlag } from '../lib/args';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
+import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
-import { killOtherQpqDevProcesses, killStaleListeners } from '../lib/killStaleListeners';
+import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 // 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
@@ -36,11 +38,21 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   primeDeployEnvFromConfig(appName);
   console.log(`Dev server for app [${appName}]`);
 
-  // Catches a lingering watcher from a previous run even if its spawned
-  // child already exited (see killOtherQpqDevProcesses) — then the usual
-  // port-based sweep for anything else still bound to our ports.
-  killOtherQpqDevProcesses(root);
-  killStaleListeners(DEV_SERVER_PORTS, (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
+  // The sweep matches on a RELATIVE bundle path, so every checkout's dev
+  // server looks like ours and a sibling worktree gets taken down with it.
+  // Opting out spares it, at the cost of this one not starting: the ports are
+  // the same either way, so what you get instead is EADDRINUSE. Report who
+  // holds them, or that failure says nothing about the cause.
+  if (hasArgFlag(argv, KEEP_OTHER_DEV_SERVERS_FLAG)) {
+    console.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
+    reportPortHolders(DEV_SERVER_PORTS);
+  } else {
+    // Catches a lingering watcher from a previous run even if its spawned
+    // child already exited (see killOtherQpqDevProcesses) — then the usual
+    // port-based sweep for anything else still bound to our ports.
+    killOtherQpqDevProcesses(root);
+    killStaleListeners(DEV_SERVER_PORTS, (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
+  }
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);

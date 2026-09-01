@@ -153,28 +153,56 @@ export const killOtherQpqDevProcesses = (root: string): void => {
   }
 };
 
+// Whatever is currently listening on a port, as pid + command line. Empty when
+// the port is free, or when lsof is unavailable.
+const getPortListeners = (port: number): { pid: number; command: string }[] => {
+  let pids: number[] = [];
+  try {
+    pids = execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .split('\n')
+      .map((line) => Number(line.trim()))
+      .filter(Boolean);
+  } catch {
+    return []; // lsof exits non-zero when nothing is listening
+  }
+
+  return pids.flatMap((pid) => {
+    try {
+      return [{ pid, command: execSync(`ps -p ${pid} -o command=`).toString().trim() }];
+    } catch {
+      return []; // already gone
+    }
+  });
+};
+
+/**
+ * Say what is holding these ports, without touching it.
+ *
+ * The other half of --keep-other-dev-servers: sparing a sibling checkout's dev
+ * server means this one cannot bind, and an unexplained EADDRINUSE is a worse
+ * experience than the silent kill it replaces. Naming the pid and the command
+ * turns "it just died" into something you can act on.
+ *
+ * Worded as a prediction, not a fact, because it IS one: this runs before the
+ * bundle step, so by the time anything binds - seconds later - the holder may
+ * well have gone. Stating "port in use" and then starting cleanly reads like
+ * the warning was wrong.
+ */
+export const reportPortHolders = (ports: number[]): void => {
+  for (const port of ports) {
+    for (const { pid, command } of getPortListeners(port)) {
+      console.warn(`Port ${port} is currently held by pid ${pid}: ${command}`);
+      console.warn(`  Starting anyway. If it still holds port ${port} once this server binds, startup will fail with EADDRINUSE.`);
+    }
+  }
+};
+
 export const killStaleListeners = (ports: number[], isOurs: (command: string) => boolean): void => {
   for (const port of ports) {
-    let pids: number[] = [];
-    try {
-      pids = execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, {
-        stdio: ['ignore', 'pipe', 'ignore'],
-      })
-        .toString()
-        .split('\n')
-        .map((line) => Number(line.trim()))
-        .filter(Boolean);
-    } catch {
-      continue; // lsof exits non-zero when nothing is listening
-    }
-
-    for (const pid of pids) {
-      let command = '';
-      try {
-        command = execSync(`ps -p ${pid} -o command=`).toString().trim();
-      } catch {
-        continue; // already gone
-      }
+    for (const { pid, command } of getPortListeners(port)) {
       if (isOurs(command)) {
         console.log(`Killing stale dev server on port ${port} (pid ${pid})`);
         process.kill(pid);
