@@ -20,7 +20,7 @@ on:
         options: [development, staging, production]
 
 # Default for every job, including the reusable test workflow called below.
-# Only the deploy and deployed-smoke jobs widen this to mint an OIDC token.
+# Only the deploy job widens this to mint an OIDC token.
 permissions:
   contents: read
 
@@ -93,33 +93,21 @@ jobs:
       - run: npx qpq go:docker all all --app qpqjs --env ${{ needs.resolve.outputs.env }}
         working-directory: quidproquojs.com
 
-  # Verify the deployment end to end: mint a GitHub OIDC token with the
-  # qpq-smoke audience, start a smoke run on the deployed test service, poll it
-  # to completion. The smoke endpoint validates the token against this repo's
-  # immutable id and the job's `environment:` claim, so only this workflow can
-  # call it. Non-production only: prod has no CI smoke path.
-  deployed-smoke:
-    needs: [resolve, deploy]
-    # An explicit `if` drops the implicit success() check, so spell it out or
-    # this would run against a failed deploy.
-    if: success() && needs.resolve.outputs.env != 'production'
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    # Declaring the environment stamps the OIDC token's `environment` claim,
-    # which the endpoint pins - same convention as the deploy role trust.
-    environment: ${{ needs.resolve.outputs.env }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: quidproquojs.com/.nvmrc
-
-      # The runner is a dependency-free node script, so no install step. It
-      # derives the api url from the environment plus the app's deploy config.
-      - run: node scripts/deployedSmoke.mjs
+      # Verify the deployment end to end: mint a GitHub OIDC token with the
+      # qpq-smoke audience, start a smoke run on the deployed test service,
+      # poll it to completion. The smoke endpoint validates the token against
+      # this repo's immutable id and this job's `environment:` claim, so only
+      # this workflow can call it. Non-production only: prod has no CI smoke
+      # path.
+      #
+      # Deliberately a step of THIS job, not a job of its own: the per
+      # environment concurrency lock above is held until the job ends, so a
+      # queued deploy for the next push cannot start until this one has both
+      # deployed and been verified. As a separate job the smoke would run
+      # against an environment the next deploy was already replacing.
+      - name: deployed smoke
+        if: needs.resolve.outputs.env != 'production'
+        run: node scripts/deployedSmoke.mjs
         working-directory: quidproquojs.com
         env:
           SMOKE_ENVIRONMENT: ${{ needs.resolve.outputs.env }}
