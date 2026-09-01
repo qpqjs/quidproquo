@@ -10,22 +10,22 @@ import {
   QpqFunctionRuntime,
 } from 'quidproquo';
 
+import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
+
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 import {
-  SMOKE_PROBE_DRIVE,
   SMOKE_PROBE_EVENT_BUS,
   SMOKE_PROBE_EVENT_QUEUE,
   SMOKE_PROBE_EVENT_TYPE,
   SMOKE_PROBE_PARAMETER,
   SMOKE_PROBE_PARAMETER_VALUE,
   SMOKE_PROBE_SECRET,
-  SMOKE_PROBE_STORE,
 } from '../constants/smokeProbe';
 import {
   SMOKE_RUN_QUEUE,
   SMOKE_RUN_REQUESTED_MESSAGE_TYPE,
 } from '../constants/smokeRunQueue';
-import { SmokeProbeRecord } from '../models/SmokeProbeRecord';
 
 // Everything the smoke feature needs: the run store, the queue runs execute
 // on, and the two routes. Runtimes are located relative to this file, so the
