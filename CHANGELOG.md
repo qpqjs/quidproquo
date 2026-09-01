@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.19
+
+- core: `defineRecurringSchedule` takes a structured `ScheduleRecurrence` (`everyMinutes`, `everyHours`, `dailyAtUtc`, `weeklyAtUtc`, `monthlyAtUtc`) instead of an AWS cron string, and rejects intervals that can't be scheduled evenly at config time. Cron rendering now lives only in deploy-awscdk, so the dev server fires the same schedules locally on the minute
+- dev-server: graceful shutdown. SIGTERM/SIGINT drains in-flight work (queue messages, kvs-stream projections, storage-drive handlers) and checkpoints the stores before exit, with a 5s worst-case budget. `qpq go:dev:api` waits for the drain on restart and handles SIGTERM as well as SIGINT, escalating to SIGKILL if the old server wedges so the ports are free for the replacement
+- dev-server: `GET /admin/service/ready` answers 503 until every subsystem is up and 200 after, for CI scripts and docker healthchecks that need more than a TCP connect
+- deploy-rspack: starting the dev server when no service infrastructure loads now fails immediately with the service names and a hint to build the app's packages, instead of a `reading 'reduce'` crash later inside express
+- deploy-awscdk: recurring schedule lambdas are handed the real firing time again; `ScheduledEventParams.time` was undefined because the rule target input replaced the whole event payload
+
+### Breaking changes
+
+- `defineRecurringSchedule` takes a `ScheduleRecurrence` object instead of a cron string; `ScheduleQPQConfigSetting.cronExpression` becomes `recurrence`
+- `awaitQueueIdle` (dev-server) is renamed to `awaitDevServerIdle`; no shim
+- every dev-server `*Implementation` now resolves once its subsystem is up (returning a `DevServerPluginStop`) instead of never resolving
+
 ## 0.1.18
 
 - core: a function runtime can carry its own `actionProcessors` (a list of getActionProcessors-style sources); they merge over the platform and service-wide processors for that function's whole execution, last wins, and in-process nested executions inherit the merged list
