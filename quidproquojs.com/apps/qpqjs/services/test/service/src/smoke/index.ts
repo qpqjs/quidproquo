@@ -5,4 +5,5 @@ export * from './data';
 export * from './logic';
 export * from './models';
 export * from './processors';
+export * from './queue';
 export * from './tests';

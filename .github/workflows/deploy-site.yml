@@ -19,19 +19,17 @@ on:
         default: production
         options: [development, staging, production]
 
-# Default for every job, including the reusable test/smoke workflows called
-# below. Only the deploy job widens this to mint an OIDC token.
+# Default for every job, including the reusable test workflow called below.
+# Only the deploy and deployed-smoke jobs widen this to mint an OIDC token.
 permissions:
   contents: read
 
 jobs:
-  # Gates. Same reusable workflows test.yml/smoke.yml run on branches and pull
-  # requests, so nothing reaches an environment on checks it has not passed.
+  # Deploy gate: the unit tests. The create-qpq-app scaffold check is NOT a
+  # gate here; it runs in its own workflow (smoke.yml) and is meant to block
+  # merging to main, not deploying a branch.
   test:
     uses: ./.github/workflows/ci-test.yml
-
-  smoke:
-    uses: ./.github/workflows/ci-smoke.yml
 
   # The target environment is resolved once, in its own job, because neither
   # `environment:` nor job-level `concurrency:` can read step outputs — each
@@ -48,7 +46,7 @@ jobs:
           echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || (github.ref_name == 'uat' && 'staging' || 'development')) }}" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: [resolve, test, smoke]
+    needs: [resolve, test]
     runs-on: ubuntu-latest
     # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
     permissions:

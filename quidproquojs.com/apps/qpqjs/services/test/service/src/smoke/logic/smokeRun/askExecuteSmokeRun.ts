@@ -1,4 +1,10 @@
-import { askCatch, askDateNow, askNewGuid, AskResponse } from 'quidproquo';
+import {
+  askCatch,
+  askDateNow,
+  AskResponse,
+  askThrowError,
+  ErrorTypeEnum,
+} from 'quidproquo';
 
 import {
   SmokeRun,
@@ -7,21 +13,10 @@ import {
   SmokeTestStatus,
 } from '@qpqjs/test-models';
 
+import { askGetSmokeRunById } from '../../data/askGetSmokeRunById';
 import { askSaveSmokeRun } from '../../data/askSaveSmokeRun';
 import { SmokeTestDefinition } from '../../tests/SmokeTestDefinition';
 import { smokeTestRegistry } from '../../tests/smokeTestRegistry';
-
-const createPendingResult = (
-  test: SmokeTestDefinition,
-  index: number
-): SmokeTestResult => ({
-  id: index + 1,
-  name: test.name,
-  status: SmokeTestStatus.pending,
-  message: '',
-  startedAt: null,
-  finishedAt: null,
-});
 
 // Runs one registered test, returning its completed result entry.
 function* askRunSmokeTest(
@@ -41,22 +36,19 @@ function* askRunSmokeTest(
   };
 }
 
-// Executes every registered test in order, persisting the run record before
-// the first test and after each one so a poll sees progress. Runs inline in
-// the request for now; moving it behind a queue is the planned next pass.
-export function* askExecuteSmokeRun(): AskResponse<SmokeRun> {
-  const runId = yield* askNewGuid();
-  const startedAt = yield* askDateNow();
+// Executes every registered test for an existing run (created by
+// askStartSmokeRun), persisting the record after each test so a poll sees
+// progress, then finalizes the run status.
+export function* askExecuteSmokeRun(runId: string): AskResponse<SmokeRun> {
+  const existing = yield* askGetSmokeRunById(runId);
+  if (!existing) {
+    return yield* askThrowError(
+      ErrorTypeEnum.NotFound,
+      `no smoke run [${runId}] to execute`
+    );
+  }
 
-  let smokeRun: SmokeRun = {
-    runId,
-    status: SmokeRunStatus.running,
-    startedAt,
-    finishedAt: null,
-    tests: smokeTestRegistry.map(createPendingResult),
-  };
-
-  yield* askSaveSmokeRun(smokeRun);
+  let smokeRun: SmokeRun = existing;
 
   for (let index = 0; index < smokeTestRegistry.length; index += 1) {
     const result = yield* askRunSmokeTest(

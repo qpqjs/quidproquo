@@ -1,1 +1,1 @@
-export * from './defineSmokeEndpoint';
+export * from './defineSmoke';
