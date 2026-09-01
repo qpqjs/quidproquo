@@ -47,12 +47,19 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       schedule: aws_events.Schedule.expression(`cron(${renderAwsCronExpression(resolveScheduleFields(props.scheduleConfig.recurrence))})`),
     });
 
-    // Set the target as lambda function
+    // Set the target as lambda function.
+    //
+    // fromObject REPLACES the event payload rather than adding to it, so
+    // anything the handler needs has to be listed here: without `time` the
+    // lambda was handed an event with no time at all, and every schedule story
+    // saw `ScheduledEventParams.time` as undefined despite the type saying
+    // otherwise. EventField.time substitutes the real firing time back in.
     cronRule.addTarget(
       new aws_events_targets.LambdaFunction(schedulerFunction.lambdaFunction, {
         event: aws_events.RuleTargetInput.fromObject({
           source: 'custom.event.RecurringSchedule',
           'detail-type': 'Recurring Schedule',
+          time: aws_events.EventField.time,
           detail: props.scheduleConfig.metadata,
         }),
       }),
