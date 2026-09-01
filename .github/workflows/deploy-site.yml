@@ -19,17 +19,22 @@ on:
         default: production
         options: [development, staging, production]
 
-# Default for every job, including the reusable test workflow called below.
+# Default for every job, including the reusable test/smoke workflows called below.
 # Only the deploy job widens this to mint an OIDC token.
 permissions:
   contents: read
 
 jobs:
-  # Deploy gate: the unit tests. The create-qpq-app scaffold check is NOT a
-  # gate here; it runs in its own workflow (smoke.yml) and is meant to block
-  # merging to main, not deploying a branch.
+  # Deploy gate: the unit tests.
   test:
     uses: ./.github/workflows/ci-test.yml
+
+  # The create-qpq-app scaffold check. Runs alongside the tests so every push
+  # gets one workflow run, but it is deliberately NOT in deploy's `needs`: it
+  # must never hold up deploying a branch. Its job is to block merging to main
+  # (branch protection, to come).
+  smoke:
+    uses: ./.github/workflows/ci-smoke.yml
 
   # The target environment is resolved once, in its own job, because neither
   # `environment:` nor job-level `concurrency:` can read step outputs — each
