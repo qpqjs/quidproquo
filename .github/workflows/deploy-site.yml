@@ -37,14 +37,14 @@ jobs:
   scaffold:
     uses: ./.github/workflows/ci-scaffold.yml
 
-  # Pre-flight smoke: the same probes the deployed smoke runs, but against a
-  # dev server on the runner. Runs alongside the tests rather than after them,
-  # since it shares nothing with them but the build.
+  # Deploy gate: the same probes the deployed smoke runs, but against a dev
+  # server on the runner. Runs alongside the tests rather than after them,
+  # since it shares nothing with them but the build, and it finishes first.
   #
-  # Deliberately NOT in deploy's `needs`, for now: it has never run green, and
-  # a new check that has not proved itself should not be able to block every
-  # branch's deploy. Move it into `needs` once it has a track record; that is
-  # the whole change.
+  # A gate rather than advisory (unlike scaffold above) because a probe that
+  # cannot pass locally has no business being deployed and then run again
+  # against AWS: the deployed smoke would just find the same break, minutes
+  # later and after a real deploy.
   #
   # The permissions block is required here, not just in the called workflow: a
   # reusable workflow can only narrow what its caller grants, and the
@@ -70,7 +70,7 @@ jobs:
           echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || (github.ref_name == 'uat' && 'staging' || 'development')) }}" >> "$GITHUB_OUTPUT"
 
   deploy:
-    needs: [resolve, test]
+    needs: [resolve, test, local-smoke]
     runs-on: ubuntu-latest
     # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
     permissions:

@@ -54,6 +54,9 @@ const STOP_TIMEOUT_MS = 15 * 1000;
 
 const APP_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+// The .bin shim npm links on install, which points at the cli's built entry.
+const QPQ_BIN = join(APP_ROOT, 'node_modules', '.bin', 'qpq');
+
 const log = (message) => console.log(`local-smoke: ${message}`);
 
 const fail = (message) => {
@@ -96,17 +99,22 @@ const waitForReady = async (server) => {
 };
 
 /**
- * Stop the dev server and resolve with its exit code.
+ * Stop the dev server and resolve with how it went.
  *
  * SIGTERM rather than SIGKILL because the graceful path is part of what this
  * script checks: the server should stop accepting, drain the smoke run's
- * in-flight work and checkpoint its stores, then exit 0. A non-zero code means
- * a teardown broke or a phase ran out of budget.
+ * in-flight work and checkpoint its stores, then exit 0.
+ *
+ * Code and signal are both reported because they mean different things and
+ * only one of them is ever a number. A code of 0 is the pass; a non-zero code
+ * means a teardown broke or a phase ran out of budget; a null code with a
+ * signal means nothing handled the signal and the process was killed where it
+ * stood, which is a shutdown that never ran rather than one that failed.
  */
 const stopServer = (server) =>
   new Promise((resolve) => {
     if (server.exitCode !== null) {
-      resolve(server.exitCode);
+      resolve({ code: server.exitCode, signal: null });
       return;
     }
 
@@ -117,9 +125,9 @@ const stopServer = (server) =>
       server.kill('SIGKILL');
     }, STOP_TIMEOUT_MS);
 
-    server.once('exit', (code) => {
+    server.once('exit', (code, signal) => {
       clearTimeout(timer);
-      resolve(code);
+      resolve({ code, signal });
     });
 
     server.kill('SIGTERM');
@@ -128,11 +136,20 @@ const stopServer = (server) =>
 const main = async () => {
   log(`starting dev server (app=${APP_NAME} env=${ENVIRONMENT})`);
 
-  const server = spawn('npx', ['qpq', 'go:dev:api', '--app', APP_NAME], {
-    cwd: APP_ROOT,
-    stdio: 'inherit',
-    env: { ...process.env, ENVIRONMENT },
-  });
+  // node on the cli directly, NOT `npx qpq`: npx is another process in front
+  // of the one we need to signal, and SIGTERM stops at it. The cli would never
+  // hear the stop, its dev server child would never drain, and the exit would
+  // come back as a signal kill. One less layer means the signal lands where
+  // the handler is.
+  const server = spawn(
+    process.execPath,
+    [QPQ_BIN, 'go:dev:api', '--app', APP_NAME],
+    {
+      cwd: APP_ROOT,
+      stdio: 'inherit',
+      env: { ...process.env, ENVIRONMENT },
+    }
+  );
 
   // The server is stopped either way, but a smoke failure is reported ahead of
   // a dirty shutdown: it is the more useful of the two, and letting the
