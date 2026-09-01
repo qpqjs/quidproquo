@@ -1,11 +1,10 @@
 name: test
 
-# main and develop are deliberately excluded: deploy-site runs the same
-# reusable workflow as a gate before it deploys those branches, and running
-# here too would duplicate a three-version matrix on every release push.
+# Pull requests only. Every push already runs this same reusable workflow as a
+# gate inside deploy-site, so a push trigger here would duplicate the
+# three-version matrix. Pull requests from forks have no push in this repo,
+# which is the one case this still covers.
 on:
-  push:
-    branches-ignore: [main, develop]
   pull_request:
 
 concurrency:

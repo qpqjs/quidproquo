@@ -1,10 +1,12 @@
 name: smoke
 
-# main and develop are deliberately excluded: deploy-site runs the same
-# reusable workflow as a gate before it deploys those branches.
+# The create-qpq-app scaffold check, run on every push independently of
+# deploy-site: it must not hold up deploying a branch. Its job is to block
+# merging to main (branch protection, to come), not to gate environments.
 on:
   push:
-    branches-ignore: [main, develop]
+    branches-ignore: [dependabot/**]
+  pull_request:
 
 concurrency:
   group: smoke-${{ github.ref }}
