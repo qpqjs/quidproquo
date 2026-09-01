@@ -37,6 +37,24 @@ jobs:
   scaffold:
     uses: ./.github/workflows/ci-scaffold.yml
 
+  # Pre-flight smoke: the same probes the deployed smoke runs, but against a
+  # dev server on the runner. Runs alongside the tests rather than after them,
+  # since it shares nothing with them but the build.
+  #
+  # Deliberately NOT in deploy's `needs`, for now: it has never run green, and
+  # a new check that has not proved itself should not be able to block every
+  # branch's deploy. Move it into `needs` once it has a track record; that is
+  # the whole change.
+  #
+  # The permissions block is required here, not just in the called workflow: a
+  # reusable workflow can only narrow what its caller grants, and the
+  # repository default above is contents-read only.
+  local-smoke:
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/ci-local-smoke.yml
+
   # The target environment is resolved once, in its own job, because neither
   # `environment:` nor job-level `concurrency:` can read step outputs, so each
   # would otherwise need its own copy of the branch mapping. Three copies that

@@ -1,0 +1,56 @@
+name: ci-local-smoke
+
+# Reusable: runs the smoke suite against a dev server started on the runner.
+#
+# The same probes, over the same routes, with the same OIDC token as the
+# deployed smoke run at the end of deploy-site.yml. Only the backend differs:
+# the dev server's local implementations instead of AWS. So this catches a
+# broken probe, or the dev server drifting from deployed behaviour, before a
+# deploy rather than after one. It cannot catch what the deployed run exists
+# for (iam grants, resource naming, cdk wiring, api gateway base path mapping),
+# so it is a pre-flight check and not a replacement for it.
+#
+# Called by deploy-site.yml alongside the tests. Not called by test.yml: a
+# fork's OIDC token carries a different repository id and would be rejected,
+# and every push already runs this.
+on:
+  workflow_call:
+
+jobs:
+  local-smoke:
+    runs-on: ubuntu-latest
+
+    # The smoke routes validate the token's environment claim against the
+    # service's own module environment, and a dev server is always
+    # development (primeDeployEnvFromConfig defaults it) whatever environment
+    # the deploy that follows targets. So this is pinned, not resolved.
+    environment: development
+
+    # id-token so the script can mint the qpq-smoke token. The caller has to
+    # grant this too: a reusable workflow can narrow what it is given, never
+    # widen it.
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: quidproquojs.com/.nvmrc
+
+      # Build the monorepo first: quidproquojs.com pulls the quidproquo-*
+      # packages via file: refs, which resolve to each package's built lib/.
+      - run: npm ci
+      - run: npm run build
+
+      # Install the site to link those file: deps. No docusaurus build here,
+      # unlike the deploy job: nothing serves the web stack in this run.
+      - run: npm ci
+        working-directory: quidproquojs.com
+
+      # Starts the dev server, waits for GET /admin/service/ready, runs the
+      # suite, then SIGTERMs and checks it shut down cleanly.
+      - run: node scripts/localSmoke.mjs
+        working-directory: quidproquojs.com
