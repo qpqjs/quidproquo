@@ -45,9 +45,19 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # Install the site to link those file: deps. No docusaurus build here,
-      # unlike the deploy job: nothing serves the web stack in this run.
+      # Install the site to link those file: deps, then build ITS packages:
+      # each service's infrastructure.ts imports @qpqjs/* by their built
+      # dist/, so without this every service fails to load and the dev server
+      # comes up with no services at all.
+      #
+      # The deploy job gets away without this because `qpq go:docker` builds
+      # inside the container. Nothing builds for us here.
+      #
+      # No docusaurus build, unlike the deploy job: nothing serves the web
+      # stack in this run.
       - run: npm ci
+        working-directory: quidproquojs.com
+      - run: npm run build
         working-directory: quidproquojs.com
 
       # Starts the dev server, waits for GET /admin/service/ready, runs the
