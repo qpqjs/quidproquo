@@ -1,7 +1,7 @@
 name: deploy-site
 
 # Deploy quidproquojs.com.
-#   push to main    -> production
+#   push to main    -> production (NOT yet: see the deploy job's `if`)
 #   push to uat     -> staging
 #   push elsewhere  -> development (every feature branch, serialized, last writer wins)
 # Any environment can also be deployed by hand from the Actions tab
@@ -71,6 +71,10 @@ jobs:
 
   deploy:
     needs: [resolve, test, local-smoke]
+    # The production account is not set up yet, so a push to main runs the
+    # gates above but does not deploy. Production can still be deployed by
+    # hand via "Run workflow" once it is. Remove this `if` to turn it on.
+    if: github.event_name == 'workflow_dispatch' || github.ref_name != 'main'
     runs-on: ubuntu-latest
     # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
     permissions:
