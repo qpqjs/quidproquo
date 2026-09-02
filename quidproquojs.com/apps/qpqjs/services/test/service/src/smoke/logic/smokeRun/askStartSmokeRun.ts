@@ -15,10 +15,10 @@ import {
 
 import {
   SMOKE_RUN_QUEUE,
-  SMOKE_RUN_REQUESTED_MESSAGE_TYPE,
+  SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
 } from '../../constants/smokeRunQueue';
 import { askSaveSmokeRun } from '../../data/askSaveSmokeRun';
-import { SmokeRunRequestedPayload } from '../../models/SmokeRunRequestedQueueEvent';
+import { SmokeTestRequestedPayload } from '../../models/SmokeTestRequestedQueueEvent';
 import { SmokeTestDefinition } from '../../tests/SmokeTestDefinition';
 import { smokeTestRegistry } from '../../tests/smokeTestRegistry';
 
@@ -34,9 +34,18 @@ const createPendingResult = (
   finishedAt: null,
 });
 
-// Creates the run record with every registered test pending, then hands the
-// run to the queue. The record exists before the message is sent so a poll
-// that races the queue still finds it.
+const createTestRequestedMessage = (
+  runId: string,
+  test: SmokeTestDefinition
+): QueueMessage<SmokeTestRequestedPayload> => ({
+  type: SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
+  payload: { runId, testName: test.name },
+});
+
+// Creates the run record with every registered test pending, then sends one
+// queue message per test so they execute in parallel. The record exists
+// before the messages are sent so a poll (or a worker) that races the queue
+// still finds it.
 export function* askStartSmokeRun(): AskResponse<SmokeRun> {
   const runId = yield* askNewGuid();
   const startedAt = yield* askDateNow();
@@ -51,12 +60,11 @@ export function* askStartSmokeRun(): AskResponse<SmokeRun> {
 
   yield* askSaveSmokeRun(smokeRun);
 
-  const message: QueueMessage<SmokeRunRequestedPayload> = {
-    type: SMOKE_RUN_REQUESTED_MESSAGE_TYPE,
-    payload: { runId },
-  };
+  const messages = smokeTestRegistry.map((test) =>
+    createTestRequestedMessage(runId, test)
+  );
 
-  yield* askQueueSendMessages(SMOKE_RUN_QUEUE, message);
+  yield* askQueueSendMessages(SMOKE_RUN_QUEUE, ...messages);
 
   return smokeRun;
 }

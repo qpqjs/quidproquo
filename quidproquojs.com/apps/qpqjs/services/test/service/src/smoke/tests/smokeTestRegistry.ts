@@ -9,8 +9,10 @@ import { askRunSecretTest } from './secret/askRunSecretTest';
 import { askRunStorageDriveTest } from './storageDrive/askRunStorageDriveTest';
 import { SmokeTestDefinition } from './SmokeTestDefinition';
 
-// Every smoke test a run executes, in order. A test's id in the run record is
-// its 1-based position here, so append rather than reorder where possible.
+// Every smoke test a run executes. They run in parallel, one queue message
+// each, so nothing here may depend on another test having finished. A test's
+// id in the run record is its 1-based position here, so append rather than
+// reorder where possible; `name` is the key the queue message carries.
 // Adding a test: one folder with its askRun<Name>Test story, one line here.
 export const smokeTestRegistry: SmokeTestDefinition[] = [
   { name: 'noop', askRun: askRunNoopTest },

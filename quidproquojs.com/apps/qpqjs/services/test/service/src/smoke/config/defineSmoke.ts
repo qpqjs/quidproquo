@@ -24,7 +24,7 @@ import {
 } from '../constants/smokeProbe';
 import {
   SMOKE_RUN_QUEUE,
-  SMOKE_RUN_REQUESTED_MESSAGE_TYPE,
+  SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
 } from '../constants/smokeRunQueue';
 
 // Everything the smoke feature needs: the run store, the queue runs execute
@@ -46,15 +46,17 @@ export const defineSmoke = (): QPQConfig => {
   ];
 
   return [
-    // One record per run, keyed by runId; the queue entry updates it as tests
-    // complete and the GET route polls it.
+    // One record per run, keyed by runId; the queue workers each write their
+    // own test's entry as it completes and the GET route polls it.
     defineKeyValueStore(SMOKE_RUNS_STORE, 'runId'),
 
+    // One message per test per run. Not FIFO and no concurrency cap, so the
+    // tests of a run fan out and execute in parallel.
     defineQueue(SMOKE_RUN_QUEUE, {
-      [SMOKE_RUN_REQUESTED_MESSAGE_TYPE]: {
+      [SMOKE_TEST_REQUESTED_MESSAGE_TYPE]: {
         basePath: __dirname,
-        relativePath: '../queue/onSmokeRunRequested',
-        functionName: 'onSmokeRunRequested',
+        relativePath: '../queue/onSmokeTestRequested',
+        functionName: 'onSmokeTestRequested',
       },
     }),
 

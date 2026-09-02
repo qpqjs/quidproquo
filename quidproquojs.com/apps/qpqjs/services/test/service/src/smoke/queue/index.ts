@@ -1,2 +1,2 @@
 export * from './onSmokeProbeEvent';
-export * from './onSmokeRunRequested';
+export * from './onSmokeTestRequested';
