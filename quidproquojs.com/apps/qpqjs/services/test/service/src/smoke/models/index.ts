@@ -1,3 +1,3 @@
 export * from './GithubOidcClaims';
 export * from './SmokeProbeEventQueueEvent';
-export * from './SmokeRunRequestedQueueEvent';
+export * from './SmokeTestRequestedQueueEvent';
