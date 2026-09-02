@@ -11,11 +11,13 @@ import {
   AskResponse,
   DecodedAccessToken,
   decomposedStringToString,
+  EventActionType,
   filterLogHistoryByActionTypes,
   LogActionType,
   LogLevelEnum,
   QpqRuntimeType,
   StoryResult,
+  StorySession,
   UserDirectoryActionType,
   UserDirectorySetAccessTokenActionPayload,
 } from 'quidproquo-core';
@@ -79,11 +81,22 @@ export const getDecodedAccessTokenFromSetAccessTokenActionInStoryResult = (story
   return actionPayload.res;
 };
 
+export const getDecodedAccessTokenFromGetStorySessionActionInStoryResult = (storyResult: StoryResult<any>): DecodedAccessToken | undefined => {
+  const actionPayload: ActionHistory<unknown, StorySession | undefined> | undefined = storyResult.history.find(
+    (h) => h.act.type === EventActionType.GetStorySession,
+  );
+
+  return actionPayload?.res?.decodedAccessToken;
+};
+
 export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: number): LogMetadata => {
   // Add the generic text to the tag list
   const tags = [...(extractors[storyResult.runtimeType]?.(storyResult) || []), ...storyResult.tags];
 
-  const decodedAccessToken = storyResult.session?.decodedAccessToken || getDecodedAccessTokenFromSetAccessTokenActionInStoryResult(storyResult);
+  const decodedAccessToken =
+    storyResult.session?.decodedAccessToken ||
+    getDecodedAccessTokenFromSetAccessTokenActionInStoryResult(storyResult) ||
+    getDecodedAccessTokenFromGetStorySessionActionInStoryResult(storyResult);
 
   // Base metadata
   const metadata: LogMetadata = {
