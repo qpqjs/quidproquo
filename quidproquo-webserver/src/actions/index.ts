@@ -4,7 +4,6 @@ export * from './apiKeyValidation';
 export * from './dns';
 export * from './email';
 export * from './genericDataResource';
-export * from './openApiSpec';
 export * from './routeAuthValidation';
 export * from './serviceFunction';
 export * from './webEntry';

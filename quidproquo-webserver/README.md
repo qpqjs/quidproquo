@@ -21,10 +21,9 @@ npm install quidproquo-webserver
 | `dns` | Record lookups and management |
 | `serviceFunction` | Invoking a function on another service |
 | `routeAuthValidation`, `apiKeyValidation` | Auth and api key checks in front of a route |
-| `openApiSpec` | Generating and serving an OpenAPI document |
 | `genericDataResource`, `admin` | Data resources and the admin surface |
 
-**Config settings** in `src/config/settings/`, the `define*` helpers you compose into a service config: `defineRoute`, `defineApi`, `defineWebEntry`, `defineWebsocket`, `defineDns`, `defineCertificate`, `defineEmailSender`, `defineApiKey`, `defineOpenApi`, `defineCache`, `defineSeo`, `defineSeed`, `defineMigration`, `defineDomainProxy`, `defineSubdomainRedirect`, `defineServiceFunction`, and the auth system helpers.
+**Config settings** in `src/config/settings/`, the `define*` helpers you compose into a service config: `defineRoute`, `defineApi`, `defineWebEntry`, `defineWebsocket`, `defineDns`, `defineCertificate`, `defineEmailSender`, `defineApiKey`, `defineCache`, `defineSeo`, `defineSeed`, `defineMigration`, `defineDomainProxy`, `defineSubdomainRedirect`, `defineServiceFunction`, and the auth system helpers.
 
 A service config is a plain array. The deploy packages read it to build infrastructure, and the dev server reads the same array to run the service locally.
 

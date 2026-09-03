@@ -9,7 +9,6 @@ export * from './domainProxy';
 export * from './emailSender';
 export * from './fileUploadSettings';
 export * from './migration';
-export * from './openApi';
 export * from './route';
 export * from './seed';
 export * from './seo';

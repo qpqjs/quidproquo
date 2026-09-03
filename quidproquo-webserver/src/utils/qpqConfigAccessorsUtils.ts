@@ -10,7 +10,6 @@ import {
   EmailSenderQPQWebServerConfigSetting,
   FileUploadSettings,
   FileUploadSettingsQPQWebServerConfigSetting,
-  OpenApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   RouteQPQWebServerConfigSetting,
   SeoQPQWebServerConfigSetting,
@@ -60,12 +59,6 @@ export const getOwnedServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQ
   return qpqCoreUtils.getOwnedItems(serviceFunctions, qpqConfig);
 };
 
-export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
-  const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.OpenApi);
-
-  return openApiSpecs;
-};
-
 export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   return getOwnedWebsocketSettings(qpqConfig)
     .flatMap((s) => [s.eventProcessors.onConnect, s.eventProcessors.onDisconnect, s.eventProcessors.onMessage])
@@ -77,7 +70,6 @@ export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRunt
 export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   return qpqCoreUtils.expandSrcEntriesWithActionProcessors([
     ...getAllRoutes(configs).map((r) => r.runtime),
-    // ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.runtime),
     ...getAllServiceFunctions(configs).map((sf) => sf.runtime),
     ...getAllWebsocketSrcEntries(configs),

@@ -3,7 +3,6 @@ import webserverApiKeyValidationActionComponentMap from './webserverApiKeyValida
 import webserverDnsActionComponentMap from './webserverDnsActionComponentMap';
 import webserverEmailActionComponentMap from './webserverEmailActionComponentMap';
 import webserverGenericDataResourceActionComponentMap from './webserverGenericDataResourceActionComponentMap';
-import webserverOpenApiSpecActionComponentMap from './webserverOpenApiSpecActionComponentMap';
 import webserverRouteAuthValidationActionComponentMap from './webserverRouteAuthValidationActionComponentMap';
 import webserverServiceActionComponentMap from './webserverServiceActionComponentMap';
 import webserverServiceFunctionActionComponentMap from './webserverServiceFunctionActionComponentMap';
@@ -16,7 +15,6 @@ export default {
   ...webserverDnsActionComponentMap,
   ...webserverEmailActionComponentMap,
   ...webserverGenericDataResourceActionComponentMap,
-  ...webserverOpenApiSpecActionComponentMap,
   ...webserverRouteAuthValidationActionComponentMap,
   ...webserverServiceActionComponentMap,
   ...webserverServiceFunctionActionComponentMap,
