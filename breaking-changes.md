@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `defineOpenApi`, `askGetOpenApiSpec`, `OpenApiSpecActionType`, and `getAllOpenApiSpecs` (`quidproquo-webserver`) are removed with no replacement; drop any config or route code depending on them.
+
 ## 0.1.19
 
 - `defineRecurringSchedule` (`quidproquo-core`) takes a structured `ScheduleRecurrence` instead of an AWS cron string: `defineRecurringSchedule('0 0 3 * * ? *', runtime)` becomes `defineRecurringSchedule({ dailyAtUtc: { hour: 3, minute: 0 } }, runtime)`. The variants are `{ everyMinutes }` (must divide 60), `{ everyHours, atMinute? }` (must divide 24), `{ dailyAtUtc }`, `{ weeklyAtUtc }` and `{ monthlyAtUtc }`, all UTC. An interval that cannot be scheduled evenly now throws an `InvalidScheduleRecurrenceError` while the config is evaluated. Cron is no longer a core concept: `renderAwsCronExpression` in `quidproquo-deploy-awscdk` is the only place that knows the EventBridge dialect, which is what lets the dev server fire the same schedules locally.

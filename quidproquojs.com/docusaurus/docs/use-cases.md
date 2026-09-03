@@ -154,12 +154,6 @@ export const api = createApi({
 });
 ```
 
-**Automatic OpenAPI Documentation**
-- Generate OpenAPI specs from your route definitions
-- Type-safe request/response contracts
-- Automatic validation against schemas
-- Interactive API documentation
-
 **Built-in Authentication & Authorization**
 ```typescript
 function* protectedRoute(request: HTTPRequest) {

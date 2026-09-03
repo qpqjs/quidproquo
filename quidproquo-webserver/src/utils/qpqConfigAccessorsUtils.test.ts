@@ -10,7 +10,6 @@ import { defineCertificate } from '../config/settings/certificate';
 import { defineDefaultRouteOptions } from '../config/settings/defaultRouteOptions';
 import { defineDns } from '../config/settings/dns';
 import { defineFileUploadSettings } from '../config/settings/fileUploadSettings';
-import { defineOpenApi } from '../config/settings/openApi';
 import { defineRoute } from '../config/settings/route';
 import { defineSeo } from '../config/settings/seo';
 import { defineServiceFunction } from '../config/settings/serviceFunction';
@@ -23,7 +22,6 @@ import {
   constructServiceDomainName,
   defaultFileUploadSettings,
   getAllApiKeyConfigs,
-  getAllOpenApiSpecs,
   getAllOwnedCacheConfigs,
   getAllOwnedCertifcateConfigs,
   getAllRoutes,
@@ -67,7 +65,6 @@ describe('config setting selectors', () => {
       defineSeo('/home', '/src/seo::home'),
       defineServiceFunction('/src/fn::charge'),
       defineApi('orders', 'example.com'),
-      defineOpenApi('./spec.yaml'),
     ]);
 
     expect(getAllRoutes(config)).toHaveLength(1);
@@ -299,7 +296,6 @@ describe('getAllSeo with subdomain redirects present', () => {
 describe('list and ownership selectors', () => {
   const config = buildTestQpqConfig([
     defineDns('example.com'),
-    defineOpenApi('./spec.yaml'),
     defineSubdomainRedirect('www', './build', 'https://example.com'),
     defineWebEntry('site', { domain: webDomain, buildPath: './dist' }),
     defineCache('cdn', cacheSettings, { owner: { module: 'test-module', cacheName: 'cdn' } }),
@@ -309,7 +305,6 @@ describe('list and ownership selectors', () => {
   ]);
 
   it('returns each list selector', () => {
-    expect(getAllOpenApiSpecs(config)).toHaveLength(1);
     expect(getDnsConfigs(config)).toHaveLength(1);
     expect(getWebEntryConfigs(config)).toHaveLength(1);
     expect(getDomainProxyConfigs(config)).toEqual([]);

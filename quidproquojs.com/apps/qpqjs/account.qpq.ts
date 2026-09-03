@@ -7,21 +7,13 @@ import { QPQConfig } from 'quidproquo';
 import {
   AwsDataStoreRemovalPolicy,
   defineAccountBudget,
-  defineAccountCloudTrail,
   defineAccountSecurityServices,
   defineAwsDataStoreRemovalPolicy,
 } from 'quidproquo-config-aws';
 
 export default (): QPQConfig => [
-  // Dev account: deleting the account stack takes the CloudTrail bucket
-  // (and its audit history) with it.
+  // Dev account: data stores created by the account stack are torn down with it.
   defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy),
-
-  defineAccountCloudTrail('main', {
-    cloudWatchLogs: {
-      retentionDays: 30,
-    },
-  }),
 
   defineAccountBudget('main', 30, ['joecoady@gmail.com']),
 
@@ -31,9 +23,5 @@ export default (): QPQConfig => [
     // would collide), and Security Hub is off pending the AWS Config cost decision.
     enableGuardDuty: false,
     enableSecurityHub: false,
-    cognitoAuthFailureAlert: {
-      emails: ['joecoady@gmail.com'],
-      thresholdPer5Minutes: 10,
-    },
   }),
 ];
