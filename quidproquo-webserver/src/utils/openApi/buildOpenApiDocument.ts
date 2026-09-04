@@ -10,17 +10,21 @@ import { OpenApiDocumentOptions } from './OpenApiDocumentOptions';
 type HttpVerb = keyof OpenApiPathItem;
 
 // Every live api the service exposes is a server the operations can be called on.
-// A service with no domain (nothing browser-facing, local only) lists none.
+// Deployed, an api domain is shared by every service in the application and each
+// service is mounted under its module name (the api gateway base path mapping),
+// so the server url carries that path. A service with no domain (nothing
+// browser-facing, local only) lists none.
 const buildServers = (qpqConfig: QPQConfig): { url: string }[] => {
   if (!getDomainName(qpqConfig)) {
     return [];
   }
 
   const baseDomain = getBaseDomainName(qpqConfig);
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return getApiConfigs(qpqConfig)
     .filter((api) => !api.deprecated)
-    .map((api) => ({ url: `https://${api.apiSubdomain}.${baseDomain}` }));
+    .map((api) => ({ url: `https://${api.apiSubdomain}.${baseDomain}/${serviceName}` }));
 };
 
 // Only schemes some operation actually references make it into components, so a

@@ -91,14 +91,14 @@ describe('buildOpenApiDocument', () => {
     expect(Object.keys(buildOpenApiDocument(config).paths)).toEqual(['/v1/widgets']);
   });
 
-  it('lists a server per live api when the service has a domain, none otherwise', () => {
+  it('lists a server per live api, mounted under the service name, none without a domain', () => {
     const withDomain = buildTestQpqConfig([
       defineDns('example.com'),
       defineApi('api', 'example.com'),
       defineApi('old', 'example.com', { deprecated: true }),
     ]);
 
-    expect(buildOpenApiDocument(withDomain).servers).toEqual([{ url: 'https://api.development.example.com' }]);
+    expect(buildOpenApiDocument(withDomain).servers).toEqual([{ url: 'https://api.development.example.com/test-module' }]);
     expect(buildOpenApiDocument(buildTestQpqConfig()).servers).toEqual([]);
   });
 
