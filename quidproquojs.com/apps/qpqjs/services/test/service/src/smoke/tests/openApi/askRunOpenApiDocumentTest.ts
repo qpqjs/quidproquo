@@ -24,7 +24,7 @@ export function* askRunOpenApiDocumentTest(): AskResponse<void> {
     'echo route does not document its 422'
   );
 
-  const smokeRun = document.paths['/v1/smoke/run/{runId}']?.get;
+  const smokeRun = document.paths['/smoke/run/{runId}']?.get;
   yield* askSmokeAssert(
     !!smokeRun?.responses['200'].content?.['application/json'].schema,
     'smoke run route has no response schema'
