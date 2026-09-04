@@ -7,7 +7,6 @@ import multer from 'multer';
 import path from 'path';
 
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
-import { getAllServiceConfigs } from '../allServiceConfig';
 import { closeHttpServerGracefully, isDevServerReady, processEvent } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
@@ -70,7 +69,8 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
 };
 
 export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
-  const allServiceConfig = getAllServiceConfigs(devServerConfig);
+  // Already localised (dns base, cors) by resolveDevServerConfig, same copy every plugin uses
+  const allServiceConfig = devServerConfig.qpqConfigs;
 
   const app: Express = express();
 
