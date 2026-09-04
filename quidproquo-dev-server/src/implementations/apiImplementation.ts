@@ -19,6 +19,21 @@ const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
     qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
   );
 
+// Raw string bodies pass through verbatim. Multer leaves multipart fields as an object, which
+// is re-serialised. body-parser sets `{}` when there was no body at all, where production
+// delivers undefined, so an empty object is undefined here too.
+const toEventBody = (req: Request): string | undefined => {
+  if (typeof req.body === 'string') {
+    return req.body;
+  }
+
+  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+    return JSON.stringify(req.body);
+  }
+
+  return undefined;
+};
+
 const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const baseDomain = getServiceBaseDomain(qpqConfig, devServerConfig);
 
@@ -61,12 +76,13 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   app.use(multer().any());
 
-  app.use(bodyParser.json({ limit: '50mb' }));
-
-  // Keep form-urlencoded bodies as the raw string so they reach handlers verbatim — exactly
-  // as API Gateway delivers them. Parsing to an object would be re-serialised as JSON below
-  // (see the `event.body` assignment), which urlencoded handlers (e.g. OAuth /token) can't read.
-  app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded', limit: '50mb' }));
+  // Service requests keep their json and form-urlencoded bodies as the raw string, exactly as
+  // API Gateway delivers them, so a route parses (and rejects) its own body on the same code
+  // path as production. Parsing here would re-serialise the body below (see `toEventBody`)
+  // and turn malformed json into an express html error before the story ever runs. The admin
+  // endpoints are not service requests and still parse theirs with express.json().
+  const rawServiceBody = bodyParser.text({ type: ['application/json', 'application/x-www-form-urlencoded'], limit: '50mb' });
+  app.use((req, res, next) => (req.path.startsWith('/admin') ? next() : rawServiceBody(req, res, next)));
 
   const apiConfigs = allServiceConfig.map((qpqConfig) => getApiDomainsFromConfig(qpqConfig, devServerConfig)).flat();
 
@@ -155,7 +171,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
         },
         method: req.method,
         isBase64Encoded: false,
-        body: typeof req.body === 'object' ? JSON.stringify(req.body) : req.body,
+        body: toEventBody(req),
       };
 
       if (req.files) {

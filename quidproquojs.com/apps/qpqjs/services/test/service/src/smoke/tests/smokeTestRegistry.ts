@@ -3,6 +3,8 @@ import { askRunCrossServiceStorageDriveTest } from './crossService/askRunCrossSe
 import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
 import { askRunKeyValueStoreTest } from './keyValueStore/askRunKeyValueStoreTest';
 import { askRunNoopTest } from './noop/askRunNoopTest';
+import { askRunEchoRoundTripTest } from './openApi/askRunEchoRoundTripTest';
+import { askRunOpenApiDocumentTest } from './openApi/askRunOpenApiDocumentTest';
 import { askRunParameterTest } from './parameter/askRunParameterTest';
 import { askRunScheduleTest } from './schedule/askRunScheduleTest';
 import { askRunSecretTest } from './secret/askRunSecretTest';
@@ -30,4 +32,6 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
     askRun: askRunCrossServiceStorageDriveTest,
   },
   { name: 'schedule', askRun: askRunScheduleTest },
+  { name: 'openApiDocument', askRun: askRunOpenApiDocumentTest },
+  { name: 'echoRoundTrip', askRun: askRunEchoRoundTripTest },
 ];

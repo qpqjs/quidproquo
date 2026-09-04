@@ -3,6 +3,7 @@ export * from './crossService';
 export * from './eventBus';
 export * from './keyValueStore';
 export * from './noop';
+export * from './openApi';
 export * from './parameter';
 export * from './secret';
 export * from './SmokeTestDefinition';
