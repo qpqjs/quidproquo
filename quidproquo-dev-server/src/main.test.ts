@@ -1,8 +1,10 @@
 import { buildTestQpqConfig, defineGlobal } from 'quidproquo-core';
+import { defineDns, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { getDevConfigs } from './main';
+import { getDevConfigs, resolveDevServerConfig } from './main';
+import { DevServerConfig } from './types';
 
 describe('getDevConfigs', () => {
   it('returns the base configs unchanged when no overrides are given', () => {
@@ -30,5 +32,25 @@ describe('getDevConfigs', () => {
 
     expect(resultA).toContainEqual(override);
     expect(resultB).not.toContainEqual(override);
+  });
+});
+
+describe('resolveDevServerConfig', () => {
+  it('localises every config once so all plugins, not just the api, see the dev origin', () => {
+    const devServerConfig = {
+      serverDomain: 'localhost',
+      serverPort: 8080,
+      dynamicModuleLoader: async () => null,
+      qpqConfigs: [buildTestQpqConfig([defineDns('quidproquojs.com')])],
+    } as unknown as DevServerConfig;
+
+    const resolved = resolveDevServerConfig(devServerConfig);
+
+    const [dns] = qpqWebServerUtils.getDnsConfigs(resolved.qpqConfigs[0]);
+    expect(dns.dnsBase).toBe('localhost:8080');
+
+    // The caller's configs are left alone; the localised ones are a copy
+    const [originalDns] = qpqWebServerUtils.getDnsConfigs(devServerConfig.qpqConfigs[0]);
+    expect(originalDns.dnsBase).toBe('quidproquojs.com');
   });
 });

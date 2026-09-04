@@ -4,6 +4,7 @@ import { askRunPendingMigrations } from 'quidproquo-webserver';
 import * as crypto from 'crypto';
 import path from 'path';
 
+import { getAllServiceConfigs } from './allServiceConfig';
 import { createTinkerInterface } from './implementations';
 import { awaitDevServerIdle, installDevServerShutdownHandlers, markDevServerReady, runDevServerShutdown } from './logic';
 import { apiPlugin, DEV_SERVER_PLUGINS, DevServerPlugin, MIGRATION_DEV_SERVER_PLUGINS, startDevServerPlugins } from './plugins';
@@ -28,13 +29,21 @@ export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?
   });
 };
 
-const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides): ResolvedDevServerConfig => {
+export const resolveDevServerConfig = (
+  devServerConfig: DevServerConfig,
+  devServerConfigOverrides?: DevServerConfigOverrides,
+): ResolvedDevServerConfig => {
   const runtimePath = devServerConfig.runtimePath || '.qpq-runtime';
+
+  // Every plugin gets the same localised configs: dns base on the dev origin, local cors
+  // origins. Doing it once here, rather than in the api plugin alone, is what keeps a
+  // story in a queue or schedule worker from deriving urls on the deployed domain.
+  const qpqConfigs = getAllServiceConfigs({ ...devServerConfig, qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs, devServerConfigOverrides) });
 
   return {
     ...devServerConfig,
     runtimePath,
-    qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs, devServerConfigOverrides),
+    qpqConfigs,
 
     fileStorageConfig: {
       storagePath: path.join(runtimePath, devServerConfig.fileStorageConfig?.storagePath || 'storage'),
