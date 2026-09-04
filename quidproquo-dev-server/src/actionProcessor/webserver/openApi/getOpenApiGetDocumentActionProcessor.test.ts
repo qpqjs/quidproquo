@@ -32,7 +32,7 @@ describe('dev server getOpenApiGetDocumentActionProcessor', () => {
       createStreamRegistry(),
     );
 
-    expect((document as OpenApiDocument).servers).toEqual([{ url: 'http://development.localhost:8080/api/test-module' }]);
+    expect((document as OpenApiDocument).servers).toEqual([{ url: 'http://localhost:8080/api/test-module' }]);
     expect(Object.keys((document as OpenApiDocument).paths)).toEqual(['/v1/widgets']);
   });
 });
