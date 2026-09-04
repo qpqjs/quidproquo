@@ -1,21 +1,27 @@
 import { askCatch, AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils, RouteOptions } from 'quidproquo-webserver';
 
+import { askDynamicRouteParseInput } from './askDynamicRouteParseInput';
+import { DynamicRouteConfig } from './DynamicRouteConfig';
+import { DynamicRouteInput } from './DynamicRouteInput';
+import { DynamicRouteKnownErrors, isDynamicRouteErrorCode } from './DynamicRouteKnownErrors';
+import { toRouteSchema } from './toRouteSchema';
+
 export type ExtractRouteParams<S extends string> = string extends S
   ? Record<string, string>
   : S extends `${infer _Start}{${infer Param}}${infer Rest}`
     ? { [K in Param | keyof ExtractRouteParams<Rest>]: string }
     : Record<never, never>;
 
-type DynamicRouteErrorCode = number;
-type DynamicRouteErrorCodeWithMessage = { code: number; message: string };
+export type DynamicRouteSettings<S extends string> = [HTTPMethod, S] | [HTTPMethod, S, number] | [HTTPMethod, S, number, RouteOptions];
 
-export type DynamicRouteKnownErrors = {
-  [key: string]: DynamicRouteErrorCode | DynamicRouteErrorCodeWithMessage;
-};
-
-export const isDynamicRouteErrorCode = (value: DynamicRouteErrorCode | DynamicRouteErrorCodeWithMessage): value is DynamicRouteErrorCode =>
-  typeof value === 'number';
+// The story behind a route. `input` carries the body and query already parsed
+// against the route's schema, so handlers never touch `event.body` themselves.
+export type DynamicRouteRuntime<S extends string, TBody = undefined, TQuery = undefined> = (
+  event: HTTPEvent,
+  params: ExtractRouteParams<S>,
+  input: DynamicRouteInput<TBody, TQuery>,
+) => AskResponse<HTTPEventResponse>;
 
 // The route config carried alongside the handler, harvested by defineDynamicRoutes
 export interface DynamicRouteMeta {
@@ -32,15 +38,34 @@ export type DynamicRouteHandler<S extends string = string> = ((event: HTTPEvent,
   dynamicRoute: DynamicRouteMeta;
 };
 
-export const dynamicRoute = <S extends string>(
-  settings: [HTTPMethod, S] | [HTTPMethod, S, number] | [HTTPMethod, S, number, RouteOptions],
-  runtime: (event: HTTPEvent, params: ExtractRouteParams<S>) => AskResponse<HTTPEventResponse>,
-  knownErrors?: DynamicRouteKnownErrors,
+// A zod schema on the config wins over any plain RouteSchema in the settings tuple,
+// field by field, because it is the one the handler is actually validated against.
+const withSchema = (options: RouteOptions | undefined, config: DynamicRouteConfig<unknown, unknown>): RouteOptions | undefined => {
+  if (!config.schema) {
+    return options;
+  }
+
+  return { ...options, schema: { ...options?.schema, ...toRouteSchema(config.schema) } };
+};
+
+export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undefined>(
+  settings: DynamicRouteSettings<S>,
+  runtime: DynamicRouteRuntime<S, TBody, TQuery>,
+  config: DynamicRouteConfig<TBody, TQuery> = {},
 ): DynamicRouteHandler<S> => {
   const [method, path, version, options] = settings;
+  const { knownErrors, schema } = config;
+
+  // Parsing lives inside the same askCatch as the handler so a schema failure
+  // takes the Invalid -> 422 path like any other validation error.
+  function* askRunWithInput(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
+    const input = yield* askDynamicRouteParseInput(event, schema);
+
+    return yield* runtime(event, params, input);
+  }
 
   const wrapper = function* wrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
-    const res = yield* askCatch(runtime(event, params));
+    const res = yield* askCatch(askRunWithInput(event, params));
 
     if (!res.success) {
       const allKnownErrors: DynamicRouteKnownErrors = {
@@ -81,6 +106,6 @@ export const dynamicRoute = <S extends string>(
   };
 
   return Object.assign(wrapper, {
-    dynamicRoute: { method, path, options, version: version || 1 },
+    dynamicRoute: { method, path, options: withSchema(options, config), version: version || 1 },
   });
 };

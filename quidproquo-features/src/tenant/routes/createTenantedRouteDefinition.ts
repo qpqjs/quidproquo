@@ -1,7 +1,16 @@
 import { AskResponse, HTTPMethod } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
 
-import { createRouteDefinition, DynamicRouteHandler, DynamicRouteKnownErrors, ExtractRouteParams, RouteDefinition } from '../../routes';
+import {
+  createRouteDefinition,
+  DynamicRouteConfig,
+  DynamicRouteHandler,
+  DynamicRouteInput,
+  DynamicRouteKnownErrors,
+  DynamicRouteRuntime,
+  ExtractRouteParams,
+  RouteDefinition,
+} from '../../routes';
 import { askTenantProvideRequestScope } from '../logic';
 
 // Like createRouteDefinition, but every handler runs inside the request's typed
@@ -27,15 +36,18 @@ export const createTenantedRouteDefinition = (
 
   const routeDefinition = createRouteDefinition(tenantedOptions, commonKnownErrors);
 
-  return <S extends string>(
+  return <S extends string, TBody = undefined, TQuery = undefined>(
     settings: [HTTPMethod, S] | [HTTPMethod, S, number],
-    runtime: (event: HTTPEvent, params: ExtractRouteParams<S>) => AskResponse<HTTPEventResponse>,
-    knownErrors?: DynamicRouteKnownErrors,
+    runtime: DynamicRouteRuntime<S, TBody, TQuery>,
+    config?: DynamicRouteConfig<TBody, TQuery>,
   ): DynamicRouteHandler<S> => {
     // Scope the whole handler to the request's tenant (and gate membership) before it runs.
-    const scopedRuntime = (event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> =>
-      askTenantProvideRequestScope(event, userDirectoryName, runtime(event, params));
+    const scopedRuntime = (
+      event: HTTPEvent,
+      params: ExtractRouteParams<S>,
+      input: DynamicRouteInput<TBody, TQuery>,
+    ): AskResponse<HTTPEventResponse> => askTenantProvideRequestScope(event, userDirectoryName, runtime(event, params, input));
 
-    return routeDefinition(settings, scopedRuntime, knownErrors);
+    return routeDefinition<S, TBody, TQuery>(settings, scopedRuntime, config);
   };
 };

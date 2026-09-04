@@ -1,6 +1,7 @@
 import { getUniqueKeyFromQpqFunctionRuntime, HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
+import { RouteSchema } from '../types/RouteSchema';
 import { ApiKeyReference } from './apiKey';
 
 interface GenericRouteAuthSettings<T> {
@@ -35,6 +36,9 @@ export interface GenericRouteOptions<T> {
   allowedOrigins?: (string | ServiceAllowedOrigin)[];
 
   routeAuthSettings?: GenericRouteAuthSettings<T>;
+
+  // Request and response shapes for validation and the generated OpenAPI document
+  schema?: RouteSchema;
 }
 
 // TODO: Probably clean up the types here

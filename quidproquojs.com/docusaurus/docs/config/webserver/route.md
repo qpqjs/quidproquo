@@ -48,6 +48,7 @@ A reference to the story that handles the request. Usually written as a relative
 | --- | --- | --- | --- |
 | `allowedOrigins` | `(string \| ServiceAllowedOrigin)[]` | – | Browser origins allowed to call this route (CORS). Either literal origin strings or `ServiceAllowedOrigin` descriptors resolved to another qpq service's domain. Merged with any [default route options](./default-route-options.md). |
 | `routeAuthSettings` | `RouteAuthSettings` | – | How the route is authenticated/authorized. See below. |
+| `schema` | `RouteSchema` | – | `bodyJsonSchema`, `queryJsonSchema` and `responseJsonSchema` as JSON Schema, plus `summary`, `description`, `tags` and `hidden`. Feeds the generated OpenAPI document; see [defineOpenApiRoutes](../features/open-api-routes.md). Routes written with `dynamicRoute` fill this in from zod schemas for you. |
 
 #### `RouteAuthSettings`
 

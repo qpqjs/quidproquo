@@ -19,6 +19,7 @@ import {
 import {
   defineAdminSettings,
   defineAdminUserDirectory,
+  defineOpenApiRoutes,
 } from 'quidproquo-features';
 
 import { execSync } from 'child_process';
@@ -141,6 +142,12 @@ export const defineQpqjsService = (
   defineAdminSettings(QpqjsServiceEnum.Admin, QPQJS_DOMAIN, {
     services: qpqjsServiceNames,
     coldStorageAfterDays: 90,
+  }),
+
+  // Every service documents itself: reference page at /v1/docs, the generated
+  // OpenAPI document at /v1/docs/openapi.json. Public, like the docs site.
+  defineOpenApiRoutes({
+    info: { title: `${modulePrefix} ${service}`, version: '1.0.0' },
   }),
 
   // turning this off is super painful for maintaince, dont be a nubbet.

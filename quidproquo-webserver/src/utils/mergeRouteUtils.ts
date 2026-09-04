@@ -22,6 +22,9 @@ export const mergeRouteOptions = (routeOptionsA: RouteOptions, routeOptionsB: Ro
   return {
     allowedOrigins: [...new Set([...(routeOptionsB.allowedOrigins || []), ...(routeOptionsA.allowedOrigins || [])])],
     routeAuthSettings: mergeRouteAuthSettings(routeOptionsA.routeAuthSettings, routeOptionsB.routeAuthSettings),
+
+    // Schemas describe one route, they are never shared defaults, so the more specific side wins outright
+    schema: routeOptionsB.schema ?? routeOptionsA.schema,
   };
 };
 

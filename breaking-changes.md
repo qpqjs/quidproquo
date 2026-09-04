@@ -6,6 +6,7 @@ assembled quickly.
 ## vNext
 
 - `defineOpenApi`, `askGetOpenApiSpec`, `OpenApiSpecActionType`, and `getAllOpenApiSpecs` (`quidproquo-webserver`) are removed with no replacement; drop any config or route code depending on them.
+- `dynamicRoute`, `createRouteDefinition`, and `createTenantedRouteDefinition` (`quidproquo-features`) take a `DynamicRouteConfig` object as their third argument instead of a bare known-errors map: `usersRoute(['POST', '/x'], handler, { [ErrorEnum.X]: 401 })` becomes `usersRoute(['POST', '/x'], handler, { knownErrors: { [ErrorEnum.X]: 401 } })`. Handlers can also add a third `input` parameter (`{ body, query }`, parsed against an optional `schema.body`/`schema.query` zod schema) if they want validated request data.
 
 ## 0.1.19
 
