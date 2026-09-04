@@ -35,6 +35,14 @@ describe('mergeRouteOptions', () => {
     expect(merged.allowedOrigins).toEqual(['https://b.com', 'https://a.com']);
     expect(merged.routeAuthSettings?.scopes).toEqual(['write', 'read']);
   });
+
+  it('keeps the more specific schema and falls back to the default one', () => {
+    const defaultSchema = { summary: 'default' };
+    const routeSchema = { summary: 'route', bodyJsonSchema: { type: 'object' } };
+
+    expect(mergeRouteOptions({ schema: defaultSchema }, { schema: routeSchema }).schema).toBe(routeSchema);
+    expect(mergeRouteOptions({ schema: defaultSchema }, {}).schema).toBe(defaultSchema);
+  });
 });
 
 describe('mergeAllRouteOptions', () => {

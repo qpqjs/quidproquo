@@ -1,7 +1,11 @@
-import { SmokeRun } from './SmokeRun';
-import { SmokeRunSummary } from './SmokeRunSummary';
+import { z } from 'zod/v4';
+
+import { SmokeRunSchema } from './SmokeRun';
+import { SmokeRunSummarySchema } from './SmokeRunSummary';
 
 // What GET /smoke/run/{runId} returns: the stored run plus derived counts.
-export type SmokeRunWithSummary = SmokeRun & {
-  summary: SmokeRunSummary;
-};
+export const SmokeRunWithSummarySchema = SmokeRunSchema.extend({
+  summary: SmokeRunSummarySchema,
+});
+
+export type SmokeRunWithSummary = z.infer<typeof SmokeRunWithSummarySchema>;

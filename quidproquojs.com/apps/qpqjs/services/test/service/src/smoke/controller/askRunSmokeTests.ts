@@ -5,6 +5,8 @@ import {
   qpqWebServerUtils,
 } from 'quidproquo';
 
+import { SmokeRunStarted } from '@qpqjs/test-models';
+
 import { askStartSmokeRun } from '../logic/smokeRun/askStartSmokeRun';
 
 // POST /smoke/run. Auth happened in the route preamble via the GitHub OIDC
@@ -15,5 +17,7 @@ export function* askRunSmokeTests(
 ): AskResponse<HTTPEventResponse> {
   const smokeRun = yield* askStartSmokeRun();
 
-  return qpqWebServerUtils.toJsonEventResponse({ runId: smokeRun.runId });
+  const started: SmokeRunStarted = { runId: smokeRun.runId };
+
+  return qpqWebServerUtils.toJsonEventResponse(started);
 }

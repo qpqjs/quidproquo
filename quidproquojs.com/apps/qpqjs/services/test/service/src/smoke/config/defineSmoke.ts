@@ -10,8 +10,14 @@ import {
   QpqFunctionRuntime,
 } from 'quidproquo';
 
+import { z } from 'zod/v4';
+
 import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
+import {
+  SmokeProbeRecord,
+  SmokeRunStartedSchema,
+  SmokeRunWithSummarySchema,
+} from '@qpqjs/test-models';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 import {
@@ -87,18 +93,46 @@ export const defineSmoke = (): QPQConfig => {
       { eventBusSubscriptions: [SMOKE_PROBE_EVENT_BUS] }
     ),
 
-    defineRoute('POST', '/smoke/run', {
-      basePath: __dirname,
-      relativePath: '../controller/askRunSmokeTests',
-      functionName: 'askRunSmokeTests',
-      actionProcessors: githubOidcAuth,
-    }),
+    // The zod models double as the routes' published contract, flattened to
+    // JSON Schema here for the OpenAPI document at /v1/docs.
+    defineRoute(
+      'POST',
+      '/smoke/run',
+      {
+        basePath: __dirname,
+        relativePath: '../controller/askRunSmokeTests',
+        functionName: 'askRunSmokeTests',
+        actionProcessors: githubOidcAuth,
+      },
+      {
+        schema: {
+          summary: 'Start a smoke run',
+          description:
+            'Queues every registered smoke test and returns the run id to poll. Requires a GitHub Actions OIDC token for this repo.',
+          tags: ['smoke'],
+          responseJsonSchema: z.toJSONSchema(SmokeRunStartedSchema),
+        },
+      }
+    ),
 
-    defineRoute('GET', '/smoke/run/{runId}', {
-      basePath: __dirname,
-      relativePath: '../controller/askGetSmokeRun',
-      functionName: 'askGetSmokeRun',
-      actionProcessors: githubOidcAuth,
-    }),
+    defineRoute(
+      'GET',
+      '/smoke/run/{runId}',
+      {
+        basePath: __dirname,
+        relativePath: '../controller/askGetSmokeRun',
+        functionName: 'askGetSmokeRun',
+        actionProcessors: githubOidcAuth,
+      },
+      {
+        schema: {
+          summary: 'Get a smoke run',
+          description:
+            'The stored run plus pass/fail counts. Poll until status leaves running.',
+          tags: ['smoke'],
+          responseJsonSchema: z.toJSONSchema(SmokeRunWithSummarySchema),
+        },
+      }
+    ),
   ];
 };

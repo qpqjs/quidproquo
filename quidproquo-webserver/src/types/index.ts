@@ -3,6 +3,7 @@ export * from './constants';
 export * from './EmailSendEvent';
 export * from './ExecuteServiceFunctionEvent';
 export * from './HTTPEvent';
+export * from './OpenApiDocument';
 export * from './SEOEvent';
 export * from './StorageDriveEvent';
 export * from './WebsocketEvent';
