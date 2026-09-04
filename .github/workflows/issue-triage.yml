@@ -37,9 +37,20 @@ jobs:
         with:
           fetch-depth: 1
 
+      # The official Claude app token cannot write under .github/workflows
+      # (no `workflows` scope), so GitHub API and git pushes use a token from
+      # our own app, which has Contents, Issues, Pull requests and Workflows
+      # read/write. Claude auth still comes from CLAUDE_CODE_OAUTH_TOKEN.
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TRIAGE_APP_ID }}
+          private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
+
       - name: Ensure triage labels exist
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: bash .github/prompts/ensure-labels.sh
 
       # Step one: decide what the issue is and label it. Opus is enough for
@@ -49,6 +60,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           # The issue number is numeric so interpolating it is injection-safe.
           # Everything user-written (title, body) is fetched by Claude via gh,
           # never interpolated into the prompt.
@@ -71,6 +83,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Repository: ${{ github.repository }}
@@ -99,10 +112,22 @@ jobs:
         with:
           fetch-depth: 1
 
+      # The official Claude app token cannot write under .github/workflows
+      # (no `workflows` scope), so GitHub API and git pushes use a token from
+      # our own app, which has Contents, Issues, Pull requests and Workflows
+      # read/write. Claude auth still comes from CLAUDE_CODE_OAUTH_TOKEN.
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TRIAGE_APP_ID }}
+          private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
+
       - name: Respond to comment
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Trigger comment id: ${{ github.event.comment.id }}
@@ -132,13 +157,24 @@ jobs:
         with:
           fetch-depth: 1
 
+      # The official Claude app token cannot write under .github/workflows
+      # (no `workflows` scope), so GitHub API and git pushes use a token from
+      # our own app, which has Contents, Issues, Pull requests and Workflows
+      # read/write. Claude auth still comes from CLAUDE_CODE_OAUTH_TOKEN.
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TRIAGE_APP_ID }}
+          private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
+
       - uses: actions/setup-node@v5
         with:
           node-version: 24
 
       - name: Ensure triage labels exist
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: bash .github/prompts/ensure-labels.sh
 
       # Same setup as ci-test.yml: cross-package imports resolve to each
@@ -151,6 +187,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Repository: ${{ github.repository }}
