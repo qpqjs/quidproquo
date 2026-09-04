@@ -6,6 +6,8 @@ name: Issue Triage
 #   respond - every human comment on an issue gets read against the full thread
 #             and the plan; Claude answers if there is something to answer and
 #             updates the plan on the branch if the comment changes it.
+#   work    - a maintainer applies `start-work`; Claude implements the plan on
+#             the issue-{n} branch, runs the checks, and opens a PR.
 #
 # Both jobs share a concurrency group per issue so overlapping runs queue
 # rather than race on the branch.
@@ -84,3 +86,49 @@ jobs:
             Read .github/prompts/issue-comment.md and follow it exactly.
           claude_args: >-
             --allowed-tools "Read,Glob,Grep,Write,Edit,Bash(git:*),Bash(gh issue:*),Bash(gh api:*)"
+
+  work:
+    if: |
+      github.event_name == 'issues' &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'start-work'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: issue-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Ensure triage labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/prompts/ensure-labels.sh
+
+      # Same setup as ci-test.yml: cross-package imports resolve to each
+      # package's built lib/, so the suite needs a full build before vitest
+      # can load anything. Claude rebuilds only what it changes afterwards.
+      - run: npm ci
+      - run: npm run build
+
+      - name: Implement the plan
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Issue number: ${{ github.event.issue.number }}
+            Repository: ${{ github.repository }}
+            Read .github/prompts/issue-work.md and follow it exactly.
+          claude_args: >-
+            --allowed-tools "Read,Glob,Grep,Write,Edit,Bash(git:*),Bash(gh issue:*),Bash(gh pr:*),Bash(gh api:*),Bash(npm run build:lite),Bash(npm run build:*),Bash(npm test:*),Bash(npm run test:*),Bash(npm run lint:*),Bash(npx vitest:*)"
