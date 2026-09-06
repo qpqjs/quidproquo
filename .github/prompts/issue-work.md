@@ -91,6 +91,20 @@ Fix what fails. Do not disable, skip, or delete a test to make it pass. If a
 failure is unrelated to your change and you can show that (it fails the same
 way on `origin/main`), note it in the PR instead.
 
+## Commands that can hang
+
+The job has a hard timeout, and hitting it loses everything you did that was
+not pushed, so never start anything that does not exit on its own:
+
+- Run tests with `npm test` or `npx vitest run`. Never bare `npx vitest`,
+  which starts watch mode and waits forever.
+- Never start the dev server (`npm run start` in `quidproquo-dev-server`),
+  `npm run watch`, or anything described as a server, watcher, or daemon.
+- Wrap the big steps so a stall fails fast instead of eating the budget:
+  `timeout 600 npm ci`, `timeout 600 npm run build`, `timeout 900 npm test`.
+- If a command does time out, do not retry it blindly. Say what happened in
+  your closing comment and stop.
+
 ## 5. Push and open the PR
 
 The plan is working material, not something to merge. Set its Status line to

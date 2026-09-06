@@ -1,6 +1,6 @@
 name: Issue Triage
 
-# Two jobs, both driven by prompts in .github/prompts/:
+# Five jobs, the Claude ones driven by prompts in .github/prompts/:
 #   triage  - a new issue (or one a maintainer labels `triage`) gets assessed,
 #             labelled, and if it is real, a branch issue-{n} with a plan file.
 #   respond - every human comment on an issue gets read against the full thread
@@ -10,9 +10,12 @@ name: Issue Triage
 #             the issue-{n} branch, runs the checks, and opens a PR.
 #   review  - a human comments on or reviews a PR the bot opened; Claude makes
 #             the requested changes on the branch and replies in the threads.
+#   merged  - a bot PR merges; plain shell closes out the issue, fixes labels,
+#             and deletes the branch. No Claude involved.
 #
-# Both jobs share a concurrency group per issue so overlapping runs queue
-# rather than race on the branch.
+# The issue jobs share a concurrency group per issue so overlapping runs queue
+# rather than race on the branch. Every job has a timeout-minutes: a hung
+# command inside a Claude run would otherwise sit for the six-hour default.
 
 on:
   issues:
@@ -23,6 +26,8 @@ on:
     types: [created]
   pull_request_review:
     types: [submitted]
+  pull_request:
+    types: [closed]
 
 jobs:
   triage:
@@ -30,6 +35,7 @@ jobs:
       github.event_name == 'issues' &&
       (github.event.action == 'opened' || github.event.label.name == 'triage')
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     concurrency:
       group: issue-${{ github.event.issue.number }}
       cancel-in-progress: false
@@ -105,6 +111,7 @@ jobs:
       github.event.issue.pull_request == null &&
       github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     concurrency:
       group: issue-${{ github.event.issue.number }}
       cancel-in-progress: false
@@ -149,6 +156,7 @@ jobs:
       github.event.action == 'labeled' &&
       github.event.label.name == 'start-work'
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     concurrency:
       group: issue-${{ github.event.issue.number }}
       cancel-in-progress: false
@@ -233,6 +241,7 @@ jobs:
         github.event.review.body != ''
       )
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     concurrency:
       group: pr-${{ github.event.pull_request.number || github.event.issue.number }}
       cancel-in-progress: false
@@ -284,3 +293,40 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "The review run failed before it could respond: $RUN_URL. Comment again once the cause is fixed."
+
+  merged:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.login == 'qpq-triage[bot]' &&
+      startsWith(github.event.pull_request.head.ref, 'issue-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TRIAGE_APP_ID }}
+          private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
+
+      # The issue number is the branch suffix, so no parsing of the PR body.
+      - name: Close out the issue
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR: ${{ github.event.pull_request.number }}
+          MERGED_BY: ${{ github.event.pull_request.merged_by.login }}
+        run: |
+          issue="${HEAD_REF#issue-}"
+          gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" \
+            --body "Merged in #$PR by @$MERGED_BY. Branch \`$HEAD_REF\` deleted."
+          gh issue edit "$issue" --repo "$GITHUB_REPOSITORY" \
+            --remove-label in-review --remove-label in-progress --remove-label planned \
+            --add-label done
+          gh issue close "$issue" --repo "$GITHUB_REPOSITORY" --reason completed || true
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$HEAD_REF" || true

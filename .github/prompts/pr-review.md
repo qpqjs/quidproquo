@@ -84,6 +84,20 @@ npm run lint
 
 Fix what fails. Do not disable or delete a test to make it pass.
 
+## Commands that can hang
+
+The job has a hard timeout, and hitting it loses everything you did that was
+not pushed, so never start anything that does not exit on its own:
+
+- Run tests with `npm test` or `npx vitest run`. Never bare `npx vitest`,
+  which starts watch mode and waits forever.
+- Never start the dev server (`npm run start` in `quidproquo-dev-server`),
+  `npm run watch`, or anything described as a server, watcher, or daemon.
+- Wrap the big steps so a stall fails fast instead of eating the budget:
+  `timeout 600 npm ci`, `timeout 600 npm run build`, `timeout 900 npm test`.
+- If a command does time out, do not retry it blindly. Say what happened in
+  your closing comment and stop.
+
 ## 5. Push and reply
 
 ```
