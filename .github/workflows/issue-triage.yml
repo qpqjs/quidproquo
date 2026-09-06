@@ -195,6 +195,12 @@ jobs:
         run: bash .github/prompts/ensure-labels.sh
 
       - name: Implement the plan
+        # Commits are authored by the person who triggered the run and only
+        # committed by the bot, so history shows who asked for the work. The
+        # noreply address links the commit to their GitHub account.
+        env:
+          GIT_AUTHOR_NAME: ${{ github.event.sender.login }}
+          GIT_AUTHOR_EMAIL: ${{ github.event.sender.id }}+${{ github.event.sender.login }}@users.noreply.github.com
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -271,6 +277,12 @@ jobs:
           node-version: 24
 
       - name: Apply review feedback
+        # Commits are authored by the person who triggered the run and only
+        # committed by the bot, so history shows who asked for the work. The
+        # noreply address links the commit to their GitHub account.
+        env:
+          GIT_AUTHOR_NAME: ${{ github.event.sender.login }}
+          GIT_AUTHOR_EMAIL: ${{ github.event.sender.id }}+${{ github.event.sender.login }}@users.noreply.github.com
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
