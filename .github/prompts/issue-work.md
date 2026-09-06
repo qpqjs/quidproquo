@@ -1,8 +1,7 @@
 # Implement an issue plan
 
 A maintainer applied the `start-work` label to an issue. The issue number and
-repository are in the prompt that pointed you here. The workspace is already
-installed and fully built. Read `CLAUDE.md` first and follow every convention in
+repository are in the prompt that pointed you here. Read `CLAUDE.md` first and follow every convention in
 it; the PR will be reviewed against it.
 Read `.github/prompts/comment-style.md` before writing any comment; every comment follows it.
 
@@ -66,7 +65,21 @@ lines in commit messages.
 
 ## 4. Run the checks
 
-Rebuild what you touched, then run that package's tests and lint:
+The workspace is checked out but not installed or built. Installing takes
+about three minutes and a full build another one and a half, so only do it
+when you have changes worth testing. Before you start, post a short comment
+on the issue saying you are installing and building to run the checks, so
+anyone watching knows why the run has gone quiet.
+
+Cross-package imports resolve to each package's built `lib/`, so tests need
+the whole monorepo built once:
+
+```
+npm ci
+npm run build
+```
+
+After that, rebuild only what you touched and run the checks:
 
 ```
 npm run build:lite

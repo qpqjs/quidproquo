@@ -2,7 +2,7 @@
 
 A human commented on, or reviewed, a PR this bot opened. The PR number,
 the event that fired, its id, and the repository are in the prompt that pointed
-you here. The workspace is installed and built. Read `CLAUDE.md` first and
+you here. Read `CLAUDE.md` first and
 follow its conventions.
 Read `.github/prompts/comment-style.md` before writing any comment; every comment follows it.
 
@@ -59,6 +59,22 @@ Commit after each logical change with a message prefixed `issue-{n}:`
 describing the change. No AI attribution.
 
 ## 4. Run the checks
+
+The workspace is checked out but not installed or built. Installing takes
+about three minutes and a full build another one and a half, so only do it
+when you have changes worth testing. Before you start, post a short comment
+on the PR saying you are installing and building to run the checks, so
+anyone watching knows why the run has gone quiet.
+
+Cross-package imports resolve to each package's built `lib/`, so tests need
+the whole monorepo built once:
+
+```
+npm ci
+npm run build
+```
+
+After that, rebuild only what you touched and run the checks:
 
 ```
 npm run build:lite

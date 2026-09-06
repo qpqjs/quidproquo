@@ -174,6 +174,9 @@ jobs:
           app-id: ${{ vars.TRIAGE_APP_ID }}
           private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
 
+      # No install or build here: they take minutes and most runs never need
+      # them. The prompt has Claude install and build on demand when it wants
+      # to run tests, and say so on the issue first.
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -182,12 +185,6 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: bash .github/prompts/ensure-labels.sh
-
-      # Same setup as ci-test.yml: cross-package imports resolve to each
-      # package's built lib/, so the suite needs a full build before vitest
-      # can load anything. Claude rebuilds only what it changes afterwards.
-      - run: npm ci
-      - run: npm run build
 
       - name: Implement the plan
         uses: anthropics/claude-code-action@v1
@@ -257,12 +254,12 @@ jobs:
           app-id: ${{ vars.TRIAGE_APP_ID }}
           private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
 
+      # No install or build here: they take minutes and most runs never need
+      # them. The prompt has Claude install and build on demand when it wants
+      # to run tests, and say so on the issue first.
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-
-      - run: npm ci
-      - run: npm run build
 
       - name: Apply review feedback
         uses: anthropics/claude-code-action@v1
