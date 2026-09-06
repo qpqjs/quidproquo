@@ -3,6 +3,7 @@
 You are triaging a newly opened GitHub issue for this repository. The issue
 number and repository are in the prompt that pointed you here. Read `CLAUDE.md`
 first so you know how the codebase is organised.
+Read `.github/prompts/comment-style.md` before writing any comment; every comment follows it.
 
 Your job is the verdict and the labels only. If the issue turns out to be a
 real bug or enhancement, a separate step writes the plan after you finish, so

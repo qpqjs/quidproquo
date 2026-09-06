@@ -8,6 +8,8 @@ name: Issue Triage
 #             updates the plan on the branch if the comment changes it.
 #   work    - a maintainer applies `start-work`; Claude implements the plan on
 #             the issue-{n} branch, runs the checks, and opens a PR.
+#   review  - a human comments on or reviews a PR the bot opened; Claude makes
+#             the requested changes on the branch and replies in the threads.
 #
 # Both jobs share a concurrency group per issue so overlapping runs queue
 # rather than race on the branch.
@@ -17,6 +19,10 @@ on:
     types: [opened, labeled]
   issue_comment:
     types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   triage:
@@ -194,4 +200,90 @@ jobs:
             Read .github/prompts/issue-work.md and follow it exactly.
           claude_args: >-
             --model claude-fable-5-1
-            --allowed-tools "Read,Glob,Grep,Write,Edit,Bash(git:*),Bash(gh issue:*),Bash(gh pr:*),Bash(gh api:*),Bash(npm run build:lite),Bash(npm run build:*),Bash(npm test:*),Bash(npm run test:*),Bash(npm run lint:*),Bash(npx vitest:*)"
+            --allowed-tools "Read,Glob,Grep,Write,Edit,Bash(git:*),Bash(gh issue:*),Bash(gh pr:*),Bash(gh api:*),Bash(npm:*),Bash(npx:*)"
+
+      # The prompt tells Claude to always comment and relabel before it
+      # finishes, but if the action itself dies (timeout, crash, token
+      # trouble) nothing runs that code. Put the issue back to `planned` and
+      # say why, so a maintainer can re-apply `start-work` after fixing it.
+      - name: Unstick the issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue edit "$ISSUE" --repo "$GITHUB_REPOSITORY" --remove-label in-progress --add-label planned
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "The work run failed before it could finish: $RUN_URL. Labels are back to \`planned\`; re-apply \`start-work\` once the cause is fixed."
+
+  review:
+    # Only PRs the bot opened, only human feedback, and only reviews that
+    # actually say something (a bare approve has nothing to act on).
+    if: |
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request != null &&
+        github.event.issue.user.login == 'qpq-triage[bot]' &&
+        github.event.comment.user.type != 'Bot'
+      ) || (
+        github.event_name == 'pull_request_review_comment' &&
+        github.event.pull_request.user.login == 'qpq-triage[bot]' &&
+        github.event.comment.user.type != 'Bot'
+      ) || (
+        github.event_name == 'pull_request_review' &&
+        github.event.pull_request.user.login == 'qpq-triage[bot]' &&
+        github.event.review.user.type != 'Bot' &&
+        github.event.review.body != ''
+      )
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TRIAGE_APP_ID }}
+          private-key: ${{ secrets.TRIAGE_APP_PRIVATE_KEY }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Apply review feedback
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
+          prompt: |
+            PR number: ${{ github.event.pull_request.number || github.event.issue.number }}
+            Trigger event: ${{ github.event_name }}
+            Trigger id: ${{ github.event.comment.id || github.event.review.id }}
+            Repository: ${{ github.repository }}
+            Read .github/prompts/pr-review.md and follow it exactly.
+          claude_args: >-
+            --model claude-fable-5-1
+            --allowed-tools "Read,Glob,Grep,Write,Edit,Bash(git:*),Bash(gh issue:*),Bash(gh pr:*),Bash(gh api:*),Bash(npm:*),Bash(npx:*)"
+
+      - name: Report failure on the PR
+        if: failure()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ github.event.pull_request.number || github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "The review run failed before it could respond: $RUN_URL. Comment again once the cause is fixed."
