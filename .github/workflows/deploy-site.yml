@@ -4,6 +4,10 @@ name: deploy-site
 #   push to main    -> production (NOT yet: see the deploy job's `if`)
 #   push to uat     -> staging
 #   push elsewhere  -> development (every feature branch, serialized, last writer wins)
+# Pushes made by a bot (claude[bot], github-actions[bot], ...) run the test,
+# scaffold and local-smoke jobs but never deploy: the issue automation pushes
+# plan edits and WIP commits to issue-{n} branches, and none of that should
+# hit AWS. See the deploy job's `if`.
 # Any environment can also be deployed by hand from the Actions tab
 # ("Run workflow"), the way to redeploy an environment out of band.
 on:
@@ -73,8 +77,18 @@ jobs:
     needs: [resolve, test, local-smoke]
     # The production account is not set up yet, so a push to main runs the
     # gates above but does not deploy. Production can still be deployed by
-    # hand via "Run workflow" once it is. Remove this `if` to turn it on.
-    if: github.event_name == 'workflow_dispatch' || github.ref_name != 'main'
+    # hand via "Run workflow" once it is. Remove the `main` clause to turn it on.
+    #
+    # Bot-authored pushes (any actor ending in `[bot]`) never deploy either:
+    # the issue automation pushes plan edits and WIP commits to issue-{n}
+    # branches, and a development deploy for each of those is pure waste.
+    # Same "skip bots" intent as the `!dependabot/**` exclusion on the push
+    # trigger. A manual "Run workflow" is not affected, since the actor there
+    # is whoever clicked the button. Deploying bot-authored work on purpose
+    # (a deploy label, an approved PR) is a later change.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.ref_name != 'main' && !endsWith(github.actor, '[bot]'))
     runs-on: ubuntu-latest
     # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
     permissions:
