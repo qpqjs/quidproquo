@@ -119,6 +119,44 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
         expect(await repo.get('users', 'u1')).toEqual({ id: 'u1', name: 'Joe' });
       });
 
+      it('upsertMany with ifNotExists inserts a batch of fresh keys', async () => {
+        const repo = ordersStore();
+
+        const results = await repo.upsertMany(
+          'orders',
+          [
+            { pk: 'p1', sk: 's1', total: 1 },
+            { pk: 'p1', sk: 's2', total: 2 },
+          ],
+          { ifNotExists: true },
+        );
+
+        expect(results.map((r) => r.oldItem)).toEqual([null, null]);
+        expect(await repo.get('orders', 'p1#s2')).toEqual({ pk: 'p1', sk: 's2', total: 2 });
+      });
+
+      it('upsertMany with ifNotExists writes NOTHING when any key already exists', async () => {
+        const repo = ordersStore();
+        await repo.upsert('orders', { pk: 'p1', sk: 's2', total: 9 });
+
+        const error = await repo
+          .upsertMany(
+            'orders',
+            [
+              { pk: 'p1', sk: 's1', total: 1 },
+              { pk: 'p1', sk: 's2', total: 2 },
+              { pk: 'p1', sk: 's3', total: 3 },
+            ],
+            { ifNotExists: true },
+          )
+          .catch((e) => e);
+
+        expect(error.name).toBe('ConditionalCheckFailedException');
+        expect(await repo.get('orders', 'p1#s1')).toBeNull();
+        expect(await repo.get('orders', 'p1#s2')).toEqual({ pk: 'p1', sk: 's2', total: 9 });
+        expect(await repo.get('orders', 'p1#s3')).toBeNull();
+      });
+
       it('upserts two composite-key items sharing a pk but differing sk without clobbering each other', async () => {
         const repo = ordersStore();
         await repo.upsert('orders', { pk: 'p1', sk: 's1', total: 5 });
@@ -789,6 +827,7 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
             { id: 'u1', name: 'new' },
             { id: 'u2', name: 'B' },
           ],
+          undefined,
           'tenant-a',
         );
 

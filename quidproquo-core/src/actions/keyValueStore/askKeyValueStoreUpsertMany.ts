@@ -4,6 +4,14 @@ import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsItemRecord } from './types';
 
 export type KeyValueStoreUpsertManyOptions = {
+  // Conditional batch insert: only write when NO item in the batch has an
+  // existing key, and write ALL of them or none. The batch becomes a
+  // transaction on every runtime (DynamoDB TransactWriteItems, a SQLite
+  // transaction locally), so a losing concurrent writer gets the namespaced
+  // Conflict with nothing landed - the batch primitive for claiming a run of
+  // consecutive slots in an append-only log.
+  ifNotExists?: boolean;
+
   // Composed into each item's partition key value by the processor; requires a string-typed partition key.
   scope?: string;
 };
@@ -21,6 +29,11 @@ export const askKeyValueStoreUpsertManyBase = createActionRequester<void>()({
     // the later write silently wins), so without this check the outcome would
     // depend on item position and never reproduce locally.
     'DuplicateKey',
+    // A conditional (ifNotExists) batch lost to an existing item; none of the
+    // batch was written. Namespaced - not ErrorTypeEnum.Conflict - so retry
+    // logic can target the write race specifically without also catching
+    // domain-level conflicts.
+    'Conflict',
   ],
   getPayload: (keyValueStoreName: string, items: KvsItemRecord[], options?: KeyValueStoreUpsertManyOptions) => ({
     keyValueStoreName,

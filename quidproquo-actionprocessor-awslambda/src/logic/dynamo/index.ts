@@ -6,4 +6,5 @@ export * from './getItem';
 export * from './putItem';
 export * from './query';
 export * from './scan';
+export * from './transactPutItems';
 export * from './updateItem';

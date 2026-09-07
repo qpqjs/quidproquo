@@ -13,12 +13,14 @@ import {
 } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { batchPutItems } from '../../../logic/dynamo';
+import { batchPutItems, transactPutItems } from '../../../logic/dynamo';
 
-// The batch sibling of Upsert: BatchWriteItem in chunks of 25, partial-acceptance
-// retry inside batchPutItems. Streams emit one record per item no matter how it
-// was written, so downstream projectors see the same records as N single upserts.
-// Unconditional (no ifNotExists — BatchWriteItem carries no conditions).
+// The batch sibling of Upsert. Unconditional: BatchWriteItem in chunks of 25,
+// partial-acceptance retry inside batchPutItems. With ifNotExists: TransactWriteItems
+// in chunks of 100, every put conditional, each chunk all-or-nothing, a lost
+// condition surfacing as the namespaced Conflict. Streams emit one record per
+// item no matter how it was written, so downstream projectors see the same
+// records as N single upserts.
 const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpsertManyBase> => {
   return async ({ keyValueStoreName, items, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
@@ -47,11 +49,13 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
       // persisted with a composed pk; reads strip it back off.
       const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
 
-      await batchPutItems(
-        dynamoTableName,
-        items.map((item) => scoped.item(item)),
-        region,
-      );
+      const scopedItems = items.map((item) => scoped.item(item));
+
+      if (options?.ifNotExists) {
+        await transactPutItems(dynamoTableName, scopedItems, storeConfig.partitionKey.key, region);
+      } else {
+        await batchPutItems(dynamoTableName, scopedItems, region);
+      }
 
       return actionResult(void 0);
     } catch (error: unknown) {
@@ -62,6 +66,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
         // fault: callers must see ServiceUnavailable, not a permanent failure.
         BatchWriteUnprocessedItemsError: () =>
           actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),
+        ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound, error.message),
       });
