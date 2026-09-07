@@ -42,6 +42,9 @@ export type EventDocEventAppendOptions = {
  * the winners and validating again, up to EVENT_DOC_APPEND_MAX_RETRIES. Hooks run after the write, outside the retry.
  * The summary read model is maintained by the stream projector, not here.
  */
+const isSlotRaceError = (errorType: string): boolean =>
+  errorType === askKeyValueStoreUpsertBase.errorType.Conflict || errorType === askKeyValueStoreUpsertBase.errorType.WriteContention;
+
 export function* askEventDocEventAppend(
   modelId: string,
   input: EventDocEventInput,
@@ -88,13 +91,13 @@ export function* askEventDocEventAppend(
     askAppendLap,
     EVENT_DOC_APPEND_MAX_RETRIES,
     EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
-    // Only the slot race re-laps; Invalid and everything else is terminal.
-    [askKeyValueStoreUpsertBase.errorType.Conflict],
+    // Only the slot race re-laps (the slot is taken, or another write holds it); Invalid and everything else is terminal.
+    [askKeyValueStoreUpsertBase.errorType.Conflict, askKeyValueStoreUpsertBase.errorType.WriteContention],
     { linearBackoff: true, maxJitterMs: EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS },
   );
 
   if (!result.success) {
-    if (result.error.errorType === askKeyValueStoreUpsertBase.errorType.Conflict) {
+    if (isSlotRaceError(result.error.errorType)) {
       return yield* askThrowError(
         ErrorTypeEnum.Conflict,
         `Could not append to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - too much concurrent write contention.`,

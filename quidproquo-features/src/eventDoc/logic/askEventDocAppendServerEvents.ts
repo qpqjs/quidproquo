@@ -26,6 +26,9 @@ import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
  * (input order is log order); a Conflict re-laps on a fresh head. Runs no hooks and rejects stores that have them,
  * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt.
  */
+const isSlotRaceError = (errorType: string): boolean =>
+  errorType === askKeyValueStoreUpsertManyBase.errorType.Conflict || errorType === askKeyValueStoreUpsertManyBase.errorType.WriteContention;
+
 export function* askEventDocAppendServerEvents(
   modelId: string,
   inputs: EventDocServerEventInput[],
@@ -87,12 +90,12 @@ export function* askEventDocAppendServerEvents(
     askAppendLap,
     EVENT_DOC_APPEND_MAX_RETRIES,
     EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
-    [askKeyValueStoreUpsertManyBase.errorType.Conflict],
+    [askKeyValueStoreUpsertManyBase.errorType.Conflict, askKeyValueStoreUpsertManyBase.errorType.WriteContention],
     { linearBackoff: true, maxJitterMs: EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS },
   );
 
   if (!result.success) {
-    if (result.error.errorType === askKeyValueStoreUpsertManyBase.errorType.Conflict) {
+    if (isSlotRaceError(result.error.errorType)) {
       return yield* askThrowError(
         ErrorTypeEnum.Conflict,
         `Could not append ${inputs.length} events to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - another writer is on this document.`,

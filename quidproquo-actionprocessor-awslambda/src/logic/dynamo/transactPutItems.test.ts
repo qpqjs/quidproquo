@@ -59,13 +59,22 @@ describe('transactPutItems', () => {
     expect(error.name).toBe('ConditionalCheckFailedException');
   });
 
-  it('rethrows a TransactionConflict cancellation as ConditionalCheckFailedException too', async () => {
-    // A plain PutItem racing this transaction on one of its items cancels the transaction
-    // with TransactionConflict rather than a failed condition; to a key-claiming caller it
-    // is the same lost race.
+  it('rethrows a TransactionConflict cancellation as TransactionConflictException', async () => {
     const cancelled = Object.assign(new Error('cancelled'), {
       name: 'TransactionCanceledException',
       CancellationReasons: [{ Code: 'TransactionConflict' }, { Code: 'None' }],
+    });
+    send.mockClear().mockRejectedValue(cancelled);
+
+    const error = await transactPutItems('my-table', items(2), 'pk', 'eu-west-1').catch((e) => e);
+
+    expect(error.name).toBe('TransactionConflictException');
+  });
+
+  it('reports an existing item over a conflict when a cancellation carries both', async () => {
+    const cancelled = Object.assign(new Error('cancelled'), {
+      name: 'TransactionCanceledException',
+      CancellationReasons: [{ Code: 'TransactionConflict' }, { Code: 'ConditionalCheckFailed' }],
     });
     send.mockClear().mockRejectedValue(cancelled);
 

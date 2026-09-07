@@ -20,14 +20,13 @@ const TRANSACT_WRITE_MAX_ITEMS = 100;
 // re-lap the whole batch" - the earlier chunks' keys are now simply taken, by
 // them.
 //
-// The SDK reports a lost race as TransactionCanceledException with, per action,
-// either a ConditionalCheckFailed reason (the key already exists) or a
-// TransactionConflict reason (another write, transactional or not, holds the
-// item right now). Both mean the same thing to a caller claiming keys: someone
-// else got there, re-read and re-lap. Every other reason (throttle, validation)
-// is rethrown untouched. Re-throwing as the same-named error the single-item
-// putItem raises keeps ONE name for "conditional write lost" in the processors'
-// error tables.
+// The SDK reports a lost race as TransactionCanceledException with a reason per
+// action. A ConditionalCheckFailed reason (the key exists) is rethrown as
+// ConditionalCheckFailedException and a TransactionConflict reason (another
+// write holds the item for the moment) as TransactionConflictException, the same
+// names the single-item PutItem raises, so the processors' error maps key on one
+// name each. Exists wins when both appear: it is final. Every other reason
+// (throttle, validation) is rethrown untouched.
 export async function transactPutItems(tableName: string, items: KvsObjectDataType[], partitionKeyAttribute: string, region: string): Promise<void> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
@@ -44,20 +43,32 @@ export async function transactPutItems(tableName: string, items: KvsObjectDataTy
     try {
       await dynamoDBClient.send(new TransactWriteItemsCommand({ TransactItems: transactItems }));
     } catch (error: unknown) {
-      if (isLostWriteRaceCancellation(error)) {
+      const reasons = cancellationReasons(error);
+
+      if (reasons.includes('ConditionalCheckFailed')) {
         throw new ConditionalCheckFailedException(`Conditional batch write to [${tableName}] lost to an existing item`);
+      }
+      if (reasons.includes('TransactionConflict')) {
+        throw new TransactionConflictException(`Conditional batch write to [${tableName}] raced another write on one of its items`);
       }
       throw error;
     }
   }
 }
 
-// Same name the single-item PutItem path throws on a lost condition, so the
-// processors' error maps key on one name for both.
+/** Same name the single-item PutItem path throws on a failed condition. */
 export class ConditionalCheckFailedException extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'ConditionalCheckFailedException';
+  }
+}
+
+/** Same name the single-item PutItem path throws when a transaction holds the item. */
+export class TransactionConflictException extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TransactionConflictException';
   }
 }
 
@@ -66,13 +77,12 @@ type TransactionCancelledLike = {
   CancellationReasons?: { Code?: string }[];
 };
 
-const LOST_RACE_REASONS = ['ConditionalCheckFailed', 'TransactionConflict'];
-
-const isLostWriteRaceCancellation = (error: unknown): boolean => {
+const cancellationReasons = (error: unknown): string[] => {
   const cancelled = error as TransactionCancelledLike;
 
-  return (
-    cancelled?.name === 'TransactionCanceledException' &&
-    !!cancelled.CancellationReasons?.some((reason) => !!reason.Code && LOST_RACE_REASONS.includes(reason.Code))
-  );
+  if (cancelled?.name !== 'TransactionCanceledException') {
+    return [];
+  }
+
+  return (cancelled.CancellationReasons ?? []).map((reason) => reason.Code ?? '');
 };

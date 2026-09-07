@@ -51,9 +51,8 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeo
         InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Conflict, 'KVS item already exists'),
-        // Same lost race as an existing item: a transaction holds the item right now.
         TransactionConflictException: () =>
-          actionResultError(askKeyValueStoreUpsertBase.errorType.Conflict, 'KVS item is being written by a transaction'),
+          actionResultError(askKeyValueStoreUpsertBase.errorType.WriteContention, 'KVS item is being written by a transaction'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertBase.errorType.StoreNotFound, error.message),
       });

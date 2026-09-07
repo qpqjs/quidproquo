@@ -26,5 +26,6 @@ describe('askKeyValueStoreUpsertMany', () => {
   it('namespaces its error enum values under the action type', () => {
     expect(askKeyValueStoreUpsertManyBase.errorType.DuplicateKey).toBe(`${KeyValueStoreActionType.UpsertMany}-DuplicateKey`);
     expect(askKeyValueStoreUpsertManyBase.errorType.Conflict).toBe(`${KeyValueStoreActionType.UpsertMany}-Conflict`);
+    expect(askKeyValueStoreUpsertManyBase.errorType.WriteContention).toBe(`${KeyValueStoreActionType.UpsertMany}-WriteContention`);
   });
 });
