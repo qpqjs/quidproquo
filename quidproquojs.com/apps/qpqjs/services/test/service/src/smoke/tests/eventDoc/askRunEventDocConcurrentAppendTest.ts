@@ -3,7 +3,6 @@ import {
   askEventDocCreate,
   askEventDocProvideStore,
   askEventDocSoftDelete,
-  EventDocEvent,
 } from 'quidproquo-features';
 
 import {
@@ -14,6 +13,7 @@ import {
   SMOKE_EVENT_DOC_SCHEMA_VERSION,
   SMOKE_EVENT_DOC_STORE_OPTIONS,
 } from '../../constants/smokeEventDoc';
+import { SMOKE_PROBE_DOC_WINDOW } from '../../eventDoc/smokeProbeDocDefinition';
 import { SmokeEventDocAppendPayload } from '../../models/SmokeEventDocAppendQueueEvent';
 import { SmokeEventDocMark } from '../../models/SmokeEventDocMark';
 import { askSmokeAssert } from '../askSmokeAssert';
@@ -21,12 +21,14 @@ import { askAssertContiguousEventIds } from './askAssertContiguousEventIds';
 import { askAssertSmokeProbeDocState } from './askAssertSmokeProbeDocState';
 import { askAwaitSmokeEventDocLog } from './askAwaitSmokeEventDocLog';
 
-const WRITERS = 12;
+// One writer per number the document can hold, so the folded window is exactly full.
+const WRITERS = SMOKE_PROBE_DOC_WINDOW;
 
-// N writers, each its own queue invocation, each appending ONE event to the same fresh
-// document at the same moment. The conditional-write append loop has to serialise them
-// onto consecutive slots: afterwards the log is INIT_STATE plus exactly one mark per
-// writer, ids 0..N with no hole, no duplicate and no lost writer.
+// N writers, each its own queue invocation, each appending ONE number (1..N) to the
+// same fresh document at the same moment. The conditional-write append loop has to
+// serialise them onto consecutive slots: afterwards the log is INIT_STATE plus one mark
+// per writer, ids 0..N with no hole and no duplicate, and the document folded through
+// the registered definition holds exactly the numbers 1..N.
 function* askRunInStore(runId: string): AskResponse<void> {
   const doc = yield* askEventDocCreate(
     `smoke-${runId}`,
@@ -34,13 +36,15 @@ function* askRunInStore(runId: string): AskResponse<void> {
     SMOKE_EVENT_DOC_ACTOR
   );
 
-  const messages = Array.from({ length: WRITERS }, (_, index) => ({
+  const numbers = Array.from({ length: WRITERS }, (_, index) => index + 1);
+
+  const messages = numbers.map((value) => ({
     type: SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE,
     payload: {
       docId: doc.id,
       runId,
-      writerId: index + 1,
-      count: 1,
+      writerId: value,
+      values: [value],
     } satisfies SmokeEventDocAppendPayload,
   }));
 
@@ -52,20 +56,14 @@ function* askRunInStore(runId: string): AskResponse<void> {
 
   const marks = events
     .filter((event) => event.type === SMOKE_EVENT_DOC_MARK_EVENT)
-    .map((event: EventDocEvent) => event.payload.data as SmokeEventDocMark);
+    .map((event) => event.payload.data as SmokeEventDocMark);
 
   yield* askSmokeAssert(
     marks.every((mark) => mark.runId === runId),
     "a mark from another run is on this run's document"
   );
 
-  const writerIds = new Set(marks.map((mark) => mark.writerId));
-  yield* askSmokeAssert(
-    writerIds.size === WRITERS && marks.length === WRITERS,
-    `expected one mark from each of ${WRITERS} writers, got ${marks.length} marks from ${writerIds.size} writers`
-  );
-
-  yield* askAssertSmokeProbeDocState(doc.id, WRITERS);
+  yield* askAssertSmokeProbeDocState(doc.id, numbers);
 
   yield* askEventDocSoftDelete(
     doc.id,

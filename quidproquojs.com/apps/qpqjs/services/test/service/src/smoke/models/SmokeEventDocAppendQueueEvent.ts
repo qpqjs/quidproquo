@@ -1,13 +1,13 @@
 import { QueueEvent, QueueMessage } from 'quidproquo';
 
-// One writer's instruction: append `count` marks to `docId` for `runId`. A count of 1
-// goes through the single server append, anything more through the batch append, so
-// the two tests exercise both paths against the same log.
+// One writer's instruction: append one mark per value to `docId` for `runId`. A single
+// value goes through the single server append, several through the batch append, so
+// the tests exercise both paths against the same log.
 export type SmokeEventDocAppendPayload = {
   docId: string;
   runId: string;
   writerId: number;
-  count: number;
+  values: number[];
 };
 
 export type SmokeEventDocAppendQueueEvent = QueueEvent<

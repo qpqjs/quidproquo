@@ -16,18 +16,22 @@ import {
 } from '../constants/smokeEventDoc';
 import { SmokeEventDocMark } from '../models/SmokeEventDocMark';
 
-// The probe doc type the event-doc smoke tests write to: one event (a mark) and one
-// fact folded from it (the marks, in log order). Small on purpose - it exists so the
-// deployed runtime exercises a REGISTERED collection end to end: the append gate, the
-// stream projector's snapshot fold, and the state reads that resolve through the
-// dynamic-functions registration all run this definition.
+// How many numbers the document keeps: a rolling window, so the fold is a real
+// reducer (it drops as well as adds) rather than an append.
+export const SMOKE_PROBE_DOC_WINDOW = 100;
+
+// The probe doc type the event-doc smoke tests write to: one event (a mark carrying a
+// number) folded into the last SMOKE_PROBE_DOC_WINDOW numbers, in log order. Small on
+// purpose - it exists so the deployed runtime exercises a REGISTERED collection end to
+// end: the append gate, the stream projector's snapshot fold, and the state reads that
+// resolve through the dynamic-functions registration all run this definition.
 export type SmokeProbeDocState = EventDocDocument & {
-  marks: SmokeEventDocMark[];
+  numbers: number[];
 };
 
 const createInitialSmokeProbeDocState = (): SmokeProbeDocState => ({
   ...createEventDocInitialDocumentState(1),
-  marks: [],
+  numbers: [],
 });
 
 type SmokeProbeDocEffects = Effect<
@@ -41,7 +45,9 @@ const smokeProbeDocFoldReducer = buildEventDocFoldReducer<
 >(createInitialSmokeProbeDocState, {
   [SMOKE_EVENT_DOC_MARK_EVENT]: (state, payload) => ({
     ...state,
-    marks: [...state.marks, payload.data],
+    numbers: [...state.numbers, payload.data.value].slice(
+      -SMOKE_PROBE_DOC_WINDOW
+    ),
   }),
 }) as QpqReducer<SmokeProbeDocState, EventDocEvent>;
 
