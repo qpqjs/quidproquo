@@ -1,6 +1,8 @@
 import { askRunCrossServiceKeyValueStoreTest } from './crossService/askRunCrossServiceKeyValueStoreTest';
 import { askRunCrossServiceStorageDriveTest } from './crossService/askRunCrossServiceStorageDriveTest';
 import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
+import { askRunEventDocConcurrentAppendTest } from './eventDoc/askRunEventDocConcurrentAppendTest';
+import { askRunEventDocInterleavedBatchAppendTest } from './eventDoc/askRunEventDocInterleavedBatchAppendTest';
 import { askRunKeyValueStoreTest } from './keyValueStore/askRunKeyValueStoreTest';
 import { askRunNoopTest } from './noop/askRunNoopTest';
 import { askRunEchoRoundTripTest } from './openApi/askRunEchoRoundTripTest';
@@ -34,4 +36,12 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
   { name: 'schedule', askRun: askRunScheduleTest },
   { name: 'openApiDocument', askRun: askRunOpenApiDocumentTest },
   { name: 'echoRoundTrip', askRun: askRunEchoRoundTripTest },
+  {
+    name: 'eventDocConcurrentAppend',
+    askRun: askRunEventDocConcurrentAppendTest,
+  },
+  {
+    name: 'eventDocInterleavedBatchAppend',
+    askRun: askRunEventDocInterleavedBatchAppendTest,
+  },
 ];
