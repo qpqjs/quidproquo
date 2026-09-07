@@ -10,11 +10,10 @@ import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport'
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { toEventDocEventInput } from './toEventDocEventInput';
 
-// Stream ONE slot's pending events, each moving into the saved log as it lands.
-// Per-event is deliberate: the document stays editable mid-save, and an interrupted
-// save leaves only the unsaved tail pending (the backend dedups against the latest
-// event only, so re-sending a non-latest event would duplicate). Re-entrancy guard
-// per slot: skip if already saving.
+/**
+ * Streams one slot's pending events, each moving into history as it lands. Per-event so an interrupted save leaves only the
+ * unsaved tail pending; the backend dedups against the latest event only. Skipped while the slot is already saving.
+ */
 export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransport, slotKey: string): AskResponse<void> {
   const state = yield* askEventDocWorkspaceReadState();
   const slotState = state.slots[slotKey];

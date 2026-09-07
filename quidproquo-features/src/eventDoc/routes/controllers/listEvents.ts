@@ -13,10 +13,8 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
   const includeBase = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'includeBase');
   const newestFirst = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'newestFirst');
 
-  // includeBase asks for the bootstrap shape: the newest snapshot base plus the events
-  // after it, with a from-the-start fallback carried in-band as base: null. It replaces
-  // afterEventId (the base decides where the page starts); a paging follow-up goes back
-  // to the plain shape with afterEventId = base.eventId.
+  // includeBase returns the newest snapshot base plus the events after it; the base decides where the page starts,
+  // so afterEventId is ignored. Follow-up paging uses the plain shape with afterEventId = base.eventId.
   if (includeBase === 'true') {
     const bootstrapPage = yield* askEventDocEventBootstrapPage(modelId, {
       limit: limit ? Number(limit) : undefined,
@@ -26,8 +24,7 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
     return qpqWebServerUtils.toJsonEventResponse(bootstrapPage);
   }
 
-  // The cursor is a numeric log position on the wire; anything else is a caller bug, not
-  // a "from the start" request.
+  // A non-integer afterEventId is a caller bug, not a "from the start" request.
   if (afterEventId !== undefined && afterEventId !== '' && !Number.isInteger(Number(afterEventId))) {
     return yield* askThrowError(ErrorTypeEnum.Invalid, `afterEventId must be an integer log position, got [${afterEventId}]`);
   }
@@ -36,13 +33,13 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
     limit: limit ? Number(limit) : undefined,
     nextPageKey,
     afterEventId: afterEventId ? Number(afterEventId) : undefined,
-    // Newest first — the history panel's latest-page-then-walk-backwards read.
     sortDescending: newestFirst === 'true' || undefined,
   });
 
   return qpqWebServerUtils.toJsonEventResponse(page);
 }
 
+/** GET {basePath}/{id}/events: a page of the doc's log, or the snapshot-seeded bootstrap shape with includeBase=true. */
 export function* listEvents(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreListEvents(event, params.id)));
 }

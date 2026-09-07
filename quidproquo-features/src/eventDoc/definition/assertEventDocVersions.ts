@@ -1,19 +1,10 @@
 import { EVENT_DOC_PRIMARY_VIEW } from './types/EventDocLatestViews';
 import { EventDocVersions } from './types/EventDocVersion';
 
-// Definition-time guards on a doc type's version history. These throw at MODULE LOAD —
-// the cheapest place to diagnose them — rather than mid-fold on someone's document, which
-// is where the same mistakes would otherwise surface: as a migration that isn't there, or
-// a view that quietly stopped folding.
-//
-// Every rule here exists because its absence fails silently:
-//
-//  - a gap in the chain      -> the fold cannot climb past it
-//  - schemaVersion mismatch  -> a version folder written but never wired up stays inert,
-//                               and the doc keeps authoring events at the old version
-//  - a view missing at some  -> that view stops folding at that version and reads as a
-//    version                    document that simply stopped changing
-//  - no `document` view      -> nothing to mount, gate, or walk references from
+/**
+ * Definition-time guards on a doc type's version history: contiguous from 1, schemaVersion equals the newest entry,
+ * a `document` view exists, and every version names the same views. Throws at module load, where it is cheapest to diagnose.
+ */
 export const assertEventDocVersions = (versions: EventDocVersions, schemaVersion: number): void => {
   const [base, ...rest] = versions;
 
@@ -38,9 +29,7 @@ export const assertEventDocVersions = (versions: EventDocVersions, schemaVersion
     throw new Error(`Every saved event doc must declare a '${EVENT_DOC_PRIMARY_VIEW}' view — found: ${viewNames.join(', ') || 'none'}.`);
   }
 
-  // Each version names every view, so a no-op migration has to be typed out rather than
-  // defaulted. An explicit `(state) => state` is evidence someone decided this view was
-  // unaffected; a defaulted one is evidence of nothing.
+  // An explicit no-op migration is evidence someone decided the view was unaffected; a defaulted one is evidence of nothing.
   rest.forEach((version) => {
     const names = Object.keys(version.views);
     const missing = viewNames.filter((name) => !names.includes(name));

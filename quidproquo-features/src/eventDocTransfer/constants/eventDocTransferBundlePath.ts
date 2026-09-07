@@ -1,11 +1,8 @@
-// Where a staged bundle lives on the transfer drive. Exports and imports are separated so a
-// download link can never be mistaken for pending import input, and the guid keeps concurrent
-// operators from overwriting each other.
+/** Where a staged export bundle lives on the transfer drive. */
 export const eventDocTransferExportPath = (transferId: string): string => `exports/${transferId}.json`;
 
+/** Where an uploaded bundle lives on the transfer drive. */
 export const eventDocTransferImportPath = (transferId: string): string => `imports/${transferId}.json`;
 
-// Where the overwrite's discarded events are parked before they are deleted. Keyed by transfer AND
-// doc so one forced import never clobbers another's backup, and so the file sits next to the bundle
-// that caused it.
+/** Where a forced overwrite parks the discarded events before deleting them. Keyed by transfer and doc so backups never collide. */
 export const eventDocTransferDiscardedPath = (transferId: string, docId: string): string => `discarded/${transferId}/${docId}.json`;

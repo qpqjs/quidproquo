@@ -5,11 +5,8 @@ import { askEventDocCreate } from './askEventDocCreate';
 import { askEventDocGetByCode } from './askEventDocGetByCode';
 
 /**
- * The doc with `code` (optionally owner-scoped), creating it on first use. Finds via
- * `askEventDocGetByCode` (so >1 existing match is a Conflict); on a miss, creates it with
- * `name`/`code`/`actor`. Assumes the store context is provided. NOT concurrency-safe — two
- * simultaneous misses both create; serialise (e.g. queue concurrency 1) or add a conditional create
- * if callers can race.
+ * The doc with `code` (optionally owner-scoped), created on first use. Not concurrency-safe: two simultaneous
+ * misses both create, so serialise callers that can race. Assumes the store context.
  */
 export function* askEventDocGetByCodeOrCreate(
   code: string,

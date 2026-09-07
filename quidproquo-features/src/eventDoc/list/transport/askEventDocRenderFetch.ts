@@ -4,10 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { EventDocRenderOptions, EventDocRenderResult } from '../../models';
 import { eventDocRenderEndpoint } from './eventDocRenderEndpoint';
 
-// Fetch a document's server-rendered output (the generic GET {basePath}/{id}/render route).
-// Resolves an EventDocLink's target to rendered HTML — the caller maps the link's type to its
-// basePath. `renderMode` (draft|published) + `effectiveAt` (as-of time), when supplied, are sent
-// as query params so the server can resolve the right version. Auto base-url + auth via askApiRequest.
+/** GET {basePath}/{id}/render: fetches a document's server-rendered output. `renderMode` and `effectiveAt` go as query params. */
 export function* askEventDocRenderFetch(
   serviceName: string,
   basePath: string,

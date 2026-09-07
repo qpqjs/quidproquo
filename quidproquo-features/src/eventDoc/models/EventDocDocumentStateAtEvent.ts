@@ -1,5 +1,4 @@
-// The document view resolved as of one event: latest-shaped state plus the event it is
-// current to (the state's clock for anything downstream that needs to cite it).
+/** The document view as of one event, latest-shaped. */
 export type EventDocDocumentStateAtEvent = {
   eventId: number;
   state: unknown;

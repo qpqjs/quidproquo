@@ -3,8 +3,7 @@ import { Nullable } from 'quidproquo-core';
 import { EventDocWorkspaceDocumentIdentity } from './EventDocWorkspaceDocumentIdentity';
 import { EventDocWorkspaceSlotError } from './EventDocWorkspaceSlotError';
 
-// Per-slot runtime status. `documentIdentity` is null for local slots and for document
-// slots that have not been initialised yet.
+/** Per-slot status. documentIdentity is null for local slots and for document slots not yet initialised. */
 export type EventDocWorkspaceSlotState = {
   documentIdentity: Nullable<EventDocWorkspaceDocumentIdentity>;
   isLoading: boolean;
@@ -12,6 +11,7 @@ export type EventDocWorkspaceSlotState = {
   error: Nullable<EventDocWorkspaceSlotError>;
 };
 
+/** Initial slot status. */
 export const createInitialEventDocWorkspaceSlotState = (): EventDocWorkspaceSlotState => ({
   documentIdentity: null,
   isLoading: false,

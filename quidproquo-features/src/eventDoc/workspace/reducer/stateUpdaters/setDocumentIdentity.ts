@@ -2,6 +2,7 @@ import { EventDocWorkspaceSetDocumentIdentityPayload } from '../../effects/Event
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
+/** Binds a slot to a document. */
 export const setDocumentIdentity = (
   state: EventDocWorkspaceState,
   { slotKey, documentIdentity }: EventDocWorkspaceSetDocumentIdentityPayload,

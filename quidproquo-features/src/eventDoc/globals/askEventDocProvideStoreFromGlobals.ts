@@ -12,21 +12,14 @@ import {
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide } from '../context/askEventDocStoreProvide';
 
-// TOOD: Revisit this, i feel like we dont need this function?.
-//       the items should be the same as the other globals.
-// Globals added AFTER the original six-key route contract: a consumer whose
-// routes were registered before the key existed has no global at all, which
-// must read as "hook not configured" ('', exactly what the definers emit for
-// an unset hook), not a request-time throw. The definers themselves always set
-// every key via buildEventDocStoreGlobals - its drift-guard test keeps that
-// true - so the soft read only ever fires for pre-upgrade consumers.
+// A missing optional hook global must read as "not configured" ('') rather than throw; routes registered before the
+// key existed have no global at all.
 function* askConfigGetGlobalAddedAfterV1(globalName: string): AskResponse<string> {
   const result = yield* askCatch(askConfigGetGlobal<string>(globalName));
   return (result.success && result.result) || '';
 }
 
-// Bridge per-route globals → store context for the controllers. askConfigGetGlobal
-// throws if a route forgot to set them.
+/** Builds the store context from the per-route globals set by buildEventDocStoreGlobals; throws if a required one is missing. */
 export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): AskResponse<T> {
   const storeName = yield* askConfigGetGlobal<string>(EVENT_DOC_STORE_NAME_GLOBAL);
   const eventsStoreName = yield* askConfigGetGlobal<string>(EVENT_DOC_EVENTS_STORE_NAME_GLOBAL);
@@ -40,9 +33,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
     {
       storeName,
       eventsStoreName,
-      // Derived, not a global: the name is a pure convention over storeName (the same one
-      // buildEventDocStore applies), so routes registered before snapshots existed still
-      // resolve it — a global would read as missing for them and need a legacy fallback.
+      // Derived rather than read from a global so routes registered before snapshots existed still resolve it.
       snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
       type,
       storageDriveName,

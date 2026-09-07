@@ -6,13 +6,8 @@ import { askEventDocBundleApplyDoc } from './askEventDocBundleApplyDoc';
 import { askEventDocTransferProvideCollection } from './askEventDocTransferProvideCollection';
 
 /**
- * Import every doc in the bundle, in bundle order (leaves-first, as the export emitted it), and
- * report what happened per doc in the same shape the plan returns.
- *
- * Docs are independent: a blocking row (diverged, code conflict) is reported and the rest still
- * land. That is deliberate - the alternative, aborting the whole bundle, would mean one
- * hand-edited doc in the target blocks every unrelated promotion. Every write is conditional on
- * (docId, index) or on an absent asset guid, so re-running after fixing the blocker is safe.
+ * Imports every doc in the bundle in bundle order (leaves first) and reports a plan row per doc.
+ * Docs are independent: a blocked doc is reported and the rest still land; re-running after fixing it is safe.
  */
 export function* askEventDocBundleApply(
   registry: EventDocTransferRegistry,

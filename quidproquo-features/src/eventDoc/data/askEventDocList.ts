@@ -8,6 +8,7 @@ export type EventDocListOptions = {
   includeDeleted?: boolean;
 };
 
+/** Every summary row in the collection, newest first, read and sorted in memory. Prefer askEventDocListPage for large collections. */
 export function* askEventDocList<T extends EventDocSummary = EventDocSummary>(options?: EventDocListOptions): AskResponse<T[]> {
   const { storeName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

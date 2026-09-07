@@ -1,22 +1,15 @@
 import { EventDocEvent } from '../../eventDoc/models';
 import { EventDocLogComparison } from '../models';
 
-// An event's identity, and the whole basis of the comparison. Events are immutable and written
-// verbatim, so if two logs agree on (type, index, version, clientMessageId, createdAt) at the
-// same position they ARE the same event; there is no need to deep-compare payload data, which
-// would mean depending on JSON key order surviving a round trip through two stores.
+// Identity is (type, eventId, version, clientMessageId, createdAt), never the payload data: deep-comparing would depend
+// on JSON key order surviving a round trip through two stores. createdBy is excluded so re-attribution does not diverge.
 const eventIdentity = (event: EventDocEvent): string => {
   const { eventId, version, clientMessageId, createdAt } = event.payload.metadata;
 
   return [event.type, eventId, version, clientMessageId, createdAt].join('|');
 };
 
-/**
- * How `existing` relates to `incoming`. Import is fast-forward only, so the question is whether
- * existing is a prefix of incoming: if it is, everything past the shared prefix is what gets
- * written. `existingAhead` covers the "target has more events" case, which is NOT a divergence
- * (nothing disagrees) but is still not importable, because the bundle is behind the target.
- */
+/** Whether `existing` is a prefix of `incoming` (import is fast-forward only), and if not, where they first disagree. */
 export const findEventDocLogDivergence = (existing: EventDocEvent[], incoming: EventDocEvent[]): EventDocLogComparison => {
   const sharedLength = Math.min(existing.length, incoming.length);
 

@@ -4,19 +4,8 @@ import { DateISOSchema } from './DateISOSchema';
 import { eventDocVersionSchema } from './EventDocVersion';
 
 /**
- * THE summary view: what folding a log's identity/lifecycle events produces.
- *
- * Every field here is DERIVED from the event log — the summary holds no authoritative
- * state of its own, so it can be dropped and rebuilt at any time, which is what makes many
- * views per document possible. `versions` tracks the publish history;
- * `createdAt`/`createdBy` are write-once, every event refreshes `updatedAt`/`updatedBy`,
- * and deletion is soft via `deletedAt`.
- *
- * Note what is NOT here: `type`. The doc type ('flow', 'template') is the summary STORE's
- * partition key, not something any event carries or any reducer derives — it is stamped
- * where the view is persisted. Keeping it out is what lets this view fold with the same
- * `fold(events)` signature as every other view, and lets EVERY event doc have a summary
- * without declaring one.
+ * The summary view folded from a log's identity and lifecycle events. Every field is derived, so the row can be rebuilt
+ * at any time. `type` is not here: it is the store's partition key, stamped at persist time.
  */
 export const eventDocSummaryViewSchema = z.object({
   id: z.string(),
@@ -32,12 +21,7 @@ export const eventDocSummaryViewSchema = z.object({
 
 export type EventDocSummaryView = z.infer<typeof eventDocSummaryViewSchema>;
 
-/**
- * The summary view as STORED (`PK=type, SK=id`) — the queryable record.
- *
- * The view plus the one field the store needs to partition by. Reads hand this back;
- * writes stamp `type` from the collection the document belongs to.
- */
+/** The summary view as stored (pk=type, sk=id). */
 export const eventDocSummarySchema = eventDocSummaryViewSchema.extend({
   type: z.string(),
 });

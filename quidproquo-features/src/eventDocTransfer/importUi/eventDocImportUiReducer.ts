@@ -10,6 +10,7 @@ import { setPlan } from './stateUpdaters/setPlan';
 import { setResult } from './stateUpdaters/setResult';
 import type { EventDocImportUiState } from './types/EventDocImportUiState';
 
+/** Reducer for the import screen state. */
 export const eventDocImportUiReducer = buildEffectReducer<EventDocImportUiState, EventDocImportUiEffects>({
   [EventDocImportUiEffect.SetLoading]: setLoading,
   [EventDocImportUiEffect.SetPlan]: setPlan,

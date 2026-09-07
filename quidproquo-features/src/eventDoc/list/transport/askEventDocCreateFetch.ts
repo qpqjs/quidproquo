@@ -4,8 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { EventDocSummary } from '../../models';
 import { eventDocListCollectionEndpoint } from './eventDocListCollectionEndpoint';
 
-// Creates a new doc in a collection (the generic POST {basePath} route) and
-// returns the created summary.
+/** POST {basePath}: creates a doc and returns its summary. */
 export function* askEventDocCreateFetch(serviceName: string, basePath: string, name: string, code: string): AskResponse<EventDocSummary> {
   const response = yield* askApiRequest<{ name: string; code: string }, EventDocSummary>(
     serviceName,

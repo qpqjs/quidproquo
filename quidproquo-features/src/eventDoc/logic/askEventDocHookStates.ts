@@ -9,24 +9,15 @@ import { foldEventDocBase } from '../fold/foldEventDocBase';
 import { EventDocEvent } from '../models';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
+/** The document state as of the triggering event and as of the event before it. */
 export type EventDocHookStates = {
-  // The document as of the triggering event, latest-shaped.
   state: unknown;
-  // The document as of the event BEFORE it — what a hook diffs against to see what the
-  // event changed (the maintenance hook's transition detection). Pristine initial state
-  // for the log's first event.
   previousState: unknown;
 };
 
 /**
- * The state pair a hook receives: the document as of the just-appended event, and as of
- * its predecessor — derived from ONE snapshot-seeded gap read, so hook cost tracks the
- * burst since the last snapshot, never the log. Event reads are CONSISTENT: the
- * triggering event was written moments ago and the fold must include it.
- *
- * A collection with no registered definition still gets hooks: the fallback folds the
- * RESERVED base view from the whole prefix (identity/lifecycle only — all that is
- * derivable without the collection's reducers).
+ * The state pair a hook receives, derived from one snapshot-seeded gap read. Event reads are consistent because the
+ * triggering event was written moments ago. A collection with no registered definition gets the reserved base fold instead.
  */
 export function* askEventDocHookStates(modelId: string, event: EventDocEvent): AskResponse<EventDocHookStates> {
   const { storeName, type } = yield* askEventDocResolveStore();
@@ -35,10 +26,8 @@ export function* askEventDocHookStates(modelId: string, event: EventDocEvent): A
   const eventId = event.payload.metadata.eventId;
   const base = yield* askEventDocSnapshotBaseLatest(modelId, eventId);
 
-  // The gap ends AT the triggering event (upToEventId inclusive), so its last element is
-  // the event itself and the predecessor state is the same gap minus that tail. A base
-  // already at the event (a projector that raced ahead, a replayed import) leaves no gap
-  // to subtract from — refold the whole prefix instead; rare by construction.
+  // The gap ends at the triggering event, so previousState is the same gap minus its tail. A base already at the
+  // event leaves nothing to subtract from, so the whole prefix is refolded instead.
   const gap =
     base && base.eventId !== eventId
       ? yield* askEventDocEventListAll(modelId, { afterEventId: base.eventId, upToEventId: eventId, consistentRead: true })
@@ -56,8 +45,6 @@ export function* askEventDocHookStates(modelId: string, event: EventDocEvent): A
       return yield* askThrowError(folded.error.errorType, folded.error.errorText);
     }
 
-    // No definition registered: the reserved base fold is all that exists. Whole-prefix
-    // read — acceptable for the rare definition-less collection that configures hooks.
     const prefix = seededGap ? yield* askEventDocEventListAll(modelId, { upToEventId: eventId, consistentRead: true }) : events;
 
     return {

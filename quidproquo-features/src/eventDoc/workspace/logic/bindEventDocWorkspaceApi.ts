@@ -4,13 +4,11 @@ import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBind
 import { EventDocWorkspaceStoryApi } from '../types/EventDocWorkspaceStoryApi';
 import { askRunInEventDocWorkspaceSlot } from './askRunInEventDocWorkspaceSlot';
 
-// Wraps one scope-blind verb so every call runs under the slot's override.
 const bindVerb = (binding: EventDocWorkspaceSlotBinding, verb: (...args: any[]) => AskResponse<any>) =>
   function* boundVerb(...args: any[]): AskResponse<any> {
     return yield* askRunInEventDocWorkspaceSlot(binding, verb(...args));
   };
 
-// Signature-identical api where every verb's commits land in the bound slot. The same
-// domain api can be mounted at n slot keys; the leaf verbs never know.
+/** Returns a signature-identical api whose verbs all run under the slot's binding, so one domain api can mount at many slot keys. */
 export const bindEventDocWorkspaceApi = <TApi extends EventDocWorkspaceStoryApi>(binding: EventDocWorkspaceSlotBinding, api: TApi): TApi =>
   Object.fromEntries(Object.entries(api).map(([verbName, verb]) => [verbName, bindVerb(binding, verb)])) as TApi;

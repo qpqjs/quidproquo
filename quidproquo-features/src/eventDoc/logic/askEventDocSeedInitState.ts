@@ -4,10 +4,8 @@ import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocInitData } from '../models';
 
 /**
- * Seed a new model's log with its INIT_STATE event, carrying the document's
- * identity (id/code/name). Create-only — clients never send INIT_STATE. It is event 0,
- * the position every later append counts from; the conditional write means a second
- * create of the same id fails loudly instead of rewriting the document's origin.
+ * Seed a new model's log with its INIT_STATE event (event 0) carrying id/code/name. Create-only; the conditional
+ * write makes a second create of the same id fail loudly.
  */
 export function* askEventDocSeedInitState(modelId: string, code: string, name: string, actor: EventDocEventActor): AskResponse<EventDocEvent> {
   const now = yield* askDateNow();

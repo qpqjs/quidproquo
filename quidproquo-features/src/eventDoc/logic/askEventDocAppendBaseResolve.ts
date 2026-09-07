@@ -6,17 +6,9 @@ import { askEventDocDocumentStateLatest } from './askEventDocDocumentStateLatest
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
- * The base an append lands on: the log's head, CONSISTENTLY read (the whole point of
- * claiming head + 1 is that the head is exactly right), plus the document state at that
- * head when the append will be validated against it.
- *
- * `validate` asks for the state. It resolves snapshot-seeded (cost tracks the gap since
- * the nearest snapshot, never the log) through the collection's registered definition; a
- * collection with NO definition (functions missing) has nothing to validate with and
- * degrades to the head alone, keeping the original write-and-go contract for it.
- *
- * A log with no events has no head to append after: every real log opens with INIT_STATE
- * (askEventDocSeedInitState), so that is a missing document, not an empty base.
+ * The base an append lands on: the log's head (consistent read, since the append claims head + 1) plus,
+ * when `validate` is set, the document state at that head. A collection with no registered definition
+ * degrades to the head alone. Throws NotFound for a log with no events (every real log opens with INIT_STATE).
  */
 export function* askEventDocAppendBaseResolve(modelId: string, validate: boolean): AskResponse<EventDocAppendBase> {
   if (validate) {

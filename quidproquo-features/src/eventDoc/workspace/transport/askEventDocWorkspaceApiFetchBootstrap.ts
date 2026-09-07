@@ -6,11 +6,10 @@ import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDoc
 import { askEventDocWorkspaceApiFetchBootstrapPage } from './askEventDocWorkspaceApiFetchBootstrapPage';
 import { askEventDocWorkspaceApiFetchEventsPage } from './askEventDocWorkspaceApiFetchEventsPage';
 
-// Fetches a document's opening load: the newest snapshot base plus the events after
-// it, following pagination in order. The base rides only the first page; follow-up
-// pages go through the plain events page pinned to the SAME base (afterEventId =
-// base.eventId), so a snapshot written mid-load can't shift the page boundaries.
-// This is the EventDocWorkspaceTransport.askFetchBootstrap shape.
+/**
+ * Opening load: the newest snapshot base plus the events after it, across pages. Follow-up pages pin afterEventId to the
+ * base so a snapshot written mid-load cannot shift the page boundaries.
+ */
 export function* askEventDocWorkspaceApiFetchBootstrap(identity: EventDocWorkspaceDocumentIdentity): AskResponse<EventDocWorkspaceBootstrap> {
   const firstPage = yield* askEventDocWorkspaceApiFetchBootstrapPage(identity);
 

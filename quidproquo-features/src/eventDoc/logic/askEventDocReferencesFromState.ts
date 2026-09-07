@@ -8,15 +8,8 @@ import { askEventDocDocumentStateLatest } from './askEventDocDocumentStateLatest
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
- * Every doc the CURRENT document depends on, ONE hop out: fold the state snapshot-seeded
- * and hand it to the `collectReferencesFromState` member of the collection's registered
- * EventDocFunctions object — no log walk. This is the references ROUTE's read: what the
- * document references now. The full-history walk (every link ANY historical state ever
- * held — askEventDocReferences) belongs to the transfer export, which exports the whole
- * log and must chase links from all of it.
- *
- * A collection with no registered object (definition-less) is a leaf and returns [];
- * so is a doc with no events.
+ * Every doc the current state links to, one hop out. Returns [] for a collection with no registered definition
+ * and for a doc with no events.
  */
 export function* askEventDocReferencesFromState(docId: string): AskResponse<EventDocLink[]> {
   const { storeName, type } = yield* askEventDocResolveStore();

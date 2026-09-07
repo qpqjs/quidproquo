@@ -4,9 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocTransferPlanRow } from '../../models';
 
-// Apply the uploaded bundle (POST /transfer/import) and return what happened per doc. `force`
-// additionally overwrites docs the target has edited directly; the server backs their discarded
-// events up first.
+/** POST /transfer/import: applies the uploaded bundle and returns a row per doc. */
 export function* askEventDocImportFetch(serviceName: string, transferId: string, force = false): AskResponse<EventDocTransferPlanRow[]> {
   const response = yield* askApiRequest<{ transferId: string; force: boolean }, EventDocTransferPlanRow[]>(
     serviceName,

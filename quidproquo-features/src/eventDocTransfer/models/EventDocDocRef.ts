@@ -1,6 +1,4 @@
-// A doc addressed the way an EventDocLink addresses one, minus the resolution mode: the
-// coordinates the transfer feature routes on. `service` matches EventDocLink.eventDocService
-// and `type` the collection's `type` (its store partition key).
+/** A doc's coordinates as the transfer routes on them (an EventDocLink minus the resolution mode). */
 export type EventDocDocRef = {
   service: string;
   type: string;

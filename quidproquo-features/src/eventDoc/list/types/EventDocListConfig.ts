@@ -1,23 +1,15 @@
-// Supplied by the host view when it initialises a list instance (doccypoccy builds
-// this from the tab's module params). The edit* fields are opaque routing strings the
-// list only stores; the host's open-item story reads them back to route to its editor.
+/** Supplied by the host when it initialises a list instance. The edit* fields are opaque routing strings the host reads back. */
 export type EventDocListConfig = {
   serviceName: string;
   basePath: string;
   editService: string;
   editModule: string;
-  // labels the editor as `{entityLabel} - {name}`
+  // Labels the editor as `{entityLabel} - {name}`.
   entityLabel: string;
-  // Base path the editor is opened against, when the collection's doc CRUD
-  // lives somewhere other than the create route (e.g. tenants create at
-  // /my-tenants, doc CRUD at /tenants). Empty means: use basePath.
+  // Base path the editor is opened against when doc CRUD lives elsewhere than the create route. Empty means basePath.
   editBasePath: string;
-  // Base path the summary list is fetched from, when it differs from the
-  // create route (e.g. tenants create at /my-tenants, scoped list at
-  // /tenants). Empty means: use basePath.
+  // Base path the summary list is fetched from when it differs from the create route. Empty means basePath.
   listBasePath: string;
-  // Whether this collection's SERVICE mounts defineEventDocTransfer. Off by default and opt-in per
-  // list, because the generic list is hosted by one service's views but points at several services'
-  // collections - showing Export/Import for a service with no transfer routes would just 404.
+  // Whether the collection's service mounts defineEventDocTransfer; Export/Import would 404 otherwise.
   canTransfer: boolean;
 };

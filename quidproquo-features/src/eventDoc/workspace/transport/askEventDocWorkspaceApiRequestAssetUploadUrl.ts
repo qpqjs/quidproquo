@@ -7,9 +7,10 @@ import { eventDocWorkspaceAssetsEndpoint } from './eventDocWorkspaceAssetsEndpoi
 
 type AssetUploadUrlRequest = { contentType: string };
 
-// Ask the collection's asset endpoint for a presigned PUT url + the guid (assetId)
-// that will name the immutable blob. The caller PUTs the bytes to `uploadUrl`, then
-// records `assetId` via a domain event (e.g. SET_FONT_BLOB_GUID).
+/**
+ * Requests a presigned PUT url and the assetId that will name the blob; the caller uploads, then records the assetId via
+ * a domain event.
+ */
 export function* askEventDocWorkspaceApiRequestAssetUploadUrl(
   identity: EventDocWorkspaceDocumentIdentity,
   contentType: string,

@@ -6,8 +6,7 @@ import { askUIEventDocExportSetLoading } from '../actionCreators/askUIEventDocEx
 import { askUIEventDocExportSetManifest } from '../actionCreators/askUIEventDocExportSetManifest';
 import { askEventDocManifestFetch } from '../transport/askEventDocManifestFetch';
 
-// Move from picking to reviewing: work out everything the picked docs drag along. Still builds
-// nothing, so the operator can go back and change their mind at no cost.
+/** Moves from picking to reviewing by fetching the manifest of the picked docs. Builds nothing. */
 export function* askEventDocExportUiPreview(serviceName: string, targets: EventDocDocRef[]): AskResponse<void> {
   yield* askUIEventDocExportSetLoading(true);
   yield* askUIEventDocExportSetError(null);

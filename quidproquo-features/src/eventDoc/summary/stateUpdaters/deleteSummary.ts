@@ -1,7 +1,6 @@
 import { EventDocEventPayload, EventDocSummaryView } from '../../models';
 
-// DELETE projects onto the record as `deletedAt`, which askEventDocList filters on by
-// default. Derived from the event, so rebuilding the projection preserves the deletion.
+/** Projects DELETE onto `deletedAt`, which askEventDocList filters on by default. */
 export const deleteSummary = (model: EventDocSummaryView, { metadata }: EventDocEventPayload): EventDocSummaryView => ({
   ...model,
   deletedAt: metadata.createdAt,

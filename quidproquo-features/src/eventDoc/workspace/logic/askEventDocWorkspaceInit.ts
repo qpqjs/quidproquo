@@ -14,12 +14,7 @@ import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport'
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
 import { isSameEventDocWorkspaceIdentity } from './isSameEventDocWorkspaceIdentity';
 
-// Instant restore from a runtime hand-off (federated module hot-swap): seed history
-// AND pending straight from the snapshot — the view renders immediately, exactly as
-// it looked before the swap, with NO loading state — then tail-pull only the events
-// that landed server-side since (the refresh path: afterEventId fetch, no isLoading).
-// The restored history refolds through THIS runtime's reducer/migrations, so a
-// schema-bump swap folds correctly.
+// Runtime hand-off: seed history and pending from the snapshot so the view renders at once, then tail-pull what landed since.
 const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTransport) =>
   function* askInitDocumentSlotFromSnapshot(
     slotKey: string,
@@ -36,21 +31,13 @@ const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTranspor
     yield* askEventDocWorkspaceRefresh(transport, [slotKey]);
   };
 
-// Seed identity, seed the buffer, and bootstrap-load ONE slot: the newest server
-// snapshot as the fold base plus only the events after it (or the whole log when the
-// server has no usable snapshot — same shape, null base). The buffer is normally
-// dropped (a stale buffer from a previous session must not leak into a fresh open),
-// but a snapshot slot whose identity matches the incoming one restores its pending —
-// that's a runtime hand-off (e.g. a federated module hot-swap), where pending is
-// precious. It seeds BEFORE the fetch so a failed load never discards intent.
+// Pending is dropped unless the snapshot slot's identity matches, and it is seeded before the fetch so a failed load never discards it.
 const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot: Nullable<EventDocWorkspaceSnapshot>) =>
   function* askInitDocumentSlot([slotKey, documentIdentity]: [string, EventDocWorkspaceDocumentIdentity]): AskResponse<void> {
     const snapshotSlot: EventDocWorkspaceSlotSnapshot | undefined = snapshot?.slots[slotKey];
     const snapshotMatches = !!snapshotSlot && isSameEventDocWorkspaceIdentity(snapshotSlot.documentIdentity, documentIdentity);
 
-    // A matching snapshot WITH history takes the instant path. Without history (an
-    // older bundle's snapshot, or a caller that stripped it to force a refetch)
-    // only pending restores and the blocking load below runs as always.
+    // A matching snapshot without history (stripped to force a refetch) restores pending only and takes the blocking load.
     if (snapshotMatches && snapshotSlot.history) {
       yield* getAskInitDocumentSlotFromSnapshot(transport)(
         slotKey,
@@ -86,8 +73,10 @@ const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot:
     yield* askUIEventDocWorkspaceSetLoading(slotKey, false);
   };
 
-// Load every requested document slot in parallel: independent logs, independent
-// loading/error state per slot.
+/**
+ * Initialises the requested document slots in parallel: identity, pending (restored from a matching snapshot slot), then the
+ * bootstrap load.
+ */
 export function* askEventDocWorkspaceInit(
   transport: EventDocWorkspaceTransport,
   identities: Record<string, EventDocWorkspaceDocumentIdentity>,

@@ -15,6 +15,7 @@ import { EventDocWorkspaceSetLoadingEffect } from './EventDocWorkspaceSetLoading
 import { EventDocWorkspaceSetPendingEventsEffect } from './EventDocWorkspaceSetPendingEventsEffect';
 import { EventDocWorkspaceSetSavingEffect } from './EventDocWorkspaceSetSavingEffect';
 
+/** Union of the workspace effects. */
 export type EventDocWorkspaceEffects =
   | EventDocWorkspaceApplyEventEffect
   | EventDocWorkspaceApplyTransientEventEffect

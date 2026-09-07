@@ -6,9 +6,7 @@ import { EventDocRestoreEffect } from './EventDocRestoreEffect';
 import { EventDocSetCodeEffect } from './EventDocSetCodeEffect';
 import { EventDocSetNameEffect } from './EventDocSetNameEffect';
 
-// Every reserved (non-domain) event-doc effect in plain-payload form (what action
-// creators pass to askApplyEventDocEvent). The fold side derives its stored shapes
-// from this union via EventDocFoldEffects (see fold/ReservedEventDocEffects).
+/** Union of the reserved (non-domain) event-doc effects in plain-payload form. */
 export type EventDocEffects =
   | EventDocInitStateEffect
   | EventDocSetCodeEffect

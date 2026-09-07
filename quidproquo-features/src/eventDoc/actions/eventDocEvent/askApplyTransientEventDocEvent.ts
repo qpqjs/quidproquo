@@ -2,37 +2,25 @@ import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
 
 import { EventDocActionType } from './EventDocActionType';
 
-// Target model is the processor's ambient context, not the payload, so the verb stays
-// pure. `transientKey` IS payload: it names the drop unit (usually a websocket
-// connection id), and only the caller knows it. version isn't here — the editor stamps
-// its configured schema version on every event.
+/** Payload of the ApplyTransientEvent action. The target doc is the processor's ambient context. */
 export type EventDocApplyTransientEventActionPayload = {
+  // Names the drop unit (usually a websocket connection id); a drop clears every transient event under it.
   transientKey: string;
   eventType: string;
   data: unknown;
 };
 
+/** Untyped requester for the ApplyTransientEvent action. Prefer askApplyTransientEventDocEvent. */
 export const askApplyTransientEventDocEventBase = createActionRequester<void>()({
   actionType: EventDocActionType.ApplyTransientEvent,
   getPayload: (transientKey: string, eventType: string, data: unknown) => ({ transientKey, eventType, data }),
 });
 
-// The never-saved sibling of askApplyEventDocEvent: yields the declarative
-// ApplyTransientEvent action, and the workspace bind routes it into the bound slot's
-// TRANSIENT group under `transientKey` — the unit a drop clears (usually a websocket
-// connection id), the event-sourced cure for the forever-spinner. Transient applies are
-// client-runtime-only by definition (a server "authors" them only via messages a client
-// story processes); an unbound or backend apply fails loudly like the normal one.
-//
-// Typed like askApplyEventDocEvent: an event-doc event IS a special kind of effect
-// (Effect<type, data>), so action creators pass their effect type as E and get the
-// data checked: askApplyTransientEventDocEvent<ZipProgressEffect>(connectionId, ZipEffect.Progress, { done, total }).
-//
-// Deliberately positional args with an explicit generic, NOT a whole-effect object:
-// passing `{ type, payload }` would let TS infer E from the literal itself, so a wrong
-// member/payload pairing would type itself instead of being checked against the
-// declared effect. The explicit generic is the check; creators are the only call
-// sites, so the one-line ceremony stays quarantined there.
+/**
+ * Never-saved sibling of askApplyEventDocEvent: the event lands in the bound slot's transient group under `transientKey`
+ * and is dropped wholesale, never persisted. Client runtime only; an unbound apply fails loudly.
+ * Pass the effect type explicitly so the data is checked against the declared effect.
+ */
 export function* askApplyTransientEventDocEvent<E extends Effect<string, any>>(
   transientKey: string,
   eventType: E['type'],

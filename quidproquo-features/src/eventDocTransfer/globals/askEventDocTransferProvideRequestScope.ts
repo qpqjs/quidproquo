@@ -4,13 +4,8 @@ import { HTTPEvent } from 'quidproquo-webserver';
 import { EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL } from '../constants';
 
 /**
- * Establish the request's ambient storage scope for a transfer, from the registered scope resolver
- * (e.g. the tenant feature's: header -> membership check -> TENANT# scope).
- *
- * Deliberately its own resolver rather than eventDoc's askEventDocProvideRequestScope: that one
- * reads the resolver name off a PROVIDED store, and a transfer spans many collections, so there is
- * no single store to read it from. Scoping once here means every collection the transfer touches
- * reads and writes inside the same tenant partition.
+ * Runs the story under the storage scope returned by the transfer's scope resolver global.
+ * Separate from askEventDocProvideRequestScope because a transfer spans collections, so there is no one store to read from.
  */
 export function* askEventDocTransferProvideRequestScope<T>(event: HTTPEvent, story: AskResponse<T>): AskResponse<T> {
   const scopeResolver = yield* askConfigGetGlobal<string>(EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL);

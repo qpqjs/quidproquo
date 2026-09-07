@@ -8,21 +8,9 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { askEventDocSnapshotStateResolve } from './askEventDocSnapshotStateResolve';
 
 /**
- * Load the newest COMPLETE snapshot at or before `upToEventId` — the seed an incremental
- * fold resumes from — or null when there is nothing usable and the caller should fold the
- * whole prefix from scratch.
- *
- * Anchors on the DOCUMENT view's row: its name is the one package constant a generic
- * reader can address (every other view name lives inside a partition key it cannot
- * enumerate), and it is written last with the manifest of its siblings, so its presence
- * means the whole set landed. From the manifest, every sibling row at the same event is
- * gathered; any hole (a pre-manifest snapshot, a missing row or blob) makes the whole
- * seed null — a partial seed would silently fold the missing view from nothing, which is
- * worse than paying for one from-scratch fold.
- *
- * Reads are eventually consistent on purpose: the seed is an optimisation, not a
- * correctness input. A replica that has not caught up simply surfaces an older seed (or
- * none), and the fold does a little more work for the same answer.
+ * Newest complete per-view snapshot set at or before `upToEventId` for the projector to resume from, or null.
+ * Anchors on the document row, which is written last with the manifest of sibling views; any missing sibling row or
+ * blob makes the whole seed null rather than folding that view from nothing.
  */
 export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: number): AskResponse<Nullable<EventDocSnapshotSeed>> {
   const { snapshotsStoreName } = yield* askEventDocResolveStore();

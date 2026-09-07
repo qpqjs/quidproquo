@@ -2,8 +2,7 @@ import { AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocExportSetManifest } from '../actionCreators/askUIEventDocExportSetManifest';
 
-// Back to picking. An empty manifest IS the picking phase (a real manifest always holds at least the
-// picked docs), so dropping it is the whole operation - the ticks are untouched.
+/** Returns from the preview to picking by clearing the manifest; the ticks are kept. */
 export function* askEventDocExportUiBack(): AskResponse<void> {
   yield* askUIEventDocExportSetManifest([]);
 }

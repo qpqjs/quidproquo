@@ -4,11 +4,7 @@ import { EventDocBundle, EventDocTransferPlanRow, EventDocTransferRegistry } fro
 import { askEventDocBundlePlanDoc } from './askEventDocBundlePlanDoc';
 import { askEventDocTransferProvideCollection } from './askEventDocTransferProvideCollection';
 
-/**
- * What importing this bundle would do, doc by doc, writing nothing. The review gate: the UI shows
- * these rows and the operator confirms before anything lands. Rows come back in bundle order (which
- * is leaves-first, the order an apply uses) so the plan and the result read the same way.
- */
+/** What importing the bundle would do, one row per doc in bundle order. Writes nothing. */
 export function* askEventDocBundlePlan(registry: EventDocTransferRegistry, bundle: EventDocBundle): AskResponse<EventDocTransferPlanRow[]> {
   const rows: EventDocTransferPlanRow[] = [];
 

@@ -11,6 +11,7 @@ import { setPageIndex } from './stateUpdaters/setPageIndex';
 import { setPageSize } from './stateUpdaters/setPageSize';
 import type { EventDocListState } from './types/EventDocListState';
 
+/** Reducer for the event-doc list state. */
 export const eventDocListReducer = buildEffectReducer<EventDocListState, EventDocListEffects>({
   [EventDocListEffect.SetConfig]: setConfig,
   [EventDocListEffect.PageLoaded]: pageLoaded,

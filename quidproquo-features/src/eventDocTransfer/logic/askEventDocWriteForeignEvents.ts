@@ -14,21 +14,14 @@ import {
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
 
+/** Options for askEventDocWriteForeignEvents. */
 export type EventDocWriteForeignEventsOptions = {
-  // Attribution for the imported events - see EventDocBundleApplyOptions.importerUserId.
   importerUserId: string;
-  // The tail was DISCARDED rather than appended to, so the hooks must fire even if nothing new was
-  // written: the summary still changed.
+  // The tail was discarded, so the hooks must fire even when nothing new was written: the summary still changed.
   logRewritten?: boolean;
 };
 
-/**
- * Re-attribute one event to the importing user, keeping the original author's display name.
- *
- * The source id would be a dangling reference in the target directory, while the display name is a
- * denormalised snapshot that stays true regardless of which system it is read in. So the id becomes
- * answerable ("who put this here") and the name stays honest ("who wrote it").
- */
+// The source user id would dangle in the target directory; the display name is a snapshot and stays true.
 const toLocalActor = (event: EventDocEvent, importerUserId: string): EventDocEvent => ({
   ...event,
   payload: {
@@ -40,15 +33,10 @@ const toLocalActor = (event: EventDocEvent, importerUserId: string): EventDocEve
   },
 });
 
-// The last Publish in a log, if any: what onPublish is fired for once the whole log has landed.
 const findLatestPublishEvent = (events: EventDocEvent[]): Nullable<EventDocEvent> =>
   [...events].reverse().find((event) => event.type === EventDocEffect.Publish) ?? null;
 
-// Fire the collection's post-append hooks ONCE for the doc, not once per imported event: per-event
-// firing would replay every historical publish and (for onAppend) spam the target's websockets.
-// Both hooks are contractually idempotent, and this is the shape a resumed import repeats safely.
-// States are derived per fired event (askEventDocHookStates reads the just-written log back
-// consistently), matching the append path's contract: the hook sees the document as of ITS event.
+// Hooks fire once per doc, not once per imported event: per-event firing would replay every historical publish.
 function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], summary: EventDocSummary): AskResponse<void> {
   const { onPublish, onAppend } = yield* askEventDocResolveStore();
 
@@ -72,20 +60,9 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
 }
 
 /**
- * Write foreign events into this collection's log almost verbatim: original index, createdAt and
- * clientMessageId preserved, so a later comparison still recognises them.
- *
- * The ONE thing rewritten is `createdBy.userId`, which becomes the importing user (see
- * toLocalActor). Event identity excludes it, so this does not disturb the fast-forward comparison.
- *
- * This deliberately does NOT go through askEventDocEventAppend, which restamps metadata and runs
- * the collection's validator. Replayed history was already validated at its origin, and a
- * validator that has since become stricter must not be able to rewrite the past.
- *
- * `events` is the doc's COMPLETE incoming log and `fromIndex` the first event not already present,
- * so the summary is rebuilt by folding the whole thing rather than patched incrementally. The
- * writes are conditional on (docId, eventId) in the store, which is what makes a partial import safe
- * to re-run.
+ * Writes `events[fromIndex..]` into the collection's log verbatim except for `createdBy.userId`, which becomes the importer.
+ * Bypasses askEventDocEventAppend on purpose: replayed history was validated at its origin and must not be restamped.
+ * `events` is the complete incoming log; the import is a fast-forward, so ids continue the local log. Requires the store context.
  */
 export function* askEventDocWriteForeignEvents(
   docId: string,
@@ -102,19 +79,13 @@ export function* askEventDocWriteForeignEvents(
     yield* askEventDocEventWrite(docId, event);
   }
 
-  // Folded from the LOCALISED log, so the summary's createdBy/updatedBy are local ids too.
-  // Nothing has to be renumbered: an import is a fast-forward of the SAME log, so the
-  // incoming events' positions continue the local log exactly (the divergence check
-  // guarantees the prefix matches), and each keeps its own.
+  // Folded from the localised log so the summary's createdBy/updatedBy are local ids too.
   const summary = foldEventDocSummary(localised);
   yield* askValidateModelOrThrowError(summary, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(summary);
 
-  // `logRewritten` covers the forced-overwrite case where the tail was DISCARDED and nothing new
-  // needed writing: the summary still changed, so a materialized read model is still stale.
   if (missing.length > 0 || logRewritten) {
-    // The hook payload crosses into an inline function, which receives the STORED shape —
-    // hence the key here, at the serialisation boundary rather than in the fold.
+    // The hook receives the stored shape, which carries `type`.
     yield* askEventDocFireImportHooks(docId, localised, { ...summary, type });
   }
 

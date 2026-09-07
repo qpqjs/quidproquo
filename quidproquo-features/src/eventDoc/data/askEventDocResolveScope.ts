@@ -1,8 +1,6 @@
 import { AskResponse, askStorageScopeRead } from 'quidproquo-core';
 
-// The ambient storage scope this collection's reads/writes are partitioned by
-// (undefined = unscoped). Read at data-fn time - no capture-at-provide staleness
-// and no ordering constraint between the store and scope providers.
+/** The ambient storage scope for this collection's reads and writes (undefined = unscoped). Read per call, not at provide time. */
 export function* askEventDocResolveScope(): AskResponse<string | undefined> {
   const scope = yield* askStorageScopeRead();
   return scope ?? undefined;

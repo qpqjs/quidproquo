@@ -7,26 +7,20 @@ import { EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 import { EventDocWorkspaceSlotViewOf } from './EventDocWorkspaceSlotViewOf';
 import { EventDocWorkspaceState } from './EventDocWorkspaceState';
 
+/** A selector over the workspace state. */
 export type EventDocWorkspaceSelector<T> = (state: EventDocWorkspaceState) => T;
 
-// Constrained to the FOLD config — selectors are buildable (and typeable) with no
-// api anywhere in sight; a full slots config satisfies the constraint too.
+/** The keyed per-slot selectors and workspace aggregates; constrained to fold configs so it needs no api. */
 export type EventDocWorkspaceSelectors<TSlots extends EventDocWorkspaceSlotFoldsConfig> = {
-  // The live log per slot: [...history, ...pending]. The PERSISTABLE log — transient
-  // events are deliberately excluded (they never save).
+  // The persistable log: [...history, ...pending], transients excluded.
   liveEvents: { [K in keyof TSlots]: EventDocWorkspaceSelector<EventDocEvent[]> };
-  // The folded view per slot: the pending tail, then the transient merge, folded onto
-  // the stored historyViews base (maintained by the reducer), memoized on the (base,
-  // pending, transient record) identities so while you type only the tails refold and
-  // history is never refolded at read.
+  // The memoized live fold (history + pending + transients), migrated to latest.
   view: { [K in keyof TSlots]: EventDocWorkspaceSelector<EventDocWorkspaceSlotViewOf<TSlots[K]>> };
   slotState: { [K in keyof TSlots]: EventDocWorkspaceSelector<EventDocWorkspaceSlotState> };
-  // Dirty/saving consider DOCUMENT slots only: a local slot's pending is session state
-  // (a chrome toggle must not mark the workspace dirty) and it never saves.
+  // isDirty and isSaving consider document slots only.
   isDirty: EventDocWorkspaceSelector<boolean>;
   isLoading: EventDocWorkspaceSelector<boolean>;
   isSaving: EventDocWorkspaceSelector<boolean>;
-  // First non-null slot error, for a single workspace-level error surface. Typed
-  // (operation + QPQError) so the consumer owns the display phrasing.
+  // First non-null slot error.
   error: EventDocWorkspaceSelector<Nullable<EventDocWorkspaceSlotError>>;
 };

@@ -18,7 +18,7 @@ function* askEventDocStoreAppendEvent(event: HTTPEvent, modelId: string): AskRes
   return qpqWebServerUtils.toJsonEventResponse(stored);
 }
 
-/** POST {basePath}/{id}/events — append a client event to the model's log. */
+/** POST {basePath}/{id}/events: appends a client event to the doc's log. */
 export function* appendEvent(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreAppendEvent(event, params.id)));
 }
