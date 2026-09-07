@@ -44,5 +44,6 @@ describe('askKeyValueStoreUpsert', () => {
     expect(askKeyValueStoreUpsertBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Upsert}-StoreNotFound`);
     expect(askKeyValueStoreUpsertBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Upsert}-InvalidScope`);
     expect(askKeyValueStoreUpsertBase.errorType.Conflict).toBe(`${KeyValueStoreActionType.Upsert}-Conflict`);
+    expect(askKeyValueStoreUpsertBase.errorType.WriteContention).toBe(`${KeyValueStoreActionType.Upsert}-WriteContention`);
   });
 });

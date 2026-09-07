@@ -29,11 +29,13 @@ export const askKeyValueStoreUpsertManyBase = createActionRequester<void>()({
     // the later write silently wins), so without this check the outcome would
     // depend on item position and never reproduce locally.
     'DuplicateKey',
-    // A conditional (ifNotExists) batch lost a race on one of its items (it exists, or
-    // another write holds it right now); none of the batch was written. Namespaced, not
-    // ErrorTypeEnum.Conflict, so retry logic can target the write race specifically
-    // without also catching domain-level conflicts.
+    // A conditional (ifNotExists) batch lost to an existing item; none of the batch was
+    // written. Final: a slot is taken. Namespaced, not ErrorTypeEnum.Conflict, so retry
+    // logic can target the write race specifically without also catching domain-level conflicts.
     'Conflict',
+    // Another write holds one of the batch's items right now; none of the batch was
+    // written. Transient: retry.
+    'WriteContention',
   ],
   getPayload: (keyValueStoreName: string, items: KvsItemRecord[], options?: KeyValueStoreUpsertManyOptions) => ({
     keyValueStoreName,
