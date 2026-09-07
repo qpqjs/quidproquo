@@ -1,15 +1,18 @@
 ---
 title: askEventDocEventAppend
-description: Append a client-authored event to a document's log — a single unconditional write with no read, no retry, and no validation.
+description: Append a client-authored event to a document's log at the next contiguous position, validating it against the document's state and retrying under write contention.
 ---
 
 # askEventDocEventAppend
 
-Appends a single client-authored event to a document's ordered event stream — the write half of the event-sourcing core. The event's id is a sortable id (UUIDv7, minted by [askNewSortableGuid](../../core/guid/ask-new-sortable-guid.md)), so the write needs no allocator and no coordination: it does not read the tail, does not validate, and has no retry loop. Concurrent appends to the same document neither contend nor fail on each other. After the event is written it also re-derives the queryable summary record so the document's status, version, name, and timestamps stay in sync with the log.
+Appends a single client-authored event to a document's ordered event stream — the write half of the event-sourcing core. The event's id is its **contiguous position** in the log (`INIT_STATE` is `0`, every append is head + 1), so log order IS commit order: a cursor "after N" is exact, and a snapshot "at N" holds exactly events `0..N`.
 
-**Validation happens later, at fold time, not here.** Dedup (a repeated `clientMessageId`), version monotonicity, and lifecycle/domain rules are all decided when the log is folded, against the accepted events before the one in question. An event that fails one of those checks is not rejected at append — it is written, then silently skipped by every fold, so the document reads as though it was never sent. That silence is deliberate: clients are expected to validate before they send (the same rules run client-side against the pending buffer), so a skipped event means a client skipped its own pre-flight, not that the append needs to report an error.
+The append is **expected-version optimistic concurrency**: it resolves the log's current head with a consistent read (and, when `options.validate` is true and the collection has registered validation functions, the document state at that head), validates the event against that state, then writes it at `head + 1` with a **conditional** write. Two writers that resolved the same head race for that slot; exactly one wins, and the other gets back the namespaced Upsert `Conflict`. A losing lap does not start over — it folds only the handful of events that beat it onto the state it already holds, re-validates, and claims the new head + 1 — and retries up to a bounded number of times before giving up (see [Notes](#notes)).
 
-- **Built from:** `askDateNow`, `askNewSortableGuid`, `askEventDocEventWrite`, and `askEventDocSummaryRederive` (plus, when the collection configures `onPublish`/`onAppend`, `askEventDocGetByIdOrThrow`, `askEventDocEventListAll`, and `askInlineFunctionExecute`). Not a single action.
+**Validation against the resolved state happens here, at append time, when enabled.** Dedup (a repeated `clientMessageId`) and version monotonicity are still decided when the log is folded, against the accepted events before the one in question, and the fold's own acceptance rules remain in place as defence in depth. But the collection's registered `validateEvent` runs against the exact state the event will land on, before the write — the gate that stops a bad event from ever entering the log, not just from being read back. A collection with no registered validation functions (or a caller that passes `{ validate: false }`, e.g. trusted server-authored appends) skips the state resolve and the check, and behaves as write-and-go instead.
+
+- **Built from:** `askDateNow`, `askEventDocAppendBaseResolve` / `askEventDocAppendBaseAdvance` (head + state resolution), `askEventDocValidateAppend`, `askEventDocEventWrite`, and `askRetry` (plus, when the collection configures `onPublish`/`onAppend`, `askEventDocGetByIdOrThrow`, `askEventDocHookStates`, and `askInlineFunctionExecute`). Not a single action.
+- **Does not maintain the summary record itself.** The queryable summary is rebuilt from the log by the events store's stream projector ([`onStream`](../../../config/features/event-doc-summary.md)), so it is eventually (not immediately) consistent with a just-written event.
 - **Requires the store context** — wrap the call in [askEventDocProvideStore](./ask-event-doc-provide-store.md) (custom routes) or [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals) (built-in routes).
 
 ```typescript
@@ -41,6 +44,7 @@ function* askEventDocEventAppend(
   modelId: string,
   input: EventDocEventInput,
   actor: EventDocEventActor,
+  options?: EventDocEventAppendOptions, // default { validate: true }
 ): AskResponse<EventDocEvent>;
 ```
 
@@ -48,9 +52,10 @@ function* askEventDocEventAppend(
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `modelId` | `string` | The document id whose log the event is appended to. Not checked against an existing `INIT_STATE` at append time — an event appended before `INIT_STATE` exists is simply written and then skipped by every fold, since the reducer has no document to fold it onto. |
+| `modelId` | `string` | The document id whose log the event is appended to. The base resolve throws `NotFound` when the log has no head to append after — every real log opens with `INIT_STATE`, so a missing document (not an empty log) is what this catches. |
 | `input` | `EventDocEventInput` | The client-authored event envelope — see below. |
 | `actor` | `EventDocEventActor` | Who authored the event; stamped onto the event as `createdBy`. Usually obtained from [askEventDocResolveActor](./ask-event-doc-resolve-actor.md). |
+| `options.validate` | `boolean` | Default `true`. Whether to resolve the document state at the append's head and run the collection's registered `validateEvent` before the write. The append route (the client trust boundary) leaves this on; [askEventDocAppendServerEvent](./ask-event-doc-append-server-event.md) passes `false` for trusted server-authored writes, since the fold remains their gate. |
 
 ### `EventDocEventInput`
 
@@ -72,7 +77,7 @@ What the client POSTs to append an event. `modelId` and the server-stamped prove
 
 ## Returns
 
-`AskResponse<EventDocEvent>` — the event now written to the log, with server-stamped metadata (`eventId`, `createdAt`, `createdBy`) filled in. Unlike before, this is not conditional on the event surviving validation — a fold may still skip it.
+`AskResponse<EventDocEvent>` — the event now durably written to the log at its claimed `eventId`, with server-stamped metadata (`eventId`, `createdAt`, `createdBy`) filled in. Passing pre-write validation does not exempt it from the fold's own rules — a fold may still skip it on a duplicate `clientMessageId` or a stale version.
 
 ### `EventDocEvent`
 
@@ -80,15 +85,16 @@ What the client POSTs to append an event. `modelId` and the server-stamped prove
 | --- | --- | --- |
 | `type` | `string` | The event type discriminant. |
 | `payload.data` | `T` | The typed domain data. |
-| `payload.metadata` | `EventDocEventMetadata` | Full provenance: `version`, `clientMessageId`, `createdBy`, `createdAt`, and `eventId` (a sortable id — mirrors the storage sort key, sorts lexicographically in creation order). |
+| `payload.metadata` | `EventDocEventMetadata` | Full provenance: `version`, `clientMessageId`, `createdBy`, `createdAt`, and `eventId` (the event's contiguous position in the log — mirrors the storage sort key). |
 
 ## Notes
 
-- **No dedup, no version check, and no lifecycle/domain validation at append time.** All three are decided when the log is folded (`foldEventDocLog`), against the accepted events before the one in question: a repeated `clientMessageId` is ignored, an event whose version is older than the log's highest accepted version is ignored, and the collection's `validators` registry (or `defaultEventDocEventValidator` when none is configured) is run there too. A rejected event is skipped silently — the document reads as though it was never written — rather than causing the append to throw.
-- **No read, no retry, no coordination.** The append does not read the tail or the log; it mints a sortable id and writes. Two appends landing in the same millisecond get an arbitrary but stable relative order, which is fine because ordering only has to be stable, not wall-clock-precise.
-- **Write uniqueness** is still enforced by [askEventDocEventWrite](./ask-event-doc-event-write.md)'s conditional (`ifNotExists`) write, but since ids are unique by construction this should never fire in practice — a collision surfaces as `KeyValueStoreUpsertErrorTypeEnum.Conflict` and indicates a bug (two writers minting the same id), not ordinary contention, so there is no retry around it.
-- After writing, it calls `askEventDocSummaryRederive`, which re-folds the whole log and re-derives the document's summary record so the queryable view (identity, version history, timestamps) stays in sync — this is the one piece of read-model maintenance still on the write path, until a stream projector replaces it.
-- Hooks (`onPublish`/`onAppend`, when the collection configures them) run after the event is durably written; a hook failure propagates so the caller knows the side effect — not the append — failed.
+- **Dedup and version monotonicity are still decided at fold time**, against the accepted events before the one in question: a repeated `clientMessageId` is ignored, and an event whose version is older than the log's highest accepted version is ignored. The append does not check either.
+- **Domain/lifecycle validation now runs at append time too, when enabled.** When `options.validate` is `true` and the collection has registered `validateEvent` functions, the event is checked against the document state at the head it will land on, before the write; a rejection throws `ErrorTypeEnum.Invalid` and nothing is written. A collection with no registered functions has nothing to validate with and falls back to write-and-go, same as `{ validate: false }`.
+- **Write contention is expected and retried, not treated as a bug.** [askEventDocEventWrite](./ask-event-doc-event-write.md)'s conditional (`ifNotExists`) write is the slot two writers that resolved the same head race for; the loser gets `KeyValueStoreUpsertErrorTypeEnum.Conflict`, folds just the events that beat it onto the state it already holds, re-validates, and re-laps at the new head. Retries are bounded (`EVENT_DOC_APPEND_MAX_RETRIES`, with linear backoff and jitter); exhausting them throws `ErrorTypeEnum.Conflict` — sustained contention on one document means something is hammering it, not ordinary concurrent editing. Different documents are different partition keys and never contend with each other.
+- **Log order is commit order.** Because the id is the log's next contiguous position rather than a value minted independently by each writer, `afterEventId` cursors and snapshot positions (`upToEventId`) are exact — no two events can claim the same position, and there is no "arbitrary but stable" ordering case to reason about.
+- **Does not maintain the summary record.** The summary is rebuilt from the log by the events store's stream projector, so it lags a just-written event until the stream delivers.
+- Hooks (`onPublish`/`onAppend`, when the collection configures them) run after the event is durably written and outside the retry loop; a hook failure propagates so the caller knows the side effect — not the append — failed.
 
 ## Related
 

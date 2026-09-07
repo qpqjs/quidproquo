@@ -19,7 +19,7 @@ import { eventDocSnapshotPath } from './eventDocSnapshotPath';
 // `views` is the manifest stamped on the document row (see EventDocSnapshot) — callers
 // write a whole per-view set via askEventDocSnapshotViewsWrite, which owns the ordering
 // that makes the manifest-carrying row the set's commit marker.
-export function* askEventDocSnapshotWrite(docId: string, viewName: string, eventId: string, state: unknown, views?: string[]): AskResponse<void> {
+export function* askEventDocSnapshotWrite(docId: string, viewName: string, eventId: number, state: unknown, views?: string[]): AskResponse<void> {
   const { snapshotsStoreName, storageDriveName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 

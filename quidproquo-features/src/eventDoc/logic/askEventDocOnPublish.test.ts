@@ -33,8 +33,6 @@ import { appendEvent } from '../routes/controllers/appendEvent';
 import { create } from '../routes/controllers/create';
 import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
 
-let sortableGuidCount = 0;
-
 // Exercises the new onPublish hook through the real append path: it must fire
 // exactly on Publish-effect appends (after the event and summary are written),
 // stay silent for other events and unconfigured collections, and propagate a
@@ -59,8 +57,8 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
       case KvsQueryOperationType.Equal:
         return actual === op.valueA;
       case KvsQueryOperationType.GreaterThan:
-        // Sort keys are sortable-guid STRINGS on the live stores (and numbers on legacy
-        // fixtures); compare whichever arrives.
+        // Sort keys are numeric event ids on the event/snapshot stores and strings on
+        // the summary index; compare whichever arrives.
         return typeof actual === typeof op.valueA && (actual as string | number) > (op.valueA as string | number);
       case KvsQueryOperationType.LessThanOrEqual:
         return typeof actual === typeof op.valueA && (actual as string | number) <= (op.valueA as string | number);
@@ -93,8 +91,6 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [InlineFunctionActionType.Execute]: (action: { payload: InlineInvocation }) => {
       inlineInvocations.push(action.payload);
       return onInlineExecute ? onInlineExecute() : undefined;

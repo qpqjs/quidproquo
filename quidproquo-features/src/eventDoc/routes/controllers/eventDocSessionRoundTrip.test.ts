@@ -31,8 +31,6 @@ import { appendEvent } from './appendEvent';
 import { create } from './create';
 import { listEvents } from './listEvents';
 
-let sortableGuidCount = 0;
-
 // Proves the real create -> appendEvent -> listEvents story logic (the exact path
 // admin session docs use) actually round-trips through a key-value store, not just
 // that the client sends the right requests. This is the story logic underneath
@@ -95,8 +93,6 @@ const buildMocks = () => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [KeyValueStoreActionType.Update]: createKvsUpdateMock({
       tableFor: (_scope, storeName) => (tables[storeName] ??= []),
       keyName: 'type',
@@ -183,7 +179,7 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     expect(appendResponse.status).toBe(200);
     const appendedEvent = JSON.parse(appendResponse.body!);
     expect(appendedEvent.type).toBe('tabChanged');
-    expect(appendedEvent.payload.metadata.eventId).toBe('sguid-0002');
+    expect(appendedEvent.payload.metadata.eventId).toBe(1);
 
     // A retried append (same clientMessageId) is WRITTEN — the append path does not read
     // the log and so cannot dedup — and mints its own id. Dedup is the fold's job now: see
@@ -199,14 +195,14 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
       ),
       mocks,
     );
-    expect(JSON.parse(retryResponse.body!).payload.metadata.eventId).toBe('sguid-0003');
+    expect(JSON.parse(retryResponse.body!).payload.metadata.eventId).toBe(2);
 
     const listResponse = runStory(listEvents(baseHttpEvent(undefined), { id: summary.id }), mocks);
     expect(listResponse.status).toBe(200);
     const page = JSON.parse(listResponse.body!);
 
     // Ids are unique and sort in creation order — minted per event, never allocated.
-    const ids = page.items.map((event: { payload: { metadata: { eventId: string } } }) => event.payload.metadata.eventId);
+    const ids = page.items.map((event: { payload: { metadata: { eventId: number } } }) => event.payload.metadata.eventId);
     expect(ids).toEqual([...ids].sort());
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toHaveLength(3);

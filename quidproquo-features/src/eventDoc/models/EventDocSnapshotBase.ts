@@ -3,6 +3,6 @@
 // the whole log. The state is era-pinned (see EventDocSnapshot) — a reader wanting the
 // latest shape migrates it up, exactly as the fold does for any stored accumulator.
 export type EventDocSnapshotBase = {
-  eventId: string;
+  eventId: number;
   state: unknown;
 };

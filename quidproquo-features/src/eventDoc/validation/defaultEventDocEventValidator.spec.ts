@@ -4,8 +4,7 @@ import { foldEventDocBase } from '../fold/foldEventDocBase';
 import { EventDocEffect, EventDocEvent } from '../models';
 import { defaultEventDocEventValidator } from './defaultEventDocEventValidator';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const { InitState, CreateDraft, Publish } = EventDocEffect;
 

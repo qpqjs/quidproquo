@@ -49,9 +49,9 @@ const globals: Record<string, string> = {
   [EVENT_DOC_USER_DIRECTORY_GLOBAL]: 'test-user-directory',
 };
 
-// Generic evaluator for the operators this flow issues. Values here are the string
-// sortable-guid sort keys, so ordering operators compare lexicographically — exactly
-// the contract the real store honours.
+// Generic evaluator for the operators this flow issues. Sort keys are the numeric event
+// ids, so ordering operators compare numerically — exactly the contract the real store
+// honours.
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
 
 const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean => {
@@ -61,9 +61,9 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
       case KvsQueryOperationType.Equal:
         return actual === op.valueA;
       case KvsQueryOperationType.GreaterThan:
-        return typeof actual === 'string' && typeof op.valueA === 'string' && actual > op.valueA;
+        return typeof actual === 'number' && typeof op.valueA === 'number' && actual > op.valueA;
       case KvsQueryOperationType.LessThanOrEqual:
-        return typeof actual === 'string' && typeof op.valueA === 'string' && actual <= op.valueA;
+        return typeof actual === 'number' && typeof op.valueA === 'number' && actual <= op.valueA;
       default:
         throw new Error(`Test KVS mock does not support operator: ${op.operation}`);
     }
@@ -79,7 +79,6 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
 const buildMocks = () => {
   const tables: Record<string, Record<string, unknown>[]> = {};
   let guidCounter = 0;
-  let sortableGuidCounter = 0;
   let clock = Date.parse('2026-08-01T00:00:00.000Z');
 
   const mocks = {
@@ -96,9 +95,6 @@ const buildMocks = () => {
 
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
-
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCounter).padStart(4, '0')}`,
 
     // Every offloaded-blob read fails: the storageDrive snapshot case must degrade to a
     // from-scratch fold, never to a folded-from-nothing document.
@@ -143,7 +139,7 @@ const buildMocks = () => {
       let items = table.filter((item) => matches(item, keyCondition));
 
       if ('sk' in (items[0] ?? {})) {
-        items = [...items].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (options?.sortAscending === false ? -1 : 1));
+        items = [...items].sort((a, b) => (Number(a.sk) - Number(b.sk)) * (options?.sortAscending === false ? -1 : 1));
       }
 
       if (options?.limit !== undefined) {
@@ -168,7 +164,7 @@ const httpEvent = (body: unknown, query: Record<string, string> = {}): HTTPEvent
   isBase64Encoded: false,
 });
 
-const eventIdOf = (event: EventDocEvent): string => event.payload.metadata.eventId;
+const eventIdOf = (event: EventDocEvent): number => event.payload.metadata.eventId;
 
 // A created doc with four appended events: [INIT_STATE, changed x4].
 const seedDocWithEvents = (mocks: ReturnType<typeof buildMocks>['mocks']) => {
@@ -234,14 +230,14 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     expect(page.items.map(eventIdOf)).toEqual(fullLog.slice(3).map(eventIdOf));
   });
 
-  it('ignores a snapshot newer than every event in the log (stale SS row after an overwrite)', () => {
+  it('ignores a snapshot newer than every event in the log (stale snapshot row after an overwrite)', () => {
     const { mocks, tables } = buildMocks();
     const docId = seedDocWithEvents(mocks);
 
     tables[store.snapshotsStoreName] = [
       {
         pk: eventDocSnapshotPk(docId, 'document'),
-        sk: 'sguid-9999',
+        sk: 9999,
         type: store.type,
         data: { type: 'inline', snapshot: { stale: true }, views: ['document'] },
       },
@@ -283,7 +279,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     const docId = seedDocWithEvents(mocks);
 
     tables[store.snapshotsStoreName] = [
-      { pk: eventDocSnapshotPk(docId, 'document'), sk: 'sguid-0001', type: store.type, data: { type: 'inline', snapshot: {}, views: ['document'] } },
+      { pk: eventDocSnapshotPk(docId, 'document'), sk: 1, type: store.type, data: { type: 'inline', snapshot: {}, views: ['document'] } },
     ];
 
     const page = listEventsPage(mocks, docId);

@@ -84,7 +84,7 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
  *
  * `events` is the doc's COMPLETE incoming log and `fromIndex` the first event not already present,
  * so the summary is rebuilt by folding the whole thing rather than patched incrementally. The
- * writes are conditional on (docId, index) in the store, which is what makes a partial import safe
+ * writes are conditional on (docId, eventId) in the store, which is what makes a partial import safe
  * to re-run.
  */
 export function* askEventDocWriteForeignEvents(
@@ -103,8 +103,9 @@ export function* askEventDocWriteForeignEvents(
   }
 
   // Folded from the LOCALISED log, so the summary's createdBy/updatedBy are local ids too.
-  // Nothing has to be renumbered: sortable ids are globally unique, so imported events keep
-  // their own and slot into the local log in their original order.
+  // Nothing has to be renumbered: an import is a fast-forward of the SAME log, so the
+  // incoming events' positions continue the local log exactly (the divergence check
+  // guarantees the prefix matches), and each keeps its own.
   const summary = foldEventDocSummary(localised);
   yield* askValidateModelOrThrowError(summary, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(summary);

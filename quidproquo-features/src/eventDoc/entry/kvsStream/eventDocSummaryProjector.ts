@@ -35,7 +35,7 @@ function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: strin
     return;
   }
 
-  yield* askEventDocProjectAtEvent(modelId, String(record.keys.sk), functionsName);
+  yield* askEventDocProjectAtEvent(modelId, Number(record.keys.sk), functionsName);
 }
 
 /**

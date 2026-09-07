@@ -6,8 +6,7 @@ import { eventDocSummaryReducer } from './eventDocSummaryReducer';
 // no-ops domain events). Every event also advances the current (tail) version's
 // `eventId` to its own log id — so a version's head always points at its last
 // event (a published version lands on its PUBLISH event; the open draft tracks the log
-// head). That head is the cutoff to fold/render the version: events with index <= it.
-// Used incrementally by the backend append handler.
+// head). That head is the cutoff to fold/render the version: events with id <= it.
 export const applyEventDocSummaryEvent = (model: EventDocSummaryView, event: EventDocEvent): EventDocSummaryView => {
   const [next] = eventDocSummaryReducer(model, event);
   const { eventId, createdAt, createdBy } = event.payload.metadata;

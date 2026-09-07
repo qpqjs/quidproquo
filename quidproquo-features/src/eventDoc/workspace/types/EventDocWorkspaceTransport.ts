@@ -9,7 +9,7 @@ import { EventDocWorkspaceDocumentIdentity } from './EventDocWorkspaceDocumentId
 export type EventDocWorkspaceEventsPageRequest = {
   limit?: number;
   nextPageKey?: string;
-  afterEventId?: string;
+  afterEventId?: number;
   newestFirst?: boolean;
 };
 
@@ -23,7 +23,7 @@ export type EventDocWorkspaceEventsPageRequest = {
 // the history panel's paged, newest-first read.
 export type EventDocWorkspaceTransport = {
   askFetchBootstrap: (identity: EventDocWorkspaceDocumentIdentity) => AskResponse<EventDocWorkspaceBootstrap>;
-  askFetchEvents: (identity: EventDocWorkspaceDocumentIdentity, afterEventId?: string) => AskResponse<EventDocEvent[]>;
+  askFetchEvents: (identity: EventDocWorkspaceDocumentIdentity, afterEventId?: number) => AskResponse<EventDocEvent[]>;
   askFetchEventsPage: (
     identity: EventDocWorkspaceDocumentIdentity,
     request?: EventDocWorkspaceEventsPageRequest,

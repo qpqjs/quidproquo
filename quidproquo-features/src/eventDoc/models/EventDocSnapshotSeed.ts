@@ -4,6 +4,6 @@ import { EventDocSnapshotViews } from './EventDocSnapshotViews';
 // event. Only ever constructed whole — a snapshot with a missing view resolves to null
 // instead, because a partial seed would fold the absent view from nothing.
 export type EventDocSnapshotSeed = {
-  eventId: string;
+  eventId: number;
   views: EventDocSnapshotViews;
 };

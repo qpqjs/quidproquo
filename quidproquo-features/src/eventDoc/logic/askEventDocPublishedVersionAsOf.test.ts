@@ -25,7 +25,7 @@ import { askEventDocPublishedVersionAsOf } from './askEventDocPublishedVersionAs
 
 const DOC_ID = 'doc-1';
 
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const buildEvent = (index: number): EventDocEvent => ({
   type: 'SET_BODY',
@@ -41,9 +41,7 @@ const buildEvent = (index: number): EventDocEvent => ({
   },
 });
 
-// Sortable ids are opaque strings; the tests only need them to sort in creation order, so
-// they are zero-padded counters.
-// A log of 6 events (ids 0000..0005) — enough that a version head genuinely truncates it.
+// A log of 6 events (ids 0..5) — enough that a version head genuinely truncates it.
 const EVENTS: EventDocEvent[] = [0, 1, 2, 3, 4, 5].map(buildEvent);
 
 const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): EventDocSummary => ({
@@ -95,13 +93,13 @@ const SNAPSHOTS_STORE_NAME = eventDocSnapshotsStoreName(STORE_NAME);
 
 // The sort-key bound the state resolver issues (upToEventId → at-or-before) — honoured
 // for real so the truncation at the version's head is exercised, not hand-waved.
-const skAtOrBefore = (keyCondition: KvsQueryOperation): string | undefined => {
+const skAtOrBefore = (keyCondition: KvsQueryOperation): number | undefined => {
   if ('conditions' in keyCondition) {
     return (keyCondition as KvsLogicalOperator).conditions.map(skAtOrBefore).find((v) => v !== undefined);
   }
 
   const condition = keyCondition as KvsQueryCondition;
-  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? String(condition.valueA) : undefined;
+  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? Number(condition.valueA) : undefined;
 };
 
 // The summary lookup, the snapshot-base lookup and the event list all land on the Query

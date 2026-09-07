@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { askEventDocEventList } from '../../data/askEventDocEventList';
@@ -26,10 +26,16 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
     return qpqWebServerUtils.toJsonEventResponse(bootstrapPage);
   }
 
+  // The cursor is a numeric log position on the wire; anything else is a caller bug, not
+  // a "from the start" request.
+  if (afterEventId !== undefined && afterEventId !== '' && !Number.isInteger(Number(afterEventId))) {
+    return yield* askThrowError(ErrorTypeEnum.Invalid, `afterEventId must be an integer log position, got [${afterEventId}]`);
+  }
+
   const page = yield* askEventDocEventList(modelId, {
     limit: limit ? Number(limit) : undefined,
     nextPageKey,
-    afterEventId: afterEventId || undefined,
+    afterEventId: afterEventId ? Number(afterEventId) : undefined,
     // Newest first — the history panel's latest-page-then-walk-backwards read.
     sortDescending: newestFirst === 'true' || undefined,
   });

@@ -68,10 +68,10 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       // Two characters, and that is not a style choice - it is the whole budget.
       //
       // A Lambda name is capped at 64 characters, and this resource carries the longest
-      // prefix of anything qpq names: the store name already has `EventLog` appended before
+      // prefix of anything qpq names: the store name already has `Events` appended before
       // the app-service-environment-feature decoration and the `-qpq` marker are added. The
-      // longest today is `qpq-admin-sessionsEventLog`, which leaves exactly two characters
-      // for the type. `kvsStream` overran by four; even `str` overruns by one.
+      // longest at the time this was set was `qpq-admin-sessionsEventLog`, which left exactly
+      // two characters for the type. `kvsStream` overran by four; even `str` overruns by one.
       //
       // So this sits at exactly 64 with no headroom: a longer store name, service, feature
       // or actor name will fail synth again, and the fix at that point is a general

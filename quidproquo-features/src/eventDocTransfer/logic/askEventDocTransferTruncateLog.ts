@@ -22,8 +22,9 @@ export function* askEventDocTransferTruncateLog(
   fromIndex: number,
 ): AskResponse<EventDocEvent[]> {
   // `fromIndex` is a POSITION in the log (what findEventDocLogDivergence reports and what
-  // askEventDocWriteForeignEvents slices on), not an event id. Those coincided while ids were a
-  // contiguous counter; with sortable ids they are different things, so slice by position.
+  // askEventDocWriteForeignEvents slices on). Ids are contiguous from 0 so the two coincide
+  // for a well-formed log, but the slice is by position on purpose: the comparison that
+  // produced `fromIndex` was positional, and a malformed log must not turn into a wrong delete.
   const discarded = existingEvents.slice(fromIndex);
 
   if (discarded.length === 0) {

@@ -23,7 +23,7 @@ import { askEventDocDocumentStateAsOf } from './askEventDocDocumentStateAsOf';
 export function* askEventDocDocumentStateAsOfTime(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocDocumentStateAtEvent>> {
   const eventId = yield* askEventDocEventIdAsOf(id, clock);
 
-  if (!eventId) {
+  if (eventId === null) {
     return null;
   }
 

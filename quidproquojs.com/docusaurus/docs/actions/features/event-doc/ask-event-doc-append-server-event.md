@@ -54,7 +54,7 @@ function* askEventDocAppendServerEvent<T>(
 
 ## Notes
 
-- This is a thin envelope-building wrapper over [askEventDocEventAppend](./ask-event-doc-event-append.md), so the same caveat applies: the event is written unconditionally, and version/lifecycle validation is decided later at fold time, not here. A server event that a validator would reject is written but silently skipped by every fold.
+- This is a thin envelope-building wrapper over [askEventDocEventAppend](./ask-event-doc-event-append.md), called with `{ validate: false }`: it still claims the next contiguous `eventId` with a conditional write and retries under slot contention, but it skips the pre-write state resolve and `validateEvent` check, trusting server code to author valid events. Version/lifecycle validation is decided later at fold time instead — a server event that a validator would reject is written but silently skipped by every fold.
 - A fresh `clientMessageId` is generated on every call, so this path does not participate in client retry dedup — each call is a distinct intended event.
 
 ## Related

@@ -40,8 +40,6 @@ import { manifest } from '../routes/controllers/manifest';
 import { plan } from '../routes/controllers/plan';
 import { upload } from '../routes/controllers/upload';
 
-let sortableGuidCount = 0;
-
 // Proves the transfer end to end through the REAL controllers, across two independent
 // "environments" that share nothing but the bundle: export from one, import into the other, and
 // assert the folded state matches. The reference collector is mocked exactly as an app would
@@ -82,8 +80,7 @@ const link = (type: string, id: string): EventDocLink => ({
   mode: EventDocLinkMode.Latest,
 });
 
-// Sortable ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const event = (index: number, type: string, data: unknown): EventDocEvent => ({
   type,
@@ -188,8 +185,6 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `${environmentName}-guid-${++guidCounter}`,
 
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     // The app-registered functions objects: collectReferences reads the links straight off the
     // doc's events, which is what a real definition does after folding. Leaf collections have no
     // registration, surfacing as the processor's DynamicFunctionsNotFound.
@@ -653,7 +648,7 @@ describe('eventDoc transfer round trip', () => {
 
     const targetEvents = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)];
     const templateRows = targetEvents.filter((row) => row.pk === 'template-1');
-    templateRows.filter((row) => (row.sk as string) >= eventId(2)).forEach((row) => targetEvents.splice(targetEvents.indexOf(row), 1));
+    templateRows.filter((row) => (row.sk as number) >= eventId(2)).forEach((row) => targetEvents.splice(targetEvents.indexOf(row), 1));
     targetEvents.push({ pk: 'template-1', sk: eventId(2), data: targetEdit(2, 'style-content') });
     targetEvents.push({ pk: 'template-1', sk: eventId(3), data: targetEdit(3, 'style-shared') });
 

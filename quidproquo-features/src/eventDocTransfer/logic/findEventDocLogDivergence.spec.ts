@@ -5,8 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { EventDocEvent } from '../../eventDoc/models';
 import { findEventDocLogDivergence } from './findEventDocLogDivergence';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const event = (index: number, overrides?: { type?: string; clientMessageId?: string; createdAt?: string }): EventDocEvent => ({
   type: overrides?.type ?? 'SET_THING',

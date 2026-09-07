@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -12,9 +12,8 @@ import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 // The workspace interpretation of askApplyEventDocEvent: record ONE event into the
 // bound slot's PENDING buffer (every slot; a local slot's pending simply never
 // saves). Local only, no network; Save streams the pending buffer later. Metadata is
-// provisional:
-// only `data` + `version` affect the fold, and the backend stamps
-// createdBy/createdAt/index on save. The validator runs against the slot's FOLDED
+// provisional: only `data` + `version` affect the fold, and the backend stamps
+// createdBy/createdAt/eventId on save. The validator runs against the slot's FOLDED
 // live state (history view + pending, transients excluded) BEFORE anything lands —
 // state, not the raw log, so the verdict is right even when the slot holds only the
 // events after its snapshot base. A rejection surfaces as slot error state (never
@@ -25,7 +24,6 @@ export function* askEventDocWorkspaceCommitEvent(
   { eventType, data }: EventDocApplyEventActionPayload,
 ): AskResponse<void> {
   const clientMessageId = yield* askNewGuid();
-  const index = yield* askNewSortableGuid();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {
@@ -38,9 +36,9 @@ export function* askEventDocWorkspaceCommitEvent(
         clientMessageId,
         createdBy: { userId: '', userDisplayName: '' },
         createdAt,
-        // Sortable ids need no allocator, so the client mints a real one. It sorts after
-        // every saved event and after earlier pending ones, with no renumbering.
-        eventId: index,
+        // Placeholder: the reducer stamps the provisional position atomically on apply
+        // (createApplyEventUpdater), and the server assigns the real id on save.
+        eventId: 0,
       },
     },
   };

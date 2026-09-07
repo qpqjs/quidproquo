@@ -13,14 +13,14 @@ export type EventDocEventListOptions = {
   consistentRead?: boolean;
   nextPageKey?: string;
   // Return only events whose log id is greater than this (exclusive) — the tail since a known
-  // point, for an incremental refresh. The events store is keyed pk=modelId / sk=index on its
+  // point, for an incremental refresh. The events store is keyed pk=modelId / sk=eventId on its
   // primary key, so this is a sort-key range condition (no GSI involved).
-  afterEventId?: string;
+  afterEventId?: number;
   // Return only events whose log id is at or before this (inclusive) — the PREFIX up to a known
   // event, for folding the document as of that event (a snapshot). Combined with afterEventId it
   // reads the slice between two known points — the gap an incremental fold applies on top of a
   // snapshot's state.
-  upToEventId?: string;
+  upToEventId?: number;
   // Newest first. For display reads that walk BACKWARDS in time (the history panel's
   // latest-page-then-load-older). Folding reads never set this — a fold consumes the log
   // in order.

@@ -1,16 +1,16 @@
-import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse } from 'quidproquo-core';
 
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocInitData } from '../models';
 
 /**
  * Seed a new model's log with its INIT_STATE event, carrying the document's
- * identity (id/code/name). Create-only — clients never send INIT_STATE, hence the empty
- * clientMessageId.
+ * identity (id/code/name). Create-only — clients never send INIT_STATE. It is event 0,
+ * the position every later append counts from; the conditional write means a second
+ * create of the same id fails loudly instead of rewriting the document's origin.
  */
 export function* askEventDocSeedInitState(modelId: string, code: string, name: string, actor: EventDocEventActor): AskResponse<EventDocEvent> {
   const now = yield* askDateNow();
-  const index = yield* askNewSortableGuid();
 
   const event: EventDocEvent<EventDocInitData> = {
     type: EventDocEffect.InitState,
@@ -21,7 +21,7 @@ export function* askEventDocSeedInitState(modelId: string, code: string, name: s
         clientMessageId: yield* askNewGuid(),
         createdBy: actor,
         createdAt: now,
-        eventId: index,
+        eventId: 0,
       },
     },
   };

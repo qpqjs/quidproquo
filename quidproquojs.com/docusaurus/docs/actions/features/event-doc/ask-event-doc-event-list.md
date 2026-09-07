@@ -5,7 +5,7 @@ description: Read a document's event log — a page of events, the whole log fla
 
 # Reading the event log
 
-Three read helpers over a document's event stream. All three resolve the collection's events store from the store context and query it by `pk = modelId`, ascending by event id (except `askEventDocEventLast`, which reads the tail). Event ids are sortable ids (UUIDv7) whose string form sorts lexicographically in creation order, so ascending-by-id and ascending-by-creation-time agree. They are the read side of the event-sourcing core, feeding the fold that reconstructs a document from its events.
+Three read helpers over a document's event stream. All three resolve the collection's events store from the store context and query it by `pk = modelId`, ascending by event id (except `askEventDocEventLast`, which reads the tail). Event ids are the event's contiguous position in the log (`INIT_STATE` is `0`, every append is head + 1, claimed by a conditional write), so log order IS commit order and ascending-by-id and ascending-by-creation-time always agree. They are the read side of the event-sourcing core, feeding the fold that reconstructs a document from its events.
 
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) / [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals).
 - **Built from:** [askKeyValueStoreQuery](../../core/key-value-store/ask-key-value-store-query.md) against the events store, plus [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore). Not single actions.
@@ -17,7 +17,7 @@ Returns one page of events for a document, oldest first. Supports paging and, vi
 ```typescript
 import { askEventDocEventList } from 'quidproquo-features';
 
-export function* refreshSince(docId: string, lastSeenEventId: string) {
+export function* refreshSince(docId: string, lastSeenEventId: number) {
   const page = yield* askEventDocEventList(docId, { afterEventId: lastSeenEventId });
   return page.items; // events after lastSeenEventId
 }
@@ -45,8 +45,8 @@ function* askEventDocEventList(
 | --- | --- | --- | --- |
 | `limit` | `number` | (store default) | Max number of events to return in the page. |
 | `nextPageKey` | `string` | — | Continuation token from a previous page's `nextPageKey`. |
-| `afterEventId` | `string` | — | Return only events whose event id sorts after this one (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
-| `upToEventId` | `string` | — | Return only events whose event id sorts at or before this one (inclusive) — the log prefix up to a known event, for folding a document as of that event (a snapshot). Not combinable with `afterEventId`: a key condition holds one sort-key range. |
+| `afterEventId` | `number` | — | Return only events whose event id is greater than this one (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
+| `upToEventId` | `number` | — | Return only events whose event id is less than or equal to this one (inclusive) — the log prefix up to a known event, for folding a document as of that event (a snapshot). Combinable with `afterEventId` for a bounded gap range. |
 | `sortDescending` | `boolean` | `false` | Newest first, for a display read that walks backwards in time (e.g. a history panel's latest-page-then-load-older). Folding reads never set this — a fold consumes the log in order. |
 | `consistentRead` | `boolean` | `false` | Strongly consistent read. Needed by a caller that just appended and is now folding to decide something — the default eventually-consistent read can otherwise miss that caller's own most recent event. Costs roughly double the read capacity, so leave it off for ordinary reads. |
 

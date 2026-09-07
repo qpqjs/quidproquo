@@ -28,7 +28,7 @@ export type EventDocDocumentStateAsOfOptions = {
  */
 export function* askEventDocDocumentStateAsOf(
   modelId: string,
-  upToEventId: string,
+  upToEventId: number,
   options?: EventDocDocumentStateAsOfOptions,
 ): AskResponse<Nullable<EventDocDocumentStateAtEvent>> {
   const { storeName, type } = yield* askEventDocResolveStore();

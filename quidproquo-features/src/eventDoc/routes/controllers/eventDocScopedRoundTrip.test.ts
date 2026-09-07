@@ -35,8 +35,6 @@ import { create } from './create';
 import { createAsset } from './createAsset';
 import { list } from './list';
 
-let sortableGuidCount = 0;
-
 // Proves the scopeResolver option end-to-end through the REAL controllers: when
 // the resolver returns a scope, every storage action the request performs
 // carries it (KVS options.scope / File payload.scope); when it returns null
@@ -106,8 +104,6 @@ const buildMocks = (resolvedScope: string | null) => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string } }) => {
       if (action.payload.functionName !== 'resolveTestScope') {
         throw new Error(`Unexpected inline function: ${action.payload.functionName}`);
