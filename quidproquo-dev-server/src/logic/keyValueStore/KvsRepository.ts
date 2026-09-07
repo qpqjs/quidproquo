@@ -51,8 +51,11 @@ export interface KvsRepository {
 
   // Write the whole batch as one unit: on an engine with transactions all
   // items commit together, and the caller gets back what each write replaced.
-  // Unconditional, like BatchWriteItem; the caller validates the batch first.
-  upsertMany(keyValueStoreName: string, items: any[], scope?: string): Promise<KvsUpsertManyResult[]>;
+  // With ifNotExists, an existing key for ANY item throws
+  // ConditionalCheckFailedException and nothing in the batch lands (the
+  // TransactWriteItems contract); without it the batch is unconditional, like
+  // BatchWriteItem. The caller validates the batch first either way.
+  upsertMany(keyValueStoreName: string, items: any[], options?: { ifNotExists?: boolean }, scope?: string): Promise<KvsUpsertManyResult[]>;
 
   update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any>;
 
