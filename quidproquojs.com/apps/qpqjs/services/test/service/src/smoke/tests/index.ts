@@ -1,6 +1,7 @@
 export * from './askSmokeAssert';
 export * from './crossService';
 export * from './eventBus';
+export * from './eventDoc';
 export * from './keyValueStore';
 export * from './noop';
 export * from './openApi';
