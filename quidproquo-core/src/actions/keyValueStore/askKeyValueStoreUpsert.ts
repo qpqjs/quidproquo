@@ -21,9 +21,9 @@ export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
   errorTypes: [
     'ServiceUnavailable', // DynamoDB internal error / throttling
     'ResourceNotFound', // the underlying table does not exist
-    // A conditional (ifNotExists) write lost to an existing item. Namespaced —
-    // not ErrorTypeEnum.Conflict — so retry logic can target the write race
-    // specifically without also catching domain-level conflicts.
+    // A conditional (ifNotExists) write lost a race on the item: it already exists, or a
+    // transaction is writing it right now. Namespaced, not ErrorTypeEnum.Conflict, so retry
+    // logic can target the write race specifically without also catching domain-level conflicts.
     'Conflict',
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
