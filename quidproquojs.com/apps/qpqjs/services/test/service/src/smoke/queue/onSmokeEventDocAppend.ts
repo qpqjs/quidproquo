@@ -22,29 +22,30 @@ function* askAppendMarks(
   docId: string,
   runId: string,
   writerId: number,
-  count: number
+  values: number[]
 ): AskResponse<void> {
-  const mark = (seq: number): SmokeEventDocMark => ({ runId, writerId, seq });
+  const mark = (value: number): SmokeEventDocMark => ({
+    value,
+    runId,
+    writerId,
+  });
 
-  if (count === 1) {
+  if (values.length === 1) {
     yield* askEventDocAppendServerEvent(
       docId,
       SMOKE_EVENT_DOC_MARK_EVENT,
-      mark(0),
+      mark(values[0]),
       SMOKE_EVENT_DOC_SCHEMA_VERSION,
       SMOKE_EVENT_DOC_ACTOR
     );
     return;
   }
 
-  const inputs: EventDocServerEventInput[] = Array.from(
-    { length: count },
-    (_, seq) => ({
-      type: SMOKE_EVENT_DOC_MARK_EVENT,
-      data: mark(seq),
-      version: SMOKE_EVENT_DOC_SCHEMA_VERSION,
-    })
-  );
+  const inputs: EventDocServerEventInput[] = values.map((value) => ({
+    type: SMOKE_EVENT_DOC_MARK_EVENT,
+    data: mark(value),
+    version: SMOKE_EVENT_DOC_SCHEMA_VERSION,
+  }));
 
   yield* askEventDocAppendServerEvents(docId, inputs, SMOKE_EVENT_DOC_ACTOR);
 }
@@ -52,11 +53,11 @@ function* askAppendMarks(
 export function* onSmokeEventDocAppend(
   event: SmokeEventDocAppendQueueEvent
 ): AskResponse<QueueEventResponse> {
-  const { docId, runId, writerId, count } = event.message.payload;
+  const { docId, runId, writerId, values } = event.message.payload;
 
   yield* askEventDocProvideStore(
     SMOKE_EVENT_DOC_STORE_OPTIONS,
-    askAppendMarks(docId, runId, writerId, count)
+    askAppendMarks(docId, runId, writerId, values)
   );
 
   return true;
