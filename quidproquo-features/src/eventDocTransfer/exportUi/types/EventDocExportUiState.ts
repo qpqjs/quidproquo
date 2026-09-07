@@ -3,20 +3,13 @@ import { Nullable } from 'quidproquo-core';
 import { EventDocSummary } from '../../../eventDoc/models';
 import { EventDocManifestItem, EventDocTransferExportResult } from '../../models';
 
-/**
- * The export dialog, which owns the whole flow: pick documents, see what they drag along, download.
- *
- * Two phases, derived rather than stored: `items` empty means still PICKING, `items` populated means
- * PREVIEWING (a manifest always contains at least the picked docs, so there is no ambiguous empty
- * result). Selection lives here rather than on the host list screen, so nothing has to survive that
- * screen's paging or refresh, and the dialog drops into any host with no selection plumbing.
- */
+/** The export dialog. `items` empty means picking; populated means previewing (a manifest always holds at least the picked docs). */
 export type EventDocExportUiState = {
   isOpen: boolean;
-  // Everything in the collection that COULD be exported, as loaded when the dialog opened.
+  // The whole collection, loaded when the dialog opened.
   candidates: EventDocSummary[];
   selectedIds: string[];
-  // The manifest of the picked docs. Empty until the operator moves to the preview.
+  // The manifest of the picked docs; empty until the preview.
   items: EventDocManifestItem[];
   isLoading: boolean;
   isExporting: boolean;
@@ -24,6 +17,7 @@ export type EventDocExportUiState = {
   result: Nullable<EventDocTransferExportResult>;
 };
 
+/** Initial (closed) export dialog state. */
 export const createInitialEventDocExportUiState = (): EventDocExportUiState => ({
   isOpen: false,
   candidates: [],

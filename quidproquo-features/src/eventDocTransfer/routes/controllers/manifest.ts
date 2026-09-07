@@ -15,11 +15,7 @@ function* askEventDocTransferManifest(event: HTTPEvent): AskResponse<HTTPEventRe
   return qpqWebServerUtils.toJsonEventResponse(items);
 }
 
-/**
- * POST /transfer/manifest — every doc that would travel with `{ docs: [...] }`, merged and deduped
- * across all of them, without building anything. Feeds the export dialog's "these will be included"
- * list.
- */
+/** POST /transfer/manifest: every doc that would travel with `{ docs: [...] }`, deduped, without building anything. */
 export function* manifest(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocTransferProvideRequestScope(event, askEventDocTransferManifest(event));
 }

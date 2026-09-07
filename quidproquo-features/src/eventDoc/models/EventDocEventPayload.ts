@@ -1,7 +1,6 @@
 import type { EventDocEventMetadata } from './EventDocEventMetadata';
 
-// The full payload the consumer reduces: typed domain data plus complete
-// provenance. This is what a load/fold or a save-ack carries.
+/** The full payload a reducer folds: domain data plus complete provenance. */
 export type EventDocEventPayload<T = unknown> = {
   data: T;
   metadata: EventDocEventMetadata;

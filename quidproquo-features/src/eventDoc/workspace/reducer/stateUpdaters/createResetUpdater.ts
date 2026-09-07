@@ -1,8 +1,6 @@
 import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
 import { createInitialEventDocWorkspaceState, EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 
-// Back to pristine for the SAME slots (keys are fixed at definition time), so a
-// remounted workspace doesn't resume a previous session's streams. Closured over the
-// slot configs because the initial state reseeds each slot's initial history view.
+/** Returns the pristine state for the same slots, reseeding each slot's initial history view. */
 export const createResetUpdater = (slots: EventDocWorkspaceSlotFoldsConfig) => (): EventDocWorkspaceState =>
   createInitialEventDocWorkspaceState(slots);

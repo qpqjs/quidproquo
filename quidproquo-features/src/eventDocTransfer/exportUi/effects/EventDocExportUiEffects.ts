@@ -8,6 +8,7 @@ import type { EventDocExportUiSetManifestEffect } from './EventDocExportUiSetMan
 import type { EventDocExportUiSetResultEffect } from './EventDocExportUiSetResultEffect';
 import type { EventDocExportUiToggleSelectedEffect } from './EventDocExportUiToggleSelectedEffect';
 
+/** Union of the export dialog effects. */
 export type EventDocExportUiEffects =
   | EventDocExportUiOpenEffect
   | EventDocExportUiSetCandidatesEffect

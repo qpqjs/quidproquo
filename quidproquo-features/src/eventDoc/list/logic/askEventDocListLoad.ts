@@ -6,10 +6,7 @@ import { askUIEventDocListSetLoading } from '../actionCreators/askUIEventDocList
 import { askEventDocListFetch } from '../transport/askEventDocListFetch';
 import type { EventDocListState } from '../types/EventDocListState';
 
-// Load the page the walk is currently on.
-//
-// The cursor comes from state (`cursors[pageIndex]`), not from the caller, so every entry point — first
-// load, next, previous, refresh — goes through one path and cannot disagree about which page is showing.
+/** Loads the page the walk is currently on; the cursor comes from `state.cursors[pageIndex]`, never from the caller. */
 export function* askEventDocListLoad(serviceName: string, basePath: string): AskResponse<void> {
   const state = yield* askStateRead<EventDocListState>();
 

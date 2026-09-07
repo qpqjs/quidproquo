@@ -3,21 +3,13 @@ import { QpqReducer } from 'quidproquo-core';
 import { EventDocEvent } from '../../models';
 import { EventDocEditorValidator } from '../../validation';
 
-// The api-free part of a slot config: everything the fold machinery (selectors,
-// reducer, initial state) needs. The workspace builds its selectors from this
-// alone; verbs never need selector imports — own-doc reads go through the
-// declarative askEventDocReadState answered by the slot binding.
+/** The api-free part of a slot config: everything the selectors, reducer and initial state need. */
 export type EventDocWorkspaceSlotFoldConfigBase<TView> = {
-  // Folds ONE event onto the view. Domain reducers are typed to their own effect
-  // union and cast to EventDocEvent at this registration boundary, the same
-  // convention as foldEventDocLog call sites.
+  // Domain reducers are cast to EventDocEvent at this boundary.
   foldReducer: QpqReducer<TView, EventDocEvent>;
   createInitialViewState: () => TView;
-  // The schema version this slot authors at; stamped on every committed event and
-  // used as the fold target for document slots. Defaults to 1.
+  // Stamped on every committed event and the fold target for document slots. Defaults to 1.
   schemaVersion?: number;
-  // Runs against the slot's live log (saved + pending) before a commit lands; the
-  // same contract the backend enforces on append. Document slots fall back to the
-  // universal lifecycle guard; local slots default to accept-all.
+  // Runs against the slot's live state before a commit lands. Document slots default to the lifecycle guard, local slots to accept-all.
   validate?: EventDocEditorValidator;
 };

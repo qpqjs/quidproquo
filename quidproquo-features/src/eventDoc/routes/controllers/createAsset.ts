@@ -14,7 +14,7 @@ function* askEventDocStoreCreateAsset(event: HTTPEvent, docId: string): AskRespo
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
-/** POST {basePath}/{id}/assets — a presigned URL to upload an immutable asset blob. */
+/** POST {basePath}/{id}/assets: a presigned URL to upload an immutable asset blob. */
 export function* createAsset(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreCreateAsset(event, params.id)));
 }

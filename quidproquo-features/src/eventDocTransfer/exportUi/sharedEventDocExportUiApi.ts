@@ -7,9 +7,7 @@ import { askEventDocExportUiConfirm } from './logic/askEventDocExportUiConfirm';
 import { askEventDocExportUiOpen } from './logic/askEventDocExportUiOpen';
 import { askEventDocExportUiPreview } from './logic/askEventDocExportUiPreview';
 
-// The whole export flow, self-contained: open (loads candidates), tick, preview the manifest, confirm.
-// A host supplies only its service name and the collection's base path, and turns the returned
-// download url into a saved file.
+/** The export dialog verbs. A host supplies its service name and base path and turns the returned download url into a file. */
 export const sharedEventDocExportUiApi = {
   askEventDocExportUiOpen,
   askUIEventDocExportToggleSelected,

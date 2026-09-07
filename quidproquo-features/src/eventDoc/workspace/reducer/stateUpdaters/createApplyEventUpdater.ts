@@ -5,15 +5,10 @@ import { EventDocWorkspaceCoalesceRules } from '../../types/EventDocWorkspaceCoa
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
 
-// Every commit lands in the slot's PENDING buffer (history is server truth only).
-// Coalescing lives IN the reducer (not the commit story) so a commit is atomic:
-// parallel commits each fold onto the latest state instead of racing a
-// read-modify-write of the whole buffer. The provisional eventId is stamped HERE for
-// the same reason: two commits in one parallel batch would otherwise read the same
-// "next" position. It only has to order the event after what the slot already holds
-// (getSlotNextEventId); the server assigns the real id on save. Closured over the
-// per-slot rules so the effect payload stays lean and serializable; the local-slot
-// 'all' default applies here too, so session streams hold one pending event per type.
+/**
+ * Lands a commit in the slot's pending buffer. Coalescing and the provisional eventId stamp happen here, atomically, so
+ * parallel commits cannot read the same next position. The server assigns the real id on save.
+ */
 export const createApplyEventUpdater =
   (coalesceRulesBySlot: Record<string, EventDocWorkspaceCoalesceRules>) =>
   (state: EventDocWorkspaceState, { slotKey, event }: EventDocWorkspaceApplyEventPayload): EventDocWorkspaceState => {

@@ -16,9 +16,7 @@ import { EventDocWorkspaceSlotsConfig } from './types/EventDocWorkspaceSlotsConf
 import { createInitialEventDocWorkspaceState, EventDocWorkspaceState } from './types/EventDocWorkspaceState';
 import { EventDocWorkspace, EventDocWorkspaceResolvedSlots } from './EventDocWorkspace';
 
-// Document slots ALWAYS get a validator: an unconfigured one falls back to the
-// universal lifecycle guard (published = CREATE_DRAFT only), so a document slot can't
-// silently mutate a published document. Local slots default to accept-all.
+// A document slot without a validator falls back to the lifecycle guard so a published document cannot be silently mutated.
 const getSlotBinding = (
   slotKey: string,
   slot: EventDocWorkspaceSlotConfig,
@@ -28,19 +26,17 @@ const getSlotBinding = (
   schemaVersion: slot.schemaVersion ?? 1,
   validate: slot.kind === EventDocWorkspaceSlotKind.document ? (slot.validate ?? defaultEventDocEventValidator) : (slot.validate ?? null),
   getView,
-  // Unmemoized on purpose: it runs once per commit, and the view selector's cache
-  // (which includes transients) can't be reused for a transient-free fold.
+  // Unmemoized on purpose: the view selector's cache includes transients, so it cannot serve a transient-free fold.
   getValidationView: (state) => foldSlotPendingTail(slot, getSlotHistoryView(state, slotKey), getSlotPending(state, slotKey)),
 });
 
 const resolveWorkspaceSlots = <TSlots extends EventDocWorkspaceSlotsConfig>(slots: TSlots): EventDocWorkspaceResolvedSlots<TSlots> =>
   ('chrome' in slots ? slots : { chrome: eventDocWorkspaceChromeSlot, ...slots }) as EventDocWorkspaceResolvedSlots<TSlots>;
 
-// Takes a workspace definition and returns the parts you need to run one (see
-// EventDocWorkspace): one `docs.<key>` node per mounted doc — its bound api plus its
-// read surface — with the built-in init/save/cancel/refresh verbs at the root api.
-// The per-doc keying is load-bearing: it lets one doc definition mount at n slot
-// keys with no verb-name collisions.
+/**
+ * Builds a runnable workspace from a definition: one `docs.<key>` node per slot (bound api plus read surface), the built-in
+ * init/save/cancel/refresh verbs at the root api, the reducer and the aggregate selectors.
+ */
 export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsConfig>(
   definition: EventDocWorkspaceDefinition<TSlots>,
 ): EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>> => {
@@ -51,9 +47,7 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
   const documentSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.document).map(([slotKey]) => slotKey);
   const localSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.local).map(([slotKey]) => slotKey);
 
-  // Built BEFORE the bindings: each slot's binding closes over its memoized view
-  // selector to answer askEventDocReadState. Kind-major internally; regrouped
-  // per-doc below.
+  // Built before the bindings: each binding closes over its slot's memoized view selector.
   const selectors = createEventDocWorkspaceSelectors(slots);
   const selectorMap = <T>(keyed: unknown) => keyed as Record<string, (state: EventDocWorkspaceState) => T>;
 

@@ -6,8 +6,7 @@ import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants';
 import { EventDocBundle, EventDocBundleAsset, EventDocBundleDoc, EventDocDocRef, EventDocTransferRegistry } from '../models';
 import { askEventDocTransferProvideCollection } from './askEventDocTransferProvideCollection';
 
-// One doc's contents, read inside its own collection's store. Assets are pulled by value: the
-// bundle has to be self-contained, since the target environment cannot reach this drive.
+// Assets travel by value: the target environment cannot reach this drive.
 function* askEventDocBundleReadDoc(ref: EventDocDocRef): AskResponse<EventDocBundleDoc> {
   const { storageDriveName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
@@ -25,11 +24,7 @@ function* askEventDocBundleReadDoc(ref: EventDocDocRef): AskResponse<EventDocBun
   return { ...ref, events, assets };
 }
 
-/**
- * Build a bundle for an exact set of docs (normally a manifest). Events travel verbatim and no
- * summary travels at all: the target rebuilds it by folding, so an import cannot carry a stale
- * derived record.
- */
+/** Builds a bundle for an exact set of docs. Events travel verbatim; no summary travels, the target folds its own. */
 export function* askEventDocBundleBuild(registry: EventDocTransferRegistry, refs: EventDocDocRef[]): AskResponse<EventDocBundle> {
   const applicationInfo = yield* askConfigGetApplicationInfo();
   const exportedAt = (yield* askDateNow()) as QpqIsoDateTime;

@@ -10,10 +10,7 @@ import { restoreSummary } from './stateUpdaters/restoreSummary';
 import { setSummaryCode } from './stateUpdaters/setSummaryCode';
 import { setSummaryName } from './stateUpdaters/setSummaryName';
 
-// Folds the reserved identity/lifecycle events into the queryable record. Domain
-// (content) events bubble `[model, false]` — the record ignores them (the applier still
-// bumps updatedAt). Cast to accept any EventDocEvent: buildEffectReducer skips
-// unknown types, so it genuinely handles the whole log.
+/** Folds the reserved events into the summary; domain events bubble unhandled. Cast so it accepts any EventDocEvent. */
 export const eventDocSummaryReducer = buildEffectReducer<EventDocSummaryView, ReservedEventDocEffects>({
   [EventDocEffect.InitState]: initSummary,
   [EventDocEffect.SetCode]: setSummaryCode,

@@ -5,10 +5,8 @@ import { askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } fro
 import { EventDocBundleAsset } from '../models';
 
 /**
- * Copy a bundle's asset blobs into this collection's drive at their ORIGINAL guids, so the
- * EventDocAssetRefs recorded in the doc's events keep resolving. Assets are immutable and
- * guid-named, so "already present" is the entire staleness check and a re-run writes nothing.
- * Assumes the collection's store is provided.
+ * Writes a bundle's asset blobs into the collection's drive at their original ids so the doc's asset refs keep resolving.
+ * Assets are immutable, so an id already present is skipped. Requires the store context.
  */
 export function* askEventDocTransferWriteAssets(docId: string, assets: EventDocBundleAsset[]): AskResponse<number> {
   if (assets.length === 0) {

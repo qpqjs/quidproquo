@@ -1,9 +1,6 @@
 import { EventDocEventPayload, EventDocInitData, EventDocSummaryView } from '../../models';
 
-// INIT builds the record's identity from the event, preserving `type` from the seed.
-// updatedAt/updatedBy are stamped by the applier (every event), so only the write-once
-// createdAt/createdBy + identity + the v1 version entry live here. `eventId` seeds v1's
-// head (this INIT_STATE event); the applier advances it as further events append.
+/** Builds the identity and the v1 version entry from INIT. updatedAt/updatedBy are stamped by the applier. */
 export const initSummary = (model: EventDocSummaryView, { data, metadata }: EventDocEventPayload<EventDocInitData>): EventDocSummaryView => ({
   ...model,
   id: data.id,

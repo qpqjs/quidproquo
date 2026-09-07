@@ -4,11 +4,7 @@ import { askUIEventDocListSetPageIndex } from '../actionCreators/askUIEventDocLi
 import type { EventDocListState } from '../types/EventDocListState';
 import { askEventDocListLoad } from './askEventDocListLoad';
 
-// Walk back one page, re-fetching it from the cursor recorded when it was first visited.
-//
-// Re-fetching rather than caching the rows is deliberate: a cursor is small and stable, whereas cached rows
-// go stale the moment anything is edited, and holding every visited page would rebuild the unbounded
-// in-memory list this change exists to remove.
+/** Walks back one page, re-fetching it from the cursor recorded when it was first visited. */
 export function* askEventDocListPreviousPage(): AskResponse<void> {
   const state = yield* askStateRead<EventDocListState>();
 

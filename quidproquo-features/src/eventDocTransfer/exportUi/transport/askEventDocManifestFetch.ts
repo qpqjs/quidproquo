@@ -4,9 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocDocRef, EventDocManifestItem } from '../../models';
 
-// Everything that would travel with the picked docs (POST /transfer/manifest), merged and deduped
-// across all of them. Read-only: it builds no bundle, so the dialog can show the list before the
-// operator commits to anything.
+/** POST /transfer/manifest: everything that would travel with the picked docs. Builds nothing. */
 export function* askEventDocManifestFetch(serviceName: string, docs: EventDocDocRef[]): AskResponse<EventDocManifestItem[]> {
   const response = yield* askApiRequest<{ docs: EventDocDocRef[] }, EventDocManifestItem[]>(
     serviceName,

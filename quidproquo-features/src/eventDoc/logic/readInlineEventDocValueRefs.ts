@@ -1,15 +1,7 @@
 import { EventDocValueRef } from '../models';
 import { isInlineEventDocValueRef } from './isInlineEventDocValueRef';
 
-/**
- * Split a keyed record of value refs into the values already in hand and the refs that still need fetching.
- *
- * The shape every reader wants: inline values resolve for free, and only what is genuinely on the blob drive
- * costs a round trip. Before the inline union existed, a caller had no choice but to treat all of them as
- * remote, which is what turned one Test Centre grid render into 1,600-plus requests for a few kilobytes.
- *
- * Pure, so it can run in a reducer, a selector or a story without ceremony.
- */
+/** Split a keyed record of value refs into the inline values already in hand and the asset refs still to fetch. Pure. */
 export const readInlineEventDocValueRefs = (
   refs: Record<string, EventDocValueRef>,
 ): {

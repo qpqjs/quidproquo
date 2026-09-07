@@ -7,15 +7,8 @@ import { EventDocEvent } from '../models';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
- * The append path's pre-write gate: run the collection's registered `validateEvent`
- * against `state` (the document as of the head the event will follow) and throw Invalid
- * on a rejection, so the event never enters the log. The write that follows is
- * conditional on that same head, which is what makes this verdict sound: if anything
- * lands in between, the write fails and the caller validates again against the advanced
- * state.
- *
- * A collection whose definition predates `validateEvent` (functions missing on the
- * member) passes: there is no rule to apply.
+ * The pre-write gate: run the registered `validateEvent` against the state at head and throw Invalid on a rejection.
+ * A collection with no validator passes.
  */
 export function* askEventDocValidateAppend(event: EventDocEvent, state: unknown): AskResponse<void> {
   const { storeName, type } = yield* askEventDocResolveStore();

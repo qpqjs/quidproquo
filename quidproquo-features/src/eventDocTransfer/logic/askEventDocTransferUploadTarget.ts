@@ -6,10 +6,7 @@ import { EventDocTransferUploadTarget } from '../models';
 
 const BUNDLE_UPLOAD_TTL_MS = 10 * 60 * 1000;
 
-/**
- * Mint a presigned PUT for an incoming bundle plus the id to quote back to plan/import. The bytes
- * go browser -> drive directly, so a bundle is never bounded by an API request payload limit.
- */
+/** Mints a presigned PUT for an incoming bundle plus the transferId to quote back to plan/import. */
 export function* askEventDocTransferUploadTarget(): AskResponse<EventDocTransferUploadTarget> {
   const scope = yield* askEventDocResolveScope();
   const transferId = yield* askNewGuid();

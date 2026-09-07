@@ -3,8 +3,7 @@ import { askConfigGetGlobal, AskResponse, askThrowError, askUserDirectoryReadAcc
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 import type { EventDocEventActor } from '../models';
 
-// Actor comes straight off the validated access token (it carries the username),
-// so the event is stamped without a separate user lookup.
+/** Resolves the event actor from the request's access token; throws Unauthorized when there is none. */
 export function* askEventDocResolveActor(): AskResponse<EventDocEventActor> {
   const userDirectory = yield* askConfigGetGlobal<string>(EVENT_DOC_USER_DIRECTORY_GLOBAL);
 

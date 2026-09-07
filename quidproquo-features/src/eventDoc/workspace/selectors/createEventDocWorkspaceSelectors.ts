@@ -17,16 +17,10 @@ const mapSlots = <T>(
   createSelector: (slotKey: string, slot: EventDocWorkspaceSlotFoldConfig) => T,
 ): Record<string, T> => Object.fromEntries(Object.entries(slots).map(([slotKey, slot]) => [slotKey, createSelector(slotKey, slot)]));
 
-// Assembles the keyed per-slot selectors plus the workspace aggregates. Built per
-// workspace so each slot's view selector owns its own pending-fold cache, and so the
-// dirty/saving aggregates scope to the document slot keys.
-//
-// Takes the api-free FOLD configs and resolves the default chrome fold slot itself
-// (idempotently — createEventDocWorkspace passes already-resolved slots), so an
-// editor can build its selectors in a standalone module that imports no api. Verbs
-// read live views through that module; the workspace passes the same instance in
-// via its definition, so both share one memoized selector set and the workspace
-// module keeps zero inbound edges (no import cycles).
+/**
+ * Builds the per-slot selectors and workspace aggregates from api-free fold configs, resolving the default chrome fold slot
+ * itself (idempotent), so selectors can live in a module that imports no api.
+ */
 export const createEventDocWorkspaceSelectors = <TSlots extends EventDocWorkspaceSlotFoldsConfig>(
   slots: TSlots,
 ): EventDocWorkspaceSelectors<EventDocWorkspaceResolvedFoldSlots<TSlots>> => {

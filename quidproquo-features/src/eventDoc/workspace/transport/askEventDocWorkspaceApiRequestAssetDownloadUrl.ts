@@ -5,8 +5,7 @@ import { EventDocAssetDownloadUrl } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { eventDocWorkspaceAssetDownloadEndpoint } from './eventDocWorkspaceAssetDownloadEndpoint';
 
-// GET a short-lived presigned url to read an asset blob — the caller loads the bytes
-// from it (e.g. as an <img src>, or to build a data URL).
+/** Requests a short-lived presigned url to read an asset blob. */
 export function* askEventDocWorkspaceApiRequestAssetDownloadUrl(
   identity: EventDocWorkspaceDocumentIdentity,
   assetId: string,

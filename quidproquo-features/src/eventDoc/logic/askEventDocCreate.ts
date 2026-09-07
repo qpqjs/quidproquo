@@ -8,9 +8,8 @@ import { applyEventDocSummaryEvent, createEventDocSummarySeed } from '../summary
 import { askEventDocSeedInitState } from './askEventDocSeedInitState';
 
 /**
- * Create a model: seed the INIT_STATE event that opens its log, then derive the record
- * (the queryable view) from it via the record reducer — the same path every later
- * append uses, so create and append can't drift.
+ * Create a model: seed the INIT_STATE event that opens its log, then derive the summary record from it
+ * through the same reducer every later append uses.
  */
 export function* askEventDocCreate(name: string, code: string, actor: EventDocEventActor): AskResponse<EventDocSummary> {
   const { type } = yield* askEventDocResolveStore();
@@ -23,7 +22,5 @@ export function* askEventDocCreate(name: string, code: string, actor: EventDocEv
   yield* askValidateModelOrThrowError(model, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(model);
 
-  // Callers get the stored shape back; `type` is the store's, and the store is what just
-  // wrote it.
   return { ...model, type };
 }

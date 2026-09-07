@@ -5,10 +5,8 @@ import { EventDocAppendBase } from '../models';
 import { askEventDocDocumentStateAdvance } from './askEventDocDocumentStateAdvance';
 
 /**
- * Move an append base past the events that beat it to the slot. A base carrying state
- * folds the gap onto the state it already holds (askEventDocDocumentStateAdvance); a
- * head-only base just re-reads the head. Both are consistent reads: the loser is racing
- * the winner's write, and a stale replica would hand back the same head it just lost on.
+ * Move an append base past the events that won the slot race. A base carrying state folds the gap
+ * onto it; a head-only base re-reads the head. Both reads are consistent: a stale replica would hand back the head just lost on.
  */
 export function* askEventDocAppendBaseAdvance(modelId: string, base: EventDocAppendBase): AskResponse<EventDocAppendBase> {
   if (base.state) {

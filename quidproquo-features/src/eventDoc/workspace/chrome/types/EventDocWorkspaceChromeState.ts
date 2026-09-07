@@ -1,12 +1,14 @@
 import { Nullable } from 'quidproquo-core';
 
+/** State of the default chrome slot. */
 export type EventDocWorkspaceChromeState = {
   historyOpen: boolean;
   helpOpen: boolean;
-  // Which slot the History panel is scoped to: per-slot history with a picker.
+  // Which slot the history panel shows.
   historySlotKey: Nullable<string>;
 };
 
+/** Initial chrome state. */
 export const createInitialEventDocWorkspaceChromeState = (): EventDocWorkspaceChromeState => ({
   historyOpen: false,
   helpOpen: false,

@@ -1,10 +1,7 @@
 import { EventDocManifestGroup } from '../../models';
 import type { EventDocExportUiState } from '../types/EventDocExportUiState';
 
-// The DEPENDENCIES grouped by doc type, for the dialog's "content: a, b, c / style: x, y" list. The
-// docs the operator picked (depth 0) are dropped: they are listed separately by
-// selectEventDocExportRoots, and repeating them as their own dependencies reads as noise. Type order
-// follows first appearance, which is the walk's own breadth-first order.
+/** The manifest's dependencies (depth > 0) grouped by doc type; the picked roots are listed by selectEventDocExportRoots. */
 export const selectEventDocExportGroups = (state: EventDocExportUiState): EventDocManifestGroup[] => {
   const dependencies = state.items.filter((item) => item.depth > 0);
 

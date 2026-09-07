@@ -15,7 +15,7 @@ function* askEventDocTransferExportBundle(event: HTTPEvent): AskResponse<HTTPEve
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
-/** POST /transfer/export — stage ONE bundle for `{ docs: [{ service, type, id }, ...] }` and return its download url. */
+/** POST /transfer/export: stages one bundle for `{ docs: [{ service, type, id }, ...] }` and returns its download url. */
 export function* exportBundle(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocTransferProvideRequestScope(event, askEventDocTransferExportBundle(event));
 }

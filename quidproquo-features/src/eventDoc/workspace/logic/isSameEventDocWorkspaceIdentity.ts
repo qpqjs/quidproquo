@@ -1,6 +1,5 @@
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 
-// Snapshot pending is only restorable into the SAME document — a snapshot taken
-// against one doc must never seed edits into another.
+/** True when two identities name the same document; snapshot pending only ever restores into the same document. */
 export const isSameEventDocWorkspaceIdentity = (a: EventDocWorkspaceDocumentIdentity, b: EventDocWorkspaceDocumentIdentity): boolean =>
   a.serviceName === b.serviceName && a.basePath === b.basePath && a.id === b.id;

@@ -4,13 +4,7 @@ import { askEventDocStoreProvide, buildEventDocStore } from '../../eventDoc/cont
 import { EventDocDocRef, EventDocTransferRegistry } from '../models';
 import { findEventDocTransferCollection } from './findEventDocTransferCollection';
 
-/**
- * Run `story` with the referenced collection's store provided, so every generic `askEventDoc*`
- * data function inside it targets that collection. This is the whole reason the transfer needs no
- * HTTP between collections: they live in this service, so the store is a context provide, not a
- * network hop. An unregistered or cross-service reference throws rather than being skipped, so an
- * incomplete manifest can never masquerade as a complete export.
- */
+/** Runs `story` with the referenced collection's store provided. An unregistered or cross-service reference throws. */
 export function* askEventDocTransferProvideCollection<T>(
   registry: EventDocTransferRegistry,
   ref: EventDocDocRef,

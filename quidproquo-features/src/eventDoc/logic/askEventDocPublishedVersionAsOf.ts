@@ -7,15 +7,8 @@ import { effectiveAsOf } from './selectors/effectiveAsOf';
 import { askEventDocDocumentStateAsOf } from './askEventDocDocumentStateAsOf';
 
 /**
- * The version published and effective at `clock`, together with the document state at
- * that version's head. Resolves the version from the persisted summary (`effectiveAsOf`,
- * keyed on `effectiveFrom`), then folds the state as of the version's `eventId` — the
- * head stamped at publish time — snapshot-seeded, so cost tracks the gap since the
- * nearest snapshot rather than the log. Returns null when the doc is missing/deleted,
- * nothing is effective yet, or the version's events are gone (a rewritten log). Assumes
- * the store context is provided (wrap in `askEventDocProvideStore`). The generic
- * backbone of a "render published" flow: use the state, and read `version.publishedAt`
- * to pin the doc's linked assets to the moment it was published.
+ * The version effective at `clock` (keyed on `effectiveFrom`) with the document state at that version's eventId.
+ * Null when the doc is missing or deleted, nothing is effective yet, or the version's events are gone. Assumes the store context.
  */
 export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocVersionState>> {
   const summary = yield* askEventDocGetById(id);

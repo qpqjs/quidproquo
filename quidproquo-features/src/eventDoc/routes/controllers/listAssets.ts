@@ -10,7 +10,7 @@ function* askEventDocStoreListAssets(docId: string): AskResponse<HTTPEventRespon
   return qpqWebServerUtils.toJsonEventResponse(assetIds);
 }
 
-/** GET {basePath}/{id}/assets — the doc's asset guids (the bytes come from getAsset). */
+/** GET {basePath}/{id}/assets: the doc's asset ids (bytes come from getAsset). */
 export function* listAssets(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreListAssets(params.id)));
 }

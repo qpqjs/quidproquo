@@ -3,10 +3,7 @@ import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceS
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumulator';
 
-// Shared by the append-history updaters (singular save-landing, plural refresh tail):
-// append the events to the slot's saved log AND fold them incrementally into the
-// stored accumulator, so the two can never disagree. No-ops on an unknown slotKey
-// (slot keys are fixed at workspace definition time).
+/** Appends events to a slot's history and folds them into the stored accumulator in one step, so the two cannot disagree. */
 export const appendSlotHistoryEvents = (
   slots: EventDocWorkspaceSlotFoldsConfig,
   state: EventDocWorkspaceState,

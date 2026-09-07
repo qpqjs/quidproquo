@@ -8,18 +8,8 @@ import { EventDocLink } from '../models';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
- * Every doc this one has EVER depended on, ONE hop out, across its whole history: hand the
- * whole log to the `collectReferences` member of the collection's registered
- * EventDocFunctions object and let it walk it (see collectEventDocReferences - it collects
- * at every step, migrated to the latest shape, so a link that existed only in an older
- * version is still found). O(log length) by design — this is the TRANSFER EXPORT's read,
- * which exports the whole history and must chase links from all of it. The references
- * route uses askEventDocReferencesFromState (current state only) instead. A collection
- * with no registered object (definition-less) is a leaf and returns []; whether it is one
- * only surfaces after the call, so the log read happens either way.
- *
- * The recursive walk over these edges lives in the transfer feature (askEventDocManifest),
- * which is the layer that knows every collection.
+ * Every doc this one has ever linked to, one hop out, across its whole log (the transfer export's read).
+ * For current links only use askEventDocReferencesFromState. A collection with no registered definition returns [].
  */
 export function* askEventDocReferences(docId: string): AskResponse<EventDocLink[]> {
   const { storeName, type } = yield* askEventDocResolveStore();

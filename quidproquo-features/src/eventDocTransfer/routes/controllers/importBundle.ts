@@ -10,8 +10,6 @@ function* askEventDocTransferImport(event: HTTPEvent): AskResponse<HTTPEventResp
   const { transferId, force } = yield* askEventDocParseBody<{ transferId: string; force?: boolean }>(event);
   const registry = yield* askEventDocTransferReadRegistry();
 
-  // Resolved once for the whole bundle: every imported event is attributed to whoever is importing,
-  // because the source system's user id means nothing in this directory.
   const importerUserId = yield* askEventDocResolveUserId();
 
   const bundle = yield* askEventDocTransferReadBundle(transferId);
@@ -20,12 +18,7 @@ function* askEventDocTransferImport(event: HTTPEvent): AskResponse<HTTPEventResp
   return qpqWebServerUtils.toJsonEventResponse(rows);
 }
 
-/**
- * POST /transfer/import — apply the uploaded bundle and report what happened per doc.
- *
- * `force` opts into overwriting docs the target has edited directly: their divergent tail is backed
- * up to the transfer drive and discarded. Off unless the caller asks for it explicitly.
- */
+/** POST /transfer/import: applies the uploaded bundle and reports a row per doc. `force` overwrites diverged docs (tail backed up first). */
 export function* importBundle(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocTransferProvideRequestScope(event, askEventDocTransferImport(event));
 }

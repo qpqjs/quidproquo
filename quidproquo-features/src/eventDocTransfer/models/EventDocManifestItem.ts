@@ -1,13 +1,11 @@
 import { EventDocDocRef } from './EventDocDocRef';
 
-// One doc discovered by the manifest walk: its coordinates plus enough identity to show the
-// operator what they are about to export. `depth` is 0 for the doc the walk started from and the
-// shortest link distance for everything else, so the walk's reverse order is leaves-first.
-// `deleted` docs are reported but never bundled: `deletedAt` lives on the summary, not the log, so
-// an events-only bundle would silently resurrect them in the target.
+/** One doc discovered by the manifest walk. */
 export type EventDocManifestItem = EventDocDocRef & {
   code: string;
   name: string;
+  // 0 for a selected root, link distance otherwise.
   depth: number;
+  // Reported but never bundled: deletedAt lives on the summary, not the log, so a bundle would resurrect it.
   deleted: boolean;
 };

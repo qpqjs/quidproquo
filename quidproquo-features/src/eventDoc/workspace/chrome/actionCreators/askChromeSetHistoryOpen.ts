@@ -4,9 +4,7 @@ import { askApplyEventDocEvent } from '../../../actions/eventDocEvent/askApplyEv
 import { EventDocWorkspaceChromeEffect } from '../effects/EventDocWorkspaceChromeEffect';
 import { EventDocWorkspaceChromeSetHistoryOpenEffect } from '../effects/EventDocWorkspaceChromeSetHistoryOpenEffect';
 
-// Scope-blind like any event-doc action creator: the commit lands on whichever
-// workspace slot this verb is bound to (the factory binds it to the chrome slot,
-// a local slot, so it lands straight in history).
+/** Opens or closes the history panel on whichever slot this verb is bound to. */
 export function* askChromeSetHistoryOpen(open: boolean): AskResponse<void> {
   yield* askApplyEventDocEvent<EventDocWorkspaceChromeSetHistoryOpenEffect>(EventDocWorkspaceChromeEffect.SetHistoryOpen, { open });
 }

@@ -10,13 +10,7 @@ function* askEventDocStoreReferences(docId: string): AskResponse<HTTPEventRespon
   return qpqWebServerUtils.toJsonEventResponse(links);
 }
 
-/**
- * GET {basePath}/{id}/references — the docs the CURRENT document depends on, ONE hop out
- * (empty for a collection with no registered functions object). Walks the folded state,
- * not the log; the transfer export keeps the full-history walk (askEventDocReferences)
- * because it exports the whole history. The recursive manifest is a transfer-feature
- * concern (POST /transfer/manifest), because only that layer knows every collection.
- */
+/** GET {basePath}/{id}/references: the docs the current state depends on, one hop out (empty with no functions object). */
 export function* references(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreReferences(params.id)));
 }

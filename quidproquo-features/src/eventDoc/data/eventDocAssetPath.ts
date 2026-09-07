@@ -1,10 +1,5 @@
-// Key layout of an eventDoc asset blob in the collection's storage drive:
-// `<docId>/assets/<assetId>` — guid-named so a re-upload is always a fresh blob
-// (immutable; the old one stays addressable for history/rollback). The sibling
-// `<docId>/runtime/<...>` prefix (derived, disposable artifacts) is written by
-// generation, not here. Swapping this scheme touches only this file.
+/** Blob key of an asset on the collection's storage drive: `<docId>/assets/<assetId>`. Assets are immutable; a re-upload is a new guid. */
 export const eventDocAssetPath = (docId: string, assetId: string): string => `${docId}/assets/${assetId}`;
 
-// The same scheme's prefix form: the folder every one of a doc's assets sits in, for
-// enumerating them (askEventDocListAssets). Lives here so the layout stays in one file.
+/** Prefix under which all of a doc's assets sit, for listing. */
 export const eventDocAssetFolderPath = (docId: string): string => `${docId}/assets`;

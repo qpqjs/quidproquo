@@ -4,10 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { EventDocSummary } from '../../models';
 import { eventDocListCollectionEndpoint } from './eventDocListCollectionEndpoint';
 
-// Fetches ONE page of a collection (the generic GET {basePath} route), newest first.
-//
-// The route now answers with QpqPagedData rather than a bare array. Passing no cursor asks for the first
-// page; passing the previous response's `nextPageKey` continues the walk.
+/** GET {basePath}: fetches one page of summaries, newest first. No cursor means the first page. */
 export function* askEventDocListFetch(
   serviceName: string,
   basePath: string,

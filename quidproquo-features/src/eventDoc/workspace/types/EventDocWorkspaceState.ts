@@ -5,27 +5,11 @@ import { EventDocWorkspaceHistoryPage } from './EventDocWorkspaceHistoryPage';
 import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsConfig';
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 
-// A workspace is n named event streams, each holding three groups of events:
-// - `history` — server truth: the confirmed (saved) log per slot, starting AFTER the
-//   slot's `base` (from the base's event zero when the base is null).
-// - `pending` — client intent: the unsaved buffer; EVERY commit lands here, Save moves
-//   it via the server into history, and a local slot's pending simply never saves.
-// - `transient` — never-saved observations (progress messages, ephemeral status),
-//   grouped per slot by transientKey (usually a websocket connection id — the unit you
-//   drop); dropping a key clears it across all slots and the folded views revert.
-// `bases` is each document slot's server-snapshot fold base: the folded state the
-// slot's history follows from, so the client holds base + tail instead of the whole
-// log. Null means the history IS the whole log (no usable server snapshot; local
-// slots always). `historyViews` is the fold ACCUMULATOR of base + history, maintained
-// incrementally by the reducer's state updaters; it sits at the last folded event's
-// schema version, which may be below the slot's latest. The live view is the (tiny)
-// pending tail, then the transient tail, folded onto that stored accumulator and
-// migrated to the latest version in selectors. Base + log stay the source of truth:
-// historyViews is a pure fold of them, never edited directly.
-// `fullHistory` is a display side-channel: the saved log NEWEST-FIRST, loaded a page at
-// a time on demand (askLoadHistory / askLoadOlderHistory — the history dialog's read)
-// because the working `history` starts after the base. Nothing folds from it; null
-// until requested.
+/**
+ * Per-slot event streams. `history` is the saved log after `bases[slot]` (null base means the whole log); `pending` is the
+ * unsaved buffer every commit lands in; `transient` holds never-saved observations by transientKey. `historyViews` is the
+ * reducer-maintained fold of base + history, at the last folded event's schema version. `fullHistory` is display-only.
+ */
 export type EventDocWorkspaceState = {
   history: Record<string, EventDocEvent[]>;
   pending: Record<string, EventDocEvent[]>;
@@ -39,8 +23,7 @@ export type EventDocWorkspaceState = {
 const mapFromSlotKeys = <T>(slotKeys: string[], createValue: () => T): Record<string, T> =>
   Object.fromEntries(slotKeys.map((slotKey) => [slotKey, createValue()]));
 
-// Takes the slot configs (not just keys) because historyViews seeds each slot's
-// createInitialViewState().
+/** Initial state; takes the configs because historyViews seeds each slot's initial view. */
 export const createInitialEventDocWorkspaceState = (slots: EventDocWorkspaceSlotFoldsConfig): EventDocWorkspaceState => {
   const slotKeys = Object.keys(slots);
 

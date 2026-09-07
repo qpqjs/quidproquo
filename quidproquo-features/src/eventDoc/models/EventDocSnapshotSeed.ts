@@ -1,8 +1,6 @@
 import { EventDocSnapshotViews } from './EventDocSnapshotViews';
 
-// A complete snapshot loaded back for resuming the fold: every view's state as of one
-// event. Only ever constructed whole — a snapshot with a missing view resolves to null
-// instead, because a partial seed would fold the absent view from nothing.
+/** A complete per-view snapshot set at one event for resuming the projector's fold. Never partial. */
 export type EventDocSnapshotSeed = {
   eventId: number;
   views: EventDocSnapshotViews;

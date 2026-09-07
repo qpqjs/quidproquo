@@ -9,12 +9,6 @@ import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOp
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
-// The history panel's reads: the LATEST page of the saved log (newest first), and older
-// pages on demand walking the stored cursor backwards — the working history starts after
-// the snapshot base, so the panel pages the server instead. Load replaces (each panel
-// open shows current); LoadOlder appends. A slot with no identity (local, or not yet
-// initialised) is skipped, as is LoadOlder with no page or no cursor to continue from.
-
 const getAskLoadSlotFullHistory = (transport: EventDocWorkspaceTransport) =>
   function* askLoadSlotFullHistory(slotKey: string): AskResponse<void> {
     const state = yield* askEventDocWorkspaceReadState();
@@ -66,10 +60,15 @@ const getAskLoadSlotOlderHistory = (transport: EventDocWorkspaceTransport) =>
     yield* askUIEventDocWorkspaceAppendFullHistory(slotKey, result.result.items, result.result.nextPageKey);
   };
 
+/**
+ * Loads the latest newest-first page of each slot's saved log into fullHistory, replacing what was there. Slots with no
+ * identity are skipped.
+ */
 export function* askEventDocWorkspaceLoadFullHistory(transport: EventDocWorkspaceTransport, slotKeys: string[]): AskResponse<void> {
   yield* askMapParallel(slotKeys, getAskLoadSlotFullHistory(transport));
 }
 
+/** Appends the next older page to each slot's fullHistory; skipped when there is no page or cursor to continue from. */
 export function* askEventDocWorkspaceLoadOlderHistory(transport: EventDocWorkspaceTransport, slotKeys: string[]): AskResponse<void> {
   yield* askMapParallel(slotKeys, getAskLoadSlotOlderHistory(transport));
 }

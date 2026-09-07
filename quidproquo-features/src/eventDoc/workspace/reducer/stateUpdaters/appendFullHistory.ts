@@ -1,9 +1,10 @@
 import { EventDocWorkspaceAppendFullHistoryPayload } from '../../effects/EventDocWorkspaceAppendFullHistoryEffect';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 
-// Append one OLDER page to a slot's newest-first history and advance the cursor.
-// No-ops when nothing is loaded yet (an older page cannot precede a first page — a
-// stale dispatch after the panel was reset) or on an unknown slotKey.
+/**
+ * Appends one older page to a slot's display history and advances the cursor. No-op when nothing is loaded yet or on an
+ * unknown slot.
+ */
 export const appendFullHistory = (
   state: EventDocWorkspaceState,
   { slotKey, events, nextPageKey }: EventDocWorkspaceAppendFullHistoryPayload,

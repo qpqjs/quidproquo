@@ -1,3 +1,2 @@
-// Recovers a slot's concrete folded-view type from its config (see the note on
-// EventDocWorkspaceSlotConfig for why the union itself is typed with `any`).
+/** Recovers a slot's concrete view type from its config. */
 export type EventDocWorkspaceSlotViewOf<TSlot> = TSlot extends { createInitialViewState: () => infer TView } ? TView : never;

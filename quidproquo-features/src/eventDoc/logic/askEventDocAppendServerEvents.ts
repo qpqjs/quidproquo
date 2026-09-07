@@ -22,38 +22,9 @@ import { EventDocEventAppendOptions } from './askEventDocEventAppend';
 import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
 
 /**
- * Append a burst of SERVER-AUTHORED events to a model's log in FOUR actions —
- * one clock read, one batch guid mint, one consistent head read, one transactional
- * batch write — where a loop of askEventDocAppendServerEvent pays a head read and a
- * write per event. The batch sibling of that single server append, for the fan-out
- * writers its contract exists for (a flow run's sink streams hundreds of events per run).
- *
- * The events claim the run head + 1 .. head + n as ONE conditional transaction
- * (askEventDocEventWriteMany): every slot lands or none does, so a concurrent writer
- * that took any slot in the run surfaces as the UpsertMany Conflict with nothing
- * written, and the lap re-reads the head and re-lays the whole run above it. Such a
- * writer is rare by design (a run's document has one sink) and a real signal when
- * it happens, which is why the cap is the same as the single append's.
- *
- * Same log out the other end: N ordinary events at consecutive ids (input order is
- * log order), so folds, snapshots, cursors and the stream projector cannot tell a
- * batched burst from a loop of singles.
- *
- * What batching deliberately drops:
- * - NO hooks — hook stores are guarded below, not by caller discipline.
- * - The pre-write gate, UNLESS asked for. The default is write-and-go: server code
- *   is trusted and the fold is its gate, which is what the fan-out sinks need. But a
- *   run landing on a document that other writers can touch (a human can publish it)
- *   should pass `validate: true`: each lap then resolves the state at head and checks
- *   the run event by event (askEventDocValidateAppendRun), so a Publish that landed
- *   in the gap rejects the run with Invalid instead of the fold silently dropping it
- *   at read time. Same option shape as the single append.
- * - A SHARED createdAt: every event in the batch carries the same write instant.
- *   Honest, because metadata.createdAt records the flush, never the occurrence —
- *   an event whose occurrence time matters carries it in its own data.
- * - clientMessageIds come from ONE batch guid mint (askNewSortableGuids: the only
- *   batch guid action; for server appends the field is pure dedup uniqueness, and
- *   the ids' ordering is irrelevant).
+ * Append a burst of server-authored events as one conditional transaction claiming head + 1 .. head + n
+ * (input order is log order); a Conflict re-laps on a fresh head. Runs no hooks and rejects stores that have them,
+ * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt.
  */
 export function* askEventDocAppendServerEvents(
   modelId: string,
@@ -65,12 +36,7 @@ export function* askEventDocAppendServerEvents(
     return [];
   }
 
-  // THE GUARD for the no-hooks contract — enforced here, not by caller
-  // discipline. A store that later gains onAppend/onPublish must fail loudly
-  // the moment a batch tries to bypass its hooks (a silently-skipped hook is a
-  // read model that quietly stops syncing); likewise a Publish inside a batch
-  // would skip the publish hook. Both are zero-I/O checks (the store context is
-  // a local read).
+  // A batch bypasses hooks, so a store with hooks (or a Publish, which has its own hook) must fail loudly here.
   const { onAppend, onPublish } = yield* askEventDocStoreRead();
   if (onAppend || onPublish) {
     return yield* askThrowError(
@@ -88,7 +54,6 @@ export function* askEventDocAppendServerEvents(
   let base: EventDocAppendBase = yield* askEventDocAppendBaseResolve(modelId, options.validate);
   let lostLaps = 0;
 
-  // One lap of the run's slot race: lay the whole burst above the head this lap holds.
   function* askAppendLap(): AskResponse<EventDocEvent[]> {
     if (lostLaps > 0) {
       base = yield* askEventDocAppendBaseAdvance(modelId, base);

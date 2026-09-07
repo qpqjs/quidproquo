@@ -7,9 +7,8 @@ import { askUIEventDocExportSetResult } from '../actionCreators/askUIEventDocExp
 import { askEventDocExportFetch } from '../transport/askEventDocExportFetch';
 
 /**
- * Build the bundle and hand the result back to the caller AS WELL as into state: the view starts the
- * browser download in the same click handler it called this from, which keeps the download out of an
- * effect hook. Null means it failed and the error is already in state.
+ * Builds the bundle. The result is returned as well as stored so the view can start the download in the same click
+ * handler; null means it failed and the error is already in state.
  */
 export function* askEventDocExportUiConfirm(serviceName: string, targets: EventDocDocRef[]): AskResponse<Nullable<EventDocTransferExportResult>> {
   yield* askUIEventDocExportSetExporting(true);

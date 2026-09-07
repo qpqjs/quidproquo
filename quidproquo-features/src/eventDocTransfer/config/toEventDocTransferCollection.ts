@@ -2,18 +2,13 @@ import { getEventDocFunctionsIdentity } from '../../eventDoc/definition/getEvent
 import { EventDocFunctions } from '../../eventDoc/definition/types/EventDocFunctions';
 import { EventDocTransferCollection } from '../models';
 
-// What a service may list as a transferable collection:
-// - its collection-list entry (anything carrying the registered `functions` object), so the
-//   SAME array that drives the defineEventDoc calls passes straight through, no mapping;
-// - the live functions object itself;
-// - a bare registry entry, for a collection that needs the import hooks (onPublish/onAppend).
+/** A transferable collection: a collection-list entry carrying `functions`, the functions object itself, or a bare registry entry. */
 export type EventDocTransferCollectionSource = EventDocFunctions | { functions: EventDocFunctions } | EventDocTransferCollection;
 
-// A collection-list entry carries its functions object under `functions`; the functions
-// object itself is the thing with behaviour; a bare registry entry has neither.
 const isEventDocFunctions = (source: EventDocTransferCollectionSource): source is EventDocFunctions =>
   typeof (source as EventDocFunctions).foldSnapshotViews === 'function';
 
+/** Normalises any EventDocTransferCollectionSource to a registry entry. */
 export const toEventDocTransferCollection = (source: EventDocTransferCollectionSource): EventDocTransferCollection => {
   if ('functions' in source) {
     return getEventDocFunctionsIdentity(source.functions);

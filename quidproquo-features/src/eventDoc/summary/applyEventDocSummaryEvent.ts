@@ -1,12 +1,10 @@
 import { EventDocEvent, EventDocSummaryView } from '../models';
 import { eventDocSummaryReducer } from './eventDocSummaryReducer';
 
-// Apply one event to the record: fold the reserved handlers, then stamp updatedAt/
-// updatedBy from the event so content edits bump "last modified" too (the reducer
-// no-ops domain events). Every event also advances the current (tail) version's
-// `eventId` to its own log id — so a version's head always points at its last
-// event (a published version lands on its PUBLISH event; the open draft tracks the log
-// head). That head is the cutoff to fold/render the version: events with id <= it.
+/**
+ * Apply one event to the summary: fold the reserved handlers, stamp updatedAt/updatedBy, and advance the tail version's
+ * `eventId` to this event's id, so a version's head is always its last event (the cutoff to fold or render it).
+ */
 export const applyEventDocSummaryEvent = (model: EventDocSummaryView, event: EventDocEvent): EventDocSummaryView => {
   const [next] = eventDocSummaryReducer(model, event);
   const { eventId, createdAt, createdBy } = event.payload.metadata;
