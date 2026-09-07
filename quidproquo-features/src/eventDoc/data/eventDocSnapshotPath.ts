@@ -4,4 +4,4 @@
 // (eventDocSnapshotPk decomposed + sk), which is why an EventDocSnapshot of type
 // 'storageDrive' stores no path: deriving it here means a row and its blob cannot drift.
 // Swapping this scheme touches only this file.
-export const eventDocSnapshotPath = (docId: string, viewName: string, eventId: string): string => `${docId}/snapshots/${viewName}/${eventId}`;
+export const eventDocSnapshotPath = (docId: string, viewName: string, eventId: number): string => `${docId}/snapshots/${viewName}/${eventId}`;

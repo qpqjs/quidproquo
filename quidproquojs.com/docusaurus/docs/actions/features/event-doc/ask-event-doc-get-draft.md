@@ -41,13 +41,13 @@ function* askEventDocGetDraft(id: string): AskResponse<Nullable<EventDocVersion>
 ```typescript
 type EventDocVersion = {
   version: number;
-  eventId: string;       // sortable id of this version's head event
+  eventId: number;       // log id of this version's head event
   publishedAt?: string;  // unset while it is the tail draft
   effectiveFrom?: string; // when the publish takes effect (as-of selection)
 };
 ```
 
-To fold or render a version's content, fold the log's events whose `eventId` sorts at or before the version's `eventId`.
+To fold or render a version's content, fold the log's events whose `eventId` is at or before the version's `eventId`.
 
 ---
 

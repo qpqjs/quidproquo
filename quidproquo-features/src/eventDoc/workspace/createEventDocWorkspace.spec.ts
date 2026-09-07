@@ -199,13 +199,10 @@ const constantNow = '2026-07-16T00:00:00.000Z';
 // every other spec keeps its stable constant timestamp.
 const createActionMocks = (dates: string[] = []): ActionMockMap => {
   let guidCount = 0;
-  let sortableGuidCount = 0;
   let dateCount = 0;
 
   return {
     [GuidActionType.New]: () => `guid-${++guidCount}`,
-    // Sortable ids must sort lexicographically in creation order; pad so they do.
-    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [DateActionType.Now]: () => dates[dateCount++] ?? constantNow,
   };
 };
@@ -220,15 +217,13 @@ type WorkspaceUnderTest = {
 const runWorkspaceStory = (workspace: WorkspaceUnderTest, story: () => AskResponse<void>, dates?: string[]): EventDocWorkspaceState =>
   runStory(askReduceState(workspace.createInitialState(), workspace.reducer, story), createActionMocks(dates));
 
-// Sortable ids are opaque strings ordered lexicographically; padded counters stand in, so a
-// fixture's ordering is still obvious at a glance.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
-// Pending events no longer carry a renumbered position — each mints its own sortable id — so
-// what the tests care about is that the buffer stays strictly ordered.
+// Pending events carry a provisional position stamped by the reducer, so what the tests
+// care about is that the buffer stays strictly ordered.
 const expectStrictlyIncreasing = (events: EventDocEvent[]): void => {
   const ids = events.map((event) => event.payload.metadata.eventId);
-  expect(ids).toEqual([...ids].sort());
+  expect(ids).toEqual([...ids].sort((a, b) => a - b));
   expect(new Set(ids).size).toBe(ids.length);
 };
 
@@ -273,7 +268,7 @@ const identityA: EventDocWorkspaceDocumentIdentity = { serviceName: 'notes', bas
 type FakeTransport = {
   transport: EventDocWorkspaceTransport;
   appended: EventDocEventInput[];
-  fetchCalls: { afterEventId?: string }[];
+  fetchCalls: { afterEventId?: number }[];
   setServerEvents: (events: EventDocEvent[]) => void;
   setServerBase: (base: Nullable<EventDocSnapshotBase>) => void;
   failAppendOnCall: (callNumber: number, errorType?: ErrorTypeEnum) => void;
@@ -288,9 +283,9 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   let failFetch = false;
   let appendCalls = 0;
   const appended: EventDocEventInput[] = [];
-  const fetchCalls: { afterEventId?: string }[] = [];
+  const fetchCalls: { afterEventId?: number }[] = [];
 
-  function* askFetchEvents(_identity: EventDocWorkspaceDocumentIdentity, afterEventId?: string): AskResponse<EventDocEvent[]> {
+  function* askFetchEvents(_identity: EventDocWorkspaceDocumentIdentity, afterEventId?: number): AskResponse<EventDocEvent[]> {
     fetchCalls.push({ afterEventId });
 
     if (failFetch) {
@@ -430,8 +425,9 @@ describe('createEventDocWorkspace scoped state', () => {
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
       createdAt: '2026-07-16T00:00:00.000Z',
-      // Minted client-side: sortable ids need no allocator, so there is no placeholder.
-      eventId: 'sguid-0001',
+      // Provisional: the reducer stamps the next position after everything the slot holds;
+      // an empty slot's first commit is 0.
+      eventId: 0,
     });
   });
 
@@ -1523,15 +1519,14 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ lineId: 'l1', text: 'from conn-2' });
     expect(state.transient.noteB['conn-1'][0].payload.data).toEqual({ title: 'b1' });
 
-    // Same guid/date/schemaVersion stamping as the ordinary commit. The id is minted like
-    // any other, but it is never used to order transient events — that is by createdAt at
-    // read time.
+    // Same guid/date/schemaVersion stamping as the ordinary commit. Transient events hold
+    // no log position (they never save) — ordering is by createdAt at read time.
     expect(state.transient.noteA['conn-1'][0].payload.metadata).toEqual({
       version: 1,
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
       createdAt: constantNow,
-      eventId: 'sguid-0001',
+      eventId: 0,
     });
 
     // Nothing leaks into the persistable groups.

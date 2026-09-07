@@ -8,8 +8,7 @@ import { all } from './all';
 import { reservedEventDocEventValidators } from './reservedEventDocEventValidators';
 import { validateEventDocEvent } from './validateEventDocEvent';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const { InitState, CreateDraft, Publish, SetCode } = EventDocEffect;
 

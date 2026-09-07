@@ -6,10 +6,11 @@ import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredE
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 // The batch sibling of askEventDocEventWrite: one UpsertMany action for a whole
-// burst of events. UNCONDITIONAL where the single write is ifNotExists — batch
-// writes carry no conditions — so the colliding-id assertion is lost here; ids
-// are unique by construction (one sortable-guid mint per event) and the logic
-// layer (askEventDocAppendServerEvents) is the only caller.
+// burst of events, CONDITIONAL like the single write — ifNotExists makes it a
+// transaction that claims every (modelId, eventId) slot or none, so a concurrent
+// writer that took any slot in the run surfaces as the UpsertMany Conflict with
+// nothing written. The logic layer (askEventDocAppendServerEvents) owns the
+// re-read-and-re-lap.
 export function* askEventDocEventWriteMany(modelId: string, events: EventDocEvent[]): AskResponse<void> {
   const { eventsStoreName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
@@ -17,6 +18,6 @@ export function* askEventDocEventWriteMany(modelId: string, events: EventDocEven
   yield* askKeyValueStoreUpsertMany(
     eventsStoreName,
     events.map((event) => eventDocEventToStoredEvent(modelId, type, event)),
-    { scope },
+    { ifNotExists: true, scope },
   );
 }

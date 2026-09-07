@@ -7,9 +7,9 @@ import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Tail of the log — the newest event by sort key. Event ids are sortable guids, so
-// lexicographic sort-key order (DynamoDB's, and the dev-server's for strings) is
-// creation order and this returns the true latest.
+// Tail of the log — the newest event by sort key. Event ids are contiguous numbers, so
+// numeric sort-key order (DynamoDB's, and the dev-server's for numbers) is log order and
+// this returns the true head.
 //
 // `consistentRead` matters MORE here than on any other event read: this is how
 // "latest" resolvers pick the head everything else clamps to. A stale replica

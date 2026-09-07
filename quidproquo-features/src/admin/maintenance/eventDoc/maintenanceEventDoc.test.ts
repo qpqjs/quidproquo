@@ -12,8 +12,7 @@ import { MaintenanceType } from './v1/types/MaintenanceType';
 import { isMaintenancePubliclyVisible } from './isMaintenancePubliclyVisible';
 import { maintenanceEventDoc } from './maintenanceEventDoc';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const buildEvent = (type: string, data: unknown, createdAt: string, index: number): EventDocEvent => ({
   type,

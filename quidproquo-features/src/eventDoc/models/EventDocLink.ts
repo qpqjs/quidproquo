@@ -17,4 +17,4 @@ export type EventDocLink =
       mode: EventDocLinkMode.Version;
       documentVersion: number;
     })
-  | (EventDocLinkTarget & { mode: EventDocLinkMode.Exact; eventId: string });
+  | (EventDocLinkTarget & { mode: EventDocLinkMode.Exact; eventId: number });

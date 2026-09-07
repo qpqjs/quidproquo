@@ -4,7 +4,7 @@
 export type EventDocStore = {
   storeName: string;
   eventsStoreName: string;
-  // Per-view folded states at points along the log, keyed pk=docId#view / sk=eventId.
+  // Per-view folded states at points along the log, keyed pk=docId#view / sk=numeric eventId.
   snapshotsStoreName: string;
   type: string;
   // The collection's blob bucket (assets + runtime artifacts), keyed per-doc.

@@ -10,7 +10,7 @@ import { askEventDocEventAppend } from './askEventDocEventAppend';
 // client building the input and POSTing it to the append route; this is for the rarer case
 // where the server itself authors an event, e.g. a generated secret.) Requires the EventDoc
 // store context — provide it via askEventDocProvideStore / askEventDocProvideStoreFromGlobals;
-// the append stamps createdBy/createdAt/index.
+// the append stamps createdBy/createdAt/eventId.
 export function* askEventDocAppendServerEvent<T>(
   modelId: string,
   type: string,
@@ -20,9 +20,9 @@ export function* askEventDocAppendServerEvent<T>(
 ): AskResponse<EventDocEvent> {
   const clientMessageId = yield* askNewGuid();
 
-  // WRITE-AND-GO: server-authored appends skip the pre-write gate (the fold is their
-  // gate). The walker streams hundreds of events per run — a per-append state resolve
-  // here multiplied the hot path's cost several-fold; the gate guards the CLIENT
-  // boundary (the append route), which this is not.
+  // Server-authored appends skip the pre-write gate (the fold is their gate), so each
+  // costs one head read and one conditional write. The walker streams hundreds of events
+  // per run — a per-append state resolve here multiplied the hot path's cost several-fold;
+  // the gate guards the CLIENT boundary (the append route), which this is not.
   return yield* askEventDocEventAppend(modelId, { type, payload: { data, metadata: { version, clientMessageId } } }, actor, { validate: false });
 }

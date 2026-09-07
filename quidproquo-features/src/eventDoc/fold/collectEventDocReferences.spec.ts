@@ -7,8 +7,7 @@ import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocLink, EventDoc
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
 import { EventDocMigration } from './EventDocMigration';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const SERVICE = 'template';
 const STYLE_TYPE = 'style';

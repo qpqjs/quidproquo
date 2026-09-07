@@ -9,7 +9,7 @@ import { askEventDocWorkspaceApiFetchEventsPage } from './askEventDocWorkspaceAp
 // This is the EventDocWorkspaceTransport.askFetchEvents shape.
 export function* askEventDocWorkspaceApiFetchEvents(
   identity: EventDocWorkspaceDocumentIdentity,
-  afterEventId?: string,
+  afterEventId?: number,
 ): AskResponse<EventDocEvent[]> {
   const all: EventDocEvent[] = [];
   let nextPageKey: string | undefined;

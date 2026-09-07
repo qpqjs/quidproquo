@@ -17,8 +17,7 @@ const DOC_ID = 'doc-1';
 const STORE_NAME = 'content';
 const EVENTS_STORE_NAME = eventDocEventsStoreName(STORE_NAME);
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const buildEvent = (index: number, createdAt: string): EventDocEvent => ({
   type: 'SET_BODY',

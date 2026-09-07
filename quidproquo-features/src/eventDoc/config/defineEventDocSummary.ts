@@ -1,7 +1,7 @@
 import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from 'quidproquo-core';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
-import { eventDocEventsStoreName, eventDocLegacyEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
@@ -31,13 +31,13 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
   }),
-  // The live log: pk=modelId, sk=sortable event id (string).
+  // The live log: pk=modelId, sk=the event's numeric log position (contiguous from 0).
   //
   // Its change stream drives the summary projector. That is what makes the summary a pure
   // projection: the append writes the event and stops, and the record is rebuilt from the
   // log out of band. Coalescing collapses a batch to one rebuild per document, so a burst of
   // appends to one document costs one re-derivation rather than one per event.
-  defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'string')], {
+  defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
     onStream: {
       runtime: {
@@ -55,18 +55,11 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
   }),
 
   // The snapshot stream: per-view folded states at points along the log, written by the
-  // same stream that projects the summary. pk=docId#view / sk=the SAME sortable event id
+  // same stream that projects the summary. pk=docId#view / sk=the SAME numeric event id
   // the log is ordered by, so a snapshot addresses the exact event it captures. Defined
   // for every collection (rows only appear for types that register a snapshot fold) so a
   // collection turning snapshots on later is a config change, not a migration.
-  defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'string')], {
-    disablePointInTimeRecovery: false,
-  }),
-
-  // The legacy log, numeric sort key. Declared but unused: a DynamoDB key schema cannot be
-  // altered in place, so the switch to sortable ids meant a new table. This keeps the old
-  // one deployed and its data reachable until the migration copies it across.
-  defineKeyValueStore<{ pk: string; sk: number; data: unknown }>(eventDocLegacyEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
+  defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
   }),
   defineStorageDrive(eventDocStorageDriveName(keyValueStoreName)),

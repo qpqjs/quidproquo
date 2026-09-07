@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocApplyTransientEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -17,7 +17,6 @@ export function* askEventDocWorkspaceCommitTransientEvent(
   { transientKey, eventType, data }: EventDocApplyTransientEventActionPayload,
 ): AskResponse<void> {
   const clientMessageId = yield* askNewGuid();
-  const eventId = yield* askNewSortableGuid();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {
@@ -30,8 +29,9 @@ export function* askEventDocWorkspaceCommitTransientEvent(
         clientMessageId,
         createdBy: { userId: '', userDisplayName: '' },
         createdAt,
-        // Minted like any other event, though transient ordering is by createdAt at read.
-        eventId,
+        // Transient events never save and are ordered by createdAt at read, so they hold
+        // no log position.
+        eventId: 0,
       },
     },
   };

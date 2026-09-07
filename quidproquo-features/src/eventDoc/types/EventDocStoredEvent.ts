@@ -9,7 +9,7 @@ import type { EventDocEvent } from '../models';
 // collection a document belongs to, so a projector could not know which summary to rebuild.
 export type EventDocStoredEvent = {
   pk: string;
-  sk: string;
+  sk: number;
   type: string;
   data: EventDocEvent;
 };

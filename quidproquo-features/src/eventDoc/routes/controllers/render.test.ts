@@ -35,7 +35,7 @@ const REQUEST_NOW = '2026-07-15T00:00:00.000Z';
 const store = buildEventDocStore({ storeName: 'templates', type: 'template' });
 const FUNCTIONS_NAME = eventDocFunctionsName('templates', 'template');
 
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const buildEvent = (index: number): EventDocEvent => ({
   type: 'SET_BODY',
@@ -96,13 +96,13 @@ type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args
 
 // The sort-key bound the state resolver issues (upToEventId → at-or-before), honoured
 // for real so a published render's truncation at the version's head is exercised.
-const skAtOrBefore = (keyCondition: KvsQueryOperation): string | undefined => {
+const skAtOrBefore = (keyCondition: KvsQueryOperation): number | undefined => {
   if ('conditions' in keyCondition) {
     return (keyCondition as KvsLogicalOperator).conditions.map(skAtOrBefore).find((v) => v !== undefined);
   }
 
   const condition = keyCondition as KvsQueryCondition;
-  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? String(condition.valueA) : undefined;
+  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? Number(condition.valueA) : undefined;
 };
 
 // Captures what the route hands the renderer — the thing under test. The registered
@@ -130,7 +130,7 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
         const upTo = skAtOrBefore(action.payload.keyCondition);
         const matching = storedEvents.filter((row) => upTo === undefined || row.sk <= upTo);
         const ascending = action.payload.options?.sortAscending !== false;
-        const sorted = [...matching].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (ascending ? 1 : -1));
+        const sorted = [...matching].sort((a, b) => (a.sk - b.sk) * (ascending ? 1 : -1));
         return { items: sorted.slice(0, action.payload.options?.limit), nextPageKey: undefined };
       }
       return { items: [buildSummary(versions)], nextPageKey: undefined };

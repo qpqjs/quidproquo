@@ -1,53 +1,74 @@
-import { askDateNow, askInlineFunctionExecute, askNewSortableGuid, AskResponse } from 'quidproquo-core';
+import {
+  askDateNow,
+  askInlineFunctionExecute,
+  askKeyValueStoreUpsertBase,
+  AskResponse,
+  askRetry,
+  askThrowError,
+  ErrorTypeEnum,
+} from 'quidproquo-core';
 
+import {
+  EVENT_DOC_APPEND_MAX_RETRIES,
+  EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
+  EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS,
+} from '../constants/eventDocAppendRetry';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
-import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocOnAppendInput, EventDocOnPublishInput } from '../models';
+import {
+  EventDocAppendBase,
+  EventDocEffect,
+  EventDocEvent,
+  EventDocEventActor,
+  EventDocEventInput,
+  EventDocOnAppendInput,
+  EventDocOnPublishInput,
+} from '../models';
+import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
+import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 import { askEventDocHookStates } from './askEventDocHookStates';
 import { askEventDocValidateAppend } from './askEventDocValidateAppend';
 
 /**
- * Append a client event to a model's log.
+ * Append a client event to a model's log at the next contiguous position.
  *
- * WRITE-AND-GO, in a single write. The event's index is a SORTABLE ID (UUIDv7, via
- * askNewSortableGuid): its string form sorts in creation order, so a writer can mint its own
- * position with no allocator, no counter and no coordination of any kind. The append does not
- * read the tail, does not read the log, does not validate, and has no retry loop, so
- * concurrent writers on the same document neither contend nor fail on each other. That is
- * what makes wide fan-out (hundreds of simultaneous appends to one doc) viable.
+ * EXPECTED-VERSION OPTIMISTIC CONCURRENCY. The append resolves the log's head (a
+ * consistent read), validates the event against the document state at that head, and
+ * writes at head + 1 with a CONDITIONAL put. The slot is claimed atomically, so of two
+ * writers that resolved the same head exactly one lands; the other gets the namespaced
+ * Upsert Conflict and re-laps. That conditional write is what makes the pre-write
+ * verdict sound: the state it validated against is, by construction, the state the event
+ * folds onto.
  *
- * Two appends in the same millisecond get an arbitrary but STABLE relative order. Stable is
- * what matters: a verdict below depends on stored order, and stored order never changes.
+ * A losing lap does NOT start over. It keeps the state it already holds and folds only
+ * the events that beat it (askEventDocAppendBaseAdvance: one consistent gap read of a
+ * handful of events, never a snapshot lookup, never the log), validates again, and
+ * claims the new head + 1. Contention on one document is rare for human editing and
+ * bounded by EVENT_DOC_APPEND_MAX_RETRIES when it is not; different documents are
+ * different partition keys and never contend.
  *
- * VALIDATION MOVED TO THE FOLD. Because nothing is checked here, an event's right to
- * exist is decided when the log is folded (foldEventDocLog): the collection's validator
- * registry rejects it on domain/lifecycle rules, and the fold's acceptance bookkeeping
- * rejects a duplicate clientMessageId or a stale schema version. A rejected event is
- * ignored silently and the document reads as though it was never written.
- *
- * That silence is deliberate and load-bearing: clients validate before they send (the same
- * registry runs on the editor's pending buffer), so a rejected event means a client
- * skipped its own pre-flight, not that a user needs an error. The caller learns the
- * outcome the same way it learns everything else — by folding the log it gets back.
- *
- * The verdict for an event is a pure function of that event and the ACCEPTED events
- * before it in id order. It can never change, so folds stay reproducible no matter how many
- * appends land afterwards.
+ * Log order IS commit order, so `afterEventId` cursors and snapshot positions are exact.
+ * The fold still applies its own acceptance rules (duplicate clientMessageId, schema
+ * version floor, and the collection's validator as defence in depth), but the gate here
+ * is the one that stops a bad event from ever entering an append-only log.
  *
  * NOTHING here maintains a read model. The summary is rebuilt from the log by the event
  * store's stream projector (see defineEventDocSummary's `onStream`), so it is eventually
- * consistent and entirely disposable — which is the whole point: a projection that the
- * writer maintains is not a projection, it is a second source of truth.
+ * consistent and entirely disposable — a projection the writer maintained would be a
+ * second source of truth.
  */
+// Shared with askEventDocAppendServerEvents, whose default is the opposite (false).
 export type EventDocEventAppendOptions = {
   // Run the registered pre-write gate (askEventDocValidateAppend) before the write.
   // TRUE for the append route — the trust boundary, where client-authored events must
   // be stopped before they enter the log. FALSE for server-authored appends
   // (askEventDocAppendServerEvent): server code is trusted to author valid events, the
-  // fold remains their gate, and the walker's fan-out depends on appends staying
-  // WRITE-AND-GO — a per-append state resolve turned an 800-event run into thousands
-  // of reads.
+  // fold remains their gate, and skipping the state resolve keeps the walker's fan-out
+  // at one head read + one write per event. Server writers landing on a document that
+  // OTHER writers can touch (a human publishing it mid-run) should pass true: a lap
+  // that loses the slot race then re-validates against what landed instead of
+  // re-laying blindly.
   validate: boolean;
 };
 
@@ -60,41 +81,67 @@ export function* askEventDocEventAppend(
   const { metadata } = input.payload;
 
   const now = yield* askDateNow();
-  const index = yield* askNewSortableGuid();
 
-  const event: EventDocEvent = {
-    type: input.type,
-    payload: {
-      data: input.payload.data,
-      metadata: {
-        version: metadata.version,
-        clientMessageId: metadata.clientMessageId,
-        createdBy: actor,
-        createdAt: now,
-        eventId: index,
+  let base: EventDocAppendBase = yield* askEventDocAppendBaseResolve(modelId, options.validate);
+  let lostLaps = 0;
+
+  // One lap of the slot race. Closes over `base` so a losing lap advances the state it
+  // already holds rather than resolving from scratch; `lostLaps` distinguishes the
+  // first lap (base freshly resolved) from a retry (base must catch up first).
+  function* askAppendLap(): AskResponse<EventDocEvent> {
+    if (lostLaps > 0) {
+      base = yield* askEventDocAppendBaseAdvance(modelId, base);
+    }
+    lostLaps += 1;
+
+    const event: EventDocEvent = {
+      type: input.type,
+      payload: {
+        data: input.payload.data,
+        metadata: {
+          version: metadata.version,
+          clientMessageId: metadata.clientMessageId,
+          createdBy: actor,
+          createdAt: now,
+          eventId: base.headEventId + 1,
+        },
       },
-    },
-  };
+    };
 
-  // THE PRE-WRITE GATE, for collections with a registered definition: resolve the
-  // document's current state (snapshot-seeded — cost tracks the gap, never the log) and
-  // run the registered validateEvent BEFORE the write. Some rules must stop the write
-  // itself, not just the fold: an append-only log holds a rejected-but-written secret
-  // forever. Client-boundary appends only (see EventDocEventAppendOptions); a collection
-  // with no registered functions object also skips (functions missing), keeping the
-  // original write-and-go contract. The fold's acceptance rules remain the last word
-  // either way (dedup + version floor are NOT validator rules and still resolve at fold
-  // time).
-  if (options.validate) {
-    yield* askEventDocValidateAppend(modelId, event);
+    if (base.state) {
+      yield* askEventDocValidateAppend(event, base.state.state);
+    }
+
+    yield* askEventDocEventWrite(modelId, event);
+
+    return event;
   }
 
-  // The id is unique by construction, so this cannot collide. ifNotExists stays as a cheap
-  // assertion — if it ever fires, two writers minted the same id, which is a bug worth
-  // surfacing loudly rather than a race to retry.
-  yield* askEventDocEventWrite(modelId, event);
+  const result = yield* askRetry(
+    askAppendLap,
+    EVENT_DOC_APPEND_MAX_RETRIES,
+    EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
+    // The slot race is the ONLY thing worth re-lapping. A domain rejection (Invalid) or
+    // anything else is terminal.
+    [askKeyValueStoreUpsertBase.errorType.Conflict],
+    { linearBackoff: true, maxJitterMs: EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS },
+  );
 
-  // Hooks run after the event is durably written. A hook may itself throw; that
+  if (!result.success) {
+    if (result.error.errorType === askKeyValueStoreUpsertBase.errorType.Conflict) {
+      return yield* askThrowError(
+        ErrorTypeEnum.Conflict,
+        `Could not append to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - too much concurrent write contention.`,
+      );
+    }
+
+    return yield* askThrowError(result.error.errorType, result.error.errorText, result.error.errorStack);
+  }
+
+  const event = result.result;
+
+  // Hooks run after the event is durably written and OUTSIDE the retry: a hook that
+  // itself throws the namespaced Conflict must not re-run the append. A hook failure
   // propagates so the caller knows the side effect failed, not the append.
   const { onPublish, onAppend } = yield* askEventDocStoreRead();
   const firePublishHook = !!onPublish && event.type === EventDocEffect.Publish;

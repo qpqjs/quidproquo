@@ -6,7 +6,7 @@ import type { EventDocSnapshot } from '../models';
 // pk composes the doc AND the view: snapshots are per-view, and one partition per
 // (doc, view) makes "the latest snapshot at or before this event, for this view" a plain
 // descending sort-key range — the exact read the incremental fold wants — while the sort
-// key stays the SAME sortable event id the history table is ordered by, so a snapshot row
+// key stays the SAME numeric event id the history table is ordered by, so a snapshot row
 // and the event it captures always correlate by key alone.
 //
 // `type` is the COLLECTION type, denormalised for the same reason it is on every event
@@ -14,7 +14,7 @@ import type { EventDocSnapshot } from '../models';
 // know which one this snapshot belongs to.
 export type EventDocStoredSnapshot = {
   pk: string;
-  sk: string;
+  sk: number;
   type: string;
   data: EventDocSnapshot;
 };

@@ -30,7 +30,7 @@ import { projectEventDocSummary } from './eventDocSummaryProjector';
 const STORE = 'test-templates';
 const SCOPE_DELIMITER = '@@QPQSCOPE@@';
 
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const event = (type: string, index: number, data: unknown): EventDocEvent => ({
   type,
@@ -271,7 +271,7 @@ describe('projectEventDocSummary snapshots', () => {
 
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows.map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
-    // sk is the SAME sortable event id the log is ordered by — the snapshot addresses the
+    // sk is the SAME numeric event id the log is ordered by — the snapshot addresses the
     // exact event it captures.
     expect(rows.every((row) => row.sk === eventId(1))).toBe(true);
     expect(rows.every((row) => row.type === 'template')).toBe(true);
@@ -410,7 +410,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
   const SNAPSHOTS_STORE = eventDocSnapshotsStoreName(STORE);
   const FOLD_FN = 'foldTemplateSnapshot';
 
-  const seedRowsAt = (sk: string): Row[] => [
+  const seedRowsAt = (sk: number): Row[] => [
     { pk: 'doc-1#summary', sk, type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
     { pk: 'doc-1#document', sk, type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
   ];

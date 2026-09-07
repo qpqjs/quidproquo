@@ -7,6 +7,8 @@ assembled quickly.
 
 - `defineOpenApi`, `askGetOpenApiSpec`, `OpenApiSpecActionType`, and `getAllOpenApiSpecs` (`quidproquo-webserver`) are removed with no replacement; drop any config or route code depending on them.
 - `dynamicRoute`, `createRouteDefinition`, and `createTenantedRouteDefinition` (`quidproquo-features`) take a `DynamicRouteConfig` object as their third argument instead of a bare known-errors map: `usersRoute(['POST', '/x'], handler, { [ErrorEnum.X]: 401 })` becomes `usersRoute(['POST', '/x'], handler, { knownErrors: { [ErrorEnum.X]: 401 } })`. Handlers can also add a third `input` parameter (`{ body, query }`, parsed against an optional `schema.body`/`schema.query` zod schema) if they want validated request data.
+- `EventDocEventMetadata.eventId` (`quidproquo-features`) is now a `number` (the event's contiguous log position, starting at 0) instead of a sortable-guid `string`. Anything comparing, storing, or serializing an `eventId` as a string must switch to numeric comparison/arithmetic.
+- `askEventDocValidateAppend` (`quidproquo-features`) now takes `(event, state)` instead of `(modelId, event)`; it no longer resolves document state itself, so callers must resolve and pass the state.
 
 ## 0.1.19
 

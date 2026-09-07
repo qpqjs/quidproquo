@@ -42,7 +42,7 @@ import { askEventDocSummaryRederive } from './askEventDocSummaryRederive';
  * The seed read stays eventually consistent — a stale seed only means folding a longer
  * gap for the same answer.
  */
-export function* askEventDocProjectAtEvent(modelId: string, eventId: string, functionsName: string): AskResponse<void> {
+export function* askEventDocProjectAtEvent(modelId: string, eventId: number, functionsName: string): AskResponse<void> {
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(functionsName);
   const seed = yield* askEventDocSnapshotSeedLatest(modelId, eventId);
 

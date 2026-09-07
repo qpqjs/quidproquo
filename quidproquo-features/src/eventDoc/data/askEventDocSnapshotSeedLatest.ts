@@ -24,7 +24,7 @@ import { askEventDocSnapshotStateResolve } from './askEventDocSnapshotStateResol
  * correctness input. A replica that has not caught up simply surfaces an older seed (or
  * none), and the fold does a little more work for the same answer.
  */
-export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: string): AskResponse<Nullable<EventDocSnapshotSeed>> {
+export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: number): AskResponse<Nullable<EventDocSnapshotSeed>> {
   const { snapshotsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 

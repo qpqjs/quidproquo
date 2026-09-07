@@ -4,41 +4,24 @@ import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocEvent } from '../models';
-import { askEventDocDocumentStateLatest } from './askEventDocDocumentStateLatest';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
  * The append path's pre-write gate: run the collection's registered `validateEvent`
- * against the document's current state and throw Invalid on a rejection, so the event
- * never enters the log. State resolves snapshot-seeded with a CONSISTENT event read (the
- * gate must see the writer's own just-landed appends — a draft-guard CreateDraft followed
- * immediately by the edit it unblocks).
+ * against `state` (the document as of the head the event will follow) and throw Invalid
+ * on a rejection, so the event never enters the log. The write that follows is
+ * conditional on that same head, which is what makes this verdict sound: if anything
+ * lands in between, the write fails and the caller validates again against the advanced
+ * state.
  *
- * A collection with no registered functions object — or one whose definition predates
- * `validateEvent` — skips the gate entirely (functions-missing), preserving write-and-go.
- * A doc with no state yet (its very first event) validates against no state only through
- * the registered validator's own tolerance: the resolver returns null state for an empty
- * log, and the gate skips — the INIT event has nothing to be validated against.
+ * A collection whose definition predates `validateEvent` (functions missing on the
+ * member) passes: there is no rule to apply.
  */
-export function* askEventDocValidateAppend(modelId: string, event: EventDocEvent): AskResponse<void> {
+export function* askEventDocValidateAppend(event: EventDocEvent, state: unknown): AskResponse<void> {
   const { storeName, type } = yield* askEventDocResolveStore();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
-  const stateAtHead = yield* askCatch(askEventDocDocumentStateLatest(modelId, { consistentRead: true }));
-
-  if (!stateAtHead.success) {
-    if (isEventDocFunctionsMissing(stateAtHead.error.errorType)) {
-      return;
-    }
-
-    return yield* askThrowError(stateAtHead.error.errorType, stateAtHead.error.errorText);
-  }
-
-  if (!stateAtHead.result) {
-    return;
-  }
-
-  const verdict = yield* askCatch(functionsCaller.validateEvent(event, stateAtHead.result.state));
+  const verdict = yield* askCatch(functionsCaller.validateEvent(event, state));
 
   if (!verdict.success) {
     if (isEventDocFunctionsMissing(verdict.error.errorType)) {
