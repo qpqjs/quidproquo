@@ -67,6 +67,9 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
         BatchWriteUnprocessedItemsError: () =>
           actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
+        // Unconditional batch puts can also race a transaction on one of their items.
+        TransactionConflictException: () =>
+          actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item is being written by a transaction'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound, error.message),
       });

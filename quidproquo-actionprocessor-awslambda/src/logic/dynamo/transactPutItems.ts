@@ -20,11 +20,14 @@ const TRANSACT_WRITE_MAX_ITEMS = 100;
 // re-lap the whole batch" - the earlier chunks' keys are now simply taken, by
 // them.
 //
-// The SDK reports a failed condition as TransactionCanceledException with a
-// ConditionalCheckFailed reason on the offending action; every other reason
-// (throttle, validation) is rethrown untouched. Re-throwing as the same-named
-// error the single-item putItem raises keeps ONE name for "conditional write
-// lost" in the processors' error tables.
+// The SDK reports a lost race as TransactionCanceledException with, per action,
+// either a ConditionalCheckFailed reason (the key already exists) or a
+// TransactionConflict reason (another write, transactional or not, holds the
+// item right now). Both mean the same thing to a caller claiming keys: someone
+// else got there, re-read and re-lap. Every other reason (throttle, validation)
+// is rethrown untouched. Re-throwing as the same-named error the single-item
+// putItem raises keeps ONE name for "conditional write lost" in the processors'
+// error tables.
 export async function transactPutItems(tableName: string, items: KvsObjectDataType[], partitionKeyAttribute: string, region: string): Promise<void> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
@@ -41,7 +44,7 @@ export async function transactPutItems(tableName: string, items: KvsObjectDataTy
     try {
       await dynamoDBClient.send(new TransactWriteItemsCommand({ TransactItems: transactItems }));
     } catch (error: unknown) {
-      if (isConditionalCheckCancellation(error)) {
+      if (isLostWriteRaceCancellation(error)) {
         throw new ConditionalCheckFailedException(`Conditional batch write to [${tableName}] lost to an existing item`);
       }
       throw error;
@@ -63,10 +66,13 @@ type TransactionCancelledLike = {
   CancellationReasons?: { Code?: string }[];
 };
 
-const isConditionalCheckCancellation = (error: unknown): boolean => {
+const LOST_RACE_REASONS = ['ConditionalCheckFailed', 'TransactionConflict'];
+
+const isLostWriteRaceCancellation = (error: unknown): boolean => {
   const cancelled = error as TransactionCancelledLike;
 
   return (
-    cancelled?.name === 'TransactionCanceledException' && !!cancelled.CancellationReasons?.some((reason) => reason.Code === 'ConditionalCheckFailed')
+    cancelled?.name === 'TransactionCanceledException' &&
+    !!cancelled.CancellationReasons?.some((reason) => !!reason.Code && LOST_RACE_REASONS.includes(reason.Code))
   );
 };
