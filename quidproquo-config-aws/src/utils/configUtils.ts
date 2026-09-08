@@ -1,4 +1,4 @@
-import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
 
 import {
   AccountBudgetQPQConfigSetting,
@@ -8,6 +8,7 @@ import {
   AwsDataStoreRemovalPolicy,
   AwsDataStoreRemovalPolicyQPQConfigSetting,
   AwsDyanmoOverrideForKvsQPQConfigSetting,
+  AwsGithubDeployRoleQPQConfigSetting,
   AwsKmsKeyQPQConfigSetting,
   AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
@@ -92,11 +93,22 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 export const getAccountBudgetConfigs = (qpqConfig: QPQConfig): AccountBudgetQPQConfigSetting[] =>
   qpqCoreUtils.getConfigSettings<AccountBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountBudget);
 
+/** Whether the account config declares the GitHub Actions OIDC provider. */
+export const isAccountGithubOidcProviderDeclared = (qpqConfig: QPQConfig): boolean =>
+  !!qpqCoreUtils.getConfigSetting(qpqConfig, QPQAwsConfigSettingType.accountGithubOidcProvider);
+
 export const getAccountSecurityServicesConfig = (qpqConfig: QPQConfig): AccountSecurityServicesQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<AccountSecurityServicesQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountSecurityServices);
 
 export const getAwsServiceDashboardConfig = (qpqConfig: QPQConfig): AwsServiceDashboardQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<AwsServiceDashboardQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceDashboard);
+
+/** The app's GitHub deploy role setting, null when the bootstrap config declares none. */
+export const getAwsGithubDeployRoleConfig = (qpqConfig: QPQConfig): Nullable<AwsGithubDeployRoleQPQConfigSetting> =>
+  qpqCoreUtils.getConfigSetting<AwsGithubDeployRoleQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsGithubDeployRole) ?? null;
+
+/** The account's GitHub Actions OIDC provider; one per account, created by `qpq setup`. */
+export const getGithubOidcProviderArn = (accountId: string): string => `arn:aws:iam::${accountId}:oidc-provider/token.actions.githubusercontent.com`;
 
 export const getBootstrapWafConfig = (qpqConfig: QPQConfig): BootstrapWafQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<BootstrapWafQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapWaf);

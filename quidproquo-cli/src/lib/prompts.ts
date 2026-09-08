@@ -27,8 +27,11 @@ export const promptText = async (message: string): Promise<string> => {
   return input({ message });
 };
 
-// A multi-select checkbox prompt over labelled values.
-export const promptCheckbox = async <T>(message: string, choices: { name: string; value: T }[]): Promise<T[]> => {
+// A multi-select checkbox prompt over labelled values; `checked` preselects a choice.
+export const promptCheckbox = async <T>(
+  message: string,
+  choices: { name: string; value: T; checked?: boolean; description?: string }[],
+): Promise<T[]> => {
   const { checkbox } = await import('@inquirer/prompts');
   return checkbox({ message, choices });
 };

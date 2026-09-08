@@ -7,6 +7,7 @@ import { QPQConfig } from 'quidproquo';
 import {
   AwsDataStoreRemovalPolicy,
   defineAccountBudget,
+  defineAccountGithubOidcProvider,
   defineAccountSecurityServices,
   defineAwsDataStoreRemovalPolicy,
 } from 'quidproquo-config-aws';
@@ -16,6 +17,9 @@ export default (): QPQConfig => [
   defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy),
 
   defineAccountBudget('main', 30, ['joecoady@gmail.com']),
+
+  // GitHub Actions OIDC provider, trusted by every app's deploy role in this account.
+  defineAccountGithubOidcProvider(),
 
   defineAccountSecurityServices({
     // GuardDuty is org-managed for this account

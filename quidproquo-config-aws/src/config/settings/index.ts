@@ -8,6 +8,7 @@ export * from './awsVirtualNetworkSettings';
 export * from './domainCertificate';
 export * from './emailSenderAllowList';
 export * from './eventBusQuickSubscription';
+export * from './githubDeployRole';
 export * from './organizations';
 export * from './serviceAccountInfo';
 export * from './waf';

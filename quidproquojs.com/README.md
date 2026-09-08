@@ -85,6 +85,9 @@ Every app-facing command (`prep`, `synth`, `go`, `go:docker`, `go:dev`, `go:dev:
 
 ```bash
 npm run deploy         # docker deploy (qpq go:docker)
+npx qpq setup          # new account/environment: checked steps (creds, IAM, zones, bucket names,
+                       # cdk bootstrap, account/domain/bootstrap stacks incl. the GitHub OIDC
+                       # provider + deploy role), run in order; then deploy services with go:docker
 npx qpq synth          # writes dist/apps/<app>/infrastructure/<svc>-config.json for cdk
 npx qpq go             # interactive aws deploy: pick app, services, stacks (inf/api/web/views)
                        # bundles (rspack production), cdk deploy, and s3 sync per phase
@@ -92,7 +95,7 @@ npx qpq go             # interactive aws deploy: pick app, services, stacks (inf
 
 `qpq go` needs AWS credentials plus a deploy identity: either an `"environments"` map in `apps/<app>/deploy.config.json` (`{ "prefix", "environments": { "<env>": { "accountId", "region" } } }`, selected with `--env <name>`) or the legacy `ENVIRONMENT` and `AWS_DEFAULT_*` env vars. App-specific bootstrap and account extras live in `apps/<app>/bootstrap.qpq.ts` and `apps/<app>/account.qpq.ts` as config fragments; the identity plumbing is provided by the generic CDK app in `quidproquo-deploy-awscdk`.
 
-- Production views bundles get prod remote URLs (`https://views.<feature>.<env>.<domain>/<svc>`) derived from `deploy.config.json` plus the service's qpq config. Dev bundles use localhost ports.
+- Production views bundles get prod remote URLs (the `views` host on the primary root, under the app's domain resolver) derived from the service's qpq config. Dev bundles use localhost ports.
 - `cdk.context.json` at the repo root is CDK's regenerable Route53 lookup cache. It is written on the first deploy, and checking it in means later synths need no live AWS lookups.
 
 ## Adding a service
