@@ -10,6 +10,7 @@ import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { closeHttpServerGracefully, isDevServerReady, processEvent } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
+import { toExpressEvent } from './toExpressEvent';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(
@@ -17,21 +18,6 @@ const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
     qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
     qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
   );
-
-// Raw string bodies pass through verbatim. Multer leaves multipart fields as an object, which
-// is re-serialised. body-parser sets `{}` when there was no body at all, where production
-// delivers undefined, so an empty object is undefined here too.
-const toEventBody = (req: Request): string | undefined => {
-  if (typeof req.body === 'string') {
-    return req.body;
-  }
-
-  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
-    return JSON.stringify(req.body);
-  }
-
-  return undefined;
-};
 
 const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const baseDomain = getServiceBaseDomain(qpqConfig, devServerConfig);
@@ -158,34 +144,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
     if (apiConfig) {
       console.log(`[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);
 
-      // Parsed from the raw url rather than `req.query`: express's extended parser turns
-      // `a[b]=1` into nested objects, which API Gateway never produces. Going through
-      // parseQueryString gives the same shape a route sees in production.
-      const [rawPath, rawQueryString = ''] = req.url.split('?');
-
-      const event: ExpressEvent = {
-        protocol: req.protocol,
-        host: req.get('host') || devServerConfig.serverDomain,
-        path: rawPath.substring(apiConfig.devPath.length),
-        ip: req.socket.remoteAddress || '127.0.0.1',
-        query: qpqWebServerUtils.parseQueryString(rawQueryString),
-        correlation: '',
-
-        headers: req.headers as {
-          [key: string]: undefined | string;
-        },
-        method: req.method,
-        isBase64Encoded: false,
-        body: toEventBody(req),
-      };
-
-      if (req.files) {
-        event.files = req.files.map((file: any) => ({
-          base64Data: file.buffer.toString('base64'),
-          filename: file.originalname,
-          mimetype: file.mimetype,
-        }));
-      }
+      const event = toExpressEvent(req, apiConfig.devPath, devServerConfig.serverDomain);
 
       const response = await processEvent<ExpressEvent, ExpressEventResponse>(
         event,
