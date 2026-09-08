@@ -4,6 +4,7 @@
 // packages. Dev-only remotes: everything points at
 // http://localhost:<port>/mf-manifest.json.
 import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { requireDomainResolver } from 'quidproquo-deploy-awscdk';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
@@ -104,23 +105,19 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
 
   const exposes = scanFederatedExposes(viewsDir);
   const qpqConfig = loadQpqConfig(viewsDir);
+  const domainResolver = qpqConfig ? requireDomainResolver(qpqConfig) : undefined;
 
-  // Prod remote base URLs: shell (the MF host app) at the root domain, every
-  // other service at views.<domainRoot>/<svc>. Domain comes from the
-  // app-scoped apps/<app>/deploy.config.json; environment/feature from the
-  // service's own QPQ config.
+  // Prod remote base URLs, baked to the PRIMARY root: shell (the MF host app) at
+  // the site root, every other service at <views host>/<svc>. Resolved with the
+  // app's resolver directly, since the `views` target belongs to shell's config.
   const getProdBaseUrl = (service: string): Nullable<string> => {
     try {
-      const deployConfig = JSON.parse(fs.readFileSync(path.join(root, 'apps', self.appName, 'deploy.config.json'), 'utf8'));
       if (!qpqConfig) {
         return null;
       }
-      const domainRoot = qpqWebServerUtils.getDomainRoot(
-        deployConfig.domain,
-        qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-        qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      );
-      return service === 'shell' ? `https://${domainRoot}` : `https://views.${domainRoot}/${service}`;
+      return service === 'shell'
+        ? `https://${qpqWebServerUtils.resolvePrimaryHost(qpqConfig, {}, domainResolver)}`
+        : `https://${qpqWebServerUtils.resolvePrimaryHost(qpqConfig, { subdomain: 'views' }, domainResolver)}/${service}`;
     } catch (e) {
       console.warn(`[views-rspack] no prod URL for ${service}:`, (e as Error).message);
       return null;

@@ -20,7 +20,7 @@ export default [
   ...defineAdminUserDirectory({ owner: { module: 'log' } }),
 
   // The admin dashboard backend, owned by the 'log' service
-  ...defineAdminSettings('log', 'example.com', {
+  ...defineAdminSettings('log', {
     logRetentionDays: 90,
     services: ['api', 'workers', 'web'],
   }),
@@ -32,7 +32,6 @@ export default [
 ```typescript
 function defineAdminSettings(
   logServiceName: string,
-  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig;
 ```
@@ -43,9 +42,6 @@ function defineAdminSettings(
 
 The name of the service that **owns** the admin resources. Owner-stamped settings (the log storage drives, the admin WebSocket event bus/queues, the key-value stores, the auth and log routes, the alarm pipeline, and the [session event doc](./admin-session-event-doc.md)) only flatten into deployable resources when the deploying service matches this name; elsewhere they resolve as foreign references. Owner resolution runs at IAM-scoping time.
 
-### `rootDomain` — `string` (required)
-
-The root domain the admin service is hosted on. Used to stand up the admin WebSocket endpoint (`defineWebSocketQueue`) under the `qpqadmin` subdomain of this domain.
 
 ### `advancedSettings` — `QPQConfigAdvancedLogSettings` (optional)
 
@@ -90,7 +86,7 @@ export default [
   ...defineAdminUserDirectory({ owner: { module: 'log' } }),
 
   // Retain logs 30 days, move to deep cold storage after 7.
-  ...defineAdminSettings('log', 'example.com', {
+  ...defineAdminSettings('log', {
     logRetentionDays: 30,
     coldStorageAfterDays: 7,
     services: ['api', 'workers'],

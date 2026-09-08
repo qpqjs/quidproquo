@@ -7,13 +7,12 @@ const runHandler = (event: Partial<APIGatewayEvent>) => getApiGatewayEventHandle
 
 describe('getApiGatewayEventHandler_redirect', () => {
   afterEach(() => {
-    delete process.env.redirectConfig;
-    delete process.env.environment;
-    delete process.env.featureEnvironment;
+    delete process.env.redirectBaseUrl;
+    delete process.env.appendPath;
   });
 
   it('redirects straight to an absolute url', async () => {
-    process.env.redirectConfig = JSON.stringify({ redirectUrl: 'https://example.com/go' });
+    process.env.redirectBaseUrl = JSON.stringify('https://example.com/go');
 
     const response = await runHandler({ path: '/ignored', queryStringParameters: null });
 
@@ -21,36 +20,17 @@ describe('getApiGatewayEventHandler_redirect', () => {
     expect(response.headers?.Location).toBe('https://example.com/go');
   });
 
-  it('builds a domain redirect preserving the request path', async () => {
-    process.env.redirectConfig = JSON.stringify({ redirectUrl: 'example.com' });
-    process.env.environment = JSON.stringify('production');
-
-    const response = await runHandler({ path: '/page', queryStringParameters: null });
-
-    expect(response.headers?.Location).toBe('https://example.com/page');
-  });
-
-  it('prefixes the environment for non-production domain redirects', async () => {
-    process.env.redirectConfig = JSON.stringify({ redirectUrl: 'example.com', addEnvironment: true });
-    process.env.environment = JSON.stringify('staging');
+  it('preserves the request path for a domain redirect', async () => {
+    process.env.redirectBaseUrl = JSON.stringify('https://staging.example.com');
+    process.env.appendPath = JSON.stringify(true);
 
     const response = await runHandler({ path: '/page', queryStringParameters: null });
 
     expect(response.headers?.Location).toBe('https://staging.example.com/page');
   });
 
-  it('prefixes the feature environment when configured', async () => {
-    process.env.redirectConfig = JSON.stringify({ redirectUrl: 'example.com', addFeatureEnvironment: true });
-    process.env.environment = JSON.stringify('production');
-    process.env.featureEnvironment = JSON.stringify('beta');
-
-    const response = await runHandler({ path: '/page', queryStringParameters: null });
-
-    expect(response.headers?.Location).toBe('https://beta.example.com/page');
-  });
-
   it('appends query string parameters to the redirect url', async () => {
-    process.env.redirectConfig = JSON.stringify({ redirectUrl: 'https://example.com' });
+    process.env.redirectBaseUrl = JSON.stringify('https://example.com');
 
     const response = await runHandler({ path: '/', queryStringParameters: { a: '1', b: 'two' } });
 

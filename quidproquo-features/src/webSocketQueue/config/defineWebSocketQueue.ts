@@ -53,7 +53,6 @@ export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
 export const defineWebSocketQueue = (
   eventBusName: string,
   apiName: string,
-  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedWebsocketQueueSettings,
 ): QPQConfig => {
   return [
@@ -72,7 +71,6 @@ export const defineWebSocketQueue = (
     // Actual web socket
     defineWebsocket(
       apiName,
-      rootDomain,
       {
         onConnect: getFeatureEntryQpqFunctionRuntime('webSocketQueue', 'webSocket', 'onWebsocketEvent::onConnect'),
         onDisconnect: getFeatureEntryQpqFunctionRuntime('webSocketQueue', 'webSocket', 'onWebsocketEvent::onDisconnect'),

@@ -46,11 +46,9 @@ describe('resolveDevServerConfig', () => {
 
     const resolved = resolveDevServerConfig(devServerConfig);
 
-    const [dns] = qpqWebServerUtils.getDnsConfigs(resolved.qpqConfigs[0]);
-    expect(dns.dnsBase).toBe('localhost:8080');
+    expect(qpqWebServerUtils.getRootDomains(resolved.qpqConfigs[0])).toEqual(['localhost:8080']);
 
     // The caller's configs are left alone; the localised ones are a copy
-    const [originalDns] = qpqWebServerUtils.getDnsConfigs(devServerConfig.qpqConfigs[0]);
-    expect(originalDns.dnsBase).toBe('quidproquojs.com');
+    expect(qpqWebServerUtils.getRootDomains(devServerConfig.qpqConfigs[0])).toEqual(['quidproquojs.com']);
   });
 });

@@ -4,18 +4,17 @@ import { QPQAwsConfigSettingType } from '../QPQConfig';
 import { defineDomainCertificate } from './domainCertificate';
 
 describe('defineDomainCertificate', () => {
-  it('builds a certificate setting keyed by rootDomain and region, defaulting includeApex to false', () => {
-    expect(defineDomainCertificate('example.com', 'us-east-1', ['api'])).toEqual({
+  it('builds a certificate setting keyed by region, defaulting includeApex to false', () => {
+    expect(defineDomainCertificate('us-east-1', [{ subdomain: 'api' }])).toEqual({
       configSettingType: QPQAwsConfigSettingType.awsDomainCertificate,
-      uniqueKey: 'example.com::us-east-1',
-      rootDomain: 'example.com',
+      uniqueKey: 'us-east-1',
       region: 'us-east-1',
-      subdomains: ['api'],
+      targets: [{ subdomain: 'api' }],
       includeApex: false,
     });
   });
 
   it('uses the supplied includeApex option', () => {
-    expect(defineDomainCertificate('example.com', 'us-east-1', [], { includeApex: true }).includeApex).toBe(true);
+    expect(defineDomainCertificate('us-east-1', [], { includeApex: true }).includeApex).toBe(true);
   });
 });

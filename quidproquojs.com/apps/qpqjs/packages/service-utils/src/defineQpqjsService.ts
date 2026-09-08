@@ -24,7 +24,7 @@ import {
 
 import { execSync } from 'child_process';
 import {
-  QPQJS_DOMAIN,
+  QPQJS_DOMAINS,
   QPQJS_USER_DIRECTORY,
   QpqjsServiceEnum,
   qpqjsServiceNames,
@@ -41,8 +41,7 @@ export const defineQpqjsService = (
   configRoot: string,
   apiBuildPath: string,
   apiLayers: ApiLayer[] = [],
-  lambdaMemoryInMiB = 1024,
-  domainName = QPQJS_DOMAIN
+  lambdaMemoryInMiB = 1024
 ): QPQConfig => [
   defineApplicationModule(
     modulePrefix,
@@ -59,7 +58,7 @@ export const defineQpqjsService = (
       .trim()}-${new Date().toISOString()}`
   ),
 
-  defineDns(domainName),
+  defineDns(QPQJS_DOMAINS),
 
   defineAdminUserDirectory({
     owner: {
@@ -112,7 +111,7 @@ export const defineQpqjsService = (
     sharedSingletons: ['chakra', 'zod'],
   }),
 
-  defineApi('api', domainName),
+  defineApi('api'),
   defineDefaultRouteOptions('api', {
     allowedOrigins: [
       'http://localhost:3080',
@@ -139,7 +138,7 @@ export const defineQpqjsService = (
     }
   ),
 
-  defineAdminSettings(QpqjsServiceEnum.Admin, QPQJS_DOMAIN, {
+  defineAdminSettings(QpqjsServiceEnum.Admin, {
     services: qpqjsServiceNames,
     coldStorageAfterDays: 90,
   }),

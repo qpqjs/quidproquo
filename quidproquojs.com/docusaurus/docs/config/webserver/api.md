@@ -7,13 +7,13 @@ description: Define an HTTP API — the public web endpoint (a custom subdomain 
 
 Defines an **API**: the public HTTP endpoint for a service. An API declares the subdomain and root domain the service is reachable on; every [route](./route.md) you declare in the same service is served under it. A service typically declares exactly one API.
 
-- **On AWS:** deploys a **regional API Gateway REST API** (`LambdaRestApi`, proxy mode, binary media types `*/*`) backed by a single Lambda that handles every route (`ApiQpqWebserverApiConstruct` in `quidproquo-deploy-awscdk`). The API is attached to a custom domain (`apiSubdomain.rootDomain`) via a base-path mapping keyed on the module name, so multiple modules can share one domain. Access logs (JSON, one-year retention) and CloudWatch metrics are enabled; a 5XX alarm is wired by default, plus 401/403 rate alarms when error notifications are configured. When WAF protection is enabled for the deploy, the shared regional Web ACL is associated with the stage.
+- **On AWS:** deploys a **regional API Gateway REST API** (`LambdaRestApi`, proxy mode, binary media types `*/*`) backed by a single Lambda that handles every route (`ApiQpqWebserverApiConstruct` in `quidproquo-deploy-awscdk`). The API is attached to a custom domain on every root declared with [defineDns](./dns.md) (the `{ subdomain: apiName }` target under the app's [domain resolver](../../domains.md)) via a base-path mapping keyed on the module name, so multiple modules can share one domain. Access logs (JSON, one-year retention) and CloudWatch metrics are enabled; a 5XX alarm is wired by default, plus 401/403 rate alarms when error notifications are configured. When WAF protection is enabled for the deploy, the shared regional Web ACL is associated with the stage.
 
 ```typescript
 import { defineApi } from 'quidproquo-webserver';
 
 export default [
-  defineApi('api', 'example.com'),
+  defineApi('api'),
 ];
 ```
 
@@ -24,7 +24,6 @@ This serves the service's routes at `https://api.<module-base>.example.com/<modu
 ```typescript
 function defineApi(
   apiName: string,
-  rootDomain: string,
   options?: QPQConfigAdvancedApiSettings,
 ): ApiQPQWebServerConfigSetting;
 ```
@@ -33,11 +32,8 @@ function defineApi(
 
 ### `apiName` — `string` (required)
 
-The API's name and its `uniqueKey` within the config. Unless overridden by `options.subDomain`, it is also the **subdomain** the API is served on (so `defineApi('api', 'example.com')` serves on `api.<...>.example.com`).
+The API's name and its `uniqueKey` within the config. Unless overridden by `options.subDomain`, it is also the **subdomain** the API is served on: the host is the `{ subdomain: apiName }` target resolved on each root (`api.development.example.com` with the default shape).
 
-### `rootDomain` — `string` (required)
-
-The root domain the API is hosted under, e.g. `'example.com'`. The deploy derives the full hostname from this plus the environment/feature and the API subdomain, so the same config deploys to multiple environments without collisions.
 
 ### `options` — `QPQConfigAdvancedApiSettings` (optional)
 
@@ -56,7 +52,7 @@ import { defineApi, defineRoute } from 'quidproquo-webserver';
 
 export default [
   // Serve on a custom subdomain, capped at 50 concurrent requests
-  defineApi('public', 'example.com', {
+  defineApi('public', {
     subDomain: 'api',
     maxConcurrentExecutions: 50,
   }),
@@ -71,5 +67,6 @@ export default [
 - [defineRoute](./route.md) — declares the individual method+path endpoints served under the API.
 - [defineDefaultRouteOptions](./default-route-options.md) — service-wide defaults (CORS, auth) merged into every route.
 - [defineServiceFunction](./service-function.md) — RPC-style callable functions, deployed as their own Lambdas rather than under the API.
-- [defineDomainCertificate](../config-aws/domain-certificate.md) — the ACM certificate for the API's domain (resolved with the same `rootDomain` prefixing).
+- [defineDns](./dns.md) — the roots the API's domain is created on.
+- [defineDomainCertificate](../config-aws/domain-certificate.md) — the ACM certificate covering the API's host on every root.
 - [defineWafProtection](../config-aws/waf-protection.md) — opt the API Gateway stage into the app's WAF web ACL.

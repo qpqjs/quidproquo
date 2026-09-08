@@ -11,12 +11,7 @@ import { closeHttpServerGracefully, isDevServerReady, processEvent } from '../lo
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
 
-const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
-  qpqWebServerUtils.getDomainRoot(
-    `${devServerConfig.serverDomain}:${devServerConfig.serverPort}`,
-    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-  );
+const getServiceBaseDomain = (devServerConfig: ResolvedDevServerConfig) => `${devServerConfig.serverDomain}:${devServerConfig.serverPort}`;
 
 // Raw string bodies pass through verbatim. Multer leaves multipart fields as an object, which
 // is re-serialised. body-parser sets `{}` when there was no body at all, where production
@@ -34,7 +29,7 @@ const toEventBody = (req: Request): string | undefined => {
 };
 
 const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
-  const baseDomain = getServiceBaseDomain(qpqConfig, devServerConfig);
+  const baseDomain = getServiceBaseDomain(devServerConfig);
 
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
@@ -216,7 +211,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
   });
 
   const httpServer = app.listen(devServerConfig.serverPort, '0.0.0.0', () => {
-    const baseDomain = getServiceBaseDomain(allServiceConfig[0], devServerConfig);
+    const baseDomain = getServiceBaseDomain(devServerConfig);
 
     console.log(`⚡️⚡️⚡️[Qpq - Dev Server]⚡️⚡️⚡️: Server is running at [http://${baseDomain}]`);
   });

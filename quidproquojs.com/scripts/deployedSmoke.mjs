@@ -8,22 +8,24 @@
 //   ACTIONS_ID_TOKEN_REQUEST_URL    provided by Actions when the job has id-token: write
 //   ACTIONS_ID_TOKEN_REQUEST_TOKEN  provided by Actions when the job has id-token: write
 //
-// The api url is derived, not configured: the apex domain comes from the app's
-// deploy.config.json, non-production environments are a subdomain of it, and
-// the api gateway maps each service under its own base path (see the
-// CfnBasePathMapping in quidproquo-deploy-awscdk's api construct):
+// The api url is derived, not configured: the primary root domain comes from the
+// app's constants package (the same value every service's defineDns reads),
+// non-production environments are a subdomain of it under the app's default
+// domain shape, and the api gateway maps each service under its own base path
+// (see the CfnBasePathMapping in quidproquo-deploy-awscdk's api construct):
 //   https://api.<environment>.<domain>/<service>
 
-import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { runSmokeRun } from './smoke/runSmokeRun.mjs';
 
 const SERVICE_NAME = 'test';
-const DEPLOY_CONFIG_PATH = join(
+// The built constants package: the deploy job builds the app before this runs.
+const DOMAIN_CONSTANTS_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
-  '../apps/qpqjs/deploy.config.json'
+  '../apps/qpqjs/packages/constants/dist/src/domain.js'
 );
 
 const log = (message) => console.log(`deployed-smoke: ${message}`);
@@ -42,9 +44,12 @@ const requireEnv = (name) => {
 };
 
 const deriveApiUrl = (environment) => {
-  const { domain } = JSON.parse(readFileSync(DEPLOY_CONFIG_PATH, 'utf8'));
+  const { QPQJS_DOMAINS } = createRequire(import.meta.url)(
+    DOMAIN_CONSTANTS_PATH
+  );
+  const [domain] = QPQJS_DOMAINS ?? [];
   if (!domain) {
-    fail(`no "domain" in ${DEPLOY_CONFIG_PATH}`);
+    fail(`no QPQJS_DOMAINS in ${DOMAIN_CONSTANTS_PATH}; build the app first`);
   }
   const envDomain =
     environment === 'production' ? domain : `${environment}.${domain}`;

@@ -26,6 +26,7 @@ export * from './QpqFunctionRuntime';
 export * from './QpqIsoDateTime';
 export * from './QpqLogger';
 export * from './QpqPagedData';
+export * from './QpqPureFunction';
 export * from './QueueEvent';
 export * from './Readonlyify';
 export * from './ScheduledEvent';

@@ -183,13 +183,13 @@ describe('cloudformation export names', () => {
   });
 
   it('builds the websocket api export name from the websocket config', () => {
-    const config = buildTestQpqConfig([defineWebsocket('ws', 'example.com', websocketEventProcessors)]);
+    const config = buildTestQpqConfig([defineWebsocket('ws', websocketEventProcessors)]);
 
     expect(getCFExportNameWebsocketApiIdFromConfig('api', config)).toBe('api-test-app-test-module-development-qpqwebsocket-api-id-export');
   });
 
   it('builds the websocket api id ssm parameter name from the websocket config', () => {
-    const config = buildTestQpqConfig([defineWebsocket('ws', 'example.com', websocketEventProcessors)]);
+    const config = buildTestQpqConfig([defineWebsocket('ws', websocketEventProcessors)]);
 
     expect(getWebsocketApiIdSsmParameterName('api', config)).toBe('/qpq/websocket/api-id/api-test-app-test-module-development');
   });

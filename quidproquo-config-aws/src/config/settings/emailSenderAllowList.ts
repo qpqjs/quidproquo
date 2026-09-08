@@ -3,8 +3,6 @@ import { QPQConfigSetting } from 'quidproquo-core';
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
 export interface EmailSenderAllowListQPQConfigSetting extends QPQConfigSetting {
-  rootDomain: string;
-
   allowedEmailAddresses: string[];
 }
 
@@ -16,16 +14,13 @@ export interface EmailSenderAllowListQPQConfigSetting extends QPQConfigSetting {
  * in the SES console (sandbox requires that anyway).
  *
  * This is an AWS-specific concession, not a portable email concept, hence it
- * lives in config-aws keyed by the `defineEmailSender` root domain rather than
- * on the webserver setting. Multiple calls for the same domain are additive.
- * Once the account has SES production access this setting does nothing useful
- * and can be deleted.
+ * lives in config-aws beside `defineEmailSender` rather than on the webserver
+ * setting. Multiple calls are additive. Once the account has SES production
+ * access this setting does nothing useful and can be deleted.
  */
-export const defineEmailSenderAllowList = (rootDomain: string, allowedEmailAddresses: string[]): EmailSenderAllowListQPQConfigSetting => ({
+export const defineEmailSenderAllowList = (allowedEmailAddresses: string[]): EmailSenderAllowListQPQConfigSetting => ({
   configSettingType: QPQAwsConfigSettingType.awsEmailSenderAllowList,
-  uniqueKey: rootDomain,
-
-  rootDomain,
+  uniqueKey: allowedEmailAddresses.join('|'),
 
   allowedEmailAddresses,
 });

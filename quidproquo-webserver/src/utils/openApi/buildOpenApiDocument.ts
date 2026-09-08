@@ -1,30 +1,26 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
+import { resolveHosts } from '../../domain/logic/host/resolveHosts';
+import { DomainResolver } from '../../domain/types/DomainResolver';
 import { OpenApiDocument, OpenApiPathItem, OpenApiSecurityScheme } from '../../types/OpenApiDocument';
 import { mergeAllRouteOptions } from '../mergeRouteUtils';
-import { getAllRoutes, getApiConfigs, getBaseDomainName, getDomainName } from '../qpqConfigAccessorsUtils';
+import { getAllRoutes, getApiConfigs } from '../qpqConfigAccessorsUtils';
 import { buildOpenApiOperation } from './buildOpenApiOperation';
 import { openApiSecuritySchemes } from './buildOpenApiSecurity';
 import { OpenApiDocumentOptions } from './OpenApiDocumentOptions';
 
 type HttpVerb = keyof OpenApiPathItem;
 
-// Every live api the service exposes is a server the operations can be called on.
-// Deployed, an api domain is shared by every service in the application and each
-// service is mounted under its module name (the api gateway base path mapping),
-// so the server url carries that path. A service with no domain (nothing
-// browser-facing, local only) lists none.
-const buildServers = (qpqConfig: QPQConfig): { url: string }[] => {
-  if (!getDomainName(qpqConfig)) {
-    return [];
-  }
-
-  const baseDomain = getBaseDomainName(qpqConfig);
+// Every live api on every root is a server the operations can be called on. Deployed, an
+// api domain is shared by every service in the application and each service is mounted
+// under its module name (the api gateway base path mapping), so the url carries that path.
+// A service with no domain (nothing browser-facing, local only) lists none.
+const buildServers = (qpqConfig: QPQConfig, resolver?: DomainResolver): { url: string }[] => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return getApiConfigs(qpqConfig)
     .filter((api) => !api.deprecated)
-    .map((api) => ({ url: `https://${api.apiSubdomain}.${baseDomain}/${serviceName}` }));
+    .flatMap((api) => resolveHosts(qpqConfig, { subdomain: api.apiSubdomain }, resolver).map((host) => ({ url: `https://${host}/${serviceName}` })));
 };
 
 // Only schemes some operation actually references make it into components, so a
@@ -42,7 +38,7 @@ const buildSecuritySchemes = (paths: Record<string, OpenApiPathItem>): Record<st
 
 // Walk every route in the config and describe it. Routes are plain data, so this
 // runs anywhere the config does: at deploy time, in a processor, or in a test.
-export const buildOpenApiDocument = (qpqConfig: QPQConfig, options: OpenApiDocumentOptions = {}): OpenApiDocument => {
+export const buildOpenApiDocument = (qpqConfig: QPQConfig, options: OpenApiDocumentOptions = {}, resolver?: DomainResolver): OpenApiDocument => {
   const paths: Record<string, OpenApiPathItem> = {};
 
   for (const route of getAllRoutes(qpqConfig)) {
@@ -62,7 +58,7 @@ export const buildOpenApiDocument = (qpqConfig: QPQConfig, options: OpenApiDocum
       version: options.version ?? '1.0.0',
       description: options.description,
     },
-    servers: buildServers(qpqConfig),
+    servers: buildServers(qpqConfig, resolver),
     paths,
     components: { securitySchemes: buildSecuritySchemes(paths) },
   };

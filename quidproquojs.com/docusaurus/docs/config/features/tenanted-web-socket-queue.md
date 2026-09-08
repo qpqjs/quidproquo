@@ -19,7 +19,7 @@ export default [
     routeAuthSettings: { userDirectoryName: 'users' },
   }),
 
-  defineTenantedWebSocketQueue('my-event-bus', 'api', 'example.com', {
+  defineTenantedWebSocketQueue('my-event-bus', 'api', {
     userDirectoryName: 'users',
   }),
 ];
@@ -31,7 +31,6 @@ export default [
 function defineTenantedWebSocketQueue(
   eventBusName: string,
   apiName: string,
-  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedTenantedWebsocketQueueSettings,
 ): QPQConfig;
 ```
@@ -40,7 +39,7 @@ function defineTenantedWebSocketQueue(
 
 ## Parameters
 
-Same as [defineWebSocketQueue](./web-socket-queue.md#parameters): `eventBusName`, `apiName`, `rootDomain`, and `advancedSettings` (without `connectionScopeResolver`, which this always sets to `TENANT_CONNECTION_SCOPE_RESOLVER_FN`).
+Same as [defineWebSocketQueue](./web-socket-queue.md#parameters): `eventBusName`, `apiName`, and `advancedSettings` (without `connectionScopeResolver`, which this always sets to `TENANT_CONNECTION_SCOPE_RESOLVER_FN`).
 
 ## Returns
 

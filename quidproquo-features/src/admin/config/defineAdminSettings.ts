@@ -69,7 +69,7 @@ const calculateLogRetentionDays = (advancedSettings?: QPQConfigAdvancedLogSettin
   return Math.max(advancedSettings.logRetentionDays, coldStorageExtension);
 };
 
-export const defineAdminSettings = (logServiceName: string, rootDomain: string, advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
+export const defineAdminSettings = (logServiceName: string, advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
       userDirectoryName: adminUserDirectoryResourceName,
@@ -99,7 +99,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
       },
     ),
 
-    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', rootDomain, {
+    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', {
       userDirectoryName: adminUserDirectoryResourceName,
       owner: { module: logServiceName },
     }),

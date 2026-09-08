@@ -53,7 +53,7 @@ import { defineSeo, defineWebEntry } from 'quidproquo-webserver';
 export default [
   defineWebEntry('website', {
     buildPath: './web/dist',
-    domain: { onRootDomain: true, rootDomain: 'example.com' },
+    domain: { onRootDomain: true },
   }),
 
   // Render product pages server-side for crawlers & link previews

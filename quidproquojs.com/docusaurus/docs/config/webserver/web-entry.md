@@ -17,7 +17,6 @@ export default [
     buildPath: './web/dist',
     domain: {
       onRootDomain: true,
-      rootDomain: 'example.com',
     },
   }),
 ];
@@ -60,13 +59,11 @@ The web entry's name and `uniqueKey`. This is the name you pass to [askWebEntryI
 export interface WebDomainOptions {
   subDomainName?: string;
   onRootDomain: boolean;
-  rootDomain: string;
 }
 ```
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `rootDomain` | `string` | The apex/root domain to host under, e.g. `'example.com'`. The ACM certificate and Route 53 hosted zone are resolved from this. |
 | `onRootDomain` | `boolean` | Serve on the apex domain itself (`example.com`). |
 | `subDomainName` | `string` (optional) | Serve on a subdomain instead of / in addition to the apex, e.g. `'app'` → `app.example.com`. |
 
@@ -112,7 +109,6 @@ export default [
     ignoreCache: ['index.html', 'remoteEntry.js', 'mf-manifest.json'],
     domain: {
       onRootDomain: true,
-      rootDomain: 'example.com',
     },
   }),
 ];
@@ -126,7 +122,6 @@ const options: QPQConfigAdvancedWebEntrySettings = {
   domain: {
     subDomainName: 'views',
     onRootDomain: false,
-    rootDomain: 'example.com',
   },
   storageDrive: {
     sourceStorageDrive: 'views',

@@ -14,15 +14,20 @@ export const importStackValue = (uniqueKey: string): string => {
   return cdk.Fn.importValue(uniqueKey);
 };
 
-export const applyEnvironmentTags = (scope: IConstruct, qpqConfig: QPQConfig) => {
+/** App-level tags for resources the bootstrap phase owns, which has an application but no module. */
+export const applyApplicationTags = (scope: IConstruct, qpqConfig: QPQConfig) => {
   cdk.Tags.of(scope).add('environment', qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig));
   cdk.Tags.of(scope).add('application', qpqCoreUtils.getApplicationName(qpqConfig));
-  cdk.Tags.of(scope).add('module', qpqCoreUtils.getApplicationModuleName(qpqConfig));
 
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
   if (feature) {
     cdk.Tags.of(scope).add('feature', feature);
   }
+};
+
+export const applyEnvironmentTags = (scope: IConstruct, qpqConfig: QPQConfig) => {
+  applyApplicationTags(scope, qpqConfig);
+  cdk.Tags.of(scope).add('module', qpqCoreUtils.getApplicationModuleName(qpqConfig));
 };
 
 // applyEnvironmentTags stamps these on every owned resource, so a single

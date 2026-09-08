@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { defineWebEntry, WebDomainOptions } from './webEntry';
 
-const domain: WebDomainOptions = { rootDomain: 'example.com', onRootDomain: true };
+const domain: WebDomainOptions = { onRootDomain: true };
 
 describe('defineWebEntry', () => {
   it('applies index, storage drive, compression and cache defaults', () => {

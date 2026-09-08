@@ -337,15 +337,20 @@ describe('getOwnedAwsAlarmConfigs', () => {
 
 describe('getDomainCertificateConfigs', () => {
   it('returns the defined certificate settings', () => {
-    const config = buildTestQpqConfig([defineDomainCertificate('example.com', 'us-east-1', ['api'])]);
+    const config = buildTestQpqConfig([defineDomainCertificate('us-east-1', [{ subdomain: 'api' }])]);
 
     expect(getDomainCertificateConfigs(config)).toHaveLength(1);
   });
 });
 
 describe('getDomainCertificateArnSsmParameterName', () => {
-  it('builds an ssm parameter name with the dots in the root domain sanitized to dashes', () => {
-    expect(getDomainCertificateArnSsmParameterName('us-east-1', 'sub.example.com')).toBe('/qpq/domain/certificate-arn/us-east-1/sub-example-com');
+  it('keys the parameter by region, app and environment, with the feature when present', () => {
+    expect(getDomainCertificateArnSsmParameterName('us-east-1', buildTestQpqConfig())).toBe(
+      '/qpq/domain/certificate-arn/us-east-1/test-app-development',
+    );
+    expect(getDomainCertificateArnSsmParameterName('us-east-1', buildTestQpqConfig([], { feature: 'joe' }))).toBe(
+      '/qpq/domain/certificate-arn/us-east-1/test-app-development-joe',
+    );
   });
 });
 

@@ -95,11 +95,10 @@ Each handler is a `QpqFunctionRuntime` — a reference to a story entry point, u
 ```typescript
 export type AuthDirectoryDnsRecord = {
   subdomain: string;
-  rootDomain: string;
 };
 ```
 
-Attaches a Cognito custom domain (`subdomain.rootDomain`) to the pool and creates the matching Route 53 alias record. Because Cognito custom domains run on CloudFront, the ACM certificate is looked up in `us-east-1`.
+Attaches a Cognito custom domain to the pool and creates the matching Route 53 alias record. A pool has one custom domain, so it lives on the **primary** root from [defineDns](../webserver/dns.md) (the `{ subdomain }` target under the app's domain resolver). Because Cognito custom domains run on CloudFront, the ACM certificate is looked up in `us-east-1`.
 
 ## Custom auth runtime
 
@@ -167,7 +166,7 @@ export default [
   // Required MFA served from a custom domain
   defineUserDirectory('staff', {
     mfa: { mode: UserDirectoryMfaMode.required },
-    dnsRecord: { subdomain: 'auth', rootDomain: 'example.com' },
+    dnsRecord: { subdomain: 'auth' },
   }),
 
   // Authenticate against a directory owned by another service

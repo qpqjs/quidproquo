@@ -16,7 +16,6 @@ export default [
   defineDomainProxy('marketing-proxy', {
     httpProxyDomain: 'origin.internal.example.com',
     domain: {
-      rootDomain: 'example.com',
       onRootDomain: true,
     },
     domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -53,7 +52,6 @@ Unique name for this proxy (the config's `uniqueKey`). Used to derive the distri
 
 ```typescript
 export interface DomainProxyDomainOptions {
-  rootDomain: string;
   subDomainNames?: string[];
   onRootDomain: boolean;
 }
@@ -61,7 +59,6 @@ export interface DomainProxyDomainOptions {
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `rootDomain` | `string` | The root domain (matches the service's [`dnsBase`](./dns.md)); the apex is resolved from it with the usual environment/feature prefixing, and the hosted zone is looked up in Route53. |
 | `subDomainNames` | `string[]` | Subdomains to serve, each expanded to `<subDomain>.<apex>`. An `A` alias record is created for each. |
 | `onRootDomain` | `boolean` | When `true` and no subdomains are given, the distribution also answers on the apex domain itself. |
 
@@ -91,7 +88,6 @@ export default [
   defineDomainProxy('api-proxy', {
     httpProxyDomain: 'backend.example.net',
     domain: {
-      rootDomain: 'example.com',
       subDomainNames: ['api', 'api-v2'],
       onRootDomain: false,
     },
@@ -104,6 +100,6 @@ export default [
 
 ## Related
 
-- [defineDns](./dns.md) — declares the `rootDomain` this proxy attaches to.
+- [defineDns](./dns.md) — declares the roots this proxy is served on.
 - [defineCertificate](./certificate.md) — related certificate configuration (the proxy uses the central certificate).
 - [defineSubdomainRedirect](./subdomain-redirect.md) — redirect a subdomain instead of proxying it.

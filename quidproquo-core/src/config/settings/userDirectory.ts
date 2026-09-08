@@ -5,7 +5,6 @@ import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
 
 export type AuthDirectoryDnsRecord = {
   subdomain: string;
-  rootDomain: string;
 };
 
 export enum UserDirectoryMfaMode {

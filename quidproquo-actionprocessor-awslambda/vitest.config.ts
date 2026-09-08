@@ -12,6 +12,7 @@ export default defineConfig({
     // (instanceof) consistent across every module in the test process.
     alias: {
       'quidproquo-core': fileURLToPath(new URL('../quidproquo-core/src/index.ts', import.meta.url)),
+      'quidproquo-webserver': fileURLToPath(new URL('../quidproquo-webserver/src/index.ts', import.meta.url)),
       // The tracer is deep-imported as lib/commonjs/traceStoryExecution (so lambda
       // bundles skip the node package's root index); map it to its source too.
       'quidproquo-actionprocessor-node/lib/commonjs/traceStoryExecution': fileURLToPath(

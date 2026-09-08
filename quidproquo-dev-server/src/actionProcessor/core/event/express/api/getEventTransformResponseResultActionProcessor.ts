@@ -2,6 +2,7 @@ import {
   actionResult,
   askEventTransformResponseResultBase,
   createActionProcessor,
+  DynamicModuleLoader,
   EitherActionResult,
   ErrorTypeEnum,
   EventActionType,
@@ -40,10 +41,14 @@ const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
   );
 };
 
-const getProcessTransformResponseResult =
-  (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> =>
+const getProcessTransformResponseResult = async (
+  qpqConfig: QPQConfig,
+  loader: DynamicModuleLoader,
+): Promise<ProcessorFor<typeof askEventTransformResponseResultBase>> => {
+  const domainResolver = await qpqWebServerUtils.loadDomainResolver(qpqConfig, loader);
+
   // We might need to JSON.stringify the body.
-  async ({ eventParams: rawEventParams, qpqEventRecordResponses }) => {
+  return async ({ eventParams: rawEventParams, qpqEventRecordResponses }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const eventParams = rawEventParams as EventInput;
@@ -56,7 +61,7 @@ const getProcessTransformResponseResult =
 
     const recordHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, expressEvent.headers),
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, expressEvent.headers, domainResolver),
       ...recordHeaders,
     };
 
@@ -67,6 +72,7 @@ const getProcessTransformResponseResult =
       headers,
     });
   };
+};
 
 export const getEventTransformResponseResultActionProcessor = createActionProcessor(
   askEventTransformResponseResultBase,

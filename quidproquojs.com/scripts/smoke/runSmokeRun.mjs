@@ -4,7 +4,7 @@
 //
 // Target-agnostic on purpose. The two callers differ only in the api url they
 // resolve, which each derives for itself:
-//   deployedSmoke.mjs  the just-deployed environment, from deploy.config.json
+//   deployedSmoke.mjs  the just-deployed environment, from the app domain constant
 //   localSmoke.mjs     a dev server it started, on localhost
 //
 // Both talk to the same routes over the same protocol with the same token, so

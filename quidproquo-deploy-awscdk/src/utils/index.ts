@@ -1,3 +1,4 @@
+export * from './domain';
 export * from './javascriptRuntimeUtils';
 export * from './logRetentionUtils';
 export * from './path';

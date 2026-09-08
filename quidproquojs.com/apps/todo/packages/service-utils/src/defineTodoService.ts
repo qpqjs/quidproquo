@@ -22,7 +22,7 @@ import {
 
 import { execSync } from 'child_process';
 import {
-  TODO_DOMAIN,
+  TODO_DOMAINS,
   TODO_USER_DIRECTORY,
   TodoServiceEnum,
   todoServiceNames,
@@ -52,8 +52,7 @@ export const defineTodoService = (
   configRoot: string,
   apiBuildPath: string,
   apiLayers: ApiLayer[] = [],
-  lambdaMemoryInMiB = 1024,
-  domainName = TODO_DOMAIN
+  lambdaMemoryInMiB = 1024
 ): QPQConfig => [
   defineApplicationModule(
     modulePrefix,
@@ -66,7 +65,7 @@ export const defineTodoService = (
 
   defineApplicationVersion(`${getVersionTag()}-${new Date().toISOString()}`),
 
-  defineDns(domainName),
+  defineDns(TODO_DOMAINS),
 
   defineAdminUserDirectory({
     owner: {
@@ -99,7 +98,7 @@ export const defineTodoService = (
     sharedSingletons: ['chakra', 'zod'],
   }),
 
-  defineApi('api', domainName),
+  defineApi('api'),
   defineDefaultRouteOptions('api', {
     allowedOrigins: [
       'http://localhost:3080',
@@ -128,7 +127,7 @@ export const defineTodoService = (
     }
   ),
 
-  defineAdminSettings(TodoServiceEnum.Admin, TODO_DOMAIN, {
+  defineAdminSettings(TodoServiceEnum.Admin, {
     services: todoServiceNames,
     coldStorageAfterDays: 90,
   }),

@@ -14,7 +14,6 @@ import {
   RouteQPQWebServerConfigSetting,
   SeoQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
-  StorageDriveCorsSettingsQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
 } from '../config';
@@ -68,18 +67,17 @@ export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRunt
 // Used in bundlers to know where and what to build and index
 // Events, routes, etc
 export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
+  // The domain resolver pointer is a QpqPureFunction, structurally an advanced runtime, so
+  // the same loader bundles and serves it.
+  const domainResolver = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns)?.resolver;
+
   return qpqCoreUtils.expandSrcEntriesWithActionProcessors([
     ...getAllRoutes(configs).map((r) => r.runtime),
     ...getAllSeo(configs).map((seo) => seo.runtime),
     ...getAllServiceFunctions(configs).map((sf) => sf.runtime),
     ...getAllWebsocketSrcEntries(configs),
+    ...(domainResolver ? [domainResolver] : []),
   ]);
-};
-
-export const getDomainName = (configs: QPQConfig): string => {
-  const dnsSettings = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns);
-
-  return dnsSettings?.dnsBase || '';
 };
 
 export const getWebEntry = (configs: QPQConfig): string => {
@@ -117,10 +115,6 @@ export const getApiConfigs = (configs: QPQConfig): ApiQPQWebServerConfigSetting[
   return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Api);
 };
 
-export const getDnsConfigs = (configs: QPQConfig): DnsQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns);
-};
-
 export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConfigSetting[] => {
   return qpqCoreUtils.getConfigSettings<WebEntryQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.WebEntry);
 };
@@ -156,76 +150,6 @@ export const getCacheConfigByName = (cacheConfigName: string, qpqConfig: QPQConf
   return cacheSetting;
 };
 
-export const getEnvironmentDomainName = (configs: QPQConfig): string => {
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(configs);
-  const apexDomainName = getDomainName(configs);
-
-  if (environment === 'production') {
-    return apexDomainName;
-  }
-
-  return `${environment}.${apexDomainName}`;
-};
-
-export const getBaseDomainName = (qpqConfig: QPQConfig): string => {
-  const environmentDomain = getEnvironmentDomainName(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  if (feature) {
-    return `${feature}.${environmentDomain}`;
-  }
-
-  return environmentDomain;
-};
-
-export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const domainBase = getBaseDomainName(qpqConfig);
-
-  return `${service}.${domainBase}`;
-};
-
-/**
- * Resolve browser CORS origins for a service resource. An explicit list wins;
- * otherwise scope to this service's own domain (apex + one-level subdomain
- * wildcard, which S3/CloudFront both support). Falls back to '*' only when the
- * service declares no domain at all (nothing browser-facing).
- *
- * Note: key off the raw dns base (`getDomainName`) to detect "no domain" —
- * `getBaseDomainName` still returns an env prefix like `development.` here.
- */
-export const resolveServiceScopedCorsAllowedOrigins = (qpqConfig: QPQConfig, explicitOrigins?: string[]): string[] => {
-  if (explicitOrigins) {
-    return explicitOrigins;
-  }
-
-  if (!getDomainName(qpqConfig)) {
-    return ['*'];
-  }
-
-  const baseDomain = getBaseDomainName(qpqConfig);
-  return [`https://${baseDomain}`, `https://*.${baseDomain}`];
-};
-
-/**
- * Browser origins allowed to read/write a storage drive's objects cross-origin
- * (e.g. presigned uploads/downloads), looked up by the drive's name. An explicit
- * `defineStorageDriveCorsSettings` wins; otherwise the service-scoped default.
- */
-export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageDriveName: string): string[] => {
-  const corsSetting = qpqCoreUtils
-    .getConfigSettings<StorageDriveCorsSettingsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.StorageDriveCorsSettings)
-    .find((setting) => setting.storageDriveName === storageDriveName);
-
-  return resolveServiceScopedCorsAllowedOrigins(qpqConfig, corsSetting?.allowedOrigins);
-};
-
-/**
- * Whether any web entry in this service serves its assets from the named storage
- * drive (`storageDrive.sourceStorageDrive`) — i.e. the drive's bucket is a
- * CloudFront origin. Drives with no web entry consumer need no CloudFront access
- * to their bucket at all.
- */
 export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveName: string): boolean => {
   return getWebEntryConfigs(qpqConfig).some((webEntry) => webEntry.storageDrive.sourceStorageDrive === storageDriveName);
 };
@@ -251,31 +175,6 @@ export const getFileUploadSettings = (qpqConfig: QPQConfig): FileUploadSettings 
   };
 };
 
-export const resolveApexDomainNameFromDomainConfig = (qpqConfig: QPQConfig, rootDomain: string, onRootDomain: boolean): string => {
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-
-  const apexDomain = onRootDomain
-    ? getDomainRoot(rootDomain, environment, feature)
-    : constructServiceDomainName(rootDomain, environment, qpqCoreUtils.getApplicationModuleName(qpqConfig), feature);
-
-  return apexDomain;
-};
-
-export const constructServiceDomainName = (rootDomain: string, environment: string, service: string, feature?: string) => {
-  const domainBase = getDomainRoot(rootDomain, environment, feature);
-
-  return `${service}.${domainBase}`;
-};
-
-export const constructEnvironmentDomainName = (environment: string, domain: string): string => {
-  if (environment === 'production') {
-    return domain;
-  }
-
-  return `${environment}.${domain}`;
-};
-
 export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptionsQPQWebServerConfigSetting[] => {
   const defaultRouteSettings =
     qpqCoreUtils.getConfigSettings<DefaultRouteOptionsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.DefaultRouteOptions) || [];
@@ -283,30 +182,8 @@ export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptio
   return defaultRouteSettings;
 };
 
-export const getDomainRoot = (rootDomain: string, environment: string, feature?: string): string => {
-  let domainPrefix = environment !== 'production' ? `${environment}.` : '';
-  if (feature) {
-    domainPrefix = `${feature}.${domainPrefix}`;
-  }
-
-  return `${domainPrefix}${rootDomain}`;
-};
-
-export const resolveDomainRoot = (rootDomain: string, qpqConfig: QPQConfig): string => {
-  const domain = getDomainRoot(
-    rootDomain,
-    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-  );
-
-  return domain;
-};
-
 export const getEmailSenderSettings = (qpqConfig: QPQConfig): EmailSenderQPQWebServerConfigSetting[] => {
-  const emailSenderSettings =
-    qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
-
-  return emailSenderSettings;
+  return qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
 };
 
 export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {

@@ -6,7 +6,6 @@ import { ResponseSecurityHeaders } from '../types/ResponseSecurityHeaders';
 export interface WebDomainOptions {
   subDomainName?: string;
   onRootDomain: boolean;
-  rootDomain: string;
 }
 
 export interface StorageDriveOptions {
