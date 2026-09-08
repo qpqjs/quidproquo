@@ -1,4 +1,8 @@
-import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
+import {
+  askNetworkRequest,
+  askOpenApiGetDocument,
+  AskResponse,
+} from 'quidproquo';
 
 import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
 

@@ -22,7 +22,8 @@ export const echo = dynamicRoute(
   {
     schema: {
       summary: 'Echo a path and body value',
-      description: 'Returns the {pathValue} url segment and the bodyValue from the JSON body, untouched. Public, for trying the docs UI.',
+      description:
+        'Returns the {pathValue} url segment and the bodyValue from the JSON body, untouched. Public, for trying the docs UI.',
       tags: ['echo'],
       body: EchoRequestSchema,
       response: EchoResponseSchema,
