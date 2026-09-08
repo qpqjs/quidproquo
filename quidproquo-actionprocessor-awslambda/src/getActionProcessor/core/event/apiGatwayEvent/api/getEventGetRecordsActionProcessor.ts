@@ -8,7 +8,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
-import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
+import { FileUploadErrorTypeEnum, HTTPEvent, HttpEventQuery, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { EventInput, InternalEventRecord } from './types';
@@ -35,7 +35,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       query: {
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
         ...(apiGatewayEvent.queryStringParameters || {}),
-      } as { [key: string]: undefined | string | string[] },
+      } as HttpEventQuery,
       body: apiGatewayEvent.body === null ? undefined : apiGatewayEvent.body,
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as HTTPMethod,

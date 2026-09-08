@@ -8,6 +8,11 @@ export interface HttpEventRouteParams {
   [key: string]: string;
 }
 
+// The parsed query string, in the shape API Gateway delivers it: a key seen once is a
+// string, a key repeated is a string[]. Every runtime (Lambda, Lambda@Edge, the dev
+// server) produces this same shape so a story can read the query the same way anywhere.
+export type HttpEventQuery = { [key: string]: undefined | string | string[] };
+
 export enum FileUploadErrorTypeEnum {
   fileTooLarge = 'fileTooLarge',
   tooManyFiles = 'tooManyFiles',
@@ -23,7 +28,7 @@ export interface HTTPEventFileUploadError {
 
 export interface HTTPEvent {
   path: string;
-  query: { [key: string]: undefined | string | string[] };
+  query: HttpEventQuery;
   body?: string;
   headers: HttpEventHeaders;
   method: HTTPMethod;
