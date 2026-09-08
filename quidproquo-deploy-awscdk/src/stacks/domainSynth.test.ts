@@ -13,6 +13,7 @@ import { DomainQpqWebserverApiConstruct } from '../constructs/feature/webserver/
 import { convertContentSecurityPolicy } from '../constructs/feature/webserver/webEntry/utils/securityHeaders';
 import { domainScopedId, resolveHostedZoneForHost } from '../utils/domain';
 import { createDomainCertificateStacks } from './createDomainCertificateStacks';
+import { DomainQpqServiceStack } from './DomainQpqServiceStack';
 
 // The hyphenated resolver as a pointer the config can carry, written where ts-node
 // would find an app's own.
@@ -112,6 +113,26 @@ describe('DomainQpqWebserverApiConstruct', () => {
 
     template.hasResourceProperties('AWS::ApiGateway::DomainName', { DomainName: 'development-api.example.com' });
     expect(resolveHostedZoneForHost(qpqConfig, 'development-api.example.com')).toBe('example.com');
+  });
+});
+
+describe('DomainQpqServiceStack', () => {
+  it('creates the api gateway service-linked role first and makes every api domain wait for it', () => {
+    const template = Template.fromStack(new DomainQpqServiceStack(new App(), 'test-domain', { qpqConfig: buildConfig('example.com') }));
+
+    template.hasResourceProperties('Custom::AWS', {
+      Create: Match.serializedJson(
+        Match.objectLike({
+          service: 'IAM',
+          action: 'createServiceLinkedRole',
+          parameters: { AWSServiceName: 'ops.apigateway.amazonaws.com' },
+          ignoreErrorCodesMatching: 'InvalidInput',
+        }),
+      ),
+    });
+
+    const [customResourceId] = Object.keys(template.findResources('Custom::AWS'));
+    template.hasResource('AWS::ApiGateway::DomainName', { DependsOn: Match.arrayWith([customResourceId]) });
   });
 });
 
