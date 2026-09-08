@@ -252,6 +252,12 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
           cachePolicy: seoCachePolicy,
+          // Without an origin request policy CloudFront strips the query string before the
+          // origin-request function runs, so the seo story would never see it. This managed
+          // policy forwards every query string and header except Host (forwarding Host
+          // breaks the S3 origin), and being managed it counts nothing against the
+          // account's origin-request-policy limit.
+          originRequestPolicy: aws_cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
           viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           compress: props.webEntryConfig.compressFiles,
           edgeLambdas: [
