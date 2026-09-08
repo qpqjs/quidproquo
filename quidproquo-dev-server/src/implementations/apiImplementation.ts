@@ -158,12 +158,17 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
     if (apiConfig) {
       console.log(`[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);
 
+      // Parsed from the raw url rather than `req.query`: express's extended parser turns
+      // `a[b]=1` into nested objects, which API Gateway never produces. Going through
+      // parseQueryString gives the same shape a route sees in production.
+      const [rawPath, rawQueryString = ''] = req.url.split('?');
+
       const event: ExpressEvent = {
         protocol: req.protocol,
         host: req.get('host') || devServerConfig.serverDomain,
-        path: req.url.substring(apiConfig.devPath.length).split('?')[0],
+        path: rawPath.substring(apiConfig.devPath.length),
         ip: req.socket.remoteAddress || '127.0.0.1',
-        query: req.query as { [key: string]: undefined | string | string[] },
+        query: qpqWebServerUtils.parseQueryString(rawQueryString),
         correlation: '',
 
         headers: req.headers as {
