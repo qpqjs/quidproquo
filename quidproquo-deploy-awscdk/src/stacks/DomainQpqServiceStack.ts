@@ -3,6 +3,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
+import { ApiGatewayServiceLinkedRole } from '../constructs/basic/ApiGatewayServiceLinkedRole';
 import { DomainQpqWebserverApiConstruct } from '../constructs/feature/webserver/api/DomainQpqWebserverApiConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { createDomainCertificateStacks } from './createDomainCertificateStacks';
@@ -20,14 +21,20 @@ export class DomainQpqServiceStack extends QpqServiceStack {
     const certStacks = createDomainCertificateStacks(scope, props.qpqConfig, id);
     certStacks.forEach((certStack) => this.addDependency(certStack));
 
-    // Regional API Gateway custom DomainName + A record, one per defineApi entry.
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
-      (setting) =>
-        new DomainQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
+    // The first api domain in a fresh account needs API Gateway's service-linked role to exist.
+    const serviceLinkedRole = new ApiGatewayServiceLinkedRole(this, 'apigateway-service-linked-role', {
+      qpqConfig: props.qpqConfig,
+    });
 
-          apiConfig: setting,
-        }),
-    );
+    // Regional API Gateway custom DomainName + A record, one per defineApi entry.
+    qpqWebServerUtils.getApiConfigs(props.qpqConfig).map((setting) => {
+      const api = new DomainQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        qpqConfig: props.qpqConfig,
+
+        apiConfig: setting,
+      });
+      api.node.addDependency(serviceLinkedRole);
+      return api;
+    });
   }
 }
