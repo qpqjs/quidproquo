@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.1.20
+
+- webserver/deploy-awscdk: domains are redone around a root list and an app-owned resolver. `defineDns` takes one or more root domains plus a `QpqPureFunction` pointer to a `DomainResolver` that decides every hostname; the tooling requires it at synth and the runtime loads it on demand. Every domain-bearing construct (api, websocket, cdn, redirects, email) now deploys on every root, one certificate per region covers all of them, and `rootDomain` disappears from the define helpers
+- webserver/features: openapi document generation. A dynamic route can declare zod `schema.body`/`schema.query` and its handler receives the validated `input`; `askOpenApiGetDocument` builds the document from the route config, `defineOpenApiRoutes` mounts it alongside a reference page, and each server url is mounted under the service module name. The old `defineOpenApi` spec setting is gone
+- features: event-doc ids are contiguous numbers again. Appends claim a run of consecutive slots with a conditional batch write, lose cleanly to a concurrent writer, and re-fold the gap before retrying; `askEventDocValidateAppend` takes the folded state instead of resolving it. Smoke tests cover concurrent and interleaved batch appends
+- core/actionprocessor-awslambda/dev-server: `askKeyValueStoreUpsertMany` gains `ifNotExists`, an all-or-nothing batch insert that runs as a DynamoDB transaction on lambda and a sqlite transaction locally. Upsert error mapping now separates `WriteContention` (a transient race against an in-flight transaction, safe to retry) from `Conflict` (the item exists), and `askKeyValueStoreUpsertWithRetry` re-laps on contention
+- config-aws/deploy-awscdk/cli: GitHub Actions can deploy over OIDC. `defineAccountGithubOidcProvider` (account stack) and `defineAwsGithubDeployRole` (bootstrap) create a role trusted only for the repo's immutable ids with deploy-scoped permissions instead of admin. The new `qpq setup` command walks a fresh account through identity, cdk bootstrap, hosted zones, buckets, the oidc provider and the deploy role, checking each step
+- deploy-awscdk: the api gateway service-linked role is created before any custom domain, so a fresh account's first custom-domain deploy no longer fails with "Access denied to certificate"
+- dev-server: json and form bodies reach service routes as the raw string, exactly as API Gateway delivers them, so a route parses and rejects its own body on the production code path; configs are localised once for every plugin, so a story in a queue or schedule worker derives urls on the dev origin rather than the deployed domain
+- cli: `--keep-other-dev-servers` on dev start skips the pre-start port sweep
+- features: admin log metadata falls back to the session from `GetStorySession`, so stories that never set an access token still record who ran them
+- qpqjs reference app (the create-qpq-app template): smoke tests run in parallel via one queue message per test, and the deployed smoke script runs its edge checks against every root domain
+
+### Breaking changes
+
+- `defineDns` takes `rootDomains` plus a resolver pointer; `rootDomain` is removed from `defineApi`, `defineWebsocket`, `defineEmailSender`, the web/proxy domain options, `defineUserDirectory`'s `dnsRecord` and the features wrappers
+- `getDomainName`, `getDomainRoot`, `getServiceDomainName` and the other old domain helpers, plus `askGetDomainRoot`, are removed; use `getRootDomains`, `resolveHosts`, `resolvePrimaryHost` and `askDnsResolveHosts`
+- `defineDomainCertificate` is now `(region, targets, options?)`, one certificate per region under an app-keyed SSM parameter; old per-root cert stacks are orphans to delete by hand
+- `defineEmailSenderAllowList` takes only the address list; `getEmailSenderAllowedAddresses` drops its domain argument
+- `defineSubdomainRedirect`'s `addEnvironment`/`addFeatureEnvironment` no longer prefix the target; a bare root redirects to the resolver's site root
+- `deploy.config.json` and `QpqAppDeployContext` lose `domain`; roots live only in `defineDns`
+- `SubdomainName` (deploy-awscdk) takes `{ target, rootDomain }`; domain constructs now create resources on every root, extra roots with `-<root>` suffixed ids
+- `askKeyValueStoreUpsert`/`askKeyValueStoreUpsertMany` throw the new `WriteContention` for a lost transaction race instead of `Conflict`; catch both
+- `defineOpenApi`, `askGetOpenApiSpec`, `OpenApiSpecActionType` and `getAllOpenApiSpecs` are removed
+- `dynamicRoute`, `createRouteDefinition` and `createTenantedRouteDefinition` take a `DynamicRouteConfig` (`{ knownErrors, schema? }`) instead of a bare known-errors map
+- `EventDocEventMetadata.eventId` is a `number` again instead of a sortable-guid string
+- `askEventDocValidateAppend` takes `(event, state)` instead of `(modelId, event)`
+- `defineAwsGithubDeployRole` no longer trusts the name-form OIDC subject by default (opt in with `trustNameForm`) and the role drops from AdministratorAccess to deploy-only permissions
+
 ## 0.1.19
 
 - core: `defineRecurringSchedule` takes a structured `ScheduleRecurrence` (`everyMinutes`, `everyHours`, `dailyAtUtc`, `weeklyAtUtc`, `monthlyAtUtc`) instead of an AWS cron string, and rejects intervals that can't be scheduled evenly at config time. Cron rendering now lives only in deploy-awscdk, so the dev server fires the same schedules locally on the minute
