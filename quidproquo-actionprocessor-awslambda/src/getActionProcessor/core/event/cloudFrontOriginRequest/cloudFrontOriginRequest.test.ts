@@ -10,10 +10,11 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-const buildCloudFrontRequest = (uri: string): any => ({
+const buildCloudFrontRequest = (uri: string, querystring: string = ''): any => ({
   cf: {
     request: {
       uri,
+      querystring,
       method: 'GET',
       clientIp: '9.9.9.9',
       body: undefined,
@@ -40,6 +41,14 @@ describe('cloudFrontOriginRequest getEventGetRecordsActionProcessor', () => {
       headers: { host: 'example.com' },
       query: {},
     });
+  });
+
+  it('parses the request query string, with repeated keys as arrays', async () => {
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+
+    const [records] = await processor({ eventParams: [{ Records: [buildCloudFrontRequest('/page', 'a=1&tag=x&tag=y')] }, context] });
+
+    expect((records as any[])[0].query).toEqual({ a: '1', tag: ['x', 'y'] });
   });
 });
 
