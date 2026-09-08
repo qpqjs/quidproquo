@@ -26,6 +26,7 @@ Running `qpq` with no command opens an interactive menu. Every command also take
 
 | Command | Does |
 | --- | --- |
+| `qpq setup` | Prepares a cloud environment for its first deploy: checks every step (credentials, IAM, hosted zones, bucket names, CDK bootstrap, then the account, domain and bootstrap stacks with the GitHub OIDC provider and deploy role they create), shows what is already in place, and runs the ones you tick in order. Services are deployed afterwards with `qpq go` or `qpq go:docker`. `--check` only reports, `--yes` runs everything, `--only <ids>` a subset |
 | `qpq go [svc] [stack]` | Deploys services. Interactive unless you pass the positional args |
 | `qpq go:docker` | The same, but deploys in parallel via docker |
 | `qpq synth [service]` | Synthesises the configs to `dist/apps/<app>/infrastructure` without deploying |

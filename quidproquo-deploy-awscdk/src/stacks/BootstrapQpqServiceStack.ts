@@ -3,7 +3,12 @@ import { qpqCoreUtils } from 'quidproquo-core';
 
 import { Construct } from 'constructs';
 
-import { BootstrapQpqCoreVirtualNetworkConstruct, QpqBootstrapConfigAwsOrganizationConstruct, QpqBootstrapConfigWafConstruct } from '../constructs';
+import {
+  BootstrapQpqCoreVirtualNetworkConstruct,
+  QpqBootstrapConfigAwsOrganizationConstruct,
+  QpqBootstrapConfigGithubDeployRoleConstruct,
+  QpqBootstrapConfigWafConstruct,
+} from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
@@ -37,6 +42,15 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
     );
 
     // Account-level resources (cloud trail, budgets, security services) live in AccountQpqStack
+
+    const githubDeployRoleConfig = qpqConfigAwsUtils.getAwsGithubDeployRoleConfig(props.qpqConfig);
+    if (githubDeployRoleConfig) {
+      new QpqBootstrapConfigGithubDeployRoleConstruct(this, 'github-deploy-role', {
+        qpqConfig: props.qpqConfig,
+
+        githubDeployRoleConfig,
+      });
+    }
 
     const wafConfig = qpqConfigAwsUtils.getBootstrapWafConfig(props.qpqConfig);
     if (wafConfig) {
