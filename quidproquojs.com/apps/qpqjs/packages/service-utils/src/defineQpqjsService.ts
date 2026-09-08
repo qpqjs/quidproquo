@@ -11,10 +11,10 @@ import {
 } from 'quidproquo';
 import {
   ApiLayer,
+  AwsDataStoreRemovalPolicy,
+  defineAwsDataStoreRemovalPolicy,
   defineAwsServiceAccountInfo,
   defineWafProtection,
-  AwsDataStoreRemovalPolicy,
-  defineAwsDataStoreRemovalPolicy 
 } from 'quidproquo-config-aws';
 import {
   defineAdminSettings,
@@ -150,5 +150,5 @@ export const defineQpqjsService = (
   }),
 
   // turning this off is super painful for maintaince, dont be a nubbet.
-  defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)
+  defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy),
 ];
