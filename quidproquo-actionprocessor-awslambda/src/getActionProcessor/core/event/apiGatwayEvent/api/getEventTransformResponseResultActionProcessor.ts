@@ -2,9 +2,9 @@ import {
   actionResult,
   askEventTransformResponseResultBase,
   createActionProcessor,
+  DynamicModuleLoader,
   EitherActionResult,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   QPQError,
@@ -50,7 +50,12 @@ const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
   );
 };
 
-const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
+const getProcessTransformResponseResult = async (
+  qpqConfig: QPQConfig,
+  loader: DynamicModuleLoader,
+): Promise<ProcessorFor<typeof askEventTransformResponseResultBase>> => {
+  const domainResolver = await qpqWebServerUtils.loadDomainResolver(qpqConfig, loader);
+
   // We might need to JSON.stringify the body.
   return async ({ eventParams: rawEventParams, qpqEventRecordResponses: rawQpqEventRecordResponses }) => {
     // Registered for one event source only, so the base requester's
@@ -75,7 +80,7 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
     // Add the cors headers
     const currentHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, apiGatewayEvent.headers),
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, apiGatewayEvent.headers, domainResolver),
       ...currentHeaders,
     };
 

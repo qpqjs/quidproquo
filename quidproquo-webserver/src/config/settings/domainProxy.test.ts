@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { defineDomainProxy, DomainProxyDomainOptions, DomainProxyViewerProtocolPolicy } from './domainProxy';
 
-const domain: DomainProxyDomainOptions = { rootDomain: 'example.com', onRootDomain: true };
+const domain: DomainProxyDomainOptions = { onRootDomain: true };
 
 describe('defineDomainProxy', () => {
   it('builds a DomainProxy setting defaulting ignoreCache to an empty array', () => {

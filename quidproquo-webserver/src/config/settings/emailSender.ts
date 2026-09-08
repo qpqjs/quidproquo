@@ -2,15 +2,10 @@ import { QPQConfigSetting } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface EmailSenderQPQWebServerConfigSetting extends QPQConfigSetting {
-  rootDomain: string;
-}
+export type EmailSenderQPQWebServerConfigSetting = QPQConfigSetting;
 
-export const defineEmailSender = (rootDomain: string): EmailSenderQPQWebServerConfigSetting => {
-  return {
-    configSettingType: QPQWebServerConfigSettingType.EmailSender,
-    uniqueKey: rootDomain,
-
-    rootDomain,
-  };
-};
+/** Sends from the app's root domains (defineDns); one per service. */
+export const defineEmailSender = (): EmailSenderQPQWebServerConfigSetting => ({
+  configSettingType: QPQWebServerConfigSettingType.EmailSender,
+  uniqueKey: 'emailSender',
+});

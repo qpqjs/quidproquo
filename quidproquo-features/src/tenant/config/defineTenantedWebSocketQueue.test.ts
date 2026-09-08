@@ -8,7 +8,7 @@ import { defineTenantedWebSocketQueue } from './defineTenantedWebSocketQueue';
 
 describe('defineTenantedWebSocketQueue', () => {
   it('pre-wires the tenant scope resolution as the connection scope resolver', () => {
-    const config = defineTenantedWebSocketQueue('chat-bus', 'chat', 'example.com');
+    const config = defineTenantedWebSocketQueue('chat-bus', 'chat');
 
     const resolverGlobal = config.find(
       (setting) =>
@@ -20,7 +20,7 @@ describe('defineTenantedWebSocketQueue', () => {
   });
 
   it('forwards the remaining advanced settings to defineWebSocketQueue', () => {
-    const config = defineTenantedWebSocketQueue('chat-bus', 'chat', 'example.com', { userDirectoryName: 'users' });
+    const config = defineTenantedWebSocketQueue('chat-bus', 'chat', { userDirectoryName: 'users' });
 
     // Same shape as defineWebSocketQueue: four globals, a connection kvs and a websocket.
     expect(config).toHaveLength(6);

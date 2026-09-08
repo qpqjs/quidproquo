@@ -2,9 +2,13 @@ import { DomainCertificateQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo
 import { QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { aws_certificatemanager, aws_iam, aws_route53, aws_ssm, Stack } from 'aws-cdk-lib';
+import { aws_certificatemanager, aws_iam, aws_ssm, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
+
+import { requireDomainResolver } from '../appWorkspace/requireDomainResolver';
+import { lookupHostedZone, resolveHostedZoneForHost } from '../utils/domain';
+import { applyApplicationTags } from '../utils/qpqDeployAwsCdkUtils';
 
 export interface DomainCertificateStackProps {
   qpqConfig: QPQConfig;
@@ -13,24 +17,38 @@ export interface DomainCertificateStackProps {
   stackName?: string;
 }
 
-const buildDomainNames = (resolvedApex: string, certificateConfig: DomainCertificateQPQConfigSetting): string[] => {
-  const subdomainFqdns = certificateConfig.subdomains.map((s) => `${s}.${resolvedApex}`);
-  if (certificateConfig.includeApex) {
-    return [resolvedApex, ...subdomainFqdns];
+// ACM's default quota for names on one certificate; a synth error beats a deploy failure.
+const acmDomainNamesPerCertificateQuota = 10;
+
+const buildDomainNames = (qpqConfig: QPQConfig, certificateConfig: DomainCertificateQPQConfigSetting): string[] => {
+  const resolver = requireDomainResolver(qpqConfig);
+  const targets = [...(certificateConfig.includeApex ? [{}] : []), ...certificateConfig.targets];
+  const domainNames = [...new Set(targets.flatMap((target) => qpqWebServerUtils.resolveHosts(qpqConfig, target, resolver)))];
+
+  if (domainNames.length === 0) {
+    throw new Error(`defineDomainCertificate("${certificateConfig.region}", ...) must declare at least one target, or set includeApex: true`);
   }
-  if (subdomainFqdns.length === 0) {
+
+  if (domainNames.length > acmDomainNamesPerCertificateQuota) {
     throw new Error(
-      `defineDomainCertificate("${certificateConfig.rootDomain}", "${certificateConfig.region}", ...) ` +
-        `must declare at least one subdomain, or set includeApex: true`,
+      `The ${certificateConfig.region} certificate needs ${domainNames.length} names (${domainNames.join(', ')}) but ACM allows ` +
+        `${acmDomainNamesPerCertificateQuota} per certificate by default; request a quota increase or declare fewer targets/roots`,
     );
   }
-  return subdomainFqdns;
+
+  return domainNames;
 };
 
+/**
+ * One certificate per region covering every root, DNS-validated in each name's own zone,
+ * ARN published to SSM in the deploy region under the app-keyed parameter name. RETAIN:
+ * a change to the name set replaces the cert while distributions may still reference the
+ * old ARN until they redeploy; retired certs are cleaned up by hand.
+ */
 export class DomainCertificateStack extends Stack {
   public readonly certificate: aws_certificatemanager.ICertificate;
   public readonly certRegion: string;
-  public readonly resolvedApex: string;
+  public readonly domainNames: string[];
 
   constructor(scope: Construct, id: string, props: DomainCertificateStackProps) {
     const deployAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
@@ -46,26 +64,27 @@ export class DomainCertificateStack extends Stack {
     });
 
     this.certRegion = certRegion;
+    this.domainNames = buildDomainNames(props.qpqConfig, props.certificateConfig);
 
-    // Apply the same environment + feature prefixing that defineApi / webEntry rootDomain
-    // fields go through, so `rootDomain: "example.com"` in a dev env resolves to
-    // `development.example.com` — matching what API Gateway / CloudFront end up using.
-    this.resolvedApex = qpqWebServerUtils.resolveDomainRoot(props.certificateConfig.rootDomain, props.qpqConfig);
-
-    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
-      domainName: this.resolvedApex,
-    });
-
-    const domainNames = buildDomainNames(this.resolvedApex, props.certificateConfig);
+    const hostedZones = Object.fromEntries(
+      this.domainNames.map((domainName) => [domainName, lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainName))]),
+    );
 
     const certificate = new aws_certificatemanager.Certificate(this, 'cert', {
-      domainName: domainNames[0],
-      subjectAlternativeNames: domainNames.slice(1),
-      validation: aws_certificatemanager.CertificateValidation.fromDns(hostedZone),
+      domainName: this.domainNames[0],
+      subjectAlternativeNames: this.domainNames.slice(1),
+      validation: aws_certificatemanager.CertificateValidation.fromDnsMultiZone(hostedZones),
     });
+    // ACM certificate names are immutable, so adding, removing or reshaping a root replaces
+    // the cert. Distributions and api domains keep referencing the old ARN until their own
+    // stacks redeploy, and ACM refuses to delete an in-use cert, so without RETAIN this
+    // update fails at cleanup and rolls back. Retained certs never expire away: list the
+    // app's unused ones by these tags and delete them once every service has redeployed.
+    certificate.applyRemovalPolicy(RemovalPolicy.RETAIN);
+    applyApplicationTags(certificate, props.qpqConfig);
     this.certificate = certificate;
 
-    const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion, props.certificateConfig.rootDomain);
+    const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion, props.qpqConfig);
 
     if (certRegion === deployRegion) {
       new aws_ssm.StringParameter(this, 'arn-ssm', {
@@ -87,7 +106,7 @@ export class DomainCertificateStack extends Stack {
       };
 
       new AwsCustomResource(this, 'arn-ssm-xregion', {
-        // Plain SSM put/deleteParameter — Lambda's built-in SDK is plenty; don't
+        // Plain SSM put/deleteParameter: Lambda's built-in SDK is plenty; don't
         // npm-install the latest SDK at runtime (slow cold starts, needs internet).
         installLatestAwsSdk: false,
         onCreate: sdkCall,

@@ -25,31 +25,31 @@ const findOwnedGlobal = (config: QPQConfig, service: string, key: string): unkno
 
 describe('defineAdminSettings', () => {
   it('leaves the log retention undefined when no retention is configured', () => {
-    const config = defineAdminSettings('log', 'example.com');
+    const config = defineAdminSettings('log');
 
     expect(findOwnedGlobal(config, 'log', 'qpq-log-retention-days')).toBeUndefined();
   });
 
   it('keeps the configured retention when no cold storage is set', () => {
-    const config = defineAdminSettings('log', 'example.com', { logRetentionDays: 30 });
+    const config = defineAdminSettings('log', { logRetentionDays: 30 });
 
     expect(findOwnedGlobal(config, 'log', 'qpq-log-retention-days')).toBe(30);
   });
 
   it('pads retention by 180 days past the cold-storage window', () => {
-    const config = defineAdminSettings('log', 'example.com', { logRetentionDays: 30, coldStorageAfterDays: 10 });
+    const config = defineAdminSettings('log', { logRetentionDays: 30, coldStorageAfterDays: 10 });
 
     expect(findOwnedGlobal(config, 'log', 'qpq-log-retention-days')).toBe(190);
   });
 
   it('exposes the configured service names to the admin', () => {
-    const config = defineAdminSettings('log', 'example.com', { services: ['billing', 'auth'] });
+    const config = defineAdminSettings('log', { services: ['billing', 'auth'] });
 
     expect(findOwnedGlobal(config, 'log', 'qpq-serviceNames')).toEqual(['billing', 'auth']);
   });
 
   it('includes the core admin log stores', () => {
-    const config = defineAdminSettings('log', 'example.com');
+    const config = defineAdminSettings('log');
 
     const kvsNames = findLogServiceSettings(config, 'log')
       .filter((s) => s.configSettingType === QPQCoreConfigSettingType.keyValueStore)
@@ -59,7 +59,7 @@ describe('defineAdminSettings', () => {
   });
 
   it('includes the action search stores and routes on the log service', () => {
-    const config = defineAdminSettings('log', 'example.com');
+    const config = defineAdminSettings('log');
     const logSettings = findLogServiceSettings(config, 'log');
 
     const kvsNames = logSettings
@@ -78,7 +78,7 @@ describe('defineAdminSettings', () => {
   });
 
   it('defines the admin session event doc stores on the log service', () => {
-    const config = defineAdminSettings('log', 'example.com');
+    const config = defineAdminSettings('log');
 
     const kvsNames = findLogServiceSettings(config, 'log')
       .filter((s) => s.configSettingType === QPQCoreConfigSettingType.keyValueStore)
@@ -89,7 +89,7 @@ describe('defineAdminSettings', () => {
   });
 
   it('mounts the session routes under /v1/admin/session', () => {
-    const config = defineAdminSettings('log', 'example.com');
+    const config = defineAdminSettings('log');
 
     const logSettings = findLogServiceSettings(config, 'log') as (QPQConfigSetting & { path?: string; method?: string })[];
     const routePaths = logSettings.filter((s) => typeof s.path === 'string').map((s) => `${s.method} ${s.path}`);

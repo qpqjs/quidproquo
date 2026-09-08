@@ -1,6 +1,5 @@
 {
   "prefix": "qpqjs",
-  "domain": "quidproquojs.com",
   "environments": {
     "development": {
       "platform": "aws",

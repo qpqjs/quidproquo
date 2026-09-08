@@ -18,7 +18,6 @@ export interface QpqAppDeployEnvironment {
 
 export interface QpqAppDeployConfig {
   prefix: string;
-  domain: string;
 
   // environment name -> where it deploys. Owning this here (not env vars) is
   // what lets `qpq go --env production` need no AWS_DEFAULT_* variables.
@@ -32,7 +31,6 @@ export interface QpqAppDeployContext {
   appDir: string;
 
   prefix: string;
-  domain: string;
 
   environment: string;
   accountId: string;
@@ -44,8 +42,9 @@ export interface QpqAppDeployContext {
 export const getQpqAppDeployConfig = (root: string, appName: string): QpqAppDeployConfig => {
   const configPath = path.join(root, 'apps', appName, 'deploy.config.json');
   if (!fs.existsSync(configPath)) {
-    throw new Error(`Missing ${configPath} — create it with { "prefix": "...", "domain": "...", "environments": { ... } }`);
+    throw new Error(`Missing ${configPath} — create it with { "prefix": "...", "environments": { ... } }`);
   }
+
   return JSON.parse(fs.readFileSync(configPath, 'utf8'));
 };
 
@@ -73,7 +72,6 @@ export const getQpqAppDeployContext = (
     appDir: path.join(root, 'apps', appName),
 
     prefix: deployConfig.prefix,
-    domain: deployConfig.domain,
 
     environment,
     accountId,

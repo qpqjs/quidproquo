@@ -1,6 +1,5 @@
 {
   "prefix": "todo",
-  "domain": "todo.quidproquojs.com",
   "environments": {
     "development": {
       "platform": "docker"

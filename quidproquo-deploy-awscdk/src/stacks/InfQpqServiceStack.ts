@@ -3,6 +3,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
+import { requireDomainResolver } from '../appWorkspace/requireDomainResolver';
 import {
   QpqCoreAiConstruct,
   QpqCoreApiGraphDatabaseConstruct,
@@ -42,7 +43,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
           storageDriveConfig: setting,
 
-          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(props.qpqConfig, setting.storageDrive),
+          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(
+            props.qpqConfig,
+            setting.storageDrive,
+            requireDomainResolver(props.qpqConfig),
+          ),
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
         }),
     );

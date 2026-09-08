@@ -18,7 +18,7 @@ Next steps:
 ${install}  npm run dev        # api on http://localhost:8080, web on http://localhost:3080
   npm run deploy     # build the docker image (then run the printed docker command)
 
-Deploy config lives in apps/${answers.appName}/deploy.config.json (domain: ${answers.domain}).
+Deploy config lives in apps/${answers.appName}/deploy.config.json; the domain (${answers.domain}) lives in the app's constants package.
 `);
   },
 };

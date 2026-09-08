@@ -12,7 +12,6 @@ export enum DomainProxyViewerProtocolPolicy {
 }
 
 export interface DomainProxyDomainOptions {
-  rootDomain: string;
   subDomainNames?: string[];
   onRootDomain: boolean;
 }

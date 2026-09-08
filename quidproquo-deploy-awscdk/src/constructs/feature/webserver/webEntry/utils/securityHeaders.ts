@@ -5,7 +5,6 @@ import {
   ContentSecurityPolicyEntry,
   HeadersFrameOption,
   HeadersReferrerPolicy,
-  QpqServiceContentSecurityPolicy,
   qpqWebServerUtils,
   ResponseHeadersContentSecurityPolicy,
   ResponseHeadersContentTypeOptions,
@@ -18,6 +17,8 @@ import {
 
 import { aws_cloudfront } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+
+import { requireDomainResolver } from '../../../../../appWorkspace/requireDomainResolver';
 
 export const convertStrictTransportSecurity = (
   strictTransportSecurity?: ResponseHeadersStrictTransportSecurity,
@@ -37,30 +38,6 @@ export const convertStrictTransportSecurity = (
     includeSubdomains: strictTransportSecurity.includeSubdomains,
     preload: strictTransportSecurity.preload,
   };
-};
-
-export const convertContentSecurityPolicyEntryToString = (qpqConfig: QPQConfig, contentSecurityPolicyEntry: ContentSecurityPolicyEntry): string => {
-  if (typeof contentSecurityPolicyEntry === 'string') {
-    return contentSecurityPolicyEntry;
-  }
-
-  // Otherwise its a QpqServiceContentSecurityPolicy
-  const scsp: QpqServiceContentSecurityPolicy = contentSecurityPolicyEntry;
-  const webDomain = scsp.domain || qpqWebServerUtils.getDomainName(qpqConfig);
-
-  const featureDomain = qpqWebServerUtils.getDomainRoot(
-    webDomain,
-    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-  );
-
-  const fullDomain = scsp.service ? `${scsp.api}.${scsp.service}.${featureDomain}` : `${scsp.api}.${featureDomain}`;
-
-  if (scsp.protocol) {
-    return `${scsp.protocol}://${fullDomain}`;
-  }
-
-  return fullDomain;
 };
 
 // Builds the exact virtual-hosted S3 endpoints the browser needs in `connect-src`
@@ -88,6 +65,8 @@ export const convertContentSecurityPolicy = (
   qpqConfig: QPQConfig,
   contentSecurityPolicy?: ResponseHeadersContentSecurityPolicy,
 ): aws_cloudfront.ResponseHeadersContentSecurityPolicy | undefined => {
+  const domainResolver = requireDomainResolver(qpqConfig);
+
   if (!contentSecurityPolicy) {
     return {
       contentSecurityPolicy: "default-src 'self'; object-src 'none'",
@@ -106,7 +85,12 @@ export const convertContentSecurityPolicy = (
   return {
     contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
       .map((directive) =>
-        [directive, ...contentSecurityPolicyCopy[directive].map((cspe) => convertContentSecurityPolicyEntryToString(qpqConfig, cspe))].join(' '),
+        [
+          directive,
+          ...contentSecurityPolicyCopy[directive].flatMap((entry) =>
+            qpqWebServerUtils.resolveContentSecurityPolicyEntry(qpqConfig, entry, domainResolver),
+          ),
+        ].join(' '),
       )
       .join('; '),
     override: contentSecurityPolicy.override,

@@ -1,18 +1,19 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { DomainTarget, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_apigateway, aws_certificatemanager, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } from '../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { lookupDomainCertificate } from './DomainCertificateLookup';
 
 export interface SubdomainNameProps extends QpqConstructBlockProps {
-  subdomain: string;
-  apexDomain: string;
+  target: DomainTarget;
   rootDomain: string;
 }
 
+/** A regional API Gateway custom domain plus its A record, for one target on one root. */
 export class SubdomainName extends QpqConstructBlock {
   public readonly domainName: aws_apigateway.DomainName;
   public readonly certificate: aws_certificatemanager.ICertificate;
@@ -22,20 +23,12 @@ export class SubdomainName extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: SubdomainNameProps) {
     super(scope, id, props);
 
-    this.deployDomain = `${props.subdomain}.${props.apexDomain}`;
+    this.deployDomain = resolveDeployHostForRoot(props.qpqConfig, props.rootDomain, props.target);
 
-    // Always look up the root hosted zone (e.g. development.quidproquojs.com), not
-    // a per-service sub-zone. The FQDN may include the service name (e.g.
-    // ws.shell.development.quidproquojs.com) but the A record lives in the root zone.
-    const hostedZoneDomain = qpqWebServerUtils.resolveDomainRoot(props.rootDomain, props.qpqConfig);
-    const apexHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
-      domainName: hostedZoneDomain,
-    });
+    const hostedZone = lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, this.deployDomain));
 
-    // Regional API Gateway custom domains need a cert in the deploy region.
-    // Look it up from SSM, written by the matching DomainCertificateStack during the domain phase.
     const deployRegion = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
-    this.certificate = lookupDomainCertificate(this, deployRegion, props.rootDomain, props.subdomain);
+    this.certificate = lookupDomainCertificate(this, deployRegion, props.qpqConfig, id);
 
     this.domainName = new aws_apigateway.DomainName(this, 'domain-name', {
       domainName: this.deployDomain,
@@ -47,15 +40,9 @@ export class SubdomainName extends QpqConstructBlock {
     this.targetARecord = aws_route53.RecordTarget.fromAlias(new aws_route53_targets.ApiGatewayDomain(this.domainName));
 
     new aws_route53.ARecord(this, 'a-record', {
-      zone: apexHostedZone,
+      zone: hostedZone,
       recordName: this.deployDomain,
       target: this.targetARecord,
     });
-
-    // // Export the names so we can import them later
-    // new cdk.CfnOutput(this, 'HostedZoneID', {
-    //   value: apexHostedZone.hostedZoneId,
-    //   exportName: `${apexHostedZone}-hosted-zone-id`,
-    // });
   }
 }

@@ -6,7 +6,7 @@ import {
 import { defineDevServerOptions } from 'quidproquo-dev-server/config';
 import { defineDynamicRoutes } from 'quidproquo-features';
 
-import { QPQJS_DOMAIN, QpqjsServiceEnum } from '@qpqjs/constants';
+import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineQpqjsService } from '@qpqjs/service-utils';
 
 import * as dynamicRoutes from './entry/controller';
@@ -23,7 +23,6 @@ const webEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   cacheSettingsName: 'default',
   domain: {
     onRootDomain: true,
-    rootDomain: QPQJS_DOMAIN,
   },
   storageDrive: {
     sourceStorageDrive: websiteWebEntryStorageDriveName,
@@ -40,7 +39,6 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   domain: {
     subDomainName: 'views',
     onRootDomain: true,
-    rootDomain: QPQJS_DOMAIN,
   },
   storageDrive: {
     sourceStorageDrive: mfeHostWebEntryStorageDriveName,
@@ -65,7 +63,6 @@ const docsWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   domain: {
     subDomainName: 'docs',
     onRootDomain: true,
-    rootDomain: QPQJS_DOMAIN,
   },
 };
 

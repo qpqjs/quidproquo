@@ -5,36 +5,41 @@ import { EmailSenderQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidpro
 import { aws_iam, aws_route53, aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { domainScopedId, lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqWebserverEmailSenderConstructProps extends QpqConstructBlockProps {
   emailSenderConfig: EmailSenderQPQWebServerConfigSetting;
 }
 
+// The sending identity per root is its site root (development.example.com), which is
+// also the zone the DKIM records land in.
+const getIdentityDomains = (qpqConfig: QPQConfig): { rootDomain: string; identityDomain: string }[] =>
+  qpqWebServerUtils.getRootDomains(qpqConfig).map((rootDomain) => ({
+    rootDomain,
+    identityDomain: resolveDeployHostForRoot(qpqConfig, rootDomain, {}),
+  }));
+
 export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverEmailSenderConstructProps) {
     super(scope, id, props);
 
-    // The identity is the env-resolved root domain (e.g. development.example.com), the same
-    // zone SubdomainName resolves against, so DKIM records land in the qpq-managed zone.
-    const identityDomain = qpqWebServerUtils.resolveDomainRoot(props.emailSenderConfig.rootDomain, props.qpqConfig);
+    for (const { rootDomain, identityDomain } of getIdentityDomains(props.qpqConfig)) {
+      const hostedZone = lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, identityDomain));
 
-    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
-      domainName: identityDomain,
-    });
-
-    // qpq zones are always public (they serve public DNS); fromLookup just types
-    // them as the broader IHostedZone
-    new aws_ses.EmailIdentity(this, 'identity', {
-      identity: aws_ses.Identity.publicHostedZone(hostedZone as aws_route53.IPublicHostedZone),
-    });
+      // qpq zones are always public (they serve public DNS); fromLookup just types
+      // them as the broader IHostedZone
+      new aws_ses.EmailIdentity(this, domainScopedId(props.qpqConfig, 'identity', rootDomain), {
+        identity: aws_ses.Identity.publicHostedZone(hostedZone as aws_route53.IPublicHostedZone),
+      });
+    }
   }
 
   // Scope email sending to this service's own verified identity domains (exact ARNs, per the
   // shared-account rule). SendRawEmail is needed for the attachment (raw MIME) path.
   // While the SES account is in sandbox, SES also authorizes against the recipient's identity,
-  // so any defineEmailSenderAllowList addresses for the domain are granted too.
-  // No-op when the service declares no email senders.
+  // so any defineEmailSenderAllowList addresses are granted too.
+  // No-op when the service declares no email sender.
   public static authorizeSendEmailForRole(
     role: aws_iam.IRole,
     emailSenderConfigs: EmailSenderQPQWebServerConfigSetting[],
@@ -46,10 +51,10 @@ export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
 
       const identityArn = (identity: string): string => `arn:aws:ses:${region}:${accountId}:identity/${identity}`;
 
-      const resources = emailSenderConfigs.flatMap((setting) => [
-        identityArn(qpqWebServerUtils.resolveDomainRoot(setting.rootDomain, qpqConfig)),
-        ...qpqConfigAwsUtils.getEmailSenderAllowedAddresses(qpqConfig, setting.rootDomain).map(identityArn),
-      ]);
+      const resources = [
+        ...getIdentityDomains(qpqConfig).map(({ identityDomain }) => identityArn(identityDomain)),
+        ...qpqConfigAwsUtils.getEmailSenderAllowedAddresses(qpqConfig).map(identityArn),
+      ];
 
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({

@@ -10,7 +10,6 @@ import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
 import {
   askReadRequiredHeader,
   askReadRequiredHeaders,
-  convertContentSecurityPolicyEntryToString,
   getAccessTokenFromHeaders,
   getAllowedOrigins,
   getCorsHeaders,
@@ -65,26 +64,31 @@ describe('askReadRequiredHeaders', () => {
   });
 });
 
-describe('convertContentSecurityPolicyEntryToString', () => {
-  it('returns a string entry untouched', () => {
-    expect(convertContentSecurityPolicyEntryToString('example.com', 'https://other.com')).toBe('https://other.com');
-  });
-
-  it('builds a service origin from an api and service', () => {
-    expect(convertContentSecurityPolicyEntryToString('example.com', { api: 'api', service: 'billing' })).toBe('https://api.billing.example.com');
-  });
-
-  it('falls back to the base domain and omits the service when absent', () => {
-    expect(convertContentSecurityPolicyEntryToString('example.com', { api: 'api', protocol: 'http' })).toBe('http://api.example.com');
-  });
-});
-
 describe('getAllowedOrigins', () => {
   it('combines the root domain with default and route origins, lowercased', () => {
     const config = prodConfig({ allowedOrigins: ['https://Default.com'] });
     const origins = getAllowedOrigins(config, { allowedOrigins: ['https://Route.com'] });
 
     expect(origins).toEqual(['https://example.com', 'https://default.com', 'https://route.com']);
+  });
+
+  it('expands service entries on every root, roots first', () => {
+    const config = buildTestQpqConfig([defineDns(['example.com', 'example.org'])], { environment: 'production' });
+    const origins = getAllowedOrigins(config, {
+      allowedOrigins: [
+        { api: 'api', service: 'billing' },
+        { api: 'app', protocol: 'http' },
+      ],
+    });
+
+    expect(origins).toEqual([
+      'https://example.com',
+      'https://example.org',
+      'https://api.billing.example.com',
+      'https://api.billing.example.org',
+      'http://app.example.com',
+      'http://app.example.org',
+    ]);
   });
 });
 

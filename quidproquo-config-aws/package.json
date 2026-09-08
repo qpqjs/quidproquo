@@ -37,6 +37,7 @@
   "devDependencies": {
     "quidproquo-core": "0.1.19",
     "quidproquo-tsconfig": "0.1.19",
+    "quidproquo-webserver": "0.1.19",
     "typescript": "^5.8.2"
   }
 }

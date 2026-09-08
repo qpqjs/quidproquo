@@ -1,9 +1,8 @@
-// App-specific bootstrap extras — WAF, api, and the domain certificates. The
-// identity plumbing (defineApplication + defineAwsServiceAccountInfo) is
-// provided by quidproquo-deploy-awscdk's workspace CDK app; this fragment must
-// not declare its own. Prefix/domain/environment arrive via the deploy context
-// (from deploy.config.json + qpq go).
-import { defineApi, QPQConfig } from 'quidproquo';
+// App-specific bootstrap extras: the root domains, WAF, the api domain, and the
+// domain certificates. The identity plumbing (defineApplication +
+// defineAwsServiceAccountInfo) is provided by quidproquo-deploy-awscdk's
+// workspace CDK app; this fragment must not declare its own.
+import { defineApi, defineDns, QPQConfig } from 'quidproquo';
 import {
   defineBootstrapWaf,
   defineDomainCertificate,
@@ -12,7 +11,11 @@ import {
 } from 'quidproquo-config-aws';
 import { QpqAppDeployContext } from 'quidproquo-deploy-awscdk';
 
-export default ({ domain, region }: QpqAppDeployContext): QPQConfig => [
+import { QPQJS_DOMAINS, QpqjsServiceEnum } from '@qpqjs/constants';
+
+export default ({ region }: QpqAppDeployContext): QPQConfig => [
+  defineDns(QPQJS_DOMAINS),
+
   defineBootstrapWaf({
     rateLimits: [{ name: 'all-traffic', limit: 2000 }],
     managedRuleGroups: [
@@ -28,15 +31,23 @@ export default ({ domain, region }: QpqAppDeployContext): QPQConfig => [
     },
   }),
 
-  defineApi('api', domain),
+  defineApi('api'),
 
+  // CloudFront (us-east-1): the site root plus every web entry, on every root domain.
   defineDomainCertificate(
-    domain,
     'us-east-1',
-    ['www', 'views', 'docs', 'storybook'],
-    {
-      includeApex: true,
-    }
+    [
+      { subdomain: 'www' },
+      { subdomain: 'views' },
+      { subdomain: 'docs' },
+      { subdomain: 'storybook' },
+    ],
+    { includeApex: true }
   ),
-  defineDomainCertificate(domain, region, ['api', 'ws.ws', 'qpqadmin.admin']),
+
+  // Regional API Gateway: the api and the admin websocket.
+  defineDomainCertificate(region, [
+    { subdomain: 'api' },
+    { subdomain: 'qpqadmin', service: QpqjsServiceEnum.Admin },
+  ]),
 ];

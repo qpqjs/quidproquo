@@ -8,6 +8,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { lookupHostedZone, resolveDeployPrimaryHost, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
@@ -175,19 +176,11 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     );
 
     if (props.userDirectoryConfig.dnsRecord) {
-      // Cognito custom domains use CloudFront under the hood, so the cert must be in us-east-1.
-      const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
-        props.qpqConfig,
-        props.userDirectoryConfig.dnsRecord.rootDomain,
-        true,
-      );
-
-      const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
-        domainName: apexDomain,
-      });
-
-      const fullDomain = `${props.userDirectoryConfig.dnsRecord.subdomain}.${apexDomain}`;
-      const certificate = lookupDomainCertificate(this, 'us-east-1', props.userDirectoryConfig.dnsRecord.rootDomain, props.userDirectoryConfig.name);
+      // A pool has one custom domain, so it lives on the primary root only. Cognito custom
+      // domains use CloudFront under the hood, so the cert must be in us-east-1.
+      const fullDomain = resolveDeployPrimaryHost(props.qpqConfig, { subdomain: props.userDirectoryConfig.dnsRecord.subdomain });
+      const hostedZone = lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, fullDomain));
+      const certificate = lookupDomainCertificate(this, 'us-east-1', props.qpqConfig, props.userDirectoryConfig.name);
 
       const userPoolDomain = new aws_cognito.UserPoolDomain(this, 'user-pool-domain', {
         userPool: this.userPool,

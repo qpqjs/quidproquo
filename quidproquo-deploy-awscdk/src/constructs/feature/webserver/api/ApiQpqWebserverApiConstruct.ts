@@ -8,6 +8,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
+import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
@@ -151,15 +152,14 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       });
     }
 
-    const baseDomain = qpqWebServerUtils.resolveDomainRoot(props.apiConfig.rootDomain, props.qpqConfig);
-
-    const domain = `${props.apiConfig.apiSubdomain}.${baseDomain}`;
-
-    new aws_apigateway.CfnBasePathMapping(this, 'bpm', {
-      domainName: domain,
-      basePath: qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
-      restApiId: api.restApiId,
-      stage: api.deploymentStage.stageName,
-    });
+    // Mounted under the service name on the api's custom domain of every root.
+    for (const rootDomain of qpqWebServerUtils.getRootDomains(props.qpqConfig)) {
+      new aws_apigateway.CfnBasePathMapping(this, domainScopedId(props.qpqConfig, 'bpm', rootDomain), {
+        domainName: resolveDeployHostForRoot(props.qpqConfig, rootDomain, { subdomain: props.apiConfig.apiSubdomain }),
+        basePath: qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+        restApiId: api.restApiId,
+        stage: api.deploymentStage.stageName,
+      });
+    }
   }
 }

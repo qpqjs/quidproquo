@@ -1,11 +1,13 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { DomainTarget, qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { aws_apigatewayv2, aws_iam, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { importStackValue } from '../../../../utils';
+import { domainScopedId } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { SubdomainName } from '../../../basic';
 import { Function } from '../../../basic/Function';
@@ -108,24 +110,24 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     deployment.addDependency(disconnectRoute);
     deployment.addDependency(defaultRoute);
 
-    // Attach a custom domain name to the api
-    const apexDomain = props.websocketConfig.onRootDomain
-      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
-
-    // Create subdomain
-    const subdomain = new SubdomainName(this, 'subdomain', {
-      apexDomain,
-      rootDomain: props.websocketConfig.rootDomain,
+    // A custom domain on every root, each mapped onto the one websocket api.
+    const target: DomainTarget = {
       subdomain: props.websocketConfig.apiSubdomain,
-      qpqConfig: props.qpqConfig,
-    });
+      service: props.websocketConfig.onRootDomain ? undefined : qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+    };
 
-    // Create a mapping between the custom domain name and the WebSocket API
-    new aws_apigatewayv2.CfnApiMapping(this, 'websocket-api-mapping', {
-      apiId: apiId,
-      domainName: subdomain.domainName.domainName,
-      stage: stage.ref,
-    });
+    for (const rootDomain of qpqWebServerUtils.getRootDomains(props.qpqConfig)) {
+      const subdomain = new SubdomainName(this, domainScopedId(props.qpqConfig, 'subdomain', rootDomain), {
+        rootDomain,
+        target,
+        qpqConfig: props.qpqConfig,
+      });
+
+      new aws_apigatewayv2.CfnApiMapping(this, domainScopedId(props.qpqConfig, 'websocket-api-mapping', rootDomain), {
+        apiId: apiId,
+        domainName: subdomain.domainName.domainName,
+        stage: stage.ref,
+      });
+    }
   }
 }

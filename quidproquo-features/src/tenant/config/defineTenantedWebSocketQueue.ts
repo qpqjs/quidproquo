@@ -14,10 +14,9 @@ export type QPQConfigAdvancedTenantedWebsocketQueueSettings = Omit<QPQConfigAdva
 export const defineTenantedWebSocketQueue = (
   eventBusName: string,
   apiName: string,
-  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedTenantedWebsocketQueueSettings,
 ): QPQConfig =>
-  defineWebSocketQueue(eventBusName, apiName, rootDomain, {
+  defineWebSocketQueue(eventBusName, apiName, {
     ...advancedSettings,
     connectionScopeResolver: TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   });

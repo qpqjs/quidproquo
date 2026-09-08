@@ -16,8 +16,8 @@ describe('dev server getOpenApiGetDocumentActionProcessor', () => {
   it('points servers at the dev mount path instead of the api subdomain', async () => {
     const qpqConfig = buildTestQpqConfig([
       defineDns('localhost:8080'),
-      defineApi('api', 'localhost:8080'),
-      defineApi('old', 'localhost:8080', { deprecated: true }),
+      defineApi('api'),
+      defineApi('old', { deprecated: true }),
       defineRoute('GET', '/v1/widgets', '/src/widgets::list'),
     ]);
     const processors = await getOpenApiGetDocumentActionProcessor(qpqConfig, noopDynamicModuleLoader);

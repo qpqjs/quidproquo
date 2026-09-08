@@ -1,34 +1,16 @@
-import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
-
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
 /**
- * Standalone 301 handler for subdomain redirects. Reads its config from env vars
- * the CDK redirect construct JSON-encodes onto the function (redirectConfig,
- * environment, featureEnvironment); no qpq runtime involved.
+ * Standalone 301 handler for subdomain redirects. The CDK redirect construct resolves the
+ * target at synth and JSON-encodes it onto the function env: `redirectBaseUrl` (absolute,
+ * no trailing path) and `appendPath` (true for domain redirects, which keep the request
+ * path; false for an explicit absolute url, which redirects as-is). No qpq runtime involved.
  */
 const apiGatewayEventHandler_redirect = async (event: APIGatewayEvent, context: Context) => {
-  const redirectConfig: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(process.env.redirectConfig as string);
+  const redirectBaseUrl: string = JSON.parse(process.env.redirectBaseUrl as string);
+  const appendPath: boolean = JSON.parse((process.env.appendPath as string | undefined) || 'false');
 
-  // An absolute url redirects as-is; anything else is a domain redirect that
-  // keeps the request path and optionally prefixes environment subdomains.
-  let redirectUrl = redirectConfig.redirectUrl;
-
-  if (!redirectConfig.redirectUrl.startsWith('http')) {
-    const environment: string = JSON.parse(process.env.environment as string);
-    const featureEnvironment: string = JSON.parse((process.env.featureEnvironment as string | undefined) || '""');
-
-    let baseDomain = redirectConfig.redirectUrl;
-    if (redirectConfig.addEnvironment && environment !== 'production') {
-      baseDomain = `${environment}.${baseDomain}`;
-    }
-
-    if (redirectConfig.addFeatureEnvironment && featureEnvironment) {
-      baseDomain = `${featureEnvironment}.${baseDomain}`;
-    }
-
-    redirectUrl = `https://${baseDomain}${event.path}`;
-  }
+  let redirectUrl = appendPath ? `${redirectBaseUrl}${event.path}` : redirectBaseUrl;
 
   const queryParams = event.queryStringParameters;
   if (queryParams) {
