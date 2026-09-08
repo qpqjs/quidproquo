@@ -16,19 +16,25 @@ export type QPQConfigAdvancedAwsGithubDeployRoleSettings = {
   repositoryId?: number;
   // The GitHub Environment the deploy job runs under. Defaults to the deploy environment.
   githubEnvironment?: string;
+  // Also trust the name-form subject (`repo:owner/name:...`). Off once ids are given: the
+  // name form can be re-earned by whoever next owns that name, the id form cannot.
+  trustNameForm?: boolean;
 };
 
 export interface AwsGithubDeployRoleQPQConfigSetting extends QPQConfigSetting {
   repository: GithubRepository;
   githubEnvironment?: string;
+  trustNameForm: boolean;
 }
 
 /**
  * The IAM role GitHub Actions assumes (OIDC) to deploy this app's environment. One per
  * bootstrap config; created by the bootstrap stack against the account's
  * `token.actions.githubusercontent.com` provider (defineAccountGithubOidcProvider). Trust is scoped
- * to `repo:<owner>/<name>:environment:<githubEnvironment>`, so the workflow job must declare
- * that `environment:`. The role carries AdministratorAccess: a deploy creates IAM roles.
+ * to the repository's immutable-id subject for `environment:<githubEnvironment>` (the name form
+ * only when no ids are given or `trustNameForm` is set), so the workflow job must declare that
+ * `environment:`. Permissions are what a deploy needs and nothing more: assume the CDK bootstrap
+ * roles (CloudFormation itself runs as the exec role) and write this app's S3 buckets.
  */
 export const defineAwsGithubDeployRole = (
   repository: string,
@@ -45,5 +51,6 @@ export const defineAwsGithubDeployRole = (
 
     repository: { owner, name, ownerId: options?.ownerId, repositoryId: options?.repositoryId },
     githubEnvironment: options?.githubEnvironment,
+    trustNameForm: options?.trustNameForm ?? (options?.ownerId === undefined || options?.repositoryId === undefined),
   };
 };

@@ -10,7 +10,13 @@ describe('defineAwsGithubDeployRole', () => {
       uniqueKey: 'githubDeployRole',
       repository: { owner: 'qpqjs', name: 'quidproquo', ownerId: 1, repositoryId: 2 },
       githubEnvironment: 'dev',
+      trustNameForm: false,
     });
+  });
+
+  it('trusts the name form only without ids, or when asked', () => {
+    expect(defineAwsGithubDeployRole('qpqjs/quidproquo').trustNameForm).toBe(true);
+    expect(defineAwsGithubDeployRole('qpqjs/quidproquo', { ownerId: 1, repositoryId: 2, trustNameForm: true }).trustNameForm).toBe(true);
   });
 
   it('rejects anything that is not owner/name', () => {
