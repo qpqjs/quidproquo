@@ -8,7 +8,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
-import { FileUploadErrorTypeEnum, HTTPEvent, HttpEventQuery, qpqWebServerUtils } from 'quidproquo-webserver';
+import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { EventInput, InternalEventRecord } from './types';
@@ -32,10 +32,13 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
 
     const internalEventRecord: InternalEventRecord = {
       path,
+      // Neither map alone matches HttpEventQuery: the multi-value map has every key as a
+      // string[], the single-value map has each as a string. Spreading single over multi
+      // leaves a key seen once as a string and a key repeated as a string[].
       query: {
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
         ...(apiGatewayEvent.queryStringParameters || {}),
-      } as HttpEventQuery,
+      },
       body: apiGatewayEvent.body === null ? undefined : apiGatewayEvent.body,
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as HTTPMethod,
