@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 
 import { exportStackValue } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqServiceRole } from '../../../base/QpqServiceRole';
 
 export interface QpqWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
@@ -78,14 +79,7 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
 
-    const serviceRole = aws_iam.Role.fromRoleName(
-      scope,
-      'referenced-websocket-service-role',
-      awsNamingUtils.getConfigRuntimeResourceNameFromConfig('service-role', qpqConfig),
-      { mutable: true },
-    );
-
-    serviceRole.addToPrincipalPolicy(
+    QpqServiceRole.of(scope, qpqConfig).addToPrincipalPolicy(
       new aws_iam.PolicyStatement({
         effect: aws_iam.Effect.ALLOW,
         actions: ['execute-api:ManageConnections'],
