@@ -1,20 +1,23 @@
 ---
 title: defineDomainCertificate
-description: Issue a real ACM certificate with DNS validation for a root domain and its subdomains.
+description: Issue one DNS-validated ACM certificate per region covering the app's hosts on every root domain.
 ---
 
 # defineDomainCertificate
 
-Issues a real **ACM (AWS Certificate Manager) certificate**, DNS-validated against a Route 53 hosted zone, for a root domain and a set of subdomains. This is the concrete certificate that API Gateway and CloudFront distributions use for HTTPS. The webserver [`defineCertificate`](../webserver/certificate.md) is a portable shim that ultimately defers to a domain certificate like this one on AWS.
+Issues a real **ACM (AWS Certificate Manager) certificate** for a region, covering a set of host targets on **every** root declared with [defineDns](../webserver/dns.md). This is the certificate API Gateway and CloudFront use for HTTPS.
 
-- **On AWS:** each unique `(region, rootDomain)` becomes a `DomainCertificateStack` (via `createDomainCertificateStacks` in `quidproquo-deploy-awscdk`). The stack resolves the root domain through the same environment/feature prefixing as [`defineApi`](../webserver/api.md) (`resolveDomainRoot`), so `rootDomain: "example.com"` in a dev deploy issues against `development.example.com`. It looks up the hosted zone, creates an `aws_certificatemanager.Certificate` with `CertificateValidation.fromDns(...)` covering the resolved subdomains (and the apex when `includeApex`), and publishes the cert ARN to SSM (keyed by region + root domain) — writing cross-region via a custom resource when the cert region differs from the deploy region. Entries sharing a `(region, rootDomain)` are merged into one cert covering the union of their names.
+- **On AWS:** each region becomes one `DomainCertificateStack` (via `createDomainCertificateStacks` in `quidproquo-deploy-awscdk`). Every target is resolved on every root through the app's [domain resolver](../../domains.md), each name is DNS-validated in its own hosted zone (`CertificateValidation.fromDnsMultiZone`), and the ARN is published to SSM under an app-keyed parameter (`/qpq/domain/certificate-arn/<region>/<app>-<environment>[-<feature>]`), cross-region via a custom resource when the cert region differs from the deploy region. The certificate is **retained** on replacement: changing the name set issues a new cert while distributions still referencing the old ARN keep working until they redeploy. Entries for the same region are merged. ACM allows 10 names per certificate by default; synth fails with the name list when a config exceeds it.
 
 ```typescript
 import { defineDomainCertificate } from 'quidproquo-config-aws';
 
-export default [
-  // A cert for api.example.com and admin.example.com in the deploy region
-  defineDomainCertificate('example.com', 'us-east-1', ['api', 'admin']),
+export default ({ region }) => [
+  // CloudFront: the site root plus www on every root
+  defineDomainCertificate('us-east-1', [{ subdomain: 'www' }], { includeApex: true }),
+
+  // Regional API Gateway: the api and a service-scoped websocket
+  defineDomainCertificate(region, [{ subdomain: 'api' }, { subdomain: 'ws', service: 'chat' }]),
 ];
 ```
 
@@ -22,48 +25,29 @@ export default [
 
 ```typescript
 function defineDomainCertificate(
-  rootDomain: string,
   region: string,
-  subdomains: string[],
+  targets: DomainTarget[],
   options?: { includeApex?: boolean },
 ): DomainCertificateQPQConfigSetting;
 ```
 
 ## Parameters
 
-### `rootDomain` — `string` (required)
-
-The base, un-prefixed apex domain — the same value you pass to `defineApi` / web-entry `rootDomain` fields. At synth time it is resolved against the config's environment and feature (a dev deploy of `"example.com"` becomes `development.example.com`, or `myfeature.development.example.com`). Together with `region` it forms the setting's `uniqueKey`.
-
 ### `region` — `string` (required)
 
-The AWS region to issue the certificate in. CloudFront requires certificates in `us-east-1`, while regional API Gateway certs live in the deploy region — declaring both for the same apex is a valid, merged case.
+The AWS region to issue the certificate in. CloudFront requires `us-east-1`; regional API Gateway custom domains need the deploy region. It is the setting's `uniqueKey`, so entries for one region merge.
 
-### `subdomains` — `string[]` (required)
+### `targets` — `DomainTarget[]` (required)
 
-The subdomain labels to cover, each combined with the resolved apex (e.g. `'api'` → `api.<resolved-apex>`). At least one subdomain must be declared unless `includeApex` is `true`, or synth throws.
+The hosts to cover, as `{ subdomain?, service? }` targets. Each is resolved on every root with the app's domain resolver, exactly as the api, web entry or websocket that uses it will be. `{ subdomain: 'api' }` covers the api host; `{ subdomain: 'ws', service: 'chat' }` covers a websocket that is not `onRootDomain`.
 
 ### `options` — `{ includeApex?: boolean }` (optional)
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| `includeApex` | `boolean` | `false` | Also cover the resolved apex domain itself (in addition to the subdomains). Merged entries OR this flag together. |
-
-## Examples
-
-```typescript
-import { defineDomainCertificate } from 'quidproquo-config-aws';
-
-export default [
-  // Regional API cert in the deploy region
-  defineDomainCertificate('example.com', 'us-east-1', ['api']),
-
-  // CloudFront cert (must be us-east-1) covering the apex and www
-  defineDomainCertificate('example.com', 'us-east-1', ['www'], { includeApex: true }),
-];
-```
+| `includeApex` | `boolean` | `false` | Also cover each root's site root (the `{}` target), which a web entry with `onRootDomain: true` and no subdomain serves on. |
 
 ## Related
 
-- [defineCertificate](../webserver/certificate.md) — the portable webserver shim that defers to this real ACM certificate on AWS.
-- [defineApi](../webserver/api.md) — its `rootDomain` uses the same resolution as this certificate's `rootDomain`.
+- [Domains](../../domains.md) — the resolver every target goes through.
+- [defineDns](../webserver/dns.md) — the roots the certificate covers.

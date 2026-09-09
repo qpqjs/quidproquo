@@ -1,3 +1,4 @@
+export * from './eventDocAppendRetry';
 export * from './eventDocEventsStoreName';
 export * from './eventDocFunctionsName';
 export * from './eventDocGlobalNames';

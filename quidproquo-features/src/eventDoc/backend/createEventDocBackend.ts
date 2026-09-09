@@ -17,11 +17,10 @@ import { askEventDocGetIdByCode } from '../logic/askEventDocGetIdByCode';
 import { askEventDocPublishedVersionAsOf } from '../logic/askEventDocPublishedVersionAsOf';
 import { EventDocBackend } from './EventDocBackend';
 
-// Bind the generic eventDoc verbs to ONE collection: identity comes off the definition
-// (the single place it is declared), and every verb provides its own store context before
-// delegating - the runtime counterpart of what defineEventDoc does for routes. Call this
-// in SERVICE code (a data-layer one-liner per collection); the frontend imports the
-// definition from shared-logic and never sees this surface.
+/**
+ * Bind the generic eventDoc verbs to one collection. Every verb provides its own store context
+ * from the definition's identity before delegating. Service code only; the frontend never sees this.
+ */
 export const createEventDocBackend = (functions: EventDocFunctions): EventDocBackend => {
   const identity = getEventDocFunctionsIdentity(functions);
 

@@ -12,8 +12,7 @@ type LoadedBundle = EventDocTransferPlanResult & {
   transferId: string;
 };
 
-// The whole read-only half of an import as ONE story, so a single askCatch covers every step: ask for
-// somewhere to put the file, put it there, read back what importing it would do.
+// One story so a single askCatch covers every step.
 function* askEventDocImportUiUploadAndPlan(serviceName: string, file: File): AskResponse<LoadedBundle> {
   const target = yield* askEventDocUploadTargetFetch(serviceName);
 
@@ -24,8 +23,7 @@ function* askEventDocImportUiUploadAndPlan(serviceName: string, file: File): Ask
   return { transferId: target.transferId, ...planResult };
 }
 
-// Upload the chosen file, then plan it. Deliberately one verb: an uploaded bundle with no plan is a
-// dead end for the operator, and planning writes nothing, so there is nothing to confirm yet.
+/** Uploads the chosen bundle file and stores its plan. Writes nothing. */
 export function* askEventDocImportUiLoad(serviceName: string, file: File): AskResponse<void> {
   yield* askUIEventDocImportSetLoading(true);
   yield* askUIEventDocImportSetError(null);

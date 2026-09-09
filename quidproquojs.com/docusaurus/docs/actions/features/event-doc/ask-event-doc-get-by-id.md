@@ -26,7 +26,7 @@ export function* loadArticle(id: string) {
 An event document is never stored as a mutable blob. Its authoritative state is an **append-only log of events**; the document you read is *derived by folding that log*.
 
 - **Summary record** ([`EventDocSummary`](#the-summary-record)) — the queryable projection folded from the log's identity/lifecycle events (`INIT_STATE`, `SET_CODE`, `SET_NAME`, `PUBLISH`, `DELETE`, `RESTORE`, …). It holds identity (`id`, `code`, `name`), audit fields, and a `versions` array. Every field on it is derived from the log — including `deletedAt`, set and cleared by `DELETE`/`RESTORE` events rather than written directly — so the whole record can be dropped and rebuilt from the log at any time. The document's editable **content** is folded separately (on the client) from the same log; the backend never reduces content.
-- **Draft vs published** — the tail (highest) version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes it and starts the next draft. Each version pointer records the `eventId` (a sortable id) of its last event (its head), so folding events whose `eventId` sorts at or before that head reconstructs the version's content as it was. `publishedAt` is when a version was published; `effectiveFrom` is when that publish takes effect (used for as-of time-travel).
+- **Draft vs published** — the tail (highest) version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes it and starts the next draft. Each version pointer records the `eventId` (its contiguous position in the log) of its last event (its head), so folding events whose `eventId` is at or before that head reconstructs the version's content as it was. `publishedAt` is when a version was published; `effectiveFrom` is when that publish takes effect (used for as-of time-travel).
 - **Code** — the caller-chosen, stable business key set at create (via `INIT_STATE`) and editable with `SET_CODE`. It stays constant across versions and is expected unique within the collection (and any owner scope), so you can address a document by `code` instead of its generated `id`.
 
 The version-pointer reads ([askEventDocGetDraft, askEventDocGetLatestPublished, askEventDocGetPublishedAsOf, askEventDocPublishedVersionAsOf](./ask-event-doc-get-draft.md)) resolve entries in this model.
@@ -49,7 +49,7 @@ type EventDocSummary = {
 
 type EventDocVersion = {
   version: number;
-  eventId: string;       // sortable id of this version's head event
+  eventId: number;       // log id of this version's head event
   publishedAt?: string;  // unset while it is the tail draft
   effectiveFrom?: string; // when the publish takes effect (as-of selection)
 };

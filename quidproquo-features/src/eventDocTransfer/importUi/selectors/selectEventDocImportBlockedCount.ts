@@ -1,8 +1,7 @@
 import { EventDocTransferStatus } from '../../models';
 import type { EventDocImportUiState } from '../types/EventDocImportUiState';
 
-// How many rows an import will leave alone because something is wrong, as opposed to because there is
-// nothing to do. `Same` is not blocked - it is already where the bundle wants it.
+/** How many rows are blocked (Diverged, CodeConflict, Ignored). Same is not blocked. */
 export const selectEventDocImportBlockedCount = (state: EventDocImportUiState): number =>
   state.rows.filter(
     (row) =>

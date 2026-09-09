@@ -2,8 +2,7 @@ import { askConfigGetGlobal, AskResponse, askThrowError, askUserDirectoryReadAcc
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 
-// Re-reads the already-validated access token (route auth gated the request) to
-// stamp createdBy/updatedBy without an extra user lookup.
+/** Resolves the caller's user id from the request's access token; throws Unauthorized when there is none. */
 export function* askEventDocResolveUserId(): AskResponse<string> {
   const userDirectory = yield* askConfigGetGlobal<string>(EVENT_DOC_USER_DIRECTORY_GLOBAL);
 

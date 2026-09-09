@@ -4,7 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocTransferPlanResult } from '../../models';
 
-// What importing the uploaded bundle would do (POST /transfer/plan). Writes nothing.
+/** POST /transfer/plan: what importing the uploaded bundle would do. Writes nothing. */
 export function* askEventDocPlanFetch(serviceName: string, transferId: string): AskResponse<EventDocTransferPlanResult> {
   const response = yield* askApiRequest<{ transferId: string }, EventDocTransferPlanResult>(serviceName, 'POST', eventDocTransferEndpoint('plan'), {
     body: { transferId },

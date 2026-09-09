@@ -1,51 +1,33 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { DevServerConfig } from './types';
 
-// Create an async function to fetch all services
+/**
+ * The service configs as the dev server runs them: every root becomes the local origin
+ * (`localhost:<port>`, so the localhost resolver serves everything from one host and the
+ * app's resolver pointer is dropped) and local plus wildcard origins join CORS. Works on a
+ * clone; the caller's configs are untouched.
+ */
 export function getAllServiceConfigs(devServerConfig: DevServerConfig): QPQConfig[] {
-  // Clone it
-  const allServices = JSON.parse(JSON.stringify(devServerConfig.qpqConfigs));
+  const allServices: QPQConfig[] = JSON.parse(JSON.stringify(devServerConfig.qpqConfigs));
 
-  // Iterate over each enum value and dynamically import the corresponding infrastructure
   const rootDomain = `${devServerConfig.serverDomain}:${devServerConfig.serverPort}`;
+  const localOrigin = `http://${rootDomain}`;
 
-  // TODO: Make this pure
-  // Overload the domain settings to represent the local env
-  // This is kind of gross, mutating it, but this is just dev.
   for (const qpqConfig of allServices) {
-    // Make it a production build
-    // const appSettings = qpqCoreUtils.getApplicationModuleSetting(qpqConfig);
-    // appSettings.feature = undefined;
-    // appSettings.environment = 'production';
-
-    const baseDomain = qpqWebServerUtils.getDomainRoot(
-      rootDomain,
-      qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-    );
-
-    // Change the domain
-    const dnsConfigs = qpqWebServerUtils.getDnsConfigs(qpqConfig);
-    for (const dnsConfig of dnsConfigs) {
-      dnsConfig.dnsBase = rootDomain;
+    const dnsConfig = qpqWebServerUtils.getDnsConfig(qpqConfig);
+    if (dnsConfig) {
+      dnsConfig.rootDomains = [rootDomain];
+      delete dnsConfig.resolver;
     }
 
-    // Expose global cors headers
-    const defaultRouteSettings = qpqWebServerUtils.getDefaultRouteSettings(qpqConfig);
-    for (const getDefaultRouteSetting of defaultRouteSettings) {
-      getDefaultRouteSetting.routeOptions.allowedOrigins = [
-        ...(getDefaultRouteSetting.routeOptions.allowedOrigins || []),
-        `http://${baseDomain}`,
-        '*',
-      ];
+    for (const defaultRouteSetting of qpqWebServerUtils.getDefaultRouteSettings(qpqConfig)) {
+      defaultRouteSetting.routeOptions.allowedOrigins = [...(defaultRouteSetting.routeOptions.allowedOrigins || []), localOrigin, '*'];
     }
 
-    // Expose global cors headers
-    const routes = qpqWebServerUtils.getAllRoutes(qpqConfig);
-    for (const route of routes) {
-      route.options.allowedOrigins = [...(route.options.allowedOrigins || []), `http://${baseDomain}`, '*'];
+    for (const route of qpqWebServerUtils.getAllRoutes(qpqConfig)) {
+      route.options.allowedOrigins = [...(route.options.allowedOrigins || []), localOrigin, '*'];
     }
   }
 

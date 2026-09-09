@@ -5,11 +5,8 @@ import { askEventDocList } from '../data/askEventDocList';
 import { EventDocSummary } from '../models';
 
 /**
- * The single non-deleted doc in the (provided) collection whose `code` matches — optionally scoped
- * to an owner (matched on `createdBy`). `code` is expected unique within that scope, so >1 match is
- * a data-integrity error (Conflict); 0 matches → null. Assumes the store context is provided (wrap
- * in `askEventDocProvideStore`). There is no GSI on `code` (and the dev KVS can't query one anyway),
- * so this lists the collection and filters in memory.
+ * The single non-deleted doc whose `code` matches, optionally scoped to an owner (`createdBy`). Null on no match;
+ * throws Conflict on more than one. Lists the collection and filters in memory (no index on `code`). Assumes the store context.
  */
 export function* askEventDocGetByCode<T extends EventDocSummary = EventDocSummary>(code: string, ownerUserId?: string): AskResponse<Nullable<T>> {
   const summaries = yield* askEventDocList<T>();

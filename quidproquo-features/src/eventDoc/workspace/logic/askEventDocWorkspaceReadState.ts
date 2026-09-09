@@ -2,9 +2,7 @@ import { AskResponse, askStateRead } from 'quidproquo-core';
 
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
-// The workspace state is the ROOT runtime state wherever a workspace runs (a
-// useQpqRuntime area on the web, askReduceState in tests and pure logic), so a bare
-// read returns it whole.
+/** Reads the whole workspace state; the workspace is always the root runtime state wherever it runs. */
 export function* askEventDocWorkspaceReadState(): AskResponse<EventDocWorkspaceState> {
   return yield* askStateRead<EventDocWorkspaceState>();
 }

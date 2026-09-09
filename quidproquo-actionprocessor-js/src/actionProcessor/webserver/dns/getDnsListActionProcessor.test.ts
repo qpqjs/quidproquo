@@ -5,24 +5,19 @@ import { describe, expect, it } from 'vitest';
 
 import { getDnsListActionProcessor } from './getDnsListActionProcessor';
 
+const getProcessor = async (qpqConfig = buildTestQpqConfig()) =>
+  (await getDnsListActionProcessor(qpqConfig, async () => null))[DnsActionType.List] as (p: any, ...rest: any[]) => Promise<any>;
+
 describe('getDnsListActionProcessor', () => {
-  it('returns the dnsBase of every configured dns setting', async () => {
-    const qpqConfig = buildTestQpqConfig([defineDns('example.com'), defineDns('api.example.com')]);
-    const processor = (await getDnsListActionProcessor(qpqConfig, async () => null))[DnsActionType.List] as (p: any, ...rest: any[]) => Promise<any>;
+  it('returns every declared root, primary first', async () => {
+    const processor = await getProcessor(buildTestQpqConfig([defineDns(['example.com', 'example.org'])]));
 
-    const result = await processor(undefined, undefined as any);
-
-    expect(resolveActionResult(result)).toEqual(['example.com', 'api.example.com']);
+    expect(resolveActionResult(await processor(undefined, undefined as any))).toEqual(['example.com', 'example.org']);
   });
 
-  it('returns an empty list when no dns settings are configured', async () => {
-    const processor = (await getDnsListActionProcessor(buildTestQpqConfig(), async () => null))[DnsActionType.List] as (
-      p: any,
-      ...rest: any[]
-    ) => Promise<any>;
+  it('returns an empty list when no dns is configured', async () => {
+    const processor = await getProcessor();
 
-    const result = await processor(undefined, undefined as any);
-
-    expect(resolveActionResult(result)).toEqual([]);
+    expect(resolveActionResult(await processor(undefined, undefined as any))).toEqual([]);
   });
 });

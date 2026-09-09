@@ -4,7 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocTransferUploadTarget } from '../../models';
 
-// Ask for somewhere to put a bundle file (POST /transfer/upload).
+/** POST /transfer/upload: a presigned PUT target for a bundle file. */
 export function* askEventDocUploadTargetFetch(serviceName: string): AskResponse<EventDocTransferUploadTarget> {
   const response = yield* askApiRequest<void, EventDocTransferUploadTarget>(serviceName, 'POST', eventDocTransferEndpoint('upload'));
 

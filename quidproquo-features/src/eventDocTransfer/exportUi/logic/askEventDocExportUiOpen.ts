@@ -5,8 +5,7 @@ import { askUIEventDocExportOpen } from '../actionCreators/askUIEventDocExportOp
 import { askUIEventDocExportSetCandidates } from '../actionCreators/askUIEventDocExportSetCandidates';
 import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExportSetError';
 
-// Open the dialog and load what there is to choose from. Reuses the collection's ordinary list route
-// rather than anything transfer-specific: the candidates ARE the collection.
+/** Opens the export dialog and loads the collection as candidates. */
 export function* askEventDocExportUiOpen(serviceName: string, basePath: string): AskResponse<void> {
   yield* askUIEventDocExportOpen();
 

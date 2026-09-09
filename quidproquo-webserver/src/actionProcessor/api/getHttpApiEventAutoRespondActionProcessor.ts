@@ -2,6 +2,7 @@ import {
   actionResult,
   askEventAutoRespondBase,
   createActionProcessor,
+  DynamicModuleLoader,
   EventActionType,
   generateUuid,
   getProcessCustomImplementation,
@@ -12,6 +13,7 @@ import {
 } from 'quidproquo-core';
 
 import { RouteOptions } from '../../config/settings/route';
+import { loadDomainResolver } from '../../domain/logic/resolver/loadDomainResolver';
 import { askValidateRouteAuth, ValidateRouteAuthPayload } from '../../stories/askValidateRouteAuth';
 import { FileUploadErrorTypeEnum, HTTPEvent, HTTPEventResponse } from '../../types/HTTPEvent';
 import { getCorsHeaders } from '../../utils/headerUtils';
@@ -26,7 +28,9 @@ const fileUploadErrorHttpStatusMap: Record<FileUploadErrorTypeEnum, number> = {
   [FileUploadErrorTypeEnum.malformed]: 400,
 };
 
-const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
+const getProcessAutoRespond = async (qpqConfig: QPQConfig, loader: DynamicModuleLoader): Promise<ProcessorFor<typeof askEventAutoRespondBase>> => {
+  const domainResolver = await loadDomainResolver(qpqConfig, loader);
+
   const validateAuth = getProcessCustomImplementation<any>(
     qpqConfig,
     askValidateRouteAuth,
@@ -46,7 +50,7 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEve
         status: 200,
         isBase64Encoded: false,
         body: '',
-        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers),
+        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers, domainResolver),
       });
     }
 
@@ -69,7 +73,7 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEve
         body: JSON.stringify({
           message: 'You are unauthorized to access this resource',
         }),
-        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers),
+        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers, domainResolver),
       });
     }
 
@@ -82,7 +86,7 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEve
           errorType: qpqEventRecord.fileUploadError.errorType,
           errorText: qpqEventRecord.fileUploadError.message,
         }),
-        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers),
+        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers, domainResolver),
       });
     }
 

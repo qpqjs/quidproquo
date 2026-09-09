@@ -7,16 +7,10 @@ import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Tail of the log — the newest event by sort key. Event ids are sortable guids, so
-// lexicographic sort-key order (DynamoDB's, and the dev-server's for strings) is
-// creation order and this returns the true latest.
-//
-// `consistentRead` matters MORE here than on any other event read: this is how
-// "latest" resolvers pick the head everything else clamps to. A stale replica
-// answering this query doesn't just delay data — it silently truncates the log
-// (or empties it: no rows -> null -> callers fall back to pristine state), and a
-// consistent gap read clamped to a stale head inherits the truncation. A writer
-// reading back its own appends must pass it.
+/**
+ * The log head (newest event by numeric sort key), or null for an empty log. A writer reading back its own appends must
+ * pass `consistentRead`: a stale head silently truncates everything clamped to it.
+ */
 export function* askEventDocEventLast(modelId: string, options?: { consistentRead?: boolean }): AskResponse<Nullable<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

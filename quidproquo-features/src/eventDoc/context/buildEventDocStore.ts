@@ -3,9 +3,7 @@ import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreN
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocStore } from '../types/EventDocStore';
 
-// One EventDoc collection's identity, minus the derivable bits. Pass it to
-// `askEventDocProvideStore` (custom routes) — the events-table + blob-drive names are
-// derived from `storeName`.
+/** A collection's identity minus the derivable bits; store and drive names are derived from `storeName`. */
 export type EventDocStoreOptions = {
   storeName: string;
   type: string;
@@ -14,10 +12,7 @@ export type EventDocStoreOptions = {
   scopeResolver?: string;
 };
 
-// Assemble an EventDocStore from a collection's storeName + type. The single source for the
-// events-table / blob-drive naming convention — used by both the per-route globals
-// (`defineEventDocRoutes`) and hand-written routes (`askEventDocProvideStore`), so a custom
-// route and a built-in route describe the exact same store.
+/** Builds an EventDocStore from storeName + type. Single source of the naming convention shared by built-in and custom routes. */
 export const buildEventDocStore = ({ storeName, type, onPublish, onAppend, scopeResolver }: EventDocStoreOptions): EventDocStore => ({
   storeName,
   eventsStoreName: eventDocEventsStoreName(storeName),

@@ -3,12 +3,10 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 
-// Establish the request's ambient storage scope from the collection's
-// `scopeResolver` inline function (e.g. the tenant feature's resolver: header
-// -> membership check -> TENANT# scope, no header -> the caller's PERSONAL#
-// scope). No resolver configured, or a null result, runs the story unscoped -
-// the tenant resolver never returns null. Must run INSIDE the store context -
-// the resolver name is read off the provided store.
+/**
+ * Runs the story under the storage scope returned by the collection's `scopeResolver` inline function.
+ * No resolver, or a null result, runs it unscoped. Requires the store context.
+ */
 export function* askEventDocProvideRequestScope<T>(event: HTTPEvent, story: AskResponse<T>): AskResponse<T> {
   const { scopeResolver } = yield* askEventDocStoreRead();
 

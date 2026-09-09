@@ -1,7 +1,6 @@
 import { EventDocDocument, EventDocStatus } from '../../models';
 
-// CREATE_DRAFT flips to draft and bumps documentVersion only when leaving published
-// (no bump if already a draft).
+/** Flips to draft; bumps documentVersion only when leaving published. */
 export const createDraft = <TState extends EventDocDocument>(state: TState): TState => ({
   ...state,
   status: EventDocStatus.Draft,

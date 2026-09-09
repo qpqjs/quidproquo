@@ -89,6 +89,12 @@ export function traceControllerWorkerMain(): void {
   const scriptUrlsById = new Map<string, string>();
   const instrumentedScriptIds = new Set<string>();
 
+  // Script end positions from scriptParsed. getPossibleBreakpoints MUST be given an
+  // explicit end: with the range left open, V8 answers with an empty list once the
+  // script's bytecode has been flushed by GC (functions parsed but not run for a few
+  // collections), so a story loaded a while before the trace would get no breakpoints.
+  const scriptEndById = new Map<string, { lineNumber: number; columnNumber: number }>();
+
   // The directory of the story function's own script (set during init). Bundles are
   // chunk-SPLIT: a story exported through a factory wrapper (export const x = wrap(story))
   // has its function object created in the FACTORY's chunk, while the code it runs lives
@@ -306,9 +312,13 @@ export function traceControllerWorkerMain(): void {
   // empty or stops advancing.
   const getAllPossibleBreakpoints = (scriptId: string): Promise<any[]> => {
     const allLocations: any[] = [];
+    const scriptEnd = scriptEndById.get(scriptId);
 
     const readPage = (startLine: number, startColumn: number): Promise<any[]> =>
-      post('Debugger.getPossibleBreakpoints', { start: { scriptId, lineNumber: startLine, columnNumber: startColumn } }).then((response: any) => {
+      post('Debugger.getPossibleBreakpoints', {
+        start: { scriptId, lineNumber: startLine, columnNumber: startColumn },
+        end: scriptEnd ? { scriptId, lineNumber: scriptEnd.lineNumber, columnNumber: scriptEnd.columnNumber } : undefined,
+      }).then((response: any) => {
         const locations = response.locations || [];
         if (locations.length === 0) return allLocations;
 
@@ -355,6 +365,7 @@ export function traceControllerWorkerMain(): void {
   session.on('Debugger.scriptParsed', (message: any) => {
     const url = message.params.url || '';
     scriptUrlsById.set(message.params.scriptId, url);
+    scriptEndById.set(message.params.scriptId, { lineNumber: message.params.endLine, columnNumber: message.params.endColumn });
 
     // A traced bundle chunk loaded mid-story (async-node chunk loading) — instrument it
     // as it appears so its statements are traced too.

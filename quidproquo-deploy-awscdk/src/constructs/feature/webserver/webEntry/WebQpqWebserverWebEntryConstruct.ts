@@ -1,6 +1,7 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { DomainTarget, qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import {
   aws_cloudfront,
@@ -17,8 +18,10 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
 
+import { requireDomainResolver } from '../../../../appWorkspace/requireDomainResolver';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { qpqAwsCdkPathUtils } from '../../../../utils';
+import { domainScopedId, lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
@@ -62,22 +65,15 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       originBucket = aws_s3.Bucket.fromBucketName(this, 'src-bucket-lookup', this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive));
     }
 
-    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
-      props.qpqConfig,
-      props.webEntryConfig.domain.rootDomain,
-      props.webEntryConfig.domain.onRootDomain,
-    );
+    // One host per root, all served by this distribution under the us-east-1 app cert.
+    const target: DomainTarget = {
+      subdomain: props.webEntryConfig.domain.subDomainName,
+      service: props.webEntryConfig.domain.onRootDomain ? undefined : qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+    };
+    const rootDomains = qpqWebServerUtils.getRootDomains(props.qpqConfig);
+    const domainNames = rootDomains.map((rootDomain) => resolveDeployHostForRoot(props.qpqConfig, rootDomain, target));
 
-    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
-      domainName: apexDomain,
-    });
-
-    const domainNames: string[] = props.webEntryConfig.domain.subDomainName ? [`${props.webEntryConfig.domain.subDomainName}.${apexDomain}`] : [];
-    if (props.webEntryConfig.domain.onRootDomain && domainNames.length === 0) {
-      domainNames.unshift(apexDomain);
-    }
-
-    const certificate = lookupDomainCertificate(this, 'us-east-1', props.webEntryConfig.domain.rootDomain, props.webEntryConfig.name);
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.qpqConfig, props.webEntryConfig.name);
 
     const cachePolicy = props.webEntryConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
@@ -113,6 +109,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(
             props.qpqConfig,
             props.webEntryConfig.corsAllowedOrigins,
+            requireDomainResolver(props.qpqConfig),
           ),
           accessControlExposeHeaders: ['*'],
           accessControlMaxAge: cdk.Duration.seconds(600),
@@ -188,10 +185,12 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       distribution.distributionId,
     );
 
-    new aws_route53.ARecord(this, `web-alias`, {
-      zone: hostedZone,
-      recordName: domainNames[0],
-      target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
+    rootDomains.forEach((rootDomain, index) => {
+      new aws_route53.ARecord(this, domainScopedId(props.qpqConfig, 'web-alias', rootDomain), {
+        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainNames[index])),
+        recordName: domainNames[index],
+        target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
+      });
     });
 
     props.webEntryConfig.ignoreCache.forEach((pathPattern) => {

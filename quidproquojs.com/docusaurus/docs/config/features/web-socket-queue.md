@@ -16,7 +16,7 @@ Defines a **WebSocket queue**: a batteries-included messaging layer on top of a 
 import { defineWebSocketQueue } from 'quidproquo-features';
 
 export default [
-  defineWebSocketQueue('my-event-bus', 'api', 'example.com', {
+  defineWebSocketQueue('my-event-bus', 'api', {
     userDirectoryName: 'users',
   }),
 ];
@@ -40,7 +40,6 @@ Because the underlying WebSocket API is created with `apiName` equal to the `api
 function defineWebSocketQueue(
   eventBusName: string,
   apiName: string,
-  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedWebsocketQueueSettings,
 ): QPQConfig;
 ```
@@ -57,9 +56,6 @@ Name of the [event bus](../core/event-bus.md) the queue is associated with (stor
 
 Logical name of the WebSocket API. Drives the resource names of the deployed API, the connection key-value store (`qpq-wsq-<apiName>`), and the globals — and is the value you pass as `websocketApiName` to send actions. Also used as the API subdomain.
 
-### `rootDomain` — `string` (required)
-
-The registered domain the WebSocket API is served under (passed straight through to the underlying [defineWebsocket](../webserver/websocket.md)).
 
 ### `advancedSettings` — `QPQConfigAdvancedWebsocketQueueSettings` (optional)
 

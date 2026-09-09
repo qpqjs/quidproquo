@@ -1,4 +1,4 @@
-// SET_CODE payload.
+/** SET_CODE payload. */
 export type EventDocSetCodeData = {
   code: string;
 };

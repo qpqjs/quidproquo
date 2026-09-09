@@ -3,7 +3,7 @@ import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceS
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { appendSlotHistoryEvents } from './appendSlotHistoryEvents';
 
-// One save landing: append the server-stamped event and fold it into the stored view.
+/** One save landing: appends and folds the server-stamped event. */
 export const createAppendHistoryEventUpdater =
   (slots: EventDocWorkspaceSlotFoldsConfig) =>
   (state: EventDocWorkspaceState, { slotKey, event }: EventDocWorkspaceAppendHistoryEventPayload): EventDocWorkspaceState =>

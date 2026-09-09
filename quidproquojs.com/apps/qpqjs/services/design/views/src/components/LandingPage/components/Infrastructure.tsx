@@ -29,8 +29,7 @@ const CONFIG_LINES: ReactNode[] = [
   </>,
   <>
     {'    '}
-    {pr('domain')}: {'{'} onRootDomain: {kw('true')}, rootDomain: QPQJS_DOMAIN{' '}
-    {'}'},
+    {pr('domain')}: {'{'} onRootDomain: {kw('true')} {'}'},
   </>,
   <>{'  }),'}</>,
   <>&nbsp;</>,

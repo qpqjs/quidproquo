@@ -1,8 +1,7 @@
 import type { EventDocExportUiSetResultPayload } from '../effects/EventDocExportUiSetResultEffect';
 import type { EventDocExportUiState } from '../types/EventDocExportUiState';
 
-// The result carries the manifest the bundle actually covered, so the dialog switches to reporting
-// what went in rather than what was proposed.
+/** Stores the export result and replaces the manifest with what the bundle actually covered. */
 export const setResult = (state: EventDocExportUiState, { result }: EventDocExportUiSetResultPayload): EventDocExportUiState => ({
   ...state,
   result,

@@ -1,3 +1,4 @@
+/** Effects of the export dialog. */
 export enum EventDocExportUiEffect {
   Open = 'EventDocExportUi/Open',
   SetCandidates = 'EventDocExportUi/SetCandidates',

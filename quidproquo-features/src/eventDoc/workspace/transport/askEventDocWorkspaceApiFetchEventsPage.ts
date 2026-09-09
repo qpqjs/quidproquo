@@ -6,10 +6,7 @@ import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDoc
 import { EventDocWorkspaceEventsPageRequest } from '../types/EventDocWorkspaceTransport';
 import { eventDocWorkspaceEventsEndpoint } from './eventDocWorkspaceEventsEndpoint';
 
-// One page of a document's event log. `afterEventId` (exclusive) fetches only events
-// after that log index (the tail since a known point, for incremental refresh);
-// `newestFirst` walks the log backwards (the history panel's latest-page read). This is
-// the EventDocWorkspaceTransport.askFetchEventsPage shape.
+/** One page of a document's log. afterEventId is exclusive; newestFirst walks the log backwards for the history panel. */
 export function* askEventDocWorkspaceApiFetchEventsPage(
   identity: EventDocWorkspaceDocumentIdentity,
   request?: EventDocWorkspaceEventsPageRequest,

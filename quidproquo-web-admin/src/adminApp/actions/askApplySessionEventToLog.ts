@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse } from 'quidproquo-core';
 import { EventDocEvent } from 'quidproquo-features';
 
 import { askUISessionLogEventAppended } from '../actionCreators/sessionLog/askUISessionLogEventAppended';
@@ -12,8 +12,6 @@ import { ApplySessionEventActionPayload } from './askApplySessionEvent';
 // processors with the action's PAYLOAD, so that is what this story receives.
 export function* askApplySessionEventToLog(payload: ApplySessionEventActionPayload): AskResponse<void> {
   const clientMessageId = yield* askNewGuid();
-  // Sortable ids need no allocator, so the id is minted here rather than positioned later.
-  const eventId = yield* askNewSortableGuid();
   const createdAt = yield* askDateNow();
 
   const event: EventDocEvent = {
@@ -25,7 +23,7 @@ export function* askApplySessionEventToLog(payload: ApplySessionEventActionPaylo
         clientMessageId,
         createdBy: localSessionEventActor,
         createdAt,
-        eventId,
+        eventId: 0,
       },
     },
   };

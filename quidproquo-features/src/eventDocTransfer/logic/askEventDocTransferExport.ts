@@ -9,16 +9,8 @@ import { askEventDocManifest } from './askEventDocManifest';
 const BUNDLE_DOWNLOAD_TTL_MS = 15 * 60 * 1000;
 
 /**
- * Export one or more docs and everything they reference as ONE staged bundle, and hand back a
- * short-lived download link plus the manifest it covers (so the UI can show exactly what went in,
- * including the soft-deleted docs that were reported but skipped).
- *
- * Selecting several docs at once is the point of taking a list: their manifests are merged and
- * deduped, so a stylesheet three templates share travels once, not three times.
- *
- * The manifest comes back in discovery order (the starting doc first), and the bundle is written in
- * REVERSE, which is leaves-first: whatever the target imports, a referenced doc lands before the doc
- * that points at it.
+ * Exports the given docs and everything they reference as one staged bundle (written leaves first) and returns
+ * a short-lived download link plus the manifest, including the soft-deleted docs that were reported but skipped.
  */
 export function* askEventDocTransferExport(registry: EventDocTransferRegistry, starts: EventDocDocRef[]): AskResponse<EventDocTransferExportResult> {
   if (starts.length === 0) {
@@ -29,8 +21,7 @@ export function* askEventDocTransferExport(registry: EventDocTransferRegistry, s
   const roots = items.filter((item) => item.depth === 0);
   const deletedRoot = roots.find((item) => item.deleted);
 
-  // A dependency that is deleted at source is reported and skipped, but a doc the operator
-  // explicitly picked is a mistake worth stopping on rather than quietly dropping.
+  // A deleted dependency is skipped, but a deleted doc the operator explicitly picked is an error.
   if (deletedRoot) {
     return yield* askThrowError(ErrorTypeEnum.BadRequest, `Doc ${deletedRoot.id} is deleted and cannot be exported.`);
   }

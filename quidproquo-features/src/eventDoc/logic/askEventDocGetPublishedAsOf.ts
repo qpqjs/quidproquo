@@ -5,9 +5,7 @@ import { askEventDocGetById } from '../data/askEventDocGetById';
 import { EventDocVersion } from '../models';
 import { publishedAsOf } from './selectors/publishedAsOf';
 
-/**
- * Resolve the version published at or before `clock` (as-of-clock time-travel).
- */
+/** The version published at or before `clock`, or null. */
 export function* askEventDocGetPublishedAsOf(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocVersion>> {
   const model = yield* askEventDocGetById(id);
   if (!model) {

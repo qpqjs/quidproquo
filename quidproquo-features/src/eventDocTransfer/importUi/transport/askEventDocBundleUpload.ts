@@ -2,8 +2,7 @@ import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'qu
 
 const BUNDLE_CONTENT_TYPE = 'application/json';
 
-// PUT the operator's file straight at the presigned url. The bytes go browser -> drive without
-// passing through the api, and the Content-Type must match what the presign was minted with.
+/** PUTs the bundle file at the presigned url. The Content-Type must match what the presign was minted with. */
 export function* askEventDocBundleUpload(uploadUrl: string, file: File): AskResponse<void> {
   const response = yield* askNetworkRequest('PUT', uploadUrl, {
     body: file,

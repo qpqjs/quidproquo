@@ -5,11 +5,10 @@ import { defineApi } from './api';
 
 describe('defineApi', () => {
   it('builds an Api setting defaulting the subdomain to the api name and deprecated to false', () => {
-    expect(defineApi('orders', 'example.com')).toEqual({
+    expect(defineApi('orders')).toEqual({
       configSettingType: QPQWebServerConfigSettingType.Api,
       uniqueKey: 'orders',
       apiSubdomain: 'orders',
-      rootDomain: 'example.com',
       apiName: 'orders',
       deprecated: false,
       cloudflareApiKeySecretName: undefined,
@@ -18,7 +17,7 @@ describe('defineApi', () => {
   });
 
   it('honours the advanced options', () => {
-    const setting = defineApi('orders', 'example.com', {
+    const setting = defineApi('orders', {
       subDomain: 'api-orders',
       deprecated: true,
       cloudflareApiKeySecretName: 'cf-secret',

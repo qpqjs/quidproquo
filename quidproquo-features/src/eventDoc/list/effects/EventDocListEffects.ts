@@ -6,6 +6,7 @@ import type { EventDocListSetLoadingEffect } from './EventDocListSetLoadingEffec
 import type { EventDocListSetPageIndexEffect } from './EventDocListSetPageIndexEffect';
 import type { EventDocListSetPageSizeEffect } from './EventDocListSetPageSizeEffect';
 
+/** Union of the list effects. */
 export type EventDocListEffects =
   | EventDocListSetConfigEffect
   | EventDocListPageLoadedEffect

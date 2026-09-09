@@ -11,9 +11,7 @@ import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
 import { askEventDocWorkspaceRestoreLocalPending } from './askEventDocWorkspaceRestoreLocalPending';
 import { askEventDocWorkspaceSave } from './askEventDocWorkspaceSave';
 
-// Init/save/refresh need the backend; cancel is pure state. The transport is optional
-// on the definition so state-only workspaces (all-local slots) stay zero-config, but
-// using a transport verb without one fails loudly instead of silently doing nothing.
+// The transport is optional so all-local workspaces stay zero-config; transport verbs fail loudly without one.
 function* askEnsureTransport(transport?: EventDocWorkspaceTransport): AskResponse<EventDocWorkspaceTransport> {
   if (!transport) {
     return yield* askThrowError(
@@ -30,8 +28,6 @@ const resolveSlotKeys = (documentSlotKeys: string[], slotKey?: string): string[]
 
 const getAskInit = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[], localSlotKeys: string[]) =>
   function* askInit(identities: Record<string, EventDocWorkspaceDocumentIdentity>, snapshot?: EventDocWorkspaceSnapshot): AskResponse<void> {
-    // Local streams first: pure state, no transport, and the document loads run in
-    // parallel after — order between the two is immaterial.
     yield* askEventDocWorkspaceRestoreLocalPending(snapshot ?? null, localSlotKeys);
 
     // Unknown keys are dropped rather than growing phantom slots.
@@ -65,6 +61,7 @@ const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefine
     yield* askEventDocWorkspaceLoadOlderHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
+/** Builds the workspace's built-in init/save/cancel/refresh/history verbs. slotKey omitted means every document slot. */
 export const createEventDocWorkspaceBuiltInApi = (
   transport: EventDocWorkspaceTransport | undefined,
   documentSlotKeys: string[],

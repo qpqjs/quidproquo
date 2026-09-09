@@ -1,3 +1,4 @@
+/** Workspace effect types. */
 export enum EventDocWorkspaceEffect {
   ApplyEvent = '@quidproquo-features/eventDocWorkspace/applyEvent',
   ApplyTransientEvent = '@quidproquo-features/eventDocWorkspace/applyTransientEvent',

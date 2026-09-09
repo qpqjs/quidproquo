@@ -286,16 +286,7 @@ export class SqliteKvsRepository implements KvsRepository {
     const data = JSON.stringify(item);
 
     if (options?.ifNotExists) {
-      // OR IGNORE swallows exactly a primary key conflict, and changes === 0
-      // is how sqlite reports one - an atomic compare-and-set.
-      const columns = access.hasSortKey ? '(scope, pk, sk, data)' : '(scope, pk, data)';
-      const placeholders = access.hasSortKey ? '(?, ?, ?, ?)' : '(?, ?, ?)';
-      const insertValues = access.hasSortKey ? [scopeValue, pk, sk, data] : [scopeValue, pk, data];
-
-      const result = this.db.prepare(`INSERT OR IGNORE INTO ${access.table} ${columns} VALUES ${placeholders}`).run(...(insertValues as any[]));
-      if (Number(result.changes) === 0) {
-        throw new ConditionalCheckFailedException(`KVS item already exists in '${keyValueStoreName}'`);
-      }
+      this.insertRowOrThrow(access, scopeValue, pk, sk, data, keyValueStoreName);
       return item;
     }
 
@@ -303,18 +294,46 @@ export class SqliteKvsRepository implements KvsRepository {
     return item;
   }
 
-  async upsertMany(keyValueStoreName: string, items: any[], scope?: string): Promise<KvsUpsertManyResult[]> {
+  // The conditional insert both upsert forms share. OR IGNORE swallows exactly
+  // a primary key conflict, and changes === 0 is how sqlite reports one - an
+  // atomic compare-and-set.
+  private insertRowOrThrow(
+    access: KvsStoreAccess,
+    scopeValue: string,
+    pk: Nullable<string | number>,
+    sk: Nullable<string | number>,
+    data: string,
+    keyValueStoreName: string,
+  ): void {
+    const columns = access.hasSortKey ? '(scope, pk, sk, data)' : '(scope, pk, data)';
+    const placeholders = access.hasSortKey ? '(?, ?, ?, ?)' : '(?, ?, ?)';
+    const insertValues = access.hasSortKey ? [scopeValue, pk, sk, data] : [scopeValue, pk, data];
+
+    const result = this.db.prepare(`INSERT OR IGNORE INTO ${access.table} ${columns} VALUES ${placeholders}`).run(...(insertValues as any[]));
+    if (Number(result.changes) === 0) {
+      throw new ConditionalCheckFailedException(`KVS item already exists in '${keyValueStoreName}'`);
+    }
+  }
+
+  async upsertMany(keyValueStoreName: string, items: any[], options?: { ifNotExists?: boolean }, scope?: string): Promise<KvsUpsertManyResult[]> {
     const access = this.accessStore(keyValueStoreName);
     const scopeValue = scope ?? '';
 
     // One transaction for the whole batch: one WAL commit instead of one per
-    // item, and a failure part-way writes nothing. The per-item SELECT tells
-    // an insert from a modify for the caller's stream events. No awaits
-    // inside: see runInImmediateTransaction.
+    // item, and a failure part-way writes nothing. That rollback is also what
+    // makes the conditional form all-or-nothing: the first existing key throws
+    // out of the transaction and every earlier insert is undone. The per-item
+    // SELECT tells an insert from a modify for the caller's stream events. No
+    // awaits inside: see runInImmediateTransaction.
     return this.runInImmediateTransaction(() =>
       items.map((item) => {
         const pk = getKvsItemPk(item, access.storeConfig) ?? null;
         const sk = getKvsItemSk(item, access.storeConfig) ?? null;
+
+        if (options?.ifNotExists) {
+          this.insertRowOrThrow(access, scopeValue, pk, sk, JSON.stringify(item), keyValueStoreName);
+          return { item, oldItem: null };
+        }
 
         const previousData = this.selectRowData(access, scopeValue, pk, sk);
         this.replaceRow(access, scopeValue, pk, sk, JSON.stringify(item));

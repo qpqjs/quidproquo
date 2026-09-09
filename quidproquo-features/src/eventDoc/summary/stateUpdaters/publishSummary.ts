@@ -1,8 +1,6 @@
 import { EventDocEventPayload, EventDocPublishData, EventDocSummaryView } from '../../models';
 
-// PUBLISH stamps the open draft — the single version with no publishedAt — with when it
-// was published (the event time) and when it takes effect (from the event). The version's
-// `eventId` (where it opened) is already set by INIT_STATE/CREATE_DRAFT, so it stays.
+/** Stamps the open draft (the one version without publishedAt) with publishedAt and effectiveFrom. */
 export const publishSummary = (model: EventDocSummaryView, { data, metadata }: EventDocEventPayload<EventDocPublishData>): EventDocSummaryView => ({
   ...model,
   versions: model.versions.map((version) =>

@@ -6,7 +6,7 @@ import {
 import { defineDevServerOptions } from 'quidproquo-dev-server/config';
 import { defineDynamicRoutes } from 'quidproquo-features';
 
-import { TODO_DOMAIN, TodoServiceEnum } from '@todo/constants';
+import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';
 
 import * as dynamicRoutes from './entry/controller';
@@ -23,7 +23,6 @@ const webEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   cacheSettingsName: 'default',
   domain: {
     onRootDomain: true,
-    rootDomain: TODO_DOMAIN,
   },
   storageDrive: {
     sourceStorageDrive: websiteWebEntryStorageDriveName,
@@ -40,7 +39,6 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   domain: {
     subDomainName: 'views',
     onRootDomain: true,
-    rootDomain: TODO_DOMAIN,
   },
   storageDrive: {
     sourceStorageDrive: mfeHostWebEntryStorageDriveName,

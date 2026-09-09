@@ -4,12 +4,10 @@ import { EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeSta
 import { eventDocWorkspaceChromeApi } from './eventDocWorkspaceChromeApi';
 import { eventDocWorkspaceChromeSlotFold } from './eventDocWorkspaceChromeSlotFold';
 
+/** The default chrome slot's config type. */
 export type EventDocWorkspaceChromeSlot = EventDocWorkspaceLocalSlotConfig<EventDocWorkspaceChromeState, typeof eventDocWorkspaceChromeApi>;
 
-// The standard chrome doc every workspace gets by default; define your own `chrome`
-// slot to replace it. Just an ordinary unsaved event doc definition. No
-// coalesceEventTypes = the unsaved 'all' default, so each chrome field keeps only
-// its latest event.
+/** The chrome slot every workspace gets by default; define your own `chrome` slot to replace it. */
 export const eventDocWorkspaceChromeSlot: EventDocWorkspaceChromeSlot = createEventDocDefinition({
   saved: false,
   foldReducer: eventDocWorkspaceChromeSlotFold.foldReducer,

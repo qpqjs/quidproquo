@@ -9,8 +9,7 @@ import { askEventDocWorkspaceApiAppendEvent } from './askEventDocWorkspaceApiApp
 import { askEventDocWorkspaceApiFetchBootstrap } from './askEventDocWorkspaceApiFetchBootstrap';
 import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFetchEvents';
 
-// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
-const eventId = (n: number): string => String(n).padStart(4, '0');
+const eventId = (n: number): number => n;
 
 const identity: EventDocWorkspaceDocumentIdentity = { serviceName: 'notes', basePath: '/notes', id: 'doc-1' };
 
@@ -64,7 +63,8 @@ describe('eventDocWorkspaceApiTransport', () => {
       [ApiActionType.Request]: respondEmpty,
     });
 
-    expect(requests[0].params).toMatchObject({ afterEventId: eventId(7) });
+    // The cursor is a number in the transport and a string on the wire.
+    expect(requests[0].params).toMatchObject({ afterEventId: String(eventId(7)) });
   });
 
   it('bootstrap asks for the base on the first page only, then pages the tail pinned to it', () => {
@@ -90,7 +90,7 @@ describe('eventDocWorkspaceApiTransport', () => {
     expect(bootstrap.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(4), eventId(5)]);
 
     expect(requests[0]).toMatchObject({ service: 'notes', method: 'GET', endpoint: '/v1/notes/doc-1/events', params: { includeBase: 'true' } });
-    expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2', afterEventId: eventId(3) });
+    expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2', afterEventId: String(eventId(3)) });
     expect(requests[1].params?.includeBase).toBeUndefined();
   });
 

@@ -4,10 +4,7 @@ import { askEventDocWorkspaceApiFetchBootstrap } from './askEventDocWorkspaceApi
 import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFetchEvents';
 import { askEventDocWorkspaceApiFetchEventsPage } from './askEventDocWorkspaceApiFetchEventsPage';
 
-// The standard transport: speaks the feature's own event routes over
-// askApiRequest, so any runtime with an ApiActionType.Request processor (the web
-// runtime, the dev server) can drive a workspace with zero wiring. Other hosts (tests,
-// backend stories) inject their own EventDocWorkspaceTransport instead.
+/** The standard transport over askApiRequest; hosts without an api request processor inject their own. */
 export const eventDocWorkspaceApiTransport: EventDocWorkspaceTransport = {
   askFetchBootstrap: askEventDocWorkspaceApiFetchBootstrap,
   askFetchEvents: askEventDocWorkspaceApiFetchEvents,

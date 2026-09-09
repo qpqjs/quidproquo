@@ -10,7 +10,7 @@ function* askEventDocTransferUpload(): AskResponse<HTTPEventResponse> {
   return qpqWebServerUtils.toJsonEventResponse(target);
 }
 
-/** POST /transfer/upload — a presigned PUT for a bundle file, plus the id plan/import quote back. */
+/** POST /transfer/upload: a presigned PUT for a bundle file plus the transferId plan/import quote back. */
 export function* upload(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocTransferProvideRequestScope(event, askEventDocTransferUpload());
 }

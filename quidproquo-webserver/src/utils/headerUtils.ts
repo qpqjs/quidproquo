@@ -1,9 +1,12 @@
 import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
 
-import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
+import { RouteOptions } from '../config/settings/route';
+import { resolveHosts } from '../domain/logic/host/resolveHosts';
+import { resolveOrigins } from '../domain/logic/origin/resolveOrigins';
+import { DomainResolver } from '../domain/types/DomainResolver';
 import { qpqHeaderIsBot, SeoEvent } from '../types';
 import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
-import { getBaseDomainName, getDefaultRouteSettings } from './qpqConfigAccessorsUtils';
+import { getDefaultRouteSettings } from './qpqConfigAccessorsUtils';
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
   const headerAsLower = header.toLowerCase();
@@ -38,55 +41,38 @@ export const getAccessTokenFromHeaders = (headers: HttpEventHeaders): string | u
   return authToken;
 };
 
-export const convertContentSecurityPolicyEntryToString = (baseDomain: string, allowedOrigin: ServiceAllowedOrigin | string): string => {
-  if (typeof allowedOrigin === 'string') {
-    return allowedOrigin;
-  }
+/** Site roots first (primary leads, so it is the fallback origin), then default and route entries, all lowercased. */
+export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions, resolver?: DomainResolver): string[] => {
+  const rootOrigins = resolveHosts(qpqConfig, {}, resolver).map((host) => `https://${host}`);
 
-  // Otherwise its a QpqServiceContentSecurityPolicy
-  const domain = allowedOrigin.domain || baseDomain;
-
-  const protocol = allowedOrigin.protocol || 'https';
-
-  if (allowedOrigin.service) {
-    return `${protocol}://${allowedOrigin.api}.${allowedOrigin.service}.${domain}`;
-  }
-
-  return `${protocol}://${allowedOrigin.api}.${domain}`;
-};
-
-export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): string[] => {
-  const baseDomain = getBaseDomainName(qpqConfig);
-  // Root domain
-  const rootDomain = `https://${baseDomain}`;
-
-  // generic settings
-  const defaultRouteSettings = getDefaultRouteSettings(qpqConfig);
-
-  const defaultAllowedOrigins = defaultRouteSettings.reduce(
-    (acc, cur) => [...acc, ...(cur.routeOptions.allowedOrigins || []).map((ao) => convertContentSecurityPolicyEntryToString(baseDomain, ao))],
-    [] as string[],
+  const defaultAllowedOrigins = getDefaultRouteSettings(qpqConfig).flatMap((setting) =>
+    (setting.routeOptions.allowedOrigins || []).flatMap((entry) => resolveOrigins(qpqConfig, entry, resolver)),
   );
 
-  // Route specific
-  const routeAllowedOrigins = (route.allowedOrigins || []).map((ao) => convertContentSecurityPolicyEntryToString(baseDomain, ao));
+  const routeAllowedOrigins = (route.allowedOrigins || []).flatMap((entry) => resolveOrigins(qpqConfig, entry, resolver));
 
-  // Return the allowed origins
-  const allAllowedOrigins = [rootDomain, ...defaultAllowedOrigins, ...routeAllowedOrigins].map((o) => o.toLowerCase());
-
-  return allAllowedOrigins;
+  return [...rootOrigins, ...defaultAllowedOrigins, ...routeAllowedOrigins].map((origin) => origin.toLowerCase());
 };
 
-export const getCorsHeaders = (qpqConfig: QPQConfig, route: RouteOptions, reqHeaders: HttpEventHeaders): HttpEventHeaders => {
+export const getCorsHeaders = (
+  qpqConfig: QPQConfig,
+  route: RouteOptions,
+  reqHeaders: HttpEventHeaders,
+  resolver?: DomainResolver,
+): HttpEventHeaders => {
   const origin = getHeaderValue('origin', reqHeaders) || '';
 
-  const allowedOrigins = getAllowedOrigins(qpqConfig, route);
+  const allowedOrigins = getAllowedOrigins(qpqConfig, route, resolver);
 
   const allowCredentials = !!route.routeAuthSettings?.userDirectoryName;
 
   // If we have an auth endpoint, then we don't let wildcard origins access the API for security reasons
+  // A service with no domain declares nothing browser-facing, so an open origin is the
+  // only sensible fallback (the storage-drive cors default makes the same call).
   const allowOrigin =
-    (!allowCredentials ? allowedOrigins.find((ao) => origin === ao || ao === '*') : allowedOrigins.find((ao) => origin === ao)) || allowedOrigins[0];
+    (!allowCredentials ? allowedOrigins.find((ao) => origin === ao || ao === '*') : allowedOrigins.find((ao) => origin === ao)) ||
+    allowedOrigins[0] ||
+    '*';
 
   // Reflect exactly what the preflight asks for instead of a blanket '*'. A
   // literal '*' is invalid once credentials are allowed (browsers reject it),

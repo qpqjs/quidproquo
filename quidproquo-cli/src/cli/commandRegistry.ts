@@ -39,6 +39,12 @@ export const cliCommands: CliCommand[] = [
     run: (a) => require('../commands/go').goCommand(a),
   },
   {
+    name: 'setup',
+    summary: 'Take a cloud environment from empty to deployed: checked steps, run in order (interactive)',
+    usageExtra: ["--check prints each step's status; --yes runs them all; --only <ids> runs a subset."],
+    run: (a) => require('../commands/setup').setupCommand(a),
+  },
+  {
     name: 'go:docker',
     summary: 'Same as go (incl. positional args), but deploys in parallel via docker',
     run: (a) => require('../commands/goDocker').goDockerCommand(a),

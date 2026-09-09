@@ -7,14 +7,8 @@ import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOp
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
-// Pull only the events appended since the last one we hold (afterEventId is exclusive,
-// so the append can't duplicate) and append JUST the tail, so the reducer folds only
-// those events into the stored history view. The cursor falls back to the slot's fold
-// base when the held history is empty — a bootstrap-loaded slot whose snapshot was
-// current holds no events, and refreshing it must not refetch from event zero.
-// Touches the SAVED log only; the pending buffer stays intact and the folded view
-// re-derives reactively. A slot with no identity (local, or not yet initialised) is
-// skipped.
+// afterEventId is exclusive. It falls back to the fold base when the held history is empty, so a slot whose snapshot was
+// current does not refetch from event zero.
 const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
   function* askRefreshDocumentSlot(slotKey: string): AskResponse<void> {
     const state = yield* askEventDocWorkspaceReadState();
@@ -42,6 +36,10 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
     }
   };
 
+/**
+ * Appends the events saved since the last held one to each slot's history; pending stays intact. Slots with no identity
+ * are skipped.
+ */
 export function* askEventDocWorkspaceRefresh(transport: EventDocWorkspaceTransport, slotKeys: string[]): AskResponse<void> {
   yield* askMapParallel(slotKeys, getAskRefreshDocumentSlot(transport));
 }

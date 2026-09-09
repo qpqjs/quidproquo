@@ -18,7 +18,7 @@ const onConnect = '/entry::onConnect' as const;
 const onDisconnect = '/entry::onDisconnect' as const;
 const onMessage = '/entry::onMessage' as const;
 
-const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', 'example.com', { onConnect, onDisconnect, onMessage })]);
+const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', { onConnect, onDisconnect, onMessage })]);
 
 const invoke = async (eventType: string) => {
   const processors = await getEventMatchStoryActionProcessor(buildConfig(), noopDynamicModuleLoader);

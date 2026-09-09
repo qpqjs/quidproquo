@@ -6,11 +6,10 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 const FALLBACK_MIMETYPE = 'application/octet-stream';
 
-// Write a server-generated binary as an immutable asset on the (provided) collection's blob drive,
-// under the standard `<docId>/assets/<guid>` scheme, and return its ref. The server-side twin of the
-// presigned upload flow (askEventDocGenerateAssetUploadUrl) — for when the backend itself holds the
-// bytes (e.g. a rendered PDF) and no client round-trip is needed. Assumes the store context is
-// provided (wrap in askEventDocProvideStore); the download route serves it back via the same key.
+/**
+ * Writes a server-held binary as an immutable asset at `<docId>/assets/<guid>` and returns its ref. Server-side twin of
+ * the presigned upload flow. Assumes the store context is provided.
+ */
 export function* askEventDocWriteAsset(docId: string, binary: QPQBinaryData): AskResponse<EventDocAssetRef> {
   const { storageDriveName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

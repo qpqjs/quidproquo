@@ -8,9 +8,7 @@ import { buildEventDocStoreGlobals } from '../globals/buildEventDocStoreGlobals'
 import { EventDocRouteName } from '../types/EventDocRouteName';
 import { EventDocRoutesOptions } from '../types/EventDocRoutesOptions';
 
-// Controllers ship inside this package (resolved relative to this file) and read
-// store/type/userDirectory from per-route globals, so a service needs no
-// controller wiring — drop the result into its infrastructure default export.
+/** The CRUD/event/asset routes for one collection. Controllers ship in this package and read the store from per-route globals. */
 export const defineEventDocRoutes = ({
   storeName,
   type,
@@ -22,8 +20,6 @@ export const defineEventDocRoutes = ({
   scopeResolver,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
-  // Same assembly a hand-written route uses via askEventDocProvideStore, so built-in and
-  // custom routes describe the identical store.
   const store = buildEventDocStore({
     storeName,
     type,

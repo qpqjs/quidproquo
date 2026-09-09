@@ -20,7 +20,9 @@ import { ResolvedDevServerConfig } from '../../../types';
 // as a single unit (one transaction on an engine that has them). Per-item
 // stream emission is kept - AWS streams emit one record per item regardless of
 // how it was written, and local projectors must see the same shape.
-// Unconditional, like BatchWriteItem.
+// Unconditional like BatchWriteItem, or with ifNotExists all-or-nothing like
+// TransactWriteItems: an existing key rolls the batch back and maps to the
+// namespaced Conflict, with no stream events emitted.
 const getProcessKeyValueStoreUpsertMany = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
@@ -49,7 +51,7 @@ const getProcessKeyValueStoreUpsertMany = (
         seenKeys.add(itemKey);
       }
 
-      const results = await repository.upsertMany(keyValueStoreName, items, scope);
+      const results = await repository.upsertMany(keyValueStoreName, items, { ifNotExists: options?.ifNotExists }, scope);
 
       // Stand in for the change stream, AFTER the batch has committed - see
       // emitKvsStreamEvent. upsertMany reports what each write replaced, so
@@ -68,6 +70,7 @@ const getProcessKeyValueStoreUpsertMany = (
       return actionResult(void 0);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
+        ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound, error.message),
       });

@@ -9,9 +9,9 @@ import {
   QPQConfig,
   QpqFunctionRuntime,
 } from 'quidproquo';
+import { defineEventDoc } from 'quidproquo-features';
 
 import { z } from 'zod/v4';
-
 import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import {
   SmokeProbeRecord,
@@ -20,6 +20,11 @@ import {
 } from '@qpqjs/test-models';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
+import {
+  SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE,
+  SMOKE_EVENT_DOC_APPEND_QUEUE,
+  SMOKE_EVENT_DOC_BASE_PATH,
+} from '../constants/smokeEventDoc';
 import {
   SMOKE_PROBE_EVENT_BUS,
   SMOKE_PROBE_EVENT_QUEUE,
@@ -32,6 +37,7 @@ import {
   SMOKE_RUN_QUEUE,
   SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
 } from '../constants/smokeRunQueue';
+import { smokeProbeDocDefinition } from '../eventDoc/smokeProbeDocDefinition';
 
 // Everything the smoke feature needs: the run store, the queue runs execute
 // on, and the two routes. Runtimes are located relative to this file, so the
@@ -92,6 +98,29 @@ export const defineSmoke = (): QPQConfig => {
       },
       { eventBusSubscriptions: [SMOKE_PROBE_EVENT_BUS] }
     ),
+
+    // The event-doc probe collection: a full registered collection (stores, stream
+    // projector, dynamic functions, routes) so the smoke tests exercise event docs the
+    // way a real service does. NOTE the routes mount with no auth - the test service
+    // has no user directory - so the collection is world-writable; it holds nothing
+    // but throwaway probe docs. The queue fans a test's writers out one invocation
+    // each, so their appends race across lambdas.
+    defineEventDoc(
+      smokeProbeDocDefinition,
+      {
+        basePath: __dirname,
+        relativePath: '../eventDoc/smokeProbeDocDefinition',
+        functionName: 'smokeProbeDocDefinition',
+      },
+      { basePath: SMOKE_EVENT_DOC_BASE_PATH }
+    ),
+    defineQueue(SMOKE_EVENT_DOC_APPEND_QUEUE, {
+      [SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE]: {
+        basePath: __dirname,
+        relativePath: '../queue/onSmokeEventDocAppend',
+        functionName: 'onSmokeEventDocAppend',
+      },
+    }),
 
     // The zod models double as the routes' published contract, flattened to
     // JSON Schema here for the OpenAPI document at /v1/docs.

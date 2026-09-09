@@ -10,8 +10,7 @@ import { setCode } from './stateUpdaters/setCode';
 import { setName } from './stateUpdaters/setName';
 import { ReservedEventDocEffects } from './ReservedEventDocEffects';
 
-// Reserved base effects every fold reducer carries, independent of any module's domain.
-// Each handler is a pure state updater in ./stateUpdaters (one per effect).
+/** The reserved effects every fold reducer carries, one pure state updater per effect. */
 export const buildEventDocBaseReducer = <TState extends EventDocDocument>(
   getInitialState: () => TState,
 ): QpqReducer<TState, ReservedEventDocEffects> =>

@@ -5,15 +5,8 @@ import { EventDocEvent } from '../../eventDoc/models';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferDiscardedPath } from '../constants';
 
 /**
- * Cut the target's log back to `fromIndex` so a bundle can be applied over the top, and park what was
- * cut on the transfer drive FIRST.
- *
- * The backup is the whole point of the ordering: deleting events is the one irreversible thing this
- * feature does, so the discarded tail is written to `discarded/<transferId>/<docId>.json` before a
- * single delete runs. If the write fails, nothing is deleted.
- *
- * Assets are left alone deliberately. They are immutable and guid-keyed, the surviving prefix may
- * still reference them, and an incoming bundle writes its own at their own guids.
+ * Cuts the target's log back to `fromIndex` and returns what was cut. The discarded tail is written to the transfer drive
+ * before any delete runs, so a failed backup deletes nothing. Assets are left alone: the surviving prefix may still reference them.
  */
 export function* askEventDocTransferTruncateLog(
   transferId: string,
@@ -21,9 +14,7 @@ export function* askEventDocTransferTruncateLog(
   existingEvents: EventDocEvent[],
   fromIndex: number,
 ): AskResponse<EventDocEvent[]> {
-  // `fromIndex` is a POSITION in the log (what findEventDocLogDivergence reports and what
-  // askEventDocWriteForeignEvents slices on), not an event id. Those coincided while ids were a
-  // contiguous counter; with sortable ids they are different things, so slice by position.
+  // Sliced by position, not by event id: the comparison that produced `fromIndex` was positional.
   const discarded = existingEvents.slice(fromIndex);
 
   if (discarded.length === 0) {

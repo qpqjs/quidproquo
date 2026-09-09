@@ -1,5 +1,6 @@
 export * from './ClientEventDocEventPayload';
 export * from './DateISOSchema';
+export * from './EventDocAppendBase';
 export * from './EventDocAssetDownloadUrl';
 export * from './EventDocAssetRef';
 export * from './EventDocAssetUploadUrl';

@@ -1,10 +1,10 @@
 import { EventDocDocument } from '../models';
 import { EventDocMigrations } from './EventDocMigrations';
 
-// Climb the single-step migration chain until the state reaches `target`, stamping the
-// new schemaVersion at each step (migrations never touch it). A target at or below the
-// current version is a no-op; a missing step throws (the chain must cover 2..latest
-// with no gaps).
+/**
+ * Climb the migration chain to `target`, stamping schemaVersion at each step. A target at or below the current version
+ * is a no-op; a missing step throws.
+ */
 export const migrateEventDocDocumentTo = (state: EventDocDocument, target: number, migrations: EventDocMigrations): EventDocDocument => {
   let migrated = state;
 

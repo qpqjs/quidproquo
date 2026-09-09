@@ -37,8 +37,9 @@ export const getWorkspaceAccountQpqConfig = (ctx: QpqAppDeployContext): QPQConfi
 ];
 
 // The app's bootstrap config: apex/zone/cert/WAF-level resources every service
-// in the app builds on. Resource names are prefixed with the app prefix, so
-// multiple apps can bootstrap into one shared AWS account.
+// in the app builds on. The fragment declares defineDns like every service does.
+// Resource names are prefixed with the app prefix, so multiple apps can bootstrap
+// into one shared AWS account.
 export const getWorkspaceBootstrapQpqConfig = (ctx: QpqAppDeployContext): QPQConfig => [
   defineApplication(ctx.prefix, ctx.environment, ctx.appDir, ctx.actorName),
 

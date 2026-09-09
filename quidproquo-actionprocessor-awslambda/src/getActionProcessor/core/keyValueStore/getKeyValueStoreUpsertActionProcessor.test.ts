@@ -55,6 +55,8 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
   it.each([
     ['InternalServerError', askKeyValueStoreUpsertBase.errorType.ServiceUnavailable],
     ['ResourceNotFoundException', askKeyValueStoreUpsertBase.errorType.ResourceNotFound],
+    ['ConditionalCheckFailedException', askKeyValueStoreUpsertBase.errorType.Conflict],
+    ['TransactionConflictException', askKeyValueStoreUpsertBase.errorType.WriteContention],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(putItem).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

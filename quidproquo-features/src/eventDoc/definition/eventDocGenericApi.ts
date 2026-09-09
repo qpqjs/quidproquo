@@ -3,9 +3,7 @@ import { askEventDocPublish } from '../actionCreators/askEventDocPublish';
 import { askEventDocSetCode } from '../actionCreators/askEventDocSetCode';
 import { askEventDocSetName } from '../actionCreators/askEventDocSetName';
 
-// The verbs EVERY saved event doc has: the reserved identity + lifecycle events.
-// createEventDocDefinition merges these into each saved definition's api, so editors
-// never hand-spread them; a domain api redefining one of these names throws there.
+/** The verbs every saved event doc has. createEventDocDefinition merges them into each saved api; a domain api redefining one throws. */
 export const eventDocGenericApi = {
   askEventDocSetCode,
   askEventDocSetName,
@@ -13,4 +11,5 @@ export const eventDocGenericApi = {
   askEventDocPublish,
 };
 
+/** The shape of the generic verb set. */
 export type EventDocGenericApi = typeof eventDocGenericApi;

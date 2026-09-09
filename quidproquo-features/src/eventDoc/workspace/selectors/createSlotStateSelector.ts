@@ -1,9 +1,10 @@
 import { EventDocWorkspaceSelector } from '../types/EventDocWorkspaceSelectors';
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from '../types/EventDocWorkspaceSlotState';
 
-// Shared fallback for reads before init / unknown keys; read-only so sharing is safe.
+// Shared read-only fallback for reads before init.
 const fallbackSlotState = createInitialEventDocWorkspaceSlotState();
 
+/** One slot's status, falling back to the initial state for unknown keys. */
 export const createSlotStateSelector =
   (slotKey: string): EventDocWorkspaceSelector<EventDocWorkspaceSlotState> =>
   (state) =>

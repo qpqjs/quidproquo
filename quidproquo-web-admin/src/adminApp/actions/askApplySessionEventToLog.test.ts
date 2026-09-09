@@ -15,7 +15,6 @@ describe('askApplySessionEventToLog', () => {
 
     runStory(askApplySessionEventToLog({ type: AdminSessionEventType.tabChanged, data: { tab: 1, tabName: 'Logs' } }), {
       [GuidActionType.New]: 'cmid-1',
-      [GuidActionType.NewSortable]: 'sguid-0001',
       [DateActionType.Now]: '2026-07-07T00:00:00.000Z',
       [StateActionType.Dispatch]: (action: { payload: { action: { type: string; payload: EventDocEvent } } }) => {
         dispatched.push(action.payload.action);

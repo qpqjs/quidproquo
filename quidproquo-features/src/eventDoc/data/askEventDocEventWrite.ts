@@ -5,11 +5,10 @@ import { EventDocEvent } from '../models';
 import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredEvent';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Events are immutable and uniquely keyed, so the write is CONDITIONAL: the
-// (modelId, index) slot is claimed atomically, and a concurrent writer that
-// computed the same index gets ErrorTypeEnum.Conflict instead of silently
-// overwriting the event. Ordering, index assignment, validation and the
-// conflict-retry live in the logic layer (askEventDocEventAppend).
+/**
+ * Conditionally claims the (modelId, eventId) slot; a concurrent writer with the same id gets the Upsert Conflict error.
+ * Id assignment and the conflict re-lap live in askEventDocEventAppend.
+ */
 export function* askEventDocEventWrite(modelId: string, event: EventDocEvent): AskResponse<void> {
   const { eventsStoreName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

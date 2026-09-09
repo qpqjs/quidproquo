@@ -3,6 +3,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
+import { requireDomainResolver } from '../appWorkspace/requireDomainResolver';
 import {
   QpqCoreAiConstruct,
   QpqCoreApiGraphDatabaseConstruct,
@@ -42,7 +43,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
           storageDriveConfig: setting,
 
-          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(props.qpqConfig, setting.storageDrive),
+          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(
+            props.qpqConfig,
+            setting.storageDrive,
+            requireDomainResolver(props.qpqConfig),
+          ),
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
         }),
     );
@@ -169,11 +174,14 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqWebserverWebsocketConstruct.authorizeManageConnectionsForRole(webserverRole, websockets, props.qpqConfig);
 
-    // Email senders (SES identities)
+    // Email senders (SES identities). The construct id is keyed by the primary root, not the
+    // setting: an SES identity's physical id is the domain itself, so a changed logical id would
+    // fail creation against the identity the stack already owns.
     const emailSenderConfigs = qpqWebServerUtils.getEmailSenderSettings(props.qpqConfig);
+    const emailSenderConstructId = `EmailSender${qpqWebServerUtils.getPrimaryRootDomain(props.qpqConfig) ?? ''}`;
     emailSenderConfigs.map(
       (setting) =>
-        new QpqWebserverEmailSenderConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        new QpqWebserverEmailSenderConstruct(this, emailSenderConstructId, {
           qpqConfig: props.qpqConfig,
 
           emailSenderConfig: setting,

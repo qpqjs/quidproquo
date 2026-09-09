@@ -2,10 +2,11 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QPQConfig } from 'quidproquo-core';
 
 import { aws_iam } from 'aws-cdk-lib';
-import { IGrantable, IRole } from 'aws-cdk-lib/aws-iam';
+import { IGrantable } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 import { QpqResource } from './QpqResource';
+import { QpqServiceRole } from './QpqServiceRole';
 
 export interface QpqConstructBlockProps {
   qpqConfig: QPQConfig;
@@ -13,7 +14,6 @@ export interface QpqConstructBlockProps {
 
 export class QpqConstructBlock extends Construct implements QpqResource {
   qpqConfig: QPQConfig;
-  serviceRole?: aws_iam.IRole;
 
   constructor(scope: Construct, id: string, props: QpqConstructBlockProps) {
     super(scope, id);
@@ -47,12 +47,6 @@ export class QpqConstructBlock extends Construct implements QpqResource {
   }
 
   getServiceRole(): aws_iam.IRole {
-    if (!this.serviceRole) {
-      this.serviceRole = aws_iam.Role.fromRoleName(this, 'service-role', this.resourceName('service-role'), {
-        mutable: true,
-      });
-    }
-
-    return this.serviceRole;
+    return QpqServiceRole.of(this, this.qpqConfig);
   }
 }

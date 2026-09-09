@@ -10,7 +10,7 @@ function* askEventDocStoreGet(id: string): AskResponse<HTTPEventResponse> {
   return qpqWebServerUtils.toJsonEventResponse(model);
 }
 
-/** GET {basePath}/{id} — fetch one head row (404 if missing). */
+/** GET {basePath}/{id}: one summary (404 if missing). */
 export function* get(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreGet(params.id)));
 }

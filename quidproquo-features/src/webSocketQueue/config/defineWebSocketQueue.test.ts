@@ -24,7 +24,7 @@ describe('webSocketQueue key helpers', () => {
 
 describe('defineWebSocketQueue', () => {
   it('emits four globals, a connection kvs and a websocket', () => {
-    const config = defineWebSocketQueue('chat-bus', 'chat', 'example.com');
+    const config = defineWebSocketQueue('chat-bus', 'chat');
     const types = config.map((setting) => (setting as { configSettingType: string }).configSettingType);
 
     expect(types).toEqual([

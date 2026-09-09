@@ -4,11 +4,7 @@ import { askUIEventDocListSetPageIndex } from '../actionCreators/askUIEventDocLi
 import type { EventDocListState } from '../types/EventDocListState';
 import { askEventDocListLoad } from './askEventDocListLoad';
 
-// Walk forward one page.
-//
-// Gated on `nextPageKey` being present — the store's own answer to "is there more". Never on item count: a
-// page can be short of `pageSize` because soft-deleted rows were filtered out after reading, and stopping on
-// that would silently hide every page beyond the first short one.
+/** Walks forward one page. Gated on `nextPageKey`, never on item count: a page can come back short and still have more after it. */
 export function* askEventDocListNextPage(): AskResponse<void> {
   const state = yield* askStateRead<EventDocListState>();
 

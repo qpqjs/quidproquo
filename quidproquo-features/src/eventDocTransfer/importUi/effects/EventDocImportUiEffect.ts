@@ -1,3 +1,4 @@
+/** Effects of the import screen. */
 export enum EventDocImportUiEffect {
   SetLoading = 'EventDocImportUi/SetLoading',
   SetPlan = 'EventDocImportUi/SetPlan',

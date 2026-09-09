@@ -4,11 +4,10 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { defineEmailSender } from './emailSender';
 
 describe('defineEmailSender', () => {
-  it('builds an EmailSender setting keyed by the root domain', () => {
-    expect(defineEmailSender('example.com')).toEqual({
+  it('builds the single EmailSender setting', () => {
+    expect(defineEmailSender()).toEqual({
       configSettingType: QPQWebServerConfigSettingType.EmailSender,
-      uniqueKey: 'example.com',
-      rootDomain: 'example.com',
+      uniqueKey: 'emailSender',
     });
   });
 });

@@ -1,6 +1,6 @@
+import type { PrismTheme } from 'prism-react-renderer';
 import type * as Preset from '@docusaurus/preset-classic';
-import type {Config} from '@docusaurus/types';
-import type {PrismTheme} from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -12,16 +12,36 @@ const qpqPrismTheme: PrismTheme = {
     backgroundColor: 'transparent',
   },
   styles: [
-    {types: ['keyword', 'operator', 'atrule'], style: {color: '#7dd3fc'}},
-    {types: ['function', 'function-variable'], style: {color: '#8df6ff'}},
-    {types: ['string', 'char', 'attr-value', 'url', 'regex'], style: {color: '#fbbf77'}},
-    {types: ['class-name', 'maybe-class-name', 'builtin', 'namespace'], style: {color: '#86efac'}},
-    {types: ['comment', 'prolog', 'doctype', 'cdata'], style: {color: '#5c7181', fontStyle: 'italic' as const}},
-    {types: ['number', 'boolean', 'constant', 'symbol', 'property', 'attr-name', 'variable'], style: {color: '#c4b5fd'}},
-    {types: ['punctuation'], style: {color: '#8fa8b8'}},
-    {types: ['tag', 'selector'], style: {color: '#7dd3fc'}},
-    {types: ['deleted'], style: {color: '#ff5f57'}},
-    {types: ['inserted'], style: {color: '#28c840'}},
+    { types: ['keyword', 'operator', 'atrule'], style: { color: '#7dd3fc' } },
+    { types: ['function', 'function-variable'], style: { color: '#8df6ff' } },
+    {
+      types: ['string', 'char', 'attr-value', 'url', 'regex'],
+      style: { color: '#fbbf77' },
+    },
+    {
+      types: ['class-name', 'maybe-class-name', 'builtin', 'namespace'],
+      style: { color: '#86efac' },
+    },
+    {
+      types: ['comment', 'prolog', 'doctype', 'cdata'],
+      style: { color: '#5c7181', fontStyle: 'italic' as const },
+    },
+    {
+      types: [
+        'number',
+        'boolean',
+        'constant',
+        'symbol',
+        'property',
+        'attr-name',
+        'variable',
+      ],
+      style: { color: '#c4b5fd' },
+    },
+    { types: ['punctuation'], style: { color: '#8fa8b8' } },
+    { types: ['tag', 'selector'], style: { color: '#7dd3fc' } },
+    { types: ['deleted'], style: { color: '#ff5f57' } },
+    { types: ['inserted'], style: { color: '#28c840' } },
   ],
 };
 
@@ -65,11 +85,15 @@ const config: Config = {
   headTags: [
     {
       tagName: 'link',
-      attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
+      attributes: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     },
     {
       tagName: 'link',
-      attributes: {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'},
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
     },
   ],
   stylesheets: [

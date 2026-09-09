@@ -1,9 +1,20 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, HTTPMethod, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import {
+  actionResult,
+  askEventGetRecordsBase,
+  createActionProcessor,
+  DynamicModuleLoader,
+  EventActionType,
+  HTTPMethod,
+  ProcessorFor,
+  QPQConfig,
+} from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+const getProcessGetRecords = async (qpqConfig: QPQConfig, loader: DynamicModuleLoader): Promise<ProcessorFor<typeof askEventGetRecordsBase>> => {
+  const domainResolver = await qpqWebServerUtils.loadDomainResolver(qpqConfig, loader);
+
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
@@ -12,7 +23,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     const records = cloudFrontRequestEvent.Records.map((record) => {
       const cfRecordRequest = record.cf.request;
 
-      const headers = Object.keys(cfRecordRequest.headers).reduce(
+      const headers: Record<string, string> = Object.keys(cfRecordRequest.headers).reduce(
         (acc, header) => ({
           ...acc,
           [header]: cfRecordRequest.headers[header][0].value,
@@ -21,7 +32,9 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       );
 
       const internalRecord: InternalEventRecord = {
-        domain: qpqWebServerUtils.getBaseDomainName(qpqConfig),
+        // Without a declared domain there is nothing to validate the Host header against,
+        // so it is the only value left; with one, a matched root wins over the header.
+        domain: qpqWebServerUtils.resolveHostForRequestHost(qpqConfig, headers.host, {}, domainResolver) ?? headers.host ?? '',
         body: cfRecordRequest.body,
         correlation: context.awsRequestId,
         method: cfRecordRequest.method as HTTPMethod,

@@ -5,6 +5,7 @@ import type { EventDocImportUiSetLoadingEffect } from './EventDocImportUiSetLoad
 import type { EventDocImportUiSetPlanEffect } from './EventDocImportUiSetPlanEffect';
 import type { EventDocImportUiSetResultEffect } from './EventDocImportUiSetResultEffect';
 
+/** Union of the import screen effects. */
 export type EventDocImportUiEffects =
   | EventDocImportUiSetLoadingEffect
   | EventDocImportUiSetPlanEffect

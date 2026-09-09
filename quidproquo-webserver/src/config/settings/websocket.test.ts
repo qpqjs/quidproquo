@@ -8,17 +8,11 @@ const eventProcessors: QpqWebSocketEventProcessors = {
 };
 
 describe('defineWebsocket', () => {
-  // The uniqueKey is deliberately domain-FREE (apiSubdomain only): it becomes the CDK
-  // construct id and therefore the CloudFormation logical id, while every physical resource
-  // the setting creates is named from app/service/environment. A domain-derived key meant a
-  // domain rename changed the logical ids over unchanged physical names, deadlocking the
-  // inf/api stacks on "already exists" — see websocket.ts.
   it('builds a WebSocket setting keyed by apiSubdomain with defaults', () => {
-    expect(defineWebsocket('api', 'example.com', eventProcessors)).toEqual({
+    expect(defineWebsocket('api', eventProcessors)).toEqual({
       configSettingType: QPQWebServerConfigSettingType.WebSocket,
       uniqueKey: 'api',
       apiSubdomain: 'api',
-      rootDomain: 'example.com',
       eventProcessors,
       onRootDomain: false,
       apiName: 'api',
@@ -30,7 +24,7 @@ describe('defineWebsocket', () => {
   });
 
   it('honours the advanced options', () => {
-    const setting = defineWebsocket('ws', 'example.com', eventProcessors, {
+    const setting = defineWebsocket('ws', eventProcessors, {
       onRootDomain: true,
       apiName: 'realtime',
       deprecated: true,

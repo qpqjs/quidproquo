@@ -7,13 +7,13 @@ description: Define a WebSocket API with connect, disconnect, and message route 
 
 Defines a **WebSocket API**: a persistent, bidirectional connection endpoint served on its own subdomain. You supply story entry points that run when a client connects, disconnects, or sends a message, and the runtime wires them to the platform's WebSocket transport. Stories push messages back to connected clients with [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md).
 
-- **On AWS:** deploys an **API Gateway v2 WebSocket API** (`QpqApiWebserverWebsocketConstruct` in `quidproquo-deploy-awscdk`) fronted by a single Lambda proxy integration. Three routes — `$connect`, `$disconnect`, and `$default` — all target that Lambda, which dispatches to the matching handler in `eventProcessors`. The API is mapped to a custom subdomain (`apiSubdomain.rootDomain`) and served from the `prod` stage. Routes use `authorizationType: NONE`; do your own auth inside the `onConnect`/`onMessage` handlers. When `deprecated` is set, nothing is deployed.
+- **On AWS:** deploys an **API Gateway v2 WebSocket API** (`QpqApiWebserverWebsocketConstruct` in `quidproquo-deploy-awscdk`) fronted by a single Lambda proxy integration. Three routes — `$connect`, `$disconnect`, and `$default` — all target that Lambda, which dispatches to the matching handler in `eventProcessors`. The API is mapped to a custom domain on every root from [defineDns](./dns.md) (the `{ subdomain: apiSubdomain, service }` target, or `{ subdomain: apiSubdomain }` when `onRootDomain` is set) and served from the `prod` stage. Routes use `authorizationType: NONE`; do your own auth inside the `onConnect`/`onMessage` handlers. When `deprecated` is set, nothing is deployed.
 
 ```typescript
 import { defineWebsocket } from 'quidproquo-webserver';
 
 export default [
-  defineWebsocket('ws', 'example.com', {
+  defineWebsocket('ws', {
     onConnect: '/entry/ws/onConnect::onConnect',
     onDisconnect: '/entry/ws/onDisconnect::onDisconnect',
     onMessage: '/entry/ws/onMessage::onMessage',
@@ -54,7 +54,6 @@ export type WebsocketEvent<T extends string | Blob | ArrayBuffer = string> = {
 ```typescript
 function defineWebsocket(
   apiSubdomain: string,
-  rootDomain: string,
   eventProcessors: QpqWebSocketEventProcessors,
   options?: QPQConfigAdvancedWebSocketSettings,
 ): WebSocketQPQWebServerConfigSetting;
@@ -64,11 +63,8 @@ function defineWebsocket(
 
 ### `apiSubdomain` — `string` (required)
 
-The subdomain the WebSocket API is served on. Combined with `rootDomain` it forms the connection host (`apiSubdomain.rootDomain`). It alone is the setting's `uniqueKey`.
+The subdomain the WebSocket API is served on; with the default shape the host is `apiSubdomain.<service>.<base>` (or `apiSubdomain.<base>` when `onRootDomain` is set). It alone is the setting's `uniqueKey`.
 
-### `rootDomain` — `string` (required)
-
-The registered domain the API lives under. On AWS a custom-domain mapping is created for `apiSubdomain.rootDomain` (or, when `onRootDomain` is set, directly under the base/service domain).
 
 ### `eventProcessors` — `QpqWebSocketEventProcessors` (required)
 

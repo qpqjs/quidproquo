@@ -92,13 +92,12 @@ describe('buildOpenApiDocument', () => {
   });
 
   it('lists a server per live api, mounted under the service name, none without a domain', () => {
-    const withDomain = buildTestQpqConfig([
-      defineDns('example.com'),
-      defineApi('api', 'example.com'),
-      defineApi('old', 'example.com', { deprecated: true }),
-    ]);
+    const withDomain = buildTestQpqConfig([defineDns(['example.com', 'example.org']), defineApi('api'), defineApi('old', { deprecated: true })]);
 
-    expect(buildOpenApiDocument(withDomain).servers).toEqual([{ url: 'https://api.development.example.com/test-module' }]);
+    expect(buildOpenApiDocument(withDomain).servers).toEqual([
+      { url: 'https://api.development.example.com/test-module' },
+      { url: 'https://api.development.example.org/test-module' },
+    ]);
     expect(buildOpenApiDocument(buildTestQpqConfig()).servers).toEqual([]);
   });
 

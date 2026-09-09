@@ -1,8 +1,7 @@
 import { EventDocWorkspaceSlotState } from '../../types/EventDocWorkspaceSlotState';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 
-// Shared by the slot-status updaters; no-ops on an unknown slotKey (slot keys are
-// fixed at workspace definition time).
+/** Merges a partial update into one slot's status; no-op on an unknown slot. */
 export const updateSlotState = (
   state: EventDocWorkspaceState,
   slotKey: string,

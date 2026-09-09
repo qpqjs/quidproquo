@@ -4,12 +4,10 @@ import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { askEventDocWorkspaceApiFetchEventsPage } from './askEventDocWorkspaceApiFetchEventsPage';
 
-// Fetches a document's event log, following pagination in order. With `afterEventId` it
-// fetches only the tail (events after that log index); without it, the full log.
-// This is the EventDocWorkspaceTransport.askFetchEvents shape.
+/** Fetches a document's events across pages; with afterEventId (exclusive) only the tail. */
 export function* askEventDocWorkspaceApiFetchEvents(
   identity: EventDocWorkspaceDocumentIdentity,
-  afterEventId?: string,
+  afterEventId?: number,
 ): AskResponse<EventDocEvent[]> {
   const all: EventDocEvent[] = [];
   let nextPageKey: string | undefined;

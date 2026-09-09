@@ -4,8 +4,7 @@ import { askApiRequest } from 'quidproquo-webserver';
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocDocRef, EventDocTransferExportResult } from '../../models';
 
-// Stage the bundle server-side (POST /transfer/export) and get back a short-lived download url.
-// The bytes never come through this response, so bundle size is not bounded by a payload limit.
+/** POST /transfer/export: stages the bundle and returns a short-lived download url. */
 export function* askEventDocExportFetch(serviceName: string, docs: EventDocDocRef[]): AskResponse<EventDocTransferExportResult> {
   const response = yield* askApiRequest<{ docs: EventDocDocRef[] }, EventDocTransferExportResult>(
     serviceName,

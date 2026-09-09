@@ -18,8 +18,7 @@ export const makeSessionEvent = <T>(
       clientMessageId: overrides?.clientMessageId ?? `cmid-${index}`,
       createdBy: { userId: 'test-user', userDisplayName: 'Test User' },
       createdAt: overrides?.createdAt ?? (`2026-07-07T00:00:0${Math.min(index, 9)}.000Z` as QpqIsoDateTime),
-      // Padded so the stub ids sort in creation order, like real sortable ids.
-      eventId: String(index).padStart(4, '0'),
+      eventId: index,
     },
   },
 });

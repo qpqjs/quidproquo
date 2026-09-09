@@ -1,9 +1,7 @@
 import { EventDocDocRef } from '../../models';
 import type { EventDocExportUiState } from '../types/EventDocExportUiState';
 
-// The ticked docs as transfer refs. Derived from the candidates rather than tracked separately, so a
-// tick can never outlive the document it pointed at. `service` comes from the caller, since the
-// candidate summaries carry the collection `type` but not the service they were fetched from.
+/** Selector factory: the ticked candidates as transfer refs. `serviceName` is needed because summaries do not carry it. */
 export const createEventDocExportSelectedRefs =
   (serviceName: string) =>
   (state: EventDocExportUiState): EventDocDocRef[] =>

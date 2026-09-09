@@ -1,13 +1,10 @@
 import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
-// Capture the carry-across-runtimes part of a workspace's state: identity, pending,
-// and held history per DOCUMENT slot that has been initialised (history rides along
-// so the restore renders instantly and only tail-pulls the delta), and the pending
-// stream per LOCAL slot (session state like the editor's active tab and chrome
-// panels — a local slot's pending IS its whole state, since locals never save and
-// fold from pending alone). Empty local streams are skipped: restoring nothing and
-// restoring an empty stream fold identically. Pure data in, pure data out.
+/**
+ * Captures what carries across runtimes: identity, pending, history and base per initialised document slot, and the pending
+ * stream per non-empty local slot.
+ */
 export const createEventDocWorkspaceSnapshot = (
   state: EventDocWorkspaceState,
   documentSlotKeys: string[],
@@ -28,8 +25,7 @@ export const createEventDocWorkspaceSnapshot = (
             documentIdentity,
             pending: state.pending[slotKey] ?? [],
             history: state.history[slotKey] ?? [],
-            // The base travels with the history it anchors — a bootstrap-loaded
-            // slot's history is partial and refolds wrongly without it.
+            // A bootstrap-loaded history is partial and refolds wrongly without its base.
             base: state.bases[slotKey] ?? null,
           },
         ],

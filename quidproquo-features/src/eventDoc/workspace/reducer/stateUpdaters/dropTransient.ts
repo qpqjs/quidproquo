@@ -1,11 +1,7 @@
 import { EventDocWorkspaceDropTransientPayload } from '../../effects/EventDocWorkspaceDropTransientEffect';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 
-// Remove one transientKey's entry from EVERY slot's transient record: the key is the
-// drop unit (usually a websocket connection id), so its observations vanish across the
-// whole workspace at once and the folded views revert reactively. Immutable, and a
-// no-op (same references) wherever the key is absent, so untouched slots keep their
-// record identity for the view selectors' memo keys.
+/** Removes one transientKey from every slot. Slots not holding the key keep their record identity so selector memo keys stay stable. */
 export const dropTransient = (state: EventDocWorkspaceState, { transientKey }: EventDocWorkspaceDropTransientPayload): EventDocWorkspaceState => {
   const holdingSlotKeys = Object.keys(state.transient).filter((slotKey) => transientKey in state.transient[slotKey]);
 

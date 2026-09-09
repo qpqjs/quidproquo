@@ -17,19 +17,13 @@ const appended = (state: SessionLogState, event: ReturnType<typeof searchEvent>)
 };
 
 describe('sessionLogReducer', () => {
-  it('keeps appended events in order without assigning positions', () => {
+  it('assigns consecutive local event ids on append', () => {
     let state = createInitialSessionLogState();
 
-    // Distinct ids, because the events now arrive already minted rather than being numbered
-    // by the reducer.
     state = appended(state, makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
-    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 1, { clientMessageId: 'b' }));
+    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
 
-    // Each event carries the sortable id it was minted with, so the buffer is ordered without
-    // anything renumbering it.
-    const ids = state.pendingEvents.map((event) => event.payload.metadata.eventId);
-    expect(ids).toEqual([...ids].sort());
-    expect(new Set(ids).size).toBe(ids.length);
+    expect(state.pendingEvents.map((event) => event.payload.metadata.eventId)).toEqual([0, 1]);
   });
 
   it('coalesces consecutive pending events of a coalescable type', () => {
@@ -55,13 +49,13 @@ describe('sessionLogReducer', () => {
     expect(state.pendingEvents[0].payload.metadata.clientMessageId).toBe('cm-1');
   });
 
-  it('moves the acked event to the log, leaving the rest pending and in order', () => {
+  it('moves the acked event to the log and renumbers the remaining pending events', () => {
     let state = createInitialSessionLogState();
 
     state = appended(state, makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
-    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 1, { clientMessageId: 'b' }));
+    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
 
-    // The server stamps its own id; nothing about the remaining pending events depends on it.
+    // Server assigned a later event id than our optimistic 0 (someone else appended too).
     const storedEvent = makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 4, { clientMessageId: 'a' });
 
     const [next] = sessionLogReducer(state, {
@@ -72,8 +66,7 @@ describe('sessionLogReducer', () => {
     expect(next.events).toEqual([storedEvent]);
     expect(next.pendingEvents).toHaveLength(1);
     expect(next.pendingEvents[0].payload.metadata.clientMessageId).toBe('b');
-    // Untouched: the pending event keeps the id it was minted with.
-    expect(next.pendingEvents[0].payload.metadata.eventId).toBe(state.pendingEvents[1].payload.metadata.eventId);
+    expect(next.pendingEvents[0].payload.metadata.eventId).toBe(5);
     expect(next.flush).toEqual({ inFlight: false, lastError: null, retryCount: 0 });
   });
 

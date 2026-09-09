@@ -11,7 +11,7 @@ function* askEventDocStoreGetAsset(docId: string, assetId: string): AskResponse<
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
-/** GET {basePath}/{id}/assets/{assetId} — a presigned URL to read an asset blob. */
+/** GET {basePath}/{id}/assets/{assetId}: a presigned URL to read an asset blob. */
 export function* getAsset(event: HTTPEvent, params: { id: string; assetId: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreGetAsset(params.id, params.assetId)));
 }

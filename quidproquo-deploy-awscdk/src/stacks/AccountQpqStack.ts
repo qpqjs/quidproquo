@@ -3,7 +3,12 @@ import { qpqCoreUtils } from 'quidproquo-core';
 
 import { Construct } from 'constructs';
 
-import { QpqAccountBudgetConstruct, QpqAccountCloudTrailConstruct, QpqAccountSecurityServicesConstruct } from '../constructs';
+import {
+  QpqAccountBudgetConstruct,
+  QpqAccountCloudTrailConstruct,
+  QpqAccountGithubOidcProviderConstruct,
+  QpqAccountSecurityServicesConstruct,
+} from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 export interface AccountQpqStackProps extends QpqServiceStackProps {}
@@ -34,6 +39,12 @@ export class AccountQpqStack extends QpqServiceStack {
           budgetConfig: setting,
         }),
     );
+
+    if (qpqConfigAwsUtils.isAccountGithubOidcProviderDeclared(props.qpqConfig)) {
+      new QpqAccountGithubOidcProviderConstruct(this, 'github-oidc-provider', {
+        qpqConfig: props.qpqConfig,
+      });
+    }
 
     const securityServicesConfig = qpqConfigAwsUtils.getAccountSecurityServicesConfig(props.qpqConfig);
     if (securityServicesConfig) {

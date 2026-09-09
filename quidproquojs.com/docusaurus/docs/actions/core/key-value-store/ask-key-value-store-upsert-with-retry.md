@@ -7,7 +7,7 @@ description: Upsert a record into a key-value store, retrying automatically on t
 
 Writes a record with [askKeyValueStoreUpsert](./ask-key-value-store-upsert.md), automatically retrying when the store is temporarily unavailable. Use it for writes that must succeed through transient DynamoDB throttling rather than failing the story on the first hiccup.
 
-- **Built from:** wraps [askKeyValueStoreUpsert](./ask-key-value-store-upsert.md) in `askRetry`, retrying only on `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable`. It is a helper story, not a distinct action.
+- **Built from:** wraps [askKeyValueStoreUpsert](./ask-key-value-store-upsert.md) in `askRetry`, retrying on `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable` and `KeyValueStoreUpsertErrorTypeEnum.WriteContention`. It is a helper story, not a distinct action.
 
 ```typescript
 import { askKeyValueStoreUpsertWithRetry } from 'quidproquo-core';
@@ -54,7 +54,7 @@ Extends `KeyValueStoreUpsertOptions` (`ttlInSeconds`, `ifNotExists`, `scope`) wi
 
 ## Notes
 
-- Only `ServiceUnavailable` (throttling / transient DynamoDB errors) is retried. A `Conflict` from an `ifNotExists` write is **not** retried — that's a genuine key collision, not a transient fault. If every attempt fails, the last error is re-thrown.
+- `ServiceUnavailable` (throttling / transient DynamoDB errors) and `WriteContention` (another write momentarily holding the item) are retried. A `Conflict` from an `ifNotExists` write is **not** retried — that's a genuine key collision, not a transient fault. If every attempt fails, the last error is re-thrown.
 - Errors that escape the retries surface the same `KeyValueStoreUpsertErrorTypeEnum` members as the plain upsert; catch them with `askCatch`.
 
 ## Related

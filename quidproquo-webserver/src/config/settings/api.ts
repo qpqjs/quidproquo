@@ -16,7 +16,6 @@ export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings 
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   apiSubdomain: string;
-  rootDomain: string;
 
   apiName: string;
 
@@ -29,13 +28,12 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   maxConcurrentExecutions?: number;
 }
 
-export const defineApi = (apiName: string, rootDomain: string, options?: QPQConfigAdvancedApiSettings): ApiQPQWebServerConfigSetting => {
+export const defineApi = (apiName: string, options?: QPQConfigAdvancedApiSettings): ApiQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.Api,
     uniqueKey: apiName,
 
     apiSubdomain: options?.subDomain || apiName,
-    rootDomain,
 
     apiName: apiName,
 

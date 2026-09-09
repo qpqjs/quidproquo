@@ -1,7 +1,6 @@
 import { EventDocManifestItem } from './EventDocManifestItem';
 
-// The manifest as the export dialog shows it: one group per doc type ("content: a, b, c").
-// `type` is the raw collection type; the view maps it to a display label.
+/** The manifest grouped by doc type for the export dialog. */
 export type EventDocManifestGroup = {
   type: string;
   items: EventDocManifestItem[];

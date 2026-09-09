@@ -1,23 +1,17 @@
 import path from 'path';
 
-import { readJsonFile } from '../lib/readJsonFile';
 import { replaceInFileExact } from '../lib/replaceInFileExact';
-import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
-// The template's domain, replaced wherever it's authoritative: the deploy
-// config and the app's domain constant (everything else derives from those).
+// The template's domain, replaced where it's authoritative: the app's domain
+// constant (everything else derives from it). One root at scaffold time; more
+// can be appended later.
 const TEMPLATE_DOMAIN = 'todo.quidproquojs.com';
 
 export const applyDomain: CreateQpqAppStep = {
   name: 'Applying domain',
 
   run: async ({ targetDirectory, answers }) => {
-    const deployConfigPath = path.join(targetDirectory, 'apps', answers.appName, 'deploy.config.json');
-    const deployConfig = readJsonFile(deployConfigPath);
-    deployConfig.domain = answers.domain;
-    writeJsonFile(deployConfigPath, deployConfig);
-
     replaceInFileExact(
       path.join(targetDirectory, 'apps', answers.appName, 'packages', 'constants', 'src', 'domain.ts'),
       TEMPLATE_DOMAIN,

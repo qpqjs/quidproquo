@@ -9,9 +9,7 @@ import { setHistoryOpen } from './stateUpdaters/setHistoryOpen';
 import { setHistorySlotKey } from './stateUpdaters/setHistorySlotKey';
 import { EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
 
-// The slice reducer speaks its own effect union (wrapped to the stored-event shape by
-// EventDocFoldEffects); slots speak the generic EventDocEvent, hence the cast at the
-// registration boundary (same convention as the version-routed document folds).
+/** Chrome slot fold reducer. Cast to the generic EventDocEvent reducer at the registration boundary, as document folds are. */
 export const eventDocWorkspaceChromeFoldReducer = buildEffectReducer<
   EventDocWorkspaceChromeState,
   EventDocFoldEffects<EventDocWorkspaceChromeEffects>

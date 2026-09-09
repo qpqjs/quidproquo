@@ -2,42 +2,22 @@ import { RouteAuthSettings } from 'quidproquo-webserver';
 
 import { EventDocRouteName } from './EventDocRouteName';
 
+/** Options for defineEventDocRoutes. */
 export type EventDocRoutesOptions = {
-  /** Must match a `defineEventDocSummary` in the same service. */
+  // Must match a `defineEventDocSummary` in the same service.
   storeName: string;
   type: string;
-  /**
-   * The collection root, named after the model `type` like every other collection
-   * (`template` -> `/templates`, `style` -> `/styles`). Nothing else may mount a
-   * literal under it: `${basePath}/{id}` matches any single segment, so a sibling
-   * `${basePath}/thing` route is ambiguous with the id `'thing'`.
-   */
+  // Nothing else may mount a literal under it: `${basePath}/{id}` matches any single segment.
   basePath: `/${string}`;
-  // Routes to leave unmounted, for a collection that must own one itself (e.g. the
-  // tenant registry owns create, so creating also links the caller as first member;
-  // the stock create would silently make an unreachable doc). Everything else the
-  // collection needs the stock behaviour for still mounts.
+  // Routes to leave unmounted, for a collection that must own one itself.
   excludeRoutes?: EventDocRouteName[];
-  // Omit to leave routes open — mutations then have no user to attribute.
+  // Omit to leave routes open; mutations then have no user to attribute.
   routeAuthSettings?: RouteAuthSettings;
   version?: number;
-  // Registered inline-function name (see `defineInlineFunction`). When set, every successful
-  // append of a Publish event invokes it with `{ docId, event, summary }` after the event is
-  // durably written and the summary re-derived - the seam for syncing a folded document into
-  // a materialized read model. Errors propagate to the caller: the event has landed, but the
-  // side effect did not, so the caller learns the read model may be stale.
+  // Inline-function name invoked with EventDocOnPublishInput after a Publish event lands. Errors propagate; the event stays.
   onPublish?: string;
-  // Registered inline-function name (see `defineInlineFunction`). When set, EVERY successful
-  // append (domain events and lifecycle events alike) invokes it with
-  // `{ docId, event, summary, events }` after the event is durably written and the summary
-  // re-derived - the seam for reacting to any mutation (e.g. broadcasting the doc's fresh
-  // fold). Runs after `onPublish` when both fire on the same Publish event. Errors propagate
-  // to the caller: the event has landed, but the side effect did not.
+  // Inline-function name invoked with EventDocOnAppendInput after every event lands, after onPublish. Errors propagate; the event stays.
   onAppend?: string;
-  // Registered inline-function name (see `defineInlineFunction`). When set, every route
-  // invokes it with `{ event }` before running; a non-null result becomes the ambient
-  // storage scope for the whole request, transparently partitioning the collection's
-  // stores and assets (e.g. per-tenant via the tenant feature's TENANT_SCOPE_RESOLVER_FN).
-  // Null means unscoped. Omit for collections that never partition.
+  // Inline-function name invoked with `{ event }` before each route; a non-null result is the request's storage scope.
   scopeResolver?: string;
 };

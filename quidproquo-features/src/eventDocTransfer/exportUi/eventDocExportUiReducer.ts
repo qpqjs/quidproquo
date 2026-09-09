@@ -13,6 +13,7 @@ import { setResult } from './stateUpdaters/setResult';
 import { toggleSelected } from './stateUpdaters/toggleSelected';
 import type { EventDocExportUiState } from './types/EventDocExportUiState';
 
+/** Reducer for the export dialog state. */
 export const eventDocExportUiReducer = buildEffectReducer<EventDocExportUiState, EventDocExportUiEffects>({
   [EventDocExportUiEffect.Open]: open,
   [EventDocExportUiEffect.SetCandidates]: setCandidates,

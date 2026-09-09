@@ -5,7 +5,7 @@ import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocSummary } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Soft-deleted rows are returned as-is — filtering is a caller concern.
+/** The summary row by id, or null. Soft-deleted rows are returned as-is. */
 export function* askEventDocGetById<T extends EventDocSummary = EventDocSummary>(id: string): AskResponse<Nullable<T>> {
   const { storeName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

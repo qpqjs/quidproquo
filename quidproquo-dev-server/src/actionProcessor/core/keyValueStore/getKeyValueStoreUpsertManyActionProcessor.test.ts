@@ -52,7 +52,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     // One repository call is what makes the batch a single transaction on the
     // sqlite engine rather than one commit per item.
     expect(repo.upsertMany).toHaveBeenCalledTimes(1);
-    expect(repo.upsertMany).toHaveBeenCalledWith('store', [{ id: 'a' }, { id: 'b' }, { id: 'c' }], undefined);
+    expect(repo.upsertMany).toHaveBeenCalledWith('store', [{ id: 'a' }, { id: 'b' }, { id: 'c' }], { ifNotExists: undefined }, undefined);
     expect(emitKvsStreamEvent).toHaveBeenCalledTimes(3);
     expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.newImage)).toEqual([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
   });
@@ -68,6 +68,17 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
 
     expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.eventType)).toEqual(['Modify', 'Insert']);
     expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.oldImage)).toEqual([{ id: 'a', old: true }, undefined]);
+  });
+
+  it('passes ifNotExists through and maps a lost condition to the typed Conflict with no stream events', async () => {
+    repo.upsertMany.mockRejectedValue(Object.assign(new Error('exists'), { name: 'ConditionalCheckFailedException' }));
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }], options: { ifNotExists: true } });
+
+    expect(repo.upsertMany).toHaveBeenCalledWith('store', [{ id: 'a' }], { ifNotExists: true }, undefined);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertManyBase.errorType.Conflict);
+    expect(emitKvsStreamEvent).not.toHaveBeenCalled();
   });
 
   it('maps a missing store to the typed StoreNotFound', async () => {

@@ -1,9 +1,10 @@
-import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic/SubdomainName';
@@ -12,12 +13,25 @@ export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstruc
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
 }
 
+// An absolute url redirects as-is. A declared root redirects to that root's site root under
+// the resolver (so `www` -> `development.example.com` in dev), keeping the request path. Any
+// other bare host is used literally, also keeping the path.
+const resolveRedirectTarget = (qpqConfig: QPQConfig, redirectUrl: string): { redirectBaseUrl: string; appendPath: boolean } => {
+  if (redirectUrl.startsWith('http')) {
+    return { redirectBaseUrl: redirectUrl, appendPath: false };
+  }
+
+  const isDeclaredRoot = qpqWebServerUtils.getRootDomains(qpqConfig).includes(redirectUrl);
+  const host = isDeclaredRoot ? resolveDeployHostForRoot(qpqConfig, redirectUrl, {}) : redirectUrl;
+
+  return { redirectBaseUrl: `https://${host}`, appendPath: true };
+};
+
 export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverSubdomainRedirectConstructProps) {
     super(scope, id, props);
 
-    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
-    const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
+    const { redirectBaseUrl, appendPath } = resolveRedirectTarget(props.qpqConfig, props.subdomainRedirectConfig.redirectUrl);
 
     const func = new Function(this, 'redirect', {
       functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
@@ -27,9 +41,8 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
 
       environment: {
-        redirectConfig: JSON.stringify(props.subdomainRedirectConfig),
-        environment: JSON.stringify(environment),
-        featureEnvironment: JSON.stringify(feature),
+        redirectBaseUrl: JSON.stringify(redirectBaseUrl),
+        appendPath: JSON.stringify(appendPath),
       },
 
       role: this.getServiceRole(),
@@ -45,26 +58,22 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       proxy: true,
     });
 
-    // www.service.domain.com or www.domain.com
-    const apexDomain = props.subdomainRedirectConfig.onRootDomain
-      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
-
-    const dnsConfig = qpqWebServerUtils.getDnsConfigs(props.qpqConfig)[0];
-    const serviceDomainName = new SubdomainName(this, 'service-domain-name', {
+    const target: DomainTarget = {
       subdomain: props.subdomainRedirectConfig.subdomain,
-      rootDomain: dnsConfig.dnsBase,
-      apexDomain,
-      qpqConfig: props.qpqConfig,
-    });
+      service: props.subdomainRedirectConfig.onRootDomain ? undefined : qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+    };
 
-    // Map all requests to this service to /serviceName/*
-    new aws_apigateway.BasePathMapping(this, 'base-path-mapping', {
-      domainName: serviceDomainName.domainName,
-      restApi: restApi,
+    for (const rootDomain of qpqWebServerUtils.getRootDomains(props.qpqConfig)) {
+      const serviceDomainName = new SubdomainName(this, domainScopedId(props.qpqConfig, 'service-domain-name', rootDomain), {
+        rootDomain,
+        target,
+        qpqConfig: props.qpqConfig,
+      });
 
-      // the properties below are optional
-      // basePath: settings.service,
-    });
+      new aws_apigateway.BasePathMapping(this, domainScopedId(props.qpqConfig, 'base-path-mapping', rootDomain), {
+        domainName: serviceDomainName.domainName,
+        restApi: restApi,
+      });
+    }
   }
 }

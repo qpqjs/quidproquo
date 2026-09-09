@@ -3,7 +3,7 @@ import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { EventDocStore } from '../types/EventDocStore';
 import { askEventDocStoreRead } from './askEventDocStoreRead';
 
-// Throw if unprovided: a QPQ context read otherwise silently returns the empty default.
+/** Reads the store context, throwing if it was not provided (a plain context read returns the empty default). */
 export function* askEventDocResolveStore(): AskResponse<EventDocStore> {
   const store = yield* askEventDocStoreRead();
 

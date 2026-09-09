@@ -5,10 +5,7 @@ import { EventDocEvent, EventDocEventInput } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { eventDocWorkspaceEventsEndpoint } from './eventDocWorkspaceEventsEndpoint';
 
-// Appends one event to the document's log. The backend validates version
-// monotonicity, dedups by clientMessageId, stamps createdBy/createdAt/index, and
-// returns the full stored event. This is the EventDocWorkspaceTransport.askAppendEvent
-// shape.
+/** POSTs one event to the document's log; the backend dedups by clientMessageId, stamps the metadata and returns the stored event. */
 export function* askEventDocWorkspaceApiAppendEvent(
   identity: EventDocWorkspaceDocumentIdentity,
   input: EventDocEventInput,

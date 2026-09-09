@@ -18,7 +18,7 @@ function* askEventDocTransferPlan(event: HTTPEvent): AskResponse<HTTPEventRespon
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
-/** POST /transfer/plan — what importing the uploaded bundle would do. Writes nothing. */
+/** POST /transfer/plan: what importing the uploaded bundle would do. Writes nothing. */
 export function* plan(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocTransferProvideRequestScope(event, askEventDocTransferPlan(event));
 }

@@ -4,14 +4,7 @@ import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocSummary, EventDocSummaryView } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Persist a folded summary view as the queryable record. Writes FIELDS rather than a
-// whole record: `type` and `id` are the store's partition/sort keys and are never
-// written as attributes, and writing only what the fold produces keeps this honest
-// about the record being nothing but a projection.
-//
-// `deletedAt` is set-or-REMOVED, never skipped: RESTORE clears it from the view, and
-// the list read hides deleted rows by attribute existence (kvsNotExists), so leaving a
-// stale `deletedAt` behind would hide a restored document forever.
+/** Persists a folded summary view as field updates on the summary row (`type` and `id` are the keys, never attributes). */
 export function* askEventDocSummaryViewWrite(modelId: string, view: EventDocSummaryView): AskResponse<void> {
   const { storeName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
@@ -25,10 +18,9 @@ export function* askEventDocSummaryViewWrite(modelId: string, view: EventDocSumm
       kvsSet('createdBy', view.createdBy),
       kvsSet('updatedAt', view.updatedAt),
       kvsSet('updatedBy', view.updatedBy),
+      // Must remove, not skip: the list read hides deleted rows by attribute existence, so a stale deletedAt hides a restored doc.
       view.deletedAt !== undefined ? kvsSet('deletedAt', view.deletedAt) : kvsRemove('deletedAt'),
-      // Cast: `versions` is a list of maps, which the marshaller writes correctly
-      // (buildAttributeValue recurses), but a zod-inferred object type carries no implicit
-      // index signature, so it will not structurally match KvsObjectDataType.
+      // Cast: the marshaller handles a list of maps, but a zod-inferred object type has no index signature to match KvsObjectDataType.
       kvsSet('versions', view.versions as unknown as KvsAdvancedDataType),
     ],
     type,

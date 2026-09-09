@@ -2,6 +2,7 @@ import { QpqAppDeployEnvironment } from 'quidproquo-deploy-awscdk';
 
 import { ClearResourcesPlan } from '../lib/clearResourcesPlan';
 import { DeployPlan, TeardownPlan } from '../lib/deployPrompts';
+import { SetupStep } from '../lib/setupStep';
 
 export enum QpqDeployPlatform {
   aws = 'aws',
@@ -35,6 +36,10 @@ export interface QpqPlatformDriver {
   // Empty the stored data of selected resources without touching the stacks
   // (`qpq clear-resources`) — optional; drivers with no strategy omit it.
   clearResources?: (appName: string, plan: ClearResourcesPlan) => Promise<void>;
+
+  // The ordered checklist that takes an empty cloud environment to a deployed
+  // one (`qpq setup`) — optional; drivers with nothing to set up omit it.
+  setupSteps?: (appName: string, environment: string) => Promise<SetupStep[]>;
 
   // Federated remote publishing (`qpq publish[:build|:upload|:deploy]`).
   publish: (appName: string, serviceNames: string[]) => Promise<void>;

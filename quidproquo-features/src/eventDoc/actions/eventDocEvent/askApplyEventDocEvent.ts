@@ -2,31 +2,23 @@ import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
 
 import { EventDocActionType } from './EventDocActionType';
 
-// Target model is the processor's ambient context, not the payload, so the verb stays pure.
-// version isn't here — the editor stamps its configured schema version on every event.
+/** Payload of the ApplyEvent action. The target doc is the processor's ambient context; the processor stamps the schema version. */
 export type EventDocApplyEventActionPayload = {
   eventType: string;
   data: unknown;
 };
 
+/** Untyped requester for the ApplyEvent action. Prefer askApplyEventDocEvent, which checks the data against the effect type. */
 export const askApplyEventDocEventBase = createActionRequester<void>()({
   actionType: EventDocActionType.ApplyEvent,
   getPayload: (eventType: string, data: unknown) => ({ eventType, data }),
 });
 
-// Pure: only yields the declarative ApplyEvent action — a registered processor decides
-// HOW (and stamps the editor's schema version + provenance). No side effects, so the
-// verbs that yield* it run anywhere (backend, tests, transforms).
-//
-// Typed like askStateDispatchEffect: an event-doc event IS a special kind of effect
-// (Effect<type, data>), so action creators pass their effect type as E and get the
-// data checked: askApplyEventDocEvent<TemplateSetTypeEffect>(TemplateEffect.SetType, { templateType }).
-//
-// Deliberately two-arg with an explicit generic, NOT a whole-effect object: passing
-// `{ type, payload }` would let TS infer E from the literal itself, so a wrong
-// member/payload pairing would type itself instead of being checked against the
-// declared effect. The explicit generic is the check; creators are the only call
-// sites, so the one-line ceremony stays quarantined there.
+/**
+ * Yields the ApplyEvent action for the doc bound by the enclosing processor; no default processor ships.
+ * Pass the effect type explicitly, `askApplyEventDocEvent<SetTypeEffect>(Effect.SetType, data)`, so the data is checked
+ * against the declared effect (a whole `{ type, payload }` object would let TS infer E from the literal).
+ */
 export function* askApplyEventDocEvent<E extends Effect<string, any>>(eventType: E['type'], data: E['payload']): AskResponse<void> {
   return yield* askApplyEventDocEventBase(eventType, data);
 }

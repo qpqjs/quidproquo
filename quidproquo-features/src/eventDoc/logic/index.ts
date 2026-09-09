@@ -1,6 +1,9 @@
+export * from './askEventDocAppendBaseAdvance';
+export * from './askEventDocAppendBaseResolve';
 export * from './askEventDocAppendServerEvent';
 export * from './askEventDocAppendServerEvents';
 export * from './askEventDocCreate';
+export * from './askEventDocDocumentStateAdvance';
 export * from './askEventDocDocumentStateAsOf';
 export * from './askEventDocDocumentStateAsOfTime';
 export * from './askEventDocDocumentStateLatest';
@@ -24,6 +27,7 @@ export * from './askEventDocSeedInitState';
 export * from './askEventDocSoftDelete';
 export * from './askEventDocSummaryRederive';
 export * from './askEventDocValidateAppend';
+export * from './askEventDocValidateAppendRun';
 export * from './isEventDocFunctionsMissing';
 export * from './isInlineEventDocValueRef';
 export * from './readInlineEventDocValueRefs';

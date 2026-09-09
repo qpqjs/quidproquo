@@ -1,5 +1,5 @@
 import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineDefaultRouteOptions, defineDns, defineRoute, qpqWebServerUtils } from 'quidproquo-webserver';
+import { defineApi, defineDefaultRouteOptions, defineDns, defineRoute, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -15,13 +15,15 @@ const buildDevServerConfig = (qpqConfig: any): DevServerConfig =>
   }) as any;
 
 describe('getAllServiceConfigs', () => {
-  it('rewrites dns base to the local server root', () => {
-    const qpqConfig = buildTestQpqConfig([defineDns('example.com')]);
+  it('rewrites every root to the local server origin and drops the app resolver', () => {
+    const resolver = { basePath: '/app', relativePath: 'domainResolver', functionName: 'domainResolver' };
+    const qpqConfig = buildTestQpqConfig([defineDns(['example.com', 'example.org'], { resolver }), defineApi('api')]);
 
     const [result] = getAllServiceConfigs(buildDevServerConfig(qpqConfig));
 
-    const dnsConfigs = qpqWebServerUtils.getDnsConfigs(result);
-    expect(dnsConfigs.every((dns) => dns.dnsBase === 'localhost:3000')).toBe(true);
+    expect(qpqWebServerUtils.getRootDomains(result)).toEqual(['localhost:3000']);
+    expect(qpqWebServerUtils.getDnsConfig(result)?.resolver).toBeUndefined();
+    expect(qpqWebServerUtils.resolveHosts(result, { subdomain: 'api' })).toEqual(['localhost:3000']);
   });
 
   it('appends local and wildcard origins to routes and default route options', () => {

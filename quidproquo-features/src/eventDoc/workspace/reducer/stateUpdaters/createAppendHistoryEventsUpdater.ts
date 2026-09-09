@@ -3,8 +3,7 @@ import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceS
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { appendSlotHistoryEvents } from './appendSlotHistoryEvents';
 
-// A refresh tail: append the fetched server events and fold ONLY them into the stored
-// view (never a whole-log refold).
+/** A refresh tail: appends and folds only the fetched events. */
 export const createAppendHistoryEventsUpdater =
   (slots: EventDocWorkspaceSlotFoldsConfig) =>
   (state: EventDocWorkspaceState, { slotKey, events }: EventDocWorkspaceAppendHistoryEventsPayload): EventDocWorkspaceState =>

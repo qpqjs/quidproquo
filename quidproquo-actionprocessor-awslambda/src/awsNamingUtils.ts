@@ -84,6 +84,10 @@ export const getConfigRuntimeBootstrapResourceNameFromConfig = (resourceName: st
   return getConfigRuntimeBootstrapResourceName(resourceName, application, environment, feature);
 };
 
+/** The GitHub Actions deploy role for an app environment: `github-actions-deploy-<app>-<env>[-<feature>]`. */
+export const getGithubDeployRoleNameFromConfig = (qpqConfig: QPQConfig): string =>
+  getConfigRuntimeBootstrapResourceNameFromConfig('github-actions-deploy', qpqConfig);
+
 export const getConfigRuntimeResourceNameFromConfigWithServiceOverride = (resourceName: string, qpqConfig: QPQConfig, serviceOverride?: string) =>
   resolveConfigRuntimeResourceNameFromConfig(resourceName, qpqConfig, { module: serviceOverride });
 

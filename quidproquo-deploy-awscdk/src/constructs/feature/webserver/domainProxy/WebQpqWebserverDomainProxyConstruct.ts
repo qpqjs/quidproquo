@@ -1,12 +1,14 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { DomainProxyQPQWebServerConfigSetting, DomainTarget, qpqWebServerUtils } from 'quidproquo-webserver';
 import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
 
 import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { lookupHostedZone, resolveDeployHosts, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
@@ -34,22 +36,13 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: WebQpqWebserverDomainProxyConstructProps) {
     super(scope, id, props);
 
-    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
-      props.qpqConfig,
-      props.domainProxyConfig.domain.rootDomain,
-      props.domainProxyConfig.domain.onRootDomain,
-    );
+    // Every subdomain on every root (the site root itself when none are listed), one distribution.
+    const service = props.domainProxyConfig.domain.onRootDomain ? undefined : qpqCoreUtils.getApplicationModuleName(props.qpqConfig);
+    const subDomainNames = props.domainProxyConfig.domain.subDomainNames ?? [];
+    const targets: DomainTarget[] = subDomainNames.length > 0 ? subDomainNames.map((subdomain) => ({ subdomain, service })) : [{ service }];
+    const domainNames = targets.flatMap((target) => resolveDeployHosts(props.qpqConfig, target));
 
-    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
-      domainName: apexDomain,
-    });
-
-    const domainNames: string[] = (props.domainProxyConfig.domain.subDomainNames ?? []).map((subDomain) => `${subDomain}.${apexDomain}`);
-    if (props.domainProxyConfig.domain.onRootDomain && domainNames.length === 0) {
-      domainNames.unshift(apexDomain);
-    }
-
-    const certificate = lookupDomainCertificate(this, 'us-east-1', props.domainProxyConfig.domain.rootDomain, props.domainProxyConfig.name);
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.qpqConfig, props.domainProxyConfig.name);
 
     const cachePolicy = props.domainProxyConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
@@ -97,7 +90,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
 
     domainNames.forEach((domainName) => {
       new aws_route53.ARecord(this, `${domainName}-web-alias`, {
-        zone: hostedZone,
+        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainName)),
         recordName: domainName,
         target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
       });

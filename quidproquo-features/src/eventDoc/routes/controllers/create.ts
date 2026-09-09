@@ -19,7 +19,7 @@ function* askEventDocStoreCreate(event: HTTPEvent): AskResponse<HTTPEventRespons
   return qpqWebServerUtils.toJsonEventResponse(model);
 }
 
-/** POST {basePath} — create a new model (body `{ name, code }`). */
+/** POST {basePath}: creates a doc (body `{ name, code }`). */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreCreate(event)));
 }

@@ -7,15 +7,11 @@ import { requireDraft } from './validators/requireDraft';
 import { requireNotDeleted } from './validators/requireNotDeleted';
 import { requirePublished } from './validators/requirePublished';
 
-// The universal lifecycle rules every event-doc document obeys, keyed by reserved effect.
-// The '*' fallback covers SET_NAME/SET_CODE and every domain edit, so a published document
-// rejects everything except CREATE_DRAFT, and a deleted one rejects everything except
-// RESTORE. Apps spread this into their own registry and override entries to add
-// payload/domain rules.
-//
-// DELETE deliberately does NOT inherit the draft-only fallback: a published document must be
-// deletable without first branching a draft. It only requires that the document is not
-// already deleted, so a repeat delete is rejected rather than recorded twice.
+/**
+ * The lifecycle rules every document obeys. The '*' fallback covers every edit, so a published document rejects all but
+ * CREATE_DRAFT and a deleted one all but RESTORE. DELETE deliberately skips the draft-only fallback, so a published
+ * document can be deleted without branching a draft first.
+ */
 export const reservedEventDocEventValidators: EventDocEventValidators = {
   [EventDocEffect.InitState]: forbidInit,
   [EventDocEffect.CreateDraft]: allOf(requireNotDeleted, requirePublished),

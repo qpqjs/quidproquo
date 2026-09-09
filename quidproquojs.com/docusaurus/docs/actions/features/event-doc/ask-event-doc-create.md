@@ -82,7 +82,7 @@ function* askEventDocSeedInitState(
 | `name` | `string` | The document's name. |
 | `actor` | `EventDocEventActor` | Who is creating the document. |
 
-**Returns** `EventDocEvent` — the written `INIT_STATE` event, with a freshly minted sortable `payload.metadata.eventId` and `version === 1`.
+**Returns** `EventDocEvent` — the written `INIT_STATE` event, with `payload.metadata.eventId === 0` (the log's opening position) and `version === 1`.
 
 Use `askEventDocCreate` unless you are building a custom create flow that needs the raw event; `askEventDocSeedInitState` alone writes the log but does **not** derive or persist the summary record.
 

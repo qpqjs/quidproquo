@@ -1,19 +1,21 @@
 ---
 title: defineDns
-description: Declare the base DNS domain a service lives under, so every domain, certificate, and DNS record it deploys hangs off one root.
+description: Declare the root domains a service is served on; every hostname the service deploys is derived from them.
 ---
 
 # defineDns
 
-Declares the **base DNS domain** for a service. Everything else in quidproquo-webserver that needs a hostname — API custom domains, web entries, [domain proxies](./domain-proxy.md), and [subdomain redirects](./subdomain-redirect.md) — derives its fully-qualified name from this single `dnsBase`. A service has one DNS base.
+Declares the **root domains** for a service, primary first. Everything else that needs a hostname (API custom domains, web entries, websockets, [domain proxies](./domain-proxy.md), [subdomain redirects](./subdomain-redirect.md), email identities, CORS and CSP origins) is derived from this list through the app's [domain resolver](../../domains.md). A service has one `defineDns`; a second one is a synth error.
 
-- **On AWS:** `defineDns` does **not** create a Route53 hosted zone by itself. The hosted zone for `dnsBase` (after environment/feature prefixing) must already exist in Route53 — deploy constructs look it up with `HostedZone.fromLookup`, then add the `A` records they need into that existing zone. Think of `defineDns` as declaring "this is my root domain"; the zone that owns it is expected to be there already.
+- **On AWS:** `defineDns` does **not** create a Route53 hosted zone. Deploy constructs look zones up with `HostedZone.fromLookup` and add records into them. A host's zone is its root's site root when it sits under it (`api.development.example.com` in `development.example.com`), otherwise the root itself (`development-api.example.com` in `example.com`); see [Domains](../../domains.md).
 
 ```typescript
 import { defineDns } from 'quidproquo-webserver';
 
 export default [
-  defineDns('example.com'),
+  defineDns(['example.com', 'example.org'], {
+    resolver: { basePath: __dirname, relativePath: 'domainResolver', functionName: 'domainResolver' },
+  }),
 ];
 ```
 
@@ -21,22 +23,22 @@ export default [
 
 ```typescript
 function defineDns(
-  dnsBase: string,
+  rootDomains: string | string[],
+  options?: { resolver?: QpqPureFunction },
 ): DnsQPQWebServerConfigSetting;
 ```
 
 ## Parameters
 
-### `dnsBase` — `string` (required)
+### `rootDomains` — `string | string[]` (required)
 
-The root domain the service is served from, e.g. `'example.com'`. This value becomes the config's `uniqueKey` and is the base that all of the service's hostnames are built on. quidproquo prefixes it per environment and feature before use, so a single config deploys cleanly to multiple environments:
+The root domains the service is served on. The first is the **primary**: anything that must bake exactly one absolute URL (email links, module-federation remotes, the Cognito custom domain) uses it. Every other resource is created on every root, so the app is fully live on all of them at once.
 
-- In `production` the base stays `example.com`.
-- In another environment it becomes `<environment>.example.com` (e.g. `development.example.com`).
-- With a feature branch it becomes `<feature>.<environment>.example.com`.
-- A service's own resources then live under `<service>.<base>` (e.g. an API at `api.<service>.development.example.com`).
+Hostnames are not built here. They come from the app's [domain resolver](../../domains.md), which by default produces `[subdomain.][service.][feature.][environment.]root` with no environment label in production.
 
-The list of declared bases is what [askDnsList](../../actions/webserver/dns/ask-dns-list.md) returns at runtime.
+### `options.resolver` — `QpqPureFunction` (optional)
+
+A pointer (`{ basePath, relativePath, functionName }`) to the app's `DomainResolver` export. The deploy tooling `require`s it at synth and build time, and the runtime loads it through the dynamic module loader (the pointer is a bundled src entry like a route), so every site resolves hosts the same way: `resolveHosts(qpqConfig, target, resolver)`. Omit it for the default shape.
 
 ## Examples
 
@@ -44,14 +46,20 @@ The list of declared bases is what [askDnsList](../../actions/webserver/dns/ask-
 import { defineDns } from 'quidproquo-webserver';
 
 export default [
-  // Serve this service under example.com (and its env/feature-prefixed variants)
+  // One root
   defineDns('example.com'),
+
+  // Two roots, example.com primary: every api, web entry and websocket is served on both,
+  // shaped by the app's own resolver
+  defineDns(['example.com', 'example.org'], {
+    resolver: { basePath: __dirname, relativePath: 'domainResolver', functionName: 'domainResolver' },
+  }),
 ];
 ```
 
 ## Related
 
-- [askDnsList](../../actions/webserver/dns/ask-dns-list.md) — returns the `dnsBase` values declared with `defineDns`.
-- [defineCertificate](./certificate.md) — TLS certificate for a domain rooted at this base.
-- [defineDomainProxy](./domain-proxy.md) — front a domain under this base with CloudFront.
-- [defineSubdomainRedirect](./subdomain-redirect.md) — redirect a subdomain under this base to another URL.
+- [Domains](../../domains.md) — how roots, the resolver, zones and certificates fit together.
+- [askDnsList](../../actions/webserver/dns/ask-dns-list.md) — returns the root list at runtime.
+- [askDnsResolveHosts](../../actions/webserver/dns/ask-dns-resolve-hosts.md) — a target's host on every root at runtime.
+- [defineDomainCertificate](../config-aws/domain-certificate.md) — the per-region certificate covering every root.

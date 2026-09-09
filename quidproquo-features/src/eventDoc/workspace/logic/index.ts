@@ -17,6 +17,7 @@ export * from './getSlotFullHistory';
 export * from './getSlotHistory';
 export * from './getSlotHistoryView';
 export * from './getSlotLiveEvents';
+export * from './getSlotNextEventId';
 export * from './getSlotPending';
 export * from './getSlotTransientEvents';
 export * from './isSameEventDocWorkspaceIdentity';

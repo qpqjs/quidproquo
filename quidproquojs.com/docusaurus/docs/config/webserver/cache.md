@@ -81,7 +81,7 @@ export default [
     buildPath: './web/dist',
     cacheSettingsName: 'default',
     ignoreCache: ['index.html'],
-    domain: { onRootDomain: true, rootDomain: 'example.com' },
+    domain: { onRootDomain: true },
   }),
 ];
 ```

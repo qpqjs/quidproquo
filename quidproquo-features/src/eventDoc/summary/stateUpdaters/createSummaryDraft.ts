@@ -1,9 +1,6 @@
 import { EventDocEventPayload, EventDocSummaryView } from '../../models';
 
-// CREATE_DRAFT appends the next version (versions are contiguous 1-based, so length + 1),
-// seeding the new version's `eventId` head with this event's log index (the applier
-// then advances it as further events append). If a draft is already open (an unpublished
-// version exists) it's a no-op — validation rejects that case upstream, this stays robust.
+/** Appends the next version (contiguous, 1-based) headed at this event's id. No-op when a draft is already open. */
 export const createSummaryDraft = (model: EventDocSummaryView, { metadata }: EventDocEventPayload): EventDocSummaryView => {
   if (model.versions.some((version) => version.publishedAt === undefined)) {
     return model;
