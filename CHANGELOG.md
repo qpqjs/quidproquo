@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.21
+
+- deploy-awscdk: every lambda in a stack now shares one `QpqServiceRole` construct, and grants made against it (event sources, tracing, `addToPrincipalPolicy`) are packaged into customer-managed policies chunked under the IAM document size limit instead of piling onto the role's inline policies, so a service with many queues, streams and buses no longer hits the 10kb inline-policy cap at deploy. The SES email sender construct is keyed by the primary root domain rather than the setting, so changing the setting no longer tries to recreate an identity the stack already owns
+- actionprocessor-node: story tracing passes an explicit script end to `Debugger.getPossibleBreakpoints`, so a story loaded a while before the trace still gets breakpoints instead of an empty list once V8 has flushed its bytecode
+
 ## 0.1.20
 
 - webserver/deploy-awscdk: domains are redone around a root list and an app-owned resolver. `defineDns` takes one or more root domains plus a `QpqPureFunction` pointer to a `DomainResolver` that decides every hostname; the tooling requires it at synth and the runtime loads it on demand. Every domain-bearing construct (api, websocket, cdn, redirects, email) now deploys on every root, one certificate per region covers all of them, and `rootDomain` disappears from the define helpers
