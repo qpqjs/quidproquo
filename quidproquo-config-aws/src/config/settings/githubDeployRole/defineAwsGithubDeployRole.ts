@@ -16,8 +16,10 @@ export type QPQConfigAdvancedAwsGithubDeployRoleSettings = {
   repositoryId?: number;
   // The GitHub Environment the deploy job runs under. Defaults to the deploy environment.
   githubEnvironment?: string;
-  // Also trust the name-form subject (`repo:owner/name:...`). Off once ids are given: the
-  // name form can be re-earned by whoever next owns that name, the id form cannot.
+  // Also trust the name-form subject (`repo:owner/name:...`). Off once ids are given: a
+  // name can be re-earned by whoever next owns it, an id cannot. Turn on only for a
+  // repository GitHub has not switched to immutable subjects yet (check the real subject
+  // in CloudTrail: `repo:owner/name:...` means not switched).
   trustNameForm?: boolean;
 };
 
