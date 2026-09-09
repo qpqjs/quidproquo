@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.21
+
 ## 0.1.20
 
 - Domains are redone around a root list and an app-owned hostname shape (see the Domains docs page). `defineDns` (`quidproquo-webserver`) takes `rootDomains: string | string[]` (primary first) and its setting is `{ rootDomains, hosts? }`; `dnsBase` is gone. The `rootDomain` parameter/field is removed from `defineApi`, `defineWebsocket`, `defineEmailSender` (now takes no arguments), web entry `WebDomainOptions`, `DomainProxyDomainOptions`, core `defineUserDirectory` `dnsRecord`, and the `quidproquo-features` wrappers `defineAdminSettings(logServiceName, advancedSettings?)`, `defineWebSocketQueue(eventBusName, apiName, advancedSettings?)` and `defineTenantedWebSocketQueue`. Roots come only from `defineDns`.
