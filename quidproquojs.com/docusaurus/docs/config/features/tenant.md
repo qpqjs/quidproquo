@@ -13,9 +13,9 @@ Wires up **everything for org/tenant support**, declared identically in every se
   - The tenant stores ([defineTenantStores](./tenant-stores.md)): the tenant event-doc collection plus the materialized record table.
   - The publish-to-record-store sync: an inline function (`askTenantOnPublish`) that runs on every published tenant document, re-folds the full event log, and upserts the resulting `TenantRecord`. It is a plain upsert of the fold result, so publish retries and repair re-runs are safe.
   - The stock event-doc CRUD at `{basePath}` ([defineEventDocRoutes](./event-doc-routes.md) for the `tenants` store, `tenant` type, with the publish sync wired in as `onPublish`, and `create` excluded — see below).
-  - The membership-gated routes at `{myTenantsBasePath}`: list my tenants, create, get record, and get logo.
+  - The membership-gated routes at `{myTenantsBasePath}`: list my tenants, create, get record, get logo, and manage members (list, add, remove).
 
-- **On AWS:** on the owner's deploy, this deploys everything [defineTenantStores](./tenant-stores.md) deploys (two DynamoDB tables and an S3 bucket) plus the API Gateway routes and Lambda handlers from [defineEventDocRoutes](./event-doc-routes.md) and the four tenant routes below. On every other service's deploy, only the `userTenantLinks` reference resolves (no new table); the inline functions deploy no infrastructure of their own anywhere.
+- **On AWS:** on the owner's deploy, this deploys everything [defineTenantStores](./tenant-stores.md) deploys (three DynamoDB tables and an S3 bucket) plus the API Gateway routes and Lambda handlers from [defineEventDocRoutes](./event-doc-routes.md) and the tenant routes below. On every other service's deploy, only the `userTenantLinks` reference resolves (no new table); the inline functions deploy no infrastructure of their own anywhere.
 
 ```typescript
 import { defineTenant } from 'quidproquo-features';
@@ -42,6 +42,9 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`) an
 | `POST` | `{myTenantsBasePath}` | Create a tenant (body `{ name }`); the caller becomes its first member. Runs under the request's scope, so the new tenant doc lands in the caller's current partition. This is the only way to create a tenant — the stock `create` route is excluded at `{basePath}` so a new tenant is never made without also linking its creator. |
 | `GET` | `{myTenantsBasePath}/{id}` | One tenant's materialized record (the fast path). Members only: non-members get `Forbidden`, a missing record gets `NotFound`. |
 | `GET` | `{myTenantsBasePath}/{id}/logo` | A presigned, short-lived URL for the tenant's logo blob. Members only: non-members get `Forbidden`; a missing record or a tenant with no logo gets `NotFound`. Presigned in the scope the tenant doc was published under (recorded on the `TenantRecord`), not the reader's own scope, since the logo asset lives in the doc's home partition. |
+| `GET` | `{myTenantsBasePath}/{id}/members` | The tenant's members as `TenantMember[]` (`userId`, `email`, `name`, hydrated from the user directory). Members only: non-members get `Forbidden`. |
+| `POST` | `{myTenantsBasePath}/{id}/members` | Add an existing user directory account to the tenant (body `{ email }`). Owner only: non-owners get `Forbidden`. No invite flow — an email with no matching account gets `NotFound`. Idempotent: re-adding a member is a no-op that still returns the `TenantMember`. |
+| `DELETE` | `{myTenantsBasePath}/{id}/members/{userId}` | Remove a member from the tenant. Owner only: non-owners get `Forbidden`. The owner can never be removed, even by themself: `BadRequest`. |
 
 On top of these, the stock event-doc route set (get, append, list events, assets, remove, and so on — everything but `create`) is mounted at `{basePath}`, named after the model type like any other collection; see [defineEventDocRoutes](./event-doc-routes.md#routes-mounted) for the list. `{basePath}` and `{myTenantsBasePath}` must be distinct and neither may be a path segment under the other: `{basePath}/{id}` matches any single segment, so a literal sibling path would be ambiguous with a tenant whose id happens to match it.
 
@@ -72,6 +75,7 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 - `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option (or use [defineTenantedEventDoc](./tenanted-event-doc.md), which does this for you).
 - The scope resolver always resolves to a typed scope — a membership-checked `TENANT#<id>` for a request that names a tenant, or the caller's own `PERSONAL#<userId>` when it doesn't. A tenant-scoped collection or connection is never left unscoped.
 - Every service — owner and non-owner alike — calls `defineTenant` with the same `owner`. There is no separate call for non-owning services anymore: the gating happens internally via [defineServiceSettings](../core/service-settings.md).
+- There is only one role beyond plain membership: the tenant's **owner** (its creator), resolved from the tenant doc's `createdByUserId`. Owners manage membership (add/remove); members merely belong. Membership is tracked in both directions — `userTenantLinks` (per-user) and `tenantMemberLinks` (per-tenant, see [defineTenantStores](./tenant-stores.md)) — kept in lock-step so a tenant can list its members without scanning every user's row.
 
 ## Related
 

@@ -20,3 +20,8 @@ export const TENANT_SCOPE_RESOLVER_FN = 'askTenantScopeResolver';
 // hook: resolves the ws Authenticate handshake into the scope stored on the
 // connection (membership-checked tenant claim, or the user's personal scope).
 export const TENANT_CONNECTION_SCOPE_RESOLVER_FN = 'askTenantConnectionScopeResolver';
+
+// tenantId -> userIds membership links: the reverse of USER_TENANT_LINKS_STORE,
+// maintained in lock-step so a tenant can list its members. Owner-only (the
+// scope resolver never reads it).
+export const TENANT_MEMBER_LINKS_STORE = 'tenantMemberLinks';

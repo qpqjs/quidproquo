@@ -4,3 +4,6 @@ export * from './TenantRecord';
 export * from './TenantSetBrandData';
 export * from './TenantStatus';
 export * from './UserTenantLinks';
+export * from './TenantMember';
+export * from './TenantMemberAddRequest';
+export * from './TenantMemberLinks';
