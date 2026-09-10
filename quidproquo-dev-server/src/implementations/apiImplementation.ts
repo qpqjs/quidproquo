@@ -81,8 +81,6 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   const apiConfigs = allServiceConfig.map((qpqConfig) => getApiDomainsFromConfig(qpqConfig, devServerConfig)).flat();
 
-  console.log(apiConfigs.map((ac) => ac.devPath));
-
   // Resolved through node resolution (not a __dirname walk) so it works both
   // from a workspace checkout and inside the docker platform image.
   const adminFrontend = path.join(path.dirname(require.resolve('quidproquo-web-admin/package.json')), 'lib');
