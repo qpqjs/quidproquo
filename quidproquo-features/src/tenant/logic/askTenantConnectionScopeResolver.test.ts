@@ -16,7 +16,7 @@ describe('askTenantConnectionScopeResolver', () => {
 
   it('resolves a tenant claim to the tenant scope when the user is a member', () => {
     const scope = runStory(askTenantConnectionScopeResolver({ userId: 'u1', requestedScope: 'tenant-a' }), {
-      [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+      [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
     });
 
     expect(scope).toBe('TENANT#tenant-a');
@@ -25,7 +25,7 @@ describe('askTenantConnectionScopeResolver', () => {
   it('throws Forbidden for a tenant claim without membership', () => {
     const runNonMember = () =>
       runStory(askTenantConnectionScopeResolver({ userId: 'u1', requestedScope: 'tenant-b' }), {
-        [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+        [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
       });
 
     expect(runNonMember).toThrowError(/not a member/);

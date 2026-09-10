@@ -10,7 +10,7 @@ import {
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
   TENANT_SCOPE_RESOLVER_FN,
-  USER_TENANT_LINKS_STORE,
+  TENANT_MEMBERSHIPS_STORE,
 } from '../constants/tenantStoreNames';
 import { defineTenant } from './defineTenant';
 
@@ -51,11 +51,21 @@ describe('defineTenant', () => {
     const membershipStore = config.find(
       (s) =>
         (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.keyValueStore &&
-        (s as { uniqueKey: string }).uniqueKey.includes(USER_TENANT_LINKS_STORE),
+        (s as { uniqueKey: string }).uniqueKey.includes(TENANT_MEMBERSHIPS_STORE),
     ) as { owner?: unknown };
 
     // The owner field alone decides owned-vs-foreign at deploy - no service-gating.
     expect(membershipStore.owner).toEqual({ module: 'owner-svc' });
+
+    // pk userId / sk tenantId for the access check; a tenantId GSI for the member list.
+    const store = membershipStore as unknown as {
+      partitionKey: { key: string };
+      sortKeys: { key: string }[];
+      indexes: { partitionKey: { key: string }; sortKey?: { key: string } }[];
+    };
+    expect(store.partitionKey.key).toBe('userId');
+    expect(store.sortKeys.map((k) => k.key)).toEqual(['tenantId']);
+    expect(store.indexes).toEqual([{ partitionKey: { key: 'tenantId', type: 'string' }, sortKey: { key: 'userId', type: 'string' } }]);
   });
 
   it('gates the rest of the registry to the owner service', () => {
@@ -126,6 +136,7 @@ describe('defineTenant', () => {
         'GET /v1/my-tenants/{id}/logo',
         'GET /v1/my-tenants/{id}/members',
         'POST /v1/my-tenants/{id}/members',
+        'PATCH /v1/my-tenants/{id}/members/{userId}',
         'DELETE /v1/my-tenants/{id}/members/{userId}',
       ]),
     );

@@ -3,8 +3,8 @@ import { askMapParallel, AskResponse, Nullable } from 'quidproquo-core';
 import { askEventDocGetById } from '../../eventDoc/data/askEventDocGetById';
 import { EventDocSummary } from '../../eventDoc/models';
 import { TENANT_DOC_TYPE } from '../constants/tenantStoreNames';
+import { askTenantMembershipsForUser } from '../data/askTenantMembershipsForUser';
 import { askTenantRecordGet } from '../data/askTenantRecordGet';
-import { askUserTenantLinksGet } from '../data/askUserTenantLinksGet';
 import { TenantRecord } from '../models/TenantRecord';
 import { TenantStatus } from '../models/TenantStatus';
 
@@ -23,7 +23,7 @@ const tenantRecordToSummary = (record: TenantRecord): EventDocSummary => ({
   versions: [],
 });
 
-// List-my-tenants: hydrate the user's membership ids two ways. A tenant doc
+// List-my-tenants: hydrate the user's (enabled) memberships two ways. A tenant doc
 // homed in the CALLER'S CURRENT scope reads as its live summary (so a fresh,
 // never-published draft appears immediately and can be reopened to finish
 // setup); every other membership hydrates from the unscoped registry record,
@@ -32,9 +32,10 @@ const tenantRecordToSummary = (record: TenantRecord): EventDocSummary => ({
 // the registry surface for everyone else. Requires the tenant eventDoc store
 // context + the request scope (the tenant routes provide both).
 export function* askTenantListForUser(userId: string): AskResponse<EventDocSummary[]> {
-  const links = yield* askUserTenantLinksGet(userId);
+  const memberships = yield* askTenantMembershipsForUser(userId);
+  const tenantIds = memberships.filter((membership) => !membership.disabled).map((membership) => membership.tenantId);
 
-  const summaries = yield* askMapParallel(links?.tenantIds ?? [], function* askHydrateTenant(tenantId): AskResponse<Nullable<EventDocSummary>> {
+  const summaries = yield* askMapParallel(tenantIds, function* askHydrateTenant(tenantId): AskResponse<Nullable<EventDocSummary>> {
     const summary = yield* askEventDocGetById(tenantId);
     if (summary) {
       return summary.deletedAt ? null : summary;

@@ -1,16 +1,21 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
-import { askTenantResolveOwnerUserId } from './askTenantResolveOwnerUserId';
-import { askTenantUnlinkMember } from './askTenantUnlinkMember';
+import { askTenantMembershipDelete } from '../data/askTenantMembershipDelete';
+import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
+import { TenantMembershipRole } from '../models/TenantMembershipRole';
 
-// Remove a member from a tenant. The owner can never be removed (by anyone): it
-// would orphan the tenant - nothing but a membership link can find it again - and
-// ownership is what gates member management in the first place.
+// Remove a member from a tenant. An owner is never removed (demote first): it
+// would risk orphaning the tenant - nothing but a membership row can find it again.
+// Idempotent - a missing row is a no-op.
 export function* askTenantMemberRemove(tenantId: string, userId: string): AskResponse<void> {
-  const ownerUserId = yield* askTenantResolveOwnerUserId(tenantId);
-  if (userId === ownerUserId) {
-    return yield* askThrowError(ErrorTypeEnum.BadRequest, "The tenant's owner cannot be removed.");
+  const membership = yield* askTenantMembershipGet(userId, tenantId);
+  if (!membership) {
+    return;
   }
 
-  yield* askTenantUnlinkMember(tenantId, userId);
+  if (membership.role === TenantMembershipRole.owner) {
+    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'An owner cannot be removed - change their role first.');
+  }
+
+  yield* askTenantMembershipDelete(userId, tenantId);
 }

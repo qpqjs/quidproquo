@@ -23,7 +23,7 @@ describe('askTenantProvideRequestScope', () => {
     const scope = runStory(askTenantProvideRequestScope(buildEvent('tenant-a'), 'app-users', askReadAmbientScope()), {
       [ConfigActionType.GetGlobal]: '',
       [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
-      [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+      [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
     });
 
     expect(scope).toBe('TENANT#tenant-a');
@@ -43,7 +43,7 @@ describe('askTenantProvideRequestScope', () => {
       runStory(askTenantProvideRequestScope(buildEvent('tenant-b'), 'app-users', askReadAmbientScope()), {
         [ConfigActionType.GetGlobal]: '',
         [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
-        [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+        [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
       });
 
     expect(runNonMember).toThrowError(/not a member/);
