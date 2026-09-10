@@ -114,6 +114,12 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqInfCoreUserDirectoryConstruct.authorizeAdminActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
 
+    // Directories this service references but doesn't own: read-only user lookups.
+    const referencedUserDirectoriesConfigs = qpqCoreUtils
+      .getUserDirectories(props.qpqConfig)
+      .filter((setting) => !ownedUserDirectoriesConfigs.includes(setting));
+    QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole(webserverRole, referencedUserDirectoriesConfigs, props.qpqConfig);
+
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
       (setting) =>

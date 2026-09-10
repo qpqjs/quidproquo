@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { QPQConfig, UserDirectoryMfaMode, UserDirectoryMfaSecondFactor, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
@@ -225,8 +225,44 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     );
   }
 
+  // Grants READ-ONLY Cognito actions on user directories this service merely
+  // references (owned by another service): look a user up by attribute / by id
+  // (askUserDirectoryGetUsersByAttribute, askUserDirectoryGetUserAttributesByUserId).
+  // Any service that shows "who" needs this - e.g. the tenant registry adding a
+  // member by email from a service that doesn't own the pool. Nothing that
+  // mutates the pool: admin actions stay with the owner (below). Cognito has no
+  // resource policy, so a pool in another account can't be granted this way -
+  // such directories are skipped (the call fails as it does today).
+  public static authorizeReadActionsForRole(role: aws_iam.IRole, referencedDirectoryConfigs: UserDirectoryQPQConfigSetting[], qpqConfig: QPQConfig) {
+    const local = getLocalServiceAccountInfo(qpqConfig);
+
+    const resources = referencedDirectoryConfigs
+      .map((userDirectoryConfig) => ({
+        userDirectoryConfig,
+        account: resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner),
+      }))
+      .filter(({ account }) => account.awsAccountId === local.awsAccountId && account.awsRegion === local.awsRegion)
+      .map(({ userDirectoryConfig, account }) => {
+        const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
+          awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryConfig.name, qpqConfig),
+        );
+
+        return `arn:aws:cognito-idp:${account.awsRegion}:${account.awsAccountId}:userpool/${userPoolId}`;
+      });
+
+    if (resources.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['cognito-idp:ListUsers', 'cognito-idp:AdminGetUser'],
+          resources,
+        }),
+      );
+    }
+  }
+
   // Grants admin Cognito actions for pools this service owns. Services that
-  // only reference a foreign user directory get no Cognito IAM from here —
+  // only reference a foreign user directory get only the read grant above —
   // token validation runs against the pool's public JWKs over HTTPS and needs
   // no IAM. Call sites must pass only owned directories (see
   // `qpqCoreUtils.getOwnedUserDirectories`).
