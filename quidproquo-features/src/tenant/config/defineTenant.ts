@@ -6,11 +6,11 @@ import {
   TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
+  TENANT_MEMBERSHIPS_STORE,
   TENANT_ON_PUBLISH_FN,
   TENANT_SCOPE_RESOLVER_FN,
-  USER_TENANT_LINKS_STORE,
 } from '../constants/tenantStoreNames';
-import { UserTenantLinks } from '../models/UserTenantLinks';
+import { TenantMembership } from '../models/TenantMembership';
 import { defineTenantRoutes } from '../routes/defineTenantRoutes';
 import { TenantOptions } from '../types/TenantRoutesOptions';
 import { defineTenantStores } from './defineTenantStores';
@@ -53,10 +53,14 @@ export const defineTenant = ({ owner, ...routeOptions }: TenantOptions): QPQConf
     { functionName: TENANT_CONNECTION_SCOPE_RESOLVER_FN },
   ),
 
-  // The membership table: created on the owner's deploy, a read-only cross-module
-  // ref on every other service's (the resolver checks membership against it). The
-  // owner field alone decides which - no service-gating needed.
-  defineKeyValueStore<UserTenantLinks>(USER_TENANT_LINKS_STORE, 'userId', [], { owner }),
+  // The membership table (pk userId, sk tenantId, GSI tenantId/userId for the member
+  // list): created on the owner's deploy, a read-only cross-module ref on every other
+  // service's (the resolver checks membership against it). The owner field alone
+  // decides which - no service-gating needed.
+  defineKeyValueStore<TenantMembership>(TENANT_MEMBERSHIPS_STORE, 'userId', ['tenantId'], {
+    owner,
+    indexes: [{ partitionKey: 'tenantId', sortKey: 'userId' }],
+  }),
 
   // The rest of the registry (owner-only): the eventDoc collection + record store,
   // the publish sync, the eventDoc CRUD, and the tenant management routes.

@@ -5,8 +5,12 @@ export const TENANT_DOC_TYPE = 'tenant';
 // Materialized fast-read table, synced from the eventDoc on publish.
 export const TENANT_RECORD_STORE = 'tenantRecords';
 
-// userId -> tenantIds membership links.
-export const USER_TENANT_LINKS_STORE = 'userTenantLinks';
+// Membership: ONE row per (user, tenant) link. pk userId + sk tenantId serves the
+// access check (a keyed get) and "my tenants"; a GSI on tenantId (sk userId) serves
+// the tenant's member list - the query processor routes to it automatically from
+// the keys the condition names. Owned by the registry service, a cross-module ref
+// everywhere else.
+export const TENANT_MEMBERSHIPS_STORE = 'tenantMemberships';
 
 // Inline-function name for the publish -> record-store sync.
 export const TENANT_ON_PUBLISH_FN = 'askTenantOnPublish';
@@ -20,8 +24,3 @@ export const TENANT_SCOPE_RESOLVER_FN = 'askTenantScopeResolver';
 // hook: resolves the ws Authenticate handshake into the scope stored on the
 // connection (membership-checked tenant claim, or the user's personal scope).
 export const TENANT_CONNECTION_SCOPE_RESOLVER_FN = 'askTenantConnectionScopeResolver';
-
-// tenantId -> userIds membership links: the reverse of USER_TENANT_LINKS_STORE,
-// maintained in lock-step so a tenant can list its members. Owner-only (the
-// scope resolver never reads it).
-export const TENANT_MEMBER_LINKS_STORE = 'tenantMemberLinks';

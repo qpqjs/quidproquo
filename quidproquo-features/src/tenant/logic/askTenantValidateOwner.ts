@@ -1,10 +1,12 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askTenantResolveOwnerUserId } from './askTenantResolveOwnerUserId';
+import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
+import { TenantMembershipRole } from '../models/TenantMembershipRole';
 
-// Whether the user OWNS (created) the tenant - the only role there is: owners manage
-// membership; members merely belong.
+// Whether the user is an ENABLED owner of the tenant - the role that manages
+// membership (add / remove / update members). Ownership is a role on the
+// membership row, so a tenant may have several owners.
 export function* askTenantValidateOwner(userId: string, tenantId: string): AskResponse<boolean> {
-  const ownerUserId = yield* askTenantResolveOwnerUserId(tenantId);
-  return ownerUserId !== null && ownerUserId === userId;
+  const membership = yield* askTenantMembershipGet(userId, tenantId);
+  return membership !== null && !membership.disabled && membership.role === TenantMembershipRole.owner;
 }

@@ -16,7 +16,7 @@ describe('askTenantResolveRequestScope', () => {
     const scope = runStory(askTenantResolveRequestScope(buildEvent('tenant-a'), 'app-users'), {
       [ConfigActionType.GetGlobal]: '',
       [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
-      [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+      [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
     });
 
     expect(scope).toBe('TENANT#tenant-a');
@@ -36,7 +36,7 @@ describe('askTenantResolveRequestScope', () => {
       runStory(askTenantResolveRequestScope(buildEvent('tenant-b'), 'app-users'), {
         [ConfigActionType.GetGlobal]: '',
         [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
-        [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+        [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
       });
 
     expect(runNonMember).toThrowError(/not a member/);
@@ -47,7 +47,7 @@ describe('askTenantResolveRequestScope', () => {
       runStory(askTenantResolveRequestScope(buildEvent('PERSONAL#u2'), 'app-users'), {
         [ConfigActionType.GetGlobal]: '',
         [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
-        [KeyValueStoreActionType.Get]: { userId: 'u1', tenantIds: ['tenant-a'] },
+        [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', role: 'member' }], nextPageKey: undefined },
       });
 
     expect(runForged).toThrowError(/not a member/);

@@ -39,15 +39,15 @@ import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from './constan
 import {
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
-  TENANT_MEMBER_LINKS_STORE,
+  TENANT_MEMBERSHIPS_STORE,
   TENANT_ON_PUBLISH_FN,
   TENANT_RECORD_STORE,
   TENANT_SCOPE_RESOLVER_FN,
-  USER_TENANT_LINKS_STORE,
 } from './constants/tenantStoreNames';
 import { TenantEffect } from './fold/TenantEffect';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
+import { TenantMembershipRole } from './models/TenantMembershipRole';
 import { TenantStatus } from './models/TenantStatus';
 import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
 import { addMember } from './routes/controllers/addMember';
@@ -57,6 +57,7 @@ import { getLogo } from './routes/controllers/getLogo';
 import { list } from './routes/controllers/list';
 import { listMembers } from './routes/controllers/listMembers';
 import { removeMember } from './routes/controllers/removeMember';
+import { updateMember } from './routes/controllers/updateMember';
 
 let sortableGuidCount = 0;
 
@@ -116,12 +117,26 @@ const buildMocks = () => {
   let clock = Date.parse('2026-07-11T00:00:00.000Z');
 
   // Row identity per store: the events store keys pk/sk, the summary store id,
-  // the record store tenantId, the links store userId.
+  // the record store tenantId, the membership stores (tenantId, userId).
   const sameRow = (item: Record<string, unknown>) => (row: Record<string, unknown>) => {
     if ('pk' in item && 'sk' in item) return row.pk === item.pk && row.sk === item.sk;
+    if ('tenantId' in item && 'userId' in item) return row.tenantId === item.tenantId && row.userId === item.userId;
     if ('tenantId' in item) return row.tenantId === item.tenantId;
     if ('userId' in item) return row.userId === item.userId;
     return row.id === item.id;
+  };
+
+  // A membership row.
+  const membershipRow = (tenantId: string, userId: string, role: TenantMembershipRole, extra: Record<string, unknown> = {}) => ({
+    tenantId,
+    userId,
+    role,
+    joinedAt: '2026-07-10T00:00:00.000Z',
+    addedByUserId: userId,
+    ...extra,
+  });
+  const seedMembership = (tenantId: string, userId: string, role: TenantMembershipRole, extra: Record<string, unknown> = {}) => {
+    (tables[TENANT_MEMBERSHIPS_STORE] ??= []).push(membershipRow(tenantId, userId, role, extra));
   };
 
   const mocks = {
@@ -192,6 +207,20 @@ const buildMocks = () => {
       return undefined;
     },
 
+    [KeyValueStoreActionType.Delete]: (action: { payload: { keyValueStoreName: string; key: string; sortKey?: string } }) => {
+      const { keyValueStoreName, key, sortKey } = action.payload;
+      const table = tables[keyValueStoreName] ?? [];
+      const index = table.findIndex((row) =>
+        keyValueStoreName === TENANT_MEMBERSHIPS_STORE
+          ? row.userId === key && row.tenantId === sortKey
+          : row.tenantId === key || row.userId === key || row.id === key,
+      );
+      if (index >= 0) {
+        table.splice(index, 1);
+      }
+      return undefined;
+    },
+
     [KeyValueStoreActionType.Query]: (action: {
       payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { sortAscending?: boolean; limit?: number } };
     }) => {
@@ -212,7 +241,7 @@ const buildMocks = () => {
     },
   };
 
-  return { mocks, tables, inlinePayloads, upsertScopes };
+  return { mocks, tables, inlinePayloads, upsertScopes, seedMembership, membershipRow };
 };
 
 const httpEvent = (body: unknown, headers: Record<string, string> = {}): HTTPEvent => ({
@@ -235,17 +264,17 @@ describe('tenant feature', () => {
     expect(createResponse.status).toBe(200);
     const summary = JSON.parse(createResponse.body!);
 
-    const links = tables[USER_TENANT_LINKS_STORE];
-    expect(links).toEqual([{ userId: 'user-1', tenantIds: [summary.id] }]);
-    expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
+    // Create: the caller becomes the first OWNER.
+    const ownerRow = { tenantId: summary.id, userId: 'user-1', role: TenantMembershipRole.owner, addedByUserId: 'user-1' };
+    expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining(ownerRow)]);
 
     // The doc + its INIT event land in the CALLER'S OWN partition (no header ->
     // personal scope), like any other scoped create - nowhere special. The
     // membership link is the unscoped cross-scope registry.
-    const docWrites = upsertScopes.filter(({ store }) => store !== USER_TENANT_LINKS_STORE && store !== TENANT_MEMBER_LINKS_STORE);
+    const docWrites = upsertScopes.filter(({ store }) => store !== TENANT_MEMBERSHIPS_STORE);
     expect(docWrites.length).toBeGreaterThan(0);
     expect(docWrites.every(({ scope }) => scope === 'PERSONAL#user-1')).toBe(true);
-    expect(upsertScopes.find(({ store }) => store === USER_TENANT_LINKS_STORE)?.scope).toBeUndefined();
+    expect(upsertScopes.find(({ store }) => store === TENANT_MEMBERSHIPS_STORE)?.scope).toBeUndefined();
 
     // The list serves the created tenant IMMEDIATELY (live summary in the
     // caller's scope, drafts included) - a never-published tenant must be
@@ -337,11 +366,12 @@ describe('tenant feature', () => {
   });
 
   it('hydrates memberships homed in other scopes from the published registry record', () => {
-    const { mocks, tables } = buildMocks();
+    const { mocks, tables, seedMembership } = buildMocks();
 
     // user-1 is a member of two tenants created elsewhere (no summary in the
     // caller's scope): one published (has a record), one still a draft.
-    tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-published', 'tenant-draft'] }];
+    seedMembership('tenant-published', 'user-1', TenantMembershipRole.member);
+    seedMembership('tenant-draft', 'user-1', TenantMembershipRole.member);
     tables[TENANT_RECORD_STORE] = [
       {
         tenantId: 'tenant-published',
@@ -362,8 +392,8 @@ describe('tenant feature', () => {
   });
 
   it('gates requests on membership of the claimed tenant header', () => {
-    const { mocks, tables } = buildMocks();
-    tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+    const { mocks, seedMembership } = buildMocks();
+    seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
 
     const resolved = runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' })), mocks);
     expect(resolved).toBe('tenant-a');
@@ -376,8 +406,8 @@ describe('tenant feature', () => {
   });
 
   it('denies get for a tenant the user is not a member of', () => {
-    const { mocks, tables } = buildMocks();
-    tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+    const { mocks, seedMembership } = buildMocks();
+    seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
 
     expect(() => runStory(get(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
   });
@@ -402,7 +432,9 @@ describe('tenant feature', () => {
       },
     });
 
-    it('adds an existing user by email (both membership directions), lists, and removes members', () => {
+    const membersOf = (response: { body?: string }) => JSON.parse(response.body!).items as { userId: string; role: string; disabled: boolean }[];
+
+    it('adds an existing user by email as a member, lists, updates, and removes', () => {
       const { mocks: baseMocks, tables } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
@@ -412,85 +444,103 @@ describe('tenant feature', () => {
       // Email lookup is case/whitespace-insensitive; the member comes back hydrated.
       const addResponse = runStory(addMember(httpEvent({ email: '  Sam@Example.com ' }), { id: summary.id }), mocks);
       expect(addResponse.status).toBe(200);
-      expect(JSON.parse(addResponse.body!)).toEqual({ userId: 'user-2', email: 'sam@example.com', name: 'Sam' });
+      expect(JSON.parse(addResponse.body!)).toMatchObject({
+        userId: 'user-2',
+        email: 'sam@example.com',
+        name: 'Sam',
+        role: TenantMembershipRole.member,
+        disabled: false,
+      });
 
-      expect(tables[USER_TENANT_LINKS_STORE]).toEqual(
-        expect.arrayContaining([
-          { userId: 'user-1', tenantIds: [summary.id] },
-          { userId: 'user-2', tenantIds: [summary.id] },
-        ]),
-      );
-      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1', 'user-2'] }]);
+      const samRow = { tenantId: summary.id, userId: 'user-2', role: TenantMembershipRole.member, addedByUserId: 'user-1' };
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(expect.objectContaining(samRow));
 
-      // Idempotent: re-adding does not duplicate the link.
+      // Idempotent: re-adding does not duplicate the row.
       runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: summary.id }), mocks);
-      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1', 'user-2'] }]);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toHaveLength(2);
 
       const listResponse = runStory(listMembers(httpEvent(undefined), { id: summary.id }), mocks);
-      expect(JSON.parse(listResponse.body!)).toEqual([
-        { userId: 'user-1', email: 'joe@example.com', name: 'Joe' },
-        { userId: 'user-2', email: 'sam@example.com', name: 'Sam' },
+      expect(membersOf(listResponse)).toEqual([
+        expect.objectContaining({ userId: 'user-1', email: 'joe@example.com', name: 'Joe', role: TenantMembershipRole.owner, disabled: false }),
+        expect.objectContaining({ userId: 'user-2', email: 'sam@example.com', name: 'Sam', role: TenantMembershipRole.member, disabled: false }),
       ]);
 
+      // Disable Sam: still listed, but no longer passes the access check.
+      const disableResponse = runStory(updateMember(httpEvent({ disabled: true }), { id: summary.id, userId: 'user-2' }), mocks);
+      expect(disableResponse.status).toBe(200);
+      expect(membersOf(runStory(listMembers(httpEvent(undefined), { id: summary.id }), mocks))).toContainEqual(
+        expect.objectContaining({ userId: 'user-2', disabled: true }),
+      );
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(expect.objectContaining({ userId: 'user-2', disabled: true }));
+
+      // Promote Sam to owner (and re-enable).
+      runStory(updateMember(httpEvent({ role: TenantMembershipRole.owner, disabled: false }), { id: summary.id, userId: 'user-2' }), mocks);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(
+        expect.objectContaining({ userId: 'user-2', role: TenantMembershipRole.owner, disabled: false }),
+      );
+
+      // An owner is never removed - demote, then remove.
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-2' }), mocks)).toThrow(/owner cannot be removed/);
+      runStory(updateMember(httpEvent({ role: TenantMembershipRole.member }), { id: summary.id, userId: 'user-2' }), mocks);
       const removeResponse = runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-2' }), mocks);
       expect(removeResponse.status).toBe(200);
-      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
-      expect(tables[USER_TENANT_LINKS_STORE]).toEqual(expect.arrayContaining([{ userId: 'user-2', tenantIds: [] }]));
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-1' })]);
     });
 
     it('lists a member the directory no longer knows with null details', () => {
-      const { mocks: baseMocks, tables } = buildMocks();
+      const { mocks: baseMocks, seedMembership } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
-      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
-      tables[TENANT_MEMBER_LINKS_STORE] = [{ tenantId: 'tenant-a', userIds: ['user-1', 'user-gone'] }];
+      seedMembership('tenant-a', 'user-1', TenantMembershipRole.owner);
+      seedMembership('tenant-a', 'user-gone', TenantMembershipRole.member);
 
       const listResponse = runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks);
-      expect(JSON.parse(listResponse.body!)).toEqual([
-        { userId: 'user-1', email: 'joe@example.com', name: 'Joe' },
-        { userId: 'user-gone', email: null, name: null },
+      expect(membersOf(listResponse)).toEqual([
+        expect.objectContaining({ userId: 'user-1', email: 'joe@example.com', name: 'Joe' }),
+        expect.objectContaining({ userId: 'user-gone', email: null, name: null }),
       ]);
     });
 
-    it('rejects an email with no account and refuses to remove the owner', () => {
+    it('rejects an email with no account, and an owner demoting or disabling themself', () => {
       const { mocks: baseMocks, tables } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
-      // user-1 owns (created) the tenant.
       const createResponse = runStory(create(httpEvent({ name: 'credit-corp' })), mocks);
       const summary = JSON.parse(createResponse.body!);
 
       expect(() => runStory(addMember(httpEvent({ email: 'nobody@example.com' }), { id: summary.id }), mocks)).toThrow(/No user account/);
       expect(() => runStory(addMember(httpEvent({}), { id: summary.id }), mocks)).toThrow(/email address is required/);
+      expect(() => runStory(updateMember(httpEvent({ role: 'member' }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/demote or disable yourself/);
+      expect(() => runStory(updateMember(httpEvent({ disabled: true }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/demote or disable yourself/);
+      expect(() => runStory(updateMember(httpEvent({ role: 'boss' }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/Unknown role/);
       expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/owner cannot be removed/);
-      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-1', role: TenantMembershipRole.owner })]);
     });
 
-    it('lets members list but only the owner add or remove users', () => {
-      const { mocks: baseMocks, tables } = buildMocks();
+    it('lets members list but only enabled owners add, update or remove users', () => {
+      const { mocks: baseMocks, tables, seedMembership } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
-      // A published tenant owned by user-2; the caller (user-1) is merely a member.
-      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
-      tables[TENANT_MEMBER_LINKS_STORE] = [{ tenantId: 'tenant-a', userIds: ['user-2', 'user-1'] }];
-      tables[TENANT_RECORD_STORE] = [
-        {
-          tenantId: 'tenant-a',
-          name: 'acme',
-          createdAt: '2026-07-10T00:00:00.000Z',
-          updatedAt: '2026-07-10T00:00:00.000Z',
-          createdByUserId: 'user-2',
-          status: TenantStatus.active,
-        },
-      ];
+      // user-2 owns tenant-a; the caller (user-1) is merely a member.
+      seedMembership('tenant-a', 'user-2', TenantMembershipRole.owner);
+      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
 
-      const listResponse = runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks);
-      expect(JSON.parse(listResponse.body!)).toHaveLength(2);
+      expect(membersOf(runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks))).toHaveLength(2);
 
-      // The regression: a member must not be able to manage (or evict the owner from) a tenant they don't own.
+      // The regression: a member must not manage (or evict the owner from) a tenant they don't own.
       expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-a' }), mocks)).toThrow(/owner can manage/);
+      expect(() => runStory(updateMember(httpEvent({ role: 'owner' }), { id: 'tenant-a', userId: 'user-1' }), mocks)).toThrow(/owner can manage/);
       expect(() => runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(/owner can manage/);
-      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: 'tenant-a', userIds: ['user-2', 'user-1'] }]);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toHaveLength(2);
+
+      // A DISABLED owner is no owner (and no member) until re-enabled.
+      seedMembership('tenant-c', 'user-1', TenantMembershipRole.owner, { disabled: true });
+      expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-c' }), mocks)).toThrow(/not a member/);
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-c' }), mocks)).toThrow(/owner can manage/);
+      expect(runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' })), mocks)).toBe('tenant-a');
+      expect(() => runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-c' })), mocks)).toThrow(
+        /not a member/,
+      );
 
       // Non-members get nothing at all.
       expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
@@ -525,8 +575,8 @@ describe('tenant feature', () => {
     };
 
     it("presigns the logo blob in the DOC record's home scope, not the reader's", () => {
-      const { mocks, tables } = buildMocks();
-      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      const { mocks, tables, seedMembership } = buildMocks();
+      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
       tables[TENANT_RECORD_STORE] = [logoRecord('PERSONAL#user-2')];
       const { presignMocks, presigns } = withPresignMock(mocks);
 
@@ -540,8 +590,8 @@ describe('tenant feature', () => {
     });
 
     it("falls back to the creator's personal scope for records published before scope was recorded", () => {
-      const { mocks, tables } = buildMocks();
-      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      const { mocks, tables, seedMembership } = buildMocks();
+      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
       tables[TENANT_RECORD_STORE] = [logoRecord(undefined)];
       const { presignMocks, presigns } = withPresignMock(mocks);
 
@@ -551,8 +601,8 @@ describe('tenant feature', () => {
     });
 
     it('denies non-members and 404s a missing logo', () => {
-      const { mocks, tables } = buildMocks();
-      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      const { mocks, tables, seedMembership } = buildMocks();
+      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
       tables[TENANT_RECORD_STORE] = [{ ...logoRecord('PERSONAL#user-2'), logo: undefined }];
 
       expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);

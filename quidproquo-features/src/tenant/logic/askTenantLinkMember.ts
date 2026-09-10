@@ -1,24 +1,27 @@
-import { AskResponse } from 'quidproquo-core';
+import { askDateNow, AskResponse } from 'quidproquo-core';
 
-import { askTenantMemberLinksGet } from '../data/askTenantMemberLinksGet';
-import { askTenantMemberLinksUpsert } from '../data/askTenantMemberLinksUpsert';
-import { askUserTenantLinksGet } from '../data/askUserTenantLinksGet';
-import { askUserTenantLinksUpsert } from '../data/askUserTenantLinksUpsert';
+import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
+import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';
+import { TenantMembership } from '../models/TenantMembership';
+import { TenantMembershipRole } from '../models/TenantMembershipRole';
 
-// Link a user to a tenant in BOTH membership directions (user -> tenants for the
-// scope resolver, tenant -> users for the member list). Idempotent: an existing
-// link is left as-is. Read-modify-write on both rows: no invite flow yet, so
-// contention on one user's or one tenant's row is negligible.
-export function* askTenantLinkMember(tenantId: string, userId: string): AskResponse<void> {
-  const userLinks = yield* askUserTenantLinksGet(userId);
-  const userTenantIds = userLinks?.tenantIds ?? [];
-  if (!userTenantIds.includes(tenantId)) {
-    yield* askUserTenantLinksUpsert({ userId, tenantIds: [...userTenantIds, tenantId] });
+// Link a user to a tenant with a role. Idempotent: an existing row (whatever its
+// role or disabled state) is returned untouched - changing it is askTenantMemberUpdate's job.
+export function* askTenantLinkMember(
+  tenantId: string,
+  userId: string,
+  role: TenantMembershipRole,
+  addedByUserId: string,
+): AskResponse<TenantMembership> {
+  const existing = yield* askTenantMembershipGet(userId, tenantId);
+  if (existing) {
+    return existing;
   }
 
-  const memberLinks = yield* askTenantMemberLinksGet(tenantId);
-  const memberUserIds = memberLinks?.userIds ?? [];
-  if (!memberUserIds.includes(userId)) {
-    yield* askTenantMemberLinksUpsert({ tenantId, userIds: [...memberUserIds, userId] });
-  }
+  const joinedAt = yield* askDateNow();
+  const membership: TenantMembership = { tenantId, userId, role, joinedAt, addedByUserId };
+
+  yield* askTenantMembershipWrite(membership);
+
+  return membership;
 }

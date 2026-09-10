@@ -1,13 +1,14 @@
 import { AskResponse, askThrowError, askUserDirectoryGetUsersByAttribute, ErrorTypeEnum } from 'quidproquo-core';
 
 import { TenantMember } from '../models/TenantMember';
+import { TenantMembershipRole } from '../models/TenantMembershipRole';
 import { askTenantLinkMember } from './askTenantLinkMember';
 
-// Add an EXISTING user directory account to a tenant by email. There is no invite
-// flow: an email with no account is NotFound (the UI tells the admin to have the
-// person sign up first). Idempotent - re-adding a member is a no-op that still
-// returns the member.
-export function* askTenantMemberAdd(userDirectoryName: string, tenantId: string, email: string): AskResponse<TenantMember> {
+// Add an EXISTING user directory account to a tenant by email, as a plain member.
+// There is no invite flow: an email with no account is NotFound (the UI tells the
+// owner to have the person sign up first). Idempotent - re-adding returns the
+// existing membership untouched.
+export function* askTenantMemberAdd(userDirectoryName: string, tenantId: string, email: string, addedByUserId: string): AskResponse<TenantMember> {
   const normalisedEmail = email.trim().toLowerCase();
   if (!normalisedEmail) {
     return yield* askThrowError(ErrorTypeEnum.BadRequest, 'An email address is required.');
@@ -20,11 +21,14 @@ export function* askTenantMemberAdd(userDirectoryName: string, tenantId: string,
     return yield* askThrowError(ErrorTypeEnum.NotFound, `No user account exists for ${normalisedEmail}.`);
   }
 
-  yield* askTenantLinkMember(tenantId, user.userId);
+  const membership = yield* askTenantLinkMember(tenantId, user.userId, TenantMembershipRole.member, addedByUserId);
 
   return {
     userId: user.userId,
     email: user.email ?? normalisedEmail,
     name: user.name ?? null,
+    role: membership.role,
+    disabled: membership.disabled ?? false,
+    joinedAt: membership.joinedAt,
   };
 }
