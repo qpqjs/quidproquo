@@ -9,5 +9,6 @@ export * from './openApi';
 export * from './pathUtils';
 export * from './preformNetworkRequest';
 export * from './qpqConfigAccessorsUtils';
+export * from './queryStringUtils';
 export * from './urlUtils';
 export * from './websocketEventUtils';

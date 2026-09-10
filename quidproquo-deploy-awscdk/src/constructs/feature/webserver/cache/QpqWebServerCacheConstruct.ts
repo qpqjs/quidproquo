@@ -44,6 +44,10 @@ export class QpqWebServerCacheConstruct extends QpqConstructBlock {
         'Access-Control-Request-Method',
       ),
 
+      // The full query string is part of the cache key: seo stories can vary their output by
+      // query, and for static web entries it is what `?v=` cache-busting params expect anyway.
+      queryStringBehavior: aws_cloudfront.CacheQueryStringBehavior.all(),
+
       enableAcceptEncodingGzip: true,
       enableAcceptEncodingBrotli: true,
     });
