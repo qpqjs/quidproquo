@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.23
+
+- actionprocessor-awslambda/deploy-awscdk: a key value store query that names the primary sort key alone (a `userId`/`tenantId` table with a GSI on `tenantId`) is routed to that GSI again instead of the primary table, where it failed; queries naming the primary partition key still prefer the table. A service that only references another service's user directory now gets read-only Cognito access to it (`ListUsers`, `AdminGetUser`) on its webserver role, so user lookups by email or id work from a service that does not own the pool
+- features: tenant branding gains `displayName`, the text shown beside the logo in the app header. Omit it to leave the current value alone, pass an empty string to clear it for a logo-only header
+
 ## 0.1.22
 
 - features: tenant member management. The membership-gated tenant routes gain `GET`/`POST` on `/{id}/members` and `PATCH`/`DELETE` on `/{id}/members/{userId}`, backed by `askTenantMemberList`, `askTenantMemberAdd`, `askTenantMemberUpdate` (role changes) and `askTenantMemberRemove`, owner-gated. Membership is stored as one `TenantMembership` row per user/tenant pair, with a tenant-keyed index serving the member list, instead of two link tables that had to be kept in step

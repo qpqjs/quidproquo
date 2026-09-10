@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.23
+
 ## 0.1.22
 
 - Tenant membership storage (`quidproquo-features`) is unified into a single `TenantMembership` record replacing the separate user/tenant link tables. `askUserTenantLinksGet`, `askUserTenantLinksUpsert`, `askTenantMemberLinksGet`, `askTenantMemberLinksUpsert`, `askTenantResolveOwnerUserId`, and `askTenantUnlinkMember` are removed, along with the `UserTenantLinks` and `TenantMemberLinks` types. Use `askTenantMembershipGet`, `askTenantMembershipWrite`, `askTenantMembershipDelete`, `askTenantMembershipsForUser`, and `askTenantMembershipsForTenant` against the new `TenantMembership` model instead. The underlying KVS store also changes shape (`USER_TENANT_LINKS_STORE`/`TENANT_MEMBER_LINKS_STORE` become one `TENANT_MEMBERSHIPS_STORE` keyed by `userId`/`tenantId` with a `tenantId` GSI), so existing deployed tenant data needs a migration.
