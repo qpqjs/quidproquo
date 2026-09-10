@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.22
+
+- features: tenant member management. The membership-gated tenant routes gain `GET`/`POST` on `/{id}/members` and `PATCH`/`DELETE` on `/{id}/members/{userId}`, backed by `askTenantMemberList`, `askTenantMemberAdd`, `askTenantMemberUpdate` (role changes) and `askTenantMemberRemove`, owner-gated. Membership is stored as one `TenantMembership` row per user/tenant pair, with a tenant-keyed index serving the member list, instead of two link tables that had to be kept in step
+
+### Breaking changes
+
+- tenant membership link stores and their `ask*Links*` helpers are replaced by one `TenantMembership` store and the `askTenantMembership*` helpers; deployed tenant data needs a migration
+
 ## 0.1.21
 
 - deploy-awscdk: every lambda in a stack now shares one `QpqServiceRole` construct, and grants made against it (event sources, tracing, `addToPrincipalPolicy`) are packaged into customer-managed policies chunked under the IAM document size limit instead of piling onto the role's inline policies, so a service with many queues, streams and buses no longer hits the 10kb inline-policy cap at deploy. The SES email sender construct is keyed by the primary root domain rather than the setting, so changing the setting no longer tries to recreate an identity the stack already owns
