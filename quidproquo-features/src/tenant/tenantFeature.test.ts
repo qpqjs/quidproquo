@@ -293,6 +293,7 @@ describe('tenant feature', () => {
             data: {
               brandColors: { primary: '#123456', secondary: '#abcdef' },
               logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+              displayName: 'Credit Corp',
             },
             metadata: { version: 1, clientMessageId: 'msg-1' },
           },
@@ -334,6 +335,7 @@ describe('tenant feature', () => {
       name: 'credit-corp',
       brandColors: { primary: '#123456', secondary: '#abcdef' },
       logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+      displayName: 'Credit Corp',
       // The doc's home partition, recorded for the registry's cross-scope reads.
       scope: 'PERSONAL#user-1',
       createdByUserId: 'user-1',

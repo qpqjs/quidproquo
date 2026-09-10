@@ -7,4 +7,5 @@ export const setBrand = (state: TenantDocument, payload: EventDocEventPayload<Te
   ...state,
   brandColors: payload.data.brandColors ?? state.brandColors,
   logo: payload.data.logo ?? state.logo,
+  displayName: payload.data.displayName ?? state.displayName,
 });

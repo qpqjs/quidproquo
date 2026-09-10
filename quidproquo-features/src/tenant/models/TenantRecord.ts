@@ -13,6 +13,8 @@ export type TenantRecord = {
   name: string;
   brandColors?: TenantBrandColors;
   logo?: EventDocAssetRef;
+  // Header text shown beside the logo (see TenantDocument.displayName).
+  displayName?: string;
   // The storage scope the tenant DOC (and so its asset blobs) live under — the
   // publishing request's ambient scope. The doc is an ordinary scoped doc, so a
   // cross-scope read (serving the logo to a member browsing under TENANT#<id>)
