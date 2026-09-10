@@ -23,6 +23,7 @@ export function* askTenantOnPublish(input: EventDocOnPublishInput): AskResponse<
     name: input.summary.name,
     brandColors: doc.brandColors,
     logo: doc.logo,
+    displayName: doc.displayName,
     scope: scope ?? undefined,
     createdAt: input.summary.createdAt,
     updatedAt: input.summary.updatedAt,
