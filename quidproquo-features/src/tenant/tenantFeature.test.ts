@@ -39,6 +39,7 @@ import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from './constan
 import {
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
+  TENANT_MEMBER_LINKS_STORE,
   TENANT_ON_PUBLISH_FN,
   TENANT_RECORD_STORE,
   TENANT_SCOPE_RESOLVER_FN,
@@ -49,10 +50,13 @@ import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
 import { TenantStatus } from './models/TenantStatus';
 import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
+import { addMember } from './routes/controllers/addMember';
 import { create } from './routes/controllers/create';
 import { get } from './routes/controllers/get';
 import { getLogo } from './routes/controllers/getLogo';
 import { list } from './routes/controllers/list';
+import { listMembers } from './routes/controllers/listMembers';
+import { removeMember } from './routes/controllers/removeMember';
 
 let sortableGuidCount = 0;
 
@@ -233,11 +237,12 @@ describe('tenant feature', () => {
 
     const links = tables[USER_TENANT_LINKS_STORE];
     expect(links).toEqual([{ userId: 'user-1', tenantIds: [summary.id] }]);
+    expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
 
     // The doc + its INIT event land in the CALLER'S OWN partition (no header ->
     // personal scope), like any other scoped create - nowhere special. The
     // membership link is the unscoped cross-scope registry.
-    const docWrites = upsertScopes.filter(({ store }) => store !== USER_TENANT_LINKS_STORE);
+    const docWrites = upsertScopes.filter(({ store }) => store !== USER_TENANT_LINKS_STORE && store !== TENANT_MEMBER_LINKS_STORE);
     expect(docWrites.length).toBeGreaterThan(0);
     expect(docWrites.every(({ scope }) => scope === 'PERSONAL#user-1')).toBe(true);
     expect(upsertScopes.find(({ store }) => store === USER_TENANT_LINKS_STORE)?.scope).toBeUndefined();
@@ -375,6 +380,122 @@ describe('tenant feature', () => {
     tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
 
     expect(() => runStory(get(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
+  });
+
+  describe('members', () => {
+    const directory: Record<string, { userId: string; email: string; name?: string }> = {
+      'user-1': { userId: 'user-1', email: 'joe@example.com', name: 'Joe' },
+      'user-2': { userId: 'user-2', email: 'sam@example.com', name: 'Sam' },
+    };
+
+    const withDirectoryMocks = (mocks: Record<string, unknown>) => ({
+      ...mocks,
+      [UserDirectoryActionType.GetUsersByAttribute]: (action: { payload: { attribueName: string; attribueValue: string } }) => ({
+        items: Object.values(directory).filter((user) => user[action.payload.attribueName as 'email'] === action.payload.attribueValue),
+      }),
+      [UserDirectoryActionType.GetUserAttributesByUserId]: (action: { payload: { userId: string } }) => {
+        const user = directory[action.payload.userId];
+        if (!user) {
+          return throwsError('UserNotFound', `No user: ${action.payload.userId}`);
+        }
+        return user;
+      },
+    });
+
+    it('adds an existing user by email (both membership directions), lists, and removes members', () => {
+      const { mocks: baseMocks, tables } = buildMocks();
+      const mocks = withDirectoryMocks(baseMocks);
+
+      const createResponse = runStory(create(httpEvent({ name: 'credit-corp' })), mocks);
+      const summary = JSON.parse(createResponse.body!);
+
+      // Email lookup is case/whitespace-insensitive; the member comes back hydrated.
+      const addResponse = runStory(addMember(httpEvent({ email: '  Sam@Example.com ' }), { id: summary.id }), mocks);
+      expect(addResponse.status).toBe(200);
+      expect(JSON.parse(addResponse.body!)).toEqual({ userId: 'user-2', email: 'sam@example.com', name: 'Sam' });
+
+      expect(tables[USER_TENANT_LINKS_STORE]).toEqual(
+        expect.arrayContaining([
+          { userId: 'user-1', tenantIds: [summary.id] },
+          { userId: 'user-2', tenantIds: [summary.id] },
+        ]),
+      );
+      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1', 'user-2'] }]);
+
+      // Idempotent: re-adding does not duplicate the link.
+      runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: summary.id }), mocks);
+      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1', 'user-2'] }]);
+
+      const listResponse = runStory(listMembers(httpEvent(undefined), { id: summary.id }), mocks);
+      expect(JSON.parse(listResponse.body!)).toEqual([
+        { userId: 'user-1', email: 'joe@example.com', name: 'Joe' },
+        { userId: 'user-2', email: 'sam@example.com', name: 'Sam' },
+      ]);
+
+      const removeResponse = runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-2' }), mocks);
+      expect(removeResponse.status).toBe(200);
+      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
+      expect(tables[USER_TENANT_LINKS_STORE]).toEqual(expect.arrayContaining([{ userId: 'user-2', tenantIds: [] }]));
+    });
+
+    it('lists a member the directory no longer knows with null details', () => {
+      const { mocks: baseMocks, tables } = buildMocks();
+      const mocks = withDirectoryMocks(baseMocks);
+
+      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      tables[TENANT_MEMBER_LINKS_STORE] = [{ tenantId: 'tenant-a', userIds: ['user-1', 'user-gone'] }];
+
+      const listResponse = runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks);
+      expect(JSON.parse(listResponse.body!)).toEqual([
+        { userId: 'user-1', email: 'joe@example.com', name: 'Joe' },
+        { userId: 'user-gone', email: null, name: null },
+      ]);
+    });
+
+    it('rejects an email with no account and refuses to remove the owner', () => {
+      const { mocks: baseMocks, tables } = buildMocks();
+      const mocks = withDirectoryMocks(baseMocks);
+
+      // user-1 owns (created) the tenant.
+      const createResponse = runStory(create(httpEvent({ name: 'credit-corp' })), mocks);
+      const summary = JSON.parse(createResponse.body!);
+
+      expect(() => runStory(addMember(httpEvent({ email: 'nobody@example.com' }), { id: summary.id }), mocks)).toThrow(/No user account/);
+      expect(() => runStory(addMember(httpEvent({}), { id: summary.id }), mocks)).toThrow(/email address is required/);
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/owner cannot be removed/);
+      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: summary.id, userIds: ['user-1'] }]);
+    });
+
+    it('lets members list but only the owner add or remove users', () => {
+      const { mocks: baseMocks, tables } = buildMocks();
+      const mocks = withDirectoryMocks(baseMocks);
+
+      // A published tenant owned by user-2; the caller (user-1) is merely a member.
+      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      tables[TENANT_MEMBER_LINKS_STORE] = [{ tenantId: 'tenant-a', userIds: ['user-2', 'user-1'] }];
+      tables[TENANT_RECORD_STORE] = [
+        {
+          tenantId: 'tenant-a',
+          name: 'acme',
+          createdAt: '2026-07-10T00:00:00.000Z',
+          updatedAt: '2026-07-10T00:00:00.000Z',
+          createdByUserId: 'user-2',
+          status: TenantStatus.active,
+        },
+      ];
+
+      const listResponse = runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks);
+      expect(JSON.parse(listResponse.body!)).toHaveLength(2);
+
+      // The regression: a member must not be able to manage (or evict the owner from) a tenant they don't own.
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-a' }), mocks)).toThrow(/owner can manage/);
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(/owner can manage/);
+      expect(tables[TENANT_MEMBER_LINKS_STORE]).toEqual([{ tenantId: 'tenant-a', userIds: ['user-2', 'user-1'] }]);
+
+      // Non-members get nothing at all.
+      expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-b' }), mocks)).toThrow(/owner can manage/);
+    });
   });
 
   describe('getLogo', () => {

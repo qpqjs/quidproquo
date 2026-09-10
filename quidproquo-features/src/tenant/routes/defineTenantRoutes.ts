@@ -9,8 +9,8 @@ import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../consta
 import { TENANT_DOC_TYPE, TENANT_EVENTDOC_STORE, TENANT_ON_PUBLISH_FN, TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 import { TenantRoutesOptions } from '../types/TenantRoutesOptions';
 
-// The membership-gated tenant routes (list mine / create / get-record / get-logo),
-// mounted at myTenantsBasePath. Every one of them keys off the caller's membership,
+// The membership-gated tenant routes (list mine / create / get-record / get-logo /
+// list, add and remove members), mounted at myTenantsBasePath. Every one of them keys off the caller's membership,
 // so they are a different surface from the tenant collection itself - the stock
 // eventDoc CRUD (append SET_BRAND, publish, audit history) that defineTenant mounts
 // at basePath. The store carries the STANDARD scope resolver so create/list run
@@ -47,5 +47,8 @@ export const defineTenantRoutes = ({ myTenantsBasePath, routeAuthSettings, versi
     route('POST', myTenantsBasePath, 'create'),
     route('GET', `${myTenantsBasePath}/{id}`, 'get'),
     route('GET', `${myTenantsBasePath}/{id}/logo`, 'getLogo'),
+    route('GET', `${myTenantsBasePath}/{id}/members`, 'listMembers'),
+    route('POST', `${myTenantsBasePath}/{id}/members`, 'addMember'),
+    route('DELETE', `${myTenantsBasePath}/{id}/members/{userId}`, 'removeMember'),
   ];
 };

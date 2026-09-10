@@ -24,7 +24,9 @@ const config = defineTenant({
 // The owner's settings arrive as arbitrarily nested config arrays (qpq flattens
 // them at load); the routes are what we assert paths against.
 const ownerRoutes = (): { method: string; path: string }[] => {
-  const serviceSettings = config.find((s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings) as {
+  const serviceSettings = config.find(
+    (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
+  ) as unknown as {
     settingsByService: Record<string, unknown[]>;
   };
 
@@ -40,7 +42,7 @@ describe('defineTenant', () => {
   it('always registers the request + connection scope resolver inline functions', () => {
     const inlineFnNames = config
       .filter((s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.inlineFunction)
-      .map((s) => (s as { functionName: string }).functionName);
+      .map((s) => (s as unknown as { functionName: string }).functionName);
 
     expect(inlineFnNames).toEqual(expect.arrayContaining([TENANT_SCOPE_RESOLVER_FN, TENANT_CONNECTION_SCOPE_RESOLVER_FN]));
   });
@@ -59,7 +61,7 @@ describe('defineTenant', () => {
   it('gates the rest of the registry to the owner service', () => {
     const serviceSettings = config.find(
       (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
-    ) as { settingsByService: Record<string, unknown[]> };
+    ) as unknown as { settingsByService: Record<string, unknown[]> };
 
     expect(Object.keys(serviceSettings.settingsByService)).toEqual(['owner-svc']);
   });
@@ -67,7 +69,7 @@ describe('defineTenant', () => {
   it('scopes the tenant collection itself with the standard tenant scope resolver', () => {
     const serviceSettings = config.find(
       (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
-    ) as { settingsByService: Record<string, unknown[]> };
+    ) as unknown as { settingsByService: Record<string, unknown[]> };
 
     // The standard resolver is threaded into the tenant collection's own route
     // globals (the {basePath} CRUD and the {myTenantsBasePath} membership routes) -
@@ -117,7 +119,15 @@ describe('defineTenant', () => {
     const paths = ownerRoutes().map((r) => `${r.method} ${r.path}`);
 
     expect(paths).toEqual(
-      expect.arrayContaining(['GET /v1/my-tenants', 'POST /v1/my-tenants', 'GET /v1/my-tenants/{id}', 'GET /v1/my-tenants/{id}/logo']),
+      expect.arrayContaining([
+        'GET /v1/my-tenants',
+        'POST /v1/my-tenants',
+        'GET /v1/my-tenants/{id}',
+        'GET /v1/my-tenants/{id}/logo',
+        'GET /v1/my-tenants/{id}/members',
+        'POST /v1/my-tenants/{id}/members',
+        'DELETE /v1/my-tenants/{id}/members/{userId}',
+      ]),
     );
   });
 
