@@ -19,6 +19,7 @@ export enum QPQCoreConfigSettingType {
   keyValueStore = '@quidproquo-core/config/KeyValueStore',
   configValue = '@quidproquo-core/config/ConfigValue',
   cryptoKey = '@quidproquo-core/config/cryptoKey',
+  signingKey = '@quidproquo-core/config/signingKey',
   environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
   serviceSettings = '@quidproquo-core/config/ServiceSettings',
   deployEvent = '@quidproquo-core/config/DeployEvent',

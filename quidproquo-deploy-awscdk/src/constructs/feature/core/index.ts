@@ -10,5 +10,6 @@ export * from './parameter';
 export * from './queue';
 export * from './schedule';
 export * from './secret';
+export * from './signingKey';
 export * from './storageDrive';
 export * from './virtualNetwork';

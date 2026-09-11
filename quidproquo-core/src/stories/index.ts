@@ -4,6 +4,7 @@ export * from './askProcessEvent';
 export * from './askRetry';
 export * from './binaryData';
 export * from './context';
+export * from './crypto';
 export * from './dateTime';
 export * from './json';
 export * from './kvs';

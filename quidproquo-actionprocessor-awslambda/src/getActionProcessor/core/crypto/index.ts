@@ -2,6 +2,9 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getCryptoDecryptActionProcessor } from './getCryptoDecryptActionProcessor';
 import { getCryptoEncryptActionProcessor } from './getCryptoEncryptActionProcessor';
+import { getCryptoGetPublicKeyActionProcessor } from './getCryptoGetPublicKeyActionProcessor';
+import { getCryptoSignActionProcessor } from './getCryptoSignActionProcessor';
+import { getCryptoVerifyActionProcessor } from './getCryptoVerifyActionProcessor';
 
 export const getCryptoActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -9,4 +12,7 @@ export const getCryptoActionProcessor: ActionProcessorListResolver = async (
 ): Promise<ActionProcessorList> => ({
   ...(await getCryptoEncryptActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getCryptoDecryptActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getCryptoSignActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getCryptoVerifyActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getCryptoGetPublicKeyActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

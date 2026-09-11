@@ -17,8 +17,20 @@ describe('CryptoActionType', () => {
     expect(CryptoActionType.Decrypt).toBe('@quidproquo-core/Crypto/Decrypt');
   });
 
+  it('should have the correct action type for Sign', () => {
+    expect(CryptoActionType.Sign).toBe('@quidproquo-core/Crypto/Sign');
+  });
+
+  it('should have the correct action type for Verify', () => {
+    expect(CryptoActionType.Verify).toBe('@quidproquo-core/Crypto/Verify');
+  });
+
+  it('should have the correct action type for GetPublicKey', () => {
+    expect(CryptoActionType.GetPublicKey).toBe('@quidproquo-core/Crypto/GetPublicKey');
+  });
+
   it('should contain all expected action types', () => {
-    const expectedActionTypes = ['Encrypt', 'Decrypt'];
+    const expectedActionTypes = ['Encrypt', 'Decrypt', 'Sign', 'Verify', 'GetPublicKey'];
 
     const actualActionTypes = Object.keys(CryptoActionType);
     expect(actualActionTypes).toEqual(expect.arrayContaining(expectedActionTypes));
