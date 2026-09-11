@@ -32,6 +32,7 @@ import {
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
   ServiceSettingsQPQConfigSetting,
+  SigningKeyQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
@@ -502,6 +503,28 @@ export const getOwnedCryptoKeys = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSett
   const cryptoKeys = getAllCryptoKeyConfigs(qpqConfig);
 
   return getOwnedItems(cryptoKeys, qpqConfig);
+};
+
+export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): SigningKeyQPQConfigSetting => {
+  const signingKeys = getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
+
+  const signingKey = signingKeys.find((k) => k.keyName === signingKeyName);
+
+  if (!signingKey) {
+    throw new Error(`Can not find signing key [${signingKeyName}]`);
+  }
+
+  return signingKey;
+};
+
+export const getAllSigningKeyConfigs = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
+  return getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
+};
+
+export const getOwnedSigningKeys = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
+  const signingKeys = getAllSigningKeyConfigs(qpqConfig);
+
+  return getOwnedItems(signingKeys, qpqConfig);
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {

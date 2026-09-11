@@ -1,4 +1,5 @@
 export * from './array';
+export * from './base64Url';
 export * from './dateTime';
 export * from './functions';
 export * from './hash';

@@ -50,4 +50,5 @@ The name of the key, and its `uniqueKey` within the config. This is the name you
 
 - [askCryptoEncrypt](../../actions/core/crypto/ask-crypto-encrypt.md): encrypts with this key.
 - [askCryptoDecrypt](../../actions/core/crypto/ask-crypto-decrypt.md): decrypts with this key.
+- [defineSigningKey](./signing-key.md): for signing and verifying (tokens, webhooks) rather than encrypting.
 - [defineSecret](./secret.md): for platform-level secret values set out-of-band, rather than values your app encrypts itself.

@@ -2,6 +2,6 @@
   "label": "Crypto",
   "link": {
     "type": "generated-index",
-    "description": "Crypto actions encrypt and decrypt values with a key declared by defineCryptoKey. Envelope encryption with an optional context that binds ciphertext to the place it was created."
+    "description": "Crypto actions encrypt and decrypt values with a key declared by defineCryptoKey, and sign and verify messages or JWTs with an asymmetric key declared by defineSigningKey. The key material never leaves the provider."
   }
 }

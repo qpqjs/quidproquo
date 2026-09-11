@@ -13,6 +13,7 @@ import {
   QpqCoreParameterConstruct,
   QpqCoreQueueConstruct,
   QpqCoreSecretConstruct,
+  QpqCoreSigningKeyConstruct,
   QpqCoreStorageDriveConstruct,
   QpqInfCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
@@ -89,6 +90,18 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqCoreCryptoKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllCryptoKeyConfigs(props.qpqConfig), props.qpqConfig);
     // end crypto keys
+
+    // Signing keys
+    const signingKeys = qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreSigningKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          signingKeyConfig: setting,
+        }),
+    );
+    QpqCoreSigningKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllSigningKeyConfigs(props.qpqConfig), props.qpqConfig);
+    // end signing keys
 
     // Queues
     const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(

@@ -26,6 +26,7 @@ export * from './queue';
 export * from './schedule';
 export * from './secret';
 export * from './serviceSettings';
+export * from './signingKey';
 export * from './storageDrive';
 export * from './userDirectory';
 export * from './virtualNetwork';
