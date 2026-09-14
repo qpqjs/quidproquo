@@ -1,3 +1,4 @@
+export * from './askFileCopy';
 export * from './askFileDelete';
 export * from './askFileExists';
 export * from './askFileGenerateTemporarySecureUrl';

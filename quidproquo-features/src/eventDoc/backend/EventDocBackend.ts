@@ -4,6 +4,7 @@ import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocList } from '../data/askEventDocList';
 import {
   EventDocAssetDownloadUrl,
+  EventDocAssetRef,
   EventDocAssetUploadUrl,
   EventDocDocumentStateAtEvent,
   EventDocEvent,
@@ -29,6 +30,14 @@ export type EventDocBackend = {
   askAppendServerEvent: <T>(modelId: string, type: string, data: T, version: number, actor: EventDocEventActor) => AskResponse<EventDocEvent>;
   askGenerateAssetUploadUrl: (docId: string, contentType: string, contentDisposition?: string) => AskResponse<EventDocAssetUploadUrl>;
   askGenerateAssetDownloadUrl: (docId: string, assetId: string) => AskResponse<EventDocAssetDownloadUrl>;
+  // Copies another collection's asset onto one of THIS collection's documents (server-side, same scope).
+  askCopyAssetFrom: (
+    sourceStoreName: string,
+    sourceDocId: string,
+    sourceAsset: EventDocAssetRef,
+    targetDocId: string,
+    targetFilename?: string,
+  ) => AskResponse<EventDocAssetRef>;
 
   // Runs any story under this collection's store context.
   askProvideStore: <T>(story: AskResponse<T>) => AskResponse<T>;

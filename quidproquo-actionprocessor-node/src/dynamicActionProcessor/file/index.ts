@@ -1,5 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
+import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
@@ -29,6 +30,7 @@ export const getFileActionProcessor = (fileStorageConfig: FileStorageConfig): Ac
     ...(await getFileListDirectoryActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileExistsActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileDeleteActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getFileCopyActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileGenerateTemporarySecureUrlActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileGenerateTemporaryUploadSecureUrlActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileIsColdStorageActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),

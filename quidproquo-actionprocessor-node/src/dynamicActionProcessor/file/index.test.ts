@@ -19,6 +19,7 @@ describe('getFileActionProcessor', () => {
       FileActionType.ListDirectory,
       FileActionType.Exists,
       FileActionType.Delete,
+      FileActionType.Copy,
       FileActionType.GenerateTemporarySecureUrl,
       FileActionType.GenerateTemporaryUploadSecureUrl,
       FileActionType.IsColdStorage,

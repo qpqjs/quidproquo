@@ -1,5 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
+import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
@@ -18,6 +19,7 @@ export const getFileActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
+  ...(await getFileCopyActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileDeleteActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileExistsActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileGenerateTemporarySecureUrlActionProcessor(qpqConfig, dynamicModuleLoader)),

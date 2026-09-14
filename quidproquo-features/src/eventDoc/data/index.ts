@@ -1,3 +1,4 @@
+export * from './askEventDocCopyAsset';
 export * from './askEventDocDelete';
 export * from './askEventDocEventDelete';
 export * from './askEventDocEventIdAsOf';
