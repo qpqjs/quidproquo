@@ -30,5 +30,10 @@ export const writeJsonFileStore = async <T>(
   const filePath = getStoreFilePath(runtimePath, storeDirectory, fileName);
 
   await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(values, null, 2));
+
+  // Write-then-rename so a concurrent reader never sees a half-written file
+  // (JSON.parse of a truncated store is a SyntaxError, not ENOENT)
+  const tempFilePath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  await fs.writeFile(tempFilePath, JSON.stringify(values, null, 2));
+  await fs.rename(tempFilePath, filePath);
 };
