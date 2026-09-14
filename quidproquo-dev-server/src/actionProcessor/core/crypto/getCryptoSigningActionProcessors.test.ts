@@ -56,6 +56,18 @@ describe('signing key action processors (dev server)', () => {
     expect(verify('sha256', Buffer.from('header.payload'), createPublicKey(publicKeyPem), Buffer.from(signature, 'base64url'))).toBe(true);
   });
 
+  it('refuses to sign with a key owned by another module, but still publishes its public key', async () => {
+    const foreignConfig = buildTestQpqConfig([defineSigningKey('their-key', { owner: { module: 'other-module' } })]);
+    const processors = await getCryptoActionProcessor({ runtimePath } as any)(foreignConfig, (() => null) as any);
+
+    const [signature, error] = await invokeProcessor(processors[CryptoActionType.Sign], { keyName: 'their-key', message: 'header.payload' });
+    expect(signature).toBeUndefined();
+    expect(error).toMatchObject({ errorType: askCryptoSign.errorType.KeyUnavailable, errorText: 'Access denied to signing key: [their-key]' });
+
+    const [publicKeyPem] = await invokeProcessor(processors[CryptoActionType.GetPublicKey], { keyName: 'their-key' });
+    expect(publicKeyPem).toMatch(/^-----BEGIN PUBLIC KEY-----/);
+  });
+
   it('is deterministic and stable across processor instances (key pair persisted on disk)', async () => {
     const [first] = await invokeProcessor(sign, { keyName: 'my-key', message: 'header.payload' });
 

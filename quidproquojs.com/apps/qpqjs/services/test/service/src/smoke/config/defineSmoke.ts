@@ -5,6 +5,7 @@ import {
   defineQueue,
   defineRoute,
   defineSecret,
+  defineSigningKey,
   defineStorageDrive,
   QPQConfig,
   QpqFunctionRuntime,
@@ -12,7 +13,11 @@ import {
 import { defineEventDoc } from 'quidproquo-features';
 
 import { z } from 'zod/v4';
-import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import {
+  SMOKE_PROBE_DRIVE,
+  SMOKE_PROBE_SIGNING_KEY,
+  SMOKE_PROBE_STORE,
+} from '@qpqjs/constants';
 import {
   SmokeProbeRecord,
   SmokeRunStartedSchema,
@@ -83,6 +88,10 @@ export const defineSmoke = (): QPQConfig => {
     }),
     defineSecret(SMOKE_PROBE_SECRET),
     defineStorageDrive(SMOKE_PROBE_DRIVE),
+    // An owned RSA signing key: kms:Sign + kms:GetPublicKey through the
+    // alias-conditioned grant. testa declares the same key foreign (see
+    // defineCrossServiceProbe) for the cross-service verify test.
+    defineSigningKey(SMOKE_PROBE_SIGNING_KEY),
 
     // Event bus test path: publish to the bus, the subscribed queue's entry
     // writes a marker into the probe store, the test polls for it.

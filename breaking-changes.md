@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- A signing key (`defineSigningKey`) declared with `owner` pointing at another module (a foreign, verify-only declaration) can no longer sign. On AWS, `kms:Sign` is granted only to the owning service's role; the dev server's `askCryptoSign`/`askCryptoSignJwt` now return `KeyUnavailable` for a foreign key. `kms:GetPublicKey`/`askCryptoVerify`/`askCryptoVerifyJwt` are unaffected. If your code relied on signing through a foreign declaration, move that call into the owning service.
+
 ## 0.1.23
 
 ## 0.1.22
