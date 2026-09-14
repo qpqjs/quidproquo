@@ -27,6 +27,7 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
 
   // Domain rules keyed by event type; the reserved lifecycle guard is always merged in. One registry per doc type, never
   // per view: the primary view is the acceptance gate. The append gate and the editor pre-flight derive from these same rules.
+  // Declare it as EventDocEventValidators<View, TheDocsEffects> so each rule reads its effect's data typed.
   validators?: EventDocEventValidators<EventDocPrimaryView<TVersions>>;
 
   // The other docs this one depends on, read off the folded primary view. Omit for a leaf doc type.
