@@ -77,6 +77,19 @@ describe('signing key action processors (dev server)', () => {
     expect(second).toBe(first);
   });
 
+  it('seeds one key pair when first use is concurrent (parallel smoke tests on a fresh checkout)', async () => {
+    const message = 'header.payload';
+    const [[signature], [publicKeyPem], [signatureAgain]] = await Promise.all([
+      invokeProcessor(sign, { keyName: 'my-key', message }),
+      invokeProcessor(getPublicKey, { keyName: 'my-key' }),
+      invokeProcessor(sign, { keyName: 'my-key', message }),
+    ]);
+
+    expect(signatureAgain).toBe(signature);
+    expect(verify('sha256', Buffer.from(message), createPublicKey(publicKeyPem), Buffer.from(signature, 'base64url'))).toBe(true);
+    expect(await invokeProcessor(verifyProcessor, { keyName: 'my-key', message, signature })).toEqual([true]);
+  });
+
   it('fails with MalformedSignature for a signature that is not base64url', async () => {
     const [, error] = await invokeProcessor(verifyProcessor, { keyName: 'my-key', message: 'x', signature: 'not base64url!' });
 
