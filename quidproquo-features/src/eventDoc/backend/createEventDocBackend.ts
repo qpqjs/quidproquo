@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 
 import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocCopyAsset } from '../data/askEventDocCopyAsset';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGenerateAssetDownloadUrl } from '../data/askEventDocGenerateAssetDownloadUrl';
 import { askEventDocGenerateAssetUploadUrl } from '../data/askEventDocGenerateAssetUploadUrl';
@@ -64,6 +65,9 @@ export const createEventDocBackend = (functions: EventDocFunctions): EventDocBac
     },
     *askGenerateAssetDownloadUrl(docId, assetId) {
       return yield* askProvideStore(askEventDocGenerateAssetDownloadUrl(docId, assetId));
+    },
+    *askCopyAssetFrom(sourceStoreName, sourceDocId, sourceAsset, targetDocId, targetFilename) {
+      return yield* askProvideStore(askEventDocCopyAsset(sourceStoreName, sourceDocId, sourceAsset, targetDocId, targetFilename));
     },
     askProvideStore,
   };

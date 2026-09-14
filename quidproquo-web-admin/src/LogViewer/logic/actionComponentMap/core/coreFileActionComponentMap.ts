@@ -6,6 +6,7 @@ const coreFileActionComponentMap: Record<string, string[]> = {
   [FileActionType.ListDirectory]: ['askFileListDirectory', 'drive', 'folderPath', 'maxFiles', 'pageToken'],
   [FileActionType.Exists]: ['askFileExists', 'drive', 'filepath'],
   [FileActionType.Delete]: ['askFileDelete', 'drive', 'filepaths'],
+  [FileActionType.Copy]: ['askFileCopy', 'sourceDrive', 'sourceFilepath', 'targetDrive', 'targetFilepath'],
   [FileActionType.ReadBinaryContents]: ['askFileReadBinaryContents', 'drive', 'filepath'],
   [FileActionType.WriteBinaryContents]: ['askFileWriteBinaryContents', 'drive', 'filepath', 'data', 'storageDriveAdvancedWriteOptions'],
   [FileActionType.GenerateTemporarySecureUrl]: ['askFileGenerateTemporarySecureUrl', 'drive', 'filepath', 'expirationMs'],

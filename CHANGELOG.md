@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- core/actionprocessor-awslambda/actionprocessor-node: `askFileCopy` copies an object to another path, on the same or another drive, without the bytes crossing the story (an S3 server-side `CopyObject` on lambda, `fs.copyFile` plus the metadata sidecar locally); one scope applies to both sides. features: `EventDocBackend.askCopyAssetFrom` copies another collection's asset onto one of this collection's documents as a new immutable asset, optionally under a new filename
+
 ## 0.1.23
 
 - actionprocessor-awslambda/deploy-awscdk: a key value store query that names the primary sort key alone (a `userId`/`tenantId` table with a GSI on `tenantId`) is routed to that GSI again instead of the primary table, where it failed; queries naming the primary partition key still prefer the table. A service that only references another service's user directory now gets read-only Cognito access to it (`ListUsers`, `AdminGetUser`) on its webserver role, so user lookups by email or id work from a service that does not own the pool

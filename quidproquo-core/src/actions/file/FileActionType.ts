@@ -8,6 +8,7 @@ export enum FileActionType {
   ListDirectory = '@quidproquo-core/File/ListDirectory',
   Exists = '@quidproquo-core/File/Exists',
   Delete = '@quidproquo-core/File/Delete',
+  Copy = '@quidproquo-core/File/Copy',
   ReadBinaryContents = '@quidproquo-core/File/ReadBinaryContents',
   WriteBinaryContents = '@quidproquo-core/File/WriteBinaryContents',
   GenerateTemporarySecureUrl = '@quidproquo-core/File/GenerateTemporarySecureUrl',
