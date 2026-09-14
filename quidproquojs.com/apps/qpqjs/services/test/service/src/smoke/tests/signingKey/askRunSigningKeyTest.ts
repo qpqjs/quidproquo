@@ -29,7 +29,10 @@ export function* askRunSigningKeyTest(runId: string): AskResponse<void> {
 
   const message = `smoke probe ${runId}`;
   const signature = yield* askCryptoSign(SMOKE_PROBE_SIGNING_KEY, message);
-  yield* askSmokeAssert(signature.length > 0, 'Sign returned an empty signature');
+  yield* askSmokeAssert(
+    signature.length > 0,
+    'Sign returned an empty signature'
+  );
 
   const verified = yield* askCryptoVerify(
     SMOKE_PROBE_SIGNING_KEY,
@@ -52,7 +55,14 @@ export function* askRunSigningKeyTest(runId: string): AskResponse<void> {
     'signed jwt did not verify with its own claims'
   );
 
-  const tamperedToken = `${token.slice(0, -1)}${token.endsWith('A') ? 'B' : 'A'}`;
+  // Corrupt a character in the MIDDLE of the signature segment. Not the last
+  // one: a 2048-bit signature is 342 base64url chars and the final char
+  // carries only two real bits, so flipping it can leave the decoded bytes
+  // unchanged and the token still valid.
+  const [header, payload, signatureSegment] = token.split('.');
+  const middle = Math.floor(signatureSegment.length / 2);
+  const flipped = signatureSegment[middle] === 'A' ? 'B' : 'A';
+  const tamperedToken = `${header}.${payload}.${signatureSegment.slice(0, middle)}${flipped}${signatureSegment.slice(middle + 1)}`;
   const tampered = yield* askCryptoVerifyJwt<SmokeSigningKeyClaims>(
     SMOKE_PROBE_SIGNING_KEY,
     tamperedToken
