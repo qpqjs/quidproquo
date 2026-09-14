@@ -23,6 +23,12 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
       );
     }
 
+    // Parity with the deployed grant: only the owning service holds kms:Sign,
+    // so a foreign (owner: another module) declaration can verify but not sign.
+    if (qpqCoreUtils.getOwnedItems([signingKeyConfig], qpqConfig).length === 0) {
+      return actionResultError(askCryptoSign.errorType.KeyUnavailable, `Access denied to signing key: [${keyName}]`);
+    }
+
     try {
       const { privateKeyPem } = await getOrSeedSigningKeyPair(devServerConfig.runtimePath, keyName, qpqConfig);
 

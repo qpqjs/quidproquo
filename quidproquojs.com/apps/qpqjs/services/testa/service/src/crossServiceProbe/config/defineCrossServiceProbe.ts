@@ -1,6 +1,7 @@
 import {
   defineKeyValueStore,
   defineServiceFunction,
+  defineSigningKey,
   defineStorageDrive,
   QPQConfig,
 } from 'quidproquo';
@@ -8,8 +9,10 @@ import {
 import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME,
+  SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME,
   SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_DRIVE,
+  SMOKE_PROBE_SIGNING_KEY,
   SMOKE_PROBE_STORE,
 } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
@@ -27,6 +30,10 @@ export const defineCrossServiceProbe = (): QPQConfig => {
       owner,
     }),
     defineStorageDrive(SMOKE_PROBE_DRIVE, { owner }),
+    // The signing key is the one foreign resource whose grant is alias-
+    // conditioned rather than exact-ARN: the owner's alias name is what this
+    // declaration must resolve to, or GetPublicKey is denied.
+    defineSigningKey(SMOKE_PROBE_SIGNING_KEY, { owner }),
 
     // One service function per foreign grant, invoked by the test service's
     // crossService* smoke tests.
@@ -47,6 +54,15 @@ export const defineCrossServiceProbe = (): QPQConfig => {
         functionName: 'smokeCrossServiceStorageDriveProbe',
       },
       { functionName: SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME }
+    ),
+    defineServiceFunction(
+      {
+        basePath: __dirname,
+        relativePath:
+          '../entry/serviceFunction/smokeCrossServiceSigningKeyProbe',
+        functionName: 'smokeCrossServiceSigningKeyProbe',
+      },
+      { functionName: SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME }
     ),
   ];
 };

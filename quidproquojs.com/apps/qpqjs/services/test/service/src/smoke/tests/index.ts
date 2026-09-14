@@ -7,6 +7,7 @@ export * from './noop';
 export * from './openApi';
 export * from './parameter';
 export * from './secret';
+export * from './signingKey';
 export * from './SmokeTestDefinition';
 export * from './smokeTestRegistry';
 export * from './storageDrive';

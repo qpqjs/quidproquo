@@ -1,4 +1,5 @@
 import { askRunCrossServiceKeyValueStoreTest } from './crossService/askRunCrossServiceKeyValueStoreTest';
+import { askRunCrossServiceSigningKeyTest } from './crossService/askRunCrossServiceSigningKeyTest';
 import { askRunCrossServiceStorageDriveTest } from './crossService/askRunCrossServiceStorageDriveTest';
 import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
 import { askRunEventDocConcurrentAppendTest } from './eventDoc/askRunEventDocConcurrentAppendTest';
@@ -10,6 +11,7 @@ import { askRunOpenApiDocumentTest } from './openApi/askRunOpenApiDocumentTest';
 import { askRunParameterTest } from './parameter/askRunParameterTest';
 import { askRunScheduleTest } from './schedule/askRunScheduleTest';
 import { askRunSecretTest } from './secret/askRunSecretTest';
+import { askRunSigningKeyTest } from './signingKey/askRunSigningKeyTest';
 import { askRunStorageDriveTest } from './storageDrive/askRunStorageDriveTest';
 import { SmokeTestDefinition } from './SmokeTestDefinition';
 
@@ -43,5 +45,10 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
   {
     name: 'eventDocInterleavedBatchAppend',
     askRun: askRunEventDocInterleavedBatchAppendTest,
+  },
+  { name: 'signingKey', askRun: askRunSigningKeyTest },
+  {
+    name: 'crossServiceSigningKey',
+    askRun: askRunCrossServiceSigningKeyTest,
   },
 ];
