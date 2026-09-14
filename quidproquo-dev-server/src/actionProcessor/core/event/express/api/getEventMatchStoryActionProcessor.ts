@@ -21,15 +21,10 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    // Sort the routes by string length
-    // Note: We may need to filter variable routes out {} as the variables are length independent
-    const sortedRoutes = routes
-      .filter((r: any) => r.method === qpqEventRecord.method || qpqEventRecord.method === 'OPTIONS')
-      .sort((a: any, b: any) => {
-        if (a.path.length < b.path.length) return -1;
-        if (a.path.length > b.path.length) return 1;
-        return 0;
-      });
+    // Most specific route first (the shared helper, so local matching agrees with lambda's).
+    const sortedRoutes = qpqWebServerUtils.sortPathMatchConfigs(
+      routes.filter((r: any) => r.method === qpqEventRecord.method || qpqEventRecord.method === 'OPTIONS'),
+    );
 
     // Find the most relevant match
     const matchedRoute = sortedRoutes

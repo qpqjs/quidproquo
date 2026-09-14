@@ -13,10 +13,16 @@ describe('urlPathLength', () => {
 });
 
 describe('sortPathMatchConfigs', () => {
-  it('orders configs by their param-stripped length, ascending', () => {
+  it('orders configs by their param-stripped length, most specific first', () => {
     const configs = [{ path: '/users/{id}/posts' }, { path: '/a' }, { path: '/users' }];
 
-    expect(sortPathMatchConfigs(configs).map((c) => c.path)).toEqual(['/a', '/users', '/users/{id}/posts']);
+    expect(sortPathMatchConfigs(configs).map((c) => c.path)).toEqual(['/users/{id}/posts', '/users', '/a']);
+  });
+
+  it('puts a literal segment ahead of a sibling parameter so the matcher tries it first', () => {
+    const configs = [{ path: '/packs/{id}' }, { path: '/packs/build' }];
+
+    expect(sortPathMatchConfigs(configs).map((c) => c.path)).toEqual(['/packs/build', '/packs/{id}']);
   });
 
   it('does not mutate the input array', () => {
