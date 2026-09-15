@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.24
+
 - `EventDocEventValidators` (`quidproquo-features`) is now keyed by the doc's effect types (typed against `EventDocEventValidators<View, TheDocsEffects>`) instead of a plain `Record<string, EventDocEventValidator>`. A validators map with a key outside the doc's effects union (typos included) or a rule reading `event.payload.data` typed for the wrong effect no longer compiles; the `'*'` fallback key still works. `EventDocEventValidator` gains a second generic `TData` for the event's payload data.
 - A signing key (`defineSigningKey`) declared with `owner` pointing at another module (a foreign, verify-only declaration) can no longer sign. On AWS, `kms:Sign` is granted only to the owning service's role; the dev server's `askCryptoSign`/`askCryptoSignJwt` now return `KeyUnavailable` for a foreign key. `kms:GetPublicKey`/`askCryptoVerify`/`askCryptoVerifyJwt` are unaffected. If your code relied on signing through a foreign declaration, move that call into the owning service.
 
