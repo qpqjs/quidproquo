@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocFunctions` (`quidproquo-features`) now requires `validateEvent`; it was previously optional. A collection registered without one no longer compiles - provide a validator (a rule set with no rules can pass `() => null`). `askEventDocValidateAppend`/`askEventDocValidateAppendRun` now also fold the candidate against the registered `foldDocumentState` and throw `Invalid` if the fold cannot read it, so append-time validation always runs against a schema version the document can fold; `askEventDocValidateAppend` now returns the folded state instead of `void`.
+
 ## 0.1.24
 
 - `EventDocEventValidators` (`quidproquo-features`) is now keyed by the doc's effect types (typed against `EventDocEventValidators<View, TheDocsEffects>`) instead of a plain `Record<string, EventDocEventValidator>`. A validators map with a key outside the doc's effects union (typos included) or a rule reading `event.payload.data` typed for the wrong effect no longer compiles; the `'*'` fallback key still works. `EventDocEventValidator` gains a second generic `TData` for the event's payload data.

@@ -17,6 +17,7 @@ const templateFunctions = {
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
   collectReferences: () => [],
+  validateEvent: () => null,
 };
 
 // The config is a flat array of settings; routes are the ones carrying a runtime with globals.

@@ -11,6 +11,7 @@ const docFunctions: EventDocFunctions = {
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
   collectReferences: () => [],
+  validateEvent: () => null,
 };
 
 describe('defineTenantedEventDoc', () => {

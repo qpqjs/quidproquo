@@ -9,6 +9,7 @@ import { applyEventDocSummaryEvent } from '../summary/applyEventDocSummaryEvent'
 import { foldEventDocSummary } from '../summary/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
+import { withEventDocSchemaVersionCeiling } from '../validation/withEventDocSchemaVersionCeiling';
 import { EventDocWorkspaceSlotKind } from '../workspace/types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceStoryApi } from '../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocDefinition, EventDocUnsavedDefinition, EventDocView } from './types/EventDocDefinition';
@@ -156,8 +157,9 @@ export function createEventDocDefinition(
     coalesceEventTypes,
     validators,
     validate,
-    // The same validator serves editor pre-flight, append pre-write and fold acceptance.
-    validateEvent: validate,
+    // The append pre-write gate: the editor's rules under the schema-version ceiling. The fold has no reducer above
+    // `schemaVersion`, and an event it cannot read must never reach the append-only log.
+    validateEvent: withEventDocSchemaVersionCeiling(schemaVersion, validate),
     api: withGenericVerbs(api),
     views,
     foldSnapshotViews,

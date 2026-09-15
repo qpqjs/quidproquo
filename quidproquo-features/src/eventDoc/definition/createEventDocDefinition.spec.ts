@@ -236,6 +236,21 @@ describe('createEventDocDefinition version guards', () => {
     ).toThrow(/must declare a 'document' view/);
   });
 
+  it('refuses, at the append gate, an event at a schema version above the one it folds (#554)', () => {
+    // The fold throws on such an event (below), so the pre-write gate must never let it into the
+    // append-only log: version 2 on a version-1 definition, a zero, and a non-number all refuse;
+    // version 1 reaches the domain rules as before.
+    const definition = createMemoDefinition();
+    const state = definition.createInitialViewState();
+
+    expect(definition.validateEvent(serverEvent(MemoEvent.SetBody, { body: 'x' }, 0, 2), state)).toMatch(/schema version 2 .*latest: 1/);
+    expect(definition.validateEvent(serverEvent(MemoEvent.SetBody, { body: 'x' }, 0, 0), state)).toMatch(/schema version 0/);
+    const versionless = serverEvent(MemoEvent.SetBody, { body: 'x' }, 0);
+    delete (versionless.payload.metadata as { version?: number }).version;
+    expect(definition.validateEvent(versionless, state)).toMatch(/schema version undefined/);
+    expect(definition.validateEvent(serverEvent(MemoEvent.SetBody, { body: 'x' }, 0, 1), state)).toBeNull();
+  });
+
   it('throws rather than silently skipping an event at a version it cannot fold', () => {
     // The old behaviour returned [state, false] here, so an incomplete registration read as
     // a document that simply stopped changing. There is no safe partial read of a log.

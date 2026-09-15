@@ -17,6 +17,7 @@ const memoFunctions: EventDocFunctions = {
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
   collectReferences: () => [],
+  validateEvent: () => null,
 };
 
 // The stream globals of the events store carry the snapshot map - dig them out of the

@@ -11,6 +11,7 @@ const definition: EventDocFunctions = {
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
   collectReferences: () => [],
+  validateEvent: () => null,
 };
 
 describe('extendEventDocFunctions', () => {

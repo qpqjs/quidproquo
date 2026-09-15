@@ -27,5 +27,6 @@ export type EventDocFunctions = {
 
   // The pre-write gate: the append path runs it against the document's head state and a non-null reason rejects the
   // append, so the event never enters the log. The fold's acceptance is defence in depth behind it. May be a story.
-  validateEvent?: (event: EventDocEvent, state: unknown) => Nullable<string> | AskResponse<Nullable<string>>;
+  // Required: a collection with no rules registers defaultEventDocEventValidator rather than leaving the gate to guess.
+  validateEvent: (event: EventDocEvent, state: unknown) => Nullable<string> | AskResponse<Nullable<string>>;
 };

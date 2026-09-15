@@ -13,6 +13,7 @@ const memoFunctions: EventDocFunctions = {
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
   collectReferences: () => [],
+  validateEvent: () => null,
 };
 
 describe('createEventDocBackend', () => {
@@ -52,6 +53,7 @@ describe('createEventDocBackend', () => {
       foldDocumentState: () => null,
       collectReferencesFromState: () => [],
       collectReferences: () => [],
+      validateEvent: () => null,
     };
 
     expect(() => createEventDocBackend(identityless)).toThrow('no identity');

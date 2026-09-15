@@ -108,6 +108,11 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
 
       if (functionName === 'foldDocumentState') {
         const [events, seed] = args as [EventDocEvent[], { published?: boolean } | undefined];
+        // The fold has reducers for version 3 only, and throws like buildVersionRoutedReducer for anything else.
+        const unreadable = events.find((event) => event.payload.metadata.version !== 3);
+        if (unreadable) {
+          return throwsError('GenericError', `No event-doc fold reducer for schema version ${unreadable.payload.metadata.version} (registered: 3).`);
+        }
         return { published: !!seed?.published || events.some((event) => event.type === EventDocEffect.Publish) };
       }
       if (functionName === 'validateEvent') {
@@ -205,6 +210,15 @@ describe('askEventDocAppendServerEvents', () => {
     expect(upserts).toHaveLength(1);
     // One fold to resolve the head state, then a validator call and a one-event fold per event.
     expect(counts.functionCalls).toEqual({ foldDocumentState: 1 + INPUTS.length, validateEvent: INPUTS.length });
+  });
+
+  it('with validate, refuses a run carrying a schema version the fold cannot read, writing nothing (#554)', () => {
+    const { mocks, upserts } = buildMocks({ heads: [1] });
+
+    const withBadVersion: EventDocServerEventInput[] = [INPUTS[0], { ...INPUTS[1], version: 99 }, INPUTS[2]];
+
+    expect(() => runAppend(withBadVersion, STORE, mocks, { validate: true })).toThrow(/No event-doc fold reducer for schema version 99/);
+    expect(upserts).toHaveLength(0);
   });
 
   it('with validate, a Publish that lands in the gap rejects the re-laid run instead of burying it', () => {

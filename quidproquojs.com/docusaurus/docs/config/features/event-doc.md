@@ -25,7 +25,7 @@ export default [
 
 ## Registering a collection's functions
 
-`functions` is an `EventDocFunctions` object: `{ storeName, type, foldSnapshotViews, collectReferences, render? }`. The object `createEventDocDefinition` returns — given `storeName`/`type` in its config — satisfies this shape directly, so a collection with no service-only render can register its definition verbatim. A collection that needs a render step only service code can perform (resolving linked docs, reading blob-drive assets) layers it on with `extendEventDocFunctions(definition, { render })`, which returns a new object and never mutates the definition itself.
+`functions` is an `EventDocFunctions` object: `{ storeName, type, foldSnapshotViews, foldDocumentState, collectReferences, collectReferencesFromState, validateEvent, render? }`. The object `createEventDocDefinition` returns — given `storeName`/`type` in its config — satisfies this shape directly, so a collection with no service-only render can register its definition verbatim. A collection that needs a render step only service code can perform (resolving linked docs, reading blob-drive assets) layers it on with `extendEventDocFunctions(definition, { render })`, which returns a new object and never mutates the definition itself.
 
 `runtime` is a [`QpqFunctionRuntime`](../core/dynamic-functions.md#runtime--qpqfunctionruntime-required) path to that SAME export — the dynamic-functions pattern: identity is read off the object here at config time, behaviour is loaded from the path by the processors at request time. Both must point at the exact object being registered, or the registration and the runtime will disagree about what the collection can do.
 
@@ -59,6 +59,7 @@ The collection's callable surface, read for its identity (`storeName`, `type`) a
 | `foldDocumentState` | `(events, seedState?) => unknown` | yes | The document view at one point, LATEST-shaped, resumable from a stored snapshot's era-pinned document state. The read side's fold: render, references, as-of reads, and the append hooks' state derivation all go through it. |
 | `collectReferences` | `(events) => EventDocLink[]` | yes | The `EventDocLink`s this doc's whole HISTORY depends on; `[]` for a leaf doc type. Invoked by the transfer manifest walk (it exports the whole history). |
 | `collectReferencesFromState` | `(state) => EventDocLink[]` | yes | The `EventDocLink`s the CURRENT state depends on; `[]` for a leaf doc type. Invoked by the references route against a snapshot-seeded folded state. |
+| `validateEvent` | `(event, state) => Nullable<string> \| AskResponse<Nullable<string>>` | yes | The append pre-write gate: checked against the state the event will land on, before the write (see [askEventDocEventAppend](../../actions/features/event-doc/ask-event-doc-event-append.md)). Return a rejection reason string to refuse the append, `null` to allow it. A collection with no domain rules can pass `() => null`. |
 | `render` | `(input: EventDocRenderInput) => EventDocRenderResult \| AskResponse<EventDocRenderResult>` | no | Render the resolved, already-folded document state (`input.state`, resolved snapshot-seeded by the route). Omit and `GET {basePath}/{id}/render` 404s as "no renderer configured". Plain function or story — the dynamic-functions processor runs either. |
 
 ### `runtime` — `QpqFunctionRuntime` (required)
