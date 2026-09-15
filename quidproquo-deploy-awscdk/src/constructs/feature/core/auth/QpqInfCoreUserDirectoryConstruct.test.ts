@@ -24,7 +24,7 @@ const buildRole = () => {
 };
 
 describe('QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole', () => {
-  it('grants read-only user lookups on a referenced (foreign-owned) pool via its exported pool id', () => {
+  it('grants read-only user lookups on the owner-tagged pools in this account, with no cross-stack import', () => {
     const { stack, role } = buildRole();
 
     QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole(role, [referenced], qpqConfig);
@@ -35,22 +35,32 @@ describe('QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole', () => {
           Match.objectLike({
             Effect: 'Allow',
             Action: ['cognito-idp:ListUsers', 'cognito-idp:AdminGetUser'],
-            // The pool id comes from the owner's stack export, composed into the pool ARN.
-            Resource: Match.objectLike({ 'Fn::Join': Match.anyValue() }),
+            Resource: `arn:aws:cognito-idp:${env.region}:${env.account}:userpool/*`,
+            Condition: {
+              StringEquals: {
+                'aws:ResourceTag/application': 'test-app',
+                'aws:ResourceTag/module': 'auth',
+                'aws:ResourceTag/environment': 'development',
+              },
+            },
           }),
         ]),
       },
     });
 
+    // Inf stacks deploy independently: the owner's pool export must never be a synth-time dependency.
     const json = JSON.stringify(Template.fromStack(stack).toJSON());
-    expect(json).toContain('Fn::ImportValue');
+    expect(json).not.toContain('Fn::ImportValue');
     expect(json).not.toContain('AdminCreateUser');
   });
 
   it('skips a directory owned in another account (no cross-account Cognito grants)', () => {
     const { stack, role } = buildRole();
     const foreignConfig = buildTestQpqConfig(
-      [defineAwsServiceAccountInfo(env.account, env.region, [{ moduleName: 'auth', awsAccountId: '999999999999', awsRegion: env.region }]), referenced],
+      [
+        defineAwsServiceAccountInfo(env.account, env.region, [{ moduleName: 'auth', awsAccountId: '999999999999', awsRegion: env.region }]),
+        referenced,
+      ],
       { moduleName: 'ca' },
     );
 

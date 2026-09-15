@@ -1,6 +1,13 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { QPQConfig, UserDirectoryMfaMode, UserDirectoryMfaSecondFactor, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import {
+  CrossModuleOwner,
+  QPQConfig,
+  qpqCoreUtils,
+  UserDirectoryMfaMode,
+  UserDirectoryMfaSecondFactor,
+  UserDirectoryQPQConfigSetting,
+} from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
@@ -28,6 +35,19 @@ const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
     default:
       return aws_cognito.Mfa.OFF;
   }
+};
+
+// The identity tags applyEnvironmentTags stamps on the owner's resources, with each
+// field falling back to this deployment's when the owner does not override it.
+const getOwnerResourceTagConditions = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): Record<string, string> => {
+  const feature = owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return {
+    'aws:ResourceTag/application': owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
+    'aws:ResourceTag/module': owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+    'aws:ResourceTag/environment': owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
+  };
 };
 
 export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
@@ -230,35 +250,35 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
   // (askUserDirectoryGetUsersByAttribute, askUserDirectoryGetUserAttributesByUserId).
   // Any service that shows "who" needs this - e.g. the tenant registry adding a
   // member by email from a service that doesn't own the pool. Nothing that
-  // mutates the pool: admin actions stay with the owner (below). Cognito has no
-  // resource policy, so a pool in another account can't be granted this way -
-  // such directories are skipped (the call fails as it does today).
+  // mutates the pool: admin actions stay with the owner (below).
+  //
+  // Inf stacks deploy independently and never import each other's outputs, and a
+  // pool id is AWS-generated, so the grant is on every pool in this account and
+  // region narrowed to the owner's identity tags (applyEnvironmentTags stamps them
+  // on the pool). Cognito has no resource policy, so a pool in another account
+  // can't be granted this way - such directories are skipped (the call fails as
+  // it does today).
   public static authorizeReadActionsForRole(role: aws_iam.IRole, referencedDirectoryConfigs: UserDirectoryQPQConfigSetting[], qpqConfig: QPQConfig) {
     const local = getLocalServiceAccountInfo(qpqConfig);
+    const anyLocalUserPoolArn = `arn:aws:cognito-idp:${local.awsRegion}:${local.awsAccountId}:userpool/*`;
 
-    const resources = referencedDirectoryConfigs
-      .map((userDirectoryConfig) => ({
-        userDirectoryConfig,
-        account: resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner),
-      }))
-      .filter(({ account }) => account.awsAccountId === local.awsAccountId && account.awsRegion === local.awsRegion)
-      .map(({ userDirectoryConfig, account }) => {
-        const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
-          awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryConfig.name, qpqConfig),
+    referencedDirectoryConfigs
+      .filter((userDirectoryConfig) => {
+        const account = resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner);
+        return account.awsAccountId === local.awsAccountId && account.awsRegion === local.awsRegion;
+      })
+      .forEach((userDirectoryConfig) => {
+        role.addToPrincipalPolicy(
+          new aws_iam.PolicyStatement({
+            effect: aws_iam.Effect.ALLOW,
+            actions: ['cognito-idp:ListUsers', 'cognito-idp:AdminGetUser'],
+            resources: [anyLocalUserPoolArn],
+            conditions: {
+              StringEquals: getOwnerResourceTagConditions(qpqConfig, userDirectoryConfig.owner),
+            },
+          }),
         );
-
-        return `arn:aws:cognito-idp:${account.awsRegion}:${account.awsAccountId}:userpool/${userPoolId}`;
       });
-
-    if (resources.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['cognito-idp:ListUsers', 'cognito-idp:AdminGetUser'],
-          resources,
-        }),
-      );
-    }
   }
 
   // Grants admin Cognito actions for pools this service owns. Services that
