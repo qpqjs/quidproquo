@@ -1,10 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.1.24
 
-- features: the event-doc summary projector deletes a document's summary row when a stream Remove leaves its log empty, instead of writing the `NO_INIT` seed; emptying an events table (`qpq clear-resources`, a transfer that removes a doc) no longer repopulates the summary table with placeholder documents
-- webserver/actionprocessor-awslambda/dev-server: route matching tries the most specific path first. Routes were sorted by static length ascending, so a parameterised sibling (`/packs/{id}`) always won over a literal one (`/packs/build`); the sort is now descending and the dev server uses the same helper instead of its own raw-length sort, so local and deployed matching agree
+- core/actionprocessor-awslambda/dev-server/deploy-awscdk: signing keys. `defineSigningKey` declares an RSA-2048 key pair whose private half never leaves the provider (a KMS sign/verify key on AWS, a locally generated pair under `.qpq-runtime` on the dev server). Stories sign and verify through `askCryptoSign`, `askCryptoVerify` and `askCryptoGetPublicKey`, or at the JWT level through `askCryptoSignJwt` and `askCryptoVerifyJwt`, RS256 throughout. Only the owning module's role is granted `kms:Sign`; verification runs in-process against a cached public key so the per-request path makes no KMS call. Replaces loading a PEM private key from a secret, which left the key in the lambda and in every story log that read it
 - core/actionprocessor-awslambda/actionprocessor-node: `askFileCopy` copies an object to another path, on the same or another drive, without the bytes crossing the story (an S3 server-side `CopyObject` on lambda, `fs.copyFile` plus the metadata sidecar locally); one scope applies to both sides. features: `EventDocBackend.askCopyAssetFrom` copies another collection's asset onto one of this collection's documents as a new immutable asset, optionally under a new filename
+- webserver/actionprocessor-awslambda/dev-server: route matching tries the most specific path first. Routes were sorted by static length ascending, so a parameterised sibling (`/packs/{id}`) always won over a literal one (`/packs/build`); the sort is now descending and the dev server uses the same helper instead of its own raw-length sort, so local and deployed matching agree
+- deploy-awscdk: the read-only Cognito grant a service gets on another service's user directory is now scoped by the owner's identity tags (application, module, environment, feature) on any pool in the account instead of importing the owner's pool id export, so inf stacks no longer take a synth-time dependency on each other
+- features: `EventDocEventValidators` is keyed by the doc's effect types, so a rule's `event.payload.data` is typed to that effect and a validator keyed on an unknown effect fails to compile; the `'*'` fallback still works
+- features: the event-doc summary projector deletes a document's summary row when a stream Remove leaves its log empty, instead of writing the `NO_INIT` seed; emptying an events table (`qpq clear-resources`, a transfer that removes a doc) no longer repopulates the summary table with placeholder documents
+- dev-server: seeding a signing key pair is safe under concurrent first use, and json store writes are atomic
+
+### Breaking changes
+
+- `EventDocEventValidators` is typed against the doc's effects union instead of `Record<string, EventDocEventValidator>`; `EventDocEventValidator` gains a `TData` generic
+- a signing key declared with a foreign `owner` can no longer sign: `kms:Sign` goes only to the owning service and the dev server returns `KeyUnavailable`; move the sign call into the owning service
 
 ## 0.1.23
 
