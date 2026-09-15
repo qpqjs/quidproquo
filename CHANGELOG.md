@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- features: the event-doc summary projector deletes a document's summary row when a stream Remove leaves its log empty, instead of writing the `NO_INIT` seed; emptying an events table (`qpq clear-resources`, a transfer that removes a doc) no longer repopulates the summary table with placeholder documents
 - webserver/actionprocessor-awslambda/dev-server: route matching tries the most specific path first. Routes were sorted by static length ascending, so a parameterised sibling (`/packs/{id}`) always won over a literal one (`/packs/build`); the sort is now descending and the dev server uses the same helper instead of its own raw-length sort, so local and deployed matching agree
 - core/actionprocessor-awslambda/actionprocessor-node: `askFileCopy` copies an object to another path, on the same or another drive, without the bytes crossing the story (an S3 server-side `CopyObject` on lambda, `fs.copyFile` plus the metadata sidecar locally); one scope applies to both sides. features: `EventDocBackend.askCopyAssetFrom` copies another collection's asset onto one of this collection's documents as a new immutable asset, optionally under a new filename
 

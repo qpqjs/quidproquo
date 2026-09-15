@@ -363,6 +363,23 @@ describe('projectEventDocSummary snapshots', () => {
     expect(record!.name).toBe('Renamed');
   });
 
+  it('deletes the summary row on a Remove that emptied the log, instead of writing the NO_INIT seed', () => {
+    // Emptying an events table (a reset, a transfer that removed the doc) streams one Remove per row;
+    // with nothing left to fold, the projector must take the summary row away, not repopulate the
+    // freshly emptied summary table with a placeholder document.
+    const { mocks, tables, updates } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN, log: [] });
+    const deletes: { keyValueStoreName: string; key: unknown; sortKey?: unknown }[] = [];
+    mocks[KeyValueStoreActionType.Delete] = (action: { payload: { keyValueStoreName: string; key: unknown; sortKey?: unknown } }) => {
+      deletes.push(action.payload);
+    };
+
+    runStory(projectEventDocSummary({ ...streamRecord(undefined), eventType: KvsStreamEventType.Remove }), mocks);
+
+    expect(updates).toHaveLength(0);
+    expect(tables[STORE]).toBeUndefined();
+    expect(deletes).toEqual([{ keyValueStoreName: STORE, key: 'template', sortKey: 'doc-1', options: { scope: undefined } }]);
+  });
+
   it('offloads a state over the inline cap to the blob drive, row recording only that', () => {
     const { mocks, tables, fileWrites } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
