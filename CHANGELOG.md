@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.25
+
+- features/core/actionprocessor-awslambda: resumable AI turns. An event-doc AI chat turn now budgets against the execution deadline: `askEventDocAiStreamTurn` reads the remaining runtime, gives the model the rest as `maxDurationMs`, and when the time budget or the output token cap cuts the reply short it saves what it has and hands the turn to a continuation service function (registered by `defineEventDocAi`), returning `SERVICE_REQUEST_DEFERRED` so the finished reply arrives on the same websocket correlation from the next execution. `askAiPrompt` and `askAiPromptStream` gain `maxDurationMs` and `maxOutputTokens` options, and `defineEventDocAi` takes `maxOutputTokens` (default 65536, since the Bedrock default of 8192 cuts a reasoning block plus a large tool input off mid-JSON). The in-flight reply in `EventDocAiState` is folded into `streamSegments` as each chunk lands instead of re-merging the whole part list every time
+- core/actionprocessor-awslambda/actionprocessor-js: `askGetRuntimeRemainingTime` returns the milliseconds left before the platform kills the current execution (lambda's `getRemainingTimeInMillis`; runtimes with no limit return `Number.MAX_SAFE_INTEGER`), so long loops can stop cleanly and hand off
+- features: admin log bodies are redacted before any download, trace, or AI tool read. The first read of a correlation writes a redacted copy to the log reports drive and every admin-facing path reads that copy. Redaction covers known secret keys, JWTs, encrypt inputs, secret lookup results, and the same values nested inside base64, form-urlencoded, and JSON-string encoded request bodies
+- core/deploy-awscdk: `defineStorageDrive` gains a `lockedDown` option that denies object reads at the bucket to every principal except the owning service's runtime role (listing and bucket management stay open, and a presigned url only works when the service role signed it). The raw logs drive is locked down, so every service writes and admins only ever read the redacted copies
+- features: an event-doc append whose event the fold cannot read is refused instead of stored. `askEventDocValidateAppend` folds the candidate against the registered `foldDocumentState`, and `withEventDocSchemaVersionCeiling` rejects a schema version above the collection's latest, so an unreadable event can no longer land permanently in the append-only log and break every later read
+
+### Breaking changes
+
+- `EventDocAiState.streamParts` is replaced by pre-folded `streamSegments` plus `isStreaming`; read the segments instead of merging parts
+- `EventDocFunctions.validateEvent` is now required and `askEventDocValidateAppend` returns the folded state instead of `void`; pass `() => null` for a collection with no rules
+
 ## 0.1.24
 
 - core/actionprocessor-awslambda/dev-server/deploy-awscdk: signing keys. `defineSigningKey` declares an RSA-2048 key pair whose private half never leaves the provider (a KMS sign/verify key on AWS, a locally generated pair under `.qpq-runtime` on the dev server). Stories sign and verify through `askCryptoSign`, `askCryptoVerify` and `askCryptoGetPublicKey`, or at the JWT level through `askCryptoSignJwt` and `askCryptoVerifyJwt`, RS256 throughout. Only the owning module's role is granted `kms:Sign`; verification runs in-process against a cached public key so the per-request path makes no KMS call. Replaces loading a PEM private key from a secret, which left the key in the lambda and in every story log that read it

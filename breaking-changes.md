@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.25
+
 - `EventDocAiState` (`quidproquo-features`) replaces `streamParts: AiStreamPart[]` with `streamSegments: EventDocAiMessageSegment[]` and `isStreaming: boolean`; the in-flight reply is now pre-folded rather than a raw part list. Code reading `state.streamParts` directly (e.g. calling `mergeStreamParts` on it) should read `state.streamSegments` instead. `EventDocAiToolUse` gains an optional `toolCallId` field.
 - `EventDocFunctions` (`quidproquo-features`) now requires `validateEvent`; it was previously optional. A collection registered without one no longer compiles - provide a validator (a rule set with no rules can pass `() => null`). `askEventDocValidateAppend`/`askEventDocValidateAppendRun` now also fold the candidate against the registered `foldDocumentState` and throw `Invalid` if the fold cannot read it, so append-time validation always runs against a schema version the document can fold; `askEventDocValidateAppend` now returns the folded state instead of `void`.
 
