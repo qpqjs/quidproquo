@@ -15,6 +15,7 @@ import { Context, SNSEvent } from 'aws-lambda';
 import { getAwsActionProcessors } from '../../getActionProcessor';
 import { QpqFunctionExecutionEvent } from '../types';
 import { dynamicModuleLoaderWarmer } from './dynamicModuleLoaderWarmer';
+import { getLambdaRuntimeRemainingTimeActionProcessor } from './getLambdaRuntimeRemainingTimeActionProcessor';
 import { getLogger } from './getLogger';
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
 import { isSnsWarmerRecord } from './isSnsWarmerRecord';
@@ -43,9 +44,12 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   qpqConfig: QPQConfig,
   getProcessEventStory: () => typeof askProcessEvent = () => askProcessEvent,
 ) => {
-  const resolveActionProcessorList = async (): Promise<ActionProcessorList> => ({
+  // Built per invoke: the lambda context (and so the execution deadline) is not
+  // known until the handler runs.
+  const getResolveActionProcessorList = (context: Context) => async (): Promise<ActionProcessorList> => ({
     ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
     ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
+    ...getLambdaRuntimeRemainingTimeActionProcessor(context),
 
     // Always done last, so they can override the default ones if the user wants.
     ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
@@ -59,7 +63,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
     const resolveStory = createRuntime(
       qpqConfig,
       getStorySession(event),
-      resolveActionProcessorList,
+      getResolveActionProcessorList(context),
       () => new Date().toISOString(),
       logger,
       getRuntimeCorrelation(qpqConfig),
