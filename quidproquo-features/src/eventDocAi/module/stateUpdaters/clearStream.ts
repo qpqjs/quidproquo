@@ -2,5 +2,6 @@ import type { EventDocAiState } from '../EventDocAiState';
 
 export const clearStream = (state: EventDocAiState): EventDocAiState => ({
   ...state,
-  streamParts: [],
+  streamSegments: [],
+  isStreaming: false,
 });

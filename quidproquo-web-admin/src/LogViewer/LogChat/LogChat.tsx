@@ -1,4 +1,4 @@
-import { eventDocAiContext, mergeStreamParts } from 'quidproquo-features';
+import { eventDocAiContext } from 'quidproquo-features';
 import { useEffectCallback } from 'quidproquo-web-react';
 import { QpqContextProvider, useQpqWebsocketQueueRuntime } from 'quidproquo-web-react';
 
@@ -22,7 +22,7 @@ const LogChatConversation: React.FC<{ logCorrelation: string }> = ({ logCorrelat
   const [api, state] = useQpqWebsocketQueueRuntime(eventDocAiLogChatRuntime, logCorrelation);
   const [adminApi] = useAdminApp();
 
-  const streamSegments = mergeStreamParts(state.streamParts);
+  const streamSegments = state.streamSegments;
   const isThinking = state.isSending && streamSegments.length === 0;
 
   const handleSendMessage = useEffectCallback(() => {

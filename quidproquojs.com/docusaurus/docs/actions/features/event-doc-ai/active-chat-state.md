@@ -9,7 +9,7 @@ These `ask`-generators are **client-side UI state setters** for the Event Doc AI
 
 Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `quidproquo-core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
 
-`chatMessages` holds only **finalized** turns. The live, in-flight assistant reply lives separately in `streamParts` (see [Event Doc AI streaming & status state](./streaming-and-status-state.md)) and is folded into a finalized message once the reply completes.
+`chatMessages` holds only **finalized** turns. The live, in-flight assistant reply lives separately in `streamSegments` (see [Event Doc AI streaming & status state](./streaming-and-status-state.md)) and is folded into a finalized message once the reply completes.
 
 ## State shape
 
@@ -19,7 +19,8 @@ type EventDocAiState = {
   activeChatId: Nullable<string>;
 
   chatMessages: EventDocAiChatMessage[];
-  streamParts: AiStreamPart[];
+  streamSegments: EventDocAiMessageSegment[];
+  isStreaming: boolean;
 
   isLoadingChats: boolean;
   isLoadingHistory: boolean;

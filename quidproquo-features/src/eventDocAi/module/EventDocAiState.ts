@@ -1,7 +1,6 @@
-import type { AiStreamPart } from 'quidproquo-core';
 import type { Nullable } from 'quidproquo-core';
 
-import type { EventDocAiChatMessage, EventDocAiChatSummary } from '../models';
+import type { EventDocAiChatMessage, EventDocAiChatSummary, EventDocAiMessageSegment } from '../models';
 
 // Which service/doc-type/document the module talks to comes from the
 // eventDocAi QPQ context (provided around the chat UI), not from state.
@@ -11,8 +10,12 @@ export type EventDocAiState = {
 
   // Finalized messages of the active chat (user + assistant).
   chatMessages: EventDocAiChatMessage[];
-  // The in-flight assistant stream; cleared once the reply is finalized.
-  streamParts: AiStreamPart[];
+  // The in-flight assistant reply, folded as each stream part arrives; cleared
+  // once the reply is finalized.
+  streamSegments: EventDocAiMessageSegment[];
+  // True from the first stream part until the stream is cleared, so the UI can
+  // show activity before any renderable segment exists.
+  isStreaming: boolean;
 
   isLoadingChats: boolean;
   isLoadingHistory: boolean;
@@ -24,7 +27,8 @@ export const createInitialEventDocAiState = (): EventDocAiState => ({
   chats: [],
   activeChatId: null,
   chatMessages: [],
-  streamParts: [],
+  streamSegments: [],
+  isStreaming: false,
   isLoadingChats: false,
   isLoadingHistory: false,
   isSending: false,

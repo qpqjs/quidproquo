@@ -11,7 +11,7 @@ interface EventDocAiSegmentsProps {
 // Renders one message's segments — text (markdown), reasoning (dimmed), tool
 // calls (a chip per tool, showing input and, once it arrives, output), and
 // file attachments. Used for both finalized messages and the live stream
-// preview (mergeStreamParts produces the same segment shape for both).
+// preview (the live stream is folded into the same segment shape).
 export const EventDocAiSegments: React.FC<EventDocAiSegmentsProps> = ({ segments }) => (
   <>
     {segments.map((segment, index) => {

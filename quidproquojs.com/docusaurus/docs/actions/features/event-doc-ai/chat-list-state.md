@@ -19,7 +19,8 @@ type EventDocAiState = {
   activeChatId: Nullable<string>;
 
   chatMessages: EventDocAiChatMessage[];
-  streamParts: AiStreamPart[];
+  streamSegments: EventDocAiMessageSegment[];
+  isStreaming: boolean;
 
   isLoadingChats: boolean;
   isLoadingHistory: boolean;
