@@ -63,6 +63,21 @@ function* askServiceRequest<TPayload, TResponse>(
 
 `TResponse` — the typed response returned by the target service's handler for that method.
 
+## Deferring the reply
+
+A handler wrapped by `serviceRequest` normally has its return value sent back as the correlated response. Returning `SERVICE_REQUEST_DEFERRED` instead sends nothing: the handler is promising that a later execution carrying the same session (an async [service function](../../webserver/service-function/ask-service-function-execute.md), say) will answer through `askServiceRequestRespond`. The browser keeps the correlation open, so intermediate state dispatches from those later executions still reach the caller. The eventDocAi chat uses this to resume a turn on a fresh Lambda before the current one times out.
+
+```typescript
+import { askServiceRequestRespond, SERVICE_REQUEST_DEFERRED } from 'quidproquo-features';
+
+// In the first handler: hand off and defer.
+yield* askServiceFunctionExecute(serviceName, 'continueWork', { jobId }, true);
+return SERVICE_REQUEST_DEFERRED;
+
+// In the continuation: answer on the original correlation.
+yield* askServiceRequestRespond({ success: true, result });
+```
+
 ## Related
 
 - [askServiceFunctionExecute](../../webserver/service-function/ask-service-function-execute.md) — direct Lambda-invoke of a named service function.

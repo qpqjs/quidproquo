@@ -9,10 +9,11 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { stepCountIs, streamText } from 'ai';
+import { streamText } from 'ai';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import {
+  buildAiStopConditions,
   createDriveFileResolver,
   mapAiStreamPart,
   prepareAiPromptCall,
@@ -53,9 +54,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
-        // Caps the server-side tool loop. Client-side tools (no executor) still halt
-        // immediately with finishReason 'tool-calls' so the caller can resume the turn.
-        stopWhen: stepCountIs(20),
+        stopWhen: buildAiStopConditions(payload),
         // streamText swallows errors by default to keep the server alive; surface them to
         // CloudWatch. The same error also reaches the consumer as an Error stream part.
         onError: ({ error }) => {

@@ -9,9 +9,9 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { generateText, stepCountIs } from 'ai';
+import { generateText } from 'ai';
 
-import { createDriveFileResolver, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
+import { buildAiStopConditions, createDriveFileResolver, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
 
 const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPrompt> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -44,7 +44,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
-        stopWhen: stepCountIs(20),
+        stopWhen: buildAiStopConditions(payload),
       });
 
       if (payload.caching) {

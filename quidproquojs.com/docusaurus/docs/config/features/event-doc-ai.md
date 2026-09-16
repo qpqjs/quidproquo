@@ -11,11 +11,12 @@ Declares an **AI chat feature** attached to an [eventDoc](./event-doc.md) collec
 
 - provisions a **storage drive** for chat histories (one JSON file per chat) and a **key-value store** listing each document's chats,
 - registers an **AI** (model + tools) the chat turns prompt through, and
-- subscribes a dedicated **queue** of four websocket service-request handlers (`onChatCreate`, `onChatList`, `onChatHistory`, `onChatSend`) that ship inside quidproquo-features.
+- subscribes a dedicated **queue** of four websocket service-request handlers (`onChatCreate`, `onChatList`, `onChatHistory`, `onChatSend`) that ship inside quidproquo-features, and
+- registers a **continuation service function** (`<storeName>AiChatContinue`) a chat turn hands itself to when the runtime deadline is near, so a long agentic turn spans as many executions as it needs. Each hop runs on the requesting session, streams to the same websocket correlation, and the last one sends the reply.
 
 The handlers and any tool executors read the wiring from per-processor globals, exactly like `defineEventDocRoutes`' controllers — you do not write the backend, only configure it.
 
-- **On AWS:** deploys the union of the four config settings it returns — a DynamoDB table ([defineKeyValueStore](../core/key-value-store.md), partition `docId` / sort `chatId`) for the chat list, an S3 bucket ([defineStorageDrive](../core/storage-drive.md)) for chat-history JSON, the AI registration ([defineAi](../core/ai.md), granting Bedrock model access and registering the `tools`), and an SQS queue ([defineQueue](../core/queue.md)) subscribed to `eventBusName` whose processors are the four chat websocket handlers. Names are derived from `storeName`, so the same config deploys per environment without collisions.
+- **On AWS:** deploys the union of the five config settings it returns — a DynamoDB table ([defineKeyValueStore](../core/key-value-store.md), partition `docId` / sort `chatId`) for the chat list, an S3 bucket ([defineStorageDrive](../core/storage-drive.md)) for chat-history JSON, the AI registration ([defineAi](../core/ai.md), granting Bedrock model access and registering the `tools`), and an SQS queue ([defineQueue](../core/queue.md)) subscribed to `eventBusName` whose processors are the four chat websocket handlers, plus a Lambda ([defineServiceFunction](../webserver/service-function.md)) for the continuation. Names are derived from `storeName`, so the same config deploys per environment without collisions.
 
 ```typescript
 import { defineEventDocAi } from 'quidproquo-features';

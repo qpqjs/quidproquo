@@ -50,6 +50,8 @@ function* askAiPrompt(
 | `messages` | [`AiMessage[]`](#aimessage) | – | A full conversation history. When present, this is sent instead of `prompt`, letting you carry a multi-turn dialogue (including prior assistant turns and tool results). |
 | `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on; `budgetTokens` caps how many tokens the model may spend thinking before it answers (defaults to `4096` on AWS). |
 | `caching` | `boolean` | – | Marks the system prompt and the last message (or the last `messages` entry) with a Bedrock cache point, so a following call in the same conversation can read everything up to there from cache instead of reprocessing it. |
+| `maxSteps` | `number` | – | Cap on model/tool steps in one call. Unset means no cap: the loop runs until the model stops on its own or `maxDurationMs` trips. A client-side tool call (a tool with no executor) still halts it immediately. |
+| `maxDurationMs` | `number` | – | Wall-clock budget for the tool loop. Checked between steps, so the loop can overrun by one step; leave headroom. When it trips with tool calls still outstanding the result finishes with `toolCalls`, and re-sending the recorded history resumes the turn. Pair it with [askGetRuntimeRemainingTime](../system/ask-get-runtime-remaining-time.md) to stop before the platform deadline. |
 
 ### `AiModel`
 

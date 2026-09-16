@@ -1,8 +1,8 @@
-import { createServiceRequester } from '../../webSocketQueue/logic/service';
-import { askEventDocAiProcessSend } from '../logic/askEventDocAiProcessSend';
-import type { EventDocAiChatSendPayload, EventDocAiChatSendResult } from '../models';
-import { askEventDocAiContextRead } from '../module';
-import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
+import { createServiceRequester } from '../../../webSocketQueue/logic/service';
+import { askEventDocAiProcessSend } from '../../logic/askEventDocAiProcessSend';
+import { eventDocAiServiceRequest } from '../../logic/eventDocAiServiceRequest';
+import type { EventDocAiChatSendPayload, EventDocAiChatSendResult } from '../../models';
+import { askEventDocAiContextRead } from '../../module';
 
 const askChatSendRequest = createServiceRequester<EventDocAiChatSendPayload, EventDocAiChatSendResult>('eventDocAi', 'ChatSend');
 

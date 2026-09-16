@@ -1,31 +1,28 @@
 import { askCatch, AskResponse, QueueEvent, QueueEventResponse, QueueMessage } from 'quidproquo-core';
 
-import { askWebsocketReadConnectionInfo } from '../../context';
-import { WebSocketQueueServerEventMessageServiceRequestResponse } from '../../types/serverMessages/WebSocketQueueServerEventMessageServiceRequestResponse';
-import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages/WebSocketQueueServerMessageEventType';
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askServiceRequestRespond } from './askServiceRequestRespond';
 import { ServiceRequester } from './createServiceRequester';
+import { isServiceRequestDeferred } from './isServiceRequestDeferred';
+import type { ServiceRequestDeferred } from './ServiceRequestDeferred';
 
 type PayloadOf<R> = R extends ServiceRequester<infer T, any> ? T : never;
 type ResponseOf<R> = R extends ServiceRequester<any, infer T> ? T : never;
 
 export const serviceRequest = <R extends ServiceRequester<any, any>>(
   requester: R,
-  runtime: (payload: PayloadOf<R>) => AskResponse<ResponseOf<R>>,
+  runtime: (payload: PayloadOf<R>) => AskResponse<ResponseOf<R> | ServiceRequestDeferred>,
 ) => {
   const { method } = requester.serviceRequest;
 
   const wrapper = function* wrapper(event: QueueEvent<QueueMessage<any>>) {
     const result = yield* askCatch(runtime(event.message.payload));
 
-    const { connectionId, correlationId } = yield* askWebsocketReadConnectionInfo();
+    // A deferred result means another execution owns the reply.
+    if (result.success && isServiceRequestDeferred(result.result)) {
+      return true as QueueEventResponse;
+    }
 
-    const response: WebSocketQueueServerEventMessageServiceRequestResponse = {
-      type: WebSocketQueueServerMessageEventType.ServiceRequestResponse,
-      payload: result,
-    };
-
-    yield* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
+    yield* askServiceRequestRespond(result);
 
     return true as QueueEventResponse;
   };

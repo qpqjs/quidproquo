@@ -2,7 +2,7 @@ import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
 
 import { EVENT_DOC_TYPE_GLOBAL } from '../../eventDoc';
 import { askEventDocResolveActor } from '../../eventDoc';
-import { serviceRequest, ServiceRequester } from '../../webSocketQueue/logic/service';
+import { serviceRequest, ServiceRequestDeferred, ServiceRequester } from '../../webSocketQueue/logic/service';
 import { EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiDocRef } from '../models';
 import { askEventDocAiContextProvide } from '../module';
@@ -18,7 +18,7 @@ type ResponseOf<R> = R extends ServiceRequester<any, infer T> ? T : never;
 // rather than from anything the caller or the model could fabricate.
 export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(
   requester: R,
-  runtime: (payload: PayloadOf<R>) => AskResponse<ResponseOf<R>>,
+  runtime: (payload: PayloadOf<R>) => AskResponse<ResponseOf<R> | ServiceRequestDeferred>,
 ) =>
   serviceRequest(requester, function* askEventDocAiServiceHandler(wirePayload: PayloadOf<R> & EventDocAiDocRef) {
     yield* askEventDocResolveActor();
@@ -29,4 +29,4 @@ export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(
     const type = yield* askConfigGetGlobal<string>(EVENT_DOC_TYPE_GLOBAL);
 
     return yield* askEventDocAiContextProvide({ serviceName, type, docId }, runtime(payload as PayloadOf<R>));
-  } as (payload: PayloadOf<R>) => AskResponse<ResponseOf<R>>);
+  } as (payload: PayloadOf<R>) => AskResponse<ResponseOf<R> | ServiceRequestDeferred>);

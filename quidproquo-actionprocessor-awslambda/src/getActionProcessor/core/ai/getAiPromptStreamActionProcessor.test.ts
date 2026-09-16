@@ -13,12 +13,12 @@ vi.mock('./logic', () => ({
   mapAiStreamPart: vi.fn(() => ({ mapped: true })),
   toCacheableSystem: vi.fn((system: string | undefined) => system),
   toCacheableMessages: vi.fn((messages: unknown) => messages),
+  buildAiStopConditions: vi.fn(() => []),
 }));
 
 const streamText = vi.fn();
 vi.mock('ai', () => ({
   streamText: (args: unknown) => streamText(args),
-  stepCountIs: (n: number) => ({ __stop: n }),
 }));
 
 vi.mock('../../../awsLambdaUtils', () => ({ randomGuid: () => 'guid' }));

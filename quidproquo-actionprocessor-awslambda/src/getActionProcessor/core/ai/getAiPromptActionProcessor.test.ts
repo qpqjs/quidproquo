@@ -12,12 +12,12 @@ vi.mock('./logic', () => ({
   toSdkMessages: vi.fn(async () => [{ role: 'user', content: 'mapped' }]),
   toCacheableSystem: vi.fn((system: string | undefined) => system),
   toCacheableMessages: vi.fn((messages: unknown) => messages),
+  buildAiStopConditions: vi.fn(() => []),
 }));
 
 const generateText = vi.fn();
 vi.mock('ai', () => ({
   generateText: (args: unknown) => generateText(args),
-  stepCountIs: (n: number) => ({ __stop: n }),
 }));
 
 const invoke = async (payload: Record<string, unknown>) => {

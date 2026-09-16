@@ -8,11 +8,13 @@ import {
   QpqFunctionRuntimeAdvanced,
   QpqQueueProcessors,
 } from 'quidproquo-core';
+import { defineServiceFunction } from 'quidproquo-webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc';
 import { buildEventDocStore, buildEventDocStoreGlobals } from '../../eventDoc';
 import { eventDocAiChatDriveName } from '../constants/eventDocAiChatDriveName';
 import { eventDocAiChatListStoreName } from '../constants/eventDocAiChatListStoreName';
+import { eventDocAiContinueFunctionName } from '../constants/eventDocAiContinueFunctionName';
 import {
   EVENT_DOC_AI_CHAT_DRIVE_GLOBAL,
   EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL,
@@ -36,10 +38,11 @@ import { EventDocAiOptions } from '../types/EventDocAiOptions';
 
 // AI chats attached to an eventDoc collection — the AI sibling of defineEventDoc.
 // Provisions a chat-history drive + chat-list KVS, registers the AI (tools are
-// defineInlineFunction names supplied by the caller), and subscribes a
+// defineInlineFunction names supplied by the caller), subscribes a
 // collection-scoped queue of websocket service-request handlers that ship
 // inside this package (per-processor globals carry the wiring, exactly like
-// defineEventDocRoutes' controllers).
+// defineEventDocRoutes' controllers), and a continuation service function a
+// turn hands itself to when the runtime deadline is near.
 export const defineEventDocAi = ({
   storeName,
   type,
@@ -73,9 +76,9 @@ export const defineEventDocAi = ({
     [EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL]: systemPromptGenerator ?? '',
   };
 
-  const runtime = (functionName: string): QpqFunctionRuntimeAdvanced => ({
+  const runtime = (entryType: string, functionName: string): QpqFunctionRuntimeAdvanced => ({
     basePath: __dirname,
-    relativePath: `../wsControllers/${functionName}`,
+    relativePath: `../entry/${entryType}/${functionName}`,
     functionName,
     globals,
   });
@@ -83,10 +86,10 @@ export const defineEventDocAi = ({
   const processorKey = (method: string): string => `qpq/serviceRequest/${serviceName}/${buildEventDocAiMethodName(type, method)}`;
 
   const processors: QpqQueueProcessors = {
-    [processorKey(EVENT_DOC_AI_METHOD_CHAT_CREATE)]: runtime('onChatCreate'),
-    [processorKey(EVENT_DOC_AI_METHOD_CHAT_LIST)]: runtime('onChatList'),
-    [processorKey(EVENT_DOC_AI_METHOD_CHAT_HISTORY)]: runtime('onChatHistory'),
-    [processorKey(EVENT_DOC_AI_METHOD_CHAT_SEND)]: runtime('onChatSend'),
+    [processorKey(EVENT_DOC_AI_METHOD_CHAT_CREATE)]: runtime('queueEvent', 'onChatCreate'),
+    [processorKey(EVENT_DOC_AI_METHOD_CHAT_LIST)]: runtime('queueEvent', 'onChatList'),
+    [processorKey(EVENT_DOC_AI_METHOD_CHAT_HISTORY)]: runtime('queueEvent', 'onChatHistory'),
+    [processorKey(EVENT_DOC_AI_METHOD_CHAT_SEND)]: runtime('queueEvent', 'onChatSend'),
   };
 
   return [
@@ -95,6 +98,9 @@ export const defineEventDocAi = ({
     defineAi(aiName, { tools }),
     defineQueue(eventDocAiQueueName(storeName), processors, {
       eventBusSubscriptions: [eventBusName],
+    }),
+    defineServiceFunction(runtime('serviceFunction', 'eventDocAiChatContinue'), {
+      functionName: eventDocAiContinueFunctionName(storeName),
     }),
   ];
 };

@@ -1,11 +1,11 @@
 import { askDateNow, askNewGuid } from 'quidproquo-core';
 
-import { askEventDocResolveActor } from '../../eventDoc';
-import { createServiceRequester } from '../../webSocketQueue/logic/service';
-import { askEventDocAiChatUpsert } from '../data/askEventDocAiChatUpsert';
-import type { EventDocAiChatCreatePayload, EventDocAiChatSummary } from '../models';
-import { askEventDocAiContextRead } from '../module';
-import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
+import { askEventDocResolveActor } from '../../../eventDoc';
+import { createServiceRequester } from '../../../webSocketQueue/logic/service';
+import { askEventDocAiChatUpsert } from '../../data/askEventDocAiChatUpsert';
+import { eventDocAiServiceRequest } from '../../logic/eventDocAiServiceRequest';
+import type { EventDocAiChatCreatePayload, EventDocAiChatSummary } from '../../models';
+import { askEventDocAiContextRead } from '../../module';
 
 // Placeholder requester: serviceRequest only stores its method for
 // defineServiceRequests-style map building, which defineEventDocAi bypasses

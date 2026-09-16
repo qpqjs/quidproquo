@@ -42,7 +42,7 @@ The parameters are identical to [askAiPrompt](./ask-ai-prompt.md) — see there 
 | --- | --- | --- |
 | `model` | `AiModel` | Which model to prompt. |
 | `prompt` | `string` | The user prompt. Ignored when `options.messages` is set. |
-| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, reasoning?, caching? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
+| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, reasoning?, caching?, maxDurationMs?, maxSteps? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
 
 ## Returns
 
@@ -92,7 +92,7 @@ Within a step, text / reasoning / tool-input events arrive as matched `*Start �
 | `stop` | `stop` | The model completed its answer naturally. |
 | `length` | `length` | The response hit the output token limit. |
 | `contentFilter` | `content-filter` | The provider's content filter stopped the response. |
-| `toolCalls` | `tool-calls` | Generation stopped while the model still had tool calls in flight. On the final `Finish` part this means the turn was halted early by a stop condition (e.g. a step limit) rather than finishing naturally, and can be resumed by re-sending the recorded history. |
+| `toolCalls` | `tool-calls` | Generation stopped while the model still had tool calls in flight. On the final `Finish` part this means the turn was halted early by a stop condition (`maxSteps` or `maxDurationMs`) rather than finishing naturally, and can be resumed by re-sending the recorded history. |
 | `error` | `error` | The stream errored. |
 | `other` | `other` | The provider reported a reason outside this catalog. |
 | `unknown` | `unknown` | The provider reported no reason, or one this version does not recognise. |
