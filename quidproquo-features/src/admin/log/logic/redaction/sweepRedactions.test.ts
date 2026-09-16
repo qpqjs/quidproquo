@@ -31,4 +31,13 @@ describe('sweepRedactions', () => {
 
     expect(sweepRedactions(input, [])).toBe(input);
   });
+
+  it('sweeps inside json-string and base64 json leaves', () => {
+    const input = { json: JSON.stringify({ msg: 'pw is tok123' }), b64: Buffer.from(JSON.stringify({ t: 'tok123' })).toString('base64') };
+
+    const result = sweepRedactions(input, ['tok123']);
+
+    expect(JSON.parse(result.json)).toEqual({ msg: `pw is ${REDACTED_STRING}` });
+    expect(JSON.parse(Buffer.from(result.b64, 'base64').toString())).toEqual({ t: REDACTED_STRING });
+  });
 });

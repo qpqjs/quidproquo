@@ -98,6 +98,10 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
 
   encryption?: boolean;
 
+  // Only the owning service's runtime role may read objects. Every other principal in the
+  // account, humans included, is denied at the bucket; writes and listing are unaffected.
+  lockedDown?: boolean;
+
   owner?: CrossModuleOwner<'storageDriveName'>;
 }
 
@@ -111,6 +115,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   lifecycleRules?: StorageDriveLifecycleRule[];
 
   encryption: boolean;
+  lockedDown: boolean;
 }
 
 export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => ({
@@ -128,6 +133,7 @@ export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdva
   lifecycleRules: options?.lifecycleRules,
 
   encryption: options?.encryption ?? false,
+  lockedDown: options?.lockedDown ?? false,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

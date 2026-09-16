@@ -26,6 +26,12 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * the bucket policy grant CloudFront read access.
    */
   allowCloudFrontRead?: boolean;
+
+  /**
+   * The owning service's runtime role. Required when the drive is lockedDown: it is the
+   * one principal exempt from the bucket's object-read deny.
+   */
+  serviceRole?: aws_iam.IRole;
 }
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
@@ -144,6 +150,29 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
             StringLike: {
               'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
             },
+          },
+        }),
+      );
+    }
+
+    if (props.storageDriveConfig.lockedDown) {
+      if (!props.serviceRole) {
+        throw new Error(`Storage drive "${props.storageDriveConfig.storageDrive}" is lockedDown but no serviceRole was supplied`);
+      }
+
+      // Object reads only. Listing stays open (file names are not the secret) and bucket
+      // management is never denied, so a bad deploy is fixed by redeploying, not by root.
+      // A presigned url is evaluated as its signer, so this also stops anyone but the
+      // service role from minting a url that works.
+      this.bucket.addToResourcePolicy(
+        new aws_iam.PolicyStatement({
+          sid: 'DenyObjectReadExceptServiceRole',
+          effect: aws_iam.Effect.DENY,
+          principals: [new aws_iam.AnyPrincipal()],
+          actions: ['s3:GetObject', 's3:GetObjectVersion'],
+          resources: [this.bucket.arnForObjects('*')],
+          conditions: {
+            ArnNotEquals: { 'aws:PrincipalArn': [props.serviceRole.roleArn] },
           },
         }),
       );

@@ -40,4 +40,20 @@ describe('knownKeysParser', () => {
 
     expect(knownKeysParser(log).redactedLog.input).toEqual([{ id: 'id1', pk: 'pk1', sk: 'sk1' }]);
   });
+
+  it('redacts keys inside json-string and base64 bodies and reports sweep values from them', () => {
+    const body = { username: 'joe', password: 'hunter2', accessToken: 'tok-1' };
+    const log = {
+      correlation: 'c1',
+      input: [{ body: Buffer.from(JSON.stringify(body)).toString('base64'), isBase64Encoded: true }],
+      history: [{ act: { payload: { body: JSON.stringify(body) } }, res: [undefined, undefined] }],
+    } as any;
+
+    const { redactedLog, redactions } = knownKeysParser(log);
+
+    const decoded = JSON.parse(Buffer.from(redactedLog.input[0].body, 'base64').toString());
+    expect(decoded).toEqual({ username: 'joe', password: REDACTED_STRING, accessToken: REDACTED_STRING });
+    expect(JSON.parse(redactedLog.history[0].act.payload.body)).toEqual({ username: 'joe', password: REDACTED_STRING, accessToken: REDACTED_STRING });
+    expect(redactions).toEqual(['tok-1', 'tok-1']);
+  });
 });

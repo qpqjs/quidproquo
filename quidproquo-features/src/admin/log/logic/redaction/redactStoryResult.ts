@@ -2,12 +2,14 @@ import { StoryResult } from 'quidproquo-core';
 
 import { logRedactionParsers } from './parsers/logRedactionParsers';
 import { LogRedactionResult } from './types/LogRedactionResult';
+import { expandJsonRedactions } from './expandJsonRedactions';
 import { sweepRedactions } from './sweepRedactions';
 
 /**
  * The single transform every admin-visible copy of a log passes through, whether written to the
  * reports drive cache or indexed in memory. Runs every parser in turn, then sweeps every reported
- * value out of every string in the log. Never mutates its input.
+ * value, and for json-shaped values every string inside them, out of every string in the log.
+ * Never mutates its input.
  */
 export const redactStoryResult = (storyResult: StoryResult<any>): StoryResult<any> => {
   const initial: LogRedactionResult = { redactedLog: structuredClone(storyResult), redactions: [] };
@@ -17,5 +19,5 @@ export const redactStoryResult = (storyResult: StoryResult<any>): StoryResult<an
     return { redactedLog: result.redactedLog, redactions: [...acc.redactions, ...result.redactions] };
   }, initial);
 
-  return sweepRedactions(parsed.redactedLog, parsed.redactions);
+  return sweepRedactions(parsed.redactedLog, expandJsonRedactions(parsed.redactions));
 };

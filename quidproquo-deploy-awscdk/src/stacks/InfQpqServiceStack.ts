@@ -50,6 +50,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
             requireDomainResolver(props.qpqConfig),
           ),
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
+          serviceRole: webserverRole,
         }),
     );
     QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);

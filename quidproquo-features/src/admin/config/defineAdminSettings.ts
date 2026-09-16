@@ -133,8 +133,11 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
       },
     ),
 
+    // Raw logs are readable only by the log service role: every service writes, admins
+    // read the redacted copies on the reports drive.
     defineStorageDrive(QPQ_LOGS_STORAGE_DRIVE_NAME, {
       owner: { module: logServiceName },
+      lockedDown: true,
       onEvent: {
         create: getFeatureEntryQpqFunctionRuntime('admin/log', 'storageDrive', 'onCreate::onCreate'),
       },

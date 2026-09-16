@@ -41,6 +41,7 @@ The name of the drive. This is the name you pass as the `drive` argument to ever
 | `onEvent` | `StorageDriveEvents` | – | Story functions to run when files are created or deleted in the drive. See [File events](#file-events-onevent). |
 | `lifecycleRules` | `StorageDriveLifecycleRule[]` | – | Rules that transition files to cheaper [storage tiers](#storagedrivetier) or delete them after a period. See [Lifecycle rules](#lifecycle-rules). |
 | `encryption` | `boolean` | `false` | Enables customer-managed KMS encryption for the drive (the KMS key comes from the service's AWS config). When `false`, provider-managed encryption still applies (SSE-S3 on AWS) — this flag only controls the KMS upgrade. |
+| `lockedDown` | `boolean` | `false` | Denies object reads to every principal except the owning service's runtime role (listing and bucket management are unaffected). On AWS, the service stack must pass its `serviceRole` to `QpqCoreStorageDriveConstruct`; synth throws if a `lockedDown` drive has no `serviceRole`. |
 | `owner` | `CrossModuleOwner<'storageDriveName'>` | – | Declares that this drive is owned by **another** module/service. Use this to read/write a drive deployed elsewhere: the deploy grants this service IAM access to the foreign drive instead of creating a new bucket. `{ module, application, feature, environment, storageDriveName }` — all optional; unset parts default to the current service. |
 
 ## File events (`onEvent`)
