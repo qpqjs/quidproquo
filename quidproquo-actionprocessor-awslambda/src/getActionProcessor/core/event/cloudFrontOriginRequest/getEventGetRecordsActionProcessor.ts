@@ -41,8 +41,9 @@ const getProcessGetRecords = async (qpqConfig: QPQConfig, loader: DynamicModuleL
         path: cfRecordRequest.uri,
         sourceIp: cfRecordRequest.clientIp,
         headers: headers,
-        // TODO: query string support
-        query: {},
+        // Only reaches the origin-request function when the behaviour forwards it
+        // (see WebQpqWebserverWebEntryConstruct). `querystring` is '' when there is none.
+        query: qpqWebServerUtils.parseQueryString(cfRecordRequest.querystring),
       };
 
       return internalRecord;

@@ -115,6 +115,7 @@ When writing documentation, comments, or user-facing frontend copy (e.g. the lan
 
 - **Never** use em dashes (—). Use a period, comma, colon, or parentheses instead.
 - Write like a person, not an AI assistant. Avoid the tells: no "leverage/utilize/robust/seamless/delve", no rule-of-three lists piled into one sentence, no overly symmetric "it's not just X, it's Y" constructions, no forced enthusiasm. Prefer plain, direct, slightly informal phrasing over polished marketing tone.
+- **Comments must not cross-pollute between packages.** A comment explains its own package's concern in its own package's terms. Platform-agnostic packages (`quidproquo-core`, `quidproquo-webserver`, `quidproquo-web`, ...) never mention AWS, API Gateway, Lambda, CloudFront, express, or any other runtime: define the shape the framework wants and describe it on its own terms. The platform-specific package (`quidproquo-actionprocessor-*`, `quidproquo-deploy-awscdk`, `quidproquo-dev-server`) is where the conversion to and from that platform's shape lives, and that is the only place a comment about the platform belongs.
 
 ## Comments
 

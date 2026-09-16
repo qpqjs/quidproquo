@@ -8,6 +8,11 @@ export interface HttpEventRouteParams {
   [key: string]: string;
 }
 
+// The parsed query string: a key seen once is a string, a key repeated is a string[]. This
+// is the one shape every runtime converts its own query representation into, so a story
+// can read the query the same way wherever it runs.
+export type HttpEventQuery = { [key: string]: undefined | string | string[] };
+
 export enum FileUploadErrorTypeEnum {
   fileTooLarge = 'fileTooLarge',
   tooManyFiles = 'tooManyFiles',
@@ -23,7 +28,7 @@ export interface HTTPEventFileUploadError {
 
 export interface HTTPEvent {
   path: string;
-  query: { [key: string]: undefined | string | string[] };
+  query: HttpEventQuery;
   body?: string;
   headers: HttpEventHeaders;
   method: HTTPMethod;
