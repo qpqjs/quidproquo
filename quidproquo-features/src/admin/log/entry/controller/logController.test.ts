@@ -1,9 +1,18 @@
-import { ConfigActionType, ErrorTypeEnum, FileActionType, KeyValueStoreActionType, runStory, StoryError } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import {
+  Action,
+  ConfigActionType,
+  ErrorTypeEnum,
+  FileActionType,
+  KeyValueStoreActionType,
+  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
+  runStory,
+  StoryError,
+} from 'quidproquo-core';
+import { HTTPEvent, ServiceFunctionActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { downloadUrl, getChildren, getLog, getServiceNames } from './logController';
+import { downloadUrl, getChildren, getLog, getServiceNames, traceLog } from './logController';
 
 const event = {} as HTTPEvent;
 
@@ -60,20 +69,49 @@ describe('getChildren', () => {
 });
 
 describe('downloadUrl', () => {
-  it('returns a signed url when the log is not in cold storage', () => {
+  it('signs the cached redacted copy on the reports drive', () => {
+    let signed: Action<any> | undefined;
+
     const response = runStory(downloadUrl(event, { correlationId: 'c1' }), {
-      [FileActionType.IsColdStorage]: false,
-      [FileActionType.GenerateTemporarySecureUrl]: 'https://signed.example/c1.json',
+      [FileActionType.Exists]: true,
+      [FileActionType.GenerateTemporarySecureUrl]: (action: Action<any>) => {
+        signed = action;
+        return 'https://signed.example/c1.redacted.json';
+      },
     });
 
-    expect(JSON.parse(response.body!)).toEqual({ url: 'https://signed.example/c1.json', isColdStorage: false });
+    expect(signed?.payload).toMatchObject({ drive: QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, filepath: 'c1.redacted.json' });
+    expect(JSON.parse(response.body!)).toEqual({ url: 'https://signed.example/c1.redacted.json', isColdStorage: false });
   });
 
-  it('reports cold storage without a url', () => {
+  it('reports cold storage without a url when no redacted copy is cached', () => {
     const response = runStory(downloadUrl(event, { correlationId: 'c1' }), {
+      [FileActionType.Exists]: false,
       [FileActionType.IsColdStorage]: true,
     });
 
     expect(JSON.parse(response.body!)).toEqual({ url: '', isColdStorage: true });
+  });
+});
+
+describe('traceLog', () => {
+  it('ships the redacted log to the owning service when no trace exists', () => {
+    const redactedLog = { correlation: 'c1', moduleName: 'svc', history: [] };
+    let executed: Action<any> | undefined;
+
+    const response = runStory(traceLog({ query: {} } as unknown as HTTPEvent, { correlationId: 'c1' }), {
+      [FileActionType.Exists]: (action: Action<any>) => action.payload.filepath !== 'c1.trace.json',
+      [FileActionType.ReadObjectJson]: (action: Action<any>) => {
+        expect(action.payload).toMatchObject({ drive: QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, filepath: 'c1.redacted.json' });
+        return redactedLog;
+      },
+      [ConfigActionType.GetApplicationInfo]: { module: 'log-service' },
+      [ServiceFunctionActionType.Execute]: (action: Action<any>) => {
+        executed = action;
+      },
+    });
+
+    expect(executed?.payload.payload.storyResult).toBe(redactedLog);
+    expect(JSON.parse(response.body!)).toEqual({ pending: true });
   });
 });

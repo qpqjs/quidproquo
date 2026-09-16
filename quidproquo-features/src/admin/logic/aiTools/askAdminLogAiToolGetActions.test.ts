@@ -24,13 +24,14 @@ describe('askAdminLogAiToolGetActions', () => {
     const result = runStory(askAdminLogAiToolGetActions(), {
       [ContextActionType.Read]: (action: { payload: { contextIdentifier: { uniqueName: string } } }) =>
         action.payload.contextIdentifier.uniqueName === eventDocAiContext.uniqueName ? { serviceName: 'log', type: 'log', docId: 'corr-1' } : {},
+      [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: (action: { payload: { filepath: string } }) => {
         requestedDrivePath = action.payload.filepath;
         return log;
       },
     });
 
-    expect(requestedDrivePath).toBe('corr-1.json');
+    expect(requestedDrivePath).toBe('corr-1.redacted.json');
     expect(result).toEqual([
       {
         index: 0,

@@ -26,6 +26,7 @@ import { askUpdateActionSearchFromStoryResult } from '../../actionSearch/logic/a
 import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';
 import * as logMetadataData from '../entry/data/logMetadataData';
 import { LogLog, LogMetadata } from '../entry/domain';
+import { redactStoryResult } from './redaction/redactStoryResult';
 import {
   apiGenericTextExtractor,
   AUTH_CREATE_AUTH_CHALLENGE_GenericTextExtractor,
@@ -174,22 +175,25 @@ export function* askGetLogInfosFromStoryResult(result: StoryResult<any>): AskRes
 export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
   const logObj = yield* askCatch(askFileReadObjectJson<StoryResult<any>>(storageDriveName, filesPath));
 
-  const metadata = logObj.success
-    ? storyResultToMetadata(logObj.result, ttl)
+  // Every row derived below is admin-visible, so only the redacted object is indexed.
+  const storyResult = logObj.success ? redactStoryResult(logObj.result) : null;
+
+  const metadata = storyResult
+    ? storyResultToMetadata(storyResult, ttl)
     : yield* askErrorReadingStoryResultToMetadata(filesPath.split('.').slice(0, -1).join('.'));
 
   yield* logMetadataData.askUpsert(metadata);
 
   // Send errors to admins
-  if (metadata.error || !logObj.success) {
+  if (metadata.error || !storyResult) {
     yield* askSendLogToAdmins(metadata);
   }
 
-  if (!logObj.success) {
+  if (!storyResult) {
     return;
   }
 
-  const logActionHistories = yield* askGetLogInfosFromStoryResult(logObj.result);
+  const logActionHistories = yield* askGetLogInfosFromStoryResult(storyResult);
   let currentTime: string = yield* askGetEpochStartTime();
   const logLogs = logActionHistories.map((lac, logIndex) => {
     const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
@@ -197,8 +201,8 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
     const logLog: LogLog = {
       type: lac.logLevel,
       reason: lac.msg,
-      fromCorrelation: logObj.result.correlation,
-      module: logObj.result.moduleName,
+      fromCorrelation: storyResult.correlation,
+      module: storyResult.moduleName,
       logIndex,
       timestamp,
     };
@@ -210,7 +214,7 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
 
   yield* askMap(logLogs, askUpsertLogLog);
 
-  yield* askUpdateActionSearchFromStoryResult(logObj.result, ttl);
+  yield* askUpdateActionSearchFromStoryResult(storyResult, ttl);
 }
 
 export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {

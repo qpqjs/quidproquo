@@ -28,6 +28,7 @@ const log = {
 describe('askGetLogActionDetail', () => {
   it('returns the full input/output breakdown for a successful action', () => {
     const result = runStory(askGetLogActionDetail('corr-1', 0), {
+      [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
 
@@ -44,6 +45,7 @@ describe('askGetLogActionDetail', () => {
 
   it('returns the error instead of output for a failed action', () => {
     const result = runStory(askGetLogActionDetail('corr-1', 1), {
+      [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
 
@@ -61,6 +63,7 @@ describe('askGetLogActionDetail', () => {
   it('throws NotFound for an out-of-range index', () => {
     expect(() =>
       runStory(askGetLogActionDetail('corr-1', 99), {
+        [FileActionType.Exists]: true,
         [FileActionType.ReadObjectJson]: log,
       }),
     ).toThrow(StoryError);

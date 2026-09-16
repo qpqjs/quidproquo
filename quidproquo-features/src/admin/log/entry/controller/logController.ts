@@ -3,15 +3,11 @@ import {
   askConfigGetGlobal,
   askFileExists,
   askFileGenerateTemporarySecureUrl,
-  askFileIsColdStorage,
-  askFileReadObjectJson,
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
   QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
-  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
-  StoryResult,
 } from 'quidproquo-core';
 import { askServiceFunctionExecute } from 'quidproquo-webserver';
 import { HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
@@ -21,6 +17,7 @@ import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
 import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
+import { askEnsureRedactedLog, askGetRedactedByCorrelation } from '../data/redactedLogData';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -117,21 +114,23 @@ export function* downloadUrl(
     correlationId: string;
   },
 ) {
-  const isColdStorage = yield* askFileIsColdStorage(QPQ_LOGS_STORAGE_DRIVE_NAME, `${params.correlationId}.json`);
+  const redactedPath = yield* askEnsureRedactedLog(params.correlationId);
 
-  if (!isColdStorage) {
-    const url = yield* askFileGenerateTemporarySecureUrl(QPQ_LOGS_STORAGE_DRIVE_NAME, `${params.correlationId}.json`, 1 * 60 * 1000);
-
-    return toJsonEventResponse({ url, isColdStorage: false });
+  if (!redactedPath) {
+    return toJsonEventResponse({ url: '', isColdStorage: true });
   }
 
-  return toJsonEventResponse({ url: '', isColdStorage: true });
+  const url = yield* askFileGenerateTemporarySecureUrl(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, redactedPath, 1 * 60 * 1000);
+
+  return toJsonEventResponse({ url, isColdStorage: false });
 }
 
 // Replays the log against its service's real code under the execution tracer and
 // returns a signed url to the resulting QpqExecutionTrace json. The trace itself is
 // produced by the OWNING service (routed on the log's moduleName) so the story code
 // loads through that service's own module loader — see trace-replay-plan.md.
+// The replay input is the redacted log, so the stored trace (which records local
+// variables) never carries anything the admin could not already read.
 //
 // ASYNC: tracing re-executes the story and can far outlive an HTTP request, so this
 // never waits for it. Responses are { url } when a stored trace exists, otherwise
@@ -145,7 +144,6 @@ export function* traceLog(
     correlationId: string;
   },
 ) {
-  const logFilePath = `${params.correlationId}.json`;
   const traceFilePath = `${params.correlationId}.trace.json`;
 
   const refresh = event.query.refresh === 'true';
@@ -164,12 +162,7 @@ export function* traceLog(
     return toJsonEventResponse({ pending: true });
   }
 
-  const isColdStorage = yield* askFileIsColdStorage(QPQ_LOGS_STORAGE_DRIVE_NAME, logFilePath);
-  if (isColdStorage) {
-    yield* askThrowError(ErrorTypeEnum.Invalid, 'Log is in cold storage and cannot be traced');
-  }
-
-  const storyResult = yield* askFileReadObjectJson<StoryResult<any>>(QPQ_LOGS_STORAGE_DRIVE_NAME, logFilePath);
+  const storyResult = yield* askGetRedactedByCorrelation(params.correlationId);
   const applicationInfo = yield* askConfigGetApplicationInfo();
 
   const traceLogPayload: QpqTraceLogExecutionPayload = {

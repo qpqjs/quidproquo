@@ -28,6 +28,7 @@ describe('askGetLogActionsForCorrelation', () => {
     };
 
     const result = runStory(askGetLogActionsForCorrelation('corr-1'), {
+      [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
 
@@ -55,6 +56,7 @@ describe('askGetLogActionsForCorrelation', () => {
 
   it('returns an empty list for a log with no actions', () => {
     const result = runStory(askGetLogActionsForCorrelation('corr-empty'), {
+      [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: { correlation: 'corr-empty', history: [] },
     });
 

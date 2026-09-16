@@ -13,8 +13,9 @@ import {
   UserDirectoryActionType,
 } from 'quidproquo-core';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { redactStoryResult } from './redaction/redactStoryResult';
 import {
   askErrorReadingStoryResultToMetadata,
   askGetLogInfosFromStoryResult,
@@ -24,6 +25,10 @@ import {
   getDecodedAccessTokenFromSetAccessTokenActionInStoryResult,
   storyResultToMetadata,
 } from './askUpdateDatabaseFromLogFiles';
+
+vi.mock('./redaction/redactStoryResult', () => ({
+  redactStoryResult: vi.fn((storyResult: unknown) => structuredClone(storyResult)),
+}));
 
 const baseStoryResult = {
   correlation: 'mod::abc',
@@ -145,6 +150,22 @@ describe('askUpdateDatabaseFromLogFile', () => {
 
     expect(upserted.correlation).toBe('mod::abc');
     expect(upserted.error).toBeUndefined();
+  });
+
+  it('indexes only the redacted object', () => {
+    const redacted = { ...baseStoryResult, correlation: 'mod::redacted' };
+    vi.mocked(redactStoryResult).mockReturnValueOnce(redacted);
+    let upserted: any;
+
+    runStory(askUpdateDatabaseFromLogFile('drive', 'mod::abc.json'), {
+      [FileActionType.ReadObjectJson]: baseStoryResult,
+      [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
+        upserted = action.payload.item;
+      },
+    });
+
+    expect(redactStoryResult).toHaveBeenCalledWith(baseStoryResult);
+    expect(upserted.correlation).toBe('mod::redacted');
   });
 
   it('builds error metadata and notifies admins when the file cannot be read', () => {

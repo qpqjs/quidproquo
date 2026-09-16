@@ -1,6 +1,6 @@
 import { AskResponse, askThrowError, ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
-import * as logData from '../../entry/data/logData';
+import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
 
 export type LogAiToolActionDetail = {
   index: number;
@@ -15,7 +15,7 @@ export type LogAiToolActionDetail = {
 // The full breakdown for one action from askGetLogActionsForCorrelation's index —
 // the action's own input payload plus its raw output (result or error).
 export function* askGetLogActionDetail(correlationId: string, index: number): AskResponse<LogAiToolActionDetail> {
-  const log = yield* logData.askGetByCorrelation(correlationId);
+  const log = yield* askGetRedactedByCorrelation(correlationId);
   const entry = log.history[index];
 
   if (!entry) {

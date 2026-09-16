@@ -1,6 +1,6 @@
 import { AskResponse, isErroredActionResult, resolveActionResultError } from 'quidproquo-core';
 
-import * as logData from '../../entry/data/logData';
+import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
 
 export type LogAiToolActionSummary = {
   index: number;
@@ -16,7 +16,7 @@ export type LogAiToolActionSummary = {
 // cheap enough to hand the model in full. Detail (input/output) is a separate lookup
 // via askGetLogActionDetail, so a large log doesn't get pasted whole into every turn.
 export function* askGetLogActionsForCorrelation(correlationId: string): AskResponse<LogAiToolActionSummary[]> {
-  const log = yield* logData.askGetByCorrelation(correlationId);
+  const log = yield* askGetRedactedByCorrelation(correlationId);
 
   return log.history.map((entry, index) => {
     const success = !isErroredActionResult(entry.res);
