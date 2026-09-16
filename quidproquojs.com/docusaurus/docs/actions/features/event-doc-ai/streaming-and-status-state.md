@@ -5,11 +5,11 @@ description: UI state setters for the in-flight assistant stream, the sending fl
 
 # Event Doc AI streaming & status state
 
-These `ask`-generators are **client-side UI state setters** for the Event Doc AI chat feature. They run inside the browser SPA and mutate the in-memory `EventDocAiState` so the chat UI re-renders. This page covers the setters that drive the **live assistant reply** (`streamParts`), the **sending** flag, and the surfaced **error** message.
+These `ask`-generators are **client-side UI state setters** for the Event Doc AI chat feature. They run inside the browser SPA and mutate the in-memory `EventDocAiState` so the chat UI re-renders. This page covers the setters that drive the **live assistant reply** (`streamSegments`), the **sending** flag, and the surfaced **error** message.
 
 Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `quidproquo-core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
 
-`streamParts` is the streaming-only buffer for the reply currently in flight. As `AiStreamPart`s arrive over the socket they're appended one by one; when the reply finishes, the client folds them into a finalized `EventDocAiChatMessage` (appended via [`askUIEventDocAiAppendChatMessage`](./active-chat-state.md)) and clears the buffer.
+`streamSegments` is the reply currently in flight, already in the durable segment format. Each `AiStreamPart` arriving over the socket is folded into the last segment as it lands (`foldStreamPart`): text and reasoning deltas extend the current segment, a `ToolInputStart` adds a tool entry with an empty input, and `ToolCall` / `ToolResult` fill in that entry's input and output. Tool argument deltas are not sent to the browser at all, so a large tool input costs the UI one update at the start and one at the end. `isStreaming` is true from the first part until the stream is cleared, so the UI can show activity before any renderable segment exists. When the reply finishes, the backend dispatches the finalized `EventDocAiChatMessage` (via [`askUIEventDocAiAppendChatMessage`](./active-chat-state.md)) and clears the buffer.
 
 ## State shape
 
@@ -19,7 +19,8 @@ type EventDocAiState = {
   activeChatId: Nullable<string>;
 
   chatMessages: EventDocAiChatMessage[];
-  streamParts: AiStreamPart[];
+  streamSegments: EventDocAiMessageSegment[];
+  isStreaming: boolean;
 
   isLoadingChats: boolean;
   isLoadingHistory: boolean;
@@ -37,7 +38,7 @@ type EventDocAiState = {
 Appends one streaming chunk to the in-flight assistant reply. Called for each part received while a reply streams in.
 
 - **Effect:** `EventDocAiEffect.AppendStreamChunk`
-- **State change:** pushes `part` onto the end of `streamParts`.
+- **State change:** folds `part` into `streamSegments` and sets `isStreaming` to `true`.
 
 ```typescript
 import { askUIEventDocAiAppendStreamChunk } from 'quidproquo-features';
@@ -58,7 +59,7 @@ function* askUIEventDocAiAppendStreamChunk(
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `part` | `AiStreamPart` | A single streaming chunk of the in-flight reply, appended to `streamParts`. |
+| `part` | `AiStreamPart` | A single streaming chunk of the in-flight reply, folded into `streamSegments`. |
 
 ---
 
@@ -67,7 +68,7 @@ function* askUIEventDocAiAppendStreamChunk(
 Clears the in-flight stream buffer — call this once the reply has been finalized into a chat message, or to discard a stream on error/cancel.
 
 - **Effect:** `EventDocAiEffect.ClearStream`
-- **State change:** resets `streamParts` to `[]`. Takes no arguments.
+- **State change:** resets `streamSegments` to `[]` and `isStreaming` to `false`. Takes no arguments.
 
 ```typescript
 import {

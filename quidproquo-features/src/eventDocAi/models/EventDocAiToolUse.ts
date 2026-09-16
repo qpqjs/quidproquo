@@ -4,4 +4,7 @@ export type EventDocAiToolUse = {
   toolName: string;
   input: unknown;
   output?: unknown;
+  // The provider's call id, used to pair streamed argument fragments and the
+  // result with this call. Absent on providers that emit the call whole.
+  toolCallId?: string;
 };

@@ -141,7 +141,14 @@ export function* askEventDocAiStreamTurn(
   });
 
   const assistantParts = yield* askStreamMap(streamHandle, function* askMap(part) {
-    yield* askUIEventDocAiAppendStreamChunk(part);
+    // Tool argument fragments are not forwarded: a large tool input arrives as
+    // hundreds of deltas, and the UI only needs to know a call has started
+    // (ToolInputStart) and what it was (ToolCall). They are still collected so
+    // the saved message folds the same way.
+    if (part.type !== AiStreamPartType.ToolInputDelta) {
+      yield* askUIEventDocAiAppendStreamChunk(part);
+    }
+
     return part;
   });
 
