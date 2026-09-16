@@ -25,7 +25,7 @@ function* askEventDocAiStreamTurn(
   docId: string,
   chatId: string,
   history: EventDocAiChatMessage[],
-  isContinuation: boolean,
+  options: { isContinuation: boolean; lengthResumes: number },
 ): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred>;
 ```
 
@@ -36,12 +36,14 @@ function* askEventDocAiStreamTurn(
 | `docId` | `string` | The trusted document the chat is scoped to (from session context). |
 | `chatId` | `string` | The chat being replied to. |
 | `history` | `EventDocAiChatMessage[]` | The full saved history to prompt with. Must already be persisted; this story only appends the reply. |
-| `isContinuation` | `boolean` | `true` when resuming. Appends a transport-only nudge as the final user message, because Anthropic rejects a conversation ending on an assistant turn when extended thinking is on. Never saved. |
+| `options.isContinuation` | `boolean` | `true` when resuming. Appends a transport-only nudge as the final user message, because Anthropic rejects a conversation ending on an assistant turn when extended thinking is on. Never saved. |
+| `options.lengthResumes` | `number` | How many consecutive resumes the output token cap has already caused. `0` for a new turn; each `length` handoff passes it on incremented, and the turn stops resuming after three. |
 
 ## Returns
 
 - `{ complete: true }` when the model finished its answer.
 - `{ complete: false }` when a client-side tool call is pending (a tool with no executor). The call is saved in the history; the client renders it and the user's answer arrives as the next chat message.
+- `{ complete: false }` also when the turn was cut off by the time budget or output cap but not resumed (an empty reply, or the length-resume limit).
 - `SERVICE_REQUEST_DEFERRED` when the turn was handed to the continuation. The reply will come from that execution on the same websocket correlation.
 
 ## What it does
@@ -52,7 +54,7 @@ function* askEventDocAiStreamTurn(
 4. Streams with the time budget as `maxDurationMs`, dispatching each part to the UI (`askUIEventDocAiAppendStreamChunk`) as it arrives.
 5. Folds the parts into segments. If any were produced, saves the assistant message and dispatches it as the finalized message (`askUIEventDocAiAppendChatMessage`).
 6. Clears the UI's live-stream buffer and touches the chat (bumps `updatedAt`).
-7. Returns `{ complete: false }` on a pending client tool. Otherwise, if the finish reason was `toolCalls` (the budget tripped) and the reply made progress, hands off. Otherwise returns `{ complete: true }`.
+7. Returns `{ complete: false }` on a pending client tool. Otherwise, if the reply made progress and the finish reason was `toolCalls` (the time budget tripped) or `length` (the output token cap tripped, and fewer than three such resumes have happened), hands off. Otherwise returns `{ complete: true }`, or `{ complete: false }` if the turn was cut off and not resumed.
 
 An empty reply that was cut off is not resumed: it would just be cut off again.
 

@@ -26,4 +26,9 @@ export type EventDocAiOptions = {
   // reasoning entirely. Thinking streams to the chat as reasoning segments so
   // the user sees progress instead of a silent wait.
   reasoningBudgetTokens?: number;
+  // Output token cap per model call. Defaults to 65536 (the Claude Sonnet ceiling
+  // on Bedrock; older or smaller models may reject it); the provider default
+  // (8192) is too small for a reasoning block plus a large tool input, and a
+  // call that hits it is cut off mid-JSON.
+  maxOutputTokens?: number;
 };

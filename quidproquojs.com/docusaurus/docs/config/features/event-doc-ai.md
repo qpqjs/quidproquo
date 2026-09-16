@@ -61,6 +61,7 @@ All options are a single `EventDocAiOptions` object.
 | `systemPromptGenerator` | `string` | – | Name of a `defineInlineFunction` invoked on **every** turn to build the system prompt. It receives an `EventDocAiSystemPromptInput` (`{ docId }`, the trusted document id) and returns a string — so the prompt can carry live document state. A non-empty result overrides `systemPrompt`; an empty result falls back to it. |
 | `tools` | `AiToolDefinition[]` | `[]` | Tools the model may call, registered on the AI. Executors are `defineInlineFunction` names supplied by the caller. Tool runtimes inherit the chat's session context, so they read the trusted `docId` from context rather than trusting the model to pass it. |
 | `reasoningBudgetTokens` | `number` | `4096` | Extended-thinking token budget. Pass `0` to disable reasoning entirely. Reasoning streams to the chat as `reasoning` segments so the user sees progress instead of a silent wait. |
+| `maxOutputTokens` | `number` | `65536` | Output token cap per model call, defaulting to the Claude Sonnet ceiling on Bedrock (a model with a lower ceiling rejects the request, so lower it for those). The provider default (8192) is too small for a reasoning block plus a large tool input; a call that hits it is cut off mid-JSON. A turn cut off this way is resumed up to three times before it gives up. |
 
 ## The chat model
 

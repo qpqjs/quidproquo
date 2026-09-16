@@ -107,6 +107,13 @@ export class Function extends QpqConstructBlock {
 
       reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig) ? undefined : props.reservedConcurrentExecutions,
 
+      // Lambda's recursive loop detection drops an async self-invocation after 16
+      // hops. A service function that hands a long AI turn to itself (eventDocAi's
+      // ChatContinue) can legitimately exceed that; qpq's own session depth limit
+      // (100) is the guard against a true runaway. Enable this if a chain ever
+      // needs more than 16 hops.
+      // recursiveLoop: aws_lambda.RecursiveLoop.ALLOW,
+
       tracing: qpqConfigAwsUtils.isTracingDisabled(props.qpqConfig) ? aws_lambda.Tracing.DISABLED : aws_lambda.Tracing.ACTIVE,
 
       logGroup: new aws_logs.LogGroup(this, 'LogGroup', {

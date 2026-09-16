@@ -42,7 +42,7 @@ The parameters are identical to [askAiPrompt](./ask-ai-prompt.md) — see there 
 | --- | --- | --- |
 | `model` | `AiModel` | Which model to prompt. |
 | `prompt` | `string` | The user prompt. Ignored when `options.messages` is set. |
-| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, reasoning?, caching?, maxDurationMs?, maxSteps? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
+| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, reasoning?, caching?, maxDurationMs?, maxSteps?, maxOutputTokens? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
 
 ## Returns
 

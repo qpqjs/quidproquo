@@ -29,5 +29,5 @@ export function* askEventDocAiProcessSend(
 
   yield* askEventDocAiChatHistorySave(docId, chatId, history);
 
-  return yield* askEventDocAiStreamTurn(docId, chatId, history, false);
+  return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: false, lengthResumes: 0 });
 }

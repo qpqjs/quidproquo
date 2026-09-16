@@ -15,6 +15,7 @@ import {
 import { askEventDocResolveScope, EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
 import {
+  EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL,
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
   EVENT_DOC_AI_REASONING_BUDGET_GLOBAL,
@@ -40,6 +41,11 @@ const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant. Use tools when appro
 // this; running out mid-save loses the reply.
 const HANDOFF_HEADROOM_MS = 90_000;
 
+// A step cut off by the output token cap leaves a truncated tool call (saved
+// with its error output). Resuming lets the model retry with a smaller call, but
+// one that keeps overrunning the cap is stopped after this many resumes.
+const MAX_LENGTH_RESUMES = 3;
+
 // Anthropic rejects a conversation ending on an assistant turn when extended
 // thinking is enabled (it reads as a response prefill), and a resumed turn always
 // ends on the just-saved assistant message. Transport-only: never saved.
@@ -47,7 +53,8 @@ const CONTINUATION_NUDGE = 'Continue the task. Your previous tool calls and thei
 
 // The Finish part's reason says how the underlying AI SDK loop ended: `stop`
 // means the model finished its answer; `toolCalls` means a stop condition cut
-// it off while it still wanted to keep acting, so the turn should be resumed.
+// it off while it still wanted to keep acting; `length` means the output token
+// cap cut it off. Both of the latter can be resumed from the saved history.
 const getFinishReason = (parts: AiStreamPart[]): AiStreamFinishReasonEnum | undefined => {
   const finishPart = parts.find((part): part is AiStreamFinish => part.type === AiStreamPartType.Finish);
   return finishPart?.finishReason;
@@ -73,6 +80,13 @@ function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
   return generatedPrompt || configuredPrompt || DEFAULT_SYSTEM_PROMPT;
 }
 
+export type EventDocAiStreamTurnOptions = {
+  // Appends the transport-only nudge so a resumed history ends on a user turn.
+  isContinuation: boolean;
+  // Consecutive resumes caused by the output token cap so far.
+  lengthResumes: number;
+};
+
 /**
  * Streams one model reply for an already-saved history and folds it in. Stream
  * parts are transport-only: each is dispatched to the UI as it arrives, then the
@@ -84,17 +98,18 @@ export function* askEventDocAiStreamTurn(
   docId: string,
   chatId: string,
   history: EventDocAiChatMessage[],
-  isContinuation: boolean,
+  { isContinuation, lengthResumes }: EventDocAiStreamTurnOptions,
 ): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
   const budgetMs = (yield* askGetRuntimeRemainingTime()) - HANDOFF_HEADROOM_MS;
 
   if (budgetMs <= 0) {
-    return yield* askEventDocAiContinueHandoff(chatId);
+    return yield* askEventDocAiContinueHandoff(chatId, lengthResumes);
   }
 
   const aiName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_NAME_GLOBAL);
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
   const reasoningBudgetTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_REASONING_BUDGET_GLOBAL);
+  const maxOutputTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
 
   // Attachments are doc assets — they live on the collection's storage drive
@@ -121,6 +136,7 @@ export function* askEventDocAiStreamTurn(
     messages: aiMessages,
     reasoning: reasoningBudgetTokens ? { budgetTokens: reasoningBudgetTokens } : undefined,
     caching: true,
+    maxOutputTokens,
     maxDurationMs: budgetMs,
   });
 
@@ -157,14 +173,23 @@ export function* askEventDocAiStreamTurn(
     return { complete: false };
   }
 
-  // 'tool-calls' on the final Finish part means the time budget cut the model
-  // off mid-work. Only a reply that made progress is worth resuming; an empty
-  // one would just be cut off again.
-  const stoppedPrematurely = getFinishReason(assistantParts) === AiStreamFinishReasonEnum.toolCalls;
+  const finishReason = getFinishReason(assistantParts);
 
-  if (stoppedPrematurely && segments.length > 0) {
-    return yield* askEventDocAiContinueHandoff(chatId);
+  // 'tool-calls' means the time budget cut the model off mid-work; 'length'
+  // means the output cap did. Only a reply that made progress is worth
+  // resuming; an empty one would just be cut off again.
+  const cutOffByTime = finishReason === AiStreamFinishReasonEnum.toolCalls;
+  const cutOffByLength = finishReason === AiStreamFinishReasonEnum.length;
+
+  if (segments.length > 0) {
+    if (cutOffByTime) {
+      return yield* askEventDocAiContinueHandoff(chatId, 0);
+    }
+
+    if (cutOffByLength && lengthResumes < MAX_LENGTH_RESUMES) {
+      return yield* askEventDocAiContinueHandoff(chatId, lengthResumes + 1);
+    }
   }
 
-  return { complete: !stoppedPrematurely };
+  return { complete: !cutOffByTime && !cutOffByLength };
 }

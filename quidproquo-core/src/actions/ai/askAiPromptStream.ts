@@ -18,6 +18,9 @@ export type AskAiPromptStreamOptions = {
   /** Cap on model/tool steps in one call. Unset means the loop runs until the model stops
    *  (or `maxDurationMs` trips); client-side tools still halt it immediately. */
   maxSteps?: number;
+  /** Output token cap per model call. Unset uses the provider default (8192 on Bedrock), which a
+   *  large tool input plus reasoning can exceed; the step then finishes with `length`. */
+  maxOutputTokens?: number;
 };
 
 export const askAiPromptStream = createActionRequester<StreamHandle<'json', AiStreamPart>>()({
@@ -32,5 +35,6 @@ export const askAiPromptStream = createActionRequester<StreamHandle<'json', AiSt
     caching: options?.caching,
     maxDurationMs: options?.maxDurationMs,
     maxSteps: options?.maxSteps,
+    maxOutputTokens: options?.maxOutputTokens,
   }),
 });

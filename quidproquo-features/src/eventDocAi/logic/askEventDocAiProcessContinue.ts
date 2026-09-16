@@ -10,8 +10,12 @@ import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
  * on the partial assistant reply, so the model picks up from its own recorded
  * tool calls and results.
  */
-export function* askEventDocAiProcessContinue(docId: string, chatId: string): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
+export function* askEventDocAiProcessContinue(
+  docId: string,
+  chatId: string,
+  lengthResumes: number,
+): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
   const history = yield* askEventDocAiChatHistoryLoad(docId, chatId);
 
-  return yield* askEventDocAiStreamTurn(docId, chatId, history, true);
+  return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: true, lengthResumes });
 }

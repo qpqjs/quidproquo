@@ -45,6 +45,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
         tools: prepared.tools,
         providerOptions,
         stopWhen: buildAiStopConditions(payload),
+        maxOutputTokens: payload.maxOutputTokens,
       });
 
       if (payload.caching) {

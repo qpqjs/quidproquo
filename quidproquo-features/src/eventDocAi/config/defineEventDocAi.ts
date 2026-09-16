@@ -18,6 +18,7 @@ import { eventDocAiContinueFunctionName } from '../constants/eventDocAiContinueF
 import {
   EVENT_DOC_AI_CHAT_DRIVE_GLOBAL,
   EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL,
+  EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL,
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
   EVENT_DOC_AI_REASONING_BUDGET_GLOBAL,
@@ -55,6 +56,7 @@ export const defineEventDocAi = ({
   systemPromptGenerator,
   tools = [],
   reasoningBudgetTokens = 4096,
+  maxOutputTokens = 65536,
 }: EventDocAiOptions): QPQConfig => {
   const store = buildEventDocStore({ storeName, type });
   const chatDrive = eventDocAiChatDriveName(storeName);
@@ -71,6 +73,7 @@ export const defineEventDocAi = ({
     [EVENT_DOC_AI_SERVICE_NAME_GLOBAL]: serviceName,
     [EVENT_DOC_AI_NAME_GLOBAL]: aiName,
     [EVENT_DOC_AI_REASONING_BUDGET_GLOBAL]: reasoningBudgetTokens,
+    [EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL]: maxOutputTokens,
     [EVENT_DOC_AI_MODEL_GLOBAL]: model,
     [EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL]: systemPrompt ?? '',
     [EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL]: systemPromptGenerator ?? '',

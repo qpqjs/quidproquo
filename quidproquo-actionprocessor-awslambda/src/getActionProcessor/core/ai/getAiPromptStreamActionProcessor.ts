@@ -55,6 +55,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         tools: prepared.tools,
         providerOptions,
         stopWhen: buildAiStopConditions(payload),
+        maxOutputTokens: payload.maxOutputTokens,
         // streamText swallows errors by default to keep the server alive; surface them to
         // CloudWatch. The same error also reaches the consumer as an Error stream part.
         onError: ({ error }) => {

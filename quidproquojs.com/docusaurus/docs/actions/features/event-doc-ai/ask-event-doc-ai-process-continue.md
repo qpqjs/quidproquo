@@ -20,7 +20,11 @@ export function* askResumeTurn(docId: string, chatId: string) {
 ## Signature
 
 ```typescript
-function* askEventDocAiProcessContinue(docId: string, chatId: string): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred>;
+function* askEventDocAiProcessContinue(
+  docId: string,
+  chatId: string,
+  lengthResumes: number,
+): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred>;
 ```
 
 ## Parameters
@@ -29,6 +33,7 @@ function* askEventDocAiProcessContinue(docId: string, chatId: string): AskRespon
 | --- | --- | --- |
 | `docId` | `string` | The document the chat is scoped to. Trusted: it came from the handing-off execution's context, not from a client. |
 | `chatId` | `string` | The chat to resume. |
+| `lengthResumes` | `number` | Consecutive resumes the output token cap has caused so far, carried on the continuation payload. |
 
 ## Returns
 
