@@ -10,6 +10,8 @@
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
+    "check": "npx tsx ./scripts/watchNpmVersions.ts --once",
+    "watch:npm": "npx tsx ./scripts/watchNpmVersions.ts",
     "patch": "npm version patch --ws --no-workspaces-update && npx tsx ./scripts/applyPatch.ts && npm install",
     "scaffold": "npm run scaffold-test -w create-qpq-app",
     "changelog": "claude -p \"/changes\" --permission-mode acceptEdits --allowedTools \"Bash(git:*)\"",
