@@ -89,8 +89,6 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       // A warmer ping arrives as its own single-record SNS event; any warmer
       // present means this invoke exists only to keep the sandbox warm.
       if (recordsNoWarm.length !== event.Records.length) {
-        console.log('Found SNS warmer');
-
         // TODO: Warm qpq things with dynamic functions
         // federate in dynamic modules
         await dynamicModuleLoaderWarmer();
