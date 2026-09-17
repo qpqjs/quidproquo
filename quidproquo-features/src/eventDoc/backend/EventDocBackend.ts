@@ -15,18 +15,20 @@ import {
 
 /**
  * A doc type's generic verbs bound to its collection: every call establishes the store context itself,
- * so callers never provide it by hand. Built by createEventDocBackend in service code only.
+ * so callers never provide it by hand. Built by createEventDocBackend in service code only. `TState` is the
+ * folded document type, inferred from the definition's `document` view; a backend built from the erased
+ * functions surface reads `unknown`.
  */
-export type EventDocBackend = {
+export type EventDocBackend<TState = unknown> = {
   askGetByIdOrThrow: (id: string) => AskResponse<EventDocSummary>;
   askGetIdByCode: (code: string, ownerUserId?: string) => AskResponse<Nullable<string>>;
   askGetByCodeOrCreate: (code: string, name: string, actor: EventDocEventActor, ownerUserId?: string) => AskResponse<EventDocSummary>;
   askList: (options?: Parameters<typeof askEventDocList>[0]) => AskResponse<EventDocSummary[]>;
   askCreate: (name: string, code: string, actor: EventDocEventActor) => AskResponse<EventDocSummary>;
   askEventListAll: (modelId: string, options?: Parameters<typeof askEventDocEventListAll>[1]) => AskResponse<EventDocEvent[]>;
-  askDocumentStateLatest: (id: string) => AskResponse<Nullable<EventDocDocumentStateAtEvent>>;
-  askDocumentStateAsOfTime: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocDocumentStateAtEvent>>;
-  askPublishedVersionAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocVersionState>>;
+  askDocumentStateLatest: (id: string) => AskResponse<Nullable<EventDocDocumentStateAtEvent<TState>>>;
+  askDocumentStateAsOfTime: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocDocumentStateAtEvent<TState>>>;
+  askPublishedVersionAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocVersionState<TState>>>;
   askAppendServerEvent: <T>(modelId: string, type: string, data: T, version: number, actor: EventDocEventActor) => AskResponse<EventDocEvent>;
   askGenerateAssetUploadUrl: (docId: string, contentType: string, contentDisposition?: string) => AskResponse<EventDocAssetUploadUrl>;
   askGenerateAssetDownloadUrl: (docId: string, assetId: string) => AskResponse<EventDocAssetDownloadUrl>;
