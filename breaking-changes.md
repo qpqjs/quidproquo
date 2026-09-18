@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- Tenant membership roles (`quidproquo-features`) move from a fixed `TenantMembershipRole` (`owner`/`member`) enum to an app-defined role catalog + direct permission grants. `TenantMembershipRole` is removed. `TenantMembership.role` is replaced by `roles: string[]` and a new `grants: TenantPermissionGrant[]` field, plus `rolesUpdatedAt`/`rolesUpdatedByUserId`. `TenantMember.role` becomes `roles: string[]`. `TenantMemberUpdateRequest.role` is removed (role assignment now has its own route); only `disabled` remains. `askTenantLinkMember` takes `roles: string[]` instead of a single `TenantMembershipRole`. `defineTenant` gains an optional `roles: { catalog: TenantRoleCatalog }` option; the built-in `tenantAdmin` role (holding `tenant:members:manage` and `tenant:roles:assign`) replaces the old `owner` role and may not be redefined. Code reading `membership.role`/`member.role` or building a `TenantMemberUpdateRequest` with `role` must migrate to the `roles` array and the new role-assignment route.
+
 ## 0.1.25
 
 - `EventDocAiState` (`quidproquo-features`) replaces `streamParts: AiStreamPart[]` with `streamSegments: EventDocAiMessageSegment[]` and `isStreaming: boolean`; the in-flight reply is now pre-folded rather than a raw part list. Code reading `state.streamParts` directly (e.g. calling `mergeStreamParts` on it) should read `state.streamSegments` instead. `EventDocAiToolUse` gains an optional `toolCallId` field.

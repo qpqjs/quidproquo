@@ -3,12 +3,10 @@ import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';
 import { TenantMembership } from '../models/TenantMembership';
-import { TenantMembershipRole } from '../models/TenantMembershipRole';
 import { TenantMemberUpdateRequest } from '../models/TenantMemberUpdateRequest';
+import { askTenantAssertNotLastAssigner } from './askTenantAssertNotLastAssigner';
 
-// Change a member's per-tenant settings (role, disabled). The caller (an owner) may
-// not demote or disable themself - that could leave the tenant with no one able to
-// manage it. Omitted fields keep their value.
+/** Change a member's per-tenant settings. The caller may not disable themself, and nobody may disable the last assigner. */
 export function* askTenantMemberUpdate(
   tenantId: string,
   callerUserId: string,
@@ -20,14 +18,17 @@ export function* askTenantMemberUpdate(
     return yield* askThrowError(ErrorTypeEnum.NotFound, `User is not a member of the tenant: ${userId}`);
   }
 
-  const role = update.role ?? membership.role;
   const disabled = update.disabled ?? membership.disabled ?? false;
 
-  if (userId === callerUserId && (role !== TenantMembershipRole.owner || disabled)) {
-    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'You cannot demote or disable yourself.');
+  if (disabled && userId === callerUserId) {
+    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'You cannot disable yourself.');
   }
 
-  const updated: TenantMembership = { ...membership, role, disabled };
+  if (disabled && !membership.disabled) {
+    yield* askTenantAssertNotLastAssigner(tenantId, userId);
+  }
+
+  const updated: TenantMembership = { ...membership, disabled };
   yield* askTenantMembershipWrite(updated);
 
   return updated;

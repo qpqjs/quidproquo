@@ -35,7 +35,8 @@ import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
 import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
-import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from './constants/tenantGlobalNames';
+import { TENANT_ADMIN_ROLE } from './constants/tenantAdminRole';
+import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL, TENANT_ROLES_GLOBAL } from './constants/tenantGlobalNames';
 import {
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
@@ -47,7 +48,7 @@ import {
 import { TenantEffect } from './fold/TenantEffect';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
-import { TenantMembershipRole } from './models/TenantMembershipRole';
+import { buildTenantRoleCatalog } from './logic/roles/buildTenantRoleCatalog';
 import { TenantStatus } from './models/TenantStatus';
 import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
 import { addMember } from './routes/controllers/addMember';
@@ -75,7 +76,7 @@ const store = buildEventDocStore({
   scopeResolver: TENANT_SCOPE_RESOLVER_FN,
 });
 
-const globals: Record<string, string> = {
+const globals: Record<string, unknown> = {
   [EVENT_DOC_STORE_NAME_GLOBAL]: store.storeName,
   [EVENT_DOC_EVENTS_STORE_NAME_GLOBAL]: store.eventsStoreName,
   [EVENT_DOC_TYPE_GLOBAL]: store.type,
@@ -83,6 +84,7 @@ const globals: Record<string, string> = {
   [EVENT_DOC_ON_PUBLISH_GLOBAL]: TENANT_ON_PUBLISH_FN,
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: TENANT_SCOPE_RESOLVER_FN,
   [TENANT_HEADER_NAME_GLOBAL]: DEFAULT_TENANT_HEADER_NAME,
+  [TENANT_ROLES_GLOBAL]: buildTenantRoleCatalog(),
 };
 
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
@@ -127,16 +129,19 @@ const buildMocks = () => {
   };
 
   // A membership row.
-  const membershipRow = (tenantId: string, userId: string, role: TenantMembershipRole, extra: Record<string, unknown> = {}) => ({
+  const membershipRow = (tenantId: string, userId: string, roles: string[], extra: Record<string, unknown> = {}) => ({
     tenantId,
     userId,
-    role,
+    roles,
+    grants: [],
     joinedAt: '2026-07-10T00:00:00.000Z',
     addedByUserId: userId,
+    rolesUpdatedAt: '2026-07-10T00:00:00.000Z',
+    rolesUpdatedByUserId: userId,
     ...extra,
   });
-  const seedMembership = (tenantId: string, userId: string, role: TenantMembershipRole, extra: Record<string, unknown> = {}) => {
-    (tables[TENANT_MEMBERSHIPS_STORE] ??= []).push(membershipRow(tenantId, userId, role, extra));
+  const seedMembership = (tenantId: string, userId: string, roles: string[], extra: Record<string, unknown> = {}) => {
+    (tables[TENANT_MEMBERSHIPS_STORE] ??= []).push(membershipRow(tenantId, userId, roles, extra));
   };
 
   const mocks = {
@@ -264,8 +269,8 @@ describe('tenant feature', () => {
     expect(createResponse.status).toBe(200);
     const summary = JSON.parse(createResponse.body!);
 
-    // Create: the caller becomes the first OWNER.
-    const ownerRow = { tenantId: summary.id, userId: 'user-1', role: TenantMembershipRole.owner, addedByUserId: 'user-1' };
+    // Create: the caller becomes the first ADMIN.
+    const ownerRow = { tenantId: summary.id, userId: 'user-1', roles: [TENANT_ADMIN_ROLE], grants: [], addedByUserId: 'user-1' };
     expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining(ownerRow)]);
 
     // The doc + its INIT event land in the CALLER'S OWN partition (no header ->
@@ -372,8 +377,8 @@ describe('tenant feature', () => {
 
     // user-1 is a member of two tenants created elsewhere (no summary in the
     // caller's scope): one published (has a record), one still a draft.
-    seedMembership('tenant-published', 'user-1', TenantMembershipRole.member);
-    seedMembership('tenant-draft', 'user-1', TenantMembershipRole.member);
+    seedMembership('tenant-published', 'user-1', []);
+    seedMembership('tenant-draft', 'user-1', []);
     tables[TENANT_RECORD_STORE] = [
       {
         tenantId: 'tenant-published',
@@ -395,7 +400,7 @@ describe('tenant feature', () => {
 
   it('gates requests on membership of the claimed tenant header', () => {
     const { mocks, seedMembership } = buildMocks();
-    seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+    seedMembership('tenant-a', 'user-1', []);
 
     const resolved = runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' })), mocks);
     expect(resolved).toBe('tenant-a');
@@ -409,7 +414,7 @@ describe('tenant feature', () => {
 
   it('denies get for a tenant the user is not a member of', () => {
     const { mocks, seedMembership } = buildMocks();
-    seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+    seedMembership('tenant-a', 'user-1', []);
 
     expect(() => runStory(get(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
   });
@@ -434,7 +439,7 @@ describe('tenant feature', () => {
       },
     });
 
-    const membersOf = (response: { body?: string }) => JSON.parse(response.body!).items as { userId: string; role: string; disabled: boolean }[];
+    const membersOf = (response: { body?: string }) => JSON.parse(response.body!).items as { userId: string; roles: string[]; disabled: boolean }[];
 
     it('adds an existing user by email as a member, lists, updates, and removes', () => {
       const { mocks: baseMocks, tables } = buildMocks();
@@ -450,11 +455,11 @@ describe('tenant feature', () => {
         userId: 'user-2',
         email: 'sam@example.com',
         name: 'Sam',
-        role: TenantMembershipRole.member,
+        roles: [],
         disabled: false,
       });
 
-      const samRow = { tenantId: summary.id, userId: 'user-2', role: TenantMembershipRole.member, addedByUserId: 'user-1' };
+      const samRow = { tenantId: summary.id, userId: 'user-2', roles: [], grants: [], addedByUserId: 'user-1' };
       expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(expect.objectContaining(samRow));
 
       // Idempotent: re-adding does not duplicate the row.
@@ -463,8 +468,8 @@ describe('tenant feature', () => {
 
       const listResponse = runStory(listMembers(httpEvent(undefined), { id: summary.id }), mocks);
       expect(membersOf(listResponse)).toEqual([
-        expect.objectContaining({ userId: 'user-1', email: 'joe@example.com', name: 'Joe', role: TenantMembershipRole.owner, disabled: false }),
-        expect.objectContaining({ userId: 'user-2', email: 'sam@example.com', name: 'Sam', role: TenantMembershipRole.member, disabled: false }),
+        expect.objectContaining({ userId: 'user-1', email: 'joe@example.com', name: 'Joe', roles: [TENANT_ADMIN_ROLE], disabled: false }),
+        expect.objectContaining({ userId: 'user-2', email: 'sam@example.com', name: 'Sam', roles: [], disabled: false }),
       ]);
 
       // Disable Sam: still listed, but no longer passes the access check.
@@ -475,15 +480,10 @@ describe('tenant feature', () => {
       );
       expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(expect.objectContaining({ userId: 'user-2', disabled: true }));
 
-      // Promote Sam to owner (and re-enable).
-      runStory(updateMember(httpEvent({ role: TenantMembershipRole.owner, disabled: false }), { id: summary.id, userId: 'user-2' }), mocks);
-      expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(
-        expect.objectContaining({ userId: 'user-2', role: TenantMembershipRole.owner, disabled: false }),
-      );
+      // Re-enable Sam.
+      runStory(updateMember(httpEvent({ disabled: false }), { id: summary.id, userId: 'user-2' }), mocks);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(expect.objectContaining({ userId: 'user-2', disabled: false }));
 
-      // An owner is never removed - demote, then remove.
-      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-2' }), mocks)).toThrow(/owner cannot be removed/);
-      runStory(updateMember(httpEvent({ role: TenantMembershipRole.member }), { id: summary.id, userId: 'user-2' }), mocks);
       const removeResponse = runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-2' }), mocks);
       expect(removeResponse.status).toBe(200);
       expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-1' })]);
@@ -493,8 +493,8 @@ describe('tenant feature', () => {
       const { mocks: baseMocks, seedMembership } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
-      seedMembership('tenant-a', 'user-1', TenantMembershipRole.owner);
-      seedMembership('tenant-a', 'user-gone', TenantMembershipRole.member);
+      seedMembership('tenant-a', 'user-1', [TENANT_ADMIN_ROLE]);
+      seedMembership('tenant-a', 'user-gone', []);
 
       const listResponse = runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks);
       expect(membersOf(listResponse)).toEqual([
@@ -503,7 +503,7 @@ describe('tenant feature', () => {
       ]);
     });
 
-    it('rejects an email with no account, and an owner demoting or disabling themself', () => {
+    it('rejects an email with no account, self-disable, and taking out the last assigner', () => {
       const { mocks: baseMocks, tables } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
@@ -512,33 +512,41 @@ describe('tenant feature', () => {
 
       expect(() => runStory(addMember(httpEvent({ email: 'nobody@example.com' }), { id: summary.id }), mocks)).toThrow(/No user account/);
       expect(() => runStory(addMember(httpEvent({}), { id: summary.id }), mocks)).toThrow(/email address is required/);
-      expect(() => runStory(updateMember(httpEvent({ role: 'member' }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/demote or disable yourself/);
-      expect(() => runStory(updateMember(httpEvent({ disabled: true }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/demote or disable yourself/);
-      expect(() => runStory(updateMember(httpEvent({ role: 'boss' }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/Unknown role/);
-      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/owner cannot be removed/);
-      expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-1', role: TenantMembershipRole.owner })]);
+      expect(() => runStory(updateMember(httpEvent({ disabled: true }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/disable yourself/);
+      expect(() => runStory(updateMember(httpEvent({ disabled: 'yes' }), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/must be a boolean/);
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/last member who can assign/);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-1', roles: [TENANT_ADMIN_ROLE] })]);
+
+      // A second admin makes the first removable; disabling the only remaining one is refused.
+      runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: summary.id }), mocks);
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/last member who can assign/);
+      tables[TENANT_MEMBERSHIPS_STORE].find((row) => row.userId === 'user-2')!.roles = [TENANT_ADMIN_ROLE];
+      runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks);
+      expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-2' })]);
     });
 
-    it('lets members list but only enabled owners add, update or remove users', () => {
+    it('lets members list but only enabled members holding MembersManage add, update or remove users', () => {
       const { mocks: baseMocks, tables, seedMembership } = buildMocks();
       const mocks = withDirectoryMocks(baseMocks);
 
-      // user-2 owns tenant-a; the caller (user-1) is merely a member.
-      seedMembership('tenant-a', 'user-2', TenantMembershipRole.owner);
-      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+      // user-2 administers tenant-a; the caller (user-1) is merely a member.
+      seedMembership('tenant-a', 'user-2', [TENANT_ADMIN_ROLE]);
+      seedMembership('tenant-a', 'user-1', []);
 
       expect(membersOf(runStory(listMembers(httpEvent(undefined), { id: 'tenant-a' }), mocks))).toHaveLength(2);
 
       // The regression: a member must not manage (or evict the owner from) a tenant they don't own.
-      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-a' }), mocks)).toThrow(/owner can manage/);
-      expect(() => runStory(updateMember(httpEvent({ role: 'owner' }), { id: 'tenant-a', userId: 'user-1' }), mocks)).toThrow(/owner can manage/);
-      expect(() => runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(/owner can manage/);
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-a' }), mocks)).toThrow(/permission to manage members/);
+      expect(() => runStory(updateMember(httpEvent({ disabled: true }), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(
+        /permission to manage members/,
+      );
+      expect(() => runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(/permission to manage members/);
       expect(tables[TENANT_MEMBERSHIPS_STORE]).toHaveLength(2);
 
-      // A DISABLED owner is no owner (and no member) until re-enabled.
-      seedMembership('tenant-c', 'user-1', TenantMembershipRole.owner, { disabled: true });
+      // A DISABLED admin is no admin (and no member) until re-enabled.
+      seedMembership('tenant-c', 'user-1', [TENANT_ADMIN_ROLE], { disabled: true });
       expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-c' }), mocks)).toThrow(/not a member/);
-      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-c' }), mocks)).toThrow(/owner can manage/);
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-c' }), mocks)).toThrow(/permission to manage members/);
       expect(runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' })), mocks)).toBe('tenant-a');
       expect(() => runStory(askTenantResolveActiveTenant(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-c' })), mocks)).toThrow(
         /not a member/,
@@ -546,7 +554,7 @@ describe('tenant feature', () => {
 
       // Non-members get nothing at all.
       expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
-      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-b' }), mocks)).toThrow(/owner can manage/);
+      expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-b' }), mocks)).toThrow(/permission to manage members/);
     });
   });
 
@@ -578,7 +586,7 @@ describe('tenant feature', () => {
 
     it("presigns the logo blob in the DOC record's home scope, not the reader's", () => {
       const { mocks, tables, seedMembership } = buildMocks();
-      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+      seedMembership('tenant-a', 'user-1', []);
       tables[TENANT_RECORD_STORE] = [logoRecord('PERSONAL#user-2')];
       const { presignMocks, presigns } = withPresignMock(mocks);
 
@@ -593,7 +601,7 @@ describe('tenant feature', () => {
 
     it("falls back to the creator's personal scope for records published before scope was recorded", () => {
       const { mocks, tables, seedMembership } = buildMocks();
-      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+      seedMembership('tenant-a', 'user-1', []);
       tables[TENANT_RECORD_STORE] = [logoRecord(undefined)];
       const { presignMocks, presigns } = withPresignMock(mocks);
 
@@ -604,7 +612,7 @@ describe('tenant feature', () => {
 
     it('denies non-members and 404s a missing logo', () => {
       const { mocks, tables, seedMembership } = buildMocks();
-      seedMembership('tenant-a', 'user-1', TenantMembershipRole.member);
+      seedMembership('tenant-a', 'user-1', []);
       tables[TENANT_RECORD_STORE] = [{ ...logoRecord('PERSONAL#user-2'), logo: undefined }];
 
       expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);

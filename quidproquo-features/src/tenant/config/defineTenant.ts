@@ -1,7 +1,8 @@
-import { defineDynamicFunctions, defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from 'quidproquo-core';
+import { defineDynamicFunctions, defineGlobal, defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from 'quidproquo-core';
 
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
+import { TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
 import {
   TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   TENANT_DOC_TYPE,
@@ -10,6 +11,7 @@ import {
   TENANT_ON_PUBLISH_FN,
   TENANT_SCOPE_RESOLVER_FN,
 } from '../constants/tenantStoreNames';
+import { buildTenantRoleCatalog } from '../logic/roles/buildTenantRoleCatalog';
 import { TenantMembership } from '../models/TenantMembership';
 import { defineTenantRoutes } from '../routes/defineTenantRoutes';
 import { TenantOptions } from '../types/TenantRoutesOptions';
@@ -18,9 +20,9 @@ import { defineTenantStores } from './defineTenantStores';
 // Org/tenant support, declared identically in every service (pass the same
 // `owner` everywhere). What materialises depends on the deploying service:
 //
-// - Everywhere: the scope-resolver + connection-scope-resolver inline functions
-//   (a service tenant-scopes its OTHER collections via the request resolver, and
-//   resolves ws connection scopes via the connection resolver).
+// - Everywhere: the role catalog global, and the scope-resolver + connection-scope-resolver
+//   inline functions (a service tenant-scopes its OTHER collections via the request resolver,
+//   and resolves ws connection scopes via the connection resolver).
 // - Owner deploy only: the registry stores (eventDoc collection + record store +
 //   membership links), the publish -> record sync, the stock eventDoc CRUD for the
 //   tenant collection at {basePath}, and the membership-gated routes at
@@ -35,7 +37,10 @@ import { defineTenantStores } from './defineTenantStores';
 // every other collection - so a tenant doc is only visible/editable from the
 // scope that owns it. The cross-scope registry surface is the membership links
 // table + the materialized record store, both unscoped.
-export const defineTenant = ({ owner, ...routeOptions }: TenantOptions): QPQConfig => [
+export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): QPQConfig => [
+  // The merged catalog, everywhere: permission checks run in every service.
+  defineGlobal(TENANT_ROLES_GLOBAL, buildTenantRoleCatalog(roles?.catalog)),
+
   defineInlineFunction(
     {
       basePath: __dirname,

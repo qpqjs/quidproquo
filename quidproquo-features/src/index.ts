@@ -4,6 +4,7 @@ export * from './eventDocAi';
 export * from './eventDocTransfer';
 export * from './getFeatureEntryQpqFunctionRuntime';
 export * from './openApi';
+export * from './permission';
 export * from './routes';
 export * from './systemUsers';
 export * from './tenant';

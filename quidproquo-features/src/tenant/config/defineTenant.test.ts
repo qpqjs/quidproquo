@@ -5,12 +5,15 @@ import { describe, expect, it } from 'vitest';
 
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
+import { toQpqPermission } from '../../permission/logic/toQpqPermission';
+import { TENANT_ADMIN_ROLE } from '../constants/tenantAdminRole';
+import { TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
 import {
   TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
-  TENANT_SCOPE_RESOLVER_FN,
   TENANT_MEMBERSHIPS_STORE,
+  TENANT_SCOPE_RESOLVER_FN,
 } from '../constants/tenantStoreNames';
 import { defineTenant } from './defineTenant';
 
@@ -19,6 +22,7 @@ const config = defineTenant({
   basePath: '/tenants',
   myTenantsBasePath: '/my-tenants',
   routeAuthSettings: { userDirectoryName: 'users' },
+  roles: { catalog: { approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] } } },
 });
 
 // The owner's settings arrive as arbitrarily nested config arrays (qpq flattens
@@ -39,6 +43,17 @@ const ownerRoutes = (): { method: string; path: string }[] => {
 };
 
 describe('defineTenant', () => {
+  it('publishes the merged role catalog as a global in every service', () => {
+    const rolesGlobal = config.find(
+      (s) =>
+        (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.global &&
+        (s as unknown as { key: string }).key === TENANT_ROLES_GLOBAL,
+    ) as unknown as { value: Record<string, { permissions: string[] }> };
+
+    expect(Object.keys(rolesGlobal.value).sort()).toEqual(['approver', TENANT_ADMIN_ROLE]);
+    expect(rolesGlobal.value[TENANT_ADMIN_ROLE].permissions).toContain('tenant:roles:assign');
+  });
+
   it('always registers the request + connection scope resolver inline functions', () => {
     const inlineFnNames = config
       .filter((s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.inlineFunction)

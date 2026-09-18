@@ -1,18 +1,22 @@
 import { QpqIsoDateTime } from 'quidproquo-core';
 
-import { TenantMembershipRole } from './TenantMembershipRole';
+import { TenantPermissionGrant } from './TenantPermissionGrant';
 
-// THE "this user inside this tenant" record: one row per link, stored identically
-// in both membership stores (see tenantStoreNames). Everything per-user-per-tenant
-// lives here - the role, a disabled switch (keeps the row, blocks access), and
-// how the link came to be.
+/**
+ * THE "this user inside this tenant" record, one row per link. Authority lives here and
+ * nowhere else: roles are catalog codes expanded at read time (never denormalised, so a
+ * catalog change takes effect everywhere at once), grants are the direct exceptions. A
+ * disabled member fails the membership check everywhere but still lists, so an admin can
+ * re-enable.
+ */
 export type TenantMembership = {
   tenantId: string;
   userId: string;
-  role: TenantMembershipRole;
-  // A disabled member fails the membership check everywhere (scope resolver,
-  // websocket scope, the tenant routes) but still lists, so an owner can re-enable.
+  roles: string[];
+  grants: TenantPermissionGrant[];
   disabled?: boolean;
   joinedAt: QpqIsoDateTime;
   addedByUserId: string;
+  rolesUpdatedAt: QpqIsoDateTime;
+  rolesUpdatedByUserId: string;
 };

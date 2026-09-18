@@ -67,6 +67,7 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 | `routeAuthSettings` | `RouteAuthSettings` | – (required) | Auth applied to every mounted route (see [route](../webserver/route.md)). Required here, unlike the generic event-doc routes: tenant routes are meaningless unauthenticated, since membership keys off the user. Only used on the owner's deploy. |
 | `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. Only used on the owner's deploy. |
 | `tenantHeaderName` | `string` | `'x-qpq-tenant-id'` | The header the client sends its selected tenant id on. Exposed to the tenant routes as the `tenantHeaderName` global, which the scope resolver reads. |
+| `roles` | `{ catalog: TenantRoleCatalog }` | just `tenantAdmin` | The app's role catalog: role code to `{ code, name, permissions }`. Merged with the built-in `tenantAdmin` role and published as the `tenantRoles` global in every service. The reserved code `tenantAdmin` may not be redefined. |
 
 ## Notes
 
@@ -76,7 +77,7 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 - `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option (or use [defineTenantedEventDoc](./tenanted-event-doc.md), which does this for you).
 - The scope resolver always resolves to a typed scope — a membership-checked `TENANT#<id>` for a request that names a tenant, or the caller's own `PERSONAL#<userId>` when it doesn't. A tenant-scoped collection or connection is never left unscoped.
 - Every service — owner and non-owner alike — calls `defineTenant` with the same `owner`. There is no separate call for non-owning services anymore: the gating happens internally via [defineServiceSettings](../core/service-settings.md).
-- Membership rows carry a `TenantMembershipRole` (`owner` or `member`, see [defineTenantStores](./tenant-stores.md)): the tenant's creator starts as `owner`. Owners manage membership (add/remove/update role or disabled); members merely belong. A single `tenantMemberships` table (keyed `userId`+`tenantId`, with a `tenantId`/`userId` GSI) serves both the access check and a tenant's member list, so there is no separate index to keep in lock-step.
+- Membership rows carry the member's `roles` (catalog codes) and direct `grants` (see [defineTenantStores](./tenant-stores.md)): the tenant's creator starts with the built-in `tenantAdmin` role, which holds `tenant:members:manage` (add, remove, disable members), `tenant:roles:assign` (set roles) and the tenant collection's own `eventDoc:tenants:*` keys. A member with no roles can list members and read the published record, and nothing else. The last member who can assign roles can never be removed or disabled. A single `tenantMemberships` table (keyed `userId`+`tenantId`, with a `tenantId`/`userId` GSI) serves the access check, the permission check and a tenant's member list.
 
 ## Related
 
