@@ -3,7 +3,7 @@ import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
-export function* askValidateModelOrThrowError<T extends z.AnyZodObject>(model: z.infer<T>, schema: T): AskResponse<z.infer<T>> {
+export function* askValidateModelOrThrowError<T extends z.ZodTypeAny>(model: z.infer<T>, schema: T): AskResponse<z.infer<T>> {
   // validate model
   const validation = schema.safeParse(model);
 
