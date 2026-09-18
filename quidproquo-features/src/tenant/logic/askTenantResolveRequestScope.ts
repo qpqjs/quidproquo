@@ -1,26 +1,10 @@
-import { askCatch, askConfigGetGlobal, AskResponse, askThrowError, askUserDirectoryReadAccessToken, ErrorTypeEnum } from 'quidproquo-core';
+import { askCatch, askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { askEventDocResolveUserId } from '../../eventDoc/globals/askEventDocResolveUserId';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../constants/tenantGlobalNames';
+import { askTenantResolveUserId } from './askTenantResolveUserId';
 import { askTenantValidateMembership } from './askTenantValidateMembership';
 import { composePersonalScope, composeTenantScope } from './storageScope';
-
-// eventDoc-bridged routes resolve the user off the store's user-directory
-// global; custom routes have no such global and pass their directory in.
-function* askResolveUserId(userDirectoryName?: string): AskResponse<string> {
-  if (!userDirectoryName) {
-    return yield* askEventDocResolveUserId();
-  }
-
-  const token = yield* askUserDirectoryReadAccessToken(userDirectoryName, false);
-
-  if (!token?.userId) {
-    return yield* askThrowError(ErrorTypeEnum.Unauthorized, 'User not authenticated');
-  }
-
-  return token.userId;
-}
 
 // The request-time scope gate: a tenant-aware request ALWAYS resolves to a
 // typed storage scope - TENANT#<id> when the header names a tenant, otherwise
@@ -38,7 +22,7 @@ export function* askTenantResolveRequestScope(event: HTTPEvent, userDirectoryNam
   const configuredHeaderName = yield* askCatch(askConfigGetGlobal<string>(TENANT_HEADER_NAME_GLOBAL));
   const headerName = (configuredHeaderName.success && configuredHeaderName.result) || DEFAULT_TENANT_HEADER_NAME;
 
-  const userId = yield* askResolveUserId(userDirectoryName);
+  const userId = yield* askTenantResolveUserId(userDirectoryName);
 
   const tenantId = qpqWebServerUtils.getHeaderValue(headerName, event.headers);
   if (!tenantId) {

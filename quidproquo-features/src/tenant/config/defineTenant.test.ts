@@ -149,10 +149,13 @@ describe('defineTenant', () => {
         'POST /v1/my-tenants',
         'GET /v1/my-tenants/{id}',
         'GET /v1/my-tenants/{id}/logo',
+        'GET /v1/my-tenants/{id}/membership',
+        'GET /v1/my-tenants/{id}/roles',
         'GET /v1/my-tenants/{id}/members',
         'POST /v1/my-tenants/{id}/members',
         'PATCH /v1/my-tenants/{id}/members/{userId}',
         'DELETE /v1/my-tenants/{id}/members/{userId}',
+        'PUT /v1/my-tenants/{id}/members/{userId}/roles',
       ]),
     );
   });

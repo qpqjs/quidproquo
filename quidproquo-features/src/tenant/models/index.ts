@@ -1,7 +1,9 @@
 export * from './TenantBrandColors';
+export * from './TenantCallerMembership';
 export * from './TenantDocument';
 export * from './TenantMember';
 export * from './TenantMemberAddRequest';
+export * from './TenantMemberRolesSetRequest';
 export * from './TenantMembership';
 export * from './TenantMemberUpdateRequest';
 export * from './TenantPermissionGrant';
@@ -10,6 +12,7 @@ export * from './TenantPermissionSelector';
 export * from './TenantRecord';
 export * from './TenantRoleCatalog';
 export * from './TenantRoleDefinition';
+export * from './TenantRoleOption';
 export * from './TenantRoutePermission';
 export * from './TenantSetBrandData';
 export * from './TenantStatus';

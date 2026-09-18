@@ -35,6 +35,7 @@ import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
 import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
+import { toQpqPermission } from '../permission/logic/toQpqPermission';
 import { TENANT_ADMIN_ROLE } from './constants/tenantAdminRole';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL, TENANT_ROLES_GLOBAL } from './constants/tenantGlobalNames';
 import {
@@ -55,9 +56,12 @@ import { addMember } from './routes/controllers/addMember';
 import { create } from './routes/controllers/create';
 import { get } from './routes/controllers/get';
 import { getLogo } from './routes/controllers/getLogo';
+import { getMembership } from './routes/controllers/getMembership';
 import { list } from './routes/controllers/list';
 import { listMembers } from './routes/controllers/listMembers';
+import { listRoles } from './routes/controllers/listRoles';
 import { removeMember } from './routes/controllers/removeMember';
+import { setMemberRoles } from './routes/controllers/setMemberRoles';
 import { updateMember } from './routes/controllers/updateMember';
 
 let sortableGuidCount = 0;
@@ -84,7 +88,9 @@ const globals: Record<string, unknown> = {
   [EVENT_DOC_ON_PUBLISH_GLOBAL]: TENANT_ON_PUBLISH_FN,
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: TENANT_SCOPE_RESOLVER_FN,
   [TENANT_HEADER_NAME_GLOBAL]: DEFAULT_TENANT_HEADER_NAME,
-  [TENANT_ROLES_GLOBAL]: buildTenantRoleCatalog(),
+  [TENANT_ROLES_GLOBAL]: buildTenantRoleCatalog({
+    approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] },
+  }),
 };
 
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
@@ -555,6 +561,101 @@ describe('tenant feature', () => {
       // Non-members get nothing at all.
       expect(() => runStory(listMembers(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
       expect(() => runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: 'tenant-b' }), mocks)).toThrow(/permission to manage members/);
+    });
+
+    describe('roles', () => {
+      const rolesEvent = (roles: string[], grants: unknown[] = []) => httpEvent({ roles, grants });
+
+      it('assigners set roles and grants; the caller reads back the permissions they expand to', () => {
+        const { mocks: baseMocks, tables } = buildMocks();
+        const mocks = withDirectoryMocks(baseMocks);
+
+        const summary = JSON.parse(runStory(create(httpEvent({ name: 'credit-corp' })), mocks).body!);
+        runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: summary.id }), mocks);
+
+        const grant = { permission: 'case:approve', selector: { kind: 'ids', ids: ['case-1'] } };
+        const setResponse = runStory(setMemberRoles(rolesEvent(['approver'], [grant]), { id: summary.id, userId: 'user-2' }), mocks);
+        expect(setResponse.status).toBe(200);
+        expect(tables[TENANT_MEMBERSHIPS_STORE]).toContainEqual(
+          expect.objectContaining({ userId: 'user-2', roles: ['approver'], grants: [grant], rolesUpdatedByUserId: 'user-1' }),
+        );
+
+        // The caller's own membership carries the expanded permission list.
+        const mine = JSON.parse(runStory(getMembership(httpEvent(undefined), { id: summary.id }), mocks).body!);
+        expect(mine.roles).toEqual([TENANT_ADMIN_ROLE]);
+        expect(mine.permissions).toEqual(expect.arrayContaining(['tenant:members:manage', 'tenant:roles:assign', 'eventDoc:tenants:write']));
+        expect(mine.permissions).not.toContain('case:approve');
+
+        // The catalog as a pick list.
+        const options = JSON.parse(runStory(listRoles(httpEvent(undefined), { id: summary.id }), mocks).body!);
+        expect(options).toEqual(
+          expect.arrayContaining([
+            { code: 'approver', name: 'Approver' },
+            { code: TENANT_ADMIN_ROLE, name: 'Tenant admin' },
+          ]),
+        );
+      });
+
+      it('rejects unknown roles, malformed grants, and non-assigners', () => {
+        const { mocks: baseMocks, seedMembership } = buildMocks();
+        const mocks = withDirectoryMocks(baseMocks);
+
+        seedMembership('tenant-a', 'user-1', [TENANT_ADMIN_ROLE]);
+        seedMembership('tenant-a', 'user-2', []);
+
+        expect(() => runStory(setMemberRoles(rolesEvent(['boss']), { id: 'tenant-a', userId: 'user-2' }), mocks)).toThrow(/Unknown role/);
+        expect(() =>
+          runStory(
+            setMemberRoles(rolesEvent([], [{ permission: 'approve', selector: { kind: 'all' } }]), { id: 'tenant-a', userId: 'user-2' }),
+            mocks,
+          ),
+        ).toThrow(/permission key/);
+        expect(() =>
+          runStory(
+            setMemberRoles(rolesEvent([], [{ permission: 'case:approve', selector: { kind: 'some' } }]), { id: 'tenant-a', userId: 'user-2' }),
+            mocks,
+          ),
+        ).toThrow();
+        expect(() => runStory(setMemberRoles(rolesEvent(['approver']), { id: 'tenant-a', userId: 'user-9' }), mocks)).toThrow(/not a member/);
+
+        // user-2 holds nothing, so cannot assign.
+        seedMembership('tenant-b', 'user-2', [TENANT_ADMIN_ROLE]);
+        seedMembership('tenant-b', 'user-1', []);
+        expect(() => runStory(setMemberRoles(rolesEvent(['approver']), { id: 'tenant-b', userId: 'user-2' }), mocks)).toThrow(
+          /permission to assign roles/,
+        );
+      });
+
+      it('never strips the last assigner, and lets a member leave', () => {
+        const { mocks: baseMocks, tables, seedMembership } = buildMocks();
+        const mocks = withDirectoryMocks(baseMocks);
+
+        seedMembership('tenant-a', 'user-1', [TENANT_ADMIN_ROLE]);
+        seedMembership('tenant-a', 'user-2', []);
+
+        expect(() => runStory(setMemberRoles(rolesEvent(['approver']), { id: 'tenant-a', userId: 'user-1' }), mocks)).toThrow(
+          /last member who can assign/,
+        );
+
+        // Hand admin to user-2, then user-1 may step down and leave.
+        runStory(setMemberRoles(rolesEvent([TENANT_ADMIN_ROLE]), { id: 'tenant-a', userId: 'user-2' }), mocks);
+        runStory(setMemberRoles(rolesEvent([]), { id: 'tenant-a', userId: 'user-1' }), mocks);
+        runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-1' }), mocks);
+        expect(tables[TENANT_MEMBERSHIPS_STORE].filter((row) => row.tenantId === 'tenant-a')).toEqual([
+          expect.objectContaining({ userId: 'user-2' }),
+        ]);
+
+        // A plain member may leave without any permission, but cannot remove anyone else.
+        seedMembership('tenant-c', 'user-2', [TENANT_ADMIN_ROLE]);
+        seedMembership('tenant-c', 'user-1', []);
+        expect(() => runStory(removeMember(httpEvent(undefined), { id: 'tenant-c', userId: 'user-2' }), mocks)).toThrow(
+          /permission to manage members/,
+        );
+        runStory(removeMember(httpEvent(undefined), { id: 'tenant-c', userId: 'user-1' }), mocks);
+        expect(tables[TENANT_MEMBERSHIPS_STORE].filter((row) => row.tenantId === 'tenant-c')).toEqual([
+          expect.objectContaining({ userId: 'user-2' }),
+        ]);
+      });
     });
   });
 
