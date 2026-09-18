@@ -1,6 +1,8 @@
 import { CrossModuleOwner } from 'quidproquo-core';
 import { RouteAuthSettings } from 'quidproquo-webserver';
 
+import { TenantRolesOptions } from './TenantRolesOptions';
+
 export type TenantRoutesOptions = {
   // The tenant collection root: the stock eventDoc CRUD mounts here, named after
   // the model type ('tenant' -> '/tenants') like every other collection.
@@ -28,4 +30,6 @@ export type TenantOptions = TenantRoutesOptions & {
   // owner, and let the deploy decide what materialises. `module` is required -
   // it names the owning service the registry is gated to.
   owner: CrossModuleOwner & { module: string };
+  // The app's roles. Omitted means the catalog is just the built-in tenantAdmin.
+  roles?: TenantRolesOptions;
 };

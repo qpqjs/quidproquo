@@ -1,4 +1,6 @@
 export * from './EventDocCollectionOptions';
+export * from './EventDocPermissionAction';
+export * from './EventDocPermissions';
 export * from './EventDocRouteName';
 export * from './EventDocRoutesOptions';
 export * from './EventDocStore';

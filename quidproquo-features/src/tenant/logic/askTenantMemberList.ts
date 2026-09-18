@@ -22,7 +22,7 @@ export function* askTenantMemberList(
       userId: membership.userId,
       email: success ? (result.email ?? null) : null,
       name: success ? (result.name ?? null) : null,
-      role: membership.role,
+      roles: membership.roles,
       disabled: membership.disabled ?? false,
       joinedAt: membership.joinedAt,
     };

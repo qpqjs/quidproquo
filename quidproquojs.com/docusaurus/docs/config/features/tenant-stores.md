@@ -64,19 +64,22 @@ The membership store holds `TenantMembership` rows, one per `(user, tenant)` lin
 type TenantMembership = {
   tenantId: string;
   userId: string;
-  role: TenantMembershipRole;
+  roles: string[];
+  grants: TenantPermissionGrant[];
   disabled?: boolean;
   joinedAt: QpqIsoDateTime;
   addedByUserId: string;
+  rolesUpdatedAt: QpqIsoDateTime;
+  rolesUpdatedByUserId: string;
 };
 ```
 
-`role` is `TenantMembershipRole.owner` or `TenantMembershipRole.member` — see [defineTenant](./tenant.md#routes-mounted) for who can change it. A `disabled` member fails the membership check everywhere (scope resolver, WebSocket scope, tenant routes) but still appears in the member list, so an owner can re-enable them.
+`roles` are codes from the catalog passed to [defineTenant](./tenant.md) (`roles.catalog`), expanded to permissions at read time, so a catalog change takes effect on every row at once and a retired code grants nothing. `grants` are direct `{ permission, selector }` entries; a selector is `{ kind: 'all' }`, `{ kind: 'ids', ids }` or `{ kind: 'resourceKinds', kinds }`, and is the only way a permission is narrowed to specific resources. A `disabled` member fails the membership check everywhere (scope resolver, WebSocket scope, tenant routes) and holds no permissions, but still appears in the member list so an admin can re-enable them.
 
 ## Notes
 
 - The tenant event-doc collection is the source of truth; the `tenantRecords` table is a read model. The sync between them is the `askTenantOnPublish` inline function, which [defineTenant](./tenant.md) registers and wires into the collection's `onPublish` hook.
-- Creating a tenant writes a `TenantMembership` row with `role: owner` for the caller, so the creator becomes the tenant's first member. The same table serves both the access check (`userId`+`tenantId` keyed get) and, via its `tenantId`/`userId` GSI, a tenant's member list — there is no separate reverse index to keep in lock-step.
+- Creating a tenant writes a `TenantMembership` row with `roles: ['tenantAdmin']` for the caller, so the creator becomes the tenant's first member and its first admin. The same table serves both the access check (`userId`+`tenantId` keyed get) and, via its `tenantId`/`userId` GSI, a tenant's member list — there is no separate reverse index to keep in lock-step.
 - Services that do **not** own these stores still call [defineTenant](./tenant.md) (with the same `owner`) to get the scope resolver and a cross-module reference to the membership table — they never call `defineTenantStores` themselves.
 
 ## Related

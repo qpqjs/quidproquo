@@ -5,20 +5,16 @@ import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../../eventDoc/constants/eve
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
 import { askEventDocParseBody } from '../../../eventDoc/routes/askEventDocParseBody';
 import { askTenantMemberAdd } from '../../logic/askTenantMemberAdd';
-import { askTenantValidateOwner } from '../../logic/askTenantValidateOwner';
 import { TenantMemberAddRequest } from '../../models/TenantMemberAddRequest';
+import { askTenantAssertCallerMayManageMembers } from '../askTenantAssertCallerMayManageMembers';
 
 /**
- * POST {basePath}/{id}/members: add an existing user (body `{ email }`) to the tenant as a
- * member, OWNERS only. NotFound when no account has that email - there is no invite flow.
+ * POST {basePath}/{id}/members: add an existing user (body `{ email }`) to the tenant with no
+ * roles. Needs MembersManage. NotFound when no account has that email - there is no invite flow.
  */
 export function* addMember(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   const userId = yield* askEventDocResolveUserId();
-
-  const isOwner = yield* askTenantValidateOwner(userId, params.id);
-  if (!isOwner) {
-    return yield* askThrowError(ErrorTypeEnum.Forbidden, 'Only a tenant owner can manage its users.');
-  }
+  yield* askTenantAssertCallerMayManageMembers(params.id, userId);
 
   const { email } = yield* askEventDocParseBody<TenantMemberAddRequest>(event);
   if (typeof email !== 'string') {
