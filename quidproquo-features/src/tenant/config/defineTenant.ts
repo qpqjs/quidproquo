@@ -6,6 +6,7 @@ import { TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
 import {
   TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   TENANT_DOC_TYPE,
+  TENANT_EVENT_DOC_AUTHORISER_FN,
   TENANT_EVENTDOC_STORE,
   TENANT_MEMBERSHIPS_STORE,
   TENANT_ON_PUBLISH_FN,
@@ -20,8 +21,8 @@ import { defineTenantStores } from './defineTenantStores';
 // Org/tenant support, declared identically in every service (pass the same
 // `owner` everywhere). What materialises depends on the deploying service:
 //
-// - Everywhere: the role catalog global, and the scope-resolver + connection-scope-resolver
-//   inline functions (a service tenant-scopes its OTHER collections via the request resolver,
+// - Everywhere: the role catalog global, and the scope-resolver, connection-scope-resolver
+//   and eventDoc-authoriser inline functions (a service tenant-scopes its OTHER collections via the request resolver,
 //   and resolves ws connection scopes via the connection resolver).
 // - Owner deploy only: the registry stores (eventDoc collection + record store +
 //   membership links), the publish -> record sync, the stock eventDoc CRUD for the
@@ -56,6 +57,14 @@ export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): 
       functionName: 'askTenantConnectionScopeResolver',
     },
     { functionName: TENANT_CONNECTION_SCOPE_RESOLVER_FN },
+  ),
+  defineInlineFunction(
+    {
+      basePath: __dirname,
+      relativePath: '../logic/askTenantEventDocAuthoriser',
+      functionName: 'askTenantEventDocAuthoriser',
+    },
+    { functionName: TENANT_EVENT_DOC_AUTHORISER_FN },
   ),
 
   // The membership table (pk userId, sk tenantId, GSI tenantId/userId for the member
@@ -96,6 +105,7 @@ export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): 
         version: routeOptions.version,
         onPublish: TENANT_ON_PUBLISH_FN,
         scopeResolver: TENANT_SCOPE_RESOLVER_FN,
+        authorise: TENANT_EVENT_DOC_AUTHORISER_FN,
         // Creating a tenant must also link the creator as its first member, or the
         // doc is unreachable: nothing but the membership table can find it again.
         // POST {myTenantsBasePath} owns that; the stock create would bypass it.

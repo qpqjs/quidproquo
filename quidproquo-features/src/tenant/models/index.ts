@@ -10,6 +10,7 @@ export * from './TenantPermissionGrant';
 export * from './TenantPermissionRequirement';
 export * from './TenantPermissionSelector';
 export * from './TenantRecord';
+export * from './TenantResolvedRequest';
 export * from './TenantRoleCatalog';
 export * from './TenantRoleDefinition';
 export * from './TenantRoleOption';

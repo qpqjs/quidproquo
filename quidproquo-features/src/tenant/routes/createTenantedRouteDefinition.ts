@@ -1,31 +1,57 @@
-import { AskResponse, HTTPMethod } from 'quidproquo-core';
+import { AskResponse, askStorageScopeProvide, HTTPMethod } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
 
 import {
   createRouteDefinition,
-  DynamicRouteConfig,
   DynamicRouteHandler,
   DynamicRouteInput,
   DynamicRouteKnownErrors,
   DynamicRouteRuntime,
   ExtractRouteParams,
-  RouteDefinition,
 } from '../../routes';
-import { askTenantProvideRequestScope } from '../logic';
+import { askTenantAssertRoutePermission } from '../logic/askTenantAssertRoutePermission';
+import { askTenantResolveRequest } from '../logic/askTenantResolveRequest';
+import { TenantRoutePermission } from '../models/TenantRoutePermission';
+import { TenantedRouteConfig } from '../types/TenantedRouteConfig';
 
-// Like createRouteDefinition, but every handler runs inside the request's typed
-// storage scope. The userDirectoryName is used twice: the gateway authenticates
-// the JWT against it (routeAuthSettings), and askTenantProvideRequestScope
-// resolves the tenant header against it (membership-checked, Forbidden on no
-// access) then runs the handler under that scope. No header = the caller's own
-// personal scope - handlers NEVER run unscoped, so one user's personal data is
-// never visible to another. Handlers no longer wrap themselves with
-// askTenantProvideRequestScope.
+/** A RouteDefinition whose config may name the permission the route requires. */
+export type TenantedRouteDefinition = <S extends string, TBody = undefined, TQuery = undefined>(
+  settings: [HTTPMethod, S] | [HTTPMethod, S, number],
+  runtime: DynamicRouteRuntime<S, TBody, TQuery>,
+  config?: TenantedRouteConfig<TBody, TQuery>,
+) => DynamicRouteHandler<S>;
+
+// Gate, then permission, then scope, then handler. The permission is judged against the row the
+// gate read, so a declared permission costs no second store read.
+function* askTenantedRun<T>(
+  event: HTTPEvent,
+  userDirectoryName: string,
+  params: Record<string, string>,
+  permission: TenantRoutePermission | undefined,
+  story: AskResponse<T>,
+): AskResponse<T> {
+  const request = yield* askTenantResolveRequest(event, userDirectoryName);
+
+  if (permission !== undefined) {
+    yield* askTenantAssertRoutePermission(permission, params, request);
+  }
+
+  return yield* askStorageScopeProvide(request.scope, story);
+}
+
+/**
+ * Like createRouteDefinition, but every handler runs inside the request's typed storage scope,
+ * after the membership gate and the route's declared `permission` (if any). The gateway
+ * authenticates the JWT against userDirectoryName (routeAuthSettings), and the tenant header
+ * is membership-checked against it. No header = the caller's own personal scope; handlers
+ * NEVER run unscoped. A route with a `permission` refuses a personal-scope request unless the
+ * declaration sets `allowPersonalScope`.
+ */
 export const createTenantedRouteDefinition = (
   userDirectoryName: string,
   options: RouteOptions = {},
   commonKnownErrors: DynamicRouteKnownErrors = {},
-): RouteDefinition => {
+): TenantedRouteDefinition => {
   const tenantedOptions: RouteOptions = {
     ...options,
     routeAuthSettings: {
@@ -39,15 +65,16 @@ export const createTenantedRouteDefinition = (
   return <S extends string, TBody = undefined, TQuery = undefined>(
     settings: [HTTPMethod, S] | [HTTPMethod, S, number],
     runtime: DynamicRouteRuntime<S, TBody, TQuery>,
-    config?: DynamicRouteConfig<TBody, TQuery>,
+    config: TenantedRouteConfig<TBody, TQuery> = {},
   ): DynamicRouteHandler<S> => {
-    // Scope the whole handler to the request's tenant (and gate membership) before it runs.
+    const { permission, ...routeConfig } = config;
+
     const scopedRuntime = (
       event: HTTPEvent,
       params: ExtractRouteParams<S>,
       input: DynamicRouteInput<TBody, TQuery>,
-    ): AskResponse<HTTPEventResponse> => askTenantProvideRequestScope(event, userDirectoryName, runtime(event, params, input));
+    ): AskResponse<HTTPEventResponse> => askTenantedRun(event, userDirectoryName, params, permission, runtime(event, params, input));
 
-    return routeDefinition<S, TBody, TQuery>(settings, scopedRuntime, config);
+    return routeDefinition<S, TBody, TQuery>(settings, scopedRuntime, routeConfig);
   };
 };

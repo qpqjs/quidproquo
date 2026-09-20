@@ -44,13 +44,33 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`) an
 | `GET` | `{myTenantsBasePath}/{id}/logo` | A presigned, short-lived URL for the tenant's logo blob. Members only: non-members get `Forbidden`; a missing record or a tenant with no logo gets `NotFound`. Presigned in the scope the tenant doc was published under (recorded on the `TenantRecord`), not the reader's own scope, since the logo asset lives in the doc's home partition. |
 | `GET` | `{myTenantsBasePath}/{id}/membership` | The caller's own membership row as a `TenantCallerMembership` (the row plus the full list of permission keys it expands to, for a UI to build its nav from). Enabled members only: a missing or disabled membership gets `Forbidden`. |
 | `GET` | `{myTenantsBasePath}/{id}/roles` | The tenant's role catalog as `TenantRoleOption[]` (`{ code, name }`), for a role picker. Members only: non-members get `Forbidden`. |
-| `GET` | `{myTenantsBasePath}/{id}/members` | A page of the tenant's members as `TenantMember[]` (`userId`, `email`, `name`, `role`, `disabled`, hydrated from the user directory). Members only: non-members get `Forbidden`. Query `limit` and `nextPageKey` page through. |
+| `GET` | `{myTenantsBasePath}/{id}/members` | A page of the tenant's members as `TenantMember[]` (`userId`, `email`, `name`, `roles`, `disabled`, hydrated from the user directory). Members only: non-members get `Forbidden`. Query `limit` and `nextPageKey` page through. |
 | `POST` | `{myTenantsBasePath}/{id}/members` | Add an existing user directory account to the tenant with no roles (body `{ email }`). Needs `tenant:members:manage`: without it, `Forbidden`. No invite flow — an email with no matching account gets `NotFound`. Idempotent: re-adding a member is a no-op that still returns the `TenantMember`. |
 | `PATCH` | `{myTenantsBasePath}/{id}/members/{userId}` | Change a member's `disabled` flag (body `{ disabled? }`). Needs `tenant:members:manage`: without it, `Forbidden`; an unknown `userId` gets `NotFound`. A caller can never disable themself, and nobody may disable the last member who can assign roles: `BadRequest`. |
 | `PUT` | `{myTenantsBasePath}/{id}/members/{userId}/roles` | Replace a member's `roles` (catalog codes) and `grants` (direct permission grants) wholesale (body `{ roles, grants }`). Needs `tenant:roles:assign`: without it, `Forbidden`; an unknown role code or a change that would leave nobody able to assign roles gets `BadRequest`; an unknown `userId` gets `NotFound`. |
 | `DELETE` | `{myTenantsBasePath}/{id}/members/{userId}` | Remove a member from the tenant. Needs `tenant:members:manage`, except that a caller may always remove themself (leave). Either way, the last member who can assign roles is never removed. |
 
-On top of these, the stock event-doc route set (get, append, list events, assets, remove, and so on — everything but `create`) is mounted at `{basePath}`, named after the model type like any other collection; see [defineEventDocRoutes](./event-doc-routes.md#routes-mounted) for the list. `{basePath}` and `{myTenantsBasePath}` must be distinct and neither may be a path segment under the other: `{basePath}/{id}` matches any single segment, so a literal sibling path would be ambiguous with a tenant whose id happens to match it.
+On top of these, the stock event-doc route set (get, append, list events, assets, remove, and so on — everything but `create`) is mounted at `{basePath}`, named after the model type like any other collection; see [defineEventDocRoutes](./event-doc-routes.md#routes-mounted) for the list. Inside a tenant those routes require `eventDoc:tenants:<action>`, which the built-in `tenantAdmin` role holds, so editing branding is an admin act. `{basePath}` and `{myTenantsBasePath}` must be distinct and neither may be a path segment under the other: `{basePath}/{id}` matches any single segment, so a literal sibling path would be ambiguous with a tenant whose id happens to match it.
+
+## Permissioned routes
+
+`createTenantedRouteDefinition` stamps out a route family whose handlers run inside the request's typed scope after the membership gate. Its config takes a `permission` on top of the usual `knownErrors` and `schema`:
+
+```typescript
+import { createTenantedRouteDefinition } from 'quidproquo-features';
+
+const caseRoute = createTenantedRouteDefinition('users', {}, { [ErrorTypeEnum.Forbidden]: 403 });
+
+export const approveCase = caseRoute(
+  ['POST', '/cases/{id}/approval'],
+  function* (event, params) { ... },
+  { permission: { permission: CasePermission.Approve, resourceIdParam: 'id', message: 'You cannot approve cases here.' } },
+);
+```
+
+The order is authenticate, resolve the tenant header, membership, permission, then the handler. The permission is judged against the membership row the gate already read, so it costs no extra store read. `permission` is a bare key or an object: `resourceIdParam` names the path param holding the resource id (a member with a grant scoped to specific ids is checked against that id; without it only a tenant-wide grant satisfies), `allowPersonalScope` lets the route run ungated when no tenant header is sent (default is to refuse, since a personal partition has no roles to check), and `message` replaces the default `Missing permission: <key>` text. A route with no `permission` is membership-only.
+
+For a check that needs the loaded resource, such as its kind, call `askTenantAssertPermission(requirement, message, userDirectoryName)` from the handler's logic after reading it.
 
 ## Signature
 

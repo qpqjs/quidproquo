@@ -11,6 +11,7 @@ import {
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocResolveStore } from '../../context/askEventDocResolveStore';
 import { EventDocInvokableFunctions } from '../../definition/types/EventDocInvokableFunctions';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
@@ -95,5 +96,7 @@ function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse
 
 /** GET {basePath}/{id}/render: renders the doc via the collection's `render` function; 404 when there is none. */
 export function* render(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreRender(event, params.id)));
+  return yield* askEventDocProvideStoreFromGlobals(
+    askEventDocProvideRequestScope(event, askEventDocStoreRender(event, params.id), eventDocRouteAction.render),
+  );
 }

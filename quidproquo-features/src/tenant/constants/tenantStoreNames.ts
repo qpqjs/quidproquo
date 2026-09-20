@@ -24,3 +24,7 @@ export const TENANT_SCOPE_RESOLVER_FN = 'askTenantScopeResolver';
 // hook: resolves the ws Authenticate handshake into the scope stored on the
 // connection (membership-checked tenant claim, or the user's personal scope).
 export const TENANT_CONNECTION_SCOPE_RESOLVER_FN = 'askTenantConnectionScopeResolver';
+
+// Inline-function name for the eventDoc `authorise` hook: refuses a collection
+// route unless the caller holds eventDoc:<store>:<action> in the active tenant.
+export const TENANT_EVENT_DOC_AUTHORISER_FN = 'askTenantEventDocAuthoriser';

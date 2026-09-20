@@ -2,7 +2,12 @@ import { ConfigActionType, runStory, throwsError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { EVENT_DOC_ON_APPEND_GLOBAL, EVENT_DOC_ON_PUBLISH_GLOBAL, EVENT_DOC_SCOPE_RESOLVER_GLOBAL } from '../constants/eventDocGlobalNames';
+import {
+  EVENT_DOC_AUTHORISER_GLOBAL,
+  EVENT_DOC_ON_APPEND_GLOBAL,
+  EVENT_DOC_ON_PUBLISH_GLOBAL,
+  EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
+} from '../constants/eventDocGlobalNames';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { buildEventDocStore } from '../context/buildEventDocStore';
 import { askEventDocProvideStoreFromGlobals } from './askEventDocProvideStoreFromGlobals';
@@ -22,6 +27,7 @@ describe('buildEventDocStoreGlobals', () => {
       onPublish: 'syncWidget',
       onAppend: 'broadcastWidget',
       scopeResolver: 'resolveWidgetScope',
+      authorise: 'authoriseWidget',
     });
 
     const globals = buildEventDocStoreGlobals(store);
@@ -51,6 +57,7 @@ describe('buildEventDocStoreGlobals', () => {
     delete globals[EVENT_DOC_ON_PUBLISH_GLOBAL];
     delete globals[EVENT_DOC_ON_APPEND_GLOBAL];
     delete globals[EVENT_DOC_SCOPE_RESOLVER_GLOBAL];
+    delete globals[EVENT_DOC_AUTHORISER_GLOBAL];
 
     const resolved = runStory(askEventDocProvideStoreFromGlobals(askEventDocStoreRead()), {
       [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => {
@@ -61,6 +68,6 @@ describe('buildEventDocStoreGlobals', () => {
       },
     });
 
-    expect(resolved).toEqual({ ...store, onPublish: '', onAppend: '', scopeResolver: '' });
+    expect(resolved).toEqual({ ...store, onPublish: '', onAppend: '', scopeResolver: '', authorise: '' });
   });
 });

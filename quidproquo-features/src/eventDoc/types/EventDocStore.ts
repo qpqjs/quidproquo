@@ -9,4 +9,5 @@ export type EventDocStore = {
   onPublish?: string;
   onAppend?: string;
   scopeResolver?: string;
+  authorise?: string;
 };

@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocGenerateAssetDownloadUrl } from '../../data/askEventDocGenerateAssetDownloadUrl';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
@@ -13,5 +14,7 @@ function* askEventDocStoreGetAsset(docId: string, assetId: string): AskResponse<
 
 /** GET {basePath}/{id}/assets/{assetId}: a presigned URL to read an asset blob. */
 export function* getAsset(event: HTTPEvent, params: { id: string; assetId: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreGetAsset(params.id, params.assetId)));
+  return yield* askEventDocProvideStoreFromGlobals(
+    askEventDocProvideRequestScope(event, askEventDocStoreGetAsset(params.id, params.assetId), eventDocRouteAction.getAsset),
+  );
 }

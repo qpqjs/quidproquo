@@ -1,7 +1,9 @@
 export * from './askTenantAssertNotLastAssigner';
 export * from './askTenantAssertPermission';
+export * from './askTenantAssertRoutePermission';
 export * from './askTenantConnectionScopeResolver';
 export * from './askTenantCreate';
+export * from './askTenantEventDocAuthoriser';
 export * from './askTenantLinkMember';
 export * from './askTenantListForUser';
 export * from './askTenantMemberAdd';
@@ -14,6 +16,7 @@ export * from './askTenantMemberUpdate';
 export * from './askTenantOnPublish';
 export * from './askTenantProvideRequestScope';
 export * from './askTenantResolveActiveTenant';
+export * from './askTenantResolveRequest';
 export * from './askTenantResolveRequestScope';
 export * from './askTenantResolveUserId';
 export * from './askTenantRolesConfigRead';

@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocListPage } from '../../data/askEventDocListPage';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
@@ -19,5 +20,5 @@ function* askEventDocStoreList(event: HTTPEvent): AskResponse<HTTPEventResponse>
 
 /** GET {basePath}: one page of summaries as QpqPagedData (newest first, excludes soft-deleted). */
 export function* list(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreList(event)));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreList(event), eventDocRouteAction.list));
 }

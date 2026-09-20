@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocResolveActor } from '../../globals/askEventDocResolveActor';
@@ -21,5 +22,5 @@ function* askEventDocStoreCreate(event: HTTPEvent): AskResponse<HTTPEventRespons
 
 /** POST {basePath}: creates a doc (body `{ name, code }`). */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreCreate(event)));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreCreate(event), eventDocRouteAction.create));
 }
