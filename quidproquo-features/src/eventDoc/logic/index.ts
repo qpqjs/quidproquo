@@ -9,6 +9,7 @@ export * from './askEventDocDocumentStateAsOfTime';
 export * from './askEventDocDocumentStateLatest';
 export * from './askEventDocEventAppend';
 export * from './askEventDocEventBootstrapPage';
+export * from './askEventDocGenerateNewId';
 export * from './askEventDocGetByCode';
 export * from './askEventDocGetByCodeOrCreate';
 export * from './askEventDocGetByIdOrThrow';
