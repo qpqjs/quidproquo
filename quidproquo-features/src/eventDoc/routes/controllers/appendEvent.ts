@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocResolveActor } from '../../globals/askEventDocResolveActor';
@@ -20,5 +21,7 @@ function* askEventDocStoreAppendEvent(event: HTTPEvent, modelId: string): AskRes
 
 /** POST {basePath}/{id}/events: appends a client event to the doc's log. */
 export function* appendEvent(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreAppendEvent(event, params.id)));
+  return yield* askEventDocProvideStoreFromGlobals(
+    askEventDocProvideRequestScope(event, askEventDocStoreAppendEvent(event, params.id), eventDocRouteAction.appendEvent),
+  );
 }

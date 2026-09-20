@@ -1,3 +1,4 @@
+export * from './EventDocAuthoriseInput';
 export * from './EventDocCollectionOptions';
 export * from './EventDocPermissionAction';
 export * from './EventDocPermissions';

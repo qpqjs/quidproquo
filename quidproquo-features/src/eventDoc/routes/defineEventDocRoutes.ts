@@ -18,6 +18,7 @@ export const defineEventDocRoutes = ({
   onPublish,
   onAppend,
   scopeResolver,
+  authorise,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
   const store = buildEventDocStore({
@@ -26,6 +27,7 @@ export const defineEventDocRoutes = ({
     onPublish,
     onAppend,
     scopeResolver,
+    authorise,
   });
 
   const globals: Record<string, unknown> = buildEventDocStoreGlobals(store);

@@ -20,4 +20,6 @@ export type EventDocRoutesOptions = {
   onAppend?: string;
   // Inline-function name invoked with `{ event }` before each route; a non-null result is the request's storage scope.
   scopeResolver?: string;
+  // Inline-function name invoked with EventDocAuthoriseInput inside the request's scope before each route; it throws to refuse.
+  authorise?: string;
 };

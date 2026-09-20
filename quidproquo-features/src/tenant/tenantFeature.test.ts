@@ -24,6 +24,7 @@ import { HTTPEvent } from 'quidproquo-webserver';
 import { describe, expect, it } from 'vitest';
 
 import {
+  EVENT_DOC_AUTHORISER_GLOBAL,
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
@@ -40,6 +41,7 @@ import { TENANT_ADMIN_ROLE } from './constants/tenantAdminRole';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL, TENANT_ROLES_GLOBAL } from './constants/tenantGlobalNames';
 import {
   TENANT_DOC_TYPE,
+  TENANT_EVENT_DOC_AUTHORISER_FN,
   TENANT_EVENTDOC_STORE,
   TENANT_MEMBERSHIPS_STORE,
   TENANT_ON_PUBLISH_FN,
@@ -87,6 +89,7 @@ const globals: Record<string, unknown> = {
   [EVENT_DOC_USER_DIRECTORY_GLOBAL]: 'test-user-directory',
   [EVENT_DOC_ON_PUBLISH_GLOBAL]: TENANT_ON_PUBLISH_FN,
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: TENANT_SCOPE_RESOLVER_FN,
+  [EVENT_DOC_AUTHORISER_GLOBAL]: TENANT_EVENT_DOC_AUTHORISER_FN,
   [TENANT_HEADER_NAME_GLOBAL]: DEFAULT_TENANT_HEADER_NAME,
   [TENANT_ROLES_GLOBAL]: buildTenantRoleCatalog({
     approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] },
@@ -180,6 +183,11 @@ const buildMocks = () => {
         const { event } = action.payload.payload as { event: HTTPEvent };
         const headerTenantId = event.headers?.[DEFAULT_TENANT_HEADER_NAME];
         return headerTenantId ? `TENANT#${headerTenantId}` : 'PERSONAL#user-1';
+      }
+
+      // The authoriser is unit-tested on its own; here every collection route is allowed.
+      if (action.payload.functionName === TENANT_EVENT_DOC_AUTHORISER_FN) {
+        return undefined;
       }
 
       inlinePayloads.push(action.payload.payload as EventDocOnPublishInput);

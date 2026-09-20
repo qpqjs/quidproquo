@@ -14,3 +14,5 @@ export const EVENT_DOC_ON_APPEND_GLOBAL = 'eventDocOnAppend';
 export const EVENT_DOC_SCOPE_RESOLVER_GLOBAL = 'eventDocScopeResolver';
 
 export const EVENT_DOC_STORAGE_DRIVE_GLOBAL = 'eventDocStorageDrive';
+
+export const EVENT_DOC_AUTHORISER_GLOBAL = 'eventDocAuthoriser';

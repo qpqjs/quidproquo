@@ -1,6 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocResolveUserId } from '../../globals/askEventDocResolveUserId';
@@ -29,5 +30,7 @@ function* askEventDocStoreSoftDelete(event: HTTPEvent, id: string): AskResponse<
 
 /** DELETE {basePath}/{id}?schemaVersion=N: soft-deletes the doc (`delete` is a reserved word, hence `remove`). */
 export function* remove(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreSoftDelete(event, params.id)));
+  return yield* askEventDocProvideStoreFromGlobals(
+    askEventDocProvideRequestScope(event, askEventDocStoreSoftDelete(event, params.id), eventDocRouteAction.remove),
+  );
 }
