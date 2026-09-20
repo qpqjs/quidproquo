@@ -287,36 +287,41 @@ describe('tenant feature', () => {
     const ownerRow = { tenantId: summary.id, userId: 'user-1', roles: [TENANT_ADMIN_ROLE], grants: [], addedByUserId: 'user-1' };
     expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining(ownerRow)]);
 
-    // The doc + its INIT event land in the CALLER'S OWN partition (no header ->
-    // personal scope), like any other scoped create - nowhere special. The
-    // membership link is the unscoped cross-scope registry.
+    // The doc + its INIT event land in the TENANT'S OWN partition, whatever scope the
+    // request ran under. The membership link is the unscoped cross-scope registry.
+    const tenantScope = `TENANT#${summary.id}`;
     const docWrites = upsertScopes.filter(({ store }) => store !== TENANT_MEMBERSHIPS_STORE);
     expect(docWrites.length).toBeGreaterThan(0);
-    expect(docWrites.every(({ scope }) => scope === 'PERSONAL#user-1')).toBe(true);
+    expect(docWrites.every(({ scope }) => scope === tenantScope)).toBe(true);
     expect(upsertScopes.find(({ store }) => store === TENANT_MEMBERSHIPS_STORE)?.scope).toBeUndefined();
 
-    // The list serves the created tenant IMMEDIATELY (live summary in the
-    // caller's scope, drafts included) - a never-published tenant must be
-    // reopenable to finish setup.
+    // The list serves the created tenant IMMEDIATELY (live summary from the tenant's
+    // own scope, drafts included) - a never-published tenant must be reopenable to
+    // finish setup.
     const draftListResponse = runStory(list(httpEvent(undefined)), mocks);
     const draftList = JSON.parse(draftListResponse.body!);
     expect(draftList).toHaveLength(1);
     expect(draftList[0]).toMatchObject({ id: summary.id, name: 'credit-corp' });
 
-    // Brand it, then publish (through the generic eventDoc append route).
+    // Brand it, then publish (through the generic eventDoc append route), from INSIDE
+    // the tenant: the doc lives in its own scope, so the request names it.
+    const inTenant = { [DEFAULT_TENANT_HEADER_NAME]: summary.id };
     const brandResponse = runStory(
       appendEvent(
-        httpEvent({
-          type: TenantEffect.setBrand,
-          payload: {
-            data: {
-              brandColors: { primary: '#123456', secondary: '#abcdef' },
-              logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
-              displayName: 'Credit Corp',
+        httpEvent(
+          {
+            type: TenantEffect.setBrand,
+            payload: {
+              data: {
+                brandColors: { primary: '#123456', secondary: '#abcdef' },
+                logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+                displayName: 'Credit Corp',
+              },
+              metadata: { version: 1, clientMessageId: 'msg-1' },
             },
-            metadata: { version: 1, clientMessageId: 'msg-1' },
           },
-        }),
+          inTenant,
+        ),
         { id: summary.id },
       ),
       mocks,
@@ -325,26 +330,26 @@ describe('tenant feature', () => {
 
     const publishResponse = runStory(
       appendEvent(
-        httpEvent({
-          type: EventDocEffect.Publish,
-          payload: { data: { effectiveFrom: '2026-07-11T00:00:00.000Z' }, metadata: { version: 1, clientMessageId: 'msg-2' } },
-        }),
+        httpEvent(
+          {
+            type: EventDocEffect.Publish,
+            payload: { data: { effectiveFrom: '2026-07-11T00:00:00.000Z' }, metadata: { version: 1, clientMessageId: 'msg-2' } },
+          },
+          inTenant,
+        ),
         { id: summary.id },
       ),
       mocks,
     );
     expect(publishResponse.status).toBe(200);
 
-    // The hook fired through the inline-function boundary; run the real sync
-    // with the exact payload it received. In production the inline function
-    // executes inside the append's session, so the store context AND the ambient
-    // storage scope are inherited; here the runStory harness needs both context
-    // reads mocked (discriminated by identifier).
+    // The hook fired through the inline-function boundary; run the real sync with the
+    // exact payload it received. In production the inline function executes inside the
+    // append's session, so the store context is inherited; here it is mocked.
     expect(inlinePayloads).toHaveLength(1);
     runStory(askTenantOnPublish(inlinePayloads[0]), {
       ...mocks,
-      [ContextActionType.Read]: (action: { payload: { contextIdentifier: QpqContextIdentifier<unknown> } }) =>
-        action.payload.contextIdentifier.uniqueName === storageScopeContext.uniqueName ? 'PERSONAL#user-1' : store,
+      [ContextActionType.Read]: store,
     });
 
     const records = tables[TENANT_RECORD_STORE];
@@ -355,8 +360,6 @@ describe('tenant feature', () => {
       brandColors: { primary: '#123456', secondary: '#abcdef' },
       logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
       displayName: 'Credit Corp',
-      // The doc's home partition, recorded for the registry's cross-scope reads.
-      scope: 'PERSONAL#user-1',
       createdByUserId: 'user-1',
       status: TenantStatus.active,
     });
@@ -386,30 +389,22 @@ describe('tenant feature', () => {
     expect(JSON.parse(listResponse.body!)).toEqual([]);
   });
 
-  it('hydrates memberships homed in other scopes from the published registry record', () => {
-    const { mocks, tables, seedMembership } = buildMocks();
+  it('hydrates every membership from the tenant doc in its own scope, whoever created it', () => {
+    const { mocks, tables, seedMembership, upsertScopes } = buildMocks();
 
-    // user-1 is a member of two tenants created elsewhere (no summary in the
-    // caller's scope): one published (has a record), one still a draft.
-    seedMembership('tenant-published', 'user-1', []);
-    seedMembership('tenant-draft', 'user-1', []);
-    tables[TENANT_RECORD_STORE] = [
-      {
-        tenantId: 'tenant-published',
-        name: 'acme',
-        createdAt: '2026-07-10T00:00:00.000Z',
-        updatedAt: '2026-07-10T00:00:00.000Z',
-        createdByUserId: 'user-2',
-        status: TenantStatus.active,
-      },
-    ];
+    // user-2 creates a tenant; user-1 is then added as a member and lists it.
+    const created = JSON.parse(
+      runStory(create(httpEvent({ name: 'acme' })), { ...mocks, [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-2' } }).body!,
+    );
+    seedMembership(created.id, 'user-1', []);
+    // A membership whose tenant doc does not exist is not listed.
+    seedMembership('tenant-missing', 'user-1', []);
 
-    // The published one appears via its record; the foreign draft has no
-    // registry presence yet, so it is (correctly) not listed.
-    const listResponse = runStory(list(httpEvent(undefined)), mocks);
-    const listed = JSON.parse(listResponse.body!);
+    const listed = JSON.parse(runStory(list(httpEvent(undefined)), mocks).body!);
     expect(listed).toHaveLength(1);
-    expect(listed[0]).toMatchObject({ id: 'tenant-published', name: 'acme', versions: [] });
+    expect(listed[0]).toMatchObject({ id: created.id, name: 'acme', createdBy: 'user-2' });
+    expect(upsertScopes.filter(({ store }) => store === TENANT_EVENTDOC_STORE).every(({ scope }) => scope === `TENANT#${created.id}`)).toBe(true);
+    expect(tables[TENANT_RECORD_STORE]).toBeUndefined();
   });
 
   it('gates requests on membership of the claimed tenant header', () => {
@@ -668,11 +663,10 @@ describe('tenant feature', () => {
   });
 
   describe('getLogo', () => {
-    const logoRecord = (scope?: string) => ({
+    const logoRecord = () => ({
       tenantId: 'tenant-a',
       name: 'acme',
       logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
-      scope,
       createdAt: '2026-07-10T00:00:00.000Z',
       updatedAt: '2026-07-10T00:00:00.000Z',
       createdByUserId: 'user-2',
@@ -693,36 +687,25 @@ describe('tenant feature', () => {
       return { presignMocks, presigns };
     };
 
-    it("presigns the logo blob in the DOC record's home scope, not the reader's", () => {
+    it("presigns the logo blob in the tenant's own scope, whatever the reader's", () => {
       const { mocks, tables, seedMembership } = buildMocks();
       seedMembership('tenant-a', 'user-1', []);
-      tables[TENANT_RECORD_STORE] = [logoRecord('PERSONAL#user-2')];
+      tables[TENANT_RECORD_STORE] = [logoRecord()];
       const { presignMocks, presigns } = withPresignMock(mocks);
 
-      // Reader browses under the tenant's scope (header set) - irrelevant to the presign.
-      const response = runStory(getLogo(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' }), { id: 'tenant-a' }), presignMocks);
+      // Reader browses their personal partition (no header) - irrelevant to the presign.
+      const response = runStory(getLogo(httpEvent(undefined), { id: 'tenant-a' }), presignMocks);
 
       expect(JSON.parse(response.body!)).toEqual({ url: 'https://signed.example/logo' });
       expect(presigns).toEqual([
-        { drive: 'tenantsedocs', filepath: 'tenant-a/assets/logo-guid', expirationMs: 15 * 60 * 1000, scope: 'PERSONAL#user-2' },
+        { drive: 'tenantsedocs', filepath: 'tenant-a/assets/logo-guid', expirationMs: 15 * 60 * 1000, scope: 'TENANT#tenant-a' },
       ]);
-    });
-
-    it("falls back to the creator's personal scope for records published before scope was recorded", () => {
-      const { mocks, tables, seedMembership } = buildMocks();
-      seedMembership('tenant-a', 'user-1', []);
-      tables[TENANT_RECORD_STORE] = [logoRecord(undefined)];
-      const { presignMocks, presigns } = withPresignMock(mocks);
-
-      runStory(getLogo(httpEvent(undefined), { id: 'tenant-a' }), presignMocks);
-
-      expect(presigns[0].scope).toBe('PERSONAL#user-2');
     });
 
     it('denies non-members and 404s a missing logo', () => {
       const { mocks, tables, seedMembership } = buildMocks();
       seedMembership('tenant-a', 'user-1', []);
-      tables[TENANT_RECORD_STORE] = [{ ...logoRecord('PERSONAL#user-2'), logo: undefined }];
+      tables[TENANT_RECORD_STORE] = [{ ...logoRecord(), logo: undefined }];
 
       expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
       expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-a' }), mocks)).toThrow(/no logo/);

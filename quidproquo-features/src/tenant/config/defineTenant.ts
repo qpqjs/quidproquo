@@ -31,13 +31,11 @@ import { defineTenantStores } from './defineTenantStores';
 // - Every non-owner deploy: a cross-module ref to the membership table, so the
 //   resolver can check membership locally against the owner's table.
 //
-// The tenant collection is an ORDINARY tenanted collection: a tenant doc lives
-// in whatever scope the request that created it ran under (the creator's
-// personal partition, or the active tenant when an org creates a sub-tenant),
-// and the routes resolve their scope with the same standard header resolver as
-// every other collection - so a tenant doc is only visible/editable from the
-// scope that owns it. The cross-scope registry surface is the membership links
-// table + the materialized record store, both unscoped.
+// The tenant collection is an ORDINARY tenanted collection whose docs live under
+// their own TENANT#<id> scope from creation, so a tenant is edited from inside
+// itself (header + membership + eventDoc:tenants:* permission) and nobody owns
+// it. The cross-scope registry surface is the membership links table + the
+// materialized record store, both unscoped.
 export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): QPQConfig => [
   // The merged catalog, everywhere: permission checks run in every service.
   defineGlobal(TENANT_ROLES_GLOBAL, buildTenantRoleCatalog(roles?.catalog)),

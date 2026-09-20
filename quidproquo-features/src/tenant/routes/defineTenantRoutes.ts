@@ -14,9 +14,8 @@ import { TenantRoutesOptions } from '../types/TenantRoutesOptions';
 // mounted at myTenantsBasePath. Every one of them keys off the caller's membership,
 // so they are a different surface from the tenant collection itself - the stock
 // eventDoc CRUD (append SET_BRAND, publish, audit history) that defineTenant mounts
-// at basePath. The store carries the STANDARD scope resolver so create/list run
-// under the request's scope like every other route - a new tenant doc lands in the
-// caller's current partition (personal, or the active tenant), nowhere special.
+// at basePath. The store carries the STANDARD scope resolver like every other route;
+// create and list then step into each tenant's own scope themselves.
 export const defineTenantRoutes = ({ myTenantsBasePath, routeAuthSettings, version, tenantHeaderName }: TenantRoutesOptions): QPQConfig => {
   const store = buildEventDocStore({
     storeName: TENANT_EVENTDOC_STORE,

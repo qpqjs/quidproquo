@@ -16,12 +16,7 @@ function* askTenantRouteCreate(event: HTTPEvent): AskResponse<HTTPEventResponse>
   return qpqWebServerUtils.toJsonEventResponse(summary);
 }
 
-/**
- * POST {basePath}: create a tenant (body `{ name }`); the caller becomes its first member.
- * Runs under the request's scope like any other scoped route, so the new tenant doc lands
- * in the caller's current partition - their personal scope, or the active tenant when an
- * org creates a sub-tenant - and stays manageable from that scope.
- */
+/** POST {basePath}: create a tenant (body `{ name }`) under its own scope; the caller becomes its first admin. */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askTenantRouteCreate(event)));
 }
