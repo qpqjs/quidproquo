@@ -12,3 +12,16 @@ export const SMOKE_PROBE_EVENT_BUS = 'smokeProbe';
 // flows bus -> queue -> store marker for the event bus test.
 export const SMOKE_PROBE_EVENT_QUEUE = 'smokeProbeEvents';
 export const SMOKE_PROBE_EVENT_TYPE = 'smokeProbeEvent';
+
+// Scoped probe resources: every call must carry a scope, an unscoped one is
+// refused. Only the test service uses them, so they stay service-level.
+export const SMOKE_SCOPED_PROBE_STORE = 'smokeScopedProbe';
+export const SMOKE_SCOPED_PROBE_DRIVE = 'smoke-scoped-probe';
+
+// The file event drives: an unscoped and a scoped one, both with create and
+// delete handlers that write a marker row the file event test polls for.
+export const SMOKE_FILE_EVENT_DRIVE = 'smoke-file-event';
+
+// A scoped store with a change stream; the handler writes a marker row the
+// kvs stream test polls for.
+export const SMOKE_STREAM_PROBE_STORE = 'smokeStreamProbe';
