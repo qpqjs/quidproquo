@@ -1,13 +1,13 @@
 import { askDnsResolveHosts, askEmailSendEmail, AskResponse } from 'quidproquo';
 
-import { smokeEmailMarkerId } from '../../storageDrive/smokeEmailMarkerId';
+import { smokeEmailMarkerId } from '../../email/smokeEmailMarkerId';
 import { askSmokeAssert } from '../askSmokeAssert';
 import { askSmokePollForMarker } from '../askSmokePollForMarker';
 
 // The inbound email path end to end: send to this app's own receiving domain
 // with its own sender, SES receives it through the account rule set and the
-// app's rule, the raw message lands in the drive, its create handler parses
-// it and writes the marker. Deployed only: nothing receives mail locally.
+// app's rule, the receiver parses it and hands it to onSmokeEmailReceived,
+// which writes the marker. Deployed only: nothing receives mail locally.
 export function* askRunEmailReceiveTest(runId: string): AskResponse<void> {
   const [receivingHost] = yield* askDnsResolveHosts({ subdomain: 'inbox' });
   const [siteHost] = yield* askDnsResolveHosts();

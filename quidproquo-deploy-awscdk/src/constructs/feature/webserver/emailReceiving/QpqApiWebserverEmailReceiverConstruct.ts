@@ -14,9 +14,9 @@ export interface QpqApiWebserverEmailReceiverConstructProps extends QpqConstruct
 }
 
 // The app's rule in the account's shared receipt rule set: mail to the receiving host of any
-// root lands in the receiver's drive under its key prefix. The set is referenced by name (the
-// account stack owns and activates it); the drive's bucket policy grants the write on the Inf
-// stack, keyed to this rule (see QpqCoreStorageDriveConstruct's emailReceiptRuleNames prop).
+// root lands in the receiver's own drive. The set is referenced by name (the account stack owns
+// and activates it); the drive's bucket policy grants the write on the Inf stack, keyed to this
+// rule (see QpqCoreStorageDriveConstruct's emailReceiptRuleNames prop).
 export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiWebserverEmailReceiverConstructProps) {
     super(scope, id, props);
@@ -30,14 +30,9 @@ export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
       );
     }
 
-    // The write statement is on the owner's bucket, so only the owner can declare the receiver.
-    const storageDrive = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).find((drive) => drive.storageDrive === storageDriveName);
-    if (!storageDrive) {
-      throw new Error(`Email receiver "${name}" writes into storage drive "${storageDriveName}", which this service does not own`);
-    }
-    // The provider writes bare keys, which a scoped drive refuses to read.
-    if (storageDrive.scoped) {
-      throw new Error(`Email receiver "${name}" cannot write into scoped storage drive "${storageDriveName}"`);
+    // defineEmailReceiver declares the drive beside the receiver, so it is always owned here.
+    if (!qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).some((drive) => drive.storageDrive === storageDriveName)) {
+      throw new Error(`Email receiver "${name}" has no storage drive "${storageDriveName}" in this service; declare it with defineEmailReceiver`);
     }
 
     new aws_ses.CfnReceiptRule(this, 'rule', {
@@ -48,7 +43,7 @@ export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
         recipients,
         scanEnabled: true,
         tlsPolicy: 'Optional',
-        actions: [{ s3Action: { bucketName: this.resourceName(storageDriveName), objectKeyPrefix: props.emailReceiverConfig.keyPrefix } }],
+        actions: [{ s3Action: { bucketName: this.resourceName(storageDriveName) } }],
       },
     });
   }

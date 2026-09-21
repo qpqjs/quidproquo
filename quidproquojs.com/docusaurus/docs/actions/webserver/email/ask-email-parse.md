@@ -5,7 +5,7 @@ description: Parse a raw MIME message into addresses, subject, body, attachments
 
 # askEmailParse
 
-Parses a raw MIME message, as a [defineEmailReceiver](../../../config/webserver/email-receiver.md) writes it and `askFileReadBinaryContents` reads it back, into an `EmailMessage`.
+Parses a raw MIME message into an `EmailMessage`, the `message` a [defineEmailReceiver](../../../config/webserver/email-receiver.md) hands its `onEmail` inside an `EmailReceivedEvent`. A receiver parses for you; this is for a raw message an app obtained some other way.
 
 - **Action type:** `EmailActionType.Parse`
 - **At runtime:** pure on every platform (postal-mime in `quidproquo-actionprocessor-js`); throws `Invalid` when the bytes are not a MIME message.
@@ -51,4 +51,4 @@ An `EmailMessage`:
 
 ## Related
 
-- [defineEmailReceiver](../../../config/webserver/email-receiver.md) — what writes the objects this parses.
+- [defineEmailReceiver](../../../config/webserver/email-receiver.md) — receives mail and calls its handler with this shape.
