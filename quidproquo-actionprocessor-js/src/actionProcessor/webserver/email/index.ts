@@ -1,6 +1,7 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getEmailParseActionProcessor } from './getEmailParseActionProcessor';
+import { getEmailReceivingHostsActionProcessor } from './getEmailReceivingHostsActionProcessor';
 
 export * from './parseEmailMessage';
 
@@ -10,4 +11,5 @@ export const getEmailActionProcessor: ActionProcessorListResolver = async (
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
   ...(await getEmailParseActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEmailReceivingHostsActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
