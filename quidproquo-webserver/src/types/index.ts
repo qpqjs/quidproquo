@@ -1,5 +1,6 @@
 export * from './CloudflareDnsDeployEvent';
 export * from './constants';
+export * from './EmailReceivedEvent';
 export * from './EmailSendEvent';
 export * from './ExecuteServiceFunctionEvent';
 export * from './HTTPEvent';

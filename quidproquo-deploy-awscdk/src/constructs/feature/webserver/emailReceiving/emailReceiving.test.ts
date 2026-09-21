@@ -17,13 +17,14 @@ import { emailReceiptRuleName } from './emailReceiptRuleName';
 import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
 import { QpqApiWebserverEmailReceiverConstruct } from './QpqApiWebserverEmailReceiverConstruct';
 
+const onEmail = '/entry/email/onEmail::onEmail';
+
 const buildConfig = (withDomain: boolean): QPQConfig =>
   buildTestQpqConfig([
     defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
     defineDns(['example.com', 'example.org']),
     ...(withDomain ? [defineEmailReceivingDomain()] : []),
-    defineStorageDrive('mail'),
-    defineEmailReceiver('support', { storageDriveName: 'mail' }),
+    defineEmailReceiver('support', { onEmail }),
   ]);
 
 const buildStack = () => new Stack(new App(), 'inf', { env: { account: '123456789012', region: 'ap-southeast-2' } });
@@ -42,43 +43,18 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
         Name: 'support-test-app-test-module-development',
         Enabled: true,
         Recipients: ['inbox.development.example.com', 'inbox.development.example.org'],
-        Actions: [{ S3Action: { BucketName: 'mail-test-app-test-module-development', ObjectKeyPrefix: 'email/support/' } }],
+        Actions: [{ S3Action: { BucketName: 'email-support-test-app-test-module-development' } }],
       }),
     });
   });
 
-  it('fails synth when the target drive is missing or scoped', () => {
-    const missing = buildTestQpqConfig([
-      defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
-      defineDns(['example.com']),
-      defineEmailReceivingDomain(),
-      defineEmailReceiver('support', { storageDriveName: 'ghost' }),
-    ]);
-    const scoped = buildTestQpqConfig([
-      defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
-      defineDns(['example.com']),
-      defineEmailReceivingDomain(),
-      defineStorageDrive('mail', { scoped: true }),
-      defineEmailReceiver('support', { storageDriveName: 'mail' }),
-    ]);
-
-    const synthWith = (qpqConfig: QPQConfig) =>
-      new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
-        qpqConfig,
-        emailReceiverConfig: qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0],
-      });
-
-    expect(() => synthWith(missing)).toThrow(/does not own/);
-    expect(() => synthWith(scoped)).toThrow(/scoped/);
-  });
-
-  it('fails synth when the drive is declared by another service', () => {
+  it('fails synth when the receiver setting is present without its drive', () => {
+    const [receiver] = defineEmailReceiver('support', { onEmail });
     const qpqConfig = buildTestQpqConfig([
       defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
       defineDns(['example.com']),
       defineEmailReceivingDomain(),
-      defineStorageDrive('mail', { owner: { module: 'other', storageDriveName: 'mail' } }),
-      defineEmailReceiver('support', { storageDriveName: 'mail' }),
+      receiver,
     ]);
 
     expect(
@@ -87,7 +63,7 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
           qpqConfig,
           emailReceiverConfig: qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0],
         }),
-    ).toThrow(/does not own/);
+    ).toThrow(/no storage drive/);
   });
 
   it('fails synth when the app has no receiving domain', () => {
@@ -103,7 +79,7 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
 describe('landing drive bucket policy', () => {
   it('lets only the app rule in the account rule set write, and nothing else', () => {
     const qpqConfig = buildConfig(true);
-    const storageDriveConfig = defineStorageDrive('mail');
+    const storageDriveConfig = defineStorageDrive('email-support');
     const stack = buildStack();
 
     new QpqCoreStorageDriveConstruct(stack, 'drive', {

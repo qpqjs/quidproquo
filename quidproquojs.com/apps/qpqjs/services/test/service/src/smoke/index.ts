@@ -2,6 +2,7 @@ export * from './config';
 export * from './constants';
 export * from './controller';
 export * from './data';
+export * from './email';
 export * from './eventDoc';
 export * from './kvsStream';
 export * from './logic';
