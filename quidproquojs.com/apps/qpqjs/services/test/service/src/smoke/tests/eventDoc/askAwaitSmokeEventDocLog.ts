@@ -3,7 +3,8 @@ import { askEventDocEventListAll, EventDocEvent } from 'quidproquo-features';
 
 import { askSmokeAssert } from '../askSmokeAssert';
 
-const POLL_ATTEMPTS = 20;
+// Long enough to cover a writer's retry laps plus one queue redelivery.
+const POLL_ATTEMPTS = 45;
 const POLL_INTERVAL_MS = 2000;
 
 // Poll a probe doc's log until it holds `expectedLength` events (INIT_STATE included),

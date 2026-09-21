@@ -214,13 +214,19 @@ export const defineSmoke = (): QPQConfig => {
       },
       { basePath: SMOKE_EVENT_DOC_BASE_PATH }
     ),
-    defineQueue(SMOKE_EVENT_DOC_APPEND_QUEUE, {
-      [SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE]: {
-        basePath: __dirname,
-        relativePath: '../queue/onSmokeEventDocAppend',
-        functionName: 'onSmokeEventDocAppend',
+    // A writer that loses the slot race past the append retry cap fails its message; a
+    // quick redelivery lets it land instead of vanishing, as a production queue should.
+    defineQueue(
+      SMOKE_EVENT_DOC_APPEND_QUEUE,
+      {
+        [SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE]: {
+          basePath: __dirname,
+          relativePath: '../queue/onSmokeEventDocAppend',
+          functionName: 'onSmokeEventDocAppend',
+        },
       },
-    }),
+      { maxTries: 3, ttRetryInSeconds: 10 }
+    ),
 
     // The zod models double as the routes' published contract, flattened to
     // JSON Schema here for the OpenAPI document at /v1/docs.
