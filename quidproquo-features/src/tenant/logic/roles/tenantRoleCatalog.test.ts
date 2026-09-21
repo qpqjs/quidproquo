@@ -5,6 +5,7 @@ import { TENANT_ADMIN_ROLE } from '../../constants/tenantAdminRole';
 import { TenantPermission } from '../../constants/TenantPermission';
 import { TenantMembership } from '../../models/TenantMembership';
 import { TenantRoleCatalog } from '../../models/TenantRoleCatalog';
+import { toTenantId } from '../toTenantId';
 import { buildTenantPermissionRequirement } from './buildTenantPermissionRequirement';
 import { buildTenantRoleCatalog } from './buildTenantRoleCatalog';
 import { tenantMembershipSatisfies } from './tenantMembershipSatisfies';
@@ -21,7 +22,7 @@ const appCatalog: TenantRoleCatalog = {
 };
 
 const membership = (roles: string[], extra: Partial<TenantMembership> = {}): TenantMembership => ({
-  tenantId: 't1',
+  tenantId: toTenantId('t1'),
   userId: 'u1',
   roles,
   grants: [],

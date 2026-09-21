@@ -4,6 +4,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
 import { askTenantLogoDownloadUrl } from '../../data/askTenantLogoDownloadUrl';
 import { askTenantRecordGet } from '../../data/askTenantRecordGet';
+import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantValidateMembership } from '../../logic/askTenantValidateMembership';
 import { composeTenantScope } from '../../logic/storageScope';
 
@@ -13,23 +14,24 @@ import { composeTenantScope } from '../../logic/storageScope';
  * scope: a member browsing their personal partition still gets the logo.
  */
 export function* getLogo(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  const tenantId = yield* askTenantIdParse(params.id);
   const userId = yield* askEventDocResolveUserId();
 
-  const isMember = yield* askTenantValidateMembership(userId, params.id);
+  const isMember = yield* askTenantValidateMembership(userId, tenantId);
   if (!isMember) {
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }
 
-  const record = yield* askTenantRecordGet(params.id);
+  const record = yield* askTenantRecordGet(tenantId);
   if (!record) {
-    return yield* askThrowError(ErrorTypeEnum.NotFound, `Tenant not found: ${params.id}`);
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `Tenant not found: ${tenantId}`);
   }
 
   if (!record.logo) {
-    return yield* askThrowError(ErrorTypeEnum.NotFound, `Tenant has no logo: ${params.id}`);
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `Tenant has no logo: ${tenantId}`);
   }
 
-  const result = yield* askTenantLogoDownloadUrl(params.id, record.logo.guid, composeTenantScope(params.id));
+  const result = yield* askTenantLogoDownloadUrl(tenantId, record.logo.guid, composeTenantScope(tenantId));
 
   return qpqWebServerUtils.toJsonEventResponse(result);
 }

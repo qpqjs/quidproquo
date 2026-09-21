@@ -2,6 +2,7 @@ import { QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocAssetRef } from '../../eventDoc/models';
 import { TenantBrandColors } from './TenantBrandColors';
+import { TenantId } from './TenantId';
 import { TenantStatus } from './TenantStatus';
 
 /**
@@ -10,7 +11,7 @@ import { TenantStatus } from './TenantStatus';
  * The logo is an asset ref in the tenant's own scope; callers presign it at read time.
  */
 export type TenantRecord = {
-  tenantId: string;
+  tenantId: TenantId;
   name: string;
   brandColors?: TenantBrandColors;
   logo?: EventDocAssetRef;

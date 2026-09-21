@@ -3,6 +3,7 @@ import { askDateNow, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproqu
 import { TenantPermission } from '../constants/TenantPermission';
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';
+import { TenantId } from '../models/TenantId';
 import { TenantMembership } from '../models/TenantMembership';
 import { TenantPermissionGrant } from '../models/TenantPermissionGrant';
 import { buildTenantPermissionRequirement } from './roles/buildTenantPermissionRequirement';
@@ -18,7 +19,7 @@ import { askTenantRolesConfigRead } from './askTenantRolesConfigRead';
  * Grant permission keys are opaque and not validated against anything.
  */
 export function* askTenantMemberRolesSet(
-  tenantId: string,
+  tenantId: TenantId,
   userId: string,
   roles: string[],
   grants: TenantPermissionGrant[],

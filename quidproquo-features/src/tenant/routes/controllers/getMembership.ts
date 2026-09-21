@@ -3,15 +3,17 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
 import { askTenantMembershipGet } from '../../data/askTenantMembershipGet';
+import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantRolesConfigRead } from '../../logic/askTenantRolesConfigRead';
 import { tenantMembershipPermissions } from '../../logic/roles/tenantMembershipPermissions';
 import { TenantCallerMembership } from '../../models/TenantCallerMembership';
 
 /** GET {basePath}/{id}/membership: the caller's own row plus the permissions it expands to, enabled members only. */
 export function* getMembership(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  const tenantId = yield* askTenantIdParse(params.id);
   const userId = yield* askEventDocResolveUserId();
 
-  const membership = yield* askTenantMembershipGet(userId, params.id);
+  const membership = yield* askTenantMembershipGet(userId, tenantId);
   if (!membership || membership.disabled) {
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }

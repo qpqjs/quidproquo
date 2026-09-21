@@ -47,7 +47,7 @@ The record store holds `TenantRecord` rows, derived from the tenant event doc on
 
 ```typescript
 type TenantRecord = {
-  tenantId: string;
+  tenantId: TenantId;
   name: string;
   brandColors?: Record<string, string>;
   logoUrl?: string;
@@ -62,7 +62,7 @@ The membership store holds `TenantMembership` rows, one per `(user, tenant)` lin
 
 ```typescript
 type TenantMembership = {
-  tenantId: string;
+  tenantId: TenantId;
   userId: string;
   roles: string[];
   grants: TenantPermissionGrant[];
@@ -73,6 +73,8 @@ type TenantMembership = {
   rolesUpdatedByUserId: string;
 };
 ```
+
+`TenantId` is a branded string (`Brand<string, 'TenantId'>`): ids the system mints or stores are branded with `toTenantId`, and ids arriving on a request (the tenant header, a path param, a WebSocket claim) go through `askTenantIdParse`, which answers `BadRequest` for anything that is not a valid scope segment. Every tenant story takes a `TenantId`, so a user id or a scope string cannot be passed where a tenant id belongs.
 
 `roles` are codes from the catalog passed to [defineTenant](./tenant.md) (`roles.catalog`), expanded to permissions at read time, so a catalog change takes effect on every row at once and a retired code grants nothing. `grants` are direct `{ permission, selector }` entries; a selector is `{ kind: 'all' }`, `{ kind: 'ids', ids }` or `{ kind: 'resourceKinds', kinds }`, and is the only way a permission is narrowed to specific resources. A `disabled` member fails the membership check everywhere (scope resolver, WebSocket scope, tenant routes) and holds no permissions, but still appears in the member list so an admin can re-enable them.
 

@@ -1,6 +1,7 @@
 import { askCatch, askMapParallel, AskResponse, askUserDirectoryGetUserAttributesByUserId, QpqPagedData } from 'quidproquo-core';
 
 import { askTenantMembershipsForTenant } from '../data/askTenantMembershipsForTenant';
+import { TenantId } from '../models/TenantId';
 import { TenantMember } from '../models/TenantMember';
 
 // One page of the tenant's members (disabled included), hydrated from the user
@@ -9,7 +10,7 @@ import { TenantMember } from '../models/TenantMember';
 // stale row.
 export function* askTenantMemberList(
   userDirectoryName: string,
-  tenantId: string,
+  tenantId: TenantId,
   limit?: number,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<TenantMember>> {

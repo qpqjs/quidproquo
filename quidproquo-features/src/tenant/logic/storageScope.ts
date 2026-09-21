@@ -1,4 +1,7 @@
-import { validateScopeSegment } from 'quidproquo-core';
+import { Nullable, validateScopeSegment } from 'quidproquo-core';
+
+import { TenantId } from '../models/TenantId';
+import { isTenantId } from './isTenantId';
 
 // Typed storage scopes: every tenant-aware request runs under exactly one of
 // these two partitions - a tenant the user belongs to, or the user's own
@@ -26,7 +29,7 @@ export interface ParsedStorageScope {
 // The raw id is validated (not the composed value): the prefix characters are
 // safe by construction, and the core scope gates re-validate the full segment
 // at every use anyway.
-export const composeTenantScope = (tenantId: string): string => {
+export const composeTenantScope = (tenantId: TenantId): string => {
   validateScopeSegment(tenantId);
   return `${TENANT_SCOPE_PREFIX}${tenantId}`;
 };
@@ -50,7 +53,7 @@ export const parseStorageScope = (scope: string): ParsedStorageScope | null => {
 };
 
 // Convenience for the common "is this scope a tenant, and which one" read.
-export const getTenantIdFromScope = (scope: string): string | null => {
+export const getTenantIdFromScope = (scope: string): Nullable<TenantId> => {
   const parsed = parseStorageScope(scope);
-  return parsed?.type === StorageScopeType.tenant ? parsed.id : null;
+  return parsed?.type === StorageScopeType.tenant && isTenantId(parsed.id) ? parsed.id : null;
 };

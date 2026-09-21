@@ -1,5 +1,6 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
+import { askTenantIdParse } from './askTenantIdParse';
 import { askTenantValidateMembership } from './askTenantValidateMembership';
 import { composePersonalScope, composeTenantScope, parseStorageScope, StorageScopeType } from './storageScope';
 
@@ -26,10 +27,11 @@ export function* askTenantConnectionScopeResolver(input: { userId: string; reque
     return requestedScope;
   }
 
-  const isMember = yield* askTenantValidateMembership(userId, requestedScope);
+  const tenantId = yield* askTenantIdParse(requestedScope);
+  const isMember = yield* askTenantValidateMembership(userId, tenantId);
   if (!isMember) {
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }
 
-  return composeTenantScope(requestedScope);
+  return composeTenantScope(tenantId);
 }

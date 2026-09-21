@@ -4,6 +4,7 @@ import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../constants/tenantGlobalNames';
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { TenantResolvedRequest } from '../models/TenantResolvedRequest';
+import { askTenantIdParse } from './askTenantIdParse';
 import { askTenantResolveUserId } from './askTenantResolveUserId';
 import { composePersonalScope, composeTenantScope } from './storageScope';
 
@@ -21,11 +22,12 @@ export function* askTenantResolveRequest(event: HTTPEvent, userDirectoryName?: s
 
   const userId = yield* askTenantResolveUserId(userDirectoryName);
 
-  const tenantId = qpqWebServerUtils.getHeaderValue(headerName, event.headers);
-  if (!tenantId) {
+  const claimedTenantId = qpqWebServerUtils.getHeaderValue(headerName, event.headers);
+  if (!claimedTenantId) {
     return { scope: composePersonalScope(userId), userId, tenantId: null, membership: null };
   }
 
+  const tenantId = yield* askTenantIdParse(claimedTenantId);
   const membership = yield* askTenantMembershipGet(userId, tenantId);
   if (!membership || membership.disabled) {
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');

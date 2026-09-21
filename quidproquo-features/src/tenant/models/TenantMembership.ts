@@ -1,5 +1,6 @@
 import { QpqIsoDateTime } from 'quidproquo-core';
 
+import { TenantId } from './TenantId';
 import { TenantPermissionGrant } from './TenantPermissionGrant';
 
 /**
@@ -10,7 +11,7 @@ import { TenantPermissionGrant } from './TenantPermissionGrant';
  * re-enable.
  */
 export type TenantMembership = {
-  tenantId: string;
+  tenantId: TenantId;
   userId: string;
   roles: string[];
   grants: TenantPermissionGrant[];

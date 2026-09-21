@@ -4,6 +4,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../../eventDoc/constants/eventDocGlobalNames';
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
 import { askEventDocParseBody } from '../../../eventDoc/routes/askEventDocParseBody';
+import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantMemberAdd } from '../../logic/askTenantMemberAdd';
 import { TenantMemberAddRequest } from '../../models/TenantMemberAddRequest';
 import { askTenantAssertCallerMayManageMembers } from '../askTenantAssertCallerMayManageMembers';
@@ -13,8 +14,9 @@ import { askTenantAssertCallerMayManageMembers } from '../askTenantAssertCallerM
  * roles. Needs MembersManage. NotFound when no account has that email - there is no invite flow.
  */
 export function* addMember(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  const tenantId = yield* askTenantIdParse(params.id);
   const userId = yield* askEventDocResolveUserId();
-  yield* askTenantAssertCallerMayManageMembers(params.id, userId);
+  yield* askTenantAssertCallerMayManageMembers(tenantId, userId);
 
   const { email } = yield* askEventDocParseBody<TenantMemberAddRequest>(event);
   if (typeof email !== 'string') {
@@ -22,7 +24,7 @@ export function* addMember(event: HTTPEvent, params: { id: string }): AskRespons
   }
 
   const userDirectoryName = yield* askConfigGetGlobal<string>(EVENT_DOC_USER_DIRECTORY_GLOBAL);
-  const member = yield* askTenantMemberAdd(userDirectoryName, params.id, email, userId);
+  const member = yield* askTenantMemberAdd(userDirectoryName, tenantId, email, userId);
 
   return qpqWebServerUtils.toJsonEventResponse(member);
 }
