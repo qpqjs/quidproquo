@@ -5,14 +5,18 @@ import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
 import { askRunEventDocConcurrentAppendTest } from './eventDoc/askRunEventDocConcurrentAppendTest';
 import { askRunEventDocInterleavedBatchAppendTest } from './eventDoc/askRunEventDocInterleavedBatchAppendTest';
 import { askRunKeyValueStoreTest } from './keyValueStore/askRunKeyValueStoreTest';
+import { askRunKeyValueStoreStreamTest } from './keyValueStoreStream/askRunKeyValueStoreStreamTest';
 import { askRunNoopTest } from './noop/askRunNoopTest';
 import { askRunEchoRoundTripTest } from './openApi/askRunEchoRoundTripTest';
 import { askRunOpenApiDocumentTest } from './openApi/askRunOpenApiDocumentTest';
 import { askRunParameterTest } from './parameter/askRunParameterTest';
 import { askRunScheduleTest } from './schedule/askRunScheduleTest';
+import { askRunScopedKeyValueStoreTest } from './scopedKeyValueStore/askRunScopedKeyValueStoreTest';
+import { askRunScopedStorageDriveTest } from './scopedStorageDrive/askRunScopedStorageDriveTest';
 import { askRunSecretTest } from './secret/askRunSecretTest';
 import { askRunSigningKeyTest } from './signingKey/askRunSigningKeyTest';
 import { askRunStorageDriveTest } from './storageDrive/askRunStorageDriveTest';
+import { askRunStorageDriveEventTest } from './storageDriveEvent/askRunStorageDriveEventTest';
 import { SmokeTestDefinition } from './SmokeTestDefinition';
 
 // Every smoke test a run executes. They run in parallel, one queue message
@@ -51,4 +55,8 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
     name: 'crossServiceSigningKey',
     askRun: askRunCrossServiceSigningKeyTest,
   },
+  { name: 'scopedStorageDrive', askRun: askRunScopedStorageDriveTest },
+  { name: 'scopedKeyValueStore', askRun: askRunScopedKeyValueStoreTest },
+  { name: 'storageDriveEvent', askRun: askRunStorageDriveEventTest },
+  { name: 'keyValueStoreStream', askRun: askRunKeyValueStoreStreamTest },
 ];

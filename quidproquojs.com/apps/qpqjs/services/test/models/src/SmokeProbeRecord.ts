@@ -5,4 +5,11 @@ export type SmokeProbeRecord = {
   probeId: string;
   category: string;
   value: number;
+
+  // Set by the storage drive event and kvs stream handlers: what the event
+  // said its scope and path/key were, and (for file events) the ambient
+  // storage scope the handler ran under, so a test can prove both agree.
+  scope?: string;
+  ambientScope?: string;
+  path?: string;
 };

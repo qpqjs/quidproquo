@@ -31,12 +31,16 @@ import {
   SMOKE_EVENT_DOC_BASE_PATH,
 } from '../constants/smokeEventDoc';
 import {
+  SMOKE_FILE_EVENT_DRIVE,
   SMOKE_PROBE_EVENT_BUS,
   SMOKE_PROBE_EVENT_QUEUE,
   SMOKE_PROBE_EVENT_TYPE,
   SMOKE_PROBE_PARAMETER,
   SMOKE_PROBE_PARAMETER_VALUE,
   SMOKE_PROBE_SECRET,
+  SMOKE_SCOPED_PROBE_DRIVE,
+  SMOKE_SCOPED_PROBE_STORE,
+  SMOKE_STREAM_PROBE_STORE,
 } from '../constants/smokeProbe';
 import {
   SMOKE_RUN_QUEUE,
@@ -61,6 +65,12 @@ export const defineSmoke = (): QPQConfig => {
       functionName: 'getGithubOidcAuthProcessors',
     },
   ];
+
+  const onSmokeFileEvent: QpqFunctionRuntime = {
+    basePath: __dirname,
+    relativePath: '../storageDrive/onSmokeFileEvent',
+    functionName: 'onSmokeFileEvent',
+  };
 
   return [
     // One record per run, keyed by runId; the queue workers each write their
@@ -92,6 +102,46 @@ export const defineSmoke = (): QPQConfig => {
     // alias-conditioned grant. testa declares the same key foreign (see
     // defineCrossServiceProbe) for the cross-service verify test.
     defineSigningKey(SMOKE_PROBE_SIGNING_KEY),
+
+    // Scoped probe resources: the scope gate in both directions (a scoped
+    // resource refuses an unscoped call, an unscoped one refuses a scope) and
+    // partition isolation between two scopes.
+    defineKeyValueStore<SmokeProbeRecord>(
+      SMOKE_SCOPED_PROBE_STORE,
+      'probeId',
+      [],
+      { indexes: ['category'], scoped: true }
+    ),
+    defineStorageDrive(SMOKE_SCOPED_PROBE_DRIVE, {
+      scoped: true,
+      onEvent: { create: onSmokeFileEvent, delete: onSmokeFileEvent },
+    }),
+
+    // File event test path: a write or delete on either drive fires the
+    // handler, which writes a marker into the probe store; the test polls for
+    // it. The scoped drive's events must arrive with the scope split off.
+    defineStorageDrive(SMOKE_FILE_EVENT_DRIVE, {
+      onEvent: { create: onSmokeFileEvent, delete: onSmokeFileEvent },
+    }),
+
+    // Kvs stream test path: a change on this scoped store streams to the
+    // handler, which writes a marker into the probe store; the test polls for
+    // it. The record must carry the scope as its own field with a raw key.
+    defineKeyValueStore<SmokeProbeRecord>(
+      SMOKE_STREAM_PROBE_STORE,
+      'probeId',
+      [],
+      {
+        scoped: true,
+        onStream: {
+          runtime: {
+            basePath: __dirname,
+            relativePath: '../kvsStream/onSmokeStreamRecord',
+            functionName: 'onSmokeStreamRecord',
+          },
+        },
+      }
+    ),
 
     // Event bus test path: publish to the bus, the subscribed queue's entry
     // writes a marker into the probe store, the test polls for it.

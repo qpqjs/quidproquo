@@ -1,8 +1,10 @@
 export * from './askSmokeAssert';
+export * from './askSmokePollForMarker';
 export * from './crossService';
 export * from './eventBus';
 export * from './eventDoc';
 export * from './keyValueStore';
+export * from './keyValueStoreStream';
 export * from './noop';
 export * from './openApi';
 export * from './parameter';
@@ -11,3 +13,4 @@ export * from './signingKey';
 export * from './SmokeTestDefinition';
 export * from './smokeTestRegistry';
 export * from './storageDrive';
+export * from './storageDriveEvent';
