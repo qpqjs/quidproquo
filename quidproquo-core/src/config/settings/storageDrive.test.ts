@@ -13,7 +13,7 @@ describe('defineStorageDrive', () => {
       global: false,
       onEvent: undefined,
       lifecycleRules: undefined,
-      encryption: false,
+      cryptoKeyName: undefined,
       scoped: false,
       lockedDown: false,
       owner: undefined,
@@ -25,19 +25,19 @@ describe('defineStorageDrive', () => {
     expect(() => defineStorageDrive('Uploads', { scoped: true, copyPath: './static' })).toThrow(/scoped/);
   });
 
-  it('defaults global, encryption and lockedDown to false', () => {
+  it('defaults global and lockedDown to false and cryptoKeyName to undefined', () => {
     const setting = defineStorageDrive('Uploads');
 
     expect(setting.global).toBe(false);
-    expect(setting.encryption).toBe(false);
+    expect(setting.cryptoKeyName).toBeUndefined();
     expect(setting.lockedDown).toBe(false);
   });
 
   it('applies the supplied options', () => {
-    const setting = defineStorageDrive('Uploads', { global: true, encryption: true, lockedDown: true, copyPath: './assets' });
+    const setting = defineStorageDrive('Uploads', { global: true, cryptoKeyName: 'main', lockedDown: true, copyPath: './assets' });
 
     expect(setting.global).toBe(true);
-    expect(setting.encryption).toBe(true);
+    expect(setting.cryptoKeyName).toBe('main');
     expect(setting.lockedDown).toBe(true);
     expect(setting.copyPath).toBe('./assets');
   });

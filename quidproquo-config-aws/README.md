@@ -19,7 +19,6 @@ You usually pair it with [`quidproquo-deploy-awscdk`](https://www.npmjs.com/pack
 | `defineAwsServiceAccountInfo` | Which account and region a service deploys into |
 | `defineAwsDyanmoOverrideForKvs` | DynamoDB specifics for a key value store: indexes, capacity, streams |
 | `defineAwsDataStoreRemovalPolicy` | Whether data stores survive a stack delete |
-| `defineAwsKmsKey` | Customer managed keys, including for the crypto actions |
 | `defineAwsVirtualNetworkSettings` | VPC placement |
 | `defineAwsAlarm`, `defineAwsServiceDashboard` | CloudWatch alarms and dashboards |
 | `defineDomainCertificate` | ACM certificates, including cross-region for CloudFront |

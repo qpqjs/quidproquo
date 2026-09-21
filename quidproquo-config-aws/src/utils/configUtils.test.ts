@@ -13,7 +13,6 @@ import {
 } from '../config/settings/awsAlarm';
 import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
-import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
 import { defineAwsServiceDashboard } from '../config/settings/awsServiceDashboard';
 import { defineAwsVirtualNetworkSettings } from '../config/settings/awsVirtualNetworkSettings';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
@@ -30,9 +29,6 @@ import {
   getAwsAccountIds,
   getAwsBootstrapOrganizationConfigs,
   getAwsDataStoreRemovalPolicy,
-  getAwsKmsKeyForKeyValueStore,
-  getAwsKmsKeyForStorageDrive,
-  getAwsKmsKeys,
   getAwsServiceAccountInfoByDeploymentInfo,
   getAwsServiceAccountInfoConfig,
   getAwsServiceAccountInfos,
@@ -351,50 +347,6 @@ describe('getDomainCertificateArnSsmParameterName', () => {
     expect(getDomainCertificateArnSsmParameterName('us-east-1', buildTestQpqConfig([], { feature: 'joe' }))).toBe(
       '/qpq/domain/certificate-arn/us-east-1/test-app-development-joe',
     );
-  });
-});
-
-describe('getAwsKmsKeys', () => {
-  it('returns the defined kms key settings', () => {
-    const config = buildTestQpqConfig([defineAwsKmsKey('k', 'arn', AwsKmsKeyTargetType.storageDrive, { name: 'files', module: 'test-module' })]);
-
-    expect(getAwsKmsKeys(config)).toHaveLength(1);
-  });
-});
-
-describe('getAwsKmsKeyForStorageDrive', () => {
-  it('matches a key by storage drive name and owning module', () => {
-    const config = buildTestQpqConfig([
-      defineStorageDrive('files'),
-      defineAwsKmsKey('filesKey', 'arn', AwsKmsKeyTargetType.storageDrive, { name: 'files', module: 'test-module' }),
-    ]);
-
-    const storageDrive = defineStorageDrive('files');
-
-    expect(getAwsKmsKeyForStorageDrive(config, storageDrive)?.keyname).toBe('filesKey');
-  });
-
-  it('returns undefined when no key matches', () => {
-    const config = buildTestQpqConfig([defineStorageDrive('files')]);
-
-    expect(getAwsKmsKeyForStorageDrive(config, defineStorageDrive('files'))).toBeUndefined();
-  });
-});
-
-describe('getAwsKmsKeyForKeyValueStore', () => {
-  it('matches a key by key value store name and owning module', () => {
-    const config = buildTestQpqConfig([
-      defineKeyValueStore('users', 'id'),
-      defineAwsKmsKey('usersKey', 'arn', AwsKmsKeyTargetType.keyValueStore, { name: 'users', module: 'test-module' }),
-    ]);
-
-    expect(getAwsKmsKeyForKeyValueStore(config, defineKeyValueStore('users', 'id'))?.keyname).toBe('usersKey');
-  });
-
-  it('returns undefined when no key matches', () => {
-    const config = buildTestQpqConfig([defineKeyValueStore('users', 'id')]);
-
-    expect(getAwsKmsKeyForKeyValueStore(config, defineKeyValueStore('users', 'id'))).toBeUndefined();
   });
 });
 

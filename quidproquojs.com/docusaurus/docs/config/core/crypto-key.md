@@ -7,10 +7,12 @@ description: Define a crypto key, an application-level encryption key for askCry
 
 Declares a **crypto key**: a named encryption key stories use through [askCryptoEncrypt](../../actions/core/crypto/ask-crypto-encrypt.md) and [askCryptoDecrypt](../../actions/core/crypto/ask-crypto-decrypt.md). The key material never leaves the provider; your code only ever sees opaque ciphertext blobs.
 
-- **On AWS:** provisions a KMS customer managed key with automatic rotation enabled, addressed by a deterministic alias derived from application/module/environment, and grants the service's role use of it (`kms:GenerateDataKey*`, `kms:Decrypt`, `kms:Encrypt`, `kms:DescribeKey`). Rotation needs nothing from the app: old key material stays available for decrypt.
+- **On AWS:** provisions a KMS customer managed key with automatic rotation enabled, addressed by a deterministic alias derived from application/module/environment, and grants the service's role use of it (`kms:GenerateDataKey*`, `kms:Decrypt`, `kms:Encrypt`, `kms:ReEncrypt*`, `kms:DescribeKey`). Rotation needs nothing from the app: old key material stays available for decrypt.
 - **On the dev server:** a local master key is seeded on first use at `.qpq-runtime/<app>/cryptoKeys/<service>.json`, so everything works offline with no AWS credentials.
 
 One application-level key is usually enough. Separation between callers comes from the `context` on each encrypt (see [askCryptoEncrypt](../../actions/core/crypto/ask-crypto-encrypt.md)), not from separate keys.
+
+The same key also encrypts data at rest: name it as `cryptoKeyName` on a [storage drive](./storage-drive.md) or [key-value store](./key-value-store.md) and that resource is encrypted with it instead of the provider's managed keys.
 
 ```typescript
 import { defineCryptoKey } from 'quidproquo-core';

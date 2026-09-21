@@ -96,7 +96,10 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
 
   lifecycleRules?: StorageDriveLifecycleRule[];
 
-  encryption?: boolean;
+  // Encrypt the drive with the named defineCryptoKey instead of the provider's own managed
+  // encryption, which always applies. The key must be declared in the same config, owned or
+  // foreign; a foreign key's owning service must be deployed first.
+  cryptoKeyName?: string;
 
   // Every file action on this drive must carry a scope; an unscoped call is refused
   // rather than written to the bare path. Incompatible with copyPath.
@@ -118,7 +121,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
 
   lifecycleRules?: StorageDriveLifecycleRule[];
 
-  encryption: boolean;
+  cryptoKeyName?: string;
   scoped: boolean;
   lockedDown: boolean;
 }
@@ -144,7 +147,7 @@ export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdva
 
     lifecycleRules: options?.lifecycleRules,
 
-    encryption: options?.encryption ?? false,
+    cryptoKeyName: options?.cryptoKeyName,
     scoped: options?.scoped ?? false,
     lockedDown: options?.lockedDown ?? false,
 

@@ -12,6 +12,12 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 
 export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
+
+  /**
+   * The key behind the store's `cryptoKeyName`, resolved by the stack (see
+   * resolveCryptoKeyForResource). Required when the store names one.
+   */
+  cryptoKey?: aws_kms.IKey;
 }
 
 export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBlock {
@@ -72,17 +78,13 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
 
-    let tableEncryption: aws_dynamodb.TableEncryption | undefined;
-    let encryptionKey: aws_kms.IKey | undefined;
-    if (props.keyValueStoreConfig.encryption) {
-      const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(props.qpqConfig, props.keyValueStoreConfig);
-      if (kmsCfg) {
-        encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
-        tableEncryption = aws_dynamodb.TableEncryption.CUSTOMER_MANAGED;
-      } else {
-        tableEncryption = aws_dynamodb.TableEncryption.AWS_MANAGED;
-      }
+    if (props.keyValueStoreConfig.cryptoKeyName && !props.cryptoKey) {
+      throw new Error(
+        `Key value store "${props.keyValueStoreConfig.keyValueStoreName}" names crypto key "${props.keyValueStoreConfig.cryptoKeyName}" but none was resolved`,
+      );
     }
+    const tableEncryption = props.cryptoKey ? aws_dynamodb.TableEncryption.CUSTOMER_MANAGED : undefined;
+    const encryptionKey = props.cryptoKey;
 
     const table = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'kvs'),
@@ -218,21 +220,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverKeyValueStoreAccess', kvsActions, foreignArns);
     }
 
-    // Grant KMS permissions for any encrypted KVSs (owned or foreign) whose
-    // customer-managed key is declared in this service's config.
-    const kmsArns = [...ownedKvsConfigs, ...foreignKvsConfigs]
-      .filter((cfg) => cfg.encryption)
-      .map((cfg) => qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(qpqConfig, cfg)?.arn)
-      .filter((arn): arn is string => Boolean(arn));
-
-    if (kmsArns.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:Encrypt', 'kms:ReEncrypt*'],
-          resources: [...new Set(kmsArns)],
-        }),
-      );
-    }
+    // KMS use for a store's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
+    // which covers every crypto key declared in this config.
   }
 }

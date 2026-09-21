@@ -13,12 +13,12 @@ export interface QpqCoreCryptoKeyConstructProps extends QpqConstructBlockProps {
   cryptoKeyConfig: CryptoKeyQPQConfigSetting;
 }
 
-// No fromOtherStack import path: lambdas are the only consumer and they get
-// access via authorizeActionsForRole; nothing references the key construct
-// cross-stack. (If one is ever added, do NOT build it on Alias.fromAliasName
-// grants - those silently no-op unless the
+// No fromOtherStack import path: the one cross-stack reference (a drive or
+// store's cryptoKeyName on a foreign key, see resolveCryptoKeyForResource) is
+// an Alias.fromAliasName used only as an encryption key id, never for grants.
+// Grants from an imported alias silently no-op unless the
 // @aws-cdk/aws-kms:applyImportedAliasPermissionsToPrincipal feature flag is
-// set; use an explicit kms:ResourceAliases policy like the one below.)
+// set, so all access comes from the explicit kms:ResourceAliases policy below.
 export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqResource {
   key: aws_kms.IKey;
 
@@ -67,7 +67,7 @@ export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqR
         new aws_iam.PolicyStatement({
           sid: 'QpqCryptoKeyUse',
           effect: aws_iam.Effect.ALLOW,
-          actions: ['kms:GenerateDataKey*', 'kms:Decrypt', 'kms:Encrypt', 'kms:DescribeKey'],
+          actions: ['kms:GenerateDataKey*', 'kms:Decrypt', 'kms:Encrypt', 'kms:ReEncrypt*', 'kms:DescribeKey'],
           resources: ['*'],
           conditions: {
             'ForAnyValue:StringEquals': {

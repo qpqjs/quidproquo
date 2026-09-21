@@ -12,7 +12,6 @@ export enum QPQAwsConfigSettingType {
   wafProtection = '@quidproquo-aws/config/wafProtection',
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
   awsGithubDeployRole = '@quidproquo-aws/config/awsGithubDeployRole',
-  awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
   awsEventBusQuickSubscription = '@quidproquo-aws/config/awsEventBusQuickSubscription',
   awsEmailSenderAllowList = '@quidproquo-aws/config/awsEmailSenderAllowList',
   awsDataStoreRemovalPolicy = '@quidproquo-aws/config/awsDataStoreRemovalPolicy',

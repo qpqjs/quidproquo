@@ -26,7 +26,7 @@ describe('defineKeyValueStore', () => {
       owner: undefined,
       ttlAttribute: undefined,
       disablePointInTimeRecovery: false,
-      encryption: false,
+      cryptoKeyName: undefined,
       scoped: false,
     });
   });
@@ -40,11 +40,11 @@ describe('defineKeyValueStore', () => {
   });
 
   it('converts a bare string index to a partition-key-only KvsIndex and applies options', () => {
-    const setting = defineKeyValueStore('Users', 'id', [], { indexes: ['email'], global: true, encryption: true });
+    const setting = defineKeyValueStore('Users', 'id', [], { indexes: ['email'], global: true, cryptoKeyName: 'main' });
 
     expect(setting.indexes).toEqual([{ partitionKey: { key: 'email', type: 'string' } }]);
     expect(setting.global).toBe(true);
-    expect(setting.encryption).toBe(true);
+    expect(setting.cryptoKeyName).toBe('main');
   });
 
   it('converts an object index with partition and sort keys, keeping explicit key types', () => {

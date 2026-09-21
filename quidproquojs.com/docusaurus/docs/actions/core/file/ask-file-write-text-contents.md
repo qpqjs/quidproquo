@@ -60,7 +60,7 @@ function* askFileWriteTextContents(
 ## Notes
 
 - If the drive declares an `onEvent.create` handler in [defineStorageDrive](../../../config/core/storage-drive.md#file-events-onevent), that story is triggered by this write.
-- Writes to a drive with `encryption: true` are encrypted at rest automatically — nothing extra is needed at the call site.
+- Every drive is encrypted at rest; `cryptoKeyName` swaps in one of your own `defineCryptoKey`s. Nothing changes at the call site either way.
 
 ## Related
 

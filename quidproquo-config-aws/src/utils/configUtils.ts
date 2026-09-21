@@ -9,8 +9,6 @@ import {
   AwsDataStoreRemovalPolicyQPQConfigSetting,
   AwsDyanmoOverrideForKvsQPQConfigSetting,
   AwsGithubDeployRoleQPQConfigSetting,
-  AwsKmsKeyQPQConfigSetting,
-  AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
   AwsServiceDashboardQPQConfigSetting,
@@ -297,32 +295,6 @@ export const getDomainCertificateArnSsmParameterName = (region: string, qpqConfi
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return `/qpq/domain/certificate-arn/${region}/${[application, environment, feature].filter(Boolean).join('-')}`;
-};
-
-export const getAwsKmsKeys = (qpqConfig: QPQConfig): AwsKmsKeyQPQConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<AwsKmsKeyQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsKmsKey);
-};
-
-export const getAwsKmsKeyForStorageDrive = (
-  qpqConfig: QPQConfig,
-  storageDriveConfig: StorageDriveQPQConfigSetting,
-): AwsKmsKeyQPQConfigSetting | undefined => {
-  const ownerModule = storageDriveConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  return getAwsKmsKeys(qpqConfig).find(
-    (k) => k.type === AwsKmsKeyTargetType.storageDrive && k.kmsOwner.name === storageDriveConfig.storageDrive && k.kmsOwner.module === ownerModule,
-  );
-};
-
-export const getAwsKmsKeyForKeyValueStore = (
-  qpqConfig: QPQConfig,
-  kvsConfig: KeyValueStoreQPQConfigSetting,
-): AwsKmsKeyQPQConfigSetting | undefined => {
-  const ownerModule = kvsConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  return getAwsKmsKeys(qpqConfig).find(
-    (k) => k.type === AwsKmsKeyTargetType.keyValueStore && k.kmsOwner.name === kvsConfig.keyValueStoreName && k.kmsOwner.module === ownerModule,
-  );
 };
 
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {

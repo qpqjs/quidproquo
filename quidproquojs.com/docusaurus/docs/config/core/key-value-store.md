@@ -55,7 +55,7 @@ Zero or more sort keys. The list is significant:
 | `owner` | `CrossModuleOwner` | – | Declares that this store is owned by **another** module/service. Use this to read/write a store deployed elsewhere: the deploy grants this service IAM access to the foreign table instead of creating a new one. |
 | `ttlAttribute` | `string` | – | Name of a record attribute holding a Unix-epoch (seconds) timestamp. DynamoDB automatically deletes records once that time passes. |
 | `disablePointInTimeRecovery` | `boolean` | `false` | Point-in-time recovery (35-day continuous backups / restore) is on by default; set this to opt out. |
-| `encryption` | `boolean` | `false` | Enables customer-managed KMS encryption for the table (the KMS key comes from the service's AWS config). When a customer-managed key isn't configured, AWS-managed encryption is used instead; when `false`, DynamoDB's default provider-managed encryption still applies. |
+| `cryptoKeyName` | `string` | | Encrypts the table with the named [defineCryptoKey](./crypto-key.md) instead of DynamoDB's default provider-managed encryption, which applies when omitted. The key must be declared in the same config, owned or via `owner`; a foreign key's owning service must be deployed first, since DynamoDB validates the key when the table is created. |
 | `scoped` | `boolean` | `false` | Requires every action against this store to carry a scope; a call without one throws `InvalidScopeError`. [askKeyValueStoreScanAllScopes](../../actions/core/key-value-store/ask-key-value-store-scan-all-scopes.md) is the one exempt action. |
 | `onStream` | `KvsStreamSettings` | – | Turns on change data capture and runs a story for every insert/modify/remove on the store. See [Change data capture (`onStream`)](#change-data-capture-onstream). |
 
@@ -172,7 +172,7 @@ export default [
 
   // Encrypted store using a store owned by another service
   defineKeyValueStore('billing', 'accountId', [], {
-    encryption: true,
+    cryptoKeyName: 'main',
     owner: { module: 'billing-service' },
   }),
 ];
@@ -183,6 +183,6 @@ export default [
 - **Read a single record:** [askKeyValueStoreGet](../../actions/core/key-value-store/ask-key-value-store-get.md) · [askKeyValueStoreGetAll](../../actions/core/key-value-store/ask-key-value-store-get-all.md)
 - **Query & scan:** [askKeyValueStoreQuery](../../actions/core/key-value-store/ask-key-value-store-query.md) · [askKeyValueStoreScan](../../actions/core/key-value-store/ask-key-value-store-scan.md)
 - **Write:** [askKeyValueStoreUpsert](../../actions/core/key-value-store/ask-key-value-store-upsert.md) · [askKeyValueStoreUpdate](../../actions/core/key-value-store/ask-key-value-store-update.md) · [askKeyValueStoreDelete](../../actions/core/key-value-store/ask-key-value-store-delete.md)
-- **AWS tuning:** [defineAwsKmsKey](../config-aws/aws-kms-key.md) (customer-managed encryption key for the `encryption` flag), [defineAwsDyanmoOverrideForKvs](../config-aws/aws-dyanmo-override-for-kvs.md) (back the store with a pre-existing DynamoDB table), and [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the table on teardown).
+- **AWS tuning:** [defineAwsDyanmoOverrideForKvs](../config-aws/aws-dyanmo-override-for-kvs.md) (back the store with a pre-existing DynamoDB table), and [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the table on teardown).
 - [defineEventDocSummary](../features/event-doc-summary.md) — a real `onStream` consumer: rebuilds a document's summary record from its event log on every change.
 - **AWS implementation:** `QpqCoreKeyValueStoreConstruct` (DynamoDB table, LSIs, GSIs, TTL, PITR, KMS, IAM grants) and `QpqApiCoreKeyValueStoreStreamConstruct` (the `onStream` handler lambda + event source) in `quidproquo-deploy-awscdk`; KVS action processors in `quidproquo-actionprocessor-awslambda`.
