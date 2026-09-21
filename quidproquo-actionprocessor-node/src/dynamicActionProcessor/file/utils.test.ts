@@ -50,7 +50,7 @@ describe('resolveDriveServiceName', () => {
 });
 
 describe('resolveFilePath', () => {
-  const qpqConfig = buildTestQpqConfig([defineStorageDrive('media')]);
+  const qpqConfig = buildTestQpqConfig([defineStorageDrive('media'), defineStorageDrive('tenantMedia', { scoped: true })]);
 
   it('resolves a relative path under the drive root', () => {
     const expected = path.resolve(fileConfig.storagePath, moduleName, 'media', 'a/b.txt');
@@ -77,19 +77,26 @@ describe('resolveFilePath', () => {
   });
 
   it('resolves under the scope segment when a scope is given', () => {
-    const expected = path.resolve(fileConfig.storagePath, moduleName, 'media', 'tenant-a', 'a/b.txt');
+    const expected = path.resolve(fileConfig.storagePath, moduleName, 'tenantMedia', 'tenant-a', 'a/b.txt');
 
-    expect(resolveFilePath(fileConfig, qpqConfig, 'media', 'a/b.txt', 'tenant-a')).toBe(expected);
+    expect(resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', 'a/b.txt', 'tenant-a')).toBe(expected);
   });
 
   it('throws when the path escapes the scope root', () => {
-    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', '../tenant-b/secret.txt', 'tenant-a')).toThrow('escapes drive root');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', '../tenant-b/secret.txt', 'tenant-a')).toThrow('escapes drive root');
+  });
+
+  it('refuses a scope/flag mismatch in either direction', () => {
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', 'a.txt')).toThrow('is scoped');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', 'tenant-a')).toThrow('is not scoped');
   });
 
   it('rejects a scope containing separators or traversal outright', () => {
-    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', 'tenant-a/../tenant-b')).toThrow('Scope must not contain path separators');
-    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', '..')).toThrow('Scope must not contain path separators');
-    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', '')).toThrow('Scope must not be empty.');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', 'a.txt', 'tenant-a/../tenant-b')).toThrow(
+      'Scope must not contain path separators',
+    );
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', 'a.txt', '..')).toThrow('Scope must not contain path separators');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'tenantMedia', 'a.txt', '')).toThrow('Scope must not be empty.');
   });
 });
 

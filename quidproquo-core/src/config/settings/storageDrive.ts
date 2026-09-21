@@ -98,6 +98,10 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
 
   encryption?: boolean;
 
+  // Every file action on this drive must carry a scope; an unscoped call is refused
+  // rather than written to the bare path. Incompatible with copyPath.
+  scoped?: boolean;
+
   // Only the owning service's runtime role may read objects. Every other principal in the
   // account, humans included, is denied at the bucket; writes and listing are unaffected.
   lockedDown?: boolean;
@@ -115,25 +119,35 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   lifecycleRules?: StorageDriveLifecycleRule[];
 
   encryption: boolean;
+  scoped: boolean;
   lockedDown: boolean;
 }
 
-export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.storageDrive,
-  uniqueKey: storageDrive,
+export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => {
+  // copyPath content is deployed straight to the bucket root, outside every
+  // scope, so it can never coexist with a scoped drive.
+  if (options?.scoped && options.copyPath) {
+    throw new Error(`Storage drive '${storageDrive}' cannot be both scoped and have a copyPath`);
+  }
 
-  storageDrive,
+  return {
+    configSettingType: QPQCoreConfigSettingType.storageDrive,
+    uniqueKey: storageDrive,
 
-  copyPath: options?.copyPath,
+    storageDrive,
 
-  global: options?.global ?? false,
+    copyPath: options?.copyPath,
 
-  onEvent: options?.onEvent,
+    global: options?.global ?? false,
 
-  lifecycleRules: options?.lifecycleRules,
+    onEvent: options?.onEvent,
 
-  encryption: options?.encryption ?? false,
-  lockedDown: options?.lockedDown ?? false,
+    lifecycleRules: options?.lifecycleRules,
 
-  owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
-});
+    encryption: options?.encryption ?? false,
+    scoped: options?.scoped ?? false,
+    lockedDown: options?.lockedDown ?? false,
+
+    owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
+  };
+};

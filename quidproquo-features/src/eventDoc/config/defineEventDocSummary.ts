@@ -13,6 +13,9 @@ import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 export type EventDocSummaryOptions = {
   // Registered dynamic-functions name per doc type; a type with no entry is not snapshotted.
   snapshotFunctions?: Record<string, string>;
+  // Every store and the drive refuse unscoped calls. Must match the routes' scopeResolver:
+  // defineEventDoc derives it; a direct caller with a resolver sets it.
+  scoped?: boolean;
 };
 
 /**
@@ -23,10 +26,12 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
   defineKeyValueStore<EventDocSummary>(keyValueStoreName, 'type', ['id'], {
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
+    scoped: options?.scoped,
   }),
   // pk=modelId, sk=numeric event id. The stream drives the summary projector; coalescing makes one burst one rebuild.
   defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
+    scoped: options?.scoped,
     onStream: {
       runtime: {
         ...getFeatureEntryQpqFunctionRuntime('eventDoc', 'kvsStream', 'eventDocSummaryProjector::projectEventDocSummary'),
@@ -44,6 +49,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
   // is a config change, not a migration.
   defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
+    scoped: options?.scoped,
   }),
-  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName)),
+  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), { scoped: options?.scoped }),
 ];

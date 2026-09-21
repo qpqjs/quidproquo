@@ -38,6 +38,7 @@ const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
 
 const STREAMED = 'streamed';
 const PLAIN = 'plain';
+const STREAMED_SCOPED = 'streamed-scoped';
 
 type StreamedRow = { pk: string; sk: string; body?: string };
 
@@ -46,6 +47,10 @@ const testQpqConfig = buildTestQpqConfig([
     onStream: { runtime: '/entry/kvsStream/project::project' as any, coalesceByPartitionKey: true },
   }),
   defineKeyValueStore(PLAIN, kvsKey('pk', 'string')),
+  defineKeyValueStore<StreamedRow>(STREAMED_SCOPED, kvsKey('pk', 'string'), [kvsKey('sk', 'string')], {
+    onStream: { runtime: '/entry/kvsStream/project::project' as any, coalesceByPartitionKey: true },
+    scoped: true,
+  }),
 ]);
 
 const upsert = async (keyValueStoreName: string, item: Record<string, unknown>, scope?: string) => {
@@ -96,7 +101,7 @@ describe('dev server kvs stream emission', () => {
   });
 
   it('passes the scope through, so the handler re-enters the right tenant', async () => {
-    await upsert(STREAMED, { pk: 'doc-1', sk: '0001' }, 'tenant-a');
+    await upsert(STREAMED_SCOPED, { pk: 'doc-1', sk: '0001' }, 'tenant-a');
 
     expect(lastEmission().scope).toBe('tenant-a');
     // Locally the backend partitions by scope at the file level, so keys stay raw.

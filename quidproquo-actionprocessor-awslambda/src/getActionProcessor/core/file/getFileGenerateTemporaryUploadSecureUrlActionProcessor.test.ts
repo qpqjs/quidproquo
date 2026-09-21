@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, ErrorTypeEnum, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,7 +15,7 @@ vi.mock('../../../logic/s3/generatePresignedUploadUrl', () => ({ generatePresign
 const session = { correlation: 'corr-1' };
 
 const invoke = async (payload: { drive: string; filepath: string; expirationMs: number; contentType?: string; contentDisposition?: string }) => {
-  const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor({} as never, null as any))[
+  const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor(buildTestQpqConfig(), null as any))[
     FileActionType.GenerateTemporaryUploadSecureUrl
   ];
   return invokeProcessor(processor, payload, { session });

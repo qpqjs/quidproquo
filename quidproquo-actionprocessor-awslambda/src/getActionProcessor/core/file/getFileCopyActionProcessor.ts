@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileCopy,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -22,9 +22,9 @@ const getProcessFileCopy = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileCo
 
       await copyFile(
         sourceBucketName,
-        composeScopedFilePath(scope, sourceFilepath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, sourceDrive, scope, sourceFilepath),
         targetBucketName,
-        composeScopedFilePath(scope, targetFilepath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, targetDrive, scope, targetFilepath),
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       );
 

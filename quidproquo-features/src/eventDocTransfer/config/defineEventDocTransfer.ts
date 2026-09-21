@@ -49,7 +49,7 @@ export const defineEventDocTransfer = ({ service, collections, scopeResolver, ro
     defineVersionedRoute(method, path, runtime(functionName), options, version);
 
   return [
-    defineStorageDrive(EVENT_DOC_TRANSFER_DRIVE_NAME),
+    defineStorageDrive(EVENT_DOC_TRANSFER_DRIVE_NAME, { scoped: scopeResolver !== undefined }),
 
     route('POST', `${TRANSFER_BASE_PATH}/manifest`, 'manifest'),
     route('POST', `${TRANSFER_BASE_PATH}/export`, 'exportBundle'),

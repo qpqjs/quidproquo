@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileListDirectory,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -22,7 +22,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       const s3FileList = await listFiles(
         s3BucketName,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-        composeScopedFilePath(scope, folderPath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, folderPath),
         maxFiles,
         pageToken,
       );

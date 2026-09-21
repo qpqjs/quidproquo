@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileStreamOpenBase,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   ErrorTypeEnum,
   FileActionType,
@@ -54,7 +54,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
 
       const response = await s3Client.send(
         new GetObjectCommand({
-          Key: composeScopedFilePath(scope, filepath),
+          Key: composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath),
           Bucket: s3BucketName,
         }),
       );

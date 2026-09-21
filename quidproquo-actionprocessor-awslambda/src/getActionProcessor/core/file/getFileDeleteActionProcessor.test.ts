@@ -1,4 +1,4 @@
-import { askFileDelete, FileActionType } from 'quidproquo-core';
+import { askFileDelete, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +14,7 @@ vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x
 vi.mock('../../../logic/s3/s3Utils', () => ({ deleteFiles: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepaths: string[] }) => {
-  const processor = (await getFileDeleteActionProcessor({} as never, null as any))[FileActionType.Delete];
+  const processor = (await getFileDeleteActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Delete];
   return invokeProcessor(processor, payload);
 };
 
@@ -25,7 +25,7 @@ describe('getProcessFileDelete', () => {
     const [result] = await invoke({ drive: 'assets', filepaths: ['a.txt', 'b.txt'] });
 
     expect(result).toEqual([]);
-    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('assets', {});
+    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('assets', expect.any(Array));
     expect(deleteFiles).toHaveBeenCalledWith('bucket-x', ['a.txt', 'b.txt'], 'us-test-1');
   });
 

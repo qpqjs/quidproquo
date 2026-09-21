@@ -1,4 +1,4 @@
-import { askFileReadObjectJsonBase, FileActionType } from 'quidproquo-core';
+import { askFileReadObjectJsonBase, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +13,7 @@ vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x
 vi.mock('../../../logic/s3/s3Utils', () => ({ readTextFile: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
-  const processor = (await getFileReadObjectJsonActionProcessor({} as never, null as any))[FileActionType.ReadObjectJson];
+  const processor = (await getFileReadObjectJsonActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ReadObjectJson];
   return invokeProcessor(processor, payload);
 };
 

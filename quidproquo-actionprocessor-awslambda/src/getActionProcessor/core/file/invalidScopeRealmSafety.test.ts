@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, FileActionType } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -23,7 +23,9 @@ vi.mock('./utils', () => ({
 
 describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
   it('maps a foreign-realm InvalidScopeError in generate secure url', async () => {
-    const processor = (await getFileGenerateTemporarySecureUrlActionProcessor({} as never, null as any))[FileActionType.GenerateTemporarySecureUrl];
+    const processor = (await getFileGenerateTemporarySecureUrlActionProcessor(buildTestQpqConfig(), null as any))[
+      FileActionType.GenerateTemporarySecureUrl
+    ];
 
     const [, error] = await invokeProcessor(processor, { drive: 'assets', filepath: 'a.txt', expirationMs: 1000, scope: 'bad' });
 
@@ -31,7 +33,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
   });
 
   it('maps a foreign-realm InvalidScopeError in generate upload secure url', async () => {
-    const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor({} as never, null as any))[
+    const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor(buildTestQpqConfig(), null as any))[
       FileActionType.GenerateTemporaryUploadSecureUrl
     ];
 

@@ -1,4 +1,4 @@
-import { FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +13,7 @@ vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x
 vi.mock('../../../logic/s3/s3Utils', () => ({ listFiles: vi.fn() }));
 
 const invoke = async (payload: { drive: string; folderPath: string; maxFiles?: number; pageToken?: string }) => {
-  const processor = (await getFileListDirectoryActionProcessor({} as never, null as any))[FileActionType.ListDirectory];
+  const processor = (await getFileListDirectoryActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ListDirectory];
   return invokeProcessor(processor, payload);
 };
 

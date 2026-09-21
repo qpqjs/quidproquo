@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileDelete,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askFile
   return async ({ drive, filepaths, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const keys = filepaths.map((filepath) => composeScopedFilePath(scope, filepath));
+      const keys = filepaths.map((filepath) => composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath));
 
       // Per-file delete failures come back as a normal result (the keys that
       // errored) so callers can retry them; only whole-call failures error.

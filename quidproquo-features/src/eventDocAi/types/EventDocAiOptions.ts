@@ -4,6 +4,10 @@ export type EventDocAiOptions = {
   // The eventDoc collection this AI works with (chats are scoped per document).
   storeName: string;
   type: string;
+  // Chats and their history follow the collection's scope: set when the collection's
+  // routes have a scopeResolver (the ws connection's scope), so the chat store and drive
+  // refuse unscoped calls just like the collection's own.
+  scoped?: boolean;
   // The service the ws requests route through — must match the serviceName the
   // frontend passes to askEventDocAiInit.
   serviceName: string;

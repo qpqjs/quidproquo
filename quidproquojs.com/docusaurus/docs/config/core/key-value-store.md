@@ -56,6 +56,7 @@ Zero or more sort keys. The list is significant:
 | `ttlAttribute` | `string` | – | Name of a record attribute holding a Unix-epoch (seconds) timestamp. DynamoDB automatically deletes records once that time passes. |
 | `disablePointInTimeRecovery` | `boolean` | `false` | Point-in-time recovery (35-day continuous backups / restore) is on by default; set this to opt out. |
 | `encryption` | `boolean` | `false` | Enables customer-managed KMS encryption for the table (the KMS key comes from the service's AWS config). When a customer-managed key isn't configured, AWS-managed encryption is used instead; when `false`, DynamoDB's default provider-managed encryption still applies. |
+| `scoped` | `boolean` | `false` | Requires every action against this store to carry a scope; a call without one throws `InvalidScopeError`. [askKeyValueStoreScanAllScopes](../../actions/core/key-value-store/ask-key-value-store-scan-all-scopes.md) is the one exempt action. |
 | `onStream` | `KvsStreamSettings` | – | Turns on change data capture and runs a story for every insert/modify/remove on the store. See [Change data capture (`onStream`)](#change-data-capture-onstream). |
 
 ## Keys (`CompositeKvsKey`)

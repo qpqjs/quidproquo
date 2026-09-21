@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileReadObjectJsonBase,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const key = composeScopedFilePath(scope, filepath);
+      const key = composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath);
 
       const json = await readTextFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 

@@ -27,7 +27,10 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
 const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
 
 const getProcessor = async () => {
-  const config = buildTestQpqConfig([defineKeyValueStore('store', { key: 'id', type: 'string' })]);
+  const config = buildTestQpqConfig([
+    defineKeyValueStore('store', { key: 'id', type: 'string' }),
+    defineKeyValueStore('tenantStore', { key: 'id', type: 'string' }, [], { scoped: true }),
+  ]);
   const processors = await getKeyValueStoreGetAllActionProcessor(devServerConfig)(config, noopDynamicModuleLoader);
   return processors[KeyValueStoreActionType.GetAll];
 };
@@ -49,16 +52,16 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockResolvedValue([]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', options: { scope: 'tenant-a' } });
+    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'tenant-a' } });
 
-    expect(repo.getAll).toHaveBeenCalledWith('store', 'tenant-a');
+    expect(repo.getAll).toHaveBeenCalledWith('tenantStore', 'tenant-a');
     expect(resolveActionResult(result)).toEqual([]);
   });
 
   it('rejects a malformed scope with InvalidScope', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', options: { scope: 'bad/scope' } });
+    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'bad/scope' } });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.InvalidScope);
     expect(repo.getAll).not.toHaveBeenCalled();

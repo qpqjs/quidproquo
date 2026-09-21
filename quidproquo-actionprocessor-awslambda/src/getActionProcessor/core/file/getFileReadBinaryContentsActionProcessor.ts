@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileReadBinaryContents,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileReadBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<ty
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const key = composeScopedFilePath(scope, filepath);
+      const key = composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath);
 
       return actionResult(await readBinaryFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {

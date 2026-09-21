@@ -19,7 +19,7 @@ export const defineEventDoc = (functions: EventDocFunctions, runtime: QpqFunctio
 
   return [
     defineDynamicFunctions(functionsName, runtime),
-    defineEventDocSummary(storeName, { snapshotFunctions: { [type]: functionsName } }),
+    defineEventDocSummary(storeName, { snapshotFunctions: { [type]: functionsName }, scoped: options.scopeResolver !== undefined }),
     defineEventDocRoutes({ storeName, type, ...options }),
   ];
 };

@@ -14,9 +14,15 @@ describe('defineStorageDrive', () => {
       onEvent: undefined,
       lifecycleRules: undefined,
       encryption: false,
+      scoped: false,
       lockedDown: false,
       owner: undefined,
     });
+  });
+
+  it('carries scoped through and rejects it alongside copyPath', () => {
+    expect(defineStorageDrive('Uploads', { scoped: true }).scoped).toBe(true);
+    expect(() => defineStorageDrive('Uploads', { scoped: true, copyPath: './static' })).toThrow(/scoped/);
   });
 
   it('defaults global, encryption and lockedDown to false', () => {

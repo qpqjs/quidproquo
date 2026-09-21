@@ -1,6 +1,7 @@
 import { KvsCoreDataType, KvsQueryOperation } from '../../actions/keyValueStore/types';
 import { KeyValueStoreQPQConfigSetting, QPQConfig } from '../../config';
 import { getKeyValueStoreByName } from '../../qpqCoreUtils';
+import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import { KvsStoreNotFoundError } from './KvsStoreNotFoundError';
 import { createScopedKvsTranslator, ScopedKvsTranslator } from './scopedKvsTranslator';
 import { validateScopeSupportedForPartitionKeyType } from './scopedKvsValue';
@@ -21,6 +22,28 @@ export const resolveKvsStoreConfigOrThrow = (qpqConfig: QPQConfig, keyValueStore
   return storeConfig;
 };
 
+// Every backend calls this on every call, scoped or not: the store's `scoped`
+// flag and the call's scope must agree, so a scoped store can never be reached
+// without one and an unscoped store never gains a hidden partition.
+// Scan-all-scopes is the one deliberate exception and does not go through here.
+export const assertKvsScopeRequirementOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string, scope: string | undefined): void => {
+  const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
+
+  if (storeConfig.scoped && scope === undefined) {
+    throw new InvalidScopeError(
+      InvalidScopeErrorCode.scopeRequired,
+      `Key value store '${keyValueStoreName}' is scoped; every call must carry a scope.`,
+    );
+  }
+
+  if (!storeConfig.scoped && scope !== undefined) {
+    throw new InvalidScopeError(
+      InvalidScopeErrorCode.notScoped,
+      `Key value store '${keyValueStoreName}' is not scoped; declare it scoped or drop the scope.`,
+    );
+  }
+};
+
 // Value-composed backends (dynamo): validate and hand back the translator that
 // knows how to scope every shape the pk appears in - a bare key, an item
 // field, a query condition tree, a scan filter, and stripping results.
@@ -29,6 +52,7 @@ export const resolveKvsStoreConfigOrThrow = (qpqConfig: QPQConfig, keyValueStore
 // scope.
 export const getScopedKvsTranslatorOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string, scope: string | undefined): ScopedKvsTranslator => {
   const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
+  assertKvsScopeRequirementOrThrow(qpqConfig, keyValueStoreName, scope);
 
   if (scope === undefined) {
     // Only a string pk can hold composed values, so only then does the

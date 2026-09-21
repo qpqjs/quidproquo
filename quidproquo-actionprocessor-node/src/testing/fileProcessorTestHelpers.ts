@@ -10,7 +10,7 @@ import {
 import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
 
 // Shared fixtures for the local-filesystem file action processor tests. Every processor
-// is resolved against a single 'media' storage drive rooted at the same fake config.
+// is resolved against the same fake config: an open 'media' drive and a scoped 'tenantMedia'.
 export const fileConfig: FileStorageConfig = {
   storagePath: '/storage',
   secureUrlPort: 4000,
@@ -18,7 +18,8 @@ export const fileConfig: FileStorageConfig = {
   secureUrlSecret: 'secret',
 };
 
-const qpqConfig = buildTestQpqConfig([defineStorageDrive('media')]);
+// 'tenantMedia' is the scoped drive: every call on it must carry a scope.
+const qpqConfig = buildTestQpqConfig([defineStorageDrive('media'), defineStorageDrive('tenantMedia', { scoped: true })]);
 
 // Builds an Error carrying a node-style `code` (e.g. ENOENT) so mocked fs calls reject the
 // same way the real fs/promises module does.

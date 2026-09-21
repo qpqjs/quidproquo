@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, validateScopeSegment } from 'quidproquo-core';
+import { assertStorageDriveScopeRequirementOrThrow, QPQConfig, qpqCoreUtils, validateScopeSegment } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -26,6 +26,8 @@ export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): st
 
 export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string, scope?: string): string {
   const service = resolveDriveServiceName(drive, qpqConfig);
+
+  assertStorageDriveScopeRequirementOrThrow(qpqConfig, drive, scope);
 
   // A scope becomes part of the root, so the escape check below also guarantees
   // the filepath cannot traverse out of its scope, not just out of the drive.

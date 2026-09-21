@@ -14,6 +14,8 @@ import { TenantRecord } from '../models/TenantRecord';
 export const defineTenantStores = (): QPQConfig => [
   defineEventDocSummary(TENANT_EVENTDOC_STORE, {
     snapshotFunctions: { [TENANT_DOC_TYPE]: eventDocFunctionsName(TENANT_EVENTDOC_STORE, TENANT_DOC_TYPE) },
+    // Tenant docs live under the tenant's own scope (defineTenant routes them through the tenant scope resolver).
+    scoped: true,
   }),
   defineKeyValueStore<TenantRecord>(TENANT_RECORD_STORE, 'tenantId'),
 ];

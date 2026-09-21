@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType } from 'quidproquo-core';
+import { ErrorTypeEnum, EventActionType, storageScopeContext } from 'quidproquo-core';
 import { StorageDriveEventType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -68,9 +68,17 @@ describe('s3/fileEvent auto respond and story session', () => {
     expect(await processor({ qpqEventRecord: {}, matchResult: {} })).toEqual([null]);
   });
 
-  it('returns no story session', async () => {
+  it('returns no story session for an unscoped record', async () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
 
     expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([undefined]);
+  });
+
+  it('runs a scoped record under its scope as the ambient storage scope', async () => {
+    const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
+
+    const [session] = await processor({ qpqEventRecord: { scope: 'TENANT#a' }, eventParams: [] });
+
+    expect((session as any).context[storageScopeContext.uniqueName]).toBe('TENANT#a');
   });
 });
