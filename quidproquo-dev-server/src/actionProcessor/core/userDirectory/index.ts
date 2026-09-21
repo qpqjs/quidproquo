@@ -40,7 +40,7 @@ export const getUserDirectoryActionProcessor =
     ...(await getUserDirectoryRefreshTokenActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectoryRespondToAuthChallengeActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
-    ...(await getUserDirectorySetAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getUserDirectorySetAccessTokenActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectorySetUserAttributesActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
   });
