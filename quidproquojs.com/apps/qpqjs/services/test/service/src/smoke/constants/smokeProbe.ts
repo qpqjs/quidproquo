@@ -25,3 +25,10 @@ export const SMOKE_FILE_EVENT_DRIVE = 'smoke-file-event';
 // A scoped store with a change stream; the handler writes a marker row the
 // kvs stream test polls for.
 export const SMOKE_STREAM_PROBE_STORE = 'smokeStreamProbe';
+
+// The crypto key the encrypted probe drive and store name: proves the
+// alias-conditioned KMS grant lets the service role write and read data
+// encrypted with a defineCryptoKey.
+export const SMOKE_CRYPTO_KEY = 'smokeProbe';
+export const SMOKE_ENCRYPTED_PROBE_STORE = 'smokeEncryptedProbe';
+export const SMOKE_ENCRYPTED_PROBE_DRIVE = 'smoke-encrypted-probe';

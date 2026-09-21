@@ -1,4 +1,5 @@
 import {
+  defineCryptoKey,
   defineEventBus,
   defineKeyValueStore,
   defineParameter,
@@ -31,6 +32,9 @@ import {
   SMOKE_EVENT_DOC_BASE_PATH,
 } from '../constants/smokeEventDoc';
 import {
+  SMOKE_CRYPTO_KEY,
+  SMOKE_ENCRYPTED_PROBE_DRIVE,
+  SMOKE_ENCRYPTED_PROBE_STORE,
   SMOKE_FILE_EVENT_DRIVE,
   SMOKE_PROBE_EVENT_BUS,
   SMOKE_PROBE_EVENT_QUEUE,
@@ -142,6 +146,19 @@ export const defineSmoke = (): QPQConfig => {
         },
       }
     ),
+
+    // Encrypted probe resources: a drive and a store encrypted with an owned
+    // crypto key, so the test proves the role's KMS grant covers data at rest.
+    defineCryptoKey(SMOKE_CRYPTO_KEY),
+    defineKeyValueStore<SmokeProbeRecord>(
+      SMOKE_ENCRYPTED_PROBE_STORE,
+      'probeId',
+      [],
+      { cryptoKeyName: SMOKE_CRYPTO_KEY }
+    ),
+    defineStorageDrive(SMOKE_ENCRYPTED_PROBE_DRIVE, {
+      cryptoKeyName: SMOKE_CRYPTO_KEY,
+    }),
 
     // Event bus test path: publish to the bus, the subscribed queue's entry
     // writes a marker into the probe store, the test polls for it.
