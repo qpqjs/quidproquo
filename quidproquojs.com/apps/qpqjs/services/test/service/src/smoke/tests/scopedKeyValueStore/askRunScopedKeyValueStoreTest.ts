@@ -18,7 +18,7 @@ import { SMOKE_SCOPED_PROBE_STORE } from '../../constants/smokeProbe';
 import { askSmokeAssert } from '../askSmokeAssert';
 
 // The scope gate on a store, on whichever backend is running: a scoped store
-// serves scoped calls (including an index query) and keeps two scopes apart,
+// serves scoped calls (including a query) and keeps two scopes apart,
 // refuses an unscoped call, and an unscoped store refuses a scoped one. On
 // dynamo the scope is composed into the partition key, so the read-back also
 // proves the composed form never leaks to the caller.
@@ -45,14 +45,16 @@ export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
     'scoped get did not return the record with its raw key'
   );
 
-  const byCategory = yield* askKeyValueStoreQuery<SmokeProbeRecord>(
+  // A scoped query must constrain the partition key (the scope is composed
+  // into it on dynamo), so the query is on probeId, not the category index.
+  const byKey = yield* askKeyValueStoreQuery<SmokeProbeRecord>(
     SMOKE_SCOPED_PROBE_STORE,
-    kvsEqual('category', category),
+    kvsEqual('probeId', probeId),
     { scope: scopeA }
   );
   yield* askSmokeAssert(
-    byCategory.items.some((item) => item.probeId === probeId),
-    'scoped index query by category did not return the record'
+    byKey.items.some((item) => item.category === category),
+    'scoped query by partition key did not return the record'
   );
 
   const fromB = yield* askKeyValueStoreGet<SmokeProbeRecord>(

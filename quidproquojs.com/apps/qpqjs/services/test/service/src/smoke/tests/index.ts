@@ -1,6 +1,7 @@
 export * from './askSmokeAssert';
 export * from './askSmokePollForMarker';
 export * from './crossService';
+export * from './encryptedResources';
 export * from './eventBus';
 export * from './eventDoc';
 export * from './keyValueStore';
