@@ -28,7 +28,8 @@ export const SMOKE_STREAM_PROBE_STORE = 'smokeStreamProbe';
 
 // The crypto key the encrypted probe drive and store name: proves the
 // alias-conditioned KMS grant lets the service role write and read data
-// encrypted with a defineCryptoKey.
-export const SMOKE_CRYPTO_KEY = 'smokeProbe';
+// encrypted with a defineCryptoKey. Not 'smokeProbe': the signing key of that
+// name is a KMS alias too, and the two would collide.
+export const SMOKE_CRYPTO_KEY = 'smokeCrypto';
 export const SMOKE_ENCRYPTED_PROBE_STORE = 'smokeEncryptedProbe';
 export const SMOKE_ENCRYPTED_PROBE_DRIVE = 'smoke-encrypted-probe';
