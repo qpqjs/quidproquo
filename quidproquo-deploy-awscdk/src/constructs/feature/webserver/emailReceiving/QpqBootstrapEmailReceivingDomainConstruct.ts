@@ -29,10 +29,12 @@ export class QpqBootstrapEmailReceivingDomainConstruct extends QpqConstructBlock
         identity: aws_ses.Identity.domain(host),
       });
 
+      // The DKIM names are deploy-time tokens, so CDK cannot see they are already fully
+      // qualified and would append the zone again; the trailing dot tells it not to.
       identity.dkimRecords.forEach((record, index) => {
         new aws_route53.CnameRecord(this, domainScopedId(props.qpqConfig, `dkim-${index}`, rootDomain), {
           zone: hostedZone,
-          recordName: record.name,
+          recordName: `${record.name}.`,
           domainName: record.value,
         });
       });

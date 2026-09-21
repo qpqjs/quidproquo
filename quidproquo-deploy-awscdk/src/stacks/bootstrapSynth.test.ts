@@ -120,7 +120,15 @@ describe('BootstrapQpqServiceStack email receiving domain', () => {
       Name: 'inbox.development.example.com.',
       ResourceRecords: ['10 inbound-smtp.ap-southeast-2.amazonaws.com'],
     });
-    // Three DKIM CNAMEs per identity.
-    expect(Object.values(template.findResources('AWS::Route53::RecordSet', { Properties: { Type: 'CNAME' } }))).toHaveLength(6);
+    // Three DKIM CNAMEs per identity, named exactly as SES hands them out: the token plus a
+    // trailing dot, never with the zone appended.
+    const cnames = Object.values(template.findResources('AWS::Route53::RecordSet', { Properties: { Type: 'CNAME' } }));
+    expect(cnames).toHaveLength(6);
+    for (const cname of cnames) {
+      const name = JSON.stringify(cname.Properties.Name);
+      expect(name).toMatch(/DkimDNSTokenName/);
+      expect(name).toMatch(/\.\"\]\]\}$/);
+      expect(name).not.toMatch(/development\.example/);
+    }
   });
 });
