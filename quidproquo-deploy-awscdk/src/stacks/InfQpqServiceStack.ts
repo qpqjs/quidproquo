@@ -25,7 +25,6 @@ import { WebserverRoll } from '../constructs/basic/WebserverRoll';
 import { OwnedCryptoKeys, resolveCryptoKeyForResource } from '../constructs/feature/core/cryptoKey/resolveCryptoKeyForResource';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { emailReceiptRuleName } from '../constructs/feature/webserver/emailReceiving/emailReceiptRuleName';
-import { QpqWebserverEmailReceiverConstruct } from '../constructs/feature/webserver/emailReceiving/QpqWebserverEmailReceiverConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
@@ -58,6 +57,10 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqCoreCryptoKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllCryptoKeyConfigs(props.qpqConfig), props.qpqConfig);
     // end crypto keys
 
+    // A drive a receiver writes into is written by the account's receipt rule of that name.
+    const emailReceiptRuleNamesForDrive = (storageDriveName: string): string[] =>
+      qpqWebServerUtils.getEmailReceiversForStorageDrive(props.qpqConfig, storageDriveName).map((r) => emailReceiptRuleName(props.qpqConfig, r.name));
+
     // Build the storage drives
     qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
       (setting) =>
@@ -76,23 +79,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
           cryptoKey: setting.cryptoKeyName
             ? resolveCryptoKeyForResource(this, `${setting.uniqueKey}-crypto-key`, props.qpqConfig, setting.cryptoKeyName, ownedCryptoKeys)
             : undefined,
-          emailReceiptRuleNames: qpqWebServerUtils
-            .getEmailReceiversForStorageDrive(props.qpqConfig, setting.storageDrive)
-            .map((r) => emailReceiptRuleName(props.qpqConfig, r.name)),
+          emailReceiptRuleNames: emailReceiptRuleNamesForDrive(setting.storageDrive),
         }),
     );
     QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);
     // end storage drives
-
-    // Email receivers: the app's rule in the account's receipt rule set, per receiver.
-    qpqWebServerUtils.getEmailReceiverConfigs(props.qpqConfig).map(
-      (setting) =>
-        new QpqWebserverEmailReceiverConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
-
-          emailReceiverConfig: setting,
-        }),
-    );
 
     // Build the parameters
     const parameters = qpqCoreUtils.getOwnedParameterConfigs(props.qpqConfig).map(

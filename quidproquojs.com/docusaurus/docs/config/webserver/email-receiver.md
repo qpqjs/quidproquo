@@ -9,7 +9,7 @@ Receives mail sent to **any address** at the app's [receiving domain](./email-re
 
 Dynamic inboxes need no configuration: an address is just a local part, so `<inboxId>@inbox.<domain>` works the moment the receiver exists, and mapping an inbox to a tenant is a row in a key-value store.
 
-- **On AWS:** adds one receipt rule, named from the app, environment, module and receiver, to the account's rule set ([defineAccountEmailReceiving](../config-aws/account-email-receiving.md)), matching the receiving host of every root with an S3 action into the drive under `keyPrefix`. The drive's bucket policy lets exactly that rule write, and nothing else. Synth fails if the service declares no [receiving domain](./email-receiving-domain.md), or the drive is not declared or is `scoped` (the provider writes bare keys, which a scoped drive refuses to read).
+- **On AWS:** adds one receipt rule, named from the app, environment, module and receiver, to the account's rule set ([defineAccountEmailReceiving](../config-aws/account-email-receiving.md)), matching the receiving host of every root with an S3 action into the drive under `keyPrefix`. The rule is added by the api stack, after the inf stack has created the drive and its bucket policy, which lets exactly that rule write and nothing else. Synth fails if the service declares no [receiving domain](./email-receiving-domain.md), or the drive is not declared or is `scoped` (the provider writes bare keys, which a scoped drive refuses to read).
 - **On the dev server:** nothing receives mail. Deployed platforms only.
 
 ```typescript

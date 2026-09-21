@@ -10,6 +10,7 @@ import {
   QpqApiCoreKeyValueStoreStreamConstruct,
   QpqApiCoreQueueConstruct,
   QpqApiCoreStorageDriveConstruct,
+  QpqApiWebserverEmailReceiverConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
   QpqConfigAwsDashboardConstruct,
@@ -123,6 +124,18 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
+        }),
+    );
+
+    // Email receivers: the app's rule in the account's receipt rule set. Here rather than on
+    // the Inf stack for the same reason as the drive events: SES validates the bucket and its
+    // write policy when the rule is created, and both exist once Inf has deployed.
+    qpqWebServerUtils.getEmailReceiverConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqApiWebserverEmailReceiverConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          emailReceiverConfig: setting,
         }),
     );
 

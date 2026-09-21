@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 import { QpqCoreStorageDriveConstruct } from '../../core/storageDrive/QpqCoreStorageDriveConstruct';
 import { emailReceiptRuleName } from './emailReceiptRuleName';
 import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
-import { QpqWebserverEmailReceiverConstruct } from './QpqWebserverEmailReceiverConstruct';
+import { QpqApiWebserverEmailReceiverConstruct } from './QpqApiWebserverEmailReceiverConstruct';
 
 const buildConfig = (withDomain: boolean): QPQConfig =>
   buildTestQpqConfig([
@@ -28,13 +28,13 @@ const buildConfig = (withDomain: boolean): QPQConfig =>
 
 const buildStack = () => new Stack(new App(), 'inf', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
-describe('QpqWebserverEmailReceiverConstruct', () => {
+describe('QpqApiWebserverEmailReceiverConstruct', () => {
   it('adds the app rule to the account rule set, for every root, into the landing bucket', () => {
     const qpqConfig = buildConfig(true);
     const receiver = qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0];
     const stack = buildStack();
 
-    new QpqWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver });
+    new QpqApiWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver });
 
     Template.fromStack(stack).hasResourceProperties('AWS::SES::ReceiptRule', {
       RuleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
@@ -63,20 +63,38 @@ describe('QpqWebserverEmailReceiverConstruct', () => {
     ]);
 
     const synthWith = (qpqConfig: QPQConfig) =>
-      new QpqWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
+      new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
         qpqConfig,
         emailReceiverConfig: qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0],
       });
 
-    expect(() => synthWith(missing)).toThrow(/does not declare/);
+    expect(() => synthWith(missing)).toThrow(/does not own/);
     expect(() => synthWith(scoped)).toThrow(/scoped/);
+  });
+
+  it('fails synth when the drive is declared by another service', () => {
+    const qpqConfig = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
+      defineDns(['example.com']),
+      defineEmailReceivingDomain(),
+      defineStorageDrive('mail', { owner: { module: 'other', storageDriveName: 'mail' } }),
+      defineEmailReceiver('support', { storageDriveName: 'mail' }),
+    ]);
+
+    expect(
+      () =>
+        new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
+          qpqConfig,
+          emailReceiverConfig: qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0],
+        }),
+    ).toThrow(/does not own/);
   });
 
   it('fails synth when the app has no receiving domain', () => {
     const qpqConfig = buildConfig(false);
     const receiver = qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0];
 
-    expect(() => new QpqWebserverEmailReceiverConstruct(buildStack(), 'receiver', { qpqConfig, emailReceiverConfig: receiver })).toThrow(
+    expect(() => new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', { qpqConfig, emailReceiverConfig: receiver })).toThrow(
       /defineEmailReceivingDomain/,
     );
   });
