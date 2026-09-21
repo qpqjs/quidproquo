@@ -112,7 +112,10 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
   // Point-in-time recovery (35-day continuous backups) is on by default; set this to opt out.
   disablePointInTimeRecovery?: boolean;
 
-  encryption?: boolean;
+  // Encrypt the table with the named defineCryptoKey instead of the provider's own managed
+  // encryption, which always applies. The key must be declared in the same config, owned or
+  // foreign; a foreign key's owning service must be deployed first.
+  cryptoKeyName?: string;
 
   // Every action on this store must carry a scope; an unscoped call is refused rather
   // than hitting the unpartitioned rows. askKeyValueStoreScanAllScopes is exempt.
@@ -137,7 +140,7 @@ export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends Q
 
   disablePointInTimeRecovery: boolean;
 
-  encryption: boolean;
+  cryptoKeyName?: string;
   scoped: boolean;
 
   onStream?: KvsStreamSettings;
@@ -169,7 +172,7 @@ export const defineKeyValueStore = <T extends object = any>(
 
   disablePointInTimeRecovery: options?.disablePointInTimeRecovery ?? false,
 
-  encryption: options?.encryption ?? false,
+  cryptoKeyName: options?.cryptoKeyName,
   scoped: options?.scoped ?? false,
 
   onStream: options?.onStream,

@@ -40,7 +40,7 @@ The name of the drive. This is the name you pass as the `drive` argument to ever
 | `global` | `boolean` | `false` | Marks the drive as globally accessible across the account rather than private to the owning module. |
 | `onEvent` | `StorageDriveEvents` | – | Story functions to run when files are created or deleted in the drive. See [File events](#file-events-onevent). |
 | `lifecycleRules` | `StorageDriveLifecycleRule[]` | – | Rules that transition files to cheaper [storage tiers](#storagedrivetier) or delete them after a period. See [Lifecycle rules](#lifecycle-rules). |
-| `encryption` | `boolean` | `false` | Enables customer-managed KMS encryption for the drive (the KMS key comes from the service's AWS config). When `false`, provider-managed encryption still applies (SSE-S3 on AWS) — this flag only controls the KMS upgrade. |
+| `cryptoKeyName` | `string` | | Encrypts the drive with the named [defineCryptoKey](./crypto-key.md) instead of the provider's managed encryption (SSE-S3 on AWS), which applies when omitted. The key must be declared in the same config, owned or via `owner`; a foreign key's owning service must be deployed first, since S3 validates the key when the bucket is created. |
 | `scoped` | `boolean` | `false` | Requires every file action against this drive to carry a scope; a call without one throws `InvalidScopeError`. Incompatible with `copyPath` (`defineStorageDrive` throws at config time if both are set), since seeded content is deployed outside every scope. |
 | `lockedDown` | `boolean` | `false` | Denies object reads to every principal except the owning service's runtime role (listing and bucket management are unaffected). On AWS, the service stack must pass its `serviceRole` to `QpqCoreStorageDriveConstruct`; synth throws if a `lockedDown` drive has no `serviceRole`. |
 | `owner` | `CrossModuleOwner<'storageDriveName'>` | – | Declares that this drive is owned by **another** module/service. Use this to read/write a drive deployed elsewhere: the deploy grants this service IAM access to the foreign drive instead of creating a new bucket. `{ module, application, feature, environment, storageDriveName }` — all optional; unset parts default to the current service. |
@@ -121,7 +121,7 @@ export default [
   // Seeded, encrypted drive with a create handler
   defineStorageDrive('templates', {
     copyPath: './seed/templates',
-    encryption: true,
+    cryptoKeyName: 'main',
     onEvent: {
       create: '/entry/storageDrive/onTemplateUploaded::onTemplateUploaded',
     },
@@ -140,5 +140,5 @@ export default [
 - **CORS for browser access:** [defineStorageDriveCorsSettings](../webserver/storage-drive-cors-settings.md) (quidproquo-webserver) controls the allowed browser origins for direct-to-drive uploads/downloads.
 - [defineFederatedModuleStore](./federated-module-store.md) — loads a service's story code from a drive declared here.
 - [defineEventDocSummary](../features/event-doc-summary.md) — declares an event-document collection's asset bucket as a drive of this kind.
-- **AWS tuning:** [defineAwsKmsKey](../config-aws/aws-kms-key.md) (customer-managed encryption key for the `encryption` flag) and [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the bucket on teardown).
+- **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the bucket on teardown).
 - **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket, lifecycle, KMS, IAM grants) in `quidproquo-deploy-awscdk`; file action processors in `quidproquo-actionprocessor-awslambda`.

@@ -22,6 +22,7 @@ import {
   QpqWebserverWebsocketConstruct,
 } from '../constructs';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
+import { OwnedCryptoKeys, resolveCryptoKeyForResource } from '../constructs/feature/core/cryptoKey/resolveCryptoKeyForResource';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
@@ -35,6 +36,18 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const webserverRole = new WebserverRoll(this, 'webserverRoll', {
       qpqConfig: props.qpqConfig,
     }).role;
+
+    // Crypto keys come first: drives and stores below encrypt with them by name.
+    const ownedCryptoKeys: OwnedCryptoKeys = {};
+    for (const setting of qpqCoreUtils.getOwnedCryptoKeys(props.qpqConfig)) {
+      ownedCryptoKeys[setting.keyName] = new QpqCoreCryptoKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        qpqConfig: props.qpqConfig,
+
+        cryptoKeyConfig: setting,
+      }).key;
+    }
+    QpqCoreCryptoKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllCryptoKeyConfigs(props.qpqConfig), props.qpqConfig);
+    // end crypto keys
 
     // Build the storage drives
     qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
@@ -51,6 +64,9 @@ export class InfQpqServiceStack extends QpqServiceStack {
           ),
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
           serviceRole: webserverRole,
+          cryptoKey: setting.cryptoKeyName
+            ? resolveCryptoKeyForResource(this, `${setting.uniqueKey}-crypto-key`, props.qpqConfig, setting.cryptoKeyName, ownedCryptoKeys)
+            : undefined,
         }),
     );
     QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);
@@ -79,18 +95,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqCoreSecretConstruct.authorizeActionsForRole(this, webserverRole, qpqCoreUtils.getAllSecretConfigs(props.qpqConfig), props.qpqConfig);
     // end secrets
-
-    // Crypto keys
-    const cryptoKeys = qpqCoreUtils.getOwnedCryptoKeys(props.qpqConfig).map(
-      (setting) =>
-        new QpqCoreCryptoKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
-
-          cryptoKeyConfig: setting,
-        }),
-    );
-    QpqCoreCryptoKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllCryptoKeyConfigs(props.qpqConfig), props.qpqConfig);
-    // end crypto keys
 
     // Signing keys
     const signingKeys = qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).map(
@@ -161,6 +165,9 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           keyValueStoreConfig: setting,
+          cryptoKey: setting.cryptoKeyName
+            ? resolveCryptoKeyForResource(this, `${setting.uniqueKey}-crypto-key`, props.qpqConfig, setting.cryptoKeyName, ownedCryptoKeys)
+            : undefined,
         }),
     );
     QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig);

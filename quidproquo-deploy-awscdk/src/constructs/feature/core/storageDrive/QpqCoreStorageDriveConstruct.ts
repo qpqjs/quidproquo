@@ -32,6 +32,12 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * one principal exempt from the bucket's object-read deny.
    */
   serviceRole?: aws_iam.IRole;
+
+  /**
+   * The key behind the drive's `cryptoKeyName`, resolved by the stack (see
+   * resolveCryptoKeyForResource). Required when the drive names one.
+   */
+  cryptoKey?: aws_kms.IKey;
 }
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
@@ -89,15 +95,13 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
 
     // S3_MANAGED is the floor, not an opt-in: S3 applies SSE-S3 to every bucket anyway,
     // and CDK's UNENCRYPTED member is deprecated for exactly that reason.
-    let bucketEncryption: aws_s3.BucketEncryption = aws_s3.BucketEncryption.S3_MANAGED;
-    let encryptionKey: aws_kms.IKey | undefined;
-    if (props.storageDriveConfig.encryption) {
-      const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForStorageDrive(props.qpqConfig, props.storageDriveConfig);
-      if (kmsCfg) {
-        encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
-        bucketEncryption = aws_s3.BucketEncryption.KMS;
-      }
+    if (props.storageDriveConfig.cryptoKeyName && !props.cryptoKey) {
+      throw new Error(
+        `Storage drive "${props.storageDriveConfig.storageDrive}" names crypto key "${props.storageDriveConfig.cryptoKeyName}" but none was resolved`,
+      );
     }
+    const bucketEncryption = props.cryptoKey ? aws_s3.BucketEncryption.KMS : aws_s3.BucketEncryption.S3_MANAGED;
+    const encryptionKey = props.cryptoKey;
 
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
@@ -253,21 +257,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverStorageDriveAccess', driveActions, foreignArns);
     }
 
-    // Grant KMS permissions for any encrypted drives (owned or foreign) whose
-    // customer-managed key is declared in this service's config.
-    const kmsArns = [...ownedDriveConfigs, ...foreignDriveConfigs]
-      .filter((cfg) => cfg.encryption)
-      .map((cfg) => qpqConfigAwsUtils.getAwsKmsKeyForStorageDrive(qpqConfig, cfg)?.arn)
-      .filter((arn): arn is string => Boolean(arn));
-
-    if (kmsArns.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:Encrypt', 'kms:ReEncrypt*'],
-          resources: [...new Set(kmsArns)],
-        }),
-      );
-    }
+    // KMS use for a drive's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
+    // which covers every crypto key declared in this config.
   }
 }
