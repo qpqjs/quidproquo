@@ -25,7 +25,7 @@ export function* askTenantAssertRoutePermission(
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'This operation requires an active tenant.');
   }
 
-  const catalog = yield* askTenantRolesConfigRead();
+  const { catalog } = yield* askTenantRolesConfigRead();
   const requirements = tenantRoutePermissionRequirements(routePermission, params);
 
   if (requirements.some((requirement) => tenantMembershipSatisfies(catalog, request.membership, requirement))) {

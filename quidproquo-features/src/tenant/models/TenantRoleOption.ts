@@ -2,4 +2,5 @@
 export type TenantRoleOption = {
   code: string;
   name: string;
+  description?: string;
 };

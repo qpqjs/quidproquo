@@ -37,7 +37,7 @@ export function* askTenantMemberRolesSet(
     return yield* askThrowError(ErrorTypeEnum.NotFound, `User is not a member of the tenant: ${userId}`);
   }
 
-  const catalog = yield* askTenantRolesConfigRead();
+  const { catalog } = yield* askTenantRolesConfigRead();
   const unknownRoles = tenantRoleCatalogUnknownRoles(catalog, roles);
   if (unknownRoles.length > 0) {
     return yield* askThrowError(ErrorTypeEnum.BadRequest, `Unknown role(s): ${unknownRoles.join(', ')}`);

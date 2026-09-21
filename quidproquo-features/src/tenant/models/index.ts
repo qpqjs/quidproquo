@@ -16,6 +16,7 @@ export * from './TenantResolvedRequest';
 export * from './TenantRoleCatalog';
 export * from './TenantRoleDefinition';
 export * from './TenantRoleOption';
+export * from './TenantRolesConfig';
 export * from './TenantRoutePermission';
 export * from './TenantSetBrandData';
 export * from './TenantStatus';

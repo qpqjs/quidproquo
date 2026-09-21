@@ -8,6 +8,7 @@ import { TenantRoleCatalog } from '../../models/TenantRoleCatalog';
 import { toTenantId } from '../toTenantId';
 import { buildTenantPermissionRequirement } from './buildTenantPermissionRequirement';
 import { buildTenantRoleCatalog } from './buildTenantRoleCatalog';
+import { buildTenantRolesConfig } from './buildTenantRolesConfig';
 import { tenantMembershipSatisfies } from './tenantMembershipSatisfies';
 import { tenantRoleCatalogExpand } from './tenantRoleCatalogExpand';
 import { tenantRoleCatalogUnknownRoles } from './tenantRoleCatalogUnknownRoles';
@@ -90,5 +91,23 @@ describe('tenantMembershipSatisfies', () => {
     expect(tenantMembershipSatisfies(catalog, admin, buildTenantPermissionRequirement(TenantPermission.MembersManage))).toBe(true);
     expect(tenantMembershipSatisfies(catalog, admin, buildTenantPermissionRequirement(TenantPermission.RolesAssign))).toBe(true);
     expect(tenantMembershipSatisfies(catalog, admin, approve)).toBe(false);
+  });
+});
+
+describe('buildTenantRolesConfig', () => {
+  it('defaults the creator to tenantAdmin and accepts an explicit list that can assign', () => {
+    expect(buildTenantRolesConfig().creatorRoles).toEqual([TENANT_ADMIN_ROLE]);
+    expect(buildTenantRolesConfig({ catalog: appCatalog, creatorRoles: [TENANT_ADMIN_ROLE, 'investigator'] }).creatorRoles).toEqual([
+      TENANT_ADMIN_ROLE,
+      'investigator',
+    ]);
+  });
+
+  it('refuses a creator list naming an unknown role or holding no assigner', () => {
+    expect(() => buildTenantRolesConfig({ catalog: appCatalog, creatorRoles: [TENANT_ADMIN_ROLE, 'boss'] })).toThrow(/not in the catalog: boss/);
+    expect(() => buildTenantRolesConfig({ catalog: appCatalog, creatorRoles: ['investigator'] })).toThrow(
+      /must include a role holding tenant:roles:assign/,
+    );
+    expect(() => buildTenantRolesConfig({ catalog: appCatalog, creatorRoles: [] })).toThrow(/must include a role holding/);
   });
 });

@@ -1,4 +1,3 @@
-export * from './index';
 export * from './TenantMembershipUiEffect';
 export * from './TenantMembershipUiEffects';
 export * from './TenantMembershipUiResetEffect';

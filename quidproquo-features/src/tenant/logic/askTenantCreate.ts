@@ -2,14 +2,14 @@ import { askNewGuid, AskResponse, askStorageScopeProvide } from 'quidproquo-core
 
 import { askEventDocCreate } from '../../eventDoc/logic/askEventDocCreate';
 import { EventDocEventActor, EventDocSummary } from '../../eventDoc/models';
-import { TENANT_ADMIN_ROLE } from '../constants/tenantAdminRole';
 import { askTenantGenerateNewId } from './askTenantGenerateNewId';
 import { askTenantLinkMember } from './askTenantLinkMember';
+import { askTenantRolesConfigRead } from './askTenantRolesConfigRead';
 import { composeTenantScope } from './storageScope';
 
 /**
- * Create the tenant eventDoc under ITS OWN scope (TENANT#<id>) and link the creator as its first
- * admin. Nothing owns a tenant but itself: any member with the right permission edits it from
+ * Create the tenant eventDoc under ITS OWN scope (TENANT#<id>) and link the creator with the
+ * configured creator roles (tenantAdmin by default). Nothing owns a tenant but itself: any member with the right permission edits it from
  * inside, and the creator leaving changes nothing. Must run under the tenant eventDoc store
  * context (the tenant routes provide it).
  */
@@ -20,7 +20,8 @@ export function* askTenantCreate(name: string, actor: EventDocEventActor): AskRe
 
   const summary = yield* askStorageScopeProvide(composeTenantScope(tenantId), askEventDocCreate(name, code, actor, tenantId));
 
-  yield* askTenantLinkMember(tenantId, actor.userId, [TENANT_ADMIN_ROLE], actor.userId);
+  const { creatorRoles } = yield* askTenantRolesConfigRead();
+  yield* askTenantLinkMember(tenantId, actor.userId, creatorRoles, actor.userId);
 
   return summary;
 }

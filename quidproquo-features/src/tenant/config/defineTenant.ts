@@ -12,7 +12,7 @@ import {
   TENANT_ON_PUBLISH_FN,
   TENANT_SCOPE_RESOLVER_FN,
 } from '../constants/tenantStoreNames';
-import { buildTenantRoleCatalog } from '../logic/roles/buildTenantRoleCatalog';
+import { buildTenantRolesConfig } from '../logic/roles/buildTenantRolesConfig';
 import { TenantMembership } from '../models/TenantMembership';
 import { defineTenantRoutes } from '../routes/defineTenantRoutes';
 import { TenantOptions } from '../types/TenantRoutesOptions';
@@ -21,7 +21,7 @@ import { defineTenantStores } from './defineTenantStores';
 // Org/tenant support, declared identically in every service (pass the same
 // `owner` everywhere). What materialises depends on the deploying service:
 //
-// - Everywhere: the role catalog global, and the scope-resolver, connection-scope-resolver
+// - Everywhere: the roles config global (catalog + creator seed), and the scope-resolver, connection-scope-resolver
 //   and eventDoc-authoriser inline functions (a service tenant-scopes its OTHER collections via the request resolver,
 //   and resolves ws connection scopes via the connection resolver).
 // - Owner deploy only: the registry stores (eventDoc collection + record store +
@@ -38,7 +38,7 @@ import { defineTenantStores } from './defineTenantStores';
 // materialized record store, both unscoped.
 export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): QPQConfig => [
   // The merged catalog, everywhere: permission checks run in every service.
-  defineGlobal(TENANT_ROLES_GLOBAL, buildTenantRoleCatalog(roles?.catalog)),
+  defineGlobal(TENANT_ROLES_GLOBAL, buildTenantRolesConfig(roles)),
 
   defineInlineFunction(
     {
