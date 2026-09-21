@@ -38,8 +38,15 @@ export class InfQpqServiceStack extends QpqServiceStack {
     }).role;
 
     // Crypto keys come first: drives and stores below encrypt with them by name.
+    // Crypto and signing keys are both KMS keys aliased by bare name, so a shared
+    // name is two aliases on one string; refuse it here rather than in the change set.
+    const signingKeyNames = new Set(qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).map((setting) => setting.keyName));
     const ownedCryptoKeys: OwnedCryptoKeys = {};
     for (const setting of qpqCoreUtils.getOwnedCryptoKeys(props.qpqConfig)) {
+      if (signingKeyNames.has(setting.keyName)) {
+        throw new Error(`Crypto key "${setting.keyName}" shares its name with a signing key; both are KMS aliases, so the names must differ`);
+      }
+
       ownedCryptoKeys[setting.keyName] = new QpqCoreCryptoKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
         qpqConfig: props.qpqConfig,
 
