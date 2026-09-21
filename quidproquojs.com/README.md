@@ -103,3 +103,7 @@ npx qpq go             # interactive aws deploy: pick app, services, stacks (inf
 1. Create its `config`, `models`, `x-models`, `shared-logic`, `x-logic`, `service-utils`, and `service` packages.
 2. Each lib gets a `package.json` with `"build": "tsc -b"` and the dist-pointing `main`, `types`, and `exports`; a `tsconfig.json` (extends the root base, **no paths**, references `./tsconfig.lib.json`); and a `tsconfig.lib.json` (`composite`, `outDir ./dist`, `rootDir .`, with `references` to its workspace deps' `tsconfig.lib.json`). There is no root-level list to touch, since `npm run build --workspaces` discovers the new lib automatically.
 3. `service/` gets a `package.json` (`@qpqjs/<svc>-service`, `private`, `"build": "tsc -p tsconfig.app.json"`) and a `tsconfig.app.json`. No rspack.config.ts and no bundle script, because `qpq go` bundles it by convention. `npm run build` then picks it up automatically.
+
+## Test
+
+Adding a note to test build / deploy
