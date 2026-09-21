@@ -24,7 +24,7 @@ export class QpqWebserverEmailReceiverConstruct extends QpqConstructBlock {
     const recipients = resolveEmailReceivingHosts(props.qpqConfig).map(({ host }) => host);
     if (recipients.length === 0) {
       throw new Error(
-        `Email receiver "${props.emailReceiverConfig.name}" needs a receiving domain: add defineEmailReceivingDomain to the bootstrap config`,
+        `Email receiver "${props.emailReceiverConfig.name}" needs a receiving domain: this service must declare defineEmailReceivingDomain (the same one as the bootstrap config), as it does defineDns`,
       );
     }
 

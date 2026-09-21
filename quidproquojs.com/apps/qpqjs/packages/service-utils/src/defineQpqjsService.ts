@@ -6,6 +6,7 @@ import {
   defineCache,
   defineDefaultRouteOptions,
   defineDns,
+  defineEmailReceivingDomain,
   defineFrontendBundleOptions,
   QPQConfig,
 } from 'quidproquo';
@@ -59,6 +60,9 @@ export const defineQpqjsService = (
   ),
 
   defineDns(QPQJS_DOMAINS),
+  // Same domain bootstrap.qpq.ts declares: bootstrap owns the records, a service's
+  // defineEmailReceiver resolves its recipients from it.
+  defineEmailReceivingDomain('inbox'),
 
   defineAdminUserDirectory({
     owner: {
