@@ -1,4 +1,4 @@
-import { askFileExists, FileActionType } from 'quidproquo-core';
+import { askFileExists, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +14,7 @@ vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x
 vi.mock('../../../logic/s3/s3Utils', () => ({ objectExists: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
-  const processor = (await getFileExistsActionProcessor({} as never, null as any))[FileActionType.Exists];
+  const processor = (await getFileExistsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Exists];
   return invokeProcessor(processor, payload);
 };
 

@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileIsColdStorage,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileIsColdStorage = (qpqConfig: QPQConfig): ProcessorFor<typeof 
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const key = composeScopedFilePath(scope, filepath);
+      const key = composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath);
       const isColdStorage =
         (await getObjectStorageClass(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig))) === 'cold_storage';
 

@@ -47,6 +47,7 @@ import { EventDocAiOptions } from '../types/EventDocAiOptions';
 export const defineEventDocAi = ({
   storeName,
   type,
+  scoped = false,
   serviceName,
   eventBusName,
   userDirectoryName,
@@ -96,8 +97,8 @@ export const defineEventDocAi = ({
   };
 
   return [
-    defineKeyValueStore<EventDocAiChatSummary>(chatListStore, 'docId', ['chatId']),
-    defineStorageDrive(chatDrive),
+    defineKeyValueStore<EventDocAiChatSummary>(chatListStore, 'docId', ['chatId'], { scoped }),
+    defineStorageDrive(chatDrive, { scoped }),
     defineAi(aiName, { tools }),
     defineQueue(eventDocAiQueueName(storeName), processors, {
       eventBusSubscriptions: [eventBusName],

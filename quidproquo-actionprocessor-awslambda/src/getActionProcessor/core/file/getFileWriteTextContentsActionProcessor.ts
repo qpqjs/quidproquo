@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileWriteTextContents,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -21,7 +21,7 @@ const getProcessFileWriteTextContents = (qpqConfig: QPQConfig): ProcessorFor<typ
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       await writeTextFile(
         s3BucketName,
-        composeScopedFilePath(scope, filepath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath),
         data,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),

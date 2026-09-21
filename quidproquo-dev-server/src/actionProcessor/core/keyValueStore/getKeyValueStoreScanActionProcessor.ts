@@ -3,6 +3,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanBase,
+  assertKvsScopeRequirementOrThrow,
   createActionProcessor,
   KeyValueStoreActionType,
   ProcessorFor,
@@ -24,6 +25,7 @@ const getProcessKeyValueStoreScan = (
 
       // The sqlite engine partitions per-scope at the ROW level, so a scoped
       // scan just iterates the scope's own rows - no injected filter needed.
+      assertKvsScopeRequirementOrThrow(qpqConfig, keyValueStoreName, scope);
       if (scope !== undefined) {
         resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
       }

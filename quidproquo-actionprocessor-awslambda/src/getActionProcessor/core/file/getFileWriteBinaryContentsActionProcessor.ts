@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileWriteBinaryContents,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -21,7 +21,7 @@ const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<t
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       await writeBinaryFile(
         s3BucketName,
-        composeScopedFilePath(scope, filepath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath),
         data,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),

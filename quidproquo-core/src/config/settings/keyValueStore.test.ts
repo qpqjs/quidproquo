@@ -27,6 +27,7 @@ describe('defineKeyValueStore', () => {
       ttlAttribute: undefined,
       disablePointInTimeRecovery: false,
       encryption: false,
+      scoped: false,
     });
   });
 

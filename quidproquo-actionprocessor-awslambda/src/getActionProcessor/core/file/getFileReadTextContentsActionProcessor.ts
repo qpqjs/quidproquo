@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileReadTextContents,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig): ProcessorFor<type
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const key = composeScopedFilePath(scope, filepath);
+      const key = composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath);
 
       return actionResult(await readTextFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {

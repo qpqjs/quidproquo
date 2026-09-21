@@ -3,6 +3,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreGetAllBase,
+  assertKvsScopeRequirementOrThrow,
   createActionProcessor,
   KeyValueStoreActionType,
   ProcessorFor,
@@ -25,6 +26,7 @@ const getProcessKeyValueStoreGetAll = (
       // The sqlite engine partitions per-scope at the ROW level, so a scoped
       // get-all just reads the scope's own rows - the validation here is kept
       // purely for dynamo error parity.
+      assertKvsScopeRequirementOrThrow(qpqConfig, keyValueStoreName, scope);
       if (scope !== undefined) {
         resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
       }

@@ -114,6 +114,10 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
 
   encryption?: boolean;
 
+  // Every action on this store must carry a scope; an unscoped call is refused rather
+  // than hitting the unpartitioned rows. askKeyValueStoreScanAllScopes is exempt.
+  scoped?: boolean;
+
   // Turn on change data capture — see KvsStreamSettings. Absent means no stream is
   // created at all.
   onStream?: KvsStreamSettings;
@@ -134,6 +138,7 @@ export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends Q
   disablePointInTimeRecovery: boolean;
 
   encryption: boolean;
+  scoped: boolean;
 
   onStream?: KvsStreamSettings;
 }
@@ -165,6 +170,7 @@ export const defineKeyValueStore = <T extends object = any>(
   disablePointInTimeRecovery: options?.disablePointInTimeRecovery ?? false,
 
   encryption: options?.encryption ?? false,
+  scoped: options?.scoped ?? false,
 
   onStream: options?.onStream,
 });

@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileGenerateTemporaryUploadSecureUrl,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -30,7 +30,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): P
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const url = await generatePresignedUploadUrl(
         s3BucketName,
-        composeScopedFilePath(scope, filepath),
+        composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath),
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         expirationMs,
         session.correlation,

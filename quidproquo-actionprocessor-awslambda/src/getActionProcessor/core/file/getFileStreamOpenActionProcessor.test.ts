@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, ErrorTypeEnum, FileActionType } from 'quidproquo-core';
 
 import { Readable } from 'stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,7 +22,7 @@ vi.mock('../../../logic/createAwsClient', () => ({ createAwsClient: vi.fn() }));
 const send = vi.fn();
 
 const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown) => {
-  const processor = (await getFileStreamOpenActionProcessor({} as never, null as any))[FileActionType.StreamOpen];
+  const processor = (await getFileStreamOpenActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.StreamOpen];
   return invokeProcessor(processor, payload, { streamRegistry });
 };
 

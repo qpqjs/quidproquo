@@ -19,6 +19,14 @@ export enum InvalidScopeErrorCode {
   // A raw partition-key value containing the scope delimiter: storing it would
   // make the row indistinguishable from another scope's composed data.
   reservedDelimiter = 'reservedDelimiter',
+  // The resource is declared `scoped` in config but the call carried no scope.
+  // On a drive that would land the object beside every tenant's prefix; on a
+  // store it would read or write the unpartitioned rows.
+  scopeRequired = 'scopeRequired',
+  // The call carried a scope but the resource is not declared `scoped` in
+  // config: the data would land under a prefix nothing else on that resource
+  // expects, invisible to every unscoped reader.
+  notScoped = 'notScoped',
 }
 
 export class InvalidScopeError extends Error {

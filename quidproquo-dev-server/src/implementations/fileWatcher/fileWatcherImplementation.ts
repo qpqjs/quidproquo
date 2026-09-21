@@ -1,5 +1,16 @@
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
-import { askExecuteStory, createRuntime, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqRuntimeType, StorySession } from 'quidproquo-core';
+import {
+  askExecuteStory,
+  createRuntime,
+  DynamicModuleLoader,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqRuntimeType,
+  splitScopedFilePath,
+  StorageDriveQPQConfigSetting,
+  storageScopeContext,
+  StorySession,
+} from 'quidproquo-core';
 import { StorageDriveEvent, StorageDriveEventType } from 'quidproquo-webserver';
 
 import * as chokidar from 'chokidar';
@@ -19,6 +30,21 @@ interface FileEventPayload {
   filepath: string;
   event: 'create' | 'delete';
 }
+
+// On a scoped drive the first folder under the drive is the scope, matching the
+// S3 key layout. A file outside any scope folder throws, as it does deployed.
+const toStorageDriveEvent = (eventPayload: FileEventPayload, storageDrive: StorageDriveQPQConfigSetting): StorageDriveEvent => {
+  const eventType = eventPayload.event === 'create' ? StorageDriveEventType.Create : StorageDriveEventType.Delete;
+  const storedPath = eventPayload.filepath.split(path.sep).join('/');
+
+  if (!storageDrive.scoped) {
+    return { eventType, driveName: eventPayload.drive, filePaths: [storedPath] };
+  }
+
+  const { scope, filepath } = splitScopedFilePath(storedPath);
+
+  return { eventType, driveName: eventPayload.drive, scope, filePaths: [filepath] };
+};
 
 const getDateNow = () => new Date().toISOString();
 
@@ -86,10 +112,19 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
   };
 
   // Execute the storage drive event function
-  const executeStorageDriveEvent = async (eventPayload: FileEventPayload, qpqConfig: QPQConfig, functionRuntime: any) => {
+  const executeStorageDriveEvent = async (
+    eventPayload: FileEventPayload,
+    qpqConfig: QPQConfig,
+    storageDrive: StorageDriveQPQConfigSetting,
+    functionRuntime: any,
+  ) => {
     const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-    // Create a story session for the event with storage event context
+    const eventData = toStorageDriveEvent(eventPayload, storageDrive);
+
+    // storageEvent lets the logger recognise a log-drive event and not log it
+    // again. A scoped object's handler also runs under its scope, so the file
+    // and kvs calls it makes stay in the partition of the object that fired it.
     const storySession: StorySession = {
       context: {
         storageEvent: {
@@ -97,18 +132,12 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
           filepath: eventPayload.filepath,
           event: eventPayload.event,
         },
+        ...(eventData.scope === undefined ? {} : { [storageScopeContext.uniqueName]: eventData.scope }),
       },
       depth: 0,
     };
 
     const logger = getDevServerLogger(qpqConfig, devServerConfig, storySession);
-
-    // Create event data to pass to the function matching StorageDriveEvent structure
-    const eventData: StorageDriveEvent = {
-      eventType: eventPayload.event === 'create' ? StorageDriveEventType.Create : StorageDriveEventType.Delete,
-      driveName: eventPayload.drive,
-      filePaths: [eventPayload.filepath],
-    };
 
     // Create a DynamicModuleLoader adapter for this service
     const dynamicModuleLoaderForService: DynamicModuleLoader = (runtime) => devServerConfig.dynamicModuleLoader(serviceName, runtime);
@@ -165,7 +194,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
 
     // Execute the function
     try {
-      await executeStorageDriveEvent(eventPayload, qpqConfig, storageDrive.onEvent.create);
+      await executeStorageDriveEvent(eventPayload, qpqConfig, storageDrive, storageDrive.onEvent.create);
     } catch (error) {
       console.error(`Error handling create event for ${fullPath}:`, error);
     }
@@ -194,7 +223,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
 
     // Execute the function
     try {
-      await executeStorageDriveEvent(eventPayload, qpqConfig, storageDrive.onEvent.delete);
+      await executeStorageDriveEvent(eventPayload, qpqConfig, storageDrive, storageDrive.onEvent.delete);
     } catch (error) {
       console.error(`Error handling delete event for ${fullPath}:`, error);
     }

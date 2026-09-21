@@ -1,4 +1,4 @@
-import { FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +13,7 @@ vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x
 vi.mock('../../../logic/s3/getObjectStorageClass', () => ({ getObjectStorageClass: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
-  const processor = (await getFileIsColdStorageActionProcessor({} as never, null as any))[FileActionType.IsColdStorage];
+  const processor = (await getFileIsColdStorageActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.IsColdStorage];
   return invokeProcessor(processor, payload);
 };
 

@@ -4,7 +4,7 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   askFileExists,
-  composeScopedFilePath,
+  composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   FileActionType,
   ProcessorFor,
@@ -18,7 +18,7 @@ const getProcessFileExists = (qpqConfig: QPQConfig): ProcessorFor<typeof askFile
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const key = composeScopedFilePath(scope, filepath);
+      const key = composeStorageDriveFilePathOrThrow(qpqConfig, drive, scope, filepath);
       return actionResult(await objectExists(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {

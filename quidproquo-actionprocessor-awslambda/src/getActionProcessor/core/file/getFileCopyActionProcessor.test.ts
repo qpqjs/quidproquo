@@ -1,4 +1,4 @@
-import { askFileCopy, FileActionType } from 'quidproquo-core';
+import { askFileCopy, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -16,7 +16,7 @@ vi.mock('../../../logic/s3/s3Utils', () => ({ copyFile: vi.fn() }));
 const payload = { sourceDrive: 'renders', sourceFilepath: 'd1/assets/a', targetDrive: 'packs', targetFilepath: 'd2/assets/b' };
 
 const invoke = async (extra: Record<string, unknown> = {}) => {
-  const processor = (await getFileCopyActionProcessor({} as never, null as any))[FileActionType.Copy];
+  const processor = (await getFileCopyActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Copy];
   return invokeProcessor(processor, { ...payload, ...extra });
 };
 
@@ -28,8 +28,8 @@ describe('getProcessFileCopy', () => {
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();
-    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('renders', {});
-    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('packs', {});
+    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('renders', expect.any(Array));
+    expect(resolveStorageDriveBucketName).toHaveBeenCalledWith('packs', expect.any(Array));
     expect(copyFile).toHaveBeenCalledWith('bucket-renders', 'd1/assets/a', 'bucket-packs', 'd2/assets/b', 'us-test-1');
   });
 

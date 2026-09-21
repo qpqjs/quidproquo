@@ -1,4 +1,4 @@
-import { FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,7 +15,7 @@ vi.mock('../../../logic/s3/s3Utils', () => ({ writeBinaryFile: vi.fn() }));
 vi.mock('../../../awsLambdaUtils', () => ({ getS3BucketStorageClassFromStorageDriveTier: vi.fn(() => 'STANDARD') }));
 
 const invoke = async (payload: Record<string, unknown>) => {
-  const processor = (await getFileWriteBinaryContentsActionProcessor({} as never, null as any))[FileActionType.WriteBinaryContents];
+  const processor = (await getFileWriteBinaryContentsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.WriteBinaryContents];
   return invokeProcessor(processor, payload);
 };
 

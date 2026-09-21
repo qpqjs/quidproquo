@@ -2,6 +2,7 @@ import {
   askKeyValueStoreScanBase,
   buildTestQpqConfig,
   createActionProcessor,
+  defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
@@ -28,7 +29,10 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
 const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
 
 const getProcessor = async () => {
-  const processors = await getKeyValueStoreScanActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);
+  const processors = await getKeyValueStoreScanActionProcessor(devServerConfig)(
+    buildTestQpqConfig([defineKeyValueStore('store', { key: 'id', type: 'string' })]),
+    noopDynamicModuleLoader,
+  );
   return processors[KeyValueStoreActionType.Scan];
 };
 
