@@ -1,6 +1,7 @@
 export * from './buildTenantAdminRole';
 export * from './buildTenantPermissionRequirement';
 export * from './buildTenantRoleCatalog';
+export * from './buildTenantRolesConfig';
 export * from './tenantMembershipEffectiveGrants';
 export * from './tenantMembershipPermissions';
 export * from './tenantMembershipSatisfies';

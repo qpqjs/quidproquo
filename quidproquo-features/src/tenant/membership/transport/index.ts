@@ -7,4 +7,3 @@ export * from './askTenantMembersFetch';
 export * from './askTenantMembershipFetch';
 export * from './askTenantRolesFetch';
 export * from './askTenantsFetch';
-export * from './index';

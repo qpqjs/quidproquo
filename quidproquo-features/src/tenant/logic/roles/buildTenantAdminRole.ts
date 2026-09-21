@@ -8,5 +8,6 @@ import { TenantRoleDefinition } from '../../models/TenantRoleDefinition';
 export const buildTenantAdminRole = (): TenantRoleDefinition => ({
   code: TENANT_ADMIN_ROLE,
   name: 'Tenant admin',
+  description: 'Manages the tenant itself: its users and their roles, and its name and branding.',
   permissions: [...Object.values(TenantPermission), ...Object.values(eventDocPermissions(TENANT_EVENTDOC_STORE))],
 });

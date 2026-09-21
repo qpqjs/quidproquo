@@ -9,7 +9,7 @@ import { askTenantRolesConfigRead } from './askTenantRolesConfigRead';
 
 /** Every enabled member of the tenant holding the requirement. Reads all pages; never on a hot path. */
 export function* askTenantMembersWithPermission(tenantId: TenantId, requirement: TenantPermissionRequirement): AskResponse<TenantMembership[]> {
-  const catalog = yield* askTenantRolesConfigRead();
+  const { catalog } = yield* askTenantRolesConfigRead();
   const memberships = yield* askKeyValueStoreQueryAll<TenantMembership>(TENANT_MEMBERSHIPS_STORE, kvsEqual('tenantId', tenantId));
 
   return memberships.filter((membership) => tenantMembershipSatisfies(catalog, membership, requirement));

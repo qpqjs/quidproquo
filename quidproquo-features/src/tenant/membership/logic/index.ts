@@ -4,4 +4,3 @@ export * from './askTenantMembershipUiLoadMembers';
 export * from './askTenantMembershipUiRemoveMember';
 export * from './askTenantMembershipUiSetMemberDisabled';
 export * from './askTenantMembershipUiSetMemberRoles';
-export * from './index';

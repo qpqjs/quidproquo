@@ -17,8 +17,8 @@ export function* listRoles(event: HTTPEvent, params: { id: string }): AskRespons
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }
 
-  const catalog = yield* askTenantRolesConfigRead();
-  const options: TenantRoleOption[] = Object.values(catalog).map(({ code, name }) => ({ code, name }));
+  const { catalog } = yield* askTenantRolesConfigRead();
+  const options: TenantRoleOption[] = Object.values(catalog).map(({ code, name, description }) => ({ code, name, description }));
 
   return qpqWebServerUtils.toJsonEventResponse(options);
 }

@@ -6,11 +6,11 @@ import { describe, expect, it } from 'vitest';
 import { toQpqPermission } from '../../permission/logic/toQpqPermission';
 import { TENANT_ADMIN_ROLE } from '../constants/tenantAdminRole';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
-import { buildTenantRoleCatalog } from '../logic/roles/buildTenantRoleCatalog';
+import { buildTenantRolesConfig } from '../logic/roles/buildTenantRolesConfig';
 import { createTenantedRouteDefinition } from './createTenantedRouteDefinition';
 
 const approve = toQpqPermission('case:approve');
-const catalog = buildTenantRoleCatalog({ approver: { code: 'approver', name: 'Approver', permissions: [approve] } });
+const rolesConfig = buildTenantRolesConfig({ catalog: { approver: { code: 'approver', name: 'Approver', permissions: [approve] } } });
 
 const buildEvent = (tenantId?: string): HTTPEvent =>
   ({
@@ -24,7 +24,8 @@ const buildEvent = (tenantId?: string): HTTPEvent =>
   }) as HTTPEvent;
 
 const buildMocks = (roles: string[], grants: unknown[] = []) => ({
-  [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => (action.payload.globalName === TENANT_ROLES_GLOBAL ? catalog : ''),
+  [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) =>
+    action.payload.globalName === TENANT_ROLES_GLOBAL ? rolesConfig : '',
   [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
   [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', roles, grants }], nextPageKey: undefined },
 });

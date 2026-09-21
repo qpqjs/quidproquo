@@ -4,5 +4,7 @@ import { QpqPermission } from '../../permission/types/QpqPermission';
 export type TenantRoleDefinition = {
   code: string;
   name: string;
+  // One sentence for a role picker: what holding this lets a person do.
+  description?: string;
   permissions: QpqPermission[];
 };

@@ -51,7 +51,7 @@ import {
 import { TenantEffect } from './fold/TenantEffect';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
-import { buildTenantRoleCatalog } from './logic/roles/buildTenantRoleCatalog';
+import { buildTenantRolesConfig } from './logic/roles/buildTenantRolesConfig';
 import { TenantStatus } from './models/TenantStatus';
 import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
 import { addMember } from './routes/controllers/addMember';
@@ -91,8 +91,8 @@ const globals: Record<string, unknown> = {
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: TENANT_SCOPE_RESOLVER_FN,
   [EVENT_DOC_AUTHORISER_GLOBAL]: TENANT_EVENT_DOC_AUTHORISER_FN,
   [TENANT_HEADER_NAME_GLOBAL]: DEFAULT_TENANT_HEADER_NAME,
-  [TENANT_ROLES_GLOBAL]: buildTenantRoleCatalog({
-    approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] },
+  [TENANT_ROLES_GLOBAL]: buildTenantRolesConfig({
+    catalog: { approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] } },
   }),
 };
 
@@ -593,8 +593,8 @@ describe('tenant feature', () => {
         const options = JSON.parse(runStory(listRoles(httpEvent(undefined), { id: summary.id }), mocks).body!);
         expect(options).toEqual(
           expect.arrayContaining([
-            { code: 'approver', name: 'Approver' },
-            { code: TENANT_ADMIN_ROLE, name: 'Tenant admin' },
+            expect.objectContaining({ code: 'approver', name: 'Approver' }),
+            expect.objectContaining({ code: TENANT_ADMIN_ROLE, name: 'Tenant admin' }),
           ]),
         );
       });

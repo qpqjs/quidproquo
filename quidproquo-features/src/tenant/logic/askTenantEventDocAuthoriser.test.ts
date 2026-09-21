@@ -5,15 +5,15 @@ import { describe, expect, it } from 'vitest';
 
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 import { TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
-import { buildTenantRoleCatalog } from '../logic/roles/buildTenantRoleCatalog';
+import { buildTenantRolesConfig } from '../logic/roles/buildTenantRolesConfig';
 import { askTenantEventDocAuthoriser } from './askTenantEventDocAuthoriser';
 
-const catalog = buildTenantRoleCatalog();
+const rolesConfig = buildTenantRolesConfig();
 const event = {} as HTTPEvent;
 
 const buildMocks = (roles: string[]) => ({
   [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) =>
-    action.payload.globalName === TENANT_ROLES_GLOBAL ? catalog : 'users',
+    action.payload.globalName === TENANT_ROLES_GLOBAL ? rolesConfig : 'users',
   [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
   [KeyValueStoreActionType.Query]: { items: [{ userId: 'u1', tenantId: 'tenant-a', roles, grants: [] }], nextPageKey: undefined },
 });

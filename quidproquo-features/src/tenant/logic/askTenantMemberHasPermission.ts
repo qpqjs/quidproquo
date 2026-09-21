@@ -9,7 +9,7 @@ import { askTenantRolesConfigRead } from './askTenantRolesConfigRead';
 
 /** Does this user hold the requirement in this tenant? One keyed read plus the pure check. A non-member or disabled member holds nothing. */
 export function* askTenantMemberHasPermission(tenantId: TenantId, userId: string, requirement: TenantPermissionRequirement): AskResponse<boolean> {
-  const catalog = yield* askTenantRolesConfigRead();
+  const { catalog } = yield* askTenantRolesConfigRead();
   const membership = yield* askTenantMembershipGet(userId, tenantId);
 
   // A code the catalog no longer names grants nothing, which is right, but a row that looks

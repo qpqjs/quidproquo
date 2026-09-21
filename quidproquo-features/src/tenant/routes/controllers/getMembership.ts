@@ -19,7 +19,7 @@ export function* getMembership(event: HTTPEvent, params: { id: string }): AskRes
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }
 
-  const catalog = yield* askTenantRolesConfigRead();
+  const { catalog } = yield* askTenantRolesConfigRead();
   const response: TenantCallerMembership = {
     ...membership,
     permissions: tenantMembershipPermissions(catalog, membership),

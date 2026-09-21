@@ -22,7 +22,10 @@ const config = defineTenant({
   basePath: '/tenants',
   myTenantsBasePath: '/my-tenants',
   routeAuthSettings: { userDirectoryName: 'users' },
-  roles: { catalog: { approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] } } },
+  roles: {
+    catalog: { approver: { code: 'approver', name: 'Approver', permissions: [toQpqPermission('case:approve')] } },
+    creatorRoles: [TENANT_ADMIN_ROLE, 'approver'],
+  },
 });
 
 // The owner's settings arrive as arbitrarily nested config arrays (qpq flattens
@@ -48,10 +51,11 @@ describe('defineTenant', () => {
       (s) =>
         (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.global &&
         (s as unknown as { key: string }).key === TENANT_ROLES_GLOBAL,
-    ) as unknown as { value: Record<string, { permissions: string[] }> };
+    ) as unknown as { value: { catalog: Record<string, { permissions: string[] }>; creatorRoles: string[] } };
 
-    expect(Object.keys(rolesGlobal.value).sort()).toEqual(['approver', TENANT_ADMIN_ROLE]);
-    expect(rolesGlobal.value[TENANT_ADMIN_ROLE].permissions).toContain('tenant:roles:assign');
+    expect(Object.keys(rolesGlobal.value.catalog).sort()).toEqual(['approver', TENANT_ADMIN_ROLE]);
+    expect(rolesGlobal.value.catalog[TENANT_ADMIN_ROLE].permissions).toContain('tenant:roles:assign');
+    expect(rolesGlobal.value.creatorRoles).toEqual([TENANT_ADMIN_ROLE, 'approver']);
   });
 
   it('always registers the request + connection scope resolver inline functions', () => {

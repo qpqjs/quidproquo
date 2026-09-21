@@ -42,7 +42,7 @@ describe('askTenantMembershipUiLoad', () => {
       TenantMembershipUiEffect.SetRoles,
       TenantMembershipUiEffect.SetLoading,
     ]);
-    expect(dispatched.at(-1)).toEqual({ type: TenantMembershipUiEffect.SetLoading, payload: { isLoading: false } });
+    expect(dispatched[dispatched.length - 1]).toEqual({ type: TenantMembershipUiEffect.SetLoading, payload: { isLoading: false } });
   });
 
   it("surfaces the server's refusal as the error and still clears loading", () => {
