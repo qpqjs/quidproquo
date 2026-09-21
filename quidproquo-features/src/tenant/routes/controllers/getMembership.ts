@@ -5,6 +5,7 @@ import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocR
 import { askTenantMembershipGet } from '../../data/askTenantMembershipGet';
 import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantRolesConfigRead } from '../../logic/askTenantRolesConfigRead';
+import { tenantMembershipEffectiveGrants } from '../../logic/roles/tenantMembershipEffectiveGrants';
 import { tenantMembershipPermissions } from '../../logic/roles/tenantMembershipPermissions';
 import { TenantCallerMembership } from '../../models/TenantCallerMembership';
 
@@ -19,7 +20,11 @@ export function* getMembership(event: HTTPEvent, params: { id: string }): AskRes
   }
 
   const catalog = yield* askTenantRolesConfigRead();
-  const response: TenantCallerMembership = { ...membership, permissions: tenantMembershipPermissions(catalog, membership) };
+  const response: TenantCallerMembership = {
+    ...membership,
+    permissions: tenantMembershipPermissions(catalog, membership),
+    effectiveGrants: tenantMembershipEffectiveGrants(catalog, membership),
+  };
 
   return qpqWebServerUtils.toJsonEventResponse(response);
 }
