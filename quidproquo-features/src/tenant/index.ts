@@ -5,6 +5,7 @@ export * from './data';
 export * from './fold';
 export * from './globals';
 export * from './logic';
+export * from './membership';
 export * from './models';
 export * from './module';
 export * from './routes';

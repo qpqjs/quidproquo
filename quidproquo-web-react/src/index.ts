@@ -10,6 +10,7 @@ export * from './qpqContext';
 export * from './runtime';
 export * from './state';
 export * from './store';
+export * from './tenant';
 export * from './useFieldBinding';
 export * from './useSharedQueryParams';
 export * from './websocket';
