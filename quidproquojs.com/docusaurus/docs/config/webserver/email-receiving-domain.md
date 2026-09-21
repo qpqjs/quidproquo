@@ -5,11 +5,14 @@ description: The app's inbound email domain, verified with the mail provider and
 
 # defineEmailReceivingDomain
 
-Declares the app's **receiving domain**: `<subdomain>.<env>.<root>` on every root, resolved like every other host through the app's [domain resolver](../../domains.md) (`inbox.development.example.com` with the default shape). It is a bootstrap setting: bootstrap owns the zone, so it owns the records. Every [`defineEmailReceiver`](./email-receiver.md) in the app receives at this domain, at any local part.
+Declares the app's **receiving domain**: `<subdomain>.<env>.<root>` on every root, resolved like every other host through the app's [domain resolver](../../domains.md) (`inbox.development.example.com` with the default shape). Every [`defineEmailReceiver`](./email-receiver.md) in the app receives at this domain, at any local part.
+
+Like [`defineDns`](./dns.md), it is declared in two places: in the bootstrap config, whose stack owns the zone and so creates the records, and in every service that declares a receiver, which resolves its rule's recipients from it. Put it next to `defineDns` in the app's shared service define.
 
 - **On AWS:** per root, creates an SES `EmailIdentity` for the receiving host (its DKIM CNAMEs land in the host's zone) and an MX record on it pointing at `inbound-smtp.<region>.amazonaws.com`. SES email receiving is only offered in some regions; the deploy region must be one of them. The identity also lets the app send to its own inboxes while the SES account is in sandbox.
 
 ```typescript
+// bootstrap.qpq.ts, and the shared service define
 import { defineDns, defineEmailReceivingDomain } from 'quidproquo-webserver';
 
 export default [
