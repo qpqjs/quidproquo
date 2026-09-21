@@ -12,6 +12,7 @@ export * from './queue';
 export * from './system';
 export * from './userDirectory';
 
+import { getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
 
@@ -33,6 +34,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
+  ...(await getPlatformActionProcessor('aws')(qpqConfig, dynamicModuleLoader)),
   ...(await getAiActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getApiKeyValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileActionProcessor(qpqConfig, dynamicModuleLoader)),

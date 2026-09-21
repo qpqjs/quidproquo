@@ -42,6 +42,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getMathActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getMetricActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getNetworkActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getPlatformActionProcessor(qpqConfig, dynamicModuleLoader)),
+  // Every real runtime overrides this with its own name.
+  ...(await getPlatformActionProcessor('js')(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

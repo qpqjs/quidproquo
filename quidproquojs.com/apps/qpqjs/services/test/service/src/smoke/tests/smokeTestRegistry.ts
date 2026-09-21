@@ -1,6 +1,7 @@
 import { askRunCrossServiceKeyValueStoreTest } from './crossService/askRunCrossServiceKeyValueStoreTest';
 import { askRunCrossServiceSigningKeyTest } from './crossService/askRunCrossServiceSigningKeyTest';
 import { askRunCrossServiceStorageDriveTest } from './crossService/askRunCrossServiceStorageDriveTest';
+import { askRunEmailReceiveTest } from './emailReceive/askRunEmailReceiveTest';
 import { askRunEncryptedResourcesTest } from './encryptedResources/askRunEncryptedResourcesTest';
 import { askRunEventBusTest } from './eventBus/askRunEventBusTest';
 import { askRunEventDocConcurrentAppendTest } from './eventDoc/askRunEventDocConcurrentAppendTest';
@@ -61,4 +62,5 @@ export const smokeTestRegistry: SmokeTestDefinition[] = [
   { name: 'storageDriveEvent', askRun: askRunStorageDriveEventTest },
   { name: 'keyValueStoreStream', askRun: askRunKeyValueStoreStreamTest },
   { name: 'encryptedResources', askRun: askRunEncryptedResourcesTest },
+  { name: 'emailReceive', askRun: askRunEmailReceiveTest, deployedOnly: true },
 ];

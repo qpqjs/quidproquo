@@ -4,9 +4,16 @@ import { z } from 'zod/v4';
 // cannot drift from the entries themselves.
 export const SmokeRunSummarySchema = z.object({
   total: z.int().nonnegative().describe('Tests registered for the run'),
-  completed: z.int().nonnegative().describe('Tests that have passed or failed'),
+  completed: z
+    .int()
+    .nonnegative()
+    .describe('Tests that have passed, failed or been skipped'),
   passed: z.int().nonnegative(),
   failed: z.int().nonnegative(),
+  skipped: z
+    .int()
+    .nonnegative()
+    .describe('Deployed-only tests not run on this platform'),
 });
 
 export type SmokeRunSummary = z.infer<typeof SmokeRunSummarySchema>;

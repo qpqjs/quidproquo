@@ -12,4 +12,6 @@ export type SmokeProbeRecord = {
   scope?: string;
   ambientScope?: string;
   path?: string;
+  // Set by the email handler: the provider's spf/dkim verdicts on the message.
+  authentication?: string;
 };

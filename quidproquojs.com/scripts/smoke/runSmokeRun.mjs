@@ -82,7 +82,7 @@ export const runSmokeRun = async (apiUrl, log) => {
     const run = await callApi('GET', `/smoke/run/${runId}`);
     const { summary } = run;
     log(
-      `status=${run.status} completed ${summary.completed}/${summary.total} passed ${summary.passed} failed ${summary.failed}`
+      `status=${run.status} completed ${summary.completed}/${summary.total} passed ${summary.passed} failed ${summary.failed} skipped ${summary.skipped}`
     );
 
     if (run.status === 'passed' || run.status === 'failed') {

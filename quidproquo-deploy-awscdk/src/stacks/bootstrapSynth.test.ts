@@ -1,5 +1,6 @@
 import { defineAwsGithubDeployRole, defineAwsServiceAccountInfo, defineDomainCertificate } from 'quidproquo-config-aws';
 import { buildTestQpqConfig } from 'quidproquo-core';
+import { defineDns, defineEmailReceivingDomain } from 'quidproquo-webserver';
 
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
@@ -87,5 +88,39 @@ describe('BootstrapQpqServiceStack github deploy role', () => {
         },
       ],
     });
+  });
+});
+
+describe('BootstrapQpqServiceStack email receiving domain', () => {
+  const synthReceiving = (declared: boolean) => {
+    const qpqConfig = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
+      defineDns(['example.com', 'example.org']),
+      ...(declared ? [defineEmailReceivingDomain()] : []),
+    ]);
+    const app = new App();
+    return Template.fromStack(
+      new BootstrapQpqServiceStack(app, 'test-bs', { qpqConfig, env: { account: '123456789012', region: 'ap-southeast-2' } }),
+    );
+  };
+
+  it('creates nothing unless declared', () => {
+    synthReceiving(false).resourceCountIs('AWS::SES::EmailIdentity', 0);
+  });
+
+  it('verifies the receiving host of every root and points its MX at SES in the deploy region', () => {
+    const template = synthReceiving(true);
+
+    template.resourceCountIs('AWS::SES::EmailIdentity', 2);
+    template.hasResourceProperties('AWS::SES::EmailIdentity', { EmailIdentity: 'inbox.development.example.com' });
+    template.hasResourceProperties('AWS::SES::EmailIdentity', { EmailIdentity: 'inbox.development.example.org' });
+
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Type: 'MX',
+      Name: 'inbox.development.example.com.',
+      ResourceRecords: ['10 inbound-smtp.ap-southeast-2.amazonaws.com'],
+    });
+    // Three DKIM CNAMEs per identity.
+    expect(Object.values(template.findResources('AWS::Route53::RecordSet', { Properties: { Type: 'CNAME' } }))).toHaveLength(6);
   });
 });

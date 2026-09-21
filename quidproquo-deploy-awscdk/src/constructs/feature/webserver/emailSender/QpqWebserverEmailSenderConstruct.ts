@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 
 import { domainScopedId, lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { resolveEmailReceivingHosts } from '../emailReceiving/resolveEmailReceivingHosts';
 
 export interface QpqWebserverEmailSenderConstructProps extends QpqConstructBlockProps {
   emailSenderConfig: EmailSenderQPQWebServerConfigSetting;
@@ -38,7 +39,8 @@ export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
   // Scope email sending to this service's own verified identity domains (exact ARNs, per the
   // shared-account rule). SendRawEmail is needed for the attachment (raw MIME) path.
   // While the SES account is in sandbox, SES also authorizes against the recipient's identity,
-  // so any defineEmailSenderAllowList addresses are granted too.
+  // so any defineEmailSenderAllowList addresses are granted too, as are the app's own receiving
+  // hosts: sending to your own inboxes is how a receiver gets tested.
   // No-op when the service declares no email sender.
   public static authorizeSendEmailForRole(
     role: aws_iam.IRole,
@@ -54,6 +56,7 @@ export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
       const resources = [
         ...getIdentityDomains(qpqConfig).map(({ identityDomain }) => identityArn(identityDomain)),
         ...qpqConfigAwsUtils.getEmailSenderAllowedAddresses(qpqConfig).map(identityArn),
+        ...resolveEmailReceivingHosts(qpqConfig).map(({ host }) => identityArn(host)),
       ];
 
       role.addToPrincipalPolicy(

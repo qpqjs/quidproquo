@@ -1,5 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
@@ -8,6 +9,7 @@ import {
   QpqBootstrapConfigAwsOrganizationConstruct,
   QpqBootstrapConfigGithubDeployRoleConstruct,
   QpqBootstrapConfigWafConstruct,
+  QpqBootstrapEmailReceivingDomainConstruct,
 } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
@@ -49,6 +51,15 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
         qpqConfig: props.qpqConfig,
 
         githubDeployRoleConfig,
+      });
+    }
+
+    const emailReceivingDomainConfig = qpqWebServerUtils.getEmailReceivingDomainConfig(props.qpqConfig);
+    if (emailReceivingDomainConfig) {
+      new QpqBootstrapEmailReceivingDomainConstruct(this, 'email-receiving-domain', {
+        qpqConfig: props.qpqConfig,
+
+        emailReceivingDomainConfig,
       });
     }
 

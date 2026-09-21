@@ -33,3 +33,8 @@ export const SMOKE_STREAM_PROBE_STORE = 'smokeStreamProbe';
 export const SMOKE_CRYPTO_KEY = 'smokeCrypto';
 export const SMOKE_ENCRYPTED_PROBE_STORE = 'smokeEncryptedProbe';
 export const SMOKE_ENCRYPTED_PROBE_DRIVE = 'smoke-encrypted-probe';
+
+// Inbound email: the receiver writes raw messages into this drive, whose create handler
+// parses them and writes a marker the email test polls for. Deployed only.
+export const SMOKE_EMAIL_RECEIVER = 'smoke';
+export const SMOKE_EMAIL_DRIVE = 'smoke-email';

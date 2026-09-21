@@ -1,4 +1,4 @@
-import { getCoreActionProcessor as getJsCoreActionProcessor } from 'quidproquo-actionprocessor-js';
+import { getCoreActionProcessor as getJsCoreActionProcessor, getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getDynamicFunctionsActionProcessor } from './dynamicFunctions';
@@ -18,6 +18,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
   ...(await getJsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getPlatformActionProcessor('node')(qpqConfig, dynamicModuleLoader)),
   ...(await getStreamActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getInlineFunctionActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getDynamicFunctionsActionProcessor(qpqConfig, dynamicModuleLoader)),

@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
+    "postal-mime": "^3.0.0",
     "quidproquo-core": "0.1.25",
     "quidproquo-webserver": "0.1.25",
     "uuidv7": "^1.0.1"

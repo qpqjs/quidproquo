@@ -40,7 +40,8 @@ function* askRunSmokeTest(
 
 const isTerminal = (result: SmokeTestResult): boolean =>
   result.status === SmokeTestStatus.passed ||
-  result.status === SmokeTestStatus.failed;
+  result.status === SmokeTestStatus.failed ||
+  result.status === SmokeTestStatus.skipped;
 
 // Executes one registered test for an existing run (created by
 // askStartSmokeRun) and records its result. Every test of a run executes
@@ -86,7 +87,7 @@ export function* askExecuteSmokeTest(
 
   const finishedAt = yield* askDateNow();
   const anyFailed = recorded.tests.some(
-    (t) => t.status !== SmokeTestStatus.passed
+    (t) => t.status === SmokeTestStatus.failed
   );
 
   return yield* askSetSmokeRunOutcome(

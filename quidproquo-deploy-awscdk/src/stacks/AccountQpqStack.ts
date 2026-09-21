@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import {
   QpqAccountBudgetConstruct,
   QpqAccountCloudTrailConstruct,
+  QpqAccountEmailReceivingConstruct,
   QpqAccountGithubOidcProviderConstruct,
   QpqAccountSecurityServicesConstruct,
 } from '../constructs';
@@ -42,6 +43,12 @@ export class AccountQpqStack extends QpqServiceStack {
 
     if (qpqConfigAwsUtils.isAccountGithubOidcProviderDeclared(props.qpqConfig)) {
       new QpqAccountGithubOidcProviderConstruct(this, 'github-oidc-provider', {
+        qpqConfig: props.qpqConfig,
+      });
+    }
+
+    if (qpqConfigAwsUtils.isAccountEmailReceivingDeclared(props.qpqConfig)) {
+      new QpqAccountEmailReceivingConstruct(this, 'email-receiving', {
         qpqConfig: props.qpqConfig,
       });
     }

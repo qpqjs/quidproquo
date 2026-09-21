@@ -10,6 +10,8 @@ import { qpqAwsCdkPathUtils } from '../../../../utils';
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
+import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../../webserver/emailReceiving/emailReceiptRuleSetName';
+
 export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
   storageDriveConfig: StorageDriveQPQConfigSetting;
 
@@ -38,6 +40,12 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * resolveCryptoKeyForResource). Required when the drive names one.
    */
   cryptoKey?: aws_kms.IKey;
+
+  /**
+   * The account receipt rules (defineEmailReceiver) that write into this drive, by name; each
+   * may put objects and nothing else. Resolved by the (web-aware) caller from the receiver configs.
+   */
+  emailReceiptRuleNames?: string[];
 }
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
@@ -153,6 +161,28 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
           conditions: {
             StringLike: {
               'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
+            },
+          },
+        }),
+      );
+    }
+
+    // Only the app's own rules in the account's rule set, not any SES principal in any account.
+    if (props.emailReceiptRuleNames && props.emailReceiptRuleNames.length > 0) {
+      const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+      this.bucket.addToResourcePolicy(
+        new aws_iam.PolicyStatement({
+          sid: 'AllowEmailReceiptRuleWrite',
+          effect: aws_iam.Effect.ALLOW,
+          principals: [new aws_iam.ServicePrincipal('ses.amazonaws.com')],
+          actions: ['s3:PutObject'],
+          resources: [this.bucket.arnForObjects('*')],
+          conditions: {
+            StringEquals: {
+              'AWS:SourceAccount': awsAccountId,
+              'AWS:SourceArn': props.emailReceiptRuleNames.map(
+                (ruleName) => `arn:aws:ses:${region}:${awsAccountId}:receipt-rule-set/${QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/${ruleName}`,
+              ),
             },
           },
         }),
