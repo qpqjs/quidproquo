@@ -73,6 +73,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ steps.app-token.outputs.token }}
+          allowed_non_write_users: harryhobbes
           # The issue number is numeric so interpolating it is injection-safe.
           # Everything user-written (title, body) is fetched by Claude via gh,
           # never interpolated into the prompt.
@@ -96,6 +97,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ steps.app-token.outputs.token }}
+          allowed_non_write_users: harryhobbes
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Repository: ${{ github.repository }}
@@ -141,6 +143,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ steps.app-token.outputs.token }}
+          allowed_non_write_users: harryhobbes
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Trigger comment id: ${{ github.event.comment.id }}
@@ -205,6 +208,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ steps.app-token.outputs.token }}
+          allowed_non_write_users: harryhobbes
           prompt: |
             Issue number: ${{ github.event.issue.number }}
             Repository: ${{ github.repository }}
@@ -287,6 +291,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ steps.app-token.outputs.token }}
+          allowed_non_write_users: harryhobbes
           prompt: |
             PR number: ${{ github.event.pull_request.number || github.event.issue.number }}
             Trigger event: ${{ github.event_name }}
