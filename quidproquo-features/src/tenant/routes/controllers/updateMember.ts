@@ -3,14 +3,16 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
 import { askEventDocParseBody } from '../../../eventDoc/routes/askEventDocParseBody';
+import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantMemberUpdate } from '../../logic/askTenantMemberUpdate';
 import { TenantMemberUpdateRequest } from '../../models/TenantMemberUpdateRequest';
 import { askTenantAssertCallerMayManageMembers } from '../askTenantAssertCallerMayManageMembers';
 
 /** PATCH {basePath}/{id}/members/{userId}: change a member's disabled flag (body `{ disabled? }`). Needs MembersManage. */
 export function* updateMember(event: HTTPEvent, params: { id: string; userId: string }): AskResponse<HTTPEventResponse> {
+  const tenantId = yield* askTenantIdParse(params.id);
   const callerUserId = yield* askEventDocResolveUserId();
-  yield* askTenantAssertCallerMayManageMembers(params.id, callerUserId);
+  yield* askTenantAssertCallerMayManageMembers(tenantId, callerUserId);
 
   const body = yield* askEventDocParseBody<TenantMemberUpdateRequest>(event);
 
@@ -18,7 +20,7 @@ export function* updateMember(event: HTTPEvent, params: { id: string; userId: st
     return yield* askThrowError(ErrorTypeEnum.BadRequest, 'disabled must be a boolean');
   }
 
-  const membership = yield* askTenantMemberUpdate(params.id, callerUserId, params.userId, { disabled: body.disabled });
+  const membership = yield* askTenantMemberUpdate(tenantId, callerUserId, params.userId, { disabled: body.disabled });
 
   return qpqWebServerUtils.toJsonEventResponse(membership);
 }

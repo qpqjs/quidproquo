@@ -1,6 +1,7 @@
 export * from './TenantBrandColors';
 export * from './TenantCallerMembership';
 export * from './TenantDocument';
+export * from './TenantId';
 export * from './TenantMember';
 export * from './TenantMemberAddRequest';
 export * from './TenantMemberRolesSetRequest';

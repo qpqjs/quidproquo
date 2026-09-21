@@ -5,6 +5,7 @@ import { askTenantRecordUpsert } from '../data/askTenantRecordUpsert';
 import { TenantDocument } from '../models/TenantDocument';
 import { TenantRecord } from '../models/TenantRecord';
 import { TenantStatus } from '../models/TenantStatus';
+import { toTenantId } from './toTenantId';
 
 /**
  * The tenant collection's onPublish inline function: materialize the tenant record from the
@@ -15,7 +16,7 @@ export function* askTenantOnPublish(input: EventDocOnPublishInput): AskResponse<
   const doc = input.state as TenantDocument;
 
   const record: TenantRecord = {
-    tenantId: input.docId,
+    tenantId: toTenantId(input.docId),
     name: input.summary.name,
     brandColors: doc.brandColors,
     logo: doc.logo,

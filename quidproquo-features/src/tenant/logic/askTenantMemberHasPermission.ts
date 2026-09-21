@@ -1,13 +1,14 @@
 import { askLogCreate, AskResponse, LogLevelEnum } from 'quidproquo-core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
+import { TenantId } from '../models/TenantId';
 import { TenantPermissionRequirement } from '../models/TenantPermissionRequirement';
 import { tenantMembershipSatisfies } from './roles/tenantMembershipSatisfies';
 import { tenantRoleCatalogUnknownRoles } from './roles/tenantRoleCatalogUnknownRoles';
 import { askTenantRolesConfigRead } from './askTenantRolesConfigRead';
 
 /** Does this user hold the requirement in this tenant? One keyed read plus the pure check. A non-member or disabled member holds nothing. */
-export function* askTenantMemberHasPermission(tenantId: string, userId: string, requirement: TenantPermissionRequirement): AskResponse<boolean> {
+export function* askTenantMemberHasPermission(tenantId: TenantId, userId: string, requirement: TenantPermissionRequirement): AskResponse<boolean> {
   const catalog = yield* askTenantRolesConfigRead();
   const membership = yield* askTenantMembershipGet(userId, tenantId);
 

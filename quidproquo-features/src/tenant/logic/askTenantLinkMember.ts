@@ -2,10 +2,11 @@ import { askDateNow, AskResponse } from 'quidproquo-core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';
+import { TenantId } from '../models/TenantId';
 import { TenantMembership } from '../models/TenantMembership';
 
 /** Link a user to a tenant with a starting role set. Idempotent: an existing row is returned untouched, whatever it holds. */
-export function* askTenantLinkMember(tenantId: string, userId: string, roles: string[], addedByUserId: string): AskResponse<TenantMembership> {
+export function* askTenantLinkMember(tenantId: TenantId, userId: string, roles: string[], addedByUserId: string): AskResponse<TenantMembership> {
   const existing = yield* askTenantMembershipGet(userId, tenantId);
   if (existing) {
     return existing;

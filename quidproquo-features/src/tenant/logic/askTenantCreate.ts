@@ -1,9 +1,9 @@
 import { askNewGuid, AskResponse, askStorageScopeProvide } from 'quidproquo-core';
 
 import { askEventDocCreate } from '../../eventDoc/logic/askEventDocCreate';
-import { askEventDocGenerateNewId } from '../../eventDoc/logic/askEventDocGenerateNewId';
 import { EventDocEventActor, EventDocSummary } from '../../eventDoc/models';
 import { TENANT_ADMIN_ROLE } from '../constants/tenantAdminRole';
+import { askTenantGenerateNewId } from './askTenantGenerateNewId';
 import { askTenantLinkMember } from './askTenantLinkMember';
 import { composeTenantScope } from './storageScope';
 
@@ -14,13 +14,13 @@ import { composeTenantScope } from './storageScope';
  * context (the tenant routes provide it).
  */
 export function* askTenantCreate(name: string, actor: EventDocEventActor): AskResponse<EventDocSummary> {
-  const tenantId = yield* askEventDocGenerateNewId();
+  const tenantId = yield* askTenantGenerateNewId();
   // Non-user-facing unique filler required by the eventDoc INIT contract.
   const code = yield* askNewGuid();
 
   const summary = yield* askStorageScopeProvide(composeTenantScope(tenantId), askEventDocCreate(name, code, actor, tenantId));
 
-  yield* askTenantLinkMember(summary.id, actor.userId, [TENANT_ADMIN_ROLE], actor.userId);
+  yield* askTenantLinkMember(tenantId, actor.userId, [TENANT_ADMIN_ROLE], actor.userId);
 
   return summary;
 }

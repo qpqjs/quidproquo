@@ -1,5 +1,6 @@
 import { AskResponse, askThrowError, askUserDirectoryGetUsersByAttribute, ErrorTypeEnum } from 'quidproquo-core';
 
+import { TenantId } from '../models/TenantId';
 import { TenantMember } from '../models/TenantMember';
 import { askTenantLinkMember } from './askTenantLinkMember';
 
@@ -8,7 +9,7 @@ import { askTenantLinkMember } from './askTenantLinkMember';
  * invite flow: an email with no account is NotFound. Idempotent - re-adding returns the
  * existing membership untouched.
  */
-export function* askTenantMemberAdd(userDirectoryName: string, tenantId: string, email: string, addedByUserId: string): AskResponse<TenantMember> {
+export function* askTenantMemberAdd(userDirectoryName: string, tenantId: TenantId, email: string, addedByUserId: string): AskResponse<TenantMember> {
   const normalisedEmail = email.trim().toLowerCase();
   if (!normalisedEmail) {
     return yield* askThrowError(ErrorTypeEnum.BadRequest, 'An email address is required.');

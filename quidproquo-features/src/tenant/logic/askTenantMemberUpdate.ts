@@ -2,13 +2,14 @@ import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';
+import { TenantId } from '../models/TenantId';
 import { TenantMembership } from '../models/TenantMembership';
 import { TenantMemberUpdateRequest } from '../models/TenantMemberUpdateRequest';
 import { askTenantAssertNotLastAssigner } from './askTenantAssertNotLastAssigner';
 
 /** Change a member's per-tenant settings. The caller may not disable themself, and nobody may disable the last assigner. */
 export function* askTenantMemberUpdate(
-  tenantId: string,
+  tenantId: TenantId,
   callerUserId: string,
   userId: string,
   update: TenantMemberUpdateRequest,

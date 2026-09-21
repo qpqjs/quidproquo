@@ -3,6 +3,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../../eventDoc/constants/eventDocGlobalNames';
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';
+import { askTenantIdParse } from '../../logic/askTenantIdParse';
 import { askTenantMemberList } from '../../logic/askTenantMemberList';
 import { askTenantValidateMembership } from '../../logic/askTenantValidateMembership';
 
@@ -13,9 +14,10 @@ const DEFAULT_PAGE_SIZE = 100;
  * role + disabled), members only. Query `limit` and `nextPageKey` page through.
  */
 export function* listMembers(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  const tenantId = yield* askTenantIdParse(params.id);
   const userId = yield* askEventDocResolveUserId();
 
-  const isMember = yield* askTenantValidateMembership(userId, params.id);
+  const isMember = yield* askTenantValidateMembership(userId, tenantId);
   if (!isMember) {
     return yield* askThrowError(ErrorTypeEnum.Forbidden, 'User is not a member of the requested tenant.');
   }
@@ -24,7 +26,7 @@ export function* listMembers(event: HTTPEvent, params: { id: string }): AskRespo
   const nextPageKey = typeof event.query?.nextPageKey === 'string' ? event.query.nextPageKey : undefined;
 
   const userDirectoryName = yield* askConfigGetGlobal<string>(EVENT_DOC_USER_DIRECTORY_GLOBAL);
-  const page = yield* askTenantMemberList(userDirectoryName, params.id, limit, nextPageKey);
+  const page = yield* askTenantMemberList(userDirectoryName, tenantId, limit, nextPageKey);
 
   return qpqWebServerUtils.toJsonEventResponse(page);
 }
