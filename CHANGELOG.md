@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.26
+
+- webserver/deploy-awscdk/actionprocessor-awslambda/dev-server: inbound email. `defineEmailReceiver` declares a receiving address and runs an `onEmail` function once per message with a parsed `EmailMessage`, instead of handing you a raw object in a drive to parse yourself. It owns its own storage drive, the SES receipt rule lives in the api stack next to the handler, and the receiver has to be declared in the service that handles the mail (a bootstrap-only `defineEmailReceivingDomain` is no longer enough)
+- features: tenant roles replace the fixed owner/member pair. `defineTenant` takes a role catalog and the roles a tenant's creator is seeded with, memberships carry `roles` plus direct permission grants, and there are routes for assigning them (a member can always remove themselves). Tenanted event-doc routes are permission-gated per collection and action, with an authorise hook for custom checks, and there is a membership UI state module for the frontend
+- core: `defineStorageDrive` and `defineKeyValueStore` gain a `scoped` option that is enforced at call time. A scoped resource refuses an unscoped read or write and vice versa with `InvalidScopeError`, so a missing scope fails loudly instead of quietly touching the unpartitioned rows. `StorageDriveEvent` carries the scope when the drive is scoped
+- core/config-aws/deploy-awscdk: drives and stores pick their encryption key by name with `cryptoKeyName` pointing at a `defineCryptoKey`, rather than a raw KMS arn. Everything stays encrypted with the provider's managed key when it is omitted, and synth fails if a named key cannot be resolved. Signing and crypto keys that would collide on name are caught at synth
+- features: a tenant's own document now lives under its `TENANT#<id>` scope, so a tenant is edited from inside itself rather than by whoever happened to create it. Tenant ids are a branded `TenantId` (built on a new core `Brand` type and `createBrandGuard`), so a bare string no longer type-checks where a tenant id is expected
+- features: `EventDocBackend` document reads are typed from the definition's view instead of returning a loose shape
+- features: event-doc append retries go to 20 with a wider redelivery cushion, so a slot race under contention resolves instead of failing the append
+- dev-server: a user store entry missing on a restart is reseeded from the access token, so a logged-in session keeps working
+
+### Breaking changes
+
+- `defineEmailReceiver` returns a config fragment, owns its drive, and requires an `onEmail` function; `storageDriveName`/`keyPrefix` are gone
+- `QpqWebserverEmailReceiverConstruct` is renamed `QpqApiWebserverEmailReceiverConstruct` and moves to the Api stack, accepting only a drive the service owns
+- `defineStorageDrive`/`defineKeyValueStore` `scoped` is enforced: mismatched scope now throws `InvalidScopeError`, and `scoped` with `copyPath` throws at config time
+- the `encryption: boolean` option is replaced by `cryptoKeyName`; `defineAwsKmsKey` and the `getAwsKmsKey*` helpers are removed
+- `TenantMembershipRole` is removed: memberships carry `roles: string[]` plus `grants`, `askTenantLinkMember` takes an array, and `askTenantRolesConfigRead` returns `{ catalog, creatorRoles }`
+- tenanted event-doc routes require an `eventDoc:<storeName>:<action>` permission, and a route with a `permission` refuses personal-scope callers unless `allowPersonalScope` is set
+- tenant docs move to their own `TENANT#<id>` scope and `TenantRecord.scope` is removed; tenants created before this need migrating
+- tenant ids are the branded `TenantId`; brand request-supplied ids with `askTenantIdParse`, stored ones with `toTenantId`
+- `TenantCallerMembership` gains a required `effectiveGrants` field
+
 ## 0.1.25
 
 - features/core/actionprocessor-awslambda: resumable AI turns. An event-doc AI chat turn now budgets against the execution deadline: `askEventDocAiStreamTurn` reads the remaining runtime, gives the model the rest as `maxDurationMs`, and when the time budget or the output token cap cuts the reply short it saves what it has and hands the turn to a continuation service function (registered by `defineEventDocAi`), returning `SERVICE_REQUEST_DEFERRED` so the finished reply arrives on the same websocket correlation from the next execution. `askAiPrompt` and `askAiPromptStream` gain `maxDurationMs` and `maxOutputTokens` options, and `defineEventDocAi` takes `maxOutputTokens` (default 65536, since the Bedrock default of 8192 cuts a reasoning block plus a large tool input off mid-JSON). The in-flight reply in `EventDocAiState` is folded into `streamSegments` as each chunk lands instead of re-merging the whole part list every time
