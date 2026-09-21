@@ -6,6 +6,8 @@ export * from './defaultRouteOptions';
 export * from './defineAuthSystem';
 export * from './dns';
 export * from './domainProxy';
+export * from './emailReceiver';
+export * from './emailReceivingDomain';
 export * from './emailSender';
 export * from './fileUploadSettings';
 export * from './migration';

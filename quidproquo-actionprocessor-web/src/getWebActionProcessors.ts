@@ -1,5 +1,6 @@
 import {
   getCoreActionProcessor as getJsCoreActionProcessor,
+  getPlatformActionProcessor,
   getWebserverActionProcessor as getJsWebserverActionProcessor,
 } from 'quidproquo-actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
@@ -19,6 +20,7 @@ export const getWebActionProcessors: ActionProcessorListResolver = async (
   ...(await getJsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getJsWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
 
+  ...(await getPlatformActionProcessor('browser')(qpqConfig, dynamicModuleLoader)),
   ...(await getWebCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getWebWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
 

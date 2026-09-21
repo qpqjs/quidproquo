@@ -1,5 +1,7 @@
 import {
   defineCryptoKey,
+  defineEmailReceiver,
+  defineEmailSender,
   defineEventBus,
   defineKeyValueStore,
   defineParameter,
@@ -33,6 +35,8 @@ import {
 } from '../constants/smokeEventDoc';
 import {
   SMOKE_CRYPTO_KEY,
+  SMOKE_EMAIL_DRIVE,
+  SMOKE_EMAIL_RECEIVER,
   SMOKE_ENCRYPTED_PROBE_DRIVE,
   SMOKE_ENCRYPTED_PROBE_STORE,
   SMOKE_FILE_EVENT_DRIVE,
@@ -158,6 +162,26 @@ export const defineSmoke = (): QPQConfig => {
     ),
     defineStorageDrive(SMOKE_ENCRYPTED_PROBE_DRIVE, {
       cryptoKeyName: SMOKE_CRYPTO_KEY,
+    }),
+
+    // Inbound email test path: the test sends to its own receiving domain, the
+    // receiver drops the raw message into the drive, the drive's create handler
+    // parses it and writes a marker into the probe store, the test polls for it.
+    // The sender is what lets the test send; SES sandbox allows sending to the
+    // app's own verified receiving domain.
+    defineEmailSender(),
+    defineStorageDrive(SMOKE_EMAIL_DRIVE, {
+      lifecycleRules: [{ deleteAfterDays: 7 }],
+      onEvent: {
+        create: {
+          basePath: __dirname,
+          relativePath: '../storageDrive/onSmokeEmailReceived',
+          functionName: 'onSmokeEmailReceived',
+        },
+      },
+    }),
+    defineEmailReceiver(SMOKE_EMAIL_RECEIVER, {
+      storageDriveName: SMOKE_EMAIL_DRIVE,
     }),
 
     // Event bus test path: publish to the bus, the subscribed queue's entry

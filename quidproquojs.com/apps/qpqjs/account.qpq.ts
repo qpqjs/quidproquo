@@ -7,6 +7,7 @@ import { QPQConfig } from 'quidproquo';
 import {
   AwsDataStoreRemovalPolicy,
   defineAccountBudget,
+  defineAccountEmailReceiving,
   defineAccountGithubOidcProvider,
   defineAccountSecurityServices,
   defineAwsDataStoreRemovalPolicy,
@@ -20,6 +21,9 @@ export default (): QPQConfig => [
 
   // GitHub Actions OIDC provider, trusted by every app's deploy role in this account.
   defineAccountGithubOidcProvider(),
+
+  // The one active SES receipt rule set; every app's inbound-email rules live in it.
+  defineAccountEmailReceiving(),
 
   defineAccountSecurityServices({
     // GuardDuty is org-managed for this account

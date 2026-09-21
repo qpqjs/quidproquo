@@ -7,7 +7,9 @@ import {
   KeyValueStoreActionType,
   LogActionType,
   noopDynamicModuleLoader,
+  PlatformActionType,
   QueueActionType,
+  resolveActionResult,
   UserDirectoryActionType,
 } from 'quidproquo-core';
 
@@ -44,5 +46,14 @@ describe('getCoreActionProcessor', () => {
     expect(processors[QueueActionType.SendMessages]).toBeDefined();
     expect(processors[LogActionType.Create]).toBeDefined();
     expect(processors[UserDirectoryActionType.DecodeAccessToken]).toBeDefined();
+  });
+
+  // The quidproquojs.com smoke suite compares askPlatformGetName against the
+  // literal 'devServer' to skip deployed-only tests locally, so it is pinned here.
+  it('answers askPlatformGetName with the name the smoke suite expects', async () => {
+    const processors = await getCoreActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader, devServerConfig);
+    const process = processors[PlatformActionType.GetName] as (payload: unknown) => Promise<any>;
+
+    expect(resolveActionResult(await process({}))).toBe('devServer');
   });
 });

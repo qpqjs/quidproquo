@@ -1,6 +1,7 @@
 import {
   askDateNow,
   askNewGuid,
+  askPlatformGetName,
   askQueueSendMessages,
   AskResponse,
   QueueMessage,
@@ -22,14 +23,15 @@ import { SmokeTestRequestedPayload } from '../../models/SmokeTestRequestedQueueE
 import { SmokeTestDefinition } from '../../tests/SmokeTestDefinition';
 import { smokeTestRegistry } from '../../tests/smokeTestRegistry';
 
-const createPendingResult = (
+const createInitialResult = (
   test: SmokeTestDefinition,
-  index: number
+  index: number,
+  skip: boolean
 ): SmokeTestResult => ({
   id: index + 1,
   name: test.name,
-  status: SmokeTestStatus.pending,
-  message: '',
+  status: skip ? SmokeTestStatus.skipped : SmokeTestStatus.pending,
+  message: skip ? 'deployed only' : '',
   startedAt: null,
   finishedAt: null,
 });
@@ -42,29 +44,41 @@ const createTestRequestedMessage = (
   payload: { runId, testName: test.name },
 });
 
-// Creates the run record with every registered test pending, then sends one
-// queue message per test so they execute in parallel. The record exists
-// before the messages are sent so a poll (or a worker) that races the queue
-// still finds it.
+// Creates the run record with every registered test pending (or skipped, for
+// a deployed-only test on the dev server), then sends one queue message per
+// pending test so they execute in parallel. The record exists before the
+// messages are sent so a poll (or a worker) that races the queue still finds
+// it. A run of nothing but skips never gets a worker, so it is finished here.
 export function* askStartSmokeRun(): AskResponse<SmokeRun> {
   const runId = yield* askNewGuid();
   const startedAt = yield* askDateNow();
+  const platformName = yield* askPlatformGetName();
+
+  const shouldSkip = (test: SmokeTestDefinition): boolean =>
+    !!test.deployedOnly && platformName === 'devServer';
+
+  const queued = smokeTestRegistry.filter((test) => !shouldSkip(test));
 
   const smokeRun: SmokeRun = {
     runId,
-    status: SmokeRunStatus.running,
+    status:
+      queued.length === 0 ? SmokeRunStatus.passed : SmokeRunStatus.running,
     startedAt,
-    finishedAt: null,
-    tests: smokeTestRegistry.map(createPendingResult),
+    finishedAt: queued.length === 0 ? startedAt : null,
+    tests: smokeTestRegistry.map((test, index) =>
+      createInitialResult(test, index, shouldSkip(test))
+    ),
   };
 
   yield* askSaveSmokeRun(smokeRun);
 
-  const messages = smokeTestRegistry.map((test) =>
+  const messages = queued.map((test) =>
     createTestRequestedMessage(runId, test)
   );
 
-  yield* askQueueSendMessages(SMOKE_RUN_QUEUE, ...messages);
+  if (messages.length > 0) {
+    yield* askQueueSendMessages(SMOKE_RUN_QUEUE, ...messages);
+  }
 
   return smokeRun;
 }

@@ -1,4 +1,4 @@
-import { getMetricActionProcessor } from 'quidproquo-actionprocessor-js';
+import { getMetricActionProcessor, getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
 import { getFileActionProcessor, getOwnCodeMarkersFromRoot, getSystemTraceStoryActionProcessor } from 'quidproquo-actionprocessor-node';
 import { ActionProcessorList, DynamicModuleLoader, isQpqFunctionRuntimeAdvanced, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
@@ -42,6 +42,7 @@ export const getCoreActionProcessor = async (
   devServerConfig: ResolvedDevServerConfig,
 ): Promise<ActionProcessorList> => {
   return {
+    ...(await getPlatformActionProcessor('devServer')(qpqConfig, dynamicModuleLoader)),
     ...(await getApiKeyValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getConfigActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getCryptoActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),

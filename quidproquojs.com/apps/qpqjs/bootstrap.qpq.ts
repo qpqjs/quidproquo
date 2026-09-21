@@ -2,7 +2,12 @@
 // domain certificates. The identity plumbing (defineApplication +
 // defineAwsServiceAccountInfo) is provided by quidproquo-deploy-awscdk's
 // workspace CDK app; this fragment must not declare its own.
-import { defineApi, defineDns, QPQConfig } from 'quidproquo';
+import {
+  defineApi,
+  defineDns,
+  defineEmailReceivingDomain,
+  QPQConfig,
+} from 'quidproquo';
 import {
   defineAwsGithubDeployRole,
   defineBootstrapWaf,
@@ -17,8 +22,14 @@ import { QPQJS_DOMAINS, QpqjsServiceEnum } from '@qpqjs/constants';
 export default ({ region }: QpqAppDeployContext): QPQConfig => [
   defineDns(QPQJS_DOMAINS),
 
+  // inbox.<env>.<root>: verified with SES and MX-routed to it, for every defineEmailReceiver.
+  defineEmailReceivingDomain('inbox'),
+
   // The role the deploy workflow assumes (ids from `gh api repos/qpqjs/quidproquo`).
-  defineAwsGithubDeployRole('qpqjs/quidproquo', { ownerId: 314167689, repositoryId: 571382961 }),
+  defineAwsGithubDeployRole('qpqjs/quidproquo', {
+    ownerId: 314167689,
+    repositoryId: 571382961,
+  }),
 
   defineBootstrapWaf({
     rateLimits: [{ name: 'all-traffic', limit: 2000 }],

@@ -12,14 +12,18 @@ export const summarizeSmokeRun = (smokeRun: SmokeRun): SmokeRunWithSummary => {
   const failed = smokeRun.tests.filter(
     (t) => t.status === SmokeTestStatus.failed
   ).length;
+  const skipped = smokeRun.tests.filter(
+    (t) => t.status === SmokeTestStatus.skipped
+  ).length;
 
   return {
     ...smokeRun,
     summary: {
       total: smokeRun.tests.length,
-      completed: passed + failed,
+      completed: passed + failed + skipped,
       passed,
       failed,
+      skipped,
     },
   };
 };

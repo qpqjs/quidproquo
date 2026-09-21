@@ -8,6 +8,7 @@ export enum QPQAwsConfigSettingType {
   accountCloudTrail = '@quidproquo-aws/config/accountCloudTrail',
   accountSecurityServices = '@quidproquo-aws/config/accountSecurityServices',
   accountGithubOidcProvider = '@quidproquo-aws/config/accountGithubOidcProvider',
+  accountEmailReceiving = '@quidproquo-aws/config/accountEmailReceiving',
   bootstrapWaf = '@quidproquo-aws/config/bootstrapWaf',
   wafProtection = '@quidproquo-aws/config/wafProtection',
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',

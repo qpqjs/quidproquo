@@ -3,6 +3,8 @@ export enum QPQWebServerConfigSettingType {
   DefaultRouteOptions = '@quidproquo-webserver/config/DefaultRouteOptions',
   Dns = '@quidproquo-webserver/config/Dns',
   EmailSender = '@quidproquo-webserver/config/EmailSender',
+  EmailReceivingDomain = '@quidproquo-webserver/config/EmailReceivingDomain',
+  EmailReceiver = '@quidproquo-webserver/config/EmailReceiver',
   Seo = '@quidproquo-webserver/config/Seo',
   SubdomainRedirect = '@quidproquo-webserver/config/SubdomainRedirect',
   WebEntry = '@quidproquo-webserver/config/WebEntry',

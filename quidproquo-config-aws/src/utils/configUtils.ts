@@ -95,6 +95,9 @@ export const getAccountBudgetConfigs = (qpqConfig: QPQConfig): AccountBudgetQPQC
 export const isAccountGithubOidcProviderDeclared = (qpqConfig: QPQConfig): boolean =>
   !!qpqCoreUtils.getConfigSetting(qpqConfig, QPQAwsConfigSettingType.accountGithubOidcProvider);
 
+export const isAccountEmailReceivingDeclared = (qpqConfig: QPQConfig): boolean =>
+  !!qpqCoreUtils.getConfigSetting(qpqConfig, QPQAwsConfigSettingType.accountEmailReceiving);
+
 export const getAccountSecurityServicesConfig = (qpqConfig: QPQConfig): AccountSecurityServicesQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<AccountSecurityServicesQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountSecurityServices);
 

@@ -11,4 +11,7 @@ import { AskResponse } from 'quidproquo';
 export type SmokeTestDefinition = {
   name: string;
   askRun: (runId: string) => AskResponse<void>;
+  // The test exercises something only a deployed platform has (inbound email,
+  // say). On the dev server it is recorded as skipped and never queued.
+  deployedOnly?: boolean;
 };

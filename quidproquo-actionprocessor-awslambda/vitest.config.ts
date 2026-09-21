@@ -11,6 +11,7 @@ export default defineConfig({
     // quidproquo-actionprocessor-node's config and keeps class identity
     // (instanceof) consistent across every module in the test process.
     alias: {
+      'quidproquo-actionprocessor-js': fileURLToPath(new URL('../quidproquo-actionprocessor-js/src/index.ts', import.meta.url)),
       'quidproquo-core': fileURLToPath(new URL('../quidproquo-core/src/index.ts', import.meta.url)),
       'quidproquo-webserver': fileURLToPath(new URL('../quidproquo-webserver/src/index.ts', import.meta.url)),
       // The tracer is deep-imported as lib/commonjs/traceStoryExecution (so lambda

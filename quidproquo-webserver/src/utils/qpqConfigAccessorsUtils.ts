@@ -7,6 +7,8 @@ import {
   DefaultRouteOptionsQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
+  EmailReceiverQPQWebServerConfigSetting,
+  EmailReceivingDomainQPQWebServerConfigSetting,
   EmailSenderQPQWebServerConfigSetting,
   FileUploadSettings,
   FileUploadSettingsQPQWebServerConfigSetting,
@@ -185,6 +187,19 @@ export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptio
 export const getEmailSenderSettings = (qpqConfig: QPQConfig): EmailSenderQPQWebServerConfigSetting[] => {
   return qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
 };
+
+export const getEmailReceivingDomainConfig = (qpqConfig: QPQConfig): EmailReceivingDomainQPQWebServerConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<EmailReceivingDomainQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailReceivingDomain);
+
+export const getEmailReceiverConfigs = (qpqConfig: QPQConfig): EmailReceiverQPQWebServerConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<EmailReceiverQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailReceiver) || [];
+
+export const getEmailReceiverByName = (qpqConfig: QPQConfig, name: string): EmailReceiverQPQWebServerConfigSetting | undefined =>
+  getEmailReceiverConfigs(qpqConfig).find((receiver) => receiver.name === name);
+
+/** The receivers that write into a drive, which the mail provider must be allowed to write into. */
+export const getEmailReceiversForStorageDrive = (qpqConfig: QPQConfig, storageDriveName: string): EmailReceiverQPQWebServerConfigSetting[] =>
+  getEmailReceiverConfigs(qpqConfig).filter((receiver) => receiver.storageDriveName === storageDriveName);
 
 export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
   const websocketSettings =
