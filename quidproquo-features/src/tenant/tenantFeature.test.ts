@@ -167,6 +167,9 @@ const buildMocks = () => {
     // derivation folds the document through it, so the hook payload carries the true
     // TenantDocument state (brand, logo) rather than a stub.
     [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [never, never] } }) => {
+      if (action.payload.functionName === 'getSnapshotCacheKey') {
+        return tenantRegistryEventDoc.getSnapshotCacheKey();
+      }
       if (action.payload.functionName === 'foldDocumentState') {
         return tenantRegistryEventDoc.foldDocumentState(action.payload.args[0], action.payload.args[1]);
       }

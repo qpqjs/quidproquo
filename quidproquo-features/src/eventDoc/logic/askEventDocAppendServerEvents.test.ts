@@ -104,6 +104,9 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
     // and whose validator refuses anything after a publish. Only reached with validate.
     [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: unknown[] } }) => {
       const { functionName, args } = action.payload;
+      if (functionName === 'getSnapshotCacheKey') {
+        return '';
+      }
       counts.functionCalls[functionName] = (counts.functionCalls[functionName] ?? 0) + 1;
 
       if (functionName === 'foldDocumentState') {

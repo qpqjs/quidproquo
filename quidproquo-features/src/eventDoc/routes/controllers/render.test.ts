@@ -138,6 +138,10 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
     [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
       expect(action.payload.dynamicFunctionsName).toBe(FUNCTIONS_NAME);
 
+      if (action.payload.functionName === 'getSnapshotCacheKey') {
+        return '';
+      }
+
       if (action.payload.functionName === 'foldDocumentState') {
         const [events] = action.payload.args as [EventDocEvent[]];
         return { foldedEventIds: events.map((event) => event.payload.metadata.eventId) };

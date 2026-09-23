@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.27
+
+- features: event-doc snapshots are filed under a per-collection `snapshotCacheKey`. Set it on `createEventDocDefinition` and change it whenever a version's seed or reducer changes in place (an additive change with no schema bump): snapshots written under any other key are invisible, so every reader refolds the log from scratch and the projector files a fresh snapshot under the new key on the next append. The bootstrap base carries the key so a workspace snapshot held in the browser across a deploy is refetched rather than trusted. `askEventDocReprojectHead` re-runs the projector at a document's head, the primitive for an admin reseed job after a key change. Omitting the key keeps the legacy row layout, so existing collections are unaffected
+
 ## 0.1.26
 
 - webserver/deploy-awscdk/actionprocessor-awslambda/dev-server: inbound email. `defineEmailReceiver` declares a receiving address and runs an `onEmail` function once per message with a parsed `EmailMessage`, instead of handing you a raw object in a drive to parse yourself. It owns its own storage drive, the SES receipt rule lives in the api stack next to the handler, and the receiver has to be declared in the service that handles the mail (a bootstrap-only `defineEmailReceivingDomain` is no longer enough)

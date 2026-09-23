@@ -119,9 +119,12 @@ const resolveAsOf = (summary: EventDocSummary | null, clock: string) =>
       return { items: summary ? [summary] : [], nextPageKey: undefined };
     },
 
-    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) => ({
-      foldedEventIds: action.payload.args[0].map((event) => event.payload.metadata.eventId),
-    }),
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) =>
+      action.payload.functionName === 'getSnapshotCacheKey'
+        ? ''
+        : {
+            foldedEventIds: action.payload.args[0].map((event) => event.payload.metadata.eventId),
+          },
   });
 
 describe('askEventDocPublishedVersionAsOf', () => {

@@ -217,7 +217,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
 
     tables[store.snapshotsStoreName] = [
       {
-        pk: eventDocSnapshotPk(docId, 'document'),
+        pk: eventDocSnapshotPk(docId, 'document', ''),
         sk: snapshotAt,
         type: store.type,
         data: { type: 'inline', snapshot: snapshotState, views: ['document'] },
@@ -226,7 +226,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
 
     const page = listEventsPage(mocks, docId, { includeBase: 'true' });
 
-    expect(page.base).toEqual({ eventId: snapshotAt, state: snapshotState });
+    expect(page.base).toEqual({ eventId: snapshotAt, state: snapshotState, snapshotCacheKey: '' });
     expect(page.items.map(eventIdOf)).toEqual(fullLog.slice(3).map(eventIdOf));
   });
 
@@ -236,7 +236,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
 
     tables[store.snapshotsStoreName] = [
       {
-        pk: eventDocSnapshotPk(docId, 'document'),
+        pk: eventDocSnapshotPk(docId, 'document', ''),
         sk: 9999,
         type: store.type,
         data: { type: 'inline', snapshot: { stale: true }, views: ['document'] },
@@ -256,7 +256,12 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
 
     tables[store.snapshotsStoreName] = [
-      { pk: eventDocSnapshotPk(docId, 'document'), sk: eventIdOf(fullLog[2]), type: store.type, data: { type: 'storageDrive', views: ['document'] } },
+      {
+        pk: eventDocSnapshotPk(docId, 'document', ''),
+        sk: eventIdOf(fullLog[2]),
+        type: store.type,
+        data: { type: 'storageDrive', views: ['document'] },
+      },
     ];
 
     const page = listEventsPage(mocks, docId, { includeBase: 'true' });
@@ -274,12 +279,53 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     expect(page.items).toEqual([]);
   });
 
+  it('under a snapshot cache key, only rows filed under that key are a usable base — legacy rows are invisible', () => {
+    const { mocks, tables } = buildMocks();
+    const docId = seedDocWithEvents(mocks);
+
+    // The collection's registered definition files snapshots under 'k2'; nothing else is registered.
+    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: { functionName: string } }) =>
+      action.payload.functionName === 'getSnapshotCacheKey'
+        ? 'k2'
+        : throwsError(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound, 'only getSnapshotCacheKey is registered');
+
+    const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
+    const snapshotAt = eventIdOf(fullLog[2]);
+
+    // A legacy row (written before the key changed) is stale fold output: not found under the new pk.
+    tables[store.snapshotsStoreName] = [
+      {
+        pk: eventDocSnapshotPk(docId, 'document', ''),
+        sk: snapshotAt,
+        type: store.type,
+        data: { type: 'inline', snapshot: { stale: true }, views: ['document'] },
+      },
+    ];
+
+    const stalePage = listEventsPage(mocks, docId, { includeBase: 'true' });
+    expect(stalePage.base).toBeNull();
+    expect(stalePage.items).toHaveLength(5);
+
+    // A row filed under the current key is the base, and says which key it was filed under.
+    const keyedState = { id: docId, folded: 'under-k2' };
+    tables[store.snapshotsStoreName].push({
+      pk: eventDocSnapshotPk(docId, 'document', 'k2'),
+      sk: snapshotAt,
+      type: store.type,
+      data: { type: 'inline', snapshot: keyedState, views: ['document'] },
+    });
+
+    const keyedPage = listEventsPage(mocks, docId, { includeBase: 'true' });
+    expect(keyedPage.base).toEqual({ eventId: snapshotAt, state: keyedState, snapshotCacheKey: 'k2' });
+    expect(keyedPage.items.map(eventIdOf)).toEqual(fullLog.slice(3).map(eventIdOf));
+  });
+
   it('leaves the plain shape untouched when includeBase is not set', () => {
     const { mocks, tables } = buildMocks();
     const docId = seedDocWithEvents(mocks);
 
     tables[store.snapshotsStoreName] = [
-      { pk: eventDocSnapshotPk(docId, 'document'), sk: 1, type: store.type, data: { type: 'inline', snapshot: {}, views: ['document'] } },
+      { pk: eventDocSnapshotPk(docId, 'document', ''), sk: 1, type: store.type, data: { type: 'inline', snapshot: {}, views: ['document'] } },
     ];
 
     const page = listEventsPage(mocks, docId);

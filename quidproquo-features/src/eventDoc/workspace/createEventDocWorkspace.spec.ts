@@ -1176,6 +1176,69 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
   });
 
+  it('a snapshot base filed under another snapshot cache key is stale fold output: blocking full load, pending kept', () => {
+    const allEvents = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'snapped' }, 1)];
+    const fake = createFakeTransport(allEvents);
+    // The server now files snapshots under 'k2' (the slot definition's key); the held base below predates that.
+    fake.setServerBase({ eventId: eventId(0), state: foldNoteHistory(allEvents.slice(0, 1)), snapshotCacheKey: 'k2' });
+    const workspace = createEventDocWorkspace({
+      slots: { noteA: { ...createNoteSlot(), getSnapshotCacheKey: () => 'k2' } },
+      transport: fake.transport,
+    });
+
+    const staleBase: EventDocSnapshotBase = { eventId: eventId(0), state: foldNoteHistory(allEvents.slice(0, 1)) };
+    const snapshot = {
+      slots: {
+        noteA: {
+          documentIdentity: identityA,
+          pending: [serverEvent(NoteEvent.SetTitle, { title: 'carried' }, 9)],
+          history: allEvents.slice(1),
+          base: staleBase,
+        },
+      },
+    };
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    // The bootstrap ran (a full load from the server's current base), not the instant restore + tail-pull.
+    expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(0) }]);
+    expect(state.bases.noteA?.snapshotCacheKey).toBe('k2');
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
+  });
+
+  it('a snapshot base filed under the slot snapshot cache key restores instantly', () => {
+    const allEvents = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'snapped' }, 1)];
+    const base: EventDocSnapshotBase = { eventId: eventId(0), state: foldNoteHistory(allEvents.slice(0, 1)), snapshotCacheKey: 'k2' };
+    const fake = createFakeTransport(allEvents);
+    fake.setServerBase(base);
+    const workspace = createEventDocWorkspace({
+      slots: { noteA: { ...createNoteSlot(), getSnapshotCacheKey: () => 'k2' } },
+      transport: fake.transport,
+    });
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+    expect(snapshot.slots.noteA.base).toEqual(base);
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    // One bootstrap for the first session, then only a tail-pull for the restore.
+    expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(0) }, { afterEventId: eventId(1) }]);
+    expect(workspace.docs.noteA.view(state).title).toBe('snapped');
+  });
+
   it('restored pending saves through the normal pipeline, in order', () => {
     const fake = createFakeTransport([initStateEvent()]);
     const workspace = createTestWorkspace(fake.transport);

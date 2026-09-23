@@ -26,14 +26,19 @@ function* askEnsureTransport(transport?: EventDocWorkspaceTransport): AskRespons
 const resolveSlotKeys = (documentSlotKeys: string[], slotKey?: string): string[] =>
   slotKey === undefined ? documentSlotKeys : documentSlotKeys.filter((documentSlotKey) => documentSlotKey === slotKey);
 
-const getAskInit = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[], localSlotKeys: string[]) =>
+const getAskInit = (
+  transport: EventDocWorkspaceTransport | undefined,
+  documentSlotKeys: string[],
+  localSlotKeys: string[],
+  slotSnapshotCacheKeys: Record<string, string>,
+) =>
   function* askInit(identities: Record<string, EventDocWorkspaceDocumentIdentity>, snapshot?: EventDocWorkspaceSnapshot): AskResponse<void> {
     yield* askEventDocWorkspaceRestoreLocalPending(snapshot ?? null, localSlotKeys);
 
     // Unknown keys are dropped rather than growing phantom slots.
     const known = Object.fromEntries(Object.entries(identities).filter(([slotKey]) => documentSlotKeys.includes(slotKey)));
 
-    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), known, snapshot ?? null);
+    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), known, snapshot ?? null, slotSnapshotCacheKeys);
   };
 
 const getAskSave = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
@@ -61,13 +66,17 @@ const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefine
     yield* askEventDocWorkspaceLoadOlderHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
-/** Builds the workspace's built-in init/save/cancel/refresh/history verbs. slotKey omitted means every document slot. */
+/**
+ * Builds the workspace's built-in init/save/cancel/refresh/history verbs. slotKey omitted means every document slot.
+ * `slotSnapshotCacheKeys` is each document slot's definition key, so init can reject a held base filed under another key.
+ */
 export const createEventDocWorkspaceBuiltInApi = (
   transport: EventDocWorkspaceTransport | undefined,
   documentSlotKeys: string[],
   localSlotKeys: string[],
+  slotSnapshotCacheKeys: Record<string, string> = {},
 ): EventDocWorkspaceBuiltInApi => ({
-  askInit: getAskInit(transport, documentSlotKeys, localSlotKeys),
+  askInit: getAskInit(transport, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
   askSave: getAskSave(transport, documentSlotKeys),
   askCancel: getAskCancel(documentSlotKeys),
   askRefresh: getAskRefresh(transport, documentSlotKeys),

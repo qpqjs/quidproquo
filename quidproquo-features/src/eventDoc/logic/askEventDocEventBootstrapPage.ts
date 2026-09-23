@@ -4,6 +4,7 @@ import { askEventDocEventLast } from '../data/askEventDocEventLast';
 import { askEventDocEventList } from '../data/askEventDocEventList';
 import { askEventDocSnapshotBaseLatest } from '../data/askEventDocSnapshotBaseLatest';
 import { EventDocEventBootstrapPage } from '../models';
+import { askEventDocSnapshotCacheKeyResolve } from './askEventDocSnapshotCacheKeyResolve';
 
 /** Paging options for the bootstrap read. */
 export type EventDocEventBootstrapPageOptions = {
@@ -26,7 +27,8 @@ export function* askEventDocEventBootstrapPage(
     return { base: null, items: [] };
   }
 
-  const base = yield* askEventDocSnapshotBaseLatest(modelId, head.payload.metadata.eventId);
+  const snapshotCacheKey = yield* askEventDocSnapshotCacheKeyResolve();
+  const base = yield* askEventDocSnapshotBaseLatest(modelId, head.payload.metadata.eventId, snapshotCacheKey);
 
   const page = yield* askEventDocEventList(modelId, {
     limit: options?.limit,

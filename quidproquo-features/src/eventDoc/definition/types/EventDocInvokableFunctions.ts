@@ -7,6 +7,7 @@ import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult,
  * askDynamicFunctionExecute. A member missing at registration (no render) surfaces as the processor's FunctionNotFound.
  */
 export type EventDocInvokableFunctions = {
+  getSnapshotCacheKey: () => string;
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
   foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];

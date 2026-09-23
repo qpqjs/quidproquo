@@ -13,6 +13,7 @@ const FUNCTIONS_RUNTIME = '/entry/eventDocs::memoEventDoc' as const;
 const memoFunctions: EventDocFunctions = {
   storeName: 'memos',
   type: 'memo',
+  getSnapshotCacheKey: () => '',
   foldSnapshotViews: () => null,
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],

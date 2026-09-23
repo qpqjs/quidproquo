@@ -12,13 +12,17 @@ import { askEventDocSnapshotStateResolve } from './askEventDocSnapshotStateResol
  * Anchors on the document row, which is written last with the manifest of sibling views; any missing sibling row or
  * blob makes the whole seed null rather than folding that view from nothing.
  */
-export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: number): AskResponse<Nullable<EventDocSnapshotSeed>> {
+export function* askEventDocSnapshotSeedLatest(
+  docId: string,
+  upToEventId: number,
+  snapshotCacheKey: string,
+): AskResponse<Nullable<EventDocSnapshotSeed>> {
   const { snapshotsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
   const documentPage = yield* askKeyValueStoreQuery<EventDocStoredSnapshot>(
     snapshotsStoreName,
-    kvsAnd([kvsEqual('pk', eventDocSnapshotPk(docId, EVENT_DOC_PRIMARY_VIEW)), kvsLessThanOrEqual('sk', upToEventId)]),
+    kvsAnd([kvsEqual('pk', eventDocSnapshotPk(docId, EVENT_DOC_PRIMARY_VIEW, snapshotCacheKey)), kvsLessThanOrEqual('sk', upToEventId)]),
     { sortAscending: false, limit: 1, scope },
   );
 
@@ -36,7 +40,7 @@ export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: numbe
         ? documentRow
         : (yield* askKeyValueStoreQuery<EventDocStoredSnapshot>(
             snapshotsStoreName,
-            kvsAnd([kvsEqual('pk', eventDocSnapshotPk(docId, viewName)), kvsEqual('sk', documentRow.sk)]),
+            kvsAnd([kvsEqual('pk', eventDocSnapshotPk(docId, viewName, snapshotCacheKey)), kvsEqual('sk', documentRow.sk)]),
             { limit: 1, scope },
           )).items[0];
 
@@ -44,7 +48,7 @@ export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: numbe
       return null;
     }
 
-    const resolved = yield* askEventDocSnapshotStateResolve(docId, viewName, row);
+    const resolved = yield* askEventDocSnapshotStateResolve(docId, viewName, row, snapshotCacheKey);
 
     if (!resolved) {
       return null;

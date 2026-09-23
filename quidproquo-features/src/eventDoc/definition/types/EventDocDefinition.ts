@@ -26,6 +26,10 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   storeName?: string;
   type?: string;
 
+  // The key this collection's snapshots are filed under ('' = legacy layout); see EventDocSavedDefinitionConfig.
+  // A member, not a property: the backend reaches a definition only through dynamic functions, so one shape serves both.
+  getSnapshotCacheKey: () => string;
+
   // Every projection, typed at the latest version. `summary` is built in: it folds only the reserved lifecycle events.
   views: {
     [K in keyof EventDocLatestViews<TVersions>]: EventDocView<EventDocLatestViews<TVersions>[K]>;
