@@ -10,6 +10,9 @@ export type EventDocWorkspaceDocumentSlotFoldConfig<TView extends EventDocDocume
   EventDocWorkspaceSlotFoldConfigBase<TView> & {
     kind: EventDocWorkspaceSlotKind.document;
     migrations?: EventDocMigrations;
+    // The key a usable fold base must carry (see EventDocSavedDefinitionConfig.snapshotCacheKey). A held base filed under
+    // another key is stale fold output and is refetched. Absent (a slot with no saved definition) reads as ''.
+    getSnapshotCacheKey?: () => string;
     // Merged after the reserved field-setter rules.
     coalesceEventTypes?: CoalesceEventType[];
     // The fully merged registry (reserved + the collection's own), so the live fold rejects exactly what the saved fold rejects.

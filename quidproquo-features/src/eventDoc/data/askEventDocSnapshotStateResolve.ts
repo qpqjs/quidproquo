@@ -13,6 +13,7 @@ export function* askEventDocSnapshotStateResolve(
   docId: string,
   viewName: string,
   row: EventDocStoredSnapshot,
+  snapshotCacheKey: string,
 ): AskResponse<Nullable<{ state: unknown }>> {
   if (row.data.type === 'inline') {
     return { state: row.data.snapshot };
@@ -21,7 +22,7 @@ export function* askEventDocSnapshotStateResolve(
   const { storageDriveName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
-  const read = yield* askCatch(askFileReadTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, row.sk), scope));
+  const read = yield* askCatch(askFileReadTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, row.sk, snapshotCacheKey), scope));
 
   return read.success ? { state: JSON.parse(read.result) } : null;
 }

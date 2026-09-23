@@ -12,8 +12,16 @@ import { eventDocSnapshotPath } from './eventDocSnapshotPath';
  * Writes one view's folded state at one event to the `${storeName}Snap` store, inline when small, else on the blob drive.
  * The blob is written before the row so a row never points at missing bytes. Unconditional upsert: a stream replay
  * rewrites the identical fact. `views` is the manifest only the document row carries (see askEventDocSnapshotViewsWrite).
+ * Filed under `snapshotCacheKey` (pk + blob path), so readers under another key never see it.
  */
-export function* askEventDocSnapshotWrite(docId: string, viewName: string, eventId: number, state: unknown, views?: string[]): AskResponse<void> {
+export function* askEventDocSnapshotWrite(
+  docId: string,
+  viewName: string,
+  eventId: number,
+  state: unknown,
+  snapshotCacheKey: string,
+  views?: string[],
+): AskResponse<void> {
   const { snapshotsStoreName, storageDriveName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
@@ -21,7 +29,7 @@ export function* askEventDocSnapshotWrite(docId: string, viewName: string, event
   const inline = bytes <= EVENT_DOC_SNAPSHOT_INLINE_MAX_BYTES;
 
   if (!inline) {
-    yield* askFileWriteTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, eventId), json, undefined, scope);
+    yield* askFileWriteTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, eventId, snapshotCacheKey), json, undefined, scope);
   }
 
   const data: EventDocSnapshot = {
@@ -31,7 +39,7 @@ export function* askEventDocSnapshotWrite(docId: string, viewName: string, event
 
   yield* askKeyValueStoreUpsert<EventDocStoredSnapshot>(
     snapshotsStoreName,
-    { pk: eventDocSnapshotPk(docId, viewName), sk: eventId, type, data },
+    { pk: eventDocSnapshotPk(docId, viewName, snapshotCacheKey), sk: eventId, type, data },
     { scope },
   );
 }

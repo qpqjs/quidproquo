@@ -107,6 +107,23 @@ describe('createEventDocDefinition', () => {
     expect(state.pending.memo[1].payload.data).toEqual({ body: 'hello\nworld' });
   });
 
+  it('files snapshots under the legacy layout by default: the cache key is empty', () => {
+    const memoDefinition = createMemoDefinition();
+
+    expect(memoDefinition.getSnapshotCacheKey()).toBe('');
+  });
+
+  it('exposes a declared snapshotCacheKey as a member, the one shape the workspace and dynamic functions both read', () => {
+    const memoDefinition = createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+      snapshotCacheKey: 'body-as-lines',
+      api: memoApi,
+    });
+
+    expect(memoDefinition.getSnapshotCacheKey()).toBe('body-as-lines');
+  });
+
   it('merges the generic identity/lifecycle verbs into the api, bound like any other', () => {
     const memoDefinition = createMemoDefinition();
     const workspace = createEventDocWorkspace({ slots: { memo: memoDefinition } });

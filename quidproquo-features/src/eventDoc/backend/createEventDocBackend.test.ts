@@ -9,6 +9,7 @@ import { createEventDocBackend } from './createEventDocBackend';
 const memoFunctions: EventDocFunctions = {
   storeName: 'memos',
   type: 'memo',
+  getSnapshotCacheKey: () => '',
   foldSnapshotViews: () => null,
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],
@@ -49,6 +50,7 @@ describe('createEventDocBackend', () => {
 
   it('throws at build time for a definition with no identity', () => {
     const identityless: EventDocFunctions = {
+      getSnapshotCacheKey: () => '',
       foldSnapshotViews: () => null,
       foldDocumentState: () => null,
       collectReferencesFromState: () => [],

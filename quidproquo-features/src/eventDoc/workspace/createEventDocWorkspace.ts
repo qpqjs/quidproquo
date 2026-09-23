@@ -46,6 +46,11 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
   const slotEntries = Object.entries(slotsConfig);
   const documentSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.document).map(([slotKey]) => slotKey);
   const localSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.local).map(([slotKey]) => slotKey);
+  const slotSnapshotCacheKeys = Object.fromEntries(
+    slotEntries.flatMap(([slotKey, slot]) =>
+      slot.kind === EventDocWorkspaceSlotKind.document ? [[slotKey, slot.getSnapshotCacheKey?.() ?? '']] : [],
+    ),
+  );
 
   // Built before the bindings: each binding closes over its slot's memoized view selector.
   const selectors = createEventDocWorkspaceSelectors(slots);
@@ -65,7 +70,7 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
 
   return {
     docs,
-    api: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys, localSlotKeys),
+    api: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
     reducer: createEventDocWorkspaceReducer(slotsConfig),
     createInitialState: () => createInitialEventDocWorkspaceState(slotsConfig),
     createSnapshot: (state: EventDocWorkspaceState) => createEventDocWorkspaceSnapshot(state, documentSlotKeys, localSlotKeys),

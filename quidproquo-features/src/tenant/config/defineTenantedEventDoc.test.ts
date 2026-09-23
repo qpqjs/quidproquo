@@ -7,6 +7,7 @@ import { defineTenantedEventDoc } from './defineTenantedEventDoc';
 const docFunctions: EventDocFunctions = {
   storeName: 'docs',
   type: 'doc',
+  getSnapshotCacheKey: () => '',
   foldSnapshotViews: () => null,
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],

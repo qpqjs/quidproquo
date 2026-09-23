@@ -82,7 +82,8 @@ type FoldCall = {
 
 type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args: [EventDocEvent[], EventDocSnapshotViews?] };
 
-const buildMocks = (streamPk: string, type = 'template', options?: { functionsName?: string; log?: EventDocEvent[] }) => {
+const buildMocks = (streamPk: string, type = 'template', options?: { functionsName?: string; log?: EventDocEvent[]; snapshotCacheKey?: string }) => {
+  const snapshotCacheKey = options?.snapshotCacheKey ?? '';
   const tables: Record<string, Row[]> = {};
   const updates: { key: unknown; scope?: string }[] = [];
   const upserts: { keyValueStoreName: string; item: Row; scope?: string }[] = [];
@@ -182,6 +183,9 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
     // Stands in for the app-registered functions object: echoes what it was invoked with
     // (so the spec can assert the prefix) and returns one small state per view.
     [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
+      if (action.payload.functionName === 'getSnapshotCacheKey') {
+        return snapshotCacheKey;
+      }
       const [events, seedViews] = action.payload.args;
       foldCalls.push({
         dynamicFunctionsName: action.payload.dynamicFunctionsName,
@@ -311,10 +315,13 @@ describe('projectEventDocSummary snapshots', () => {
     expect('deletedAt' in record!).toBe(false);
 
     // And the inverse: a view carrying deletedAt lands it on the row.
-    mocks[DynamicFunctionsActionType.Execute] = () => ({
-      document: {},
-      summary: { name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
-    });
+    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) =>
+      action.payload.functionName === 'getSnapshotCacheKey'
+        ? ''
+        : {
+            document: {},
+            summary: { name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
+          };
     // A fresh event id so the seed-at-event replay skip doesn't short-circuit the fold.
     tables[eventDocEventsStoreName(STORE)].push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
     runStory(projectEventDocSummary({ ...streamRecord(undefined), keys: { pk: 'doc-1', sk: eventId(2) } }), mocks);
@@ -384,7 +391,8 @@ describe('projectEventDocSummary snapshots', () => {
     const { mocks, tables, fileWrites } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     // A fold whose document state cannot fit a KVS row.
-    mocks[DynamicFunctionsActionType.Execute] = () => ({ document: { huge: 'x'.repeat(301 * 1024) } });
+    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) =>
+      action.payload.functionName === 'getSnapshotCacheKey' ? '' : { document: { huge: 'x'.repeat(301 * 1024) } };
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
@@ -431,6 +439,51 @@ describe('projectEventDocSummary incremental snapshots', () => {
     { pk: 'doc-1#summary', sk, type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
     { pk: 'doc-1#document', sk, type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
   ];
+
+  it('files every row and offloaded blob under the definition snapshot cache key, and ignores seeds filed under another key', () => {
+    const { mocks, tables, foldCalls, fileWrites } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN, snapshotCacheKey: 'k2' });
+    // A complete legacy seed set at event 0: stale fold output once the key changed.
+    tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
+
+    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) => {
+      if (action.payload.functionName === 'getSnapshotCacheKey') {
+        return 'k2';
+      }
+      const [events, seedViews] = action.payload.args;
+      foldCalls.push({
+        dynamicFunctionsName: action.payload.dynamicFunctionsName,
+        member: action.payload.functionName,
+        input: { events, seedViews },
+      });
+      return { document: { huge: 'x'.repeat(301 * 1024) }, summary: { name: 'from-fold' } };
+    };
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    // No seed under 'k2' → the whole prefix, from scratch.
+    expect(foldCalls).toHaveLength(1);
+    expect(foldCalls[0].input.seedViews).toBeUndefined();
+    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+
+    // New rows land under the keyed pk; the legacy rows persist untouched.
+    const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
+    expect(
+      rows
+        .filter((row) => row.sk === eventId(1))
+        .map((row) => row.pk)
+        .sort(),
+    ).toEqual(['doc-1#document#k2', 'doc-1#summary#k2']);
+    expect(
+      rows
+        .filter((row) => row.sk === eventId(0))
+        .map((row) => row.pk)
+        .sort(),
+    ).toEqual(['doc-1#document', 'doc-1#summary']);
+
+    // The offloaded document state is filed under the key too, so the row and its bytes always share one.
+    expect(fileWrites).toHaveLength(1);
+    expect(fileWrites[0].filepath).toBe(`doc-1/snapshots/k2/document/${eventId(1)}`);
+  });
 
   it('hands the fold the seed and ONLY the gap since it', () => {
     const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
@@ -484,6 +537,9 @@ describe('projectEventDocSummary incremental snapshots', () => {
     tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
 
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) => {
+      if (action.payload.functionName === 'getSnapshotCacheKey') {
+        return '';
+      }
       const [events, seedViews] = action.payload.args;
       foldCalls.push({
         dynamicFunctionsName: action.payload.dynamicFunctionsName,

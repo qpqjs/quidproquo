@@ -10,6 +10,10 @@ export type EventDocFunctions = {
   storeName?: string;
   type?: string;
 
+  // The snapshot cache key the collection's snapshots are filed under (see EventDocSavedDefinitionConfig.snapshotCacheKey).
+  // A member rather than a value because the data layer reaches a definition only through dynamic functions.
+  getSnapshotCacheKey: () => string;
+
   // Every view of the log prefix, era-pinned: what a snapshot stores. Invoked by the event store's stream projector.
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
 

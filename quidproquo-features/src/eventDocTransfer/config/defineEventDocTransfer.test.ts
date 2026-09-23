@@ -13,6 +13,7 @@ const collections = [{ storeName: 'templates', type: 'template' }];
 const templateFunctions = {
   storeName: 'templates',
   type: 'template',
+  getSnapshotCacheKey: () => '',
   foldSnapshotViews: () => null,
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],

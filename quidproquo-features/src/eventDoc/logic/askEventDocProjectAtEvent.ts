@@ -7,17 +7,20 @@ import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EVENT_DOC_SUMMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSnapshotViews, EventDocSummaryView } from '../models';
+import { askEventDocSnapshotCacheKeyResolve } from './askEventDocSnapshotCacheKeyResolve';
 import { askEventDocSummaryRederive } from './askEventDocSummaryRederive';
 
 /**
  * Project a document as of one event: fold every view from the newest snapshot seed through the gap, then write
- * the summary row and the snapshot set. Falls back to a whole-prefix fold with no usable seed, and to
+ * the summary row and the snapshot set, all under the collection's snapshot cache key (a seed under another key is
+ * invisible, so a changed key refolds the whole prefix). Falls back to a whole-prefix fold with no usable seed, and to
  * askEventDocSummaryRederive when the fold produces nothing. Event reads are consistent: a snapshot missing the
  * event it claims to capture is never rewritten.
  */
 export function* askEventDocProjectAtEvent(modelId: string, eventId: number, functionsName: string): AskResponse<void> {
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(functionsName);
-  const seed = yield* askEventDocSnapshotSeedLatest(modelId, eventId);
+  const snapshotCacheKey = yield* askEventDocSnapshotCacheKeyResolve(functionsName);
+  const seed = yield* askEventDocSnapshotSeedLatest(modelId, eventId, snapshotCacheKey);
 
   if (seed?.eventId === eventId) {
     const seedSummary = seed.views[EVENT_DOC_SUMMARY_VIEW];
@@ -65,5 +68,5 @@ export function* askEventDocProjectAtEvent(modelId: string, eventId: number, fun
     yield* askEventDocSummaryRederive(modelId);
   }
 
-  yield* askEventDocSnapshotViewsWrite(modelId, eventId, snapshotViews);
+  yield* askEventDocSnapshotViewsWrite(modelId, eventId, snapshotViews, snapshotCacheKey);
 }

@@ -7,6 +7,7 @@ import { askEventDocSnapshotBaseLatest } from '../data/askEventDocSnapshotBaseLa
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { foldEventDocBase } from '../fold/foldEventDocBase';
 import { EventDocEvent } from '../models';
+import { askEventDocSnapshotCacheKeyResolve } from './askEventDocSnapshotCacheKeyResolve';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /** The document state as of the triggering event and as of the event before it. */
@@ -24,7 +25,8 @@ export function* askEventDocHookStates(modelId: string, event: EventDocEvent): A
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const eventId = event.payload.metadata.eventId;
-  const base = yield* askEventDocSnapshotBaseLatest(modelId, eventId);
+  const snapshotCacheKey = yield* askEventDocSnapshotCacheKeyResolve();
+  const base = yield* askEventDocSnapshotBaseLatest(modelId, eventId, snapshotCacheKey);
 
   // The gap ends at the triggering event, so previousState is the same gap minus its tail. A base already at the
   // event leaves nothing to subtract from, so the whole prefix is refolded instead.

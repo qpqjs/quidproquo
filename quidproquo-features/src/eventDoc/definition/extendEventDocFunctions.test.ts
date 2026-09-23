@@ -7,6 +7,7 @@ import { extendEventDocFunctions } from './extendEventDocFunctions';
 const definition: EventDocFunctions = {
   storeName: 'memos',
   type: 'memo',
+  getSnapshotCacheKey: () => '',
   foldSnapshotViews: () => null,
   foldDocumentState: () => null,
   collectReferencesFromState: () => [],

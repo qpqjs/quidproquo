@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocFunctions` (`quidproquo-features`) requires a new `getSnapshotCacheKey: () => string` member; the object `createEventDocDefinition` returns carries it, so only hand-built functions objects and test doubles that answer `DynamicFunctionsActionType.Execute` by member name need to add it (answer `''` for the legacy layout). The snapshot data stories `askEventDocSnapshotWrite`, `askEventDocSnapshotViewsWrite`, `askEventDocSnapshotBaseLatest`, `askEventDocSnapshotSeedLatest` and `askEventDocSnapshotStateResolve`, and the key builders `eventDocSnapshotPk`/`eventDocSnapshotPath`, take the collection's `snapshotCacheKey` as a trailing argument (resolve it with `askEventDocSnapshotCacheKeyResolve`). `EventDocSnapshotBase` gains an optional `snapshotCacheKey`, and `askEventDocWorkspaceInit`/`createEventDocWorkspaceBuiltInApi` take the per-slot keys as a trailing optional argument. Snapshot rows and blobs are unchanged for a collection that declares no key.
+
 ## 0.1.26
 
 - `QpqWebserverEmailReceiverConstruct` (`quidproquo-deploy-awscdk`) is renamed to `QpqApiWebserverEmailReceiverConstruct` (its props type to `QpqApiWebserverEmailReceiverConstructProps`) and moves from the Inf stack to the Api stack. It now only accepts a storage drive owned by the same service (`getOwnedStorageDrives`) instead of any declared drive, throwing `"...which this service does not own"` (was `"...which this config does not declare"`) for a drive owned elsewhere.

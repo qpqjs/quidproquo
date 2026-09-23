@@ -6,6 +6,7 @@ import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotBaseLatest } from '../data/askEventDocSnapshotBaseLatest';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocDocumentStateAtEvent } from '../models';
+import { askEventDocSnapshotCacheKeyResolve } from './askEventDocSnapshotCacheKeyResolve';
 
 /** Options for the snapshot-seeded state reads. */
 export type EventDocDocumentStateAsOfOptions = {
@@ -26,7 +27,8 @@ export function* askEventDocDocumentStateAsOf(
   const { storeName, type } = yield* askEventDocResolveStore();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
-  const base = yield* askEventDocSnapshotBaseLatest(modelId, upToEventId);
+  const snapshotCacheKey = yield* askEventDocSnapshotCacheKeyResolve();
+  const base = yield* askEventDocSnapshotBaseLatest(modelId, upToEventId, snapshotCacheKey);
 
   // A base at the target still goes through foldDocumentState with an empty gap: that migrates the stored state to the current schema.
   const gap =

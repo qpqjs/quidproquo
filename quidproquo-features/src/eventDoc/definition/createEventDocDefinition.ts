@@ -153,6 +153,7 @@ export function createEventDocDefinition(
     // Latest-shaped, unlike the fold's own seed: the workspace hands this straight to selectors for a pristine slot.
     createInitialViewState: () => migrateEventDocDocumentTo(primaryFoldConfig.seed, schemaVersion, primaryFoldConfig.migrations),
     schemaVersion,
+    getSnapshotCacheKey: () => config.snapshotCacheKey ?? '',
     migrations: primaryFoldConfig.migrations,
     coalesceEventTypes,
     validators,

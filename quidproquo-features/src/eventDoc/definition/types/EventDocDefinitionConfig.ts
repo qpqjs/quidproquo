@@ -22,6 +22,11 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
   // Oldest first. The head seeds; each tail entry migrates from the one before it.
   versions: TVersions;
 
+  // The cache key stored snapshots are filed under. Change it whenever a version's seed or reducer changes IN PLACE
+  // (an additive change that needs no schema bump): snapshots filed under any other key are invisible to readers and
+  // the log refolds from scratch until the projector writes a fresh one. Omitted = '' (the legacy layout).
+  snapshotCacheKey?: string;
+
   // Merged after the reserved rules (SET_CODE/SET_NAME coalesce; lifecycle events never do). Unlisted types append.
   coalesceEventTypes?: CoalesceEventType[];
 
