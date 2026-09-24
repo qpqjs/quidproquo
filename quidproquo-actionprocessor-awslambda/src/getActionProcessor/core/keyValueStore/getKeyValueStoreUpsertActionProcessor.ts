@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertBase,
   createActionProcessor,
-  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
@@ -14,6 +13,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { putItem } from '../../../logic/dynamo';
+import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpsertBase> => {
   return async ({ keyValueStoreName, item, options }) => {

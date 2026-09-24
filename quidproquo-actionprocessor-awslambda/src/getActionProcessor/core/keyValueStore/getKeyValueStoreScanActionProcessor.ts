@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanBase,
   createActionProcessor,
-  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
@@ -13,6 +12,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
+import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreScanBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {

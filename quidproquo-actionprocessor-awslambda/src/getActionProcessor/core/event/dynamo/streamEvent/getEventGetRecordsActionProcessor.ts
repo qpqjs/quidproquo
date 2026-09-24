@@ -2,7 +2,6 @@ import {
   actionResult,
   askEventGetRecordsBase,
   createActionProcessor,
-  decomposeScopedKvsValue,
   EventActionType,
   KvsStreamEventType,
   ProcessorFor,
@@ -13,6 +12,7 @@ import { DynamoDBRecord } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { convertDynamoMapToObject } from '../../../../../logic/dynamo/convertDynamoMapToObject';
+import { decomposeScopedKvsValue } from '../../../../../logic/dynamo/scope';
 import { EventInput, GLOBAL_KVS_STREAM_COALESCE, GLOBAL_KVS_STREAM_PARTITION_KEY, GLOBAL_KVS_STREAM_STORE_NAME, InternalEventRecord } from './types';
 
 // aws-lambda types the stream images with its own AttributeValue shape; the marshaller is

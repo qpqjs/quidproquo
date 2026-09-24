@@ -2,15 +2,18 @@ import { KvsCoreDataType, KvsQueryOperation } from '../../actions/keyValueStore/
 import { KeyValueStoreQPQConfigSetting, QPQConfig } from '../../config';
 import { getKeyValueStoreByName } from '../../qpqCoreUtils';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
+import {
+  validateKvsKeyConditionForScopeOrThrow,
+  validateKvsPkValueForScopeOrThrow,
+  validateScopeSupportedForPartitionKeyType,
+} from './kvsScopeRules';
 import { KvsStoreNotFoundError } from './KvsStoreNotFoundError';
-import { createScopedKvsTranslator, ScopedKvsTranslator } from './scopedKvsTranslator';
-import { validateScopeSupportedForPartitionKeyType } from './scopedKvsValue';
 import { validateScopeSegment } from './validateScopeSegment';
 
-// THE shared scope gate for every kvs backend (dynamo, dev-server json, ...):
-// resolve the store's config, validate the scope against it, and hand back
-// what the backend needs. Lives in core so the value-composed and
-// file-partitioned backends can never drift apart on validation.
+// THE shared scope gate for every kvs backend (dynamo, dev-server sqlite, ...):
+// resolve the store's config and validate the call's scope against it. How a
+// backend stores the scope is its own business; the rules they all enforce are
+// in kvsScopeRules, so backends can never drift apart on validation.
 
 // Store lookup with the typed misconfiguration error (never a bare throw).
 export const resolveKvsStoreConfigOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string): KeyValueStoreQPQConfigSetting => {
@@ -44,32 +47,30 @@ export const assertKvsScopeRequirementOrThrow = (qpqConfig: QPQConfig, keyValueS
   }
 };
 
-// Value-composed backends (dynamo): validate and hand back the translator that
-// knows how to scope every shape the pk appears in - a bare key, an item
-// field, a query condition tree, a scan filter, and stripping results.
-// Unscoped requests get the identity translator (plus the composed-row scan
-// exclusion when the store's string pk is known), so callers never branch on
-// scope.
-export const getScopedKvsTranslatorOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string, scope: string | undefined): ScopedKvsTranslator => {
+/**
+ * Store lookup plus every store-level scope rule: the call's scope matches the
+ * store's `scoped` flag, and a scope is a valid segment on a string-pk store.
+ * Backends call it once per request before touching data.
+ */
+export const resolveScopedKvsStoreOrThrow = (
+  qpqConfig: QPQConfig,
+  keyValueStoreName: string,
+  scope: string | undefined,
+): KeyValueStoreQPQConfigSetting => {
   const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
   assertKvsScopeRequirementOrThrow(qpqConfig, keyValueStoreName, scope);
 
-  if (scope === undefined) {
-    // Only a string pk can hold composed values, so only then does the
-    // unscoped scan exclusion apply.
-    const stringPkAttribute = storeConfig.partitionKey.type === 'string' ? storeConfig.partitionKey.key : '';
-    return createScopedKvsTranslator(undefined, stringPkAttribute);
+  if (scope !== undefined) {
+    validateScopeSegment(scope);
+    validateScopeSupportedForPartitionKeyType(storeConfig.partitionKey.type);
   }
 
-  validateScopeSegment(scope);
-  validateScopeSupportedForPartitionKeyType(storeConfig.partitionKey.type);
-
-  return createScopedKvsTranslator(scope, storeConfig.partitionKey.key);
+  return storeConfig;
 };
 
-// File-partitioned backends (dev-server json): the scope becomes a FOLDER
-// name, so the same validations apply, but all the backend needs back is the
-// real partition key attribute name.
+// Row-partitioned backends (dev-server sqlite): the scope is a column, so the
+// same validations apply, but all the backend needs back is the real partition
+// key attribute name.
 export const resolveScopedPkAttributeOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string, scope: string): string => {
   const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
 
@@ -79,11 +80,10 @@ export const resolveScopedPkAttributeOrThrow = (qpqConfig: QPQConfig, keyValueSt
   return storeConfig.partitionKey.key;
 };
 
-// Validation-only counterparts for file-partitioned backends. They store keys
-// and items raw (the scope just picks the file), but anything the
-// value-composed translator would reject must fail locally too - same scope
-// validation, same reserved-delimiter rule - so local behavior matches
-// deployed behavior. The composed results are discarded.
+// Request-level checks for backends that keep the scope out of stored values
+// (dev-server sqlite stores keys and items raw; the scope just picks the rows).
+// They run the same rules a composing backend runs, so a call that fails
+// deployed fails locally too.
 
 export const validateScopedKvsKeyOrThrow = (
   qpqConfig: QPQConfig,
@@ -91,7 +91,7 @@ export const validateScopedKvsKeyOrThrow = (
   scope: string | undefined,
   key: KvsCoreDataType,
 ): void => {
-  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).key(key);
+  validateKvsPkValueForScopeOrThrow(resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope), scope, key);
 };
 
 export const validateScopedKvsItemOrThrow = (
@@ -100,7 +100,8 @@ export const validateScopedKvsItemOrThrow = (
   scope: string | undefined,
   item: Record<string, any>,
 ): void => {
-  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).item(item ?? {});
+  const storeConfig = resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope);
+  validateKvsPkValueForScopeOrThrow(storeConfig, scope, (item ?? {})[storeConfig.partitionKey.key]);
 };
 
 export const validateScopedKvsKeyConditionOrThrow = (
@@ -109,5 +110,5 @@ export const validateScopedKvsKeyConditionOrThrow = (
   scope: string | undefined,
   keyCondition: KvsQueryOperation,
 ): void => {
-  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).keyCondition(keyCondition);
+  validateKvsKeyConditionForScopeOrThrow(resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope), scope, keyCondition);
 };

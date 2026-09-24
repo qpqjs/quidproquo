@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreGetAllBase,
   createActionProcessor,
-  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
@@ -13,6 +12,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { getAllItems } from '../../../logic/dynamo';
+import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreGetAllBase> => {
   return async ({ keyValueStoreName, options }) => {
