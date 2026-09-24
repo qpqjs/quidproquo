@@ -3,7 +3,7 @@ import { defineDevServerOptions } from 'quidproquo-dev-server/config';
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineQpqjsService } from '@qpqjs/service-utils';
 
-import { defineCrossServiceProbe } from './crossServiceProbe/config/defineCrossServiceProbe';
+import { defineSmokeProbes } from './smoke/config/defineSmokeProbes';
 
 // testa exists to be "the other service" in the smoke suite: it owns nothing
 // of its own and exercises the cross-service (foreign ARN) IAM grants against
@@ -18,5 +18,5 @@ export default [
     '../../../../../../dist/apps/qpqjs/services/testa/service'
   ),
 
-  defineCrossServiceProbe(),
+  defineSmokeProbes(),
 ];
