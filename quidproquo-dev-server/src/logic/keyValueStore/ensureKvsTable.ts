@@ -2,11 +2,8 @@ import { KeyValueStoreQPQConfigSetting } from 'quidproquo-core';
 
 import { DatabaseSync } from 'node:sqlite';
 
+import { kvsJsonExtractExpression } from './kvsJsonExtractExpression';
 import { quoteSqlIdentifier } from './quoteSqlIdentifier';
-
-// json_extract path as a SQL string literal, key quoted so a dotted or dashed
-// attribute name addresses one key rather than a nested path.
-const toJsonPathLiteral = (attributeName: string): string => `'$."${attributeName.replace(/'/g, "''")}"'`;
 
 /**
  * Idempotent DDL for one store: the table, plus one expression index per
@@ -38,7 +35,7 @@ export const ensureKvsTable = (db: DatabaseSync, tableName: string, storeConfig:
   for (const index of storeConfig.indexes) {
     const indexedAttributes = [index.partitionKey.key, ...(index.sortKey ? [index.sortKey.key] : [])];
     const indexName = quoteSqlIdentifier(`${tableName}_gsi_${indexedAttributes.join('_')}`);
-    const indexedExpressions = indexedAttributes.map((attributeName) => `json_extract(data, ${toJsonPathLiteral(attributeName)})`);
+    const indexedExpressions = indexedAttributes.map(kvsJsonExtractExpression);
 
     db.exec(`CREATE INDEX IF NOT EXISTS ${indexName} ON ${table} (scope, ${indexedExpressions.join(', ')})`);
   }

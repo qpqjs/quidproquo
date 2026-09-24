@@ -1,7 +1,6 @@
 import {
   KvsAdvancedDataType,
   KvsCoreDataType,
-  KvsLogicalOperator,
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
@@ -10,6 +9,7 @@ import {
   KvsUpdateActionType,
 } from '../../actions/keyValueStore/types';
 import { KeyValueStoreQPQConfigSetting, KvsKey } from '../../config';
+import { flattenKvsQueryConditions } from '../keyValueStore/flattenKvsQueryConditions';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 
 // The kvs scope rules every backend enforces, whatever it does with the scope
@@ -43,7 +43,7 @@ const SCOPABLE_PK_OPERATIONS = [
 const MIRRORABLE_UPDATE_ACTIONS = [KvsUpdateActionType.Set, KvsUpdateActionType.SetIfNotExists, KvsUpdateActionType.Remove];
 
 /**
- * On a scoped store, the GSI partition keys other than the table pk (whose
+ * On a scoped store, the index partition keys other than the table pk (whose
  * stored value already carries the scope), one per attribute. A composing
  * backend partitions these per scope, which is what the item, key condition and
  * update rules below restrict. Empty on an unscoped store.
@@ -120,7 +120,7 @@ const describeValueType = (value: unknown): string => {
   return Array.isArray(value) ? 'array' : typeof value;
 };
 
-// The check dynamo makes on a real key attribute, which a composing backend's
+// The check a store makes on a real key attribute, which a composing backend's
 // scope-partitioned copy would otherwise skip.
 const validateIndexKeyValueOrThrow = (indexKey: KvsKey, value: unknown): void => {
   const matchesDeclaredType = typeof value === indexKey.type && (typeof value !== 'number' || Number.isFinite(value));
@@ -136,7 +136,7 @@ const validateIndexKeyValueOrThrow = (indexKey: KvsKey, value: unknown): void =>
 /**
  * An item written to this store. Its pk passes validateKvsPkValueForScopeOrThrow;
  * under a scope no attribute name carries the reserved marker, and every scoped
- * GSI partition key it sets matches the key's declared type.
+ * index partition key it sets matches the key's declared type.
  */
 export const validateKvsItemForScopeOrThrow = (
   storeConfig: KeyValueStoreQPQConfigSetting,
@@ -151,22 +151,13 @@ export const validateKvsItemForScopeOrThrow = (
 
   validateAttributeNamesForScopeOrThrow(Object.keys(item));
 
-  // Absent and null both leave the row out of that index, like a real GSI.
+  // Absent and null both leave the row out of that index, as a sparse index would.
   for (const indexKey of getScopedKvsIndexPartitionKeys(storeConfig)) {
     const value = item[indexKey.key];
     if (value !== undefined && value !== null) {
       validateIndexKeyValueOrThrow(indexKey, value);
     }
   }
-};
-
-// Every leaf condition in a tree, in traversal order.
-const collectConditions = (operation: KvsQueryOperation): KvsQueryCondition[] => {
-  if ('conditions' in operation) {
-    return (operation as KvsLogicalOperator).conditions.flatMap(collectConditions);
-  }
-
-  return [operation as KvsQueryCondition];
 };
 
 // A condition's comparison values, each entry of an In list separately.
@@ -178,7 +169,7 @@ const validateScopedPkConditionsOrThrow = (
   scope: string,
   operation: KvsQueryOperation,
 ): KvsQueryCondition[] => {
-  const pkConditions = collectConditions(operation).filter((condition) => condition.key === storeConfig.partitionKey.key);
+  const pkConditions = flattenKvsQueryConditions(operation).filter((condition) => condition.key === storeConfig.partitionKey.key);
 
   for (const condition of pkConditions) {
     if (!SCOPABLE_PK_OPERATIONS.includes(condition.operation)) {
@@ -204,12 +195,12 @@ type IndexKeyCondition = {
 const findScopedIndexKeyConditions = (storeConfig: KeyValueStoreQPQConfigSetting, operation: KvsQueryOperation): IndexKeyCondition[] => {
   const indexKeys = getScopedKvsIndexPartitionKeys(storeConfig);
 
-  return collectConditions(operation).flatMap((condition) =>
+  return flattenKvsQueryConditions(operation).flatMap((condition) =>
     indexKeys.filter((indexKey) => indexKey.key === condition.key).map((indexKey) => ({ condition, indexKey })),
   );
 };
 
-// A scoped query that doesn't constrain the pk runs against a GSI, which must
+// A scoped query that doesn't constrain the pk runs against an index, which must
 // be one partitioned per scope and constrained with `=` (all a partition key
 // takes anyway).
 const validateScopedIndexKeyConditionsOrThrow = (storeConfig: KeyValueStoreQPQConfigSetting, operation: KvsQueryOperation): void => {
@@ -240,7 +231,7 @@ const validateScopedIndexKeyConditionsOrThrow = (storeConfig: KeyValueStoreQPQCo
  * would match (or probe for) scope acme's composed rows on a composing backend.
  */
 export function validateUnscopedPkConditionValuesOrThrow(operation: KvsQueryOperation, pkKeyNames: string[]): void {
-  const pkConditions = collectConditions(operation).filter((condition) => pkKeyNames.includes(condition.key));
+  const pkConditions = flattenKvsQueryConditions(operation).filter((condition) => pkKeyNames.includes(condition.key));
 
   for (const condition of pkConditions) {
     getConditionValues(condition).forEach((value) => validateRawPkValueForScopeOrThrow(value as KvsCoreDataType));
@@ -250,7 +241,7 @@ export function validateUnscopedPkConditionValuesOrThrow(operation: KvsQueryOper
 /**
  * Key condition rules. A scoped one must constrain the pk (it would otherwise
  * span every scope) with scopable operations and valid scoped values, or else a
- * scoped GSI partition key with `=`, and can't name a reserved-marker attribute.
+ * scoped index partition key with `=`, and can't name a reserved-marker attribute.
  * An unscoped one on a string pk can't carry the reserved marker in a pk
  * comparison.
  */
@@ -266,7 +257,7 @@ export const validateKvsKeyConditionForScopeOrThrow = (
     return;
   }
 
-  validateAttributeNamesForScopeOrThrow(collectConditions(operation).map((condition) => condition.key));
+  validateAttributeNamesForScopeOrThrow(flattenKvsQueryConditions(operation).map((condition) => condition.key));
 
   if (validateScopedPkConditionsOrThrow(storeConfig, scope, operation).length === 0) {
     validateScopedIndexKeyConditionsOrThrow(storeConfig, operation);
@@ -286,7 +277,7 @@ export const validateKvsFilterForScopeOrThrow = (
     return;
   }
 
-  validateAttributeNamesForScopeOrThrow(collectConditions(operation).map((condition) => condition.key));
+  validateAttributeNamesForScopeOrThrow(flattenKvsQueryConditions(operation).map((condition) => condition.key));
   validateScopedPkConditionsOrThrow(storeConfig, scope, operation);
 };
 
@@ -312,7 +303,7 @@ const validateIndexKeyUpdateOrThrow = (indexKey: KvsKey, update: KvsUpdateAction
 
 /**
  * Update rules. Under a scope no path may start at a reserved-marker attribute,
- * and a scoped GSI partition key can only be Set, SetIfNotExists or Removed as a
+ * and a scoped index partition key can only be Set, SetIfNotExists or Removed as a
  * whole, with a value of its declared type: a composing backend mirrors the new
  * value, so it has to know it up front. Unscoped updates are unchecked.
  */

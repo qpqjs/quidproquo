@@ -14,6 +14,8 @@ export type KvsKey<T extends object = any> = {
 };
 
 export type KvsIndex<T extends object = any> = {
+  // What the index is queried by (askKeyValueStoreQuery's `indexName` option) and deployed as.
+  name: string;
   partitionKey: KvsKey<T>;
   sortKey?: KvsKey<T>;
 };
@@ -26,6 +28,8 @@ export const kvsKey = <T extends object = any>(key: KeyOf<T>, type: KvsKeyType =
 type CompositeKvsKey<T extends object = any> = KvsKey<T> | KeyOf<T>;
 
 type CompositeCompositeKvsIndex<T extends object = any> = {
+  // Defaults to the partition key attribute. Name an index when two share a partition key.
+  name?: string;
   partitionKey: CompositeKvsKey<T>;
   sortKey?: CompositeKvsKey<T>;
 };
@@ -51,12 +55,16 @@ const isCompositeKvsIndexACompositeCompositeKvsIndex = <T extends object = any>(
 const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(compositeKvsIndex: CompositeKvsIndex<T>): KvsIndex<T> => {
   if (!isCompositeKvsIndexACompositeCompositeKvsIndex<T>(compositeKvsIndex)) {
     return {
+      name: compositeKvsIndex,
       partitionKey: kvsKey<T>(compositeKvsIndex, 'string'),
     };
   }
 
+  const partitionKey = convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.partitionKey);
+
   return {
-    partitionKey: convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.partitionKey),
+    name: compositeKvsIndex.name ?? partitionKey.key,
+    partitionKey,
     sortKey: compositeKvsIndex.sortKey ? convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.sortKey) : undefined,
   };
 };
@@ -157,7 +165,12 @@ export const defineKeyValueStore = <T extends object = any>(
   const tablePartitionKey = convertCompositeKvsKeyToKvsKey<T>(partitionKey);
   const indexes = (options?.indexes ?? []).map(convertCompositeKvsIndexToKvsIndex<T>);
 
-  // A scoped store's GSIs are partitioned per scope, which every backend can do
+  const duplicateIndexName = indexes.find((index, position) => indexes.findIndex((other) => other.name === index.name) !== position);
+  if (duplicateIndexName) {
+    throw new Error(`Key value store '${keyValueStoreName}' declares two indexes named '${duplicateIndexName.name}'; give one an explicit name`);
+  }
+
+  // A scoped store's indexes are partitioned per scope, which every backend can do
   // for a string or number key but not a binary one.
   if (options?.scoped && indexes.some((index) => index.partitionKey.type === 'binary' && index.partitionKey.key !== tablePartitionKey.key)) {
     throw new Error(`Key value store '${keyValueStoreName}' is scoped, so its index partition keys must be strings or numbers`);

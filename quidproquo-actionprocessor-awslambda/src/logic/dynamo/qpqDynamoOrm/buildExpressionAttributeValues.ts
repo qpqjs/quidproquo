@@ -1,9 +1,8 @@
-import { KvsAdvancedDataType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType } from 'quidproquo-core';
+import { flattenKvsQueryConditions, KvsAdvancedDataType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType } from 'quidproquo-core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { buildAttributeValue } from './buildAttributeValue';
-import { flattenKvsQueryConditions } from './flattenKvsQueryConditions';
 import { getValueName } from './getValueName';
 
 // IN renders one placeholder per element, every other operation references

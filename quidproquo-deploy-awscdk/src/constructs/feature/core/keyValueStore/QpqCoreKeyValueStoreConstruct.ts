@@ -136,10 +136,10 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
 
     // Do global secondary indexes. A scoped store's are keyed on hidden scope-composed copies of
-    // their partition keys, so each partition holds one scope's rows; the name stays the declared key.
+    // their partition keys, so each partition holds one scope's rows.
     for (const index of props.keyValueStoreConfig.indexes) {
       table.addGlobalSecondaryIndex({
-        indexName: index.partitionKey.key,
+        indexName: index.name,
         partitionKey: convertKvsKeyToDynamodbAttribute(awsNamingUtils.getKvsIndexPartitionKey(props.keyValueStoreConfig, index)),
         sortKey: index.sortKey && convertKvsKeyToDynamodbAttribute(index.sortKey),
       });

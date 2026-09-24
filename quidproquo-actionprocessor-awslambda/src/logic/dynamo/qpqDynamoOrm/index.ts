@@ -6,8 +6,6 @@ export * from './buildExpressionAttributeValues';
 export * from './buildUpdateExpressionAttributeNames';
 export * from './buildUpdateExpressionAttributeValues';
 export * from './convertObjectToDynamoItem';
-export * from './flattenKvsQueryConditions';
-export * from './getDynamoTableIndexByConfigAndQuery';
 export * from './getHash';
 export * from './getItemName';
 export * from './getValueName';

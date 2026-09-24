@@ -43,6 +43,10 @@ describe('KVS scope isolation', () => {
       [
         defineKeyValueStore('widgets', { key: 'id', type: 'string' }, [], { scoped: true }),
         defineKeyValueStore('gadgets', { key: 'id', type: 'string' }, [], { scoped: true, indexes: ['category'] }),
+        defineKeyValueStore('summaries', { key: 'type', type: 'string' }, [{ key: 'id', type: 'string' }], {
+          scoped: true,
+          indexes: [{ partitionKey: { key: 'type', type: 'string' }, sortKey: { key: 'updatedAt', type: 'string' } }],
+        }),
         defineKeyValueStore('counters', { key: 'seq', type: 'number' }, [], { scoped: true }),
         defineKeyValueStore('globals', { key: 'id', type: 'string' }),
       ],
@@ -184,6 +188,37 @@ describe('KVS scope isolation', () => {
     });
 
     expect(resolveActionResult(result).items).toEqual([{ id: 'g1', category: 'tools' }]);
+  });
+
+  it("reads a named GSI that shares the pk in the index's order, within the scope (the eventDoc list shape)", async () => {
+    const { upsert, query } = await getProcessors();
+    const upsertSummary = (id: string, updatedAt: string, scope: string) =>
+      invokeProcessor(upsert, { keyValueStoreName: 'summaries', item: { type: 'doc', id, updatedAt }, options: { scope } });
+
+    await upsertSummary('a', '2026-03-01', 'tenant-a');
+    await upsertSummary('b', '2026-01-01', 'tenant-a');
+    await upsertSummary('c', '2026-02-01', 'tenant-a');
+    await upsertSummary('z', '2026-09-01', 'tenant-b');
+
+    const result = await invokeProcessor(query, {
+      keyValueStoreName: 'summaries',
+      keyCondition: { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' },
+      options: { scope: 'tenant-a', indexName: 'type', sortAscending: false },
+    });
+
+    expect(resolveActionResult(result).items.map((item: { id: string }) => item.id)).toEqual(['a', 'c', 'b']);
+  });
+
+  it('refuses a query naming an undeclared index', async () => {
+    const { query } = await getProcessors();
+
+    const result = await invokeProcessor(query, {
+      keyValueStoreName: 'summaries',
+      keyCondition: { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' },
+      options: { scope: 'tenant-a', indexName: 'missing' },
+    });
+
+    expect(resolveActionResultError(result).errorType).toContain('IndexNotFound');
   });
 
   it('rejects the scoped GSI operations dynamo cannot serve (aws parity)', async () => {

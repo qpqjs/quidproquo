@@ -45,8 +45,8 @@ export type ScopedKvsTranslator = {
   key: (key: KvsCoreDataType) => KvsCoreDataType;
   /** Upsert: clone the item with its pk field prefixed and its hidden index copies set. */
   item: <T extends Record<string, any>>(item: T) => T;
-  /** Query: rewrite pk conditions, and the partition key condition of the chosen GSI (`indexName`), to the stored form. */
-  keyCondition: (operation: KvsQueryOperation, indexName?: string) => KvsQueryOperation;
+  /** Query: rewrite pk conditions, and those on the queried GSI's partition key attribute (`indexPartitionKey`), to the stored form. */
+  keyCondition: (operation: KvsQueryOperation, indexPartitionKey?: string) => KvsQueryOperation;
   /** Optional filter: rewrite any pk legs; non-pk conditions untouched. */
   filter: (operation?: KvsQueryOperation) => KvsQueryOperation | undefined;
   /** Scan/GetAll: AND a begins_with scope predicate onto the caller's filter. */
@@ -147,11 +147,11 @@ const createScopedTranslator = (scope: string, storeConfig: KeyValueStoreQPQConf
     return composed as T;
   };
 
-  const composeKeyCondition = (operation: KvsQueryOperation, indexName?: string): KvsQueryOperation => {
+  const composeKeyCondition = (operation: KvsQueryOperation, indexPartitionKey?: string): KvsQueryOperation => {
     validateKvsKeyConditionForScopeOrThrow(storeConfig, scope, operation);
 
     const withComposedPk = composeScopedKvsQueryOperation(scope, operation, pkAttributeName);
-    const indexKey = indexKeys.find((key) => key.key === indexName);
+    const indexKey = indexKeys.find((key) => key.key === indexPartitionKey);
 
     return indexKey ? composeScopedKvsIndexKeyCondition(scope, withComposedPk, indexKey.key) : withComposedPk;
   };

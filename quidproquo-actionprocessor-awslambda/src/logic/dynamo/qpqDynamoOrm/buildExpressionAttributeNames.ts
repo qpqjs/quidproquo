@@ -1,6 +1,5 @@
-import { KvsQueryOperation } from 'quidproquo-core';
+import { flattenKvsQueryConditions, KvsQueryOperation } from 'quidproquo-core';
 
-import { flattenKvsQueryConditions } from './flattenKvsQueryConditions';
 import { getItemName } from './getItemName';
 
 /**

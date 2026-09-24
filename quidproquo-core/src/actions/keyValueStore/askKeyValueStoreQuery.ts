@@ -13,6 +13,10 @@ export type KeyValueStoreQueryOptions = {
   filter?: KvsQueryOperation;
   // Composed into partition-key conditions by the processor; requires a string-typed partition key.
   scope?: string;
+  // Query the declared index with this name (which defaults to its partition key attribute) and read in
+  // its sort order. Without it the table, or else the first index, whose keys cover the key condition
+  // serves it, so an index sharing the table's keys is only used when named here.
+  indexName?: string;
   // Read the writer's own most recent writes, at the cost of a slower and (on DynamoDB) doubly-charged
   // read.
   //
@@ -34,6 +38,7 @@ export const askKeyValueStoreQueryBase = createActionRequester<QpqPagedData<unkn
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
+    'IndexNotFound', // `indexName` names an index the store doesn't declare (misconfiguration)
   ],
   getPayload: (keyValueStoreName: string, keyCondition: KvsQueryOperation, options?: KeyValueStoreQueryOptions) => ({
     keyValueStoreName,
