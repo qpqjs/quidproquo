@@ -6,8 +6,8 @@ import { buildTestQpqConfig } from '../../testing';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import {
   assertKvsScopeRequirementOrThrow,
-  getScopedKvsTranslatorOrThrow,
   resolveKvsStoreConfigOrThrow,
+  resolveScopedKvsStoreOrThrow,
   resolveScopedPkAttributeOrThrow,
   validateScopedKvsItemOrThrow,
   validateScopedKvsKeyConditionOrThrow,
@@ -44,31 +44,17 @@ describe('resolveKvsStoreConfigOrThrow', () => {
   });
 });
 
-describe('getScopedKvsTranslatorOrThrow', () => {
-  it('returns a composing translator for a valid scope on a string-pk store', () => {
-    const translator = getScopedKvsTranslatorOrThrow(qpqConfig, 'scopedStringStore', 'scope-a');
-
-    expect(translator.key('item-1')).toBe('scope-a@@QPQSCOPE@@item-1');
-  });
-
-  it('returns the unscoped translator with the composed-row scan exclusion for a string-pk store', () => {
-    const translator = getScopedKvsTranslatorOrThrow(qpqConfig, 'stringStore', undefined);
-
-    expect(translator.key('item-1')).toBe('item-1');
-    expect(translator.scanFilter(undefined)).toEqual({ key: 'id', operation: KvsQueryOperationType.NotContains, valueA: '@@QPQSCOPE@@' });
-  });
-
-  it('returns a pure passthrough for an unscoped number-pk store', () => {
-    const translator = getScopedKvsTranslatorOrThrow(qpqConfig, 'numberStore', undefined);
-
-    expect(translator.scanFilter(undefined)).toBeUndefined();
+describe('resolveScopedKvsStoreOrThrow', () => {
+  it('returns the store config for a valid scope on a string-pk store, and for an unscoped call', () => {
+    expect(resolveScopedKvsStoreOrThrow(qpqConfig, 'scopedStringStore', 'scope-a').keyValueStoreName).toBe('scopedStringStore');
+    expect(resolveScopedKvsStoreOrThrow(qpqConfig, 'numberStore', undefined).keyValueStoreName).toBe('numberStore');
   });
 
   it('rejects an invalid scope, a number-pk store, and an unknown store', () => {
-    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'scopedStringStore', '../evil'), InvalidScopeErrorCode.unsafeCharacters);
-    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'scopedStringStore', 'ten@nt'), InvalidScopeErrorCode.unsafeCharacters);
-    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'scopedNumberStore', 'scope-a'), InvalidScopeErrorCode.unsafeCharacters);
-    expect(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'missingStore', 'scope-a')).toThrow(KvsStoreNotFoundError);
+    expectInvalidScope(() => resolveScopedKvsStoreOrThrow(qpqConfig, 'scopedStringStore', '../evil'), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => resolveScopedKvsStoreOrThrow(qpqConfig, 'scopedStringStore', 'ten@nt'), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => resolveScopedKvsStoreOrThrow(qpqConfig, 'scopedNumberStore', 'scope-a'), InvalidScopeErrorCode.unsafeCharacters);
+    expect(() => resolveScopedKvsStoreOrThrow(qpqConfig, 'missingStore', 'scope-a')).toThrow(KvsStoreNotFoundError);
   });
 });
 
@@ -178,11 +164,11 @@ describe('assertKvsScopeRequirementOrThrow', () => {
 
   it('refuses a scoped call on an unscoped store', () => {
     expectInvalidScope(() => assertKvsScopeRequirementOrThrow(scopedConfig, 'openStore', 'TENANT#a'), InvalidScopeErrorCode.notScoped);
-    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(scopedConfig, 'openStore', 'TENANT#a'), InvalidScopeErrorCode.notScoped);
+    expectInvalidScope(() => resolveScopedKvsStoreOrThrow(scopedConfig, 'openStore', 'TENANT#a'), InvalidScopeErrorCode.notScoped);
   });
 
-  it('is enforced by every translator and validation entry point', () => {
-    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(scopedConfig, 'tenantStore', undefined), InvalidScopeErrorCode.scopeRequired);
+  it('is enforced by every validation entry point', () => {
+    expectInvalidScope(() => resolveScopedKvsStoreOrThrow(scopedConfig, 'tenantStore', undefined), InvalidScopeErrorCode.scopeRequired);
     expectInvalidScope(() => validateScopedKvsKeyOrThrow(scopedConfig, 'tenantStore', undefined, 'x'), InvalidScopeErrorCode.scopeRequired);
     expectInvalidScope(() => validateScopedKvsItemOrThrow(scopedConfig, 'tenantStore', undefined, { id: 'x' }), InvalidScopeErrorCode.scopeRequired);
   });

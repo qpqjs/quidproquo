@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanAllScopesBase,
   createActionProcessor,
-  decomposeScopedKvsValue,
   KeyValueStoreActionType,
   KvsScopedItem,
   ProcessorFor,
@@ -15,6 +14,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
+import { decomposeScopedKvsValue } from '../../../logic/dynamo/scope';
 
 // Every row in the table, scope and all. No scoped translator is involved: that is the whole
 // point, and it is why this action is migration-only (see askKeyValueStoreScanAllScopes).

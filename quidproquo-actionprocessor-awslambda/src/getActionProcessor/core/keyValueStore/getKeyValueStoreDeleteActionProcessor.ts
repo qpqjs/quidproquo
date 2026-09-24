@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreDelete,
   createActionProcessor,
-  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
@@ -14,6 +13,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { deleteItem } from '../../../logic/dynamo';
+import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreDelete> => {
   return async ({ keyValueStoreName, key, sortKey, options }) => {

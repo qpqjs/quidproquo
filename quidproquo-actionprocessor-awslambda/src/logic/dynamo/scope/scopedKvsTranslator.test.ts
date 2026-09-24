@@ -1,8 +1,19 @@
+import {
+  defineKeyValueStore,
+  InvalidScopeError,
+  InvalidScopeErrorCode,
+  kvsKey,
+  KvsLogicalOperatorType,
+  KvsQueryOperationType,
+} from 'quidproquo-core';
+
 import { describe, expect, it } from 'vitest';
 
-import { KvsLogicalOperatorType, KvsQueryOperationType } from '../../actions/keyValueStore/types';
-import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import { createScopedKvsTranslator } from './scopedKvsTranslator';
+
+const stringStore = defineKeyValueStore('stringStore', 'id');
+const numberStore = defineKeyValueStore('numberStore', kvsKey('seq', 'number'));
+const scopedStore = defineKeyValueStore('scopedStore', 'id', [], { scoped: true });
 
 const expectInvalidScope = (fn: () => unknown, code: InvalidScopeErrorCode) => {
   try {
@@ -16,7 +27,7 @@ const expectInvalidScope = (fn: () => unknown, code: InvalidScopeErrorCode) => {
 
 describe('createScopedKvsTranslator (unscoped)', () => {
   it('excludes scope-composed rows from an unscoped scan', () => {
-    const translator = createScopedKvsTranslator(undefined, 'id');
+    const translator = createScopedKvsTranslator(undefined, stringStore);
 
     expect(translator.scanFilter(undefined)).toEqual({
       key: 'id',
@@ -26,7 +37,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
   });
 
   it('ANDs the composed-row exclusion onto an existing unscoped scan filter', () => {
-    const translator = createScopedKvsTranslator(undefined, 'id');
+    const translator = createScopedKvsTranslator(undefined, stringStore);
     const filter = { key: 'status', operation: KvsQueryOperationType.Equal, valueA: 'active' };
 
     expect(translator.scanFilter(filter)).toEqual({
@@ -35,8 +46,8 @@ describe('createScopedKvsTranslator (unscoped)', () => {
     });
   });
 
-  it('stays a pure passthrough when the partition key is unknown or non-string', () => {
-    const translator = createScopedKvsTranslator(undefined, '');
+  it('stays a pure passthrough when the partition key is non-string', () => {
+    const translator = createScopedKvsTranslator(undefined, numberStore);
     const filter = { key: 'status', operation: KvsQueryOperationType.Equal, valueA: 'active' };
 
     expect(translator.scanFilter(undefined)).toBeUndefined();
@@ -44,7 +55,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
   });
 
   it('leaves the other unscoped operations untouched', () => {
-    const translator = createScopedKvsTranslator(undefined, 'id');
+    const translator = createScopedKvsTranslator(undefined, stringStore);
     const item = { id: 'a', name: 'n' };
     const condition = { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'a' };
 
@@ -58,7 +69,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
   it('rejects the reserved delimiter in unscoped keys, items, and key conditions', () => {
     // An unscoped raw pk value 'acme@@QPQSCOPE@@secret' would read or forge scope
     // acme's composed rows, so it is rejected instead of matched.
-    const translator = createScopedKvsTranslator(undefined, 'id');
+    const translator = createScopedKvsTranslator(undefined, stringStore);
 
     expectInvalidScope(() => translator.key('acme@@QPQSCOPE@@secret'), InvalidScopeErrorCode.reservedDelimiter);
     expectInvalidScope(() => translator.item({ id: 'acme@@QPQSCOPE@@secret', name: 'n' }), InvalidScopeErrorCode.reservedDelimiter);
@@ -70,7 +81,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
 });
 
 describe('createScopedKvsTranslator (scoped)', () => {
-  const translator = createScopedKvsTranslator('scope-a', 'id');
+  const translator = createScopedKvsTranslator('scope-a', scopedStore);
 
   it('scopes a scan by begins-with on the pk', () => {
     expect(translator.scanFilter(undefined)).toEqual({

@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpdateBase,
   createActionProcessor,
-  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
@@ -14,6 +13,7 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { updateItem } from '../../../logic/dynamo';
+import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpdateBase> => {
   return async ({ keyValueStoreName, key, sortKey, updates, options }) => {
