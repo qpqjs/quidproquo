@@ -2,12 +2,13 @@ import {
   defineKeyValueStore,
   defineQueue,
   defineRoute,
+  defineStorageDrive,
   QPQConfig,
   QpqFunctionRuntime,
 } from 'quidproquo';
 
 import { z } from 'zod/v4';
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import {
   SmokeProbeRecord,
   SmokeRunStartedSchema,
@@ -22,8 +23,9 @@ import {
 
 /**
  * The part of the smoke feature every suite relies on: the run store, the
- * queue runs execute on, the shared probe store and the two routes. Knows
- * nothing about individual suites; defineSmoke adds theirs alongside.
+ * queue runs execute on, the shared probe store and drive, and the two
+ * routes. Knows nothing about individual suites; defineSmoke adds theirs
+ * alongside.
  *
  * The routes look public (no user directory, no api keys) but carry a
  * per-runtime action processor override that swaps the route auth decode for
@@ -62,6 +64,11 @@ export const defineSmokeHarness = (): QPQConfig => {
     defineKeyValueStore<SmokeProbeRecord>(SMOKE_PROBE_STORE, 'probeId', [], {
       indexes: ['category'],
     }),
+
+    // The unscoped probe drive: the storageDrive suite's subject, testa's
+    // cross-service target, and the drive the scopedStorageDrive suite proves
+    // refuses a scope.
+    defineStorageDrive(SMOKE_PROBE_DRIVE),
 
     // The zod models double as the routes' published contract, flattened to
     // JSON Schema here for the OpenAPI document at /v1/docs.

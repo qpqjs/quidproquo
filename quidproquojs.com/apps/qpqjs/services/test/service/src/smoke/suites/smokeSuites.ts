@@ -10,6 +10,7 @@ import { openApiSmokeSuite } from './openApi/openApiSmokeSuite';
 import { parameterSmokeSuite } from './parameter/parameterSmokeSuite';
 import { scheduleSmokeSuite } from './schedule/scheduleSmokeSuite';
 import { scopedKeyValueStoreSmokeSuite } from './scopedKeyValueStore/scopedKeyValueStoreSmokeSuite';
+import { scopedStorageDriveSmokeSuite } from './scopedStorageDrive/scopedStorageDriveSmokeSuite';
 import { secretSmokeSuite } from './secret/secretSmokeSuite';
 import { signingKeySmokeSuite } from './signingKey/signingKeySmokeSuite';
 import { storageDriveSmokeSuite } from './storageDrive/storageDriveSmokeSuite';
@@ -36,6 +37,7 @@ export const smokeSuites: SmokeSuite[] = [
   openApiSmokeSuite,
   eventDocSmokeSuite,
   signingKeySmokeSuite,
+  scopedStorageDriveSmokeSuite,
   storageDriveEventSmokeSuite,
   scopedKeyValueStoreSmokeSuite,
   keyValueStoreStreamSmokeSuite,

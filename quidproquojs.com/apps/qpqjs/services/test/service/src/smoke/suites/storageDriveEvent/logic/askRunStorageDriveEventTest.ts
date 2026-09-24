@@ -9,7 +9,7 @@ import {
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
 import { SMOKE_FILE_EVENT_DRIVE } from '../constants/SMOKE_FILE_EVENT_DRIVE';
-import { SMOKE_SCOPED_PROBE_DRIVE } from '../constants/SMOKE_SCOPED_PROBE_DRIVE';
+import { SMOKE_SCOPED_FILE_EVENT_DRIVE } from '../constants/SMOKE_SCOPED_FILE_EVENT_DRIVE';
 import { smokeFileEventMarkerId } from './smokeFileEventMarkerId';
 
 // The storage drive event path end to end: a write fires the create handler
@@ -41,7 +41,7 @@ export function* askRunStorageDriveEventTest(): AskResponse<void> {
   );
 
   yield* askFileWriteTextContents(
-    SMOKE_SCOPED_PROBE_DRIVE,
+    SMOKE_SCOPED_FILE_EVENT_DRIVE,
     filepath,
     fileId,
     undefined,
@@ -65,7 +65,7 @@ export function* askRunStorageDriveEventTest(): AskResponse<void> {
     'scoped create handler did not run under the event scope'
   );
 
-  yield* askFileDelete(SMOKE_SCOPED_PROBE_DRIVE, [filepath], scope);
+  yield* askFileDelete(SMOKE_SCOPED_FILE_EVENT_DRIVE, [filepath], scope);
 
   const scopedDeleted = yield* askSmokePollForMarker(
     smokeFileEventMarkerId(filepath, StorageDriveEventType.Delete),

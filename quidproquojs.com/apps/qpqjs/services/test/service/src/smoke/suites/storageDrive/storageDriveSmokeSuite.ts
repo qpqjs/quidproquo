@@ -1,11 +1,9 @@
 import { SmokeSuite } from '../../harness/types/SmokeSuite';
-import { defineStorageDriveSmoke } from './config/defineStorageDriveSmoke';
 import { askRunCrossServiceStorageDriveTest } from './logic/askRunCrossServiceStorageDriveTest';
 import { askRunStorageDriveTest } from './logic/askRunStorageDriveTest';
 
-/** An owned drive, from this service and from testa. */
+/** Every S3 action on the probe drive, from this service and from testa. No config: the drive belongs to the harness. */
 export const storageDriveSmokeSuite: SmokeSuite = {
-  defineConfig: defineStorageDriveSmoke,
   tests: [
     { name: 'storageDrive', askRun: askRunStorageDriveTest },
     {
