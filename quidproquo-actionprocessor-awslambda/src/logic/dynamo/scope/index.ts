@@ -3,3 +3,4 @@ export * from './scopedKvsIndexAttribute';
 export * from './scopedKvsQueryOperation';
 export * from './scopedKvsTranslator';
 export * from './scopedKvsValue';
+export * from './validateScopedKvsPageKeyOrThrow';

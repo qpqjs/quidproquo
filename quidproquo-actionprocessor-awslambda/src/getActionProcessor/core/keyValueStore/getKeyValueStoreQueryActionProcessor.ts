@@ -36,7 +36,7 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof
         region,
         scoped.keyCondition(keyCondition, index?.partitionKey.key),
         scoped.filter(options?.filter),
-        options?.nextPageKey,
+        scoped.pageKey(options?.nextPageKey),
         index?.name,
         options?.limit,
         options?.sortAscending,

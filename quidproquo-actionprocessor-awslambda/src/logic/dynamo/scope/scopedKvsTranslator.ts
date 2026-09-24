@@ -18,6 +18,7 @@ import {
 import { composeScopedKvsIndexValue, getScopedKvsIndexAttributeName, stripScopedKvsIndexAttributes } from './scopedKvsIndexAttribute';
 import { composeScopedKvsIndexKeyCondition, composeScopedKvsQueryOperation, stripScopedKvsItem } from './scopedKvsQueryOperation';
 import { buildKvsScopeBeginsWithCondition, buildKvsScopeExclusionCondition, composeScopedKvsValue } from './scopedKvsValue';
+import { validateScopedKvsPageKeyOrThrow } from './validateScopedKvsPageKeyOrThrow';
 
 /**
  * Everything dynamo needs to scope one store, in one object. DynamoDB has no
@@ -53,6 +54,8 @@ export type ScopedKvsTranslator = {
   scanFilter: (operation?: KvsQueryOperation) => KvsQueryOperation | undefined;
   /** Update: mirror writes to GSI partition keys onto their hidden copies. */
   update: (updates: KvsUpdate) => KvsUpdate;
+  /** Query/Scan: pass a client's page key through, refusing one issued under another scope (null/undefined passthrough). */
+  pageKey: (pageKey?: string) => string | undefined;
   /** Reads: strip the prefix and hidden index copies off a returned item (null/undefined passthrough). */
   strip: <T>(item: T) => T;
 };
@@ -97,6 +100,7 @@ const createUnscopedTranslator = (storeConfig: KeyValueStoreQPQConfigSetting): S
     filter: (operation) => operation,
     scanFilter: excludeScopedRows,
     update: guardedUpdates,
+    pageKey: (pageKey) => pageKey,
     strip: (item) => item,
   };
 };
@@ -177,6 +181,13 @@ const createScopedTranslator = (scope: string, storeConfig: KeyValueStoreQPQConf
     return updates.flatMap((update) => mirrorIndexKeyUpdate(scope, update, indexKeys));
   };
 
+  const guardPageKey = (pageKey?: string): string | undefined => {
+    if (pageKey) {
+      validateScopedKvsPageKeyOrThrow(scope, pageKey, pkAttributeName);
+    }
+    return pageKey;
+  };
+
   const strip = <T>(item: T): T =>
     item && typeof item === 'object'
       ? (stripScopedKvsIndexAttributes(stripScopedKvsItem(scope, item as Record<string, any>, pkAttributeName)) as unknown as T)
@@ -189,6 +200,7 @@ const createScopedTranslator = (scope: string, storeConfig: KeyValueStoreQPQConf
     filter: composeFilter,
     scanFilter: scopeScan,
     update: composeUpdates,
+    pageKey: guardPageKey,
     strip,
   };
 };

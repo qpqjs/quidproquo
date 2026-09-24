@@ -5,6 +5,7 @@ import {
   askKeyValueStoreGet,
   askKeyValueStoreGetBase,
   askKeyValueStoreQuery,
+  askKeyValueStoreQueryBase,
   askKeyValueStoreUpdate,
   askKeyValueStoreUpsert,
   askKeyValueStoreUpsertBase,
@@ -63,7 +64,7 @@ function* askSmokeScopedCategoryQuery(
 // scopes apart, refuses an unscoped call, and an unscoped store refuses a
 // scoped one. On dynamo the scope is composed into the partition key and into
 // a hidden copy of each GSI partition key, so the reads also prove neither
-// composed form leaks to the caller.
+// composed form leaks to the caller, and a page key can't cross scopes.
 export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
   const probeId = yield* askNewGuid();
   const otherProbeId = yield* askNewGuid();
@@ -131,6 +132,60 @@ export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
     'scoped index query leaked a reserved @@QPQ attribute'
   );
 
+  // Paging a scoped index: the scope's own page key (a real DynamoDB page key,
+  // carrying the hidden index copy) continues the listing, and the same key
+  // used from another scope is refused rather than read.
+  const pagedProbeId = yield* askNewGuid();
+  yield* askKeyValueStoreUpsert<SmokeProbeRecord>(
+    SMOKE_SCOPED_PROBE_STORE,
+    { probeId: pagedProbeId, category, value: 3 },
+    { scope: scopeB }
+  );
+
+  const scopeBRows = [otherProbeId, pagedProbeId].sort().join(',');
+  const indexedInB = yield* askSmokeScopedCategoryQuery(category, scopeB, [
+    otherProbeId,
+    pagedProbeId,
+  ]);
+  yield* askSmokeAssert(
+    probeIdsOf(indexedInB) === scopeBRows,
+    'scoped index never showed both of scope B rows'
+  );
+
+  const firstPage = yield* askKeyValueStoreQuery<SmokeProbeRecord>(
+    SMOKE_SCOPED_PROBE_STORE,
+    kvsEqual('category', category),
+    { scope: scopeB, limit: 1 }
+  );
+  yield* askSmokeAssert(
+    firstPage.items.length === 1 && !!firstPage.nextPageKey,
+    'scoped index query with limit 1 did not return a page key'
+  );
+
+  const secondPage = yield* askKeyValueStoreQuery<SmokeProbeRecord>(
+    SMOKE_SCOPED_PROBE_STORE,
+    kvsEqual('category', category),
+    { scope: scopeB, limit: 1, nextPageKey: firstPage.nextPageKey }
+  );
+  yield* askSmokeAssert(
+    probeIdsOf([...firstPage.items, ...secondPage.items]) === scopeBRows,
+    'paging the scoped index did not walk both of scope B rows'
+  );
+
+  const pageKeyFromOtherScope = yield* askCatch(
+    askKeyValueStoreQuery<SmokeProbeRecord>(
+      SMOKE_SCOPED_PROBE_STORE,
+      kvsEqual('category', category),
+      { scope: scopeA, nextPageKey: firstPage.nextPageKey }
+    )
+  );
+  yield* askSmokeAssert(
+    !pageKeyFromOtherScope.success &&
+      pageKeyFromOtherScope.error.errorType ===
+        askKeyValueStoreQueryBase.errorType.InvalidScope,
+    'scope B page key was not refused from scope A'
+  );
+
   // Changing the indexed attribute moves the row's index entry with it.
   yield* askKeyValueStoreUpdate(
     SMOKE_SCOPED_PROBE_STORE,
@@ -182,6 +237,12 @@ export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
   yield* askKeyValueStoreDelete(
     SMOKE_SCOPED_PROBE_STORE,
     otherProbeId,
+    undefined,
+    { scope: scopeB }
+  );
+  yield* askKeyValueStoreDelete(
+    SMOKE_SCOPED_PROBE_STORE,
+    pagedProbeId,
     undefined,
     { scope: scopeB }
   );

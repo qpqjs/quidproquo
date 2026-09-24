@@ -1,4 +1,6 @@
 import {
+  InvalidScopeError,
+  InvalidScopeErrorCode,
   KeyValueStoreQPQConfigSetting,
   KvsIndex,
   KvsQueryOperation,
@@ -249,9 +251,17 @@ export class SqliteKvsRepository implements KvsRepository {
 
     // One row-value comparison seeks past the last returned row in exactly the read order.
     if (nextPageKey) {
+      const cursor = decodeKvsPageCursor(nextPageKey);
+
+      // Rows are already confined to this scope by the WHERE above; refusing the cursor keeps the error
+      // the same as dynamo, whose page keys carry the scope.
+      if ((cursor.scope ?? '') !== scopeValue) {
+        throw new InvalidScopeError(InvalidScopeErrorCode.pageKeyOutOfScope, 'The page key was not issued under this scope.');
+      }
+
       const comparison = sortAscending ? '>' : '<';
       whereClauses.push(`(${orderExpressions.join(', ')}) ${comparison} (${orderExpressions.map(() => '?').join(', ')})`);
-      bindValues.push(...getKvsCursorValues(decodeKvsPageCursor(nextPageKey), access, index));
+      bindValues.push(...getKvsCursorValues(cursor, access, index));
     }
 
     const direction = sortAscending ? 'ASC' : 'DESC';
@@ -281,7 +291,7 @@ export class SqliteKvsRepository implements KvsRepository {
 
     return {
       items: pageItems,
-      nextPageKey: hasMore ? encodeKvsPageCursor(pageItems[pageItems.length - 1], access.storeConfig, index) : undefined,
+      nextPageKey: hasMore ? encodeKvsPageCursor(pageItems[pageItems.length - 1], access.storeConfig, scopeValue, index) : undefined,
     };
   }
 

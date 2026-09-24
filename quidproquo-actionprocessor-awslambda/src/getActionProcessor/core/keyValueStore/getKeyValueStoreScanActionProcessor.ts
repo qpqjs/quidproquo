@@ -25,7 +25,7 @@ const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       // scan on the Dynamo side - only the results are isolated.
       const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
 
-      const items = await scan<any>(dynamoTableName, region, scoped.scanFilter(filterCondition), nextPageKey);
+      const items = await scan<any>(dynamoTableName, region, scoped.scanFilter(filterCondition), scoped.pageKey(nextPageKey));
 
       items.items = items.items.map((item: any) => scoped.strip(item));
 
