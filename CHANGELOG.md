@@ -2,7 +2,20 @@
 
 ## 0.1.27
 
-- features: event-doc snapshots are filed under a per-collection `snapshotCacheKey`. Set it on `createEventDocDefinition` and change it whenever a version's seed or reducer changes in place (an additive change with no schema bump): snapshots written under any other key are invisible, so every reader refolds the log from scratch and the projector files a fresh snapshot under the new key on the next append. The bootstrap base carries the key so a workspace snapshot held in the browser across a deploy is refetched rather than trusted. `askEventDocReprojectHead` re-runs the projector at a document's head, the primitive for an admin reseed job after a key change. Omitting the key keeps the legacy row layout, so existing collections are unaffected
+- core/actionprocessor-awslambda/deploy-awscdk/dev-server: scoped key value stores support GSIs. The index keeps its name and sort key, and its partition key is scope-composed so a query only sees the caller's scope
+- core/actionprocessor-awslambda/dev-server: `askKeyValueStoreQuery` takes an `indexName` to query a declared index by name (index definitions gain an optional `name`). Without one, a query runs on the table or the first index whose keys cover the key condition
+- features: event-doc snapshots are filed under a per-collection `snapshotCacheKey`. Change it when a seed or reducer changes in place and readers refold from the log instead of trusting old snapshots; `askEventDocReprojectHead` reseeds a document's head. No key keeps the legacy layout
+- features: the event-doc collection list reads newest first through the `(type, updatedAt)` index
+- core/actionprocessor-awslambda/dev-server: a scoped store refuses a `nextPageKey` that wasn't issued under the caller's scope, failing with `InvalidScope`
+- dev-server: a query that resolves to a GSI reads in that index's sort key order and skips rows missing its keys, as it does deployed
+
+### Breaking changes
+
+- scoped stores reserve `@@QPQ` in pk values and attribute names, limit GSI partition key updates to whole-value writes, and need a remove-then-re-add deploy for an existing non-pk GSI
+- `KvsIndex` always carries `name` and index names must be unique per store; old event-doc list `nextPageKey`s can't continue, so restart paging
+- a scoped `nextPageKey` from another scope fails with `InvalidScope`, and dev-server page keys issued before this can't continue a scoped listing
+- the DynamoDB scope helpers (`composeScopedKvsValue`, `createScopedKvsTranslator` and the rest) move from core into actionprocessor-awslambda
+- `EventDocFunctions` requires `getSnapshotCacheKey`, and the event-doc snapshot data stories take a trailing `snapshotCacheKey`
 
 ## 0.1.26
 

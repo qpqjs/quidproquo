@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-web-react",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -37,19 +37,19 @@
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
-    "quidproquo-core": "0.1.26",
-    "quidproquo-tsconfig": "0.1.26",
+    "quidproquo-core": "0.1.27",
+    "quidproquo-tsconfig": "0.1.27",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "react": ">=18.3.1"
   },
   "dependencies": {
-    "quidproquo-actionprocessor-node": "0.1.26",
-    "quidproquo-actionprocessor-web": "0.1.26",
-    "quidproquo-features": "0.1.26",
-    "quidproquo-web": "0.1.26",
-    "quidproquo-webserver": "0.1.26",
+    "quidproquo-actionprocessor-node": "0.1.27",
+    "quidproquo-actionprocessor-web": "0.1.27",
+    "quidproquo-features": "0.1.27",
+    "quidproquo-web": "0.1.27",
+    "quidproquo-webserver": "0.1.27",
     "symbol-observable": "^4.0.0"
   }
 }
