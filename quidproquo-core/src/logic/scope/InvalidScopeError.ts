@@ -38,6 +38,9 @@ export enum InvalidScopeErrorCode {
   // key condition on it, or an update whose result isn't known up front
   // (Increment, Add, Delete, a nested path).
   unsupportedOperation = 'unsupportedOperation',
+  // A page key issued under another scope. A page key only continues the
+  // listing that issued it; one edited to point elsewhere is refused.
+  pageKeyOutOfScope = 'pageKeyOutOfScope',
 }
 
 export class InvalidScopeError extends Error {

@@ -209,6 +209,40 @@ describe('KVS scope isolation', () => {
     expect(resolveActionResult(result).items.map((item: { id: string }) => item.id)).toEqual(['a', 'c', 'b']);
   });
 
+  it("continues paging with the scope's own page key and refuses it from another scope", async () => {
+    const { upsert, query } = await getProcessors();
+    const typeIsDoc = { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' };
+
+    await invokeProcessor(upsert, {
+      keyValueStoreName: 'summaries',
+      item: { type: 'doc', id: 'a', updatedAt: '2026-01-01' },
+      options: { scope: 'tenant-a' },
+    });
+    await invokeProcessor(upsert, {
+      keyValueStoreName: 'summaries',
+      item: { type: 'doc', id: 'b', updatedAt: '2026-02-01' },
+      options: { scope: 'tenant-a' },
+    });
+
+    const first = resolveActionResult(
+      await invokeProcessor(query, { keyValueStoreName: 'summaries', keyCondition: typeIsDoc, options: { scope: 'tenant-a', limit: 1 } }),
+    );
+    const next = await invokeProcessor(query, {
+      keyValueStoreName: 'summaries',
+      keyCondition: typeIsDoc,
+      options: { scope: 'tenant-a', limit: 1, nextPageKey: first.nextPageKey },
+    });
+    const elsewhere = await invokeProcessor(query, {
+      keyValueStoreName: 'summaries',
+      keyCondition: typeIsDoc,
+      options: { scope: 'tenant-b', limit: 1, nextPageKey: first.nextPageKey },
+    });
+
+    expect(first.items.map((item: { id: string }) => item.id)).toEqual(['a']);
+    expect(resolveActionResult(next).items.map((item: { id: string }) => item.id)).toEqual(['b']);
+    expect(resolveActionResultError(elsewhere).errorType).toContain('InvalidScope');
+  });
+
   it('refuses a query naming an undeclared index', async () => {
     const { query } = await getProcessors();
 

@@ -1,9 +1,17 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsLogicalOperatorType, KvsQueryOperationType } from 'quidproquo-core';
+import {
+  askKeyValueStoreScanBase,
+  buildTestQpqConfig,
+  defineKeyValueStore,
+  KeyValueStoreActionType,
+  KvsLogicalOperatorType,
+  KvsQueryOperationType,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { scan } from '../../../logic/dynamo/scan';
+import { lastEvaluatedKeyToString } from '../../../logic/dynamo/utils/lastEvaluatedKeyToString';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 
@@ -12,7 +20,11 @@ vi.mock('../../../logic/dynamo/scan', () => ({
 }));
 
 const resolveProcessor = async () => {
-  const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), defineKeyValueStore('users', 'pk', ['sk'])]);
+  const config = buildTestQpqConfig([
+    defineAwsServiceAccountInfo('111', 'eu-west-1'),
+    defineKeyValueStore('users', 'pk', ['sk']),
+    defineKeyValueStore('orders', 'id', [], { scoped: true }),
+  ]);
   const processors = await getKeyValueStoreScanActionProcessor(config, {} as any);
   return processors[KeyValueStoreActionType.Scan];
 };
@@ -48,5 +60,15 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     await invokeProcessor(processor, { keyValueStoreName: 'users' });
 
     expect(scan).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', composedRowExclusion, undefined);
+  });
+
+  it('refuses a scoped scan page key issued under another scope before reading', async () => {
+    const processor = await resolveProcessor();
+    const otherScopeKey = lastEvaluatedKeyToString({ id: { S: 'bobco@@QPQSCOPE@@o-1' } });
+
+    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'orders', nextPageKey: otherScopeKey, options: { scope: 'acme' } });
+
+    expect(error?.errorType).toBe(askKeyValueStoreScanBase.errorType.InvalidScope);
+    expect(scan).not.toHaveBeenCalled();
   });
 });

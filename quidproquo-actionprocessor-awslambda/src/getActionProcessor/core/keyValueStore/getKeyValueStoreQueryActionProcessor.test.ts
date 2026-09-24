@@ -4,6 +4,7 @@ import { askKeyValueStoreQueryBase, buildTestQpqConfig, defineKeyValueStore, Key
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { query } from '../../../logic/dynamo';
+import { lastEvaluatedKeyToString } from '../../../logic/dynamo/utils/lastEvaluatedKeyToString';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 
@@ -91,6 +92,26 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
 
     expect(vi.mocked(query).mock.calls[0][5]).toBe('customerByTotal');
     expect(vi.mocked(query).mock.calls[0][2]).toEqual(equal('@@QPQGSI_customerId@@', 'acme@@QPQSCOPE@@c-9'));
+  });
+
+  it("passes the scope's own page key through and refuses one from another scope before reading", async () => {
+    const processor = await resolveProcessor();
+    const pageKeyFor = (scope: string) => lastEvaluatedKeyToString({ id: { S: `${scope}@@QPQSCOPE@@o-1` } });
+
+    await invokeProcessor(processor, {
+      keyValueStoreName: 'orders',
+      keyCondition: equal('id', 'o-1'),
+      options: { scope: 'acme', nextPageKey: pageKeyFor('acme') },
+    });
+    const [, error] = await invokeProcessor(processor, {
+      keyValueStoreName: 'orders',
+      keyCondition: equal('id', 'o-1'),
+      options: { scope: 'acme', nextPageKey: pageKeyFor('bobco') },
+    });
+
+    expect(vi.mocked(query)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(query).mock.calls[0][4]).toBe(pageKeyFor('acme'));
+    expect(error?.errorType).toBe(askKeyValueStoreQueryBase.errorType.InvalidScope);
   });
 
   it('returns the typed IndexNotFound error for an undeclared index', async () => {
