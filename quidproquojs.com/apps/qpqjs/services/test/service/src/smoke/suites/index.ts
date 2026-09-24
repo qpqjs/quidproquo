@@ -9,6 +9,7 @@ export * from './openApi';
 export * from './parameter';
 export * from './schedule';
 export * from './scopedKeyValueStore';
+export * from './scopedStorageDrive';
 export * from './secret';
 export * from './signingKey';
 export * from './smokeSuites';
