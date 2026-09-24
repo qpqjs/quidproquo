@@ -43,6 +43,19 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
     const usersStore = () => make([defineKeyValueStore('users', { key: 'id', type: 'string' })]);
     const ordersStore = () => make([defineKeyValueStore('orders', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'string' }])]);
     const eventsStore = () => make([defineKeyValueStore('events', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'number' }])]);
+    // A GSI sharing the table pk (the eventDoc summary shape) and one on another attribute.
+    const docsStore = () =>
+      make([
+        defineKeyValueStore('docs', { key: 'type', type: 'string' }, [{ key: 'id', type: 'string' }], {
+          indexes: [
+            { partitionKey: { key: 'type', type: 'string' }, sortKey: { key: 'updatedAt', type: 'string' } },
+            { name: 'docsByCreated', partitionKey: { key: 'type', type: 'string' }, sortKey: { key: 'createdAt', type: 'string' } },
+          ],
+        }),
+        defineKeyValueStore('people', { key: 'id', type: 'string' }, [], {
+          indexes: [{ partitionKey: { key: 'team', type: 'string' }, sortKey: { key: 'age', type: 'number' } }],
+        }),
+      ]);
 
     describe('upsert/get/delete', () => {
       it('upserts an item then reads it back by key', async () => {
@@ -295,6 +308,78 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
         await repo.update('orders', 'p1', 's1', [{ attributePath: 'total', action: KvsUpdateActionType.Set, value: 3 }]);
 
         expect(await repo.get('orders', 'p1#s1')).toEqual({ pk: 'p1', sk: 's1', total: 3 });
+      });
+    });
+
+    describe('query through a GSI', () => {
+      const typeIsDoc = { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' };
+
+      // Ids and update times deliberately disagree on order.
+      const seedDocs = async (repo: KvsRepository) => {
+        await repo.upsert('docs', { type: 'doc', id: 'a', updatedAt: '2026-03-01' });
+        await repo.upsert('docs', { type: 'doc', id: 'b', updatedAt: '2026-01-01' });
+        await repo.upsert('docs', { type: 'doc', id: 'c', updatedAt: '2026-04-01' });
+        await repo.upsert('docs', { type: 'doc', id: 'd', updatedAt: '2026-02-01' });
+      };
+
+      it("reads in the index's sort key order, both ways, and the table's order without it", async () => {
+        const repo = docsStore();
+        await seedDocs(repo);
+
+        const newestFirst = await repo.query('docs', typeIsDoc, undefined, undefined, 'type', undefined, false);
+        const oldestFirst = await repo.query('docs', typeIsDoc, undefined, undefined, 'type', undefined, true);
+        const byTable = await repo.query('docs', typeIsDoc, undefined, undefined, undefined, undefined, false);
+
+        expect(newestFirst.items.map((item) => item.id)).toEqual(['c', 'a', 'd', 'b']);
+        expect(oldestFirst.items.map((item) => item.id)).toEqual(['b', 'd', 'a', 'c']);
+        expect(byTable.items.map((item) => item.id)).toEqual(['d', 'c', 'b', 'a']);
+      });
+
+      it('pages through an index in its order without repeating or skipping rows', async () => {
+        const repo = docsStore();
+        await seedDocs(repo);
+
+        const first = await repo.query('docs', typeIsDoc, undefined, undefined, 'type', 3, false);
+        const second = await repo.query('docs', typeIsDoc, undefined, first.nextPageKey, 'type', 3, false);
+
+        expect(first.items.map((item) => item.id)).toEqual(['c', 'a', 'd']);
+        expect(second.items.map((item) => item.id)).toEqual(['b']);
+        expect(second.nextPageKey).toBeUndefined();
+      });
+
+      it("skips rows missing the index's keys, like a sparse GSI", async () => {
+        const repo = docsStore();
+        await seedDocs(repo);
+        await repo.upsert('docs', { type: 'doc', id: 'e' });
+
+        const throughIndex = await repo.query('docs', typeIsDoc, undefined, undefined, 'type');
+        const byTable = await repo.query('docs', typeIsDoc);
+
+        expect(throughIndex.items.map((item) => item.id)).not.toContain('e');
+        expect(byTable.items.map((item) => item.id)).toContain('e');
+      });
+
+      it('reads an explicitly named index in its own sort key order', async () => {
+        const repo = docsStore();
+        await repo.upsert('docs', { type: 'doc', id: 'a', createdAt: '2026-02-01', updatedAt: '2026-09-01' });
+        await repo.upsert('docs', { type: 'doc', id: 'b', createdAt: '2026-01-01', updatedAt: '2026-01-01' });
+
+        const byCreated = await repo.query('docs', typeIsDoc, undefined, undefined, 'docsByCreated', undefined, true);
+        const byUpdated = await repo.query('docs', typeIsDoc, undefined, undefined, 'type', undefined, false);
+
+        expect(byCreated.items.map((item) => item.id)).toEqual(['b', 'a']);
+        expect(byUpdated.items.map((item) => item.id)).toEqual(['a', 'b']);
+      });
+
+      it('orders a numeric index sort key numerically', async () => {
+        const repo = docsStore();
+        await repo.upsert('people', { id: 'p1', team: 'a', age: 10 });
+        await repo.upsert('people', { id: 'p2', team: 'a', age: 9 });
+        await repo.upsert('people', { id: 'p3', team: 'b', age: 1 });
+
+        const result = await repo.query('people', { key: 'team', operation: KvsQueryOperationType.Equal, valueA: 'a' }, undefined, undefined, 'team');
+
+        expect(result.items.map((item) => item.id)).toEqual(['p2', 'p1']);
       });
     });
 

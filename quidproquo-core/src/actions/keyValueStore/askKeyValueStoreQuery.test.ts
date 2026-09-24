@@ -46,5 +46,6 @@ describe('askKeyValueStoreQuery', () => {
   it('namespaces its error enum values under the action type', () => {
     expect(askKeyValueStoreQueryBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Query}-StoreNotFound`);
     expect(askKeyValueStoreQueryBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Query}-InvalidScope`);
+    expect(askKeyValueStoreQueryBase.errorType.IndexNotFound).toBe(`${KeyValueStoreActionType.Query}-IndexNotFound`);
   });
 });

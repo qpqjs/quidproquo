@@ -28,6 +28,8 @@ export type KvsUpsertManyResult = {
 export interface KvsRepository {
   get(keyValueStoreName: string, key: string, scope?: string): Promise<any | null>;
 
+  // `indexName` reads through that declared GSI: only rows carrying its keys,
+  // in its sort key order, as dynamo returns them.
   query(
     keyValueStoreName: string,
     keyCondition: KvsQueryOperation,

@@ -139,8 +139,7 @@ export const getKvsDynamoTableNameFromConfig = (resourceName: string, qpqConfig:
 
 /**
  * The attribute a store's GSI is keyed on. On a scoped store that's the hidden scope-composed copy of the
- * declared partition key, a string (see getScopedKvsIndexPartitionKeys); otherwise the declared key. The
- * index itself is always named after the declared key.
+ * declared partition key, a string (see getScopedKvsIndexPartitionKeys); otherwise the declared key.
  */
 export const getKvsIndexPartitionKey = (storeConfig: KeyValueStoreQPQConfigSetting, index: KvsIndex): KvsKey =>
   getScopedKvsIndexPartitionKeys(storeConfig).some((key) => key.key === index.partitionKey.key)

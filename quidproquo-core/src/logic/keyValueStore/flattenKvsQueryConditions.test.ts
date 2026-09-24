@@ -1,7 +1,6 @@
-import { KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperationType } from 'quidproquo-core';
-
 import { describe, expect, it } from 'vitest';
 
+import { KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperationType } from '../../actions/keyValueStore/types';
 import { flattenKvsQueryConditions } from './flattenKvsQueryConditions';
 
 const ageCondition: KvsQueryCondition = { key: 'age', operation: KvsQueryOperationType.Equal, valueA: 1 };

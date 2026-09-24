@@ -7,6 +7,8 @@ import {
   KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
+  resolveKvsQueryIndex,
+  resolveKvsStoreConfigOrThrow,
   validateScopedKvsKeyConditionOrThrow,
 } from 'quidproquo-core';
 
@@ -32,12 +34,15 @@ const getProcessKeyValueStoreQuery = (
       // comparison.
       validateScopedKvsKeyConditionOrThrow(qpqConfig, keyValueStoreName, scope, keyCondition);
 
+      // The same index dynamo would read, so rows come back in the same order.
+      const index = resolveKvsQueryIndex(resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName), keyCondition, options?.indexName);
+
       const result = await repository.query(
         keyValueStoreName,
         keyCondition,
         options?.filter,
         options?.nextPageKey,
-        undefined, // indexName - for basic implementation
+        index?.name,
         options?.limit,
         options?.sortAscending ?? true,
         scope,
@@ -48,6 +53,7 @@ const getProcessKeyValueStoreQuery = (
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.StoreNotFound, error.message),
+        KvsIndexNotFoundError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.IndexNotFound, error.message),
       });
     }
   };

@@ -43,7 +43,11 @@ describe('getScopedKvsIndexPartitionKeys', () => {
   it('lists each scoped GSI partition key once, leaving out the table pk', () => {
     const store = defineKeyValueStore<Order>('shared', 'id', [], {
       scoped: true,
-      indexes: [{ partitionKey: 'customerId', sortKey: 'createdAt' }, { partitionKey: 'customerId', sortKey: 'updatedAt' }, 'id'],
+      indexes: [
+        { partitionKey: 'customerId', sortKey: 'createdAt' },
+        { name: 'customerByUpdated', partitionKey: 'customerId', sortKey: 'updatedAt' },
+        'id',
+      ],
     });
 
     expect(getScopedKvsIndexPartitionKeys(store)).toEqual([{ key: 'customerId', type: 'string' }]);

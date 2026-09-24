@@ -83,7 +83,7 @@ defineKeyValueStore('events', kvsKey('deviceId'), [kvsKey('timestamp', 'number')
 
 ## Indexes (GSIs)
 
-Each entry in `options.indexes` is a `CompositeKvsIndex<T>` — either a bare attribute name (a partition-key-only index) or an object with a `partitionKey` and optional `sortKey`:
+Each entry in `options.indexes` is a `CompositeKvsIndex<T>` — either a bare attribute name (a partition-key-only index) or an object with a `partitionKey`, optional `sortKey`, and optional `name`:
 
 ```typescript
 import { defineKeyValueStore, kvsKey } from 'quidproquo-core';
@@ -94,11 +94,15 @@ defineKeyValueStore('orders', 'orderId', [], {
     { partitionKey: 'customerId', sortKey: kvsKey('createdAt', 'number') },
     // Query orders by status (partition-only index)
     'status',
+    // Two indexes on the same partition key need an explicit name
+    { name: 'byStatusAndTotal', partitionKey: 'status', sortKey: kvsKey('total', 'number') },
   ],
 });
 ```
 
-On AWS each index becomes a Global Secondary Index whose name is the index's partition-key attribute (`customerId`, `status` above).
+`name` defaults to the partition-key attribute (`customerId`, `status` above) and is what [askKeyValueStoreQuery](../../actions/core/key-value-store/ask-key-value-store-query.md)'s `indexName` option targets; `defineKeyValueStore` throws if two indexes resolve to the same name. On AWS each index becomes a Global Secondary Index deployed under this name.
+
+A query without `indexName` runs against the table if its keys cover every attribute in the key condition, otherwise the first declared index whose keys do.
 
 ### Indexes on a scoped store
 

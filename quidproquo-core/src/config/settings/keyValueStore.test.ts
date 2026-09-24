@@ -42,7 +42,7 @@ describe('defineKeyValueStore', () => {
   it('converts a bare string index to a partition-key-only KvsIndex and applies options', () => {
     const setting = defineKeyValueStore('Users', 'id', [], { indexes: ['email'], global: true, cryptoKeyName: 'main' });
 
-    expect(setting.indexes).toEqual([{ partitionKey: { key: 'email', type: 'string' } }]);
+    expect(setting.indexes).toEqual([{ name: 'email', partitionKey: { key: 'email', type: 'string' } }]);
     expect(setting.global).toBe(true);
     expect(setting.cryptoKeyName).toBe('main');
   });
@@ -54,10 +54,33 @@ describe('defineKeyValueStore', () => {
 
     expect(setting.indexes).toEqual([
       {
+        name: 'email',
         partitionKey: { key: 'email', type: 'string' },
         sortKey: { key: 'createdAt', type: 'string' },
       },
     ]);
+  });
+
+  it('keeps an explicit name, so two indexes can share a partition key', () => {
+    const setting = defineKeyValueStore<{ id: string; type: string; createdAt: string; updatedAt: string }>('docs', 'id', [], {
+      indexes: [
+        { partitionKey: 'type', sortKey: 'updatedAt' },
+        { name: 'typeByCreated', partitionKey: 'type', sortKey: 'createdAt' },
+      ],
+    });
+
+    expect(setting.indexes.map((index) => index.name)).toEqual(['type', 'typeByCreated']);
+  });
+
+  it('refuses two indexes with the same name', () => {
+    expect(() =>
+      defineKeyValueStore<{ id: string; type: string; createdAt: string; updatedAt: string }>('docs', 'id', [], {
+        indexes: [
+          { partitionKey: 'type', sortKey: 'updatedAt' },
+          { partitionKey: 'type', sortKey: 'createdAt' },
+        ],
+      }),
+    ).toThrow("Key value store 'docs' declares two indexes named 'type'; give one an explicit name");
   });
 
   it('refuses a binary index partition key on a scoped store', () => {

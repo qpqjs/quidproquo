@@ -80,11 +80,13 @@ describe('defineTenant', () => {
     const store = membershipStore as unknown as {
       partitionKey: { key: string };
       sortKeys: { key: string }[];
-      indexes: { partitionKey: { key: string }; sortKey?: { key: string } }[];
+      indexes: { name: string; partitionKey: { key: string }; sortKey?: { key: string } }[];
     };
     expect(store.partitionKey.key).toBe('userId');
     expect(store.sortKeys.map((k) => k.key)).toEqual(['tenantId']);
-    expect(store.indexes).toEqual([{ partitionKey: { key: 'tenantId', type: 'string' }, sortKey: { key: 'userId', type: 'string' } }]);
+    expect(store.indexes).toEqual([
+      { name: 'tenantId', partitionKey: { key: 'tenantId', type: 'string' }, sortKey: { key: 'userId', type: 'string' } },
+    ]);
   });
 
   it('gates the rest of the registry to the owner service', () => {

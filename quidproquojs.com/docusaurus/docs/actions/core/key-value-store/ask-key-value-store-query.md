@@ -52,6 +52,7 @@ function* askKeyValueStoreQuery<KvsItem>(
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `filter` | `KvsQueryOperation` | – | An extra condition applied to non-key attributes **after** the key match. Filtered-out rows still count against `limit`. |
+| `indexName` | `string` | – | Force the query onto the [index](../../../config/core/key-value-store.md#indexes-gsis) declared with this name, read in its sort order. Without it, the table serves the query if its keys cover the key condition, otherwise the first declared index whose keys do — so an index sharing the table's keys is only reached by naming it here. An undeclared name throws `IndexNotFound`. |
 | `sortAscending` | `boolean` | `true` | Order results by the sort key. `false` returns the newest/highest first. |
 | `limit` | `number` | – | Maximum number of records to return in this page. |
 | `nextPageKey` | `string` | – | Opaque cursor from a previous page's `nextPageKey`; pass it to fetch the following page. |
@@ -120,6 +121,7 @@ When `nextPageKey` is set, pass it back as `options.nextPageKey` to fetch the ne
 | `KeyValueStoreQueryErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreQueryErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, a scoped query's key condition does not constrain the partition key or an [index](../../../config/core/key-value-store.md#indexes-gsis) partition key (or constrains one with an operator that cannot be scoped: an index partition key only takes `=`), a condition names an attribute containing `@@QPQ`, an index partition-key condition value doesn't match that index's declared type, or a partition-key condition value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped queries reject it too). |
 | `KeyValueStoreQueryErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
+| `KeyValueStoreQueryErrorTypeEnum.IndexNotFound` | The `indexName` option names an index the store doesn't declare. |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

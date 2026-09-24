@@ -28,13 +28,13 @@ export enum InvalidScopeErrorCode {
   // expects, invisible to every unscoped reader.
   notScoped = 'notScoped',
   // An attribute name on a scoped store carrying the reserved marker. Those
-  // attributes belong to the backend (dynamo's hidden GSI keys); a caller-set
+  // attributes belong to the backend (its own index bookkeeping); a caller-set
   // one could file the row under another scope's index partition.
   reservedAttribute = 'reservedAttribute',
-  // A scoped store's GSI partition key value that doesn't match the key's
+  // A scoped store's index partition key value that doesn't match the key's
   // declared type.
   indexKeyType = 'indexKeyType',
-  // Something a scoped store's GSI partition key can't support: a non-equality
+  // Something a scoped store's index partition key can't support: a non-equality
   // key condition on it, or an update whose result isn't known up front
   // (Increment, Add, Delete, a nested path).
   unsupportedOperation = 'unsupportedOperation',

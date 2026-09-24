@@ -1,5 +1,6 @@
 import {
   KeyValueStoreQPQConfigSetting,
+  KvsIndex,
   KvsQueryOperation,
   KvsUpdate,
   Nullable,
@@ -19,7 +20,8 @@ import { evaluateKvsQueryOperation, validateKvsQueryOperation } from './evaluate
 import { getKvsItemPk } from './getKvsItemPk';
 import { getKvsItemSk } from './getKvsItemSk';
 import { getKvsTableName } from './getKvsTableName';
-import { decodeKvsPageCursor, encodeKvsPageCursor } from './kvsPageCursor';
+import { kvsJsonExtractExpression } from './kvsJsonExtractExpression';
+import { decodeKvsPageCursor, encodeKvsPageCursor, KvsPageCursor } from './kvsPageCursor';
 import { KvsRepository, KvsUpsertManyResult } from './KvsRepository';
 import { openKvsDatabase } from './openKvsDatabase';
 import { quoteSqlIdentifier } from './quoteSqlIdentifier';
@@ -32,6 +34,21 @@ type KvsStoreAccess = {
   table: string;
   hasSortKey: boolean;
 };
+
+// What rows come back ordered by: a GSI's sort key when reading through one (its order is
+// the point of reading it), then the table key as a stable tiebreak.
+const getKvsOrderExpressions = (access: KvsStoreAccess, index: Nullable<KvsIndex>): string[] => [
+  ...(index?.sortKey ? [kvsJsonExtractExpression(index.sortKey.key)] : []),
+  'pk',
+  ...(access.hasSortKey ? ['sk'] : []),
+];
+
+// The cursor's values for the same columns, in the same order.
+const getKvsCursorValues = (cursor: KvsPageCursor, access: KvsStoreAccess, index: Nullable<KvsIndex>): unknown[] => [
+  ...(index?.sortKey ? [cursor.indexSk] : []),
+  cursor.pk,
+  ...(access.hasSortKey ? [cursor.sk] : []),
+];
 
 /**
  * KVS repository on node:sqlite (built into node, no native deps).
@@ -167,7 +184,7 @@ export class SqliteKvsRepository implements KvsRepository {
     keyCondition: KvsQueryOperation,
     filter?: KvsQueryOperation,
     nextPageKey?: string,
-    _indexName?: string,
+    indexName?: string,
     limit?: number,
     sortAscending: boolean = true,
     scope?: string,
@@ -179,7 +196,10 @@ export class SqliteKvsRepository implements KvsRepository {
       validateKvsQueryOperation(filter);
     }
 
-    return this.readPage(access, scope ?? '', keyCondition, filter, nextPageKey, limit, sortAscending);
+    // An undeclared name reads the table; the query processor has already refused it with IndexNotFound.
+    const index = access.storeConfig.indexes.find((declared) => declared.name === indexName) ?? null;
+
+    return this.readPage(access, scope ?? '', keyCondition, filter, nextPageKey, limit, sortAscending, index);
   }
 
   async scan(
@@ -198,10 +218,10 @@ export class SqliteKvsRepository implements KvsRepository {
     return this.readPage(access, scope ?? '', undefined, filter, nextPageKey, limit, true);
   }
 
-  // Shared read path for query and scan. SQL narrows, orders by (pk, sk) and
-  // streams rows out; JS re-evaluates the full condition and counts the page
-  // off rows that survive filtering, so a filter can't truncate a page early.
-  // One extra matching row is enough to know hasMore.
+  // Shared read path for query and scan. SQL narrows, orders (see
+  // getKvsOrderExpressions) and streams rows out; JS re-evaluates the full
+  // condition and counts the page off rows that survive filtering, so a filter
+  // can't truncate a page early. One extra matching row is enough to know hasMore.
   private readPage(
     access: KvsStoreAccess,
     scopeValue: string,
@@ -210,9 +230,10 @@ export class SqliteKvsRepository implements KvsRepository {
     nextPageKey: string | undefined,
     limit: number | undefined,
     sortAscending: boolean,
+    index: Nullable<KvsIndex> = null,
   ): QpqPagedData<any> {
     const whereClauses = ['scope = ?'];
-    const bindValues: (string | number)[] = [scopeValue];
+    const bindValues: unknown[] = [scopeValue];
 
     if (keyCondition) {
       const narrowing = buildKvsKeyNarrowing(keyCondition, access.storeConfig);
@@ -220,20 +241,21 @@ export class SqliteKvsRepository implements KvsRepository {
       bindValues.push(...narrowing.params);
     }
 
+    // A GSI only holds rows that carry its keys, so reading through one skips the rest, as dynamo does.
+    const indexKeys = index ? [index.partitionKey, ...(index.sortKey ? [index.sortKey] : [])] : [];
+    whereClauses.push(...indexKeys.map((indexKey) => `${kvsJsonExtractExpression(indexKey.key)} IS NOT NULL`));
+
+    const orderExpressions = getKvsOrderExpressions(access, index);
+
+    // One row-value comparison seeks past the last returned row in exactly the read order.
     if (nextPageKey) {
-      const cursor = decodeKvsPageCursor(nextPageKey);
       const comparison = sortAscending ? '>' : '<';
-      if (access.hasSortKey) {
-        whereClauses.push(`(pk ${comparison} ? OR (pk = ? AND sk ${comparison} ?))`);
-        bindValues.push(cursor.pk, cursor.pk, cursor.sk);
-      } else {
-        whereClauses.push(`pk ${comparison} ?`);
-        bindValues.push(cursor.pk);
-      }
+      whereClauses.push(`(${orderExpressions.join(', ')}) ${comparison} (${orderExpressions.map(() => '?').join(', ')})`);
+      bindValues.push(...getKvsCursorValues(decodeKvsPageCursor(nextPageKey), access, index));
     }
 
     const direction = sortAscending ? 'ASC' : 'DESC';
-    const orderBy = access.hasSortKey ? `pk ${direction}, sk ${direction}` : `pk ${direction}`;
+    const orderBy = orderExpressions.map((expression) => `${expression} ${direction}`).join(', ');
     const sql = `SELECT data FROM ${access.table} WHERE ${whereClauses.join(' AND ')} ORDER BY ${orderBy}`;
 
     const pageSize = limit || 100;
@@ -259,7 +281,7 @@ export class SqliteKvsRepository implements KvsRepository {
 
     return {
       items: pageItems,
-      nextPageKey: hasMore ? encodeKvsPageCursor(pageItems[pageItems.length - 1], access.storeConfig) : undefined,
+      nextPageKey: hasMore ? encodeKvsPageCursor(pageItems[pageItems.length - 1], access.storeConfig, index) : undefined,
     };
   }
 

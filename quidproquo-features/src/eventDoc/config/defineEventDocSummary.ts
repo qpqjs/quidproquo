@@ -18,10 +18,7 @@ export type EventDocSummaryOptions = {
   scoped?: boolean;
 };
 
-/**
- * Summary store, events store (`${name}Events`), snapshots store (`${name}Snap`) and blob drive for a collection.
- * The events store has no GSI on purpose: the dev-server query processor cannot target one.
- */
+/** Summary store, events store (`${name}Events`), snapshots store (`${name}Snap`) and blob drive for a collection. */
 export const defineEventDocSummary = (keyValueStoreName: string, options?: EventDocSummaryOptions): QPQConfig => [
   defineKeyValueStore<EventDocSummary>(keyValueStoreName, 'type', ['id'], {
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],

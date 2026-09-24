@@ -63,4 +63,27 @@ describe('QpqCoreKeyValueStoreConstruct global secondary indexes', () => {
       AttributeDefinitions: Match.arrayWith([{ AttributeName: 'level', AttributeType: 'N' }]),
     });
   });
+
+  it('deploys an explicitly named index under its name, sharing the hidden partition key copy', () => {
+    const store = defineKeyValueStore<Order>('orders', 'id', [], {
+      scoped: true,
+      indexes: [
+        { partitionKey: kvsKey<Order>('level', 'number'), sortKey: kvsKey<Order>('score', 'number') },
+        { name: 'levelByUpdated', partitionKey: kvsKey<Order>('level', 'number'), sortKey: kvsKey<Order>('updatedAt') },
+      ],
+    });
+
+    synth(store).hasResourceProperties('AWS::DynamoDB::Table', {
+      GlobalSecondaryIndexes: Match.arrayWith([
+        Match.objectLike({ IndexName: 'level', KeySchema: Match.arrayWith([{ AttributeName: '@@QPQGSI_level@@', KeyType: 'HASH' }]) }),
+        Match.objectLike({
+          IndexName: 'levelByUpdated',
+          KeySchema: [
+            { AttributeName: '@@QPQGSI_level@@', KeyType: 'HASH' },
+            { AttributeName: 'updatedAt', KeyType: 'RANGE' },
+          ],
+        }),
+      ]),
+    });
+  });
 });
