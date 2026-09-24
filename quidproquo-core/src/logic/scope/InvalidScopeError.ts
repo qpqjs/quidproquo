@@ -27,6 +27,17 @@ export enum InvalidScopeErrorCode {
   // config: the data would land under a prefix nothing else on that resource
   // expects, invisible to every unscoped reader.
   notScoped = 'notScoped',
+  // An attribute name on a scoped store carrying the reserved marker. Those
+  // attributes belong to the backend (dynamo's hidden GSI keys); a caller-set
+  // one could file the row under another scope's index partition.
+  reservedAttribute = 'reservedAttribute',
+  // A scoped store's GSI partition key value that doesn't match the key's
+  // declared type.
+  indexKeyType = 'indexKeyType',
+  // Something a scoped store's GSI partition key can't support: a non-equality
+  // key condition on it, or an update whose result isn't known up front
+  // (Increment, Add, Delete, a nested path).
+  unsupportedOperation = 'unsupportedOperation',
 }
 
 export class InvalidScopeError extends Error {

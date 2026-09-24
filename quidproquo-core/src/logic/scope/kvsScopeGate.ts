@@ -1,10 +1,12 @@
-import { KvsCoreDataType, KvsQueryOperation } from '../../actions/keyValueStore/types';
+import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from '../../actions/keyValueStore/types';
 import { KeyValueStoreQPQConfigSetting, QPQConfig } from '../../config';
 import { getKeyValueStoreByName } from '../../qpqCoreUtils';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import {
+  validateKvsItemForScopeOrThrow,
   validateKvsKeyConditionForScopeOrThrow,
   validateKvsPkValueForScopeOrThrow,
+  validateKvsUpdatesForScopeOrThrow,
   validateScopeSupportedForPartitionKeyType,
 } from './kvsScopeRules';
 import { KvsStoreNotFoundError } from './KvsStoreNotFoundError';
@@ -100,8 +102,16 @@ export const validateScopedKvsItemOrThrow = (
   scope: string | undefined,
   item: Record<string, any>,
 ): void => {
-  const storeConfig = resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope);
-  validateKvsPkValueForScopeOrThrow(storeConfig, scope, (item ?? {})[storeConfig.partitionKey.key]);
+  validateKvsItemForScopeOrThrow(resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope), scope, item ?? {});
+};
+
+export const validateScopedKvsUpdatesOrThrow = (
+  qpqConfig: QPQConfig,
+  keyValueStoreName: string,
+  scope: string | undefined,
+  updates: KvsUpdate,
+): void => {
+  validateKvsUpdatesForScopeOrThrow(resolveScopedKvsStoreOrThrow(qpqConfig, keyValueStoreName, scope), scope, updates);
 };
 
 export const validateScopedKvsKeyConditionOrThrow = (

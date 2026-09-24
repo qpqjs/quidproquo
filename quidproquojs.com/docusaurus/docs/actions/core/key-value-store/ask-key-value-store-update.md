@@ -101,7 +101,7 @@ Each `path` is a `KvsAttributePath` — either a top-level attribute name (`'bal
 | --- | --- |
 | `KeyValueStoreUpdateErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreUpdateErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreUpdateErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or the partition-key value contains the reserved `@@QPQSCOPE@@` delimiter (reserved on string-pk stores, so unscoped calls reject it too). |
+| `KeyValueStoreUpdateErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, the partition-key value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped calls reject it too), a scoped update names an attribute containing `@@QPQ`, or a scoped update targets an [index](../../../config/core/key-value-store.md#indexes-gsis) partition key with anything other than a whole-value `Set`/`SetIfNotExists`/`Remove` of the declared type (`Increment`, `Add`, `Delete`, and nested paths are refused). |
 | `KeyValueStoreUpdateErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.

@@ -60,6 +60,16 @@ describe('defineKeyValueStore', () => {
     ]);
   });
 
+  it('refuses a binary index partition key on a scoped store', () => {
+    type Row = { id: string; blob: string };
+    const indexes = [{ partitionKey: kvsKey<Row>('blob', 'binary') }];
+
+    expect(() => defineKeyValueStore<Row>('scoped', 'id', [], { scoped: true, indexes })).toThrow(
+      "Key value store 'scoped' is scoped, so its index partition keys must be strings or numbers",
+    );
+    expect(() => defineKeyValueStore<Row>('open', 'id', [], { indexes })).not.toThrow();
+  });
+
   it('passes ttlAttribute through', () => {
     expect(defineKeyValueStore('Users', 'id', [], { ttlAttribute: 'expiresAt' }).ttlAttribute).toBe('expiresAt');
   });

@@ -70,7 +70,7 @@ When `nextPageKey` is set, pass it back as the third argument to fetch the next 
 | --- | --- |
 | `KeyValueStoreScanErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreScanErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreScanErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `@@QPQSCOPE@@` delimiter. |
+| `KeyValueStoreScanErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, a scoped call's partition-key value contains the reserved `@@QPQ` marker, a scoped call's `filterCondition` names an attribute containing `@@QPQ`, or a scoped `filterCondition`'s partition-key comparison uses an operator that cannot be scoped. |
 | `KeyValueStoreScanErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.

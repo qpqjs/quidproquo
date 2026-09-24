@@ -12,7 +12,7 @@ import { DynamoDBRecord } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { convertDynamoMapToObject } from '../../../../../logic/dynamo/convertDynamoMapToObject';
-import { decomposeScopedKvsValue } from '../../../../../logic/dynamo/scope';
+import { decomposeScopedKvsValue, stripScopedKvsIndexAttributes } from '../../../../../logic/dynamo/scope';
 import { EventInput, GLOBAL_KVS_STREAM_COALESCE, GLOBAL_KVS_STREAM_PARTITION_KEY, GLOBAL_KVS_STREAM_STORE_NAME, InternalEventRecord } from './types';
 
 // aws-lambda types the stream images with its own AttributeValue shape; the marshaller is
@@ -38,10 +38,20 @@ const toEventType = (eventName: DynamoDBRecord['eventName']): KvsStreamEventType
   }
 };
 
-// Put the raw partition key back on an image, so nothing downstream ever sees the composed
-// form. Mirrors what the scoped translator's `strip` does for an ordinary read.
-const stripScope = (image: Record<string, unknown> | undefined, rawPartitionKey: string): Record<string, unknown> | undefined =>
-  image && GLOBAL_KVS_STREAM_PARTITION_KEY ? { ...image, [GLOBAL_KVS_STREAM_PARTITION_KEY]: rawPartitionKey } : image;
+// Put the raw partition key back on an image and drop a scoped row's hidden index copies, so
+// nothing downstream ever sees the stored form. Mirrors the scoped translator's `strip`.
+const stripScope = (
+  image: Record<string, unknown> | undefined,
+  rawPartitionKey: string,
+  scope: string | undefined,
+): Record<string, unknown> | undefined => {
+  if (!image || !GLOBAL_KVS_STREAM_PARTITION_KEY) {
+    return image;
+  }
+
+  const rawImage = { ...image, [GLOBAL_KVS_STREAM_PARTITION_KEY]: rawPartitionKey };
+  return scope === undefined ? rawImage : stripScopedKvsIndexAttributes(rawImage);
+};
 
 const toInternalRecord = (record: DynamoDBRecord): InternalEventRecord => {
   const keys = toObject(record.dynamodb?.Keys) ?? {};
@@ -56,8 +66,8 @@ const toInternalRecord = (record: DynamoDBRecord): InternalEventRecord => {
     eventType: toEventType(record.eventName),
     scope,
     keys: GLOBAL_KVS_STREAM_PARTITION_KEY ? { ...keys, [GLOBAL_KVS_STREAM_PARTITION_KEY]: rawValue } : keys,
-    newImage: stripScope(toObject(record.dynamodb?.NewImage), rawValue),
-    oldImage: stripScope(toObject(record.dynamodb?.OldImage), rawValue),
+    newImage: stripScope(toObject(record.dynamodb?.NewImage), rawValue, scope),
+    oldImage: stripScope(toObject(record.dynamodb?.OldImage), rawValue, scope),
   };
 };
 

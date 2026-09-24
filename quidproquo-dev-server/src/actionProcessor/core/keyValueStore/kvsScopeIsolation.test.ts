@@ -4,6 +4,7 @@ import {
   isErroredActionResult,
   KeyValueStoreActionType,
   KvsQueryOperationType,
+  KvsUpdateActionType,
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
@@ -22,6 +23,7 @@ import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionP
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
+import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
 // End-to-end scope isolation through the real sqlite repository: an item
@@ -40,6 +42,7 @@ describe('KVS scope isolation', () => {
     buildTestQpqConfig(
       [
         defineKeyValueStore('widgets', { key: 'id', type: 'string' }, [], { scoped: true }),
+        defineKeyValueStore('gadgets', { key: 'id', type: 'string' }, [], { scoped: true, indexes: ['category'] }),
         defineKeyValueStore('counters', { key: 'seq', type: 'number' }, [], { scoped: true }),
         defineKeyValueStore('globals', { key: 'id', type: 'string' }),
       ],
@@ -56,6 +59,7 @@ describe('KVS scope isolation', () => {
       query: (await getKeyValueStoreQueryActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Query],
       scan: (await getKeyValueStoreScanActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Scan],
       remove: (await getKeyValueStoreDeleteActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Delete],
+      update: (await getKeyValueStoreUpdateActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Update],
     };
   };
 
@@ -165,6 +169,47 @@ describe('KVS scope isolation', () => {
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toContain('InvalidScope');
+  });
+
+  it('serves a scoped query on a GSI partition key from its own scope only, storing rows raw', async () => {
+    const { upsert, query } = await getProcessors();
+
+    await invokeProcessor(upsert, { keyValueStoreName: 'gadgets', item: { id: 'g1', category: 'tools' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert, { keyValueStoreName: 'gadgets', item: { id: 'g2', category: 'tools' }, options: { scope: 'tenant-b' } });
+
+    const result = await invokeProcessor(query, {
+      keyValueStoreName: 'gadgets',
+      keyCondition: { key: 'category', operation: KvsQueryOperationType.Equal, valueA: 'tools' },
+      options: { scope: 'tenant-a' },
+    });
+
+    expect(resolveActionResult(result).items).toEqual([{ id: 'g1', category: 'tools' }]);
+  });
+
+  it('rejects the scoped GSI operations dynamo cannot serve (aws parity)', async () => {
+    const { upsert, query, update } = await getProcessors();
+
+    const rangeOnIndexKey = await invokeProcessor(query, {
+      keyValueStoreName: 'gadgets',
+      keyCondition: { key: 'category', operation: KvsQueryOperationType.BeginsWith, valueA: 'to' },
+      options: { scope: 'tenant-a' },
+    });
+    expect(resolveActionResultError(rangeOnIndexKey).errorType).toContain('InvalidScope');
+
+    const plantedCopy = await invokeProcessor(upsert, {
+      keyValueStoreName: 'gadgets',
+      item: { id: 'g1', '@@QPQGSI_category@@': 'tenant-b@@QPQSCOPE@@tools' },
+      options: { scope: 'tenant-a' },
+    });
+    expect(resolveActionResultError(plantedCopy).errorType).toContain('InvalidScope');
+
+    const addToIndexKey = await invokeProcessor(update, {
+      keyValueStoreName: 'gadgets',
+      key: 'g1',
+      updates: [{ attributePath: 'category', action: KvsUpdateActionType.Add, value: 'x' }],
+      options: { scope: 'tenant-a' },
+    });
+    expect(resolveActionResultError(addToIndexKey).errorType).toContain('InvalidScope');
   });
 
   it('restricts scans to the scope and strips returned items', async () => {

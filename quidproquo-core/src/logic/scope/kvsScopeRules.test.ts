@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { KvsLogicalOperatorType, KvsQueryOperationType } from '../../actions/keyValueStore/types';
+import { KvsLogicalOperatorType, KvsQueryOperationType, KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { defineKeyValueStore, kvsKey } from '../../config';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import {
+  getScopedKvsIndexPartitionKeys,
   validateKvsFilterForScopeOrThrow,
+  validateKvsItemForScopeOrThrow,
   validateKvsKeyConditionForScopeOrThrow,
   validateKvsPkValueForScopeOrThrow,
+  validateKvsUpdatesForScopeOrThrow,
   validateUnscopedPkConditionValuesOrThrow,
 } from './kvsScopeRules';
 
@@ -23,6 +26,34 @@ const expectInvalidScope = (fn: () => unknown, code: InvalidScopeErrorCode) => {
 const stringStore = defineKeyValueStore('stringStore', 'id');
 const numberStore = defineKeyValueStore('numberStore', kvsKey('seq', 'number'));
 const scopedStore = defineKeyValueStore('scopedStore', 'id', [], { scoped: true });
+
+type Order = { id: string; createdAt: string; updatedAt: string; customerId: string; level: number; score: number };
+
+// A string and a number GSI partition key, plus one sharing the table pk (no per-scope copy needed).
+const ordersStore = defineKeyValueStore<Order>('orders', 'id', [], {
+  scoped: true,
+  indexes: [
+    { partitionKey: 'customerId', sortKey: 'createdAt' },
+    { partitionKey: kvsKey('level', 'number'), sortKey: kvsKey('score', 'number') },
+    { partitionKey: 'id', sortKey: 'updatedAt' },
+  ],
+});
+
+describe('getScopedKvsIndexPartitionKeys', () => {
+  it('lists each scoped GSI partition key once, leaving out the table pk', () => {
+    const store = defineKeyValueStore<Order>('shared', 'id', [], {
+      scoped: true,
+      indexes: [{ partitionKey: 'customerId', sortKey: 'createdAt' }, { partitionKey: 'customerId', sortKey: 'updatedAt' }, 'id'],
+    });
+
+    expect(getScopedKvsIndexPartitionKeys(store)).toEqual([{ key: 'customerId', type: 'string' }]);
+    expect(getScopedKvsIndexPartitionKeys(ordersStore).map((key) => key.key)).toEqual(['customerId', 'level']);
+  });
+
+  it('is empty on an unscoped store', () => {
+    expect(getScopedKvsIndexPartitionKeys(defineKeyValueStore<Order>('open', 'id', [], { indexes: ['customerId'] }))).toEqual([]);
+  });
+});
 
 describe('validateKvsPkValueForScopeOrThrow', () => {
   it('passes clean values, including ones containing "::" (correlation ids)', () => {
@@ -43,8 +74,42 @@ describe('validateKvsPkValueForScopeOrThrow', () => {
     );
   });
 
+  it('reserves the whole @@QPQ marker, not just the scope delimiter', () => {
+    expectInvalidScope(() => validateKvsPkValueForScopeOrThrow(stringStore, undefined, 'a@@QPQb'), InvalidScopeErrorCode.reservedDelimiter);
+  });
+
   it('leaves an unscoped number-pk store unchecked', () => {
     expect(() => validateKvsPkValueForScopeOrThrow(numberStore, undefined, 'acme@@QPQSCOPE@@secret')).not.toThrow();
+  });
+});
+
+describe('validateKvsItemForScopeOrThrow', () => {
+  it('passes a scoped item with correctly typed index keys, and one that leaves an index key out', () => {
+    expect(() => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 'o-1', customerId: 'c-9', level: 3 })).not.toThrow();
+    expect(() => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 'o-1', level: null })).not.toThrow();
+  });
+
+  it('rejects an attribute name carrying the reserved marker on a scoped store only', () => {
+    const item = { id: 'o-1', '@@QPQGSI_customerId@@': 'scope-b@@QPQSCOPE@@c-9' };
+
+    expectInvalidScope(() => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', item), InvalidScopeErrorCode.reservedAttribute);
+    expect(() => validateKvsItemForScopeOrThrow(stringStore, undefined, item)).not.toThrow();
+  });
+
+  it('rejects an index key value that does not match its declared type', () => {
+    expectInvalidScope(
+      () => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 'o-1', customerId: 9 }),
+      InvalidScopeErrorCode.indexKeyType,
+    );
+    expectInvalidScope(() => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 'o-1', level: '3' }), InvalidScopeErrorCode.indexKeyType);
+    expectInvalidScope(
+      () => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 'o-1', level: Number.NaN }),
+      InvalidScopeErrorCode.indexKeyType,
+    );
+  });
+
+  it('still applies the pk value rule', () => {
+    expectInvalidScope(() => validateKvsItemForScopeOrThrow(ordersStore, 'scope-a', { id: 42 }), InvalidScopeErrorCode.unsafeCharacters);
   });
 });
 
@@ -59,6 +124,46 @@ describe('validateKvsKeyConditionForScopeOrThrow', () => {
     expectInvalidScope(
       () => validateKvsKeyConditionForScopeOrThrow(scopedStore, 'scope-a', { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' }),
       InvalidScopeErrorCode.queryMissingPartitionKey,
+    );
+  });
+
+  it('passes a scoped query on an index partition key with equality, sort key conditions untouched', () => {
+    const keyCondition = {
+      operation: KvsLogicalOperatorType.And,
+      conditions: [
+        { key: 'level', operation: KvsQueryOperationType.Equal, valueA: 3 },
+        { key: 'score', operation: KvsQueryOperationType.GreaterThan, valueA: 500 },
+      ],
+    };
+
+    expect(() => validateKvsKeyConditionForScopeOrThrow(ordersStore, 'scope-a', keyCondition)).not.toThrow();
+  });
+
+  it('rejects anything but equality on a scoped index partition key, and a mistyped value', () => {
+    expectInvalidScope(
+      () =>
+        validateKvsKeyConditionForScopeOrThrow(ordersStore, 'scope-a', {
+          key: 'customerId',
+          operation: KvsQueryOperationType.BeginsWith,
+          valueA: 'c-',
+        }),
+      InvalidScopeErrorCode.unsupportedOperation,
+    );
+    expectInvalidScope(
+      () => validateKvsKeyConditionForScopeOrThrow(ordersStore, 'scope-a', { key: 'level', operation: KvsQueryOperationType.Equal, valueA: '3' }),
+      InvalidScopeErrorCode.indexKeyType,
+    );
+  });
+
+  it('rejects a scoped key condition naming a reserved-marker attribute', () => {
+    expectInvalidScope(
+      () =>
+        validateKvsKeyConditionForScopeOrThrow(ordersStore, 'scope-a', {
+          key: '@@QPQGSI_customerId@@',
+          operation: KvsQueryOperationType.Equal,
+          valueA: 'scope-b@@QPQSCOPE@@c-9',
+        }),
+      InvalidScopeErrorCode.reservedAttribute,
     );
   });
 
@@ -104,11 +209,72 @@ describe('validateKvsFilterForScopeOrThrow', () => {
     );
   });
 
+  it('rejects a scoped filter naming a reserved-marker attribute', () => {
+    expectInvalidScope(
+      () => validateKvsFilterForScopeOrThrow(ordersStore, 'scope-a', { key: '@@QPQGSI_customerId@@', operation: KvsQueryOperationType.Exists }),
+      InvalidScopeErrorCode.reservedAttribute,
+    );
+  });
+
   it('leaves unscoped and absent filters unchecked', () => {
     expect(() =>
       validateKvsFilterForScopeOrThrow(stringStore, undefined, { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme@@QPQSCOPE@@x' }),
     ).not.toThrow();
     expect(() => validateKvsFilterForScopeOrThrow(scopedStore, 'scope-a', undefined)).not.toThrow();
+  });
+});
+
+describe('validateKvsUpdatesForScopeOrThrow', () => {
+  it('passes Set, SetIfNotExists and Remove on scoped index keys, and anything on other attributes', () => {
+    expect(() =>
+      validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [
+        { attributePath: 'customerId', action: KvsUpdateActionType.Set, value: 'c-2' },
+        { attributePath: ['level'], action: KvsUpdateActionType.SetIfNotExists, value: 4 },
+        { attributePath: 'customerId', action: KvsUpdateActionType.Remove },
+        { attributePath: 'score', action: KvsUpdateActionType.Increment, value: 1, defaultValue: 0 },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('rejects updates to a scoped index key whose result is not known up front', () => {
+    expectInvalidScope(
+      () =>
+        validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [
+          { attributePath: 'level', action: KvsUpdateActionType.Increment, value: 1, defaultValue: 0 },
+        ]),
+      InvalidScopeErrorCode.unsupportedOperation,
+    );
+    expectInvalidScope(
+      () => validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [{ attributePath: 'level', action: KvsUpdateActionType.Add, value: 1 }]),
+      InvalidScopeErrorCode.unsupportedOperation,
+    );
+    expectInvalidScope(
+      () =>
+        validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [
+          { attributePath: ['customerId', 'part'], action: KvsUpdateActionType.Set, value: 'x' },
+        ]),
+      InvalidScopeErrorCode.unsupportedOperation,
+    );
+  });
+
+  it('rejects a mistyped index key value and a reserved-marker path', () => {
+    expectInvalidScope(
+      () => validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [{ attributePath: 'level', action: KvsUpdateActionType.Set, value: '4' }]),
+      InvalidScopeErrorCode.indexKeyType,
+    );
+    expectInvalidScope(
+      () =>
+        validateKvsUpdatesForScopeOrThrow(ordersStore, 'scope-a', [
+          { attributePath: ['@@QPQGSI_customerId@@'], action: KvsUpdateActionType.Set, value: 'x' },
+        ]),
+      InvalidScopeErrorCode.reservedAttribute,
+    );
+  });
+
+  it('leaves unscoped updates unchecked', () => {
+    expect(() =>
+      validateKvsUpdatesForScopeOrThrow(stringStore, undefined, [{ attributePath: '@@QPQGSI_x@@', action: KvsUpdateActionType.Increment, value: 1 }]),
+    ).not.toThrow();
   });
 });
 

@@ -15,8 +15,10 @@ import { askSmokePollForMarker } from '../askSmokePollForMarker';
 
 // The kvs stream path end to end on a scoped store: an upsert streams an
 // Insert and a delete streams a Remove to the handler. On dynamo the scope is
-// composed into the stored partition key, so the record must hand it back as
-// its own field with the key stripped, the same as the dev server does.
+// composed into the stored partition key and into a hidden copy of the
+// category GSI key, so the record must hand the scope back as its own field
+// with the key stripped and the hidden copy dropped, the same as the dev
+// server does.
 export function* askRunKeyValueStoreStreamTest(): AskResponse<void> {
   const probeId = yield* askNewGuid();
   const scope = `smoke-st-${probeId}`;
@@ -43,6 +45,13 @@ export function* askRunKeyValueStoreStreamTest(): AskResponse<void> {
   yield* askSmokeAssert(
     inserted.path === probeId,
     `stream insert key [${inserted.path}] was not the raw key`
+  );
+  yield* askSmokeAssert(
+    !!inserted.imageAttributes?.includes('category') &&
+      inserted.imageAttributes.every(
+        (attribute) => !attribute.includes('@@QPQ')
+      ),
+    `stream insert image attributes [${inserted.imageAttributes}] missed category or leaked a reserved @@QPQ attribute`
   );
 
   yield* askKeyValueStoreDelete(SMOKE_STREAM_PROBE_STORE, probeId, undefined, {

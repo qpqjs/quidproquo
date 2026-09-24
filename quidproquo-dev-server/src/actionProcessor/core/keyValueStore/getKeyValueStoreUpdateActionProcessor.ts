@@ -9,6 +9,7 @@ import {
   ProcessorFor,
   QPQConfig,
   validateScopedKvsKeyOrThrow,
+  validateScopedKvsUpdatesOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
@@ -27,10 +28,12 @@ const getProcessKeyValueStoreUpdate = (
 
       // The sqlite engine partitions per-scope at the ROW level (a scope
       // column in the primary key), so keys and items stay raw - the scope
-      // just selects which rows the store updates. The key is still validated
-      // for AWS parity: a key prod rejects (bad scope, or the reserved scope
-      // delimiter in the raw value) must fail locally too.
+      // just selects which rows the store updates. The key and updates are still
+      // validated for AWS parity: a key prod rejects (bad scope, or the reserved
+      // marker in the raw value), or an update it can't mirror onto a scoped
+      // GSI key, must fail locally too.
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
+      validateScopedKvsUpdatesOrThrow(qpqConfig, keyValueStoreName, scope, updates);
 
       const result = await repository.update(keyValueStoreName, String(key), sortKey ? String(sortKey) : undefined, updates, scope);
 

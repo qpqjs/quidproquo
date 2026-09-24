@@ -5,7 +5,7 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanAllScopesBase,
   createActionProcessor,
-  KeyValueStoreActionType,
+  KeyValueStoreQPQConfigSetting,
   KvsScopedItem,
   ProcessorFor,
   QPQConfig,
@@ -14,7 +14,23 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
-import { decomposeScopedKvsValue } from '../../../logic/dynamo/scope';
+import { decomposeScopedKvsValue, stripScopedKvsIndexAttributes } from '../../../logic/dynamo/scope';
+
+// Split a stored row into the scope it lives under and the item a scoped read would return. Only a
+// string pk can carry a composed scope; anything else is unscoped by construction. A scoped row's
+// hidden index copies are dropped too, so a caller re-writing it under another scope can't carry
+// the old scope's copies across.
+const toKvsScopedItem = (storeConfig: KeyValueStoreQPQConfigSetting, item: Record<string, any>): KvsScopedItem<any> => {
+  if (storeConfig.partitionKey.type !== 'string') {
+    return { item };
+  }
+
+  const partitionKey = storeConfig.partitionKey.key;
+  const { scope, rawValue } = decomposeScopedKvsValue(String(item[partitionKey] ?? ''));
+  const rawItem = { ...item, [partitionKey]: rawValue };
+
+  return { scope, item: scope === undefined ? rawItem : stripScopedKvsIndexAttributes(rawItem) };
+};
 
 // Every row in the table, scope and all. No scoped translator is involved: that is the whole
 // point, and it is why this action is migration-only (see askKeyValueStoreScanAllScopes).
@@ -29,21 +45,9 @@ const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): ProcessorFo
 
     try {
       const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
-      const partitionKey = storeConfig.partitionKey.key;
 
       const page = await scan<any>(dynamoTableName, region, filterCondition, nextPageKey);
-
-      const items: KvsScopedItem<any>[] = page.items.map((item: any) => {
-        // Only a string partition key can carry a composed scope; anything else is unscoped
-        // by construction.
-        if (storeConfig.partitionKey.type !== 'string') {
-          return { item };
-        }
-
-        const { scope, rawValue } = decomposeScopedKvsValue(String(item[partitionKey] ?? ''));
-
-        return { scope, item: { ...item, [partitionKey]: rawValue } };
-      });
+      const items = page.items.map((item: Record<string, any>) => toKvsScopedItem(storeConfig, item));
 
       return actionResult({ items, nextPageKey: page.nextPageKey });
     } catch (error: unknown) {
