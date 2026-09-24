@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { KvsQueryOperationType } from '../../actions/keyValueStore/types';
+import { KvsQueryOperationType, KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { defineKeyValueStore, kvsKey } from '../../config';
 import { buildTestQpqConfig } from '../../testing';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
@@ -12,6 +12,7 @@ import {
   validateScopedKvsItemOrThrow,
   validateScopedKvsKeyConditionOrThrow,
   validateScopedKvsKeyOrThrow,
+  validateScopedKvsUpdatesOrThrow,
 } from './kvsScopeGate';
 import { KvsStoreNotFoundError } from './KvsStoreNotFoundError';
 
@@ -144,6 +145,27 @@ describe('validateScopedKvsKeyConditionOrThrow', () => {
       () => validateScopedKvsKeyConditionOrThrow(qpqConfig, 'stringStore', undefined, pkEquals('acme@@QPQSCOPE@@secret')),
       InvalidScopeErrorCode.reservedDelimiter,
     );
+  });
+});
+
+describe('validateScopedKvsUpdatesOrThrow', () => {
+  const indexedConfig = buildTestQpqConfig([
+    defineKeyValueStore<{ id: string; customerId: string }>('indexedStore', 'id', [], { scoped: true, indexes: ['customerId'] }),
+  ]);
+
+  it('passes updates a scoped index key can take and refuses the rest', () => {
+    const setCustomer = [{ attributePath: 'customerId', action: KvsUpdateActionType.Set, value: 'c-2' }];
+    const deleteCustomer = [{ attributePath: 'customerId', action: KvsUpdateActionType.Delete, value: 'c-2' }];
+
+    expect(() => validateScopedKvsUpdatesOrThrow(indexedConfig, 'indexedStore', 'scope-a', setCustomer)).not.toThrow();
+    expectInvalidScope(
+      () => validateScopedKvsUpdatesOrThrow(indexedConfig, 'indexedStore', 'scope-a', deleteCustomer),
+      InvalidScopeErrorCode.unsupportedOperation,
+    );
+  });
+
+  it('enforces the scope requirement', () => {
+    expectInvalidScope(() => validateScopedKvsUpdatesOrThrow(indexedConfig, 'indexedStore', undefined, []), InvalidScopeErrorCode.scopeRequired);
   });
 });
 

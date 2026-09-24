@@ -55,7 +55,7 @@ function* askKeyValueStoreGetAll<Value>(
 | --- | --- |
 | `KeyValueStoreGetAllErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreGetAllErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreGetAllErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `@@QPQSCOPE@@` delimiter. |
+| `KeyValueStoreGetAllErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `@@QPQ` marker. |
 | `KeyValueStoreGetAllErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.

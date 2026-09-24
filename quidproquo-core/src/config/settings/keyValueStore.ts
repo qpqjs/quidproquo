@@ -153,27 +153,38 @@ export const defineKeyValueStore = <T extends object = any>(
   sortKeys: CompositeKvsKey<T>[] = [],
 
   options?: QPQConfigAdvancedKeyValueStoreSettings<T>,
-): KeyValueStoreQPQConfigSetting<T> => ({
-  configSettingType: QPQCoreConfigSettingType.keyValueStore,
-  uniqueKey: keyValueStoreName,
+): KeyValueStoreQPQConfigSetting<T> => {
+  const tablePartitionKey = convertCompositeKvsKeyToKvsKey<T>(partitionKey);
+  const indexes = (options?.indexes ?? []).map(convertCompositeKvsIndexToKvsIndex<T>);
 
-  keyValueStoreName,
+  // A scoped store's GSIs are partitioned per scope, which every backend can do
+  // for a string or number key but not a binary one.
+  if (options?.scoped && indexes.some((index) => index.partitionKey.type === 'binary' && index.partitionKey.key !== tablePartitionKey.key)) {
+    throw new Error(`Key value store '${keyValueStoreName}' is scoped, so its index partition keys must be strings or numbers`);
+  }
 
-  partitionKey: convertCompositeKvsKeyToKvsKey<T>(partitionKey),
-  sortKeys: sortKeys.map(convertCompositeKvsKeyToKvsKey<T>),
+  return {
+    configSettingType: QPQCoreConfigSettingType.keyValueStore,
+    uniqueKey: keyValueStoreName,
 
-  indexes: (options?.indexes ?? []).map(convertCompositeKvsIndexToKvsIndex<T>),
+    keyValueStoreName,
 
-  global: options?.global ?? false,
+    partitionKey: tablePartitionKey,
+    sortKeys: sortKeys.map(convertCompositeKvsKeyToKvsKey<T>),
 
-  owner: options?.owner,
+    indexes,
 
-  ttlAttribute: options?.ttlAttribute,
+    global: options?.global ?? false,
 
-  disablePointInTimeRecovery: options?.disablePointInTimeRecovery ?? false,
+    owner: options?.owner,
 
-  cryptoKeyName: options?.cryptoKeyName,
-  scoped: options?.scoped ?? false,
+    ttlAttribute: options?.ttlAttribute,
 
-  onStream: options?.onStream,
-});
+    disablePointInTimeRecovery: options?.disablePointInTimeRecovery ?? false,
+
+    cryptoKeyName: options?.cryptoKeyName,
+    scoped: options?.scoped ?? false,
+
+    onStream: options?.onStream,
+  };
+};

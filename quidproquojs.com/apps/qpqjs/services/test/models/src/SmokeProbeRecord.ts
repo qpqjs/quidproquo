@@ -12,6 +12,9 @@ export type SmokeProbeRecord = {
   scope?: string;
   ambientScope?: string;
   path?: string;
+  // Set by the kvs stream handler: the attribute names on the record's image,
+  // so a test can prove no backend bookkeeping attribute reaches a handler.
+  imageAttributes?: string[];
   // Set by the email handler: the provider's spf/dkim verdicts on the message.
   authentication?: string;
 };

@@ -27,7 +27,7 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): ProcessorFor<typeo
       const item = await updateItem(
         dynamoTableName,
         region,
-        updates,
+        scoped.update(updates),
         storeConfig.partitionKey.key,
         scoped.key(key),
         storeConfig.sortKeys[0]?.key,

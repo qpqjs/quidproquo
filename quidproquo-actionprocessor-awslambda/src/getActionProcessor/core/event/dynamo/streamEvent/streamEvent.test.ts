@@ -43,6 +43,17 @@ describe('dynamo/streamEvent getEventGetRecordsActionProcessor', () => {
     expect(record.eventType).toBe(KvsStreamEventType.Insert);
   });
 
+  it("drops a scoped row's hidden index copies from its images", async () => {
+    const [record] = await getRecords([
+      buildStreamRecord('INSERT', `tenant-a${SCOPE_DELIMITER}doc-1`, '0001', {
+        category: { S: 'books' },
+        '@@QPQGSI_category@@': { S: `tenant-a${SCOPE_DELIMITER}books` },
+      }),
+    ]);
+
+    expect(record.newImage).toEqual({ pk: 'doc-1', sk: '0001', category: 'books' });
+  });
+
   it('leaves an unscoped row alone', async () => {
     const [record] = await getRecords([buildStreamRecord('MODIFY', 'doc-1', '0001')]);
 

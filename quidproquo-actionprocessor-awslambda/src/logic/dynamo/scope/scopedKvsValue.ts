@@ -1,11 +1,11 @@
-import { KvsCoreDataType, KvsQueryCondition, KvsQueryOperationType } from 'quidproquo-core';
+import { KVS_RESERVED_MARKER, KvsCoreDataType, KvsQueryCondition, KvsQueryOperationType } from 'quidproquo-core';
 
-// Separates the scope from the raw key in a stored partition key value. It must
-// contain core's KVS_RESERVED_MARKER, which caller pk values can never carry, so
-// no raw value can forge it. '::' is unusable: it is qpq's own function-runtime
-// separator ('src/path::method') and appears inside correlation ids, which the
-// log service stores as partition keys.
-export const KVS_SCOPE_DELIMITER = '@@QPQSCOPE@@';
+// Separates the scope from the raw key in a stored partition key value
+// ('@@QPQSCOPE@@'). Built on core's KVS_RESERVED_MARKER, which caller pk values
+// can never carry, so no raw value can forge it. '::' is unusable: it is qpq's
+// own function-runtime separator ('src/path::method') and appears inside
+// correlation ids, which the log service stores as partition keys.
+export const KVS_SCOPE_DELIMITER = `${KVS_RESERVED_MARKER}SCOPE@@`;
 
 // Compose a scope into a partition key value: `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`.
 // Callers validate both first with core's kvs scope rules; the translator does.

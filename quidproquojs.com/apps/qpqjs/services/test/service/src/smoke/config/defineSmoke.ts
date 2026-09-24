@@ -133,12 +133,14 @@ export const defineSmoke = (): QPQConfig => {
 
     // Kvs stream test path: a change on this scoped store streams to the
     // handler, which writes a marker into the probe store; the test polls for
-    // it. The record must carry the scope as its own field with a raw key.
+    // it. The record must carry the scope as its own field with a raw key, and
+    // the category index's hidden copy must not reach the handler.
     defineKeyValueStore<SmokeProbeRecord>(
       SMOKE_STREAM_PROBE_STORE,
       'probeId',
       [],
       {
+        indexes: ['category'],
         scoped: true,
         onStream: {
           runtime: {

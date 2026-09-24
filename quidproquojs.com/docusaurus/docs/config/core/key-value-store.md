@@ -100,6 +100,12 @@ defineKeyValueStore('orders', 'orderId', [], {
 
 On AWS each index becomes a Global Secondary Index whose name is the index's partition-key attribute (`customerId`, `status` above).
 
+### Indexes on a scoped store
+
+A store with `scoped: true` (see [`scoped`](#options--qpqconfigadvancedkeyvaluestoresettingst-optional)) can still declare `indexes`. On AWS, an index whose partition key isn't the table's partition key is keyed on a hidden `@@QPQGSI_<attribute>@@` attribute holding the scope-composed value; the index keeps its declared name and sort key, and stories never see the hidden attribute. A scoped store's index partition key must be a `'string'` or `'number'` key, since a scope can't be composed onto a `'binary'` key — `defineKeyValueStore` throws at config time otherwise.
+
+Adding or removing an index on an already-deployed scoped store needs two deploys: remove the index and deploy, then re-add it and deploy. CloudFormation can't change a GSI's key schema in place, and rows written before the new index exists only appear in it once they're rewritten.
+
 ## Change data capture (`onStream`)
 
 ```typescript

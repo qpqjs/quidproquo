@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineQueue, defineUserDirectory, QPQConfig } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, defineQueue, defineUserDirectory, kvsKey, QPQConfig } from 'quidproquo-core';
 import { defineWebsocket } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -26,6 +26,7 @@ import {
   getGlobalQpqRuntimeResourceName,
   getInfStackName,
   getKvsDynamoTableNameFromConfig,
+  getKvsIndexPartitionKey,
   getQpqRuntimeResourceName,
   getQpqRuntimeResourceNameFromConfig,
   getQueueRuntimeResourceNameFromConfig,
@@ -248,5 +249,27 @@ describe('stack names', () => {
 
   it('builds the feature domain stack name', () => {
     expect(getDomainStackName(buildTestQpqConfig([], { feature: 'beta' }))).toBe('test-app-development-beta-domain');
+  });
+});
+
+describe('getKvsIndexPartitionKey', () => {
+  type Order = { id: string; updatedAt: string; level: number; score: number };
+
+  const scopedStore = defineKeyValueStore<Order>('orders', 'id', [], {
+    scoped: true,
+    indexes: [
+      { partitionKey: kvsKey('level', 'number'), sortKey: kvsKey('score', 'number') },
+      { partitionKey: 'id', sortKey: 'updatedAt' },
+    ],
+  });
+  const openStore = defineKeyValueStore<Order>('open', 'id', [], { indexes: [{ partitionKey: kvsKey('level', 'number') }] });
+
+  it("keys a scoped store's GSI on the hidden string copy of its partition key", () => {
+    expect(getKvsIndexPartitionKey(scopedStore, scopedStore.indexes[0])).toEqual({ key: '@@QPQGSI_level@@', type: 'string' });
+  });
+
+  it('keeps the declared key for an index sharing the table pk, and on an unscoped store', () => {
+    expect(getKvsIndexPartitionKey(scopedStore, scopedStore.indexes[1])).toEqual({ key: 'id', type: 'string' });
+    expect(getKvsIndexPartitionKey(openStore, openStore.indexes[0])).toEqual({ key: 'level', type: 'number' });
   });
 });

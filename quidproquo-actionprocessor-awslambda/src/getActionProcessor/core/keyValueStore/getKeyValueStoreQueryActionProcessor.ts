@@ -24,18 +24,20 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof
     try {
       const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
 
-      // Scope lives inside the pk values, so pk conditions are rewritten to the
-      // composed form (throws when the key condition never constrains the pk).
+      // Scope lives inside the stored key values (the pk, and a scoped GSI's hidden
+      // partition key copy), so key conditions are rewritten to the composed form.
+      // The index is picked from the caller's condition: the rewrite renames a scoped
+      // GSI's partition key, but the index keeps its declared name.
       const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
-      const effectiveKeyCondition = scoped.keyCondition(keyCondition);
+      const indexName = getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition) ?? undefined;
 
       const items = await query<any>(
         dynamoTableName,
         region,
-        effectiveKeyCondition,
+        scoped.keyCondition(keyCondition, indexName),
         scoped.filter(options?.filter),
         options?.nextPageKey,
-        getDynamoTableIndexByConfigAndQuery(storeConfig, effectiveKeyCondition) ?? undefined,
+        indexName,
         options?.limit,
         options?.sortAscending,
         options?.consistentRead,

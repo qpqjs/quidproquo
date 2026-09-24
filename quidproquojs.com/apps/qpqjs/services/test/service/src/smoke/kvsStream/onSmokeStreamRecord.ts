@@ -11,9 +11,10 @@ import { SmokeProbeRecord } from '@qpqjs/test-models';
 import { smokeStreamMarkerId } from './smokeStreamMarkerId';
 
 // Fan-in for the kvs stream test: the scoped stream store's changes land
-// here. The marker records the scope the record carried and the raw key, so
-// the test can check the stream hands back the scope as its own field with
-// the key stripped of it.
+// here. The marker records the scope the record carried, the raw key and the
+// image's attribute names, so the test can check the stream hands back the
+// scope as its own field, the key stripped of it, and none of the store's
+// hidden index attributes.
 export function* onSmokeStreamRecord(
   record: KvsStreamRecord<SmokeProbeRecord>
 ): AskResponse<KvsStreamEventResponse> {
@@ -25,6 +26,7 @@ export function* onSmokeStreamRecord(
     value: 1,
     scope: record.scope,
     path: key,
+    imageAttributes: Object.keys(record.newImage ?? record.oldImage ?? {}),
   };
 
   yield* askKeyValueStoreUpsert<SmokeProbeRecord>(SMOKE_PROBE_STORE, marker);
