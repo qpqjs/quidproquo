@@ -1,4 +1,5 @@
 import { QpqPlatformDriver } from '../types';
+import { getDockerPlatformSettings } from './getDockerPlatformSettings';
 import { dockerGo } from './go';
 
 const publishNotSupported = async (): Promise<void> => {
@@ -7,8 +8,10 @@ const publishNotSupported = async (): Promise<void> => {
 };
 
 export const dockerPlatformDriver: QpqPlatformDriver = {
-  // The docker platform needs no deploy identity — everything runs in-image.
-  prepareDeployment: () => {},
+  // No identity to prime; only the port mappings need checking before the build starts.
+  prepareDeployment: (deploymentName, deployment) => {
+    getDockerPlatformSettings(deploymentName, deployment);
+  },
 
   go: dockerGo,
 
