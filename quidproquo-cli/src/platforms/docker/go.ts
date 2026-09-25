@@ -12,6 +12,8 @@
 //
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
+import { getQpqAppDeployment } from 'quidproquo-config-aws';
+import { QpqDeployEnvVar } from 'quidproquo-core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
 
 import fs from 'fs';
@@ -26,6 +28,7 @@ import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
+import { getDockerPlatformSettings } from './getDockerPlatformSettings';
 
 const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
 
@@ -98,7 +101,14 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   }
 
   const root = getRoot();
-  const imageTag = `qpq-${appName}:${process.env.ENVIRONMENT}`;
+  const deploymentName = process.env[QpqDeployEnvVar.deployName]!;
+  const { portMappings } = getDockerPlatformSettings(deploymentName, getQpqAppDeployment(root, appName, deploymentName));
+
+  // Tagged by the deployment's name, not the app folder, so two products built
+  // from one codebase get separate images and data volumes.
+  const applicationName = process.env[QpqDeployEnvVar.applicationName];
+  const imageTag = `qpq-${applicationName}:${process.env[QpqDeployEnvVar.environment]}`;
+  const volumeName = `qpq-${applicationName}-data`;
 
   // The dev server hosts every service of the app, so per-service/stack
   // selections don't apply — the image is always the whole app.
@@ -160,14 +170,21 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   logTimeEnd('totalTime');
 
+  const sitePort = portMappings.find((mapping) => mapping.container === 8080)?.host;
+  const portFlags = portMappings.map((mapping) => `-p ${mapping.host}:${mapping.container}`).join(' ');
   console.log(`
-Done. Run it with:
+Done. The image is [${imageTag}] in the local docker store.
 
-  docker run --rm -p 80:8080 -p 8080:8080 -p 8888:8888 -p 3001:3001 \\
-    -v qpq-${appName}-data:/app/.qpq-runtime \\
-    ${imageTag}
+Run it here:
 
-Then open http://localhost
-(80 serves the shell; 8080 stays mapped because the app's url resolvers call localhost:8080 for apis)
+  docker run --rm ${portFlags} -v ${volumeName}:/app/.qpq-runtime ${imageTag}
+
+Then open http://localhost${sitePort && sitePort !== 80 ? `:${sitePort}` : ''}
+
+Or export it for another host (Unraid: upload the tarball, map the same ports and the /app/.qpq-runtime volume):
+
+  docker save ${imageTag} | gzip > ${path.join(contextDir, `${imageTag.replace(':', '-')}.tar.gz`)}
+
+(ports come from the deployment's platformSettings.portMappings: ${portMappings.map((m) => `${m.host}:${m.container}`).join(', ')})
 `);
 };
