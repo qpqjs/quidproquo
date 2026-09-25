@@ -8,6 +8,7 @@ import {
   defineDns,
   defineEmailReceivingDomain,
   defineFrontendBundleOptions,
+  getDeploySettingList,
   QPQConfig,
 } from 'quidproquo';
 import {
@@ -26,7 +27,6 @@ import {
 
 import { execSync } from 'child_process';
 import {
-  QPQJS_DOMAINS,
   QPQJS_USER_DIRECTORY,
   QpqjsServiceEnum,
   qpqjsServiceNames,
@@ -61,7 +61,8 @@ export const defineQpqjsService = (
       .trim()}-${new Date().toISOString()}`
   ),
 
-  defineDns(QPQJS_DOMAINS),
+  // Root domains come from the deployment's ROOT_DOMAINS setting, primary first.
+  defineDns(getDeploySettingList('ROOT_DOMAINS')),
   // Same domain bootstrap.qpq.ts declares: bootstrap owns the records, a service's
   // defineEmailReceiver resolves its recipients from it.
   defineEmailReceivingDomain('inbox'),

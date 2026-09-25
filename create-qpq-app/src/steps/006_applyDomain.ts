@@ -1,21 +1,21 @@
 import path from 'path';
 
-import { replaceInFileExact } from '../lib/replaceInFileExact';
+import { readJsonFile } from '../lib/readJsonFile';
+import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
-// The template's domain, replaced where it's authoritative: the app's domain
-// constant (everything else derives from it). One root at scaffold time; more
-// can be appended later.
-const TEMPLATE_DOMAIN = 'todo.quidproquojs.com';
-
+// The domain is a deployment setting (ROOT_DOMAINS, read by every defineDns), so
+// it is set on each generated deployment. One root at scaffold time; more can
+// be appended later, comma separated, primary first.
 export const applyDomain: CreateQpqAppStep = {
   name: 'Applying domain',
 
   run: async ({ targetDirectory, answers }) => {
-    replaceInFileExact(
-      path.join(targetDirectory, 'apps', answers.appName, 'packages', 'constants', 'src', 'domain.ts'),
-      TEMPLATE_DOMAIN,
-      answers.domain,
-    );
+    const deployConfigPath = path.join(targetDirectory, 'apps', answers.appName, 'deploy.config.json');
+    const deployConfig = readJsonFile(deployConfigPath);
+    for (const deployment of Object.values(deployConfig.deployments) as { settings?: Record<string, string> }[]) {
+      deployment.settings = { ...deployment.settings, ROOT_DOMAINS: answers.domain };
+    }
+    writeJsonFile(deployConfigPath, deployConfig);
   },
 };

@@ -5,7 +5,6 @@ export * from './getPositionalArgs';
 export * from './listFilesRecursive';
 export * from './promptSelect';
 export * from './readJsonFile';
-export * from './replaceInFileExact';
 export * from './replaceInFiles';
 export * from './runCommand';
 export * from './writeJsonFile';

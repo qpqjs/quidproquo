@@ -7,6 +7,7 @@ import {
   defineDefaultRouteOptions,
   defineDns,
   defineFrontendBundleOptions,
+  getDeploySettingList,
   QPQConfig,
 } from 'quidproquo';
 import {
@@ -22,7 +23,6 @@ import {
 
 import { execSync } from 'child_process';
 import {
-  TODO_DOMAINS,
   TODO_USER_DIRECTORY,
   TodoServiceEnum,
   todoServiceNames,
@@ -66,7 +66,8 @@ export const defineTodoService = (
 
   defineApplicationVersion(`${getVersionTag()}-${new Date().toISOString()}`),
 
-  defineDns(TODO_DOMAINS),
+  // Root domains come from the deployment's ROOT_DOMAINS setting, primary first.
+  defineDns(getDeploySettingList('ROOT_DOMAINS')),
 
   defineAdminUserDirectory({
     owner: {

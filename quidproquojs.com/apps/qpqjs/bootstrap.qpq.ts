@@ -6,6 +6,7 @@ import {
   defineApi,
   defineDns,
   defineEmailReceivingDomain,
+  getDeploySettingList,
   QPQConfig,
 } from 'quidproquo';
 import {
@@ -17,10 +18,10 @@ import {
 } from 'quidproquo-config-aws';
 import { QpqAppDeployContext } from 'quidproquo-deploy-awscdk';
 
-import { QPQJS_DOMAINS, QpqjsServiceEnum } from '@qpqjs/constants';
+import { QpqjsServiceEnum } from '@qpqjs/constants';
 
 export default ({ region }: QpqAppDeployContext): QPQConfig => [
-  defineDns(QPQJS_DOMAINS),
+  defineDns(getDeploySettingList('ROOT_DOMAINS')),
 
   // inbox.<env>.<root>: verified with SES and MX-routed to it, for every defineEmailReceiver.
   defineEmailReceivingDomain('inbox'),
