@@ -8,7 +8,7 @@ const publishNotSupported = async (): Promise<void> => {
 
 export const dockerPlatformDriver: QpqPlatformDriver = {
   // The docker platform needs no deploy identity — everything runs in-image.
-  primeDeployIdentity: () => [],
+  prepareDeployment: () => {},
 
   go: dockerGo,
 

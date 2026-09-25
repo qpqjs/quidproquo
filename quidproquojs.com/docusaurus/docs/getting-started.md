@@ -45,7 +45,7 @@ curl http://localhost:8080/api/shell/v1/health
 myapp/
 ├── package.json              # workspace root — run all commands from here
 └── apps/myapp/
-    ├── deploy.config.json    # environments: development + production (docker)
+    ├── deploy.config.json    # deployments: development + production (docker)
     ├── packages/
     │   ├── constants/        # domain, service enum, user directory name
     │   ├── config/
@@ -106,14 +106,14 @@ itself.
 
 ## Deploy it
 
-Both scaffolded environments deploy as a single docker image — the whole
+Both scaffolded deployments build a single docker image — the whole
 app, one container:
 
 ```bash
 npm run go
 ```
 
-Pick an environment when prompted (or pass `--env development`), and the
+Pick a deployment when prompted (or pass `--deployment development`), and the
 build prints the `docker run` command when the image is ready:
 
 ```bash
@@ -122,7 +122,7 @@ docker run --rm -p 80:8080 -p 8080:8080 -p 8888:8888 -p 3001:3001 \
   qpq-myapp:development
 ```
 
-Then open [http://localhost](http://localhost). Environments live in
+Then open [http://localhost](http://localhost). Deployments live in
 `apps/myapp/deploy.config.json` — an app can move platforms (docker → AWS)
 with a config change, not a rewrite.
 

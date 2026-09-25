@@ -2,13 +2,12 @@ import fs from 'fs';
 import path from 'path';
 
 import { readJsonFile } from '../lib/readJsonFile';
-import { replaceInFileExact } from '../lib/replaceInFileExact';
 import { replaceInFiles } from '../lib/replaceInFiles';
 import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
 // Give the app its identity. Only targeted, collision-free tokens are
-// rewritten: the app FOLDER, the package SCOPE and the deploy PREFIX take
+// rewritten: the app FOLDER, the package SCOPE and each deployment's NAME take
 // the app name, while template vocabulary (TodoServiceEnum, services/todo,
 // TodoList, TODO comments) is deliberately left alone so every generated app
 // shares the same internal layout.
@@ -31,17 +30,14 @@ export const applyAppIdentity: CreateQpqAppStep = {
       ['apps/todo/', `apps/${appName}/`],
     ]);
 
-    // The deploy prefix names every stack/resource; this is the app name.
+    // A deployment's name prefixes every stack/resource; service configs read it
+    // from the primed APPLICATION_NAME, so the JSON is the only place it's set.
     const deployConfigPath = path.join(targetDirectory, 'apps', appName, 'deploy.config.json');
     const deployConfig = readJsonFile(deployConfigPath);
-    deployConfig.prefix = appName;
+    for (const deployment of Object.values(deployConfig.deployments) as { name: string }[]) {
+      deployment.name = appName;
+    }
     writeJsonFile(deployConfigPath, deployConfig);
-
-    replaceInFileExact(
-      path.join(appDirectory, 'packages', 'service-utils', 'src', 'defineTodoService.ts'),
-      "const modulePrefix = 'todo';",
-      `const modulePrefix = '${appName}';`,
-    );
 
     const rootPackageJsonPath = path.join(targetDirectory, 'package.json');
     const rootPackageJson = readJsonFile(rootPackageJsonPath);

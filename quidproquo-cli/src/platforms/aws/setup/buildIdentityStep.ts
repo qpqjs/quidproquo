@@ -23,7 +23,7 @@ export const buildIdentityStep = (ctx: AwsSetupContext): SetupStep => ({
   run: async () => {
     const result = await checkIdentity(ctx);
     if (!result.done) {
-      throw new Error(`${result.detail}. Log in to the right account (or fix AWS_DEFAULT_ACCOUNT / deploy.config.json) and rerun.`);
+      throw new Error(`${result.detail}. Log in to the right account (or fix the deployment in deploy.config.json) and rerun.`);
     }
   },
 });

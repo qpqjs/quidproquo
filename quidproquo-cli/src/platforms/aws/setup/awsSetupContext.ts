@@ -15,16 +15,14 @@ export type AwsSetupContext = {
   serviceQpqConfigs: QPQConfig[];
 };
 
-export const buildAwsSetupContext = (appName: string, environment: string): AwsSetupContext => {
-  const accountId = process.env.AWS_DEFAULT_ACCOUNT ?? '';
-  const region = process.env.AWS_DEFAULT_REGION ?? '';
-  const ctx = getQpqAppDeployContext(getRoot(), appName, environment, process.env.ACTOR_NAME, { accountId, region });
+export const buildAwsSetupContext = (appName: string, deploymentName: string): AwsSetupContext => {
+  const ctx = getQpqAppDeployContext(getRoot(), appName, deploymentName);
 
   return {
     appName,
-    environment,
-    accountId,
-    region,
+    environment: ctx.environment,
+    accountId: ctx.accountId,
+    region: ctx.region,
     accountQpqConfig: getWorkspaceAccountQpqConfig(ctx),
     bootstrapQpqConfig: getWorkspaceBootstrapQpqConfig(ctx),
     serviceQpqConfigs: getServiceNames(appName).map((service) => loadServiceQpqConfig(appName, service)),

@@ -28,7 +28,8 @@ import {
   todoServiceNames,
 } from '@todo/constants';
 
-const modulePrefix = 'todo';
+// Identity comes from the selected deployment in deploy.config.json, primed by the CLI.
+const modulePrefix = process.env.APPLICATION_NAME!;
 
 // The deployed version tag — git sha when available, so a fresh checkout
 // (or a scaffold that skipped git init) still loads.
@@ -60,7 +61,7 @@ export const defineTodoService = (
     process.env.ENVIRONMENT!,
     configRoot,
     apiBuildPath,
-    process.env.ACTOR_NAME
+    process.env.FEATURE_NAME
   ),
 
   defineApplicationVersion(`${getVersionTag()}-${new Date().toISOString()}`),
@@ -75,9 +76,9 @@ export const defineTodoService = (
 
   defineAuthSystem(TodoServiceEnum.Auth, TODO_USER_DIRECTORY),
 
-  // Both todo environments deploy as docker images, so there's no
-  // cross-account service map — identity comes from the environment when an
-  // aws target is ever added.
+  // Both todo deployments are docker images, so there's no cross-account
+  // service map — identity comes from the deployment when an aws target is
+  // ever added.
   defineAwsServiceAccountInfo(
     process.env.AWS_DEFAULT_ACCOUNT!,
     process.env.AWS_DEFAULT_REGION!,

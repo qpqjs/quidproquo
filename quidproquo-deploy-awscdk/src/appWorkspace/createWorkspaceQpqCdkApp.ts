@@ -1,6 +1,7 @@
+import { getQpqAppDeployment, primeAwsDeploymentEnv, primeDeploymentEnv, validateAwsDeployment } from 'quidproquo-config-aws';
+import { QpqDeployEnvVar } from 'quidproquo-core';
+
 import * as cdk from 'aws-cdk-lib';
-import fs from 'fs';
-import path from 'path';
 
 import { createQPQApp } from '../QPQApp';
 import {
@@ -12,47 +13,37 @@ import {
   WebQpqServiceStack,
 } from '../stacks';
 import * as qpqDeployAwsCdkUtils from '../utils';
+import { getQpqAppDeployContext } from './getQpqAppDeployContext';
 import { getWorkspaceAccountQpqConfig, getWorkspaceBootstrapQpqConfig, getWorkspaceServiceQpqConfig } from './getWorkspaceQpqConfigs';
-import { getQpqAppDeployContext } from './qpqAppDeployConfig';
 
-// Walk up from cwd to the workspace root (the directory with an apps/ folder).
-export const findWorkspaceRoot = (startDir: string = process.cwd()): string => {
-  let dir = startDir;
-  while (!fs.existsSync(path.join(dir, 'apps')) || !fs.existsSync(path.join(dir, 'package.json'))) {
-    const parent = path.dirname(dir);
-    if (parent === dir) throw new Error('Could not find workspace root (a directory containing apps/ and package.json)');
-    dir = parent;
-  }
-  return dir;
-};
-
-// The generic CDK app for a QPQ app workspace — the same stacks for every
+// The generic CDK app for a QPQ app workspace: the same stacks for every
 // product; everything app-specific comes from apps/<app>/ (deploy.config.json
 // + optional account.qpq.ts / bootstrap.qpq.ts fragments).
 //
-// Driven by environment variables set by the invoking tool (`qpq go`):
-//   DEPLOY_APP_NAME      (required) app folder under apps/
-//   DEPLOY_SERVICE_NAME  (optional) also synth the service's inf/web/api stacks
-//   ENVIRONMENT          (required) environment name in deploy.config.json
-//   ACTOR_NAME           (optional) actor/feature deploys
-//   AWS_DEFAULT_ACCOUNT / AWS_DEFAULT_REGION (optional) identity override
+// Driven by two env vars set by the invoking tool (`qpq go`):
+//   DEPLOY_APP_NAME      app folder under apps/
+//   DEPLOY_NAME          deployment name in that app's deploy.config.json
+// plus DEPLOY_SERVICE_NAME (optional) to also synth a service's inf/web/api
+// stacks. Everything else (identity, environment, feature, settings) comes from
+// the deployment entry, primed here before any service config is required.
 export const createWorkspaceQpqCdkApp = (): cdk.App => {
-  const root = findWorkspaceRoot();
+  // qpq spawns cdk with cwd at the workspace root.
+  const root = process.cwd();
 
-  const deployAppName = process.env.DEPLOY_APP_NAME;
+  const deployAppName = process.env[QpqDeployEnvVar.deployAppName];
   if (!deployAppName) {
-    throw new Error('DEPLOY_APP_NAME environment variable is not set.');
+    throw new Error(`${QpqDeployEnvVar.deployAppName} environment variable is not set.`);
   }
 
-  const environment = process.env.ENVIRONMENT;
-  if (!environment) {
-    throw new Error('ENVIRONMENT environment variable is not set.');
+  const deploymentName = process.env[QpqDeployEnvVar.deployName];
+  if (!deploymentName) {
+    throw new Error(`${QpqDeployEnvVar.deployName} environment variable is not set.`);
   }
 
-  const ctx = getQpqAppDeployContext(root, deployAppName, environment, process.env.ACTOR_NAME, {
-    accountId: process.env.AWS_DEFAULT_ACCOUNT,
-    region: process.env.AWS_DEFAULT_REGION,
-  });
+  const deployment = validateAwsDeployment(deploymentName, getQpqAppDeployment(root, deployAppName, deploymentName));
+  primeDeploymentEnv(deployAppName, deploymentName, deployment);
+  primeAwsDeploymentEnv(deployment);
+  const ctx = getQpqAppDeployContext(root, deployAppName, deploymentName);
 
   const app = createQPQApp();
 

@@ -10,10 +10,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
-import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { resolveDeployment } from '../lib/resolveDeployment';
 
 const processConfig = (folderName: string, appName: string): void => {
   console.log(`Processing infrastructure: [${folderName}] for app [${appName}]`);
@@ -27,7 +27,7 @@ const processConfig = (folderName: string, appName: string): void => {
 };
 
 export const synthCommand = async (argv: string[]): Promise<void> => {
-  const [specifiedServiceName] = getPositionalArgs(argv, ['--app', '--env']);
+  const [specifiedServiceName] = getPositionalArgs(argv, ['--app', '--deployment']);
 
   const hasExplicitApp =
     argv.includes('--app') || argv.some((a) => a.startsWith('--app=')) || !!process.env.npm_config_app || !!process.env.DEPLOY_APP_NAME;
@@ -53,10 +53,9 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
   console.log(`QPQ synthesizing apps: ${appNames.join(', ')}`);
 
   for (const appName of appNames) {
-    // Service configs read ENVIRONMENT / AWS_DEFAULT_* at require time. When
-    // invoked inside a deploy they're already primed; standalone synth primes
-    // them from deploy.config.json (development default).
-    primeDeployEnvFromConfig(appName);
+    // Service configs read the deployment env vars at require time, so the
+    // deployment is resolved (and primed) before any infrastructure.ts loads.
+    await resolveDeployment(argv, appName);
 
     // Validate a specified service against the app's discovered services before it
     // reaches loadServiceQpqConfig -> require. The bare-service-name branch above

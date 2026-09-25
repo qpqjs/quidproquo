@@ -1,14 +1,14 @@
 // `qpq setup` — takes a cloud environment from empty to deployed, in order, with
 // every step checked first so the menu shows what is already in place and a
-// rerun on a half-set-up account is safe. The platform (from the environment's
+// rerun on a half-set-up account is safe. The platform (from the deployment's
 // entry in deploy.config.json) contributes the steps.
 //   --check      print each step's status and exit, run nothing
 //   --yes        run every step without the menu
 //   --only a,b   run only the named step ids (no menu)
 import { getArgValue } from '../lib/args';
-import { resolveDeployEnvironment } from '../lib/deployEnv';
 import { promptCheckbox } from '../lib/prompts';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { resolveDeployment } from '../lib/resolveDeployment';
 import { SetupCheckResult, SetupStep } from '../lib/setupStep';
 import { getPlatformDriver } from '../platforms';
 
@@ -73,17 +73,17 @@ const selectFromArgs = (steps: SetupStep[], argv: string[]): SetupStep[] | null 
 
 export const setupCommand = async (argv: string[]): Promise<void> => {
   const appName = await resolveAppSelection({ argv, envVar: 'DEPLOY_APP_NAME' });
-  const { environment, platform } = await resolveDeployEnvironment(argv, appName);
-  const driver = getPlatformDriver(platform);
+  const { deploymentName, deployment } = await resolveDeployment(argv, appName);
+  const driver = getPlatformDriver(deployment.platform);
 
   if (!driver.setupSteps) {
-    console.log(`The '${platform}' platform has nothing to set up for environment '${environment}'.`);
+    console.log(`The '${deployment.platform}' platform has nothing to set up for deployment '${deploymentName}'.`);
     return;
   }
 
-  const steps = await driver.setupSteps(appName, environment);
+  const steps = await driver.setupSteps(appName, deploymentName);
 
-  console.log(`\nSetup for app '${appName}', environment '${environment}' (${platform})\n`);
+  console.log(`\nSetup for app '${appName}', deployment '${deploymentName}' (${deployment.platform})\n`);
   const checked = await checkAll(steps);
   printChecklist(checked);
   console.log('');
@@ -105,5 +105,5 @@ export const setupCommand = async (argv: string[]): Promise<void> => {
 
   console.log('\nSetup complete. Final state:\n');
   printChecklist(await checkAll(steps));
-  console.log(`\nNext: deploy the services with  npx qpq go:docker all all --app ${appName} --env ${environment}`);
+  console.log(`\nNext: deploy the services with  npx qpq go:docker all all --app ${appName} --deployment ${deploymentName}`);
 };

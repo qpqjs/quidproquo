@@ -16,11 +16,11 @@ import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { hasArgFlag } from '../lib/args';
-import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { resolveDeployment } from '../lib/resolveDeployment';
 
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
@@ -37,7 +37,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
 
   process.env.LOCAL_DEV_SERVER = 'true';
   process.env.NODE_ENV = 'development';
-  primeDeployEnvFromConfig(appName);
+  await resolveDeployment(argv, appName);
 
   const only = getArgValue(argv, '--only')
     ?.split(',')
