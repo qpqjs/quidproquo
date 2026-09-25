@@ -30,10 +30,11 @@ import { fileURLToPath } from 'node:url';
 
 import { runSmokeRun } from './smoke/runSmokeRun.mjs';
 
-// The dev server defaults to this anyway; set explicitly so a CI runner that
-// already has ENVIRONMENT set (the deploy workflow does) cannot change what
-// the smoke routes expect from the token. Must match the job's `environment:`.
-const ENVIRONMENT = 'development';
+// The deployment (an entry in apps/qpqjs/deploy.config.json) the dev server
+// runs as. There are several, so it has to be named or a headless cli exits.
+// Its environment must match what the smoke routes expect from the token, i.e.
+// the job's `environment:`.
+const DEPLOYMENT = 'development';
 
 // There is more than one app under apps/, so the app has to be named: without
 // it the cli exits with the app list rather than picking one.
@@ -134,7 +135,7 @@ const stopServer = (server) =>
   });
 
 const main = async () => {
-  log(`starting dev server (app=${APP_NAME} env=${ENVIRONMENT})`);
+  log(`starting dev server (app=${APP_NAME} deployment=${DEPLOYMENT})`);
 
   // node on the cli directly, NOT `npx qpq`: npx is another process in front
   // of the one we need to signal, and SIGTERM stops at it. The cli would never
@@ -143,11 +144,10 @@ const main = async () => {
   // the handler is.
   const server = spawn(
     process.execPath,
-    [QPQ_BIN, 'go:dev:api', '--app', APP_NAME],
+    [QPQ_BIN, 'go:dev:api', '--app', APP_NAME, '--deployment', DEPLOYMENT],
     {
       cwd: APP_ROOT,
       stdio: 'inherit',
-      env: { ...process.env, ENVIRONMENT },
     }
   );
 

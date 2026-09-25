@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-latest
 
     # The smoke routes validate the token's environment claim against the
-    # service's own module environment, and a dev server is always
-    # development (primeDeployEnvFromConfig defaults it) whatever environment
-    # the deploy that follows targets. So this is pinned, not resolved.
+    # service's own module environment, and the smoke script always starts the
+    # dev server as the `development` deployment whatever the deploy that
+    # follows targets. So this is pinned, not resolved.
     environment: development
 
     # id-token so the script can mint the qpq-smoke token. The caller has to
