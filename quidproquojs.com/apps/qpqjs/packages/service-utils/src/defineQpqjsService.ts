@@ -16,6 +16,7 @@ import {
   defineAwsDataStoreRemovalPolicy,
   defineAwsServiceAccountInfo,
   defineWafProtection,
+  getAwsServiceAccountInfosForDeployments,
 } from 'quidproquo-config-aws';
 import {
   defineAdminSettings,
@@ -31,11 +32,12 @@ import {
   qpqjsServiceNames,
 } from '@qpqjs/constants';
 
-const productionAccountId = '761018864142';
-const stagingAccountId = '761018864142';
-const developmentAccountId = '061039804449';
-const modulePrefix = 'qpqjs';
-const developerNames: string[] = [];
+// Identity comes from the selected deployment in deploy.config.json, primed by the CLI.
+const modulePrefix = process.env.APPLICATION_NAME!;
+
+// Deployments (by name in deploy.config.json) whose services this one may reach
+// across accounts. Add a developer's feature deployment here to share with it.
+const crossDeploymentNames = ['production', 'staging'];
 
 export const defineQpqjsService = (
   service: QpqjsServiceEnum,
@@ -50,7 +52,7 @@ export const defineQpqjsService = (
     process.env.ENVIRONMENT!,
     configRoot,
     apiBuildPath,
-    process.env.ACTOR_NAME
+    process.env.FEATURE_NAME
   ),
 
   defineApplicationVersion(
@@ -76,27 +78,7 @@ export const defineQpqjsService = (
     process.env.AWS_DEFAULT_ACCOUNT!,
     process.env.AWS_DEFAULT_REGION!,
 
-    qpqjsServiceNames.flatMap((crossServiceName) => [
-      {
-        environment: 'production',
-        moduleName: crossServiceName,
-        awsAccountId: productionAccountId,
-        awsRegion: process.env.AWS_DEFAULT_REGION!,
-      },
-      {
-        environment: 'staging',
-        moduleName: crossServiceName,
-        awsAccountId: stagingAccountId,
-        awsRegion: process.env.AWS_DEFAULT_REGION!,
-      },
-      ...developerNames.map((actorName) => ({
-        environment: 'development',
-        moduleName: crossServiceName,
-        feature: actorName,
-        awsAccountId: developmentAccountId,
-        awsRegion: process.env.AWS_DEFAULT_REGION!,
-      })),
-    ]),
+    getAwsServiceAccountInfosForDeployments(crossDeploymentNames, qpqjsServiceNames),
     {
       apiLayers,
       lambdaMaxMemoryInMiB: lambdaMemoryInMiB,

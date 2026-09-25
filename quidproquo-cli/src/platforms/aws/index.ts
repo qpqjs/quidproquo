@@ -2,13 +2,13 @@ import { QpqPlatformDriver } from '../types';
 import { awsClearResources } from './clearResources';
 import { awsGo } from './go';
 import { awsGoDocker } from './goDocker';
-import { awsPrimeDeployIdentity } from './identity';
+import { awsPrepareDeployment } from './prepareDeployment';
 import { awsPublish, awsPublishBuild, awsPublishDeploy, awsPublishUpload } from './publish';
 import { awsSetupSteps } from './setup';
 import { awsTeardown } from './teardown';
 
 export const awsPlatformDriver: QpqPlatformDriver = {
-  primeDeployIdentity: awsPrimeDeployIdentity,
+  prepareDeployment: awsPrepareDeployment,
 
   go: awsGo,
   goDocker: awsGoDocker,

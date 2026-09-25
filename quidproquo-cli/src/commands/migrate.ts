@@ -13,10 +13,10 @@ import { spawn } from 'child_process';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
-import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { resolveDeployment } from '../lib/resolveDeployment';
 
 const MIGRATE_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'migrate.js');
 
@@ -24,7 +24,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
   process.env.QPQ_DEV_APP = appName;
-  primeDeployEnvFromConfig(appName);
+  await resolveDeployment(argv, appName);
 
   console.log(`Running local migrations for app [${appName}]`);
 

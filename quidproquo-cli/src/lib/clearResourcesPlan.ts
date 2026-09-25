@@ -10,6 +10,7 @@ import { qpqCoreUtils } from 'quidproquo-core';
 import { getServiceNames } from './discovery';
 import { promptCheckbox, promptSelect, promptText } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
+import { getDeployTargetLabel } from './getDeployTargetLabel';
 
 export type ClearableResourceKind = 'storageDrive' | 'keyValueStore';
 
@@ -73,9 +74,7 @@ const pickByResource = (clearable: ClearableResource[]): Promise<ClearableResour
   );
 
 export const promptClearResourcesPlan = async (appName: string): Promise<ClearResourcesPlan> => {
-  const deployInfo = process.env.ACTOR_NAME
-    ? `${appName}-${process.env.ENVIRONMENT}-${process.env.ACTOR_NAME}`
-    : `${appName}-${process.env.ENVIRONMENT}`;
+  const deployInfo = getDeployTargetLabel();
 
   const clearable = getClearableResources(appName);
 

@@ -18,13 +18,13 @@ import path from 'path';
 import { rspack } from '@rspack/core';
 
 import { hasArgFlag } from '../lib/args';
-import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { resolveDeployment } from '../lib/resolveDeployment';
 
 // 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
 // file-storage (secure URL) default port.
@@ -35,7 +35,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
   process.env.QPQ_DEV_APP = appName;
-  primeDeployEnvFromConfig(appName);
+  await resolveDeployment(argv, appName);
   console.log(`Dev server for app [${appName}]`);
 
   // The sweep matches on a RELATIVE bundle path, so every checkout's dev

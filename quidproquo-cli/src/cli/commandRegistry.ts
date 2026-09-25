@@ -30,7 +30,7 @@ export const cliCommands: CliCommand[] = [
   {
     name: 'go',
     usageArgs: '[svc] [stack]',
-    summary: 'Deploy services (interactive; platform from deploy.config.json, default aws).',
+    summary: 'Deploy services (interactive; platform from the deployment in deploy.config.json).',
     usageExtra: [
       'Pass positional args to skip prompts, e.g. qpq go all all — svc is',
       "'all' | comma-list | account | domain | bootstrap; stack is all|inf|api|web|views.",
@@ -144,7 +144,7 @@ export const buildUsage = (): string => {
   return [
     'qpq — build, dev and deploy orchestration for QPQ apps',
     '',
-    'Usage: qpq <command> [--app <name>] [--env <name>] [--platform <name>]',
+    'Usage: qpq <command> [--app <name>] [--deployment <name>]',
     '       qpq            (no command opens an interactive menu)',
     '',
     'Commands:',

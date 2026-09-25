@@ -9,7 +9,7 @@ npm install --save-dev quidproquo-cli
 npx qpq
 ```
 
-Running `qpq` with no command opens an interactive menu. Every command also takes `--app`, `--env`, and `--platform`.
+Running `qpq` with no command opens an interactive menu. Every command also takes `--app` and `--deployment` (an entry in `apps/<app>/deploy.config.json`).
 
 ## Commands
 

@@ -15,8 +15,8 @@ import { buildAccountStackStep, buildBootstrapStackStep, buildDomainStackStep } 
  * provider, the bootstrap stack the GitHub deploy role). Services are deployed separately
  * with `qpq go` / `qpq go:docker`, which is where the time goes and where parallelism lives.
  */
-export const awsSetupSteps = async (appName: string, environment: string): Promise<SetupStep[]> => {
-  const ctx = buildAwsSetupContext(appName, environment);
+export const awsSetupSteps = async (appName: string, deploymentName: string): Promise<SetupStep[]> => {
+  const ctx = buildAwsSetupContext(appName, deploymentName);
 
   return [
     buildIdentityStep(ctx),

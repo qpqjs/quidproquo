@@ -5,6 +5,7 @@
 // service that opts into module federation has its federated remote published
 // (built + uploaded + manifest flipped), so a deploy that ships new backend
 // code also republishes the code the lambdas federate.
+import { QpqDeployEnvVar } from 'quidproquo-core';
 import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
 import { getServiceRspackConfig } from 'quidproquo-deploy-rspack';
 
@@ -82,10 +83,10 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   }
 
   if (plan.kind === 'bootstrap') {
-    // Actor bootstraps deploy into a shared account — leave the account-level
+    // Feature bootstraps deploy into a shared account — leave the account-level
     // guardrails stack alone (deploy it explicitly via the 'account' option).
-    if (process.env.ACTOR_NAME) {
-      console.log('Skipping account stack for actor deploy');
+    if (process.env[QpqDeployEnvVar.featureName]) {
+      console.log('Skipping account stack for feature deploy');
     } else {
       await deployAccountStack(plan.appName);
     }

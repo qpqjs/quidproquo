@@ -1,11 +1,14 @@
 {
-  "prefix": "todo",
-  "environments": {
+  "deployments": {
     "development": {
-      "platform": "docker"
+      "platform": "docker",
+      "name": "todo",
+      "environment": "development"
     },
     "production": {
-      "platform": "docker"
+      "platform": "docker",
+      "name": "todo",
+      "environment": "production"
     }
   }
 }

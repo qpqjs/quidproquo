@@ -3,6 +3,7 @@
 // (or domain/bootstrap), pick stacks. buildDeployPlanFromArgs is the
 // non-interactive shortcut (`qpq go all all`) that skips every prompt.
 import { getPositionalArgs } from './args';
+import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { getServiceNames } from './discovery';
 import { promptSelect, promptText, promptYesNo } from './prompts';
 
@@ -31,7 +32,7 @@ export type DeployPlan =
 // to the interactive promptDeployPlan. Passing args is an explicit opt-in to a
 // prompt-free deploy, so the "Deploying to: [env]" confirmation is skipped too.
 export const buildDeployPlanFromArgs = (appName: string, argv: string[]): DeployPlan | null => {
-  const [servicesArg, stacksArg] = getPositionalArgs(argv, ['--app', '--env', '--platform']);
+  const [servicesArg, stacksArg] = getPositionalArgs(argv, ['--app', '--deployment']);
 
   if (!servicesArg) {
     return null;
@@ -66,9 +67,7 @@ export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Deploy
 };
 
 export const promptDeployPlan = async (appName: string): Promise<DeployPlan> => {
-  const deployInfo = process.env.ACTOR_NAME
-    ? `${appName}-${process.env.ENVIRONMENT}-${process.env.ACTOR_NAME}`
-    : `${appName}-${process.env.ENVIRONMENT}`;
+  const deployInfo = getDeployTargetLabel();
 
   if (!(await promptYesNo(`Deploying to: [${deployInfo}]`))) {
     console.log('Exiting!');
@@ -121,9 +120,7 @@ export type TeardownPlan =
 // target back to confirm — destroying inf stacks takes user data (key value
 // stores, user directories) with it, so a y/n prompt isn't enough friction.
 export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan> => {
-  const deployInfo = process.env.ACTOR_NAME
-    ? `${appName}-${process.env.ENVIRONMENT}-${process.env.ACTOR_NAME}`
-    : `${appName}-${process.env.ENVIRONMENT}`;
+  const deployInfo = getDeployTargetLabel();
 
   let services: string[] = [];
 

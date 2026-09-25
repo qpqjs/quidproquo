@@ -128,10 +128,15 @@ All new enums follow the house style: TS `enum` with camelCase members.
 ## Per-app configuration
 
 - **`deploy.config.json` stays JSON** (machine-readable before any TS executes —
-  discovery, prompts, credential checks) and is **extended to own deploy identity**:
-  environment name → account/region. `qpq go --env production` then needs no
-  AWS_DEFAULT_ACCOUNT/AWS_DEFAULT_REGION/ENVIRONMENT env vars (account IDs are
-  committed; ACTOR_NAME remains an env/flag detail). Prefix + domain stay here too.
+  discovery, prompts, credential checks) and is **the source of truth for every
+  deployment**: `{ "deployments": { "<name>": { platform, name, environment,
+  feature?, platformSettings, settings? } } }`. `qpq go --deployment production`
+  needs no identity env vars; the CLI primes APPLICATION_NAME / ENVIRONMENT /
+  FEATURE_NAME / DEPLOY_SETTING_* (and the platform's own, AWS_DEFAULT_* for aws)
+  from the entry, unconditionally. A feature deployment is an entry with
+  `feature` set, not a shell variable. Settings are strings handed to
+  infrastructure.ts via `getDeploySetting`; the file holds identity only, never
+  credentials. The domain stays in code (defineDns).
 - **`account.qpq.ts` / `bootstrap.qpq.ts` move from tools into each app**,
   parameterized by the values in deploy.config.json. One bootstrap/account config
   per app; bootstrap already namespaces deployed resources by app name, so multiple
@@ -201,13 +206,12 @@ implementation:
 - **Bundle options apply everywhere**: static lambda build, federated remote
   build (which also now externalizes layer modules), and the dev-server bundle
   (ignoreWarnings/ignoreModules merged across all hosted services).
-- **deploy.config.json** gains an optional `environments` map
-  (env → accountId/region). `qpq go --env <name>` primes
-  ENVIRONMENT/AWS_DEFAULT_* for legacy config reads; raw env vars still
-  override, so existing setups keep working. `account.qpq.ts` /
-  `bootstrap.qpq.ts` are default-exported `(ctx) => QPQConfig` fragments of
-  app-specific EXTRAS — the workspace CDK app provides defineApplication +
-  defineAwsServiceAccountInfo.
+- **deploy.config.json** is a `deployments` map (see Per-app configuration).
+  `qpq go --deployment <name>` selects an entry and primes its env vars; the CDK
+  app receives only DEPLOY_APP_NAME + DEPLOY_NAME and re-reads the same entry.
+  `account.qpq.ts` / `bootstrap.qpq.ts` are default-exported `(ctx) => QPQConfig`
+  fragments of app-specific EXTRAS — the workspace CDK app provides
+  defineApplication + defineAwsServiceAccountInfo from the entry.
 - **Dev server entry is generated** at `dist/qpq/dev-server/entry.ts` per
   `qpq go:dev:api` run; an optional `apps/<app>/devServer.config.ts`
   (default-exporting DevServerConfigOverrides) is imported when present.
@@ -241,18 +245,19 @@ implementation:
 - **Platform drivers (added after landing)**: the CLI is internally split into
   `src/platforms/<platform>/` drivers (aws = go, goDocker, publish, stacks,
   cdkApp, viewsSync, remote, credentials) behind a `QpqPlatformDriver`
-  interface. `qpq go` resolves the platform from the environment's `platform`
-  field in deploy.config.json (default `aws`; `--platform` overrides) and
-  dispatches — a future `quidproquo-deploy-gcp` means adding
-  `src/platforms/gcp/` + a registry entry, with no command-surface or consumer
-  changes. Platform-neutral commands (go:dev, go:dev:api, go:dev:web, synth, prep, hooks)
-  and the neutral build helpers stay in `src/lib/`. Identity priming is a
-  driver method too (`primeDeployIdentity(target)` — AWS fills
-  AWS_DEFAULT_ACCOUNT/AWS_DEFAULT_REGION from the environment entry, env vars
-  win, and returns what's missing so deploys can fail while local dev shrugs);
-  the neutral code never names an AWS env var. Remaining known AWS-ism: the
-  deploy.config.json reader/types live in quidproquo-deploy-awscdk — move to a
-  neutral package when a second platform lands.
+  interface. `qpq go` resolves the platform from the deployment's `platform`
+  field in deploy.config.json and dispatches — a future `quidproquo-deploy-gcp`
+  means adding `src/platforms/gcp/` + a registry entry, with no command-surface
+  or consumer changes. Every command that loads a service config (go, go:dev,
+  synth, setup, publish, teardown, clear-resources, migrate) resolves a
+  deployment the same way (`--deployment`, else DEPLOY_NAME from a parent qpq
+  command, else the sole entry, else a prompt). Platform validation and identity
+  priming is a driver method (`prepareDeployment(name, entry)` — AWS checks
+  `platformSettings` and fills AWS_DEFAULT_ACCOUNT/AWS_DEFAULT_REGION, docker is
+  a no-op); the neutral code never names an AWS env var. The neutral deployment
+  types live in quidproquo-core (`deployment/`, types only); the reader,
+  validator and neutral primer live in quidproquo-config-aws alongside the aws
+  narrowing, since both the CLI and the CDK app already depend on it.
 
 - **Docker platform (proof of concept)**: `"platform": "docker"` on an
   environment makes `qpq go` bake the whole app into one self-hosting image —

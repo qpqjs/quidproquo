@@ -1,6 +1,9 @@
 // Host-side `cdk deploy` helpers. No cdk.json anywhere: the CDK app command is
 // passed via --app and runs quidproquo-deploy-awscdk's generic workspace app
-// (bin/qpq-cdk-app.js) under ts-node hooks, with DEPLOY_* in the env.
+// (bin/qpq-cdk-app.js) under ts-node hooks. The child inherits the primed
+// deployment env (DEPLOY_APP_NAME / DEPLOY_NAME and everything resolveDeployment
+// set); only the per-invocation service is added here.
+import { QpqDeployEnvVar } from 'quidproquo-core';
 import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
 
 import path from 'path';
@@ -77,9 +80,9 @@ export const deployAccountStack = async (appName: string): Promise<void> => {
 
 export const deployBootstrapStack = async (appName: string): Promise<void> => {
   const appPrefix = getAppPrefix(appName);
-  const stackName = process.env.ACTOR_NAME
-    ? `${appPrefix}-${process.env.ENVIRONMENT}-${process.env.ACTOR_NAME}-bs`
-    : `${appPrefix}-${process.env.ENVIRONMENT}-bs`;
+  const environment = process.env[QpqDeployEnvVar.environment];
+  const feature = process.env[QpqDeployEnvVar.featureName];
+  const stackName = feature ? `${appPrefix}-${environment}-${feature}-bs` : `${appPrefix}-${environment}-bs`;
   await deployStack(stackName, {
     DEPLOY_SERVICE_NAME: '',
     DEPLOY_APP_NAME: appName,
