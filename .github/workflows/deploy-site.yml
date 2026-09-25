@@ -132,7 +132,9 @@ jobs:
       # Fully non-interactive deploy: all services, all stacks (inf -> api ->
       # web -> views), in parallel via docker. The AWS_* creds set by the step
       # above are passed through to the deploy containers.
-      - run: npx qpq go:docker all all --app qpqjs --env ${{ needs.resolve.outputs.env }}
+      # The GitHub environment name doubles as the deployment name in
+      # apps/qpqjs/deploy.config.json, which owns account/region/identity.
+      - run: npx qpq go:docker all all --app qpqjs --deployment ${{ needs.resolve.outputs.env }}
         working-directory: quidproquojs.com
 
       # Verify the deployment end to end: mint a GitHub OIDC token with the
