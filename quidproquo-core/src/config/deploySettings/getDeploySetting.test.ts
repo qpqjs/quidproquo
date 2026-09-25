@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { getDeploySetting } from './getDeploySetting';
 import { getDeploySettingEnvName } from './getDeploySettingEnvName';
+import { getDeploySettingList } from './getDeploySettingList';
 import { getDeploySettingOrDefault } from './getDeploySettingOrDefault';
 
 const envName = getDeploySettingEnvName('PAGE_TITLE');
@@ -29,6 +30,17 @@ describe('getDeploySetting', () => {
 
   it('throws naming the key when unset', () => {
     expect(() => getDeploySetting('PAGE_TITLE')).toThrow("Deploy setting 'PAGE_TITLE' is not defined");
+  });
+});
+
+describe('getDeploySettingList', () => {
+  it('splits on commas and trims', () => {
+    process.env[envName] = 'example.com, example.org,,';
+    expect(getDeploySettingList('PAGE_TITLE')).toEqual(['example.com', 'example.org']);
+  });
+
+  it('throws naming the key when unset', () => {
+    expect(() => getDeploySettingList('PAGE_TITLE')).toThrow("Deploy setting 'PAGE_TITLE' is not defined");
   });
 });
 

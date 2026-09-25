@@ -11,13 +11,14 @@
 //   ACTIONS_ID_TOKEN_REQUEST_TOKEN  provided by Actions when the job has id-token: write
 //   SMOKE_ROOTS                     optional comma list to run a subset of the roots
 //
-// Urls are derived, not configured: the roots come from the app's constants
-// package (the same list every service's defineDns reads), hosts follow the
-// app's default domain shape (see getRootHosts), and the api gateway maps each
-// service under its own base path:
+// Urls are derived, not configured: the roots come from the deployment's
+// ROOT_DOMAINS setting in apps/qpqjs/deploy.config.json (the same list every
+// service's defineDns reads; the deployment is named after the environment),
+// hosts follow the app's default domain shape (see getRootHosts), and the api
+// gateway maps each service under its own base path:
 //   https://api.<environment>.<root>/<service>
 
-import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,10 +26,9 @@ import { getRootHosts, runEdgeChecks } from './smoke/runEdgeChecks.mjs';
 import { runSmokeRun } from './smoke/runSmokeRun.mjs';
 
 const SERVICE_NAME = 'test';
-// The built constants package: the deploy job builds the app before this runs.
-const DOMAIN_CONSTANTS_PATH = join(
+const DEPLOY_CONFIG_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
-  '../apps/qpqjs/packages/constants/dist/src/domain.js'
+  '../apps/qpqjs/deploy.config.json'
 );
 
 const log = (message) => console.log(`deployed-smoke: ${message}`);
@@ -46,24 +46,29 @@ const requireEnv = (name) => {
   return value;
 };
 
-const getRoots = () => {
-  const { QPQJS_DOMAINS } = createRequire(import.meta.url)(
-    DOMAIN_CONSTANTS_PATH
-  );
-  if (!QPQJS_DOMAINS?.length) {
-    fail(`no QPQJS_DOMAINS in ${DOMAIN_CONSTANTS_PATH}; build the app first`);
-  }
-
-  const subset = process.env.SMOKE_ROOTS?.split(',')
-    .map((root) => root.trim())
+const splitList = (value) =>
+  (value ?? '')
+    .split(',')
+    .map((item) => item.trim())
     .filter(Boolean);
-  if (!subset?.length) {
-    return QPQJS_DOMAINS;
+
+const getRoots = (environment) => {
+  const { deployments } = JSON.parse(readFileSync(DEPLOY_CONFIG_PATH, 'utf8'));
+  const allRoots = splitList(deployments[environment]?.settings?.ROOT_DOMAINS);
+  if (!allRoots.length) {
+    fail(
+      `deployment '${environment}' in ${DEPLOY_CONFIG_PATH} has no ROOT_DOMAINS setting`
+    );
   }
 
-  const unknown = subset.filter((root) => !QPQJS_DOMAINS.includes(root));
+  const subset = splitList(process.env.SMOKE_ROOTS);
+  if (!subset.length) {
+    return allRoots;
+  }
+
+  const unknown = subset.filter((root) => !allRoots.includes(root));
   if (unknown.length > 0) {
-    fail(`SMOKE_ROOTS names roots not in QPQJS_DOMAINS: ${unknown.join(', ')}`);
+    fail(`SMOKE_ROOTS names roots not in ROOT_DOMAINS: ${unknown.join(', ')}`);
   }
   return subset;
 };
@@ -101,7 +106,7 @@ const smokeRoot = async (hosts, allHosts) => {
 };
 
 const environment = requireEnv('SMOKE_ENVIRONMENT');
-const roots = getRoots();
+const roots = getRoots(environment);
 const allHosts = roots.map((root) => getRootHosts(root, environment));
 
 log(`environment=${environment} roots=${roots.join(', ')}`);

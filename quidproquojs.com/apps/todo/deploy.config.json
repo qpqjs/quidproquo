@@ -3,12 +3,18 @@
     "development": {
       "platform": "docker",
       "name": "todo",
-      "environment": "development"
+      "environment": "development",
+      "settings": {
+        "ROOT_DOMAINS": "todo.quidproquojs.com"
+      }
     },
     "production": {
       "platform": "docker",
       "name": "todo",
-      "environment": "production"
+      "environment": "production",
+      "settings": {
+        "ROOT_DOMAINS": "todo.quidproquojs.com"
+      }
     }
   }
 }

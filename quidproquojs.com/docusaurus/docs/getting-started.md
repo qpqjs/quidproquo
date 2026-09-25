@@ -47,7 +47,7 @@ myapp/
 └── apps/myapp/
     ├── deploy.config.json    # deployments: development + production (docker)
     ├── packages/
-    │   ├── constants/        # domain, service enum, user directory name
+    │   ├── constants/        # service enum, user directory name
     │   ├── config/
     │   └── service-utils/    # the shared config every service starts from
     └── services/

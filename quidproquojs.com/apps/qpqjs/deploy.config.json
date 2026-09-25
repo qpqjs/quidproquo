@@ -7,6 +7,9 @@
       "platformSettings": {
         "accountId": "061039804449",
         "region": "ap-southeast-2"
+      },
+      "settings": {
+        "ROOT_DOMAINS": "quidproquojs.com, qpqjs.com"
       }
     },
     "staging": {
@@ -16,6 +19,9 @@
       "platformSettings": {
         "accountId": "061039804449",
         "region": "us-east-1"
+      },
+      "settings": {
+        "ROOT_DOMAINS": "quidproquojs.com, qpqjs.com"
       }
     },
     "production": {
@@ -25,12 +31,18 @@
       "platformSettings": {
         "accountId": "761018864142",
         "region": "ap-southeast-2"
+      },
+      "settings": {
+        "ROOT_DOMAINS": "quidproquojs.com, qpqjs.com"
       }
     },
     "local": {
       "platform": "docker",
       "name": "qpqjs",
-      "environment": "local"
+      "environment": "local",
+      "settings": {
+        "ROOT_DOMAINS": "quidproquojs.com, qpqjs.com"
+      }
     }
   }
 }
