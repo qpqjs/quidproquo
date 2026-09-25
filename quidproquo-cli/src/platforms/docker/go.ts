@@ -117,7 +117,9 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   console.log('Bundling server (dev server + all services)');
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);
-  await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs }));
+  // The image installs its own node_modules next to the bundle, so externals
+  // must stay bare; host-resolved absolute paths do not exist in the container.
+  await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs, portableExternals: true }));
 
   // ---- Views: production builds with same-origin federation remotes ----
   process.env.QPQ_VIEWS_REMOTE_BASE = '/views';

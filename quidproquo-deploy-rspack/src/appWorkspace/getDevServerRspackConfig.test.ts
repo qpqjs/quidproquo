@@ -39,6 +39,23 @@ describe('getDevServerRspackConfig', () => {
     expect(resolved).toBe('commonjs node:sqlite');
   });
 
+  it('resolves an installed external to its absolute path for the host, but leaves it bare when portable', async () => {
+    fs.mkdirSync(path.join(root, 'node_modules', 'immer'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'node_modules', 'immer', 'package.json'), JSON.stringify({ name: 'immer', main: 'index.js' }));
+    fs.writeFileSync(path.join(root, 'node_modules', 'immer', 'index.js'), '');
+
+    const externaliseWith = (portableExternals: boolean) => {
+      const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()], portableExternals });
+      const [externalise] = config.externals as unknown as ((data: any, callback: (err?: Error, result?: string) => void) => void)[];
+      return new Promise<string | undefined>((resolve, reject) => {
+        externalise({ request: 'immer', context: root }, (error?: Error, result?: string) => (error ? reject(error) : resolve(result)));
+      });
+    };
+
+    expect(await externaliseWith(false)).toBe(`commonjs ${fs.realpathSync(path.join(root, 'node_modules', 'immer', 'index.js'))}`);
+    expect(await externaliseWith(true)).toBe('commonjs immer');
+  });
+
   it('includes the shared backend swc TS rules (same as the lambda builds)', () => {
     const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
     const rules = (config.module?.rules ?? []) as RuleSetRule[];

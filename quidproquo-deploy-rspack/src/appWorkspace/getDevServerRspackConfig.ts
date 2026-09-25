@@ -20,9 +20,13 @@ export type DevServerRspackOptions = {
   entry: string;
   // Every service config the dev server hosts.
   qpqConfigs: QPQConfig[];
+  // Leave externals as bare requests instead of resolving them to absolute
+  // paths on this machine. Required for a bundle that runs somewhere else
+  // (the docker image), where deps are installed next to the bundle.
+  portableExternals?: boolean;
 };
 
-export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerRspackOptions): Configuration => {
+export const getDevServerRspackConfig = ({ root, entry, qpqConfigs, portableExternals = false }: DevServerRspackOptions): Configuration => {
   const { aliases, packageNames } = getWorkspaceSourceAliases(root);
 
   // Dependency build quirks declared by any hosted service
@@ -43,10 +47,15 @@ export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerR
   // in the framework repo's node_modules (e.g. quidproquo-dev-server's
   // body-parser); build-time resolution reproduces what node would have done
   // had the package not been bundled. Requests that don't resolve (optional
-  // deps behind try/catch) fall back to a plain bare require.
+  // deps behind try/catch) fall back to a plain bare require. A portable
+  // bundle skips all of this: the host's paths mean nothing where it runs.
   const externalResolutionCache = new Map<string, string>();
 
   const resolveExternal = (request: string, context: string): string => {
+    if (portableExternals) {
+      return request;
+    }
+
     const cacheKey = `${context}\n${request}`;
     const cached = externalResolutionCache.get(cacheKey);
     if (cached) {
