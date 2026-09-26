@@ -114,7 +114,14 @@ const scaffoldTestLanguage = async (workDir, language) => {
   // qpq go:dev:api, not the `dev` script (qpq go:dev): the scaffold test only
   // asserts the API health endpoint, and the views dev servers would add
   // minutes of Rspack compile plus a fleet of ports this script doesn't sweep.
-  const devServer = spawn('npx', ['--no-install', 'qpq', 'go:dev:api'], { cwd: appDir, shell: true, detached: true, stdio: 'ignore' });
+  // The template has more than one deployment and there is no terminal to pick one on,
+  // so the flag is required or the CLI exits before the server ever binds.
+  const devServer = spawn('npx', ['--no-install', 'qpq', 'go:dev:api', '--deployment', 'development'], {
+    cwd: appDir,
+    shell: true,
+    detached: true,
+    stdio: 'ignore',
+  });
 
   try {
     const health = await waitForHealthy(BOOT_TIMEOUT_MS);
