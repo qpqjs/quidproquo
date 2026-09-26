@@ -5,6 +5,7 @@ import { getOwnPackageRoot } from '../lib/getOwnPackageRoot';
 import { getOwnVersion } from '../lib/getOwnVersion';
 import { getPositionalArgs } from '../lib/getPositionalArgs';
 import { promptSelect } from '../lib/promptSelect';
+import { promptText } from '../lib/promptText';
 import { createQpqAppSteps } from '../steps';
 import { AppLanguage, CreateQpqAppAnswers, StepContext } from '../types';
 
@@ -13,6 +14,8 @@ const USAGE = `Usage: npx create-qpq-app <app-name> [options]
 Options:
   --language <typescript|javascript>   skip the language prompt
   --domain <domain>                    app domain (default: <app-name>.example.com)
+  --docker-registry <host[:port]>      registry qpq go pushes the image to (e.g. 192.168.8.88:5000)
+  --docker-host <address>              address browsers use for the docker host (e.g. 192.168.8.88)
   --no-git                             skip git init
   --no-install                         skip npm install
 `;
@@ -32,8 +35,18 @@ const resolveLanguage = async (argv: string[]): Promise<AppLanguage> => {
   return selected === 'JavaScript' ? AppLanguage.javascript : AppLanguage.typescript;
 };
 
+// Where the app will be self-hosted. A flag wins; an interactive terminal is asked, with blank
+// meaning "not yet"; a script or CI run without the flag gets blank without a prompt.
+const resolveDockerSetting = async (argv: string[], flag: string, question: string): Promise<string> => {
+  const flagValue = getArgValue(argv, flag);
+  if (flagValue !== undefined) {
+    return flagValue.trim();
+  }
+  return process.stdin.isTTY ? promptText(question) : '';
+};
+
 export const runCreateQpqApp = async (argv: string[]): Promise<void> => {
-  const [appName] = getPositionalArgs(argv, ['--language', '--domain']);
+  const [appName] = getPositionalArgs(argv, ['--language', '--domain', '--docker-registry', '--docker-host']);
 
   if (!appName || argv.includes('--help')) {
     console.log(USAGE);
@@ -46,6 +59,16 @@ export const runCreateQpqApp = async (argv: string[]): Promise<void> => {
     appName,
     language: await resolveLanguage(argv),
     domain: getArgValue(argv, '--domain') ?? `${appName}.example.com`,
+    dockerRegistry: await resolveDockerSetting(
+      argv,
+      '--docker-registry',
+      'Docker registry to push images to (blank for none, e.g. 192.168.8.88:5000)',
+    ),
+    dockerHost: await resolveDockerSetting(
+      argv,
+      '--docker-host',
+      'Address browsers will use for the docker host (blank for localhost, e.g. 192.168.8.88)',
+    ),
     initialiseGit: !argv.includes('--no-git'),
     installDependencies: !argv.includes('--no-install'),
   };
