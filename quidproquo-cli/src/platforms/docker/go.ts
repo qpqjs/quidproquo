@@ -186,7 +186,16 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const containerPorts = getContainerPorts(webEntryHosts);
   const portMappings = resolvePortMappings(deploymentName, dockerSettings, containerPorts);
 
-  const entry = writeDevServerEntry(root, appName);
+  // Secure file urls carry the container's file-storage port, so the host must expose it as is.
+  const fileStorageMapping = portMappings.find((mapping) => mapping.container === DEV_SERVER_PORTS.fileStorage);
+  if (fileStorageMapping && fileStorageMapping.host !== DEV_SERVER_PORTS.fileStorage) {
+    throw new Error(
+      `Invalid docker deployment '${deploymentName}': file storage port ${DEV_SERVER_PORTS.fileStorage} must map to itself, not ${fileStorageMapping.host}`,
+    );
+  }
+
+  // Nothing deploys into the container, so the image runs its own pending migrations on start.
+  const entry = writeDevServerEntry(root, appName, 'migrate-then-serve');
   // The image installs its own node_modules next to the bundle, so externals
   // must stay bare; host-resolved absolute paths do not exist in the container.
   await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs, portableExternals: true }));
@@ -223,7 +232,15 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     copyWebEntryContent(appName, contextDir, entry, viewServices);
   }
 
-  const composePath = writeComposeFile({ contextDir, imageName, serviceName: containerName, volumeName, portMappings });
+  const composePath = writeComposeFile({
+    contextDir,
+    imageName,
+    serviceName: containerName,
+    volumeName,
+    portMappings,
+    dataPath: dockerSettings.dataPath ?? null,
+    publicHost: dockerSettings.publicHost ?? null,
+  });
 
   // ---- Build the image ----
   console.log(
@@ -256,6 +273,10 @@ ${onHost}
 Then open ${siteUrl} (replace localhost with the host's address)
 ${entryLines ? `\nWeb entries:\n${entryLines}\n` : ''}
 Ports come from the deployment's platformSettings.portMappings (${portMappings.map((m) => `${m.host}:${m.container}`).join(', ')})
-and are baked into the frontend, so a host must map the same ones. App state lives in the ${volumeName} volume.
+and are baked into the frontend, so a host must map the same ones. App state lives in ${dockerSettings.dataPath ?? `the ${volumeName} volume`}.${
+    dockerSettings.publicHost
+      ? ''
+      : `\nSecure file urls point at localhost; set platformSettings.publicHost to the address browsers use for this host.`
+  }
 `);
 };

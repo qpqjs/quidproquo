@@ -8,6 +8,8 @@ export type ParsedDockerPlatformSettings = {
   registry?: string;
   arch?: string;
   tag: string;
+  publicHost?: string;
+  dataPath?: string;
 };
 
 const asOptionalString = (deploymentName: string, name: string, value: unknown): string | undefined => {
@@ -37,5 +39,7 @@ export const getDockerPlatformSettings = (deploymentName: string, deployment: Qp
     registry: asOptionalString(deploymentName, 'registry', settings.registry),
     arch: asOptionalString(deploymentName, 'arch', settings.arch),
     tag: asOptionalString(deploymentName, 'tag', settings.tag) ?? deployment.environment,
+    publicHost: asOptionalString(deploymentName, 'publicHost', settings.publicHost),
+    dataPath: asOptionalString(deploymentName, 'dataPath', settings.dataPath),
   };
 };

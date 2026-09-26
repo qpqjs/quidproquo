@@ -5,26 +5,41 @@ import { describe, expect, it } from 'vitest';
 
 import { writeComposeFile } from './writeComposeFile';
 
+const base = {
+  imageName: '192.168.8.88:5000/qpq-qpqjs:local',
+  serviceName: 'qpq-qpqjs',
+  volumeName: 'qpq-qpqjs-data',
+  portMappings: [
+    { host: 80, container: 8080 },
+    { host: 3090, container: 3090 },
+  ],
+};
+
 describe('writeComposeFile', () => {
-  it('writes the image, ports and state volume', () => {
+  it('uses a named volume and no environment by default', () => {
     const contextDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-compose-'));
 
-    const composePath = writeComposeFile({
-      contextDir,
-      imageName: '192.168.8.88:5000/qpq-qpqjs:local',
-      serviceName: 'qpq-qpqjs',
-      volumeName: 'qpq-qpqjs-data',
-      portMappings: [
-        { host: 80, container: 8080 },
-        { host: 3090, container: 3090 },
-      ],
-    });
+    const composePath = writeComposeFile({ ...base, contextDir, dataPath: null, publicHost: null });
 
     const compose = fs.readFileSync(composePath, 'utf8');
     expect(composePath).toBe(path.join(contextDir, 'docker-compose.yml'));
     expect(compose).toContain('image: 192.168.8.88:5000/qpq-qpqjs:local');
     expect(compose).toContain('      - "80:8080"\n      - "3090:3090"');
     expect(compose).toContain('- qpq-qpqjs-data:/app/.qpq-runtime');
-    expect(compose).toContain('volumes:\n  qpq-qpqjs-data:');
+    expect(compose).toContain('\nvolumes:\n  qpq-qpqjs-data:');
+    expect(compose).not.toContain('environment:');
+  });
+
+  it('binds the data path and sets the public host when given', () => {
+    const contextDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-compose-'));
+
+    const compose = fs.readFileSync(
+      writeComposeFile({ ...base, contextDir, dataPath: '/mnt/user/appdata/qpq-qpqjs', publicHost: '192.168.8.88' }),
+      'utf8',
+    );
+
+    expect(compose).toContain('- /mnt/user/appdata/qpq-qpqjs:/app/.qpq-runtime');
+    expect(compose).not.toContain('\nvolumes:\n  qpq-qpqjs-data:');
+    expect(compose).toContain('environment:\n      - QPQ_PUBLIC_HOST=192.168.8.88');
   });
 });
