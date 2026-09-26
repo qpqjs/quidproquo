@@ -14,17 +14,28 @@ describe('getDockerPlatformSettings', () => {
       registry: undefined,
       arch: undefined,
       tag: 'local',
+      publicHost: undefined,
+      dataPath: undefined,
     });
   });
 
-  it('parses every setting, trimming a trailing slash off the registry', () => {
-    expect(
-      getDockerPlatformSettings('local', deployment({ portMappings: '80:8080', registry: '192.168.8.88:5000/', arch: 'linux/amd64', tag: 'latest' })),
-    ).toEqual({
+  it('parses every setting, trimming trailing slashes', () => {
+    const settings = {
+      portMappings: '80:8080',
+      registry: '192.168.8.88:5000/',
+      arch: 'linux/amd64',
+      tag: 'latest',
+      publicHost: '192.168.8.88',
+      dataPath: '/mnt/user/appdata/qpq-app/',
+    };
+
+    expect(getDockerPlatformSettings('local', deployment(settings))).toEqual({
       portMappings: [{ host: 80, container: 8080 }],
       registry: '192.168.8.88:5000',
       arch: 'linux/amd64',
       tag: 'latest',
+      publicHost: '192.168.8.88',
+      dataPath: '/mnt/user/appdata/qpq-app',
     });
   });
 

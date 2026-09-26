@@ -47,7 +47,9 @@
         "portMappings": "80:8080, 8888:8888, 3001:3001, 3090:3090",
         "registry": "192.168.8.88:5000",
         "arch": "linux/amd64",
-        "tag": "latest"
+        "tag": "latest",
+        "publicHost": "192.168.8.88",
+        "dataPath": "/mnt/user/appdata/qpq-qpqjs"
       }
     }
   }

@@ -17,4 +17,12 @@ export type QpqDockerPlatformSettings = {
 
   // Image tag. Default: the deployment's environment.
   tag?: string;
+
+  // The address browsers reach the host on, e.g. "192.168.8.88" or "unraid.local". Secure file
+  // upload/download urls are absolute and point here. Default: localhost.
+  publicHost?: string;
+
+  // Host directory for the app's state (key-value stores, file storage), e.g.
+  // "/mnt/user/appdata/qpq-myapp". Default: a docker named volume.
+  dataPath?: string;
 };
