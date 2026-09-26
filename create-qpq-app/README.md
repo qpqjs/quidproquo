@@ -26,11 +26,15 @@ npx create-qpq-app <app-name> [options]
 
 --language <typescript|javascript>   skip the language prompt
 --domain <domain>                    app domain (default: <app-name>.example.com)
+--docker-registry <host[:port]>      registry qpq go pushes the image to (e.g. 192.168.8.88:5000)
+--docker-host <address>              address browsers use for the docker host (e.g. 192.168.8.88)
 --no-git                             skip git init
 --no-install                         skip npm install
 ```
 
 Pass `--language javascript` and you get the same app with type annotations stripped and JSX preserved, running on the same toolchain.
+
+The two docker flags are asked for when you run interactively and can be left blank. They fill the docker deployments' `platformSettings` in `apps/<app>/deploy.config.json` (registry, `linux/amd64`, `publicHost`, and an appdata `dataPath`), so `npm run deploy` pushes an image and writes a `docker-compose.yml` that runs on a self-hosting box like Unraid as is. Edit the file later to change any of it.
 
 ## How it works
 

@@ -4,6 +4,7 @@ export * from './getOwnVersion';
 export * from './getPositionalArgs';
 export * from './listFilesRecursive';
 export * from './promptSelect';
+export * from './promptText';
 export * from './readJsonFile';
 export * from './replaceInFiles';
 export * from './runCommand';

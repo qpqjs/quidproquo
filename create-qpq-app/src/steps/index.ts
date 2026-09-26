@@ -5,13 +5,14 @@ import { deleteDocusaurus } from './003_deleteDocusaurus';
 import { deleteQpqjsApp } from './004_deleteQpqjsApp';
 import { applyAppIdentity } from './005_applyAppIdentity';
 import { applyDomain } from './006_applyDomain';
-import { pinRegistryVersions } from './007_pinRegistryVersions';
-import { transpileToJavaScript } from './008_transpileToJavaScript';
-import { restoreGitignore } from './009_restoreGitignore';
-import { gitInit } from './010_gitInit';
-import { npmInstall } from './011_npmInstall';
-import { buildWorkspaces } from './012_buildWorkspaces';
-import { printNextSteps } from './013_printNextSteps';
+import { applyDockerHost } from './007_applyDockerHost';
+import { pinRegistryVersions } from './008_pinRegistryVersions';
+import { transpileToJavaScript } from './009_transpileToJavaScript';
+import { restoreGitignore } from './010_restoreGitignore';
+import { gitInit } from './011_gitInit';
+import { npmInstall } from './012_npmInstall';
+import { buildWorkspaces } from './013_buildWorkspaces';
+import { printNextSteps } from './014_printNextSteps';
 
 // The pipeline: always this list, always this order; the numeric file
 // prefixes match, so the steps directory reads top to bottom. Steps decide
@@ -23,6 +24,7 @@ export const createQpqAppSteps: CreateQpqAppStep[] = [
   deleteQpqjsApp,
   applyAppIdentity,
   applyDomain,
+  applyDockerHost,
   pinRegistryVersions,
   transpileToJavaScript,
   restoreGitignore,
@@ -34,6 +36,7 @@ export const createQpqAppSteps: CreateQpqAppStep[] = [
 
 export {
   applyAppIdentity,
+  applyDockerHost,
   applyDomain,
   buildWorkspaces,
   copyTemplate,
