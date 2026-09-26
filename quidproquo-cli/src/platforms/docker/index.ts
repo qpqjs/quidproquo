@@ -8,7 +8,8 @@ const publishNotSupported = async (): Promise<void> => {
 };
 
 export const dockerPlatformDriver: QpqPlatformDriver = {
-  // No identity to prime; only the port mappings need checking before the build starts.
+  // No identity to prime. Mappings are only parsed here; which container ports exist depends
+  // on the app's config, which is not loaded yet, so that check happens in the build.
   prepareDeployment: (deploymentName, deployment) => {
     getDockerPlatformSettings(deploymentName, deployment);
   },

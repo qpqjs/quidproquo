@@ -1,20 +1,17 @@
 import { QpqAppDeployment } from 'quidproquo-core';
 
-import { CONTAINER_PORTS } from './CONTAINER_PORTS';
-import { getDefaultPortMappings } from './getDefaultPortMappings';
-import { assertContainerPorts, parsePortMappings, PortMapping } from './parsePortMappings';
+import { parsePortMappings, PortMapping } from './parsePortMappings';
 
-export type ResolvedDockerPlatformSettings = {
-  portMappings: PortMapping[];
+export type ParsedDockerPlatformSettings = {
+  // Absent when the deployment sets no `portMappings`; the defaults depend on the app's config.
+  portMappings?: PortMapping[];
 };
 
-/** The docker entry's platform settings with defaults applied; throws for a bad port mapping, naming the deployment. */
-export const getDockerPlatformSettings = (deploymentName: string, deployment: QpqAppDeployment): ResolvedDockerPlatformSettings => {
+/** The docker entry's platform settings, parsed; throws for a malformed port mapping, naming the deployment. */
+export const getDockerPlatformSettings = (deploymentName: string, deployment: QpqAppDeployment): ParsedDockerPlatformSettings => {
   const raw = deployment.platformSettings?.portMappings;
   try {
-    const portMappings = raw === undefined ? getDefaultPortMappings(CONTAINER_PORTS) : parsePortMappings(raw);
-    assertContainerPorts(portMappings, CONTAINER_PORTS);
-    return { portMappings };
+    return { portMappings: raw === undefined ? undefined : parsePortMappings(raw) };
   } catch (error) {
     throw new Error(`Invalid docker deployment '${deploymentName}': ${error instanceof Error ? error.message : String(error)}`);
   }

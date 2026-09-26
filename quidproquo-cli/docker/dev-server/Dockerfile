@@ -36,7 +36,8 @@ COPY web/ ./web/
 ENV QPQ_WEB_ROOT=/app/web
 ENV NODE_ENV=production
 
-# api / websocket / file-storage secure urls
+# api + site / websocket / file-storage secure urls, then one port per hosted web
+# entry. The build rewrites this line from the app's config.
 EXPOSE 8080 8888 3001
 
 # Emulated platform state (KVS JSON files + file storage) lives here — mount

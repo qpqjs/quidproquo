@@ -4,7 +4,7 @@ import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineQpqjsService } from '@qpqjs/service-utils';
 
 export default [
-  defineDevServerOptions({ port: 3082 }),
+  defineDevServerOptions({ views: { port: 3082 } }),
 
   // never change the app name, it will result in a new stack!
   defineQpqjsService(

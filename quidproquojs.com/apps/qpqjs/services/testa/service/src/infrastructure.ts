@@ -9,7 +9,7 @@ import { defineSmokeProbes } from './smoke/config/defineSmokeProbes';
 // of its own and exercises the cross-service (foreign ARN) IAM grants against
 // resources the test service owns.
 export default [
-  defineDevServerOptions({ port: 3084 }),
+  defineDevServerOptions({ views: { port: 3084 } }),
 
   // never change the app name, it will result in a new stack!
   defineQpqjsService(

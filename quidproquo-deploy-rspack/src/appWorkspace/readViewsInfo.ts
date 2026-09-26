@@ -8,14 +8,14 @@ import { requireQpqConfig } from './requireQpqConfig';
 import { sanitizeMfName } from './sanitizeMfName';
 import { ViewsInfo } from './ViewsInfo';
 
-// Local dev-server port: the service's `defineDevServerOptions({ port })`,
+// Local dev-server port: the service's `defineDevServerOptions({ views: { port } })`,
 // falling back to a legacy `"port"` in the views package.json, then 4200.
 // Requiring the TS infrastructure module relies on the caller running with TS
 // require hooks (rspack.config.ts evaluation / ts-node), as the views build
 // already does.
 const resolveViewsPort = (viewsDir: string, pkg: { port?: number | string }): number => {
   try {
-    const port = getDevServerOptions(requireQpqConfig(path.join(viewsDir, '..', 'service', 'src', 'infrastructure'))).port;
+    const port = getDevServerOptions(requireQpqConfig(path.join(viewsDir, '..', 'service', 'src', 'infrastructure'))).views?.port;
     if (port) {
       return port;
     }

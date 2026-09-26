@@ -54,7 +54,7 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
 };
 
 export default [
-  defineDevServerOptions({ port: 3080 }),
+  defineDevServerOptions({ views: { port: 3080 } }),
 
   // never change the app name, it will result in a new stack!
   defineTodoService(

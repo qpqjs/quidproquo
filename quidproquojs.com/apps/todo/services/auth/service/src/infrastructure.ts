@@ -4,7 +4,7 @@ import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';
 
 export default [
-  defineDevServerOptions({ port: 3083 }),
+  defineDevServerOptions({ views: { port: 3083 } }),
 
   // never change the app name, it will result in a new stack!
   defineTodoService(

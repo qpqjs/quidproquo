@@ -67,7 +67,11 @@ const docsWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
 };
 
 export default [
-  defineDevServerOptions({ port: 3080 }),
+  defineDevServerOptions({
+    views: { port: 3080 },
+    // The docker image hosts the docs site on this port; AWS gives it docs.<domain>.
+    webEntries: { docs: { port: 3090 } },
+  }),
 
   // never change the app name, it will result in a new stack!
   defineQpqjsService(
