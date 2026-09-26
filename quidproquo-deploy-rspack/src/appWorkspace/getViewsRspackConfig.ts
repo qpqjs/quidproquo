@@ -5,6 +5,7 @@
 // http://localhost:<port>/mf-manifest.json.
 import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { requireDomainResolver } from 'quidproquo-deploy-awscdk';
+import { getWebAddressing } from 'quidproquo-dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
@@ -14,6 +15,7 @@ import { Configuration, rspack } from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
 import { getQpqCircularCheckPlugin } from '../plugins';
+import { getAppServiceQpqConfigs } from './getAppServiceQpqConfigs';
 import { getViewsContext } from './getViewsContext';
 import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
 import { requireQpqConfig } from './requireQpqConfig';
@@ -82,6 +84,15 @@ const buildQpqDefines = (qpqConfig: Nullable<QPQConfig>): Record<string, string>
     [`process.env.QPQ_APPLICATION_CONFIG_INFO_${serviceName.toUpperCase()}`]: JSON.stringify(applicationConfigInfo),
     'process.env.QPQ_APPLICATION_CONFIG_INFO': JSON.stringify(applicationConfigInfo),
   };
+};
+
+// How the bundle addresses the api, websockets and other web entries. The CLI sets
+// QPQ_WEB_ADDRESSING for port-mode builds (dev server, docker); otherwise the build is for
+// subdomain hosting and the entries come from the app's own config.
+const buildWebAddressingDefine = (root: string, appName: string): Record<string, string> => {
+  const baked =
+    process.env.QPQ_WEB_ADDRESSING ?? JSON.stringify(getWebAddressing(getAppServiceQpqConfigs(root, appName), null, requireDomainResolver));
+  return { 'process.env.QPQ_WEB_ADDRESSING': JSON.stringify(baked) };
 };
 
 const swcReactOptions = (isDev: boolean, tsx: boolean) => ({
@@ -248,7 +259,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
         ...(fs.existsSync(favicon) ? { favicon } : {}),
       }),
       ...(fs.existsSync(publicDir) ? [new rspack.CopyRspackPlugin({ patterns: [{ from: publicDir, to: '.' }] })] : []),
-      new rspack.DefinePlugin(buildQpqDefines(qpqConfig)),
+      new rspack.DefinePlugin({ ...buildQpqDefines(qpqConfig), ...buildWebAddressingDefine(root, self.appName) }),
       getQpqCircularCheckPlugin(),
       ...(isDev ? [new ReactRefreshRspackPlugin()] : []),
     ],

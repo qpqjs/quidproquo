@@ -32,6 +32,7 @@ import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
+import { clearWebAddressingEnv, setWebAddressingEnv } from '../../lib/webAddressingEnv';
 import { BASE_CONTAINER_PORTS, getContainerPorts } from './getContainerPorts';
 import { getDockerPlatformSettings } from './getDockerPlatformSettings';
 import { resolvePortMappings } from './resolvePortMappings';
@@ -176,6 +177,10 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs, portableExternals: true }));
 
   // ---- Views: production builds with same-origin federation remotes ----
+  // The browser reaches everything on the page's own host, on the HOST side of the port
+  // mappings; an unmapped port stays as is (nothing outside the container can reach it anyway).
+  const mapHostPort = (containerPort: number): number => portMappings.find((mapping) => mapping.container === containerPort)?.host ?? containerPort;
+  setWebAddressingEnv(qpqConfigs, { api: DEV_SERVER_PORTS.api, webSocket: DEV_SERVER_PORTS.webSocket, mapHostPort });
   process.env.QPQ_VIEWS_REMOTE_BASE = `/${FEDERATED_VIEWS_SUBDOMAIN}`;
   const viewServices = getServiceNamesWithViews(appName);
   for (const serviceName of viewServices) {
@@ -183,6 +188,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     await bundleViews(appName, serviceName);
   }
   delete process.env.QPQ_VIEWS_REMOTE_BASE;
+  clearWebAddressingEnv();
 
   // ---- Assemble the image context ----
   console.log('Assembling image context');

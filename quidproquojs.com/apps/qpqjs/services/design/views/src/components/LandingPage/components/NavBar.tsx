@@ -1,14 +1,6 @@
-// Docs live on the docs. subdomain of whatever apex this page is served from
-// (minus the views. prefix on federated views); localhost falls back to prod.
-const getDocsUrl = (): string => {
-  const { hostname, protocol, host } = window.location;
+import { getWebEntryUrl } from 'quidproquo-web';
 
-  if (hostname === 'localhost' || hostname.endsWith('.localhost')) {
-    return 'https://docs.quidproquojs.com';
-  }
-
-  return `${protocol}//docs.${host.replace(/^views\./, '')}`;
-};
+const getDocsUrl = (): string => getWebEntryUrl('docs');
 
 export function NavBar() {
   return (

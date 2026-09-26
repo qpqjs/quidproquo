@@ -8,7 +8,7 @@
 //   qpq go:dev:web
 //   qpq go:dev:web --only shell,design
 //   qpq go:dev:web --app <name>
-import { getAllViews, getViewsRspackConfig } from 'quidproquo-deploy-rspack';
+import { getAllViews, getAppServiceQpqConfigs, getViewsRspackConfig } from 'quidproquo-deploy-rspack';
 
 import http from 'http';
 import { rspack } from '@rspack/core';
@@ -16,11 +16,13 @@ import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { hasArgFlag } from '../lib/args';
+import { DEV_SERVER_PORTS } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
+import { setWebAddressingEnv } from '../lib/webAddressingEnv';
 
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
@@ -38,6 +40,13 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   process.env.LOCAL_DEV_SERVER = 'true';
   process.env.NODE_ENV = 'development';
   await resolveDeployment(argv, appName);
+
+  // Local pages address the api dev server and each other by port on localhost.
+  setWebAddressingEnv(getAppServiceQpqConfigs(root, appName), {
+    api: DEV_SERVER_PORTS.api,
+    webSocket: DEV_SERVER_PORTS.webSocket,
+    mapHostPort: (port) => port,
+  });
 
   const only = getArgValue(argv, '--only')
     ?.split(',')
