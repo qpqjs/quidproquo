@@ -9,6 +9,7 @@ import { kvsStreamPlugin } from './kvsStreamPlugin';
 import { queuePlugin } from './queuePlugin';
 import { schedulePlugin } from './schedulePlugin';
 import { serviceFunctionPlugin } from './serviceFunctionPlugin';
+import { webEntryHostsPlugin } from './webEntryHostsPlugin';
 import { webSocketPlugin } from './webSocketPlugin';
 
 /**
@@ -34,6 +35,7 @@ export const DEV_SERVER_PLUGINS: DevServerPlugin[] = [
   schedulePlugin,
 
   apiPlugin,
+  webEntryHostsPlugin,
   webSocketPlugin,
   fileStoragePlugin,
   fileWatcherPlugin,

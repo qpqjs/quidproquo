@@ -11,4 +11,5 @@ export * from './schedulePlugin';
 export * from './serviceFunctionPlugin';
 export * from './startDevServerPlugins';
 export * from './types';
+export * from './webEntryHostsPlugin';
 export * from './webSocketPlugin';

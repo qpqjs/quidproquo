@@ -115,10 +115,13 @@ though layers are the AWS mechanism.
 Fonts/images are already default-on in the views build. Grow on demand (extra asset
 extensions, extra MF shared packages, html tweaks). Don't add speculative options.
 
-### defineDevServerOptions({ port }) — exported from quidproquo-dev-server
+### defineDevServerOptions({ views, webEntries }) — exported from quidproquo-dev-server
 
-Replaces the `"port": 3069` smuggled into views package.json. The package that
-consumes the setting exports it, same pattern as AWS-only settings living in
+`views: { port }` replaces the `"port": 3069` smuggled into views package.json.
+`webEntries: { <name>: { port } }` gives a service's other web entries (docs and
+the like) a port of their own, which the docker image listens on; the shell's
+website and views entries always ride the api port. The package that consumes
+the setting exports it, same pattern as AWS-only settings living in
 quidproquo-config-aws. No `defineDevServerBundleOptions` for now — the dev server
 runs from source with real node_modules, so bundling concerns dissolve there by
 construction; add it only when a genuine dev-only build tweak appears.

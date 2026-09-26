@@ -8,4 +8,5 @@ export * from './queueImplementation';
 export * from './schedule';
 export * from './serviceFunctionImplementation';
 export * from './tinkerImplementation';
+export * from './webEntryHostsImplementation';
 export * from './webSocket';

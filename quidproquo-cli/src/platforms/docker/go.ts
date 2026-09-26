@@ -6,21 +6,25 @@
 //   2. Build every views microfrontend with a same-origin module-federation
 //      remote base (/views/<svc>), mirroring the AWS website/views layout.
 //   3. Assemble an image context under dist/qpq/docker-image/<app>/ — server
-//      bundle, web root, a workspaces-stripped package.json for runtime deps,
-//      and the locally-built quidproquo packages as a vendor overlay.
+//      bundle, web root (views plus every other web entry given a port, each
+//      hosted on that port), a workspaces-stripped package.json for runtime
+//      deps, and the locally-built quidproquo packages as a vendor overlay.
 //   4. docker build, then print the run command.
 //
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from 'quidproquo-config-aws';
-import { QpqDeployEnvVar } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, QpqDeployEnvVar } from 'quidproquo-core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
+import { getWebEntryHostDir, getWebEntryHosts, WebEntryHost } from 'quidproquo-dev-server';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
 import path from 'path';
 
 import { DeployPlan } from '../../lib/deployPrompts';
 import { writeDevServerEntry } from '../../lib/devServerEntry';
+import { DEV_SERVER_PORTS } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
@@ -28,9 +32,47 @@ import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
+import { BASE_CONTAINER_PORTS, getContainerPorts } from './getContainerPorts';
 import { getDockerPlatformSettings } from './getDockerPlatformSettings';
+import { resolvePortMappings } from './resolvePortMappings';
 
 const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
+
+// The shell's website and views entries are served same-origin on the api port by
+// convention; anything else only reaches the image through a defineDevServerOptions port.
+const SAME_ORIGIN_WEB_ENTRIES = ['website', 'views'];
+
+const listUnhostedWebEntries = (qpqConfigs: QPQConfig[], hosts: WebEntryHost[]): string[] =>
+  qpqConfigs.flatMap((qpqConfig) => {
+    const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+    return qpqWebServerUtils
+      .getWebEntryConfigs(qpqConfig)
+      .filter((entry) => !SAME_ORIGIN_WEB_ENTRIES.includes(entry.name))
+      .filter((entry) => !hosts.some((host) => host.service === service && host.entryName === entry.name))
+      .map((entry) => `${service}/${entry.name}`);
+  });
+
+// Each hosted entry's build output goes where the runtime looks for it. A missing build is
+// an error here rather than an empty site later: the entry asked to be hosted.
+const copyWebEntryHosts = (contextDir: string, hosts: WebEntryHost[]): void => {
+  for (const host of hosts) {
+    if (!host.webEntry.buildPath) {
+      throw new Error(`Web entry ${host.service}/${host.entryName} has a port but no buildPath, so there is nothing to host`);
+    }
+    const buildDir = path.resolve(host.configRoot, host.webEntry.buildPath);
+    if (!fs.existsSync(path.join(buildDir, host.webEntry.indexRoot))) {
+      throw new Error(`Web entry ${host.service}/${host.entryName} has no ${host.webEntry.indexRoot} under ${buildDir}; build it before qpq go`);
+    }
+    fs.cpSync(buildDir, getWebEntryHostDir(path.join(contextDir, 'web'), host), { recursive: true });
+  }
+};
+
+// The Dockerfile is shared; only its EXPOSE line depends on the app.
+const writeDockerfile = (contextDir: string, containerPorts: number[]): void => {
+  const template = fs.readFileSync(path.join(getOwnPackageRoot(), 'docker', 'dev-server', 'Dockerfile'), 'utf8');
+  const dockerfile = template.replace(/^EXPOSE .*$/m, `EXPOSE ${containerPorts.join(' ')}`);
+  fs.writeFileSync(path.join(contextDir, 'Dockerfile'), dockerfile);
+};
 
 // The consumer root package.json, stripped to what the image's npm install
 // needs: runtime dependencies (+ overrides). Workspaces/scripts/devDeps are
@@ -102,7 +144,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   const root = getRoot();
   const deploymentName = process.env[QpqDeployEnvVar.deployName]!;
-  const { portMappings } = getDockerPlatformSettings(deploymentName, getQpqAppDeployment(root, appName, deploymentName));
+  const dockerSettings = getDockerPlatformSettings(deploymentName, getQpqAppDeployment(root, appName, deploymentName));
 
   // Tagged by the deployment's name, not the app folder, so two products built
   // from one codebase get separate images and data volumes.
@@ -126,6 +168,15 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   // ---- Server bundle: the dev server + every service, one main.js ----
   console.log('Bundling server (dev server + all services)');
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
+
+  // Resolved before anything slow runs, so a bad port fails the build up front.
+  const webEntryHosts = getWebEntryHosts(qpqConfigs, BASE_CONTAINER_PORTS);
+  const containerPorts = getContainerPorts(webEntryHosts);
+  const portMappings = resolvePortMappings(deploymentName, dockerSettings, containerPorts);
+  for (const unhosted of listUnhostedWebEntries(qpqConfigs, webEntryHosts)) {
+    console.warn(`Web entry ${unhosted} has no port in defineDevServerOptions({ webEntries }) and will not be in the image`);
+  }
+
   const entry = writeDevServerEntry(root, appName);
   // The image installs its own node_modules next to the bundle, so externals
   // must stay bare; host-resolved absolute paths do not exist in the container.
@@ -146,7 +197,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   fs.rmSync(contextDir, { recursive: true, force: true });
   fs.mkdirSync(contextDir, { recursive: true });
 
-  fs.copyFileSync(path.join(getOwnPackageRoot(), 'docker', 'dev-server', 'Dockerfile'), path.join(contextDir, 'Dockerfile'));
+  writeDockerfile(contextDir, containerPorts);
   writeImagePackageJson(root, contextDir);
 
   const vendored = vendorQuidproquoPackages(root, contextDir);
@@ -164,14 +215,20 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     }
   }
 
+  copyWebEntryHosts(contextDir, webEntryHosts);
+
   // ---- Build the image ----
   console.log('Building docker image');
   await runCommand('docker', ['build', '-t', imageTag, contextDir]);
 
   logTimeEnd('totalTime');
 
-  const sitePort = portMappings.find((mapping) => mapping.container === 8080)?.host;
+  const hostUrl = (containerPort: number): string => {
+    const hostPort = portMappings.find((mapping) => mapping.container === containerPort)?.host;
+    return hostPort === undefined ? `(container port ${containerPort} is not mapped)` : `http://localhost${hostPort === 80 ? '' : `:${hostPort}`}`;
+  };
   const portFlags = portMappings.map((mapping) => `-p ${mapping.host}:${mapping.container}`).join(' ');
+  const entryLines = webEntryHosts.map((host) => `  ${host.service}/${host.entryName}: ${hostUrl(host.port)}`).join('\n');
   console.log(`
 Done. The image is [${imageTag}] in the local docker store.
 
@@ -179,8 +236,8 @@ Run it here:
 
   docker run --rm ${portFlags} -v ${volumeName}:/app/.qpq-runtime ${imageTag}
 
-Then open http://localhost${sitePort && sitePort !== 80 ? `:${sitePort}` : ''}
-
+Then open ${hostUrl(DEV_SERVER_PORTS.api)}
+${entryLines ? `\nOther web entries:\n${entryLines}\n` : ''}
 Or export it for another host (Unraid: upload the tarball, map the same ports and the /app/.qpq-runtime volume):
 
   docker save ${imageTag} | gzip > ${path.join(contextDir, `${imageTag.replace(':', '-')}.tar.gz`)}

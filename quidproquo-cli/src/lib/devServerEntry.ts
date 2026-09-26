@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+import { DEV_SERVER_PORTS } from './devServerPorts';
 import { getAppDirectory } from './discovery';
 
 // TODO: This file is a mess, revisit and clean up.
@@ -40,12 +41,13 @@ ${overridesImport}
 ${mode === 'migrate' ? 'runMigrations' : 'startDevServer'}(
   {
     serverDomain: 'localhost',
-    serverPort: 8080,
-    webSocketPort: 8888,
+    serverPort: ${DEV_SERVER_PORTS.api},
+    webSocketPort: ${DEV_SERVER_PORTS.webSocket},
     // Scoped per app so running the dev server for two apps out of the same
     // repo root doesn't share kvs/file-storage/config state.
     runtimePath: ${JSON.stringify(path.join('.qpq-runtime', appName))},
     fileStorageConfig: {
+      secureUrlPort: ${DEV_SERVER_PORTS.fileStorage},
       secureUrlSecret: 'dev-secure-url-secret',
     },
     qpqConfigs,
