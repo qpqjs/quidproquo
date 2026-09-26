@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.28
+
+- cli/core/config-aws/deploy-awscdk: `deploy.config.json` is a map of named deployments and `qpq` commands select one with `--deployment <name>`. Each entry carries its platform, name, environment, optional feature, platform settings (aws account and region) and a `settings` map that reaches `infrastructure.ts` as `DEPLOY_SETTING_<KEY>` env vars via `getDeploySetting`. The file is the source of truth: no env var or flag overrides it, and root domains come from a deploy setting instead of an app constant
+- cli: docker deployments can push to a registry, build for a chosen architecture, and write a compose file for a remote host. `qpq setup` prompts for the registry and host, and `publicHost` and `dataPath` settings set the host secure file urls carry and where state lives on disk
+- cli/dev-server: the docker image hosts every web entry. `defineDevServerOptions({ views, webEntries })` gives an entry such as docs its own container port; anything without one is routed same-origin on the api port by its domain. Port mappings are configurable per deployment, the image tag is scoped to the deployment name, the file storage host port no longer has to match the container port, and an app can set its dev server ports in `devServer.config.ts`
+- web/webserver/dev-server: frontends resolve api, websocket, federated views and web entry urls from web addressing config baked in at build time, through the `quidproquo-web` addressing helpers, instead of sniffing `window.location`
+- deploy-rspack: the docker dev server bundle keeps externals bare (`portableExternals`) so they resolve inside the container rather than to paths on the building machine
+
+### Breaking changes
+
+- `deploy.config.json` changes shape to `{ deployments: { <name>: {...} } }`; `prefix`/`environments` are gone
+- `qpq` commands take `--deployment <name>` instead of `--env`, and `--platform` is removed
+- primed env vars are `APPLICATION_NAME`, `ENVIRONMENT`, `FEATURE_NAME` (was `ACTOR_NAME`), `DEPLOY_NAME` and `DEPLOY_APP_NAME`
+- deploy-awscdk: `getQpqAppDeployContext(root, appName, deploymentName)`; the deploy config types and `findWorkspaceRoot` move out or are removed
+- config-aws owns the deploy config reader and aws narrowing; `QpqPlatformDriver.primeDeployIdentity` becomes `prepareDeployment`
+- `defineDevServerOptions` takes `{ views?, webEntries? }` instead of `{ port }`
+- docker image tag and data volume are keyed by deployment name; `platformSettings.portMappings` is validated before the build
+- `getDevServerRspackConfig` gains a `portableExternals` option
+- `FileStorageConfig` requires `secureUrlPublicPort`, and `writeComposeFile` requires `publicFileStoragePort`
+- cli docker helpers change shape: `DEFAULT_DEV_SERVER_PORTS` + `readDevServerPorts` replace `DEV_SERVER_PORTS`, and the port helpers take the dev server ports
+
 ## 0.1.27
 
 - core/actionprocessor-awslambda/deploy-awscdk/dev-server: scoped key value stores support GSIs. The index keeps its name and sort key, and its partition key is scope-composed so a query only sees the caller's scope
