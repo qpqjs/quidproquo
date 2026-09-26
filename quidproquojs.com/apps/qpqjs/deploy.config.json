@@ -42,6 +42,12 @@
       "environment": "local",
       "settings": {
         "ROOT_DOMAINS": "quidproquojs.com, qpqjs.com"
+      },
+      "platformSettings": {
+        "portMappings": "80:8080, 8888:8888, 3001:3001, 3090:3090",
+        "registry": "192.168.8.88:5000",
+        "arch": "linux/amd64",
+        "tag": "latest"
       }
     }
   }

@@ -9,7 +9,8 @@
 //      bundle, web root (every web entry, placed by its port or its domain),
 //      a workspaces-stripped package.json for runtime deps, and the
 //      locally-built quidproquo packages as a vendor overlay.
-//   4. docker build, then print the run command.
+//   4. docker build (buildx with a push when the deployment names a registry or
+//      a target platform), write a docker-compose.yml, print how to run it.
 //
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
@@ -34,8 +35,10 @@ import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
 import { clearWebAddressingEnv, setWebAddressingEnv } from '../../lib/webAddressingEnv';
 import { BASE_CONTAINER_PORTS, getContainerPorts } from './getContainerPorts';
-import { getDockerPlatformSettings } from './getDockerPlatformSettings';
+import { getDockerPlatformSettings, ParsedDockerPlatformSettings } from './getDockerPlatformSettings';
+import { getImageName } from './getImageName';
 import { resolvePortMappings } from './resolvePortMappings';
+import { writeComposeFile } from './writeComposeFile';
 
 const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
 
@@ -62,6 +65,19 @@ const copyWebEntryContent = (appName: string, contextDir: string, entry: WebEntr
     throw new Error(`Web entry ${label} has no ${entry.webEntry.indexRoot} under ${buildDir}; build it before qpq go`);
   }
   fs.cpSync(buildDir, targetDir, { recursive: true });
+};
+
+// Plain `docker build` into the local store unless the deployment asks for a registry or a
+// target platform, which need buildx: `--push` sends a cross-platform image straight to the
+// registry, `--load` keeps a same-machine one local.
+const buildImage = async (imageName: string, contextDir: string, settings: ParsedDockerPlatformSettings): Promise<void> => {
+  if (!settings.registry && !settings.arch) {
+    await runCommand('docker', ['build', '-t', imageName, contextDir]);
+    return;
+  }
+
+  const platformArgs = settings.arch ? ['--platform', settings.arch] : [];
+  await runCommand('docker', ['buildx', 'build', ...platformArgs, '-t', imageName, settings.registry ? '--push' : '--load', contextDir]);
 };
 
 // The Dockerfile is shared; only its EXPOSE line depends on the app.
@@ -143,15 +159,14 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const deploymentName = process.env[QpqDeployEnvVar.deployName]!;
   const dockerSettings = getDockerPlatformSettings(deploymentName, getQpqAppDeployment(root, appName, deploymentName));
 
-  // Tagged by the deployment's name, not the app folder, so two products built
-  // from one codebase get separate images and data volumes.
-  const applicationName = process.env[QpqDeployEnvVar.applicationName];
-  const imageTag = `qpq-${applicationName}:${process.env[QpqDeployEnvVar.environment]}`;
-  const volumeName = `qpq-${applicationName}-data`;
+  const applicationName = process.env[QpqDeployEnvVar.applicationName]!;
+  const imageName = getImageName(applicationName, dockerSettings);
+  const containerName = `qpq-${applicationName}`;
+  const volumeName = `${containerName}-data`;
 
   // The dev server hosts every service of the app, so per-service/stack
   // selections don't apply — the image is always the whole app.
-  console.log(`\n\nBuilding docker image [${imageTag}] — the whole app deploys as one image\n\n`);
+  console.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
 
   logTimeStart('totalTime');
 
@@ -208,9 +223,13 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     copyWebEntryContent(appName, contextDir, entry, viewServices);
   }
 
+  const composePath = writeComposeFile({ contextDir, imageName, serviceName: containerName, volumeName, portMappings });
+
   // ---- Build the image ----
-  console.log('Building docker image');
-  await runCommand('docker', ['build', '-t', imageTag, contextDir]);
+  console.log(
+    `Building docker image${dockerSettings.arch ? ` for ${dockerSettings.arch}` : ''}${dockerSettings.registry ? `, pushing to ${dockerSettings.registry}` : ''}`,
+  );
+  await buildImage(imageName, contextDir, dockerSettings);
 
   logTimeEnd('totalTime');
 
@@ -218,25 +237,25 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     const hostPort = portMappings.find((mapping) => mapping.container === containerPort)?.host;
     return hostPort === undefined ? `(container port ${containerPort} is not mapped)` : `http://localhost${hostPort === 80 ? '' : `:${hostPort}`}`;
   };
-  const portFlags = portMappings.map((mapping) => `-p ${mapping.host}:${mapping.container}`).join(' ');
   const siteUrl = hostUrl(DEV_SERVER_PORTS.api);
   const entryLines = [
     ...webEntryRoutes.map((route) => `  ${route.service}/${route.entryName}: ${siteUrl}${route.path === '/' ? '' : route.path}`),
     ...webEntryHosts.map((host) => `  ${host.service}/${host.entryName}: ${hostUrl(host.port)}`),
   ].join('\n');
+  const where = dockerSettings.registry ? `pushed to [${imageName}]` : `[${imageName}] in the local docker store`;
+  const onHost = dockerSettings.registry
+    ? `On the host (Unraid: Compose Manager, or any docker host), copy the compose file there and run:`
+    : `Run it here:`;
   console.log(`
-Done. The image is [${imageTag}] in the local docker store.
+Done. The image is ${where}.
 
-Run it here:
+${onHost}
 
-  docker run --rm ${portFlags} -v ${volumeName}:/app/.qpq-runtime ${imageTag}
+  docker compose -f ${composePath} up -d
 
-Then open ${siteUrl}
+Then open ${siteUrl} (replace localhost with the host's address)
 ${entryLines ? `\nWeb entries:\n${entryLines}\n` : ''}
-Or export it for another host (Unraid: upload the tarball, map the same ports and the /app/.qpq-runtime volume):
-
-  docker save ${imageTag} | gzip > ${path.join(contextDir, `${imageTag.replace(':', '-')}.tar.gz`)}
-
-(ports come from the deployment's platformSettings.portMappings: ${portMappings.map((m) => `${m.host}:${m.container}`).join(', ')})
+Ports come from the deployment's platformSettings.portMappings (${portMappings.map((m) => `${m.host}:${m.container}`).join(', ')})
+and are baked into the frontend, so a host must map the same ones. App state lives in the ${volumeName} volume.
 `);
 };
