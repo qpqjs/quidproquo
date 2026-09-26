@@ -7,6 +7,7 @@ import multer from 'multer';
 import path from 'path';
 
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
+import { getWebEntryDir, getWebEntryPlacements } from '../config/webEntryHosts';
 import { closeHttpServerGracefully, isDevServerReady, processEvent } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
@@ -136,12 +137,16 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
     res.json(result);
   });
 
-  // Pre-built views (docker platform image): shell at /, remotes at
-  // /views/<svc> — the same layout as the AWS website/views buckets, so the
-  // module-federation manifests resolve with a root-relative remote base.
-  if (devServerConfig.webRoot) {
-    app.use('/views', express.static(path.join(devServerConfig.webRoot, 'views')));
-    app.use(express.static(path.join(devServerConfig.webRoot, 'website')));
+  // Pre-built web (docker platform image): every web entry without a port of its own is
+  // served here by its domain, the subdomain entries under /<subdomain> and the root-domain
+  // entry at /, the same shape as the AWS distributions on one origin.
+  const { webRoot } = devServerConfig;
+  const webRoutes = webRoot
+    ? getWebEntryPlacements(devServerConfig.qpqConfigs).routes.map((route) => ({ route, dir: getWebEntryDir(webRoot, route) }))
+    : [];
+  const rootRoute = webRoutes.find(({ route }) => route.path === '/');
+  for (const { route, dir } of webRoutes) {
+    app.use(route.path, express.static(dir));
   }
 
   // Proxy for all services
@@ -199,9 +204,9 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
           res.status(response.result.statusCode).send(response.result.body);
         }
       }
-    } else if (devServerConfig.webRoot && req.method === 'GET' && req.accepts('html')) {
-      // SPA fallback — client-side routes resolve to the shell's index.html.
-      res.sendFile(path.resolve(devServerConfig.webRoot, 'website', 'index.html'));
+    } else if (rootRoute && req.method === 'GET' && req.accepts('html')) {
+      // SPA fallback — client-side routes resolve to the root entry's index.
+      res.sendFile(path.resolve(rootRoute.dir, rootRoute.route.webEntry.indexRoot));
     } else {
       console.log(`NotFound::[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);
       res.status(500).send({ message: 'resource does not exist' });

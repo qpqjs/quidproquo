@@ -4,20 +4,20 @@
 //
 //   1. Build workspace packages, then the dev-server bundle (all services).
 //   2. Build every views microfrontend with a same-origin module-federation
-//      remote base (/views/<svc>), mirroring the AWS website/views layout.
+//      remote base (/<views subdomain>/<svc>), mirroring the AWS layout.
 //   3. Assemble an image context under dist/qpq/docker-image/<app>/ — server
-//      bundle, web root (views plus every other web entry given a port, each
-//      hosted on that port), a workspaces-stripped package.json for runtime
-//      deps, and the locally-built quidproquo packages as a vendor overlay.
+//      bundle, web root (every web entry, placed by its port or its domain),
+//      a workspaces-stripped package.json for runtime deps, and the
+//      locally-built quidproquo packages as a vendor overlay.
 //   4. docker build, then print the run command.
 //
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils, QpqDeployEnvVar } from 'quidproquo-core';
+import { QpqDeployEnvVar } from 'quidproquo-core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
-import { getWebEntryHostDir, getWebEntryHosts, WebEntryHost } from 'quidproquo-dev-server';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from 'quidproquo-dev-server';
+import { FEDERATED_VIEWS_SUBDOMAIN } from 'quidproquo-webserver';
 
 import fs from 'fs';
 import path from 'path';
@@ -38,33 +38,29 @@ import { resolvePortMappings } from './resolvePortMappings';
 
 const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
 
-// The shell's website and views entries are served same-origin on the api port by
-// convention; anything else only reaches the image through a defineDevServerOptions port.
-const SAME_ORIGIN_WEB_ENTRIES = ['website', 'views'];
+// Every web entry's files go where the runtime looks for them. The federated views entry
+// is assembled from every service's views build (one folder per service, as on AWS);
+// anything else is its own buildPath. A missing build fails here rather than serving an
+// empty site later.
+const copyWebEntryContent = (appName: string, contextDir: string, entry: WebEntryHost | WebEntryRoute, viewServices: string[]): void => {
+  const label = `${entry.service}/${entry.entryName}`;
+  const targetDir = getWebEntryDir(path.join(contextDir, 'web'), entry);
 
-const listUnhostedWebEntries = (qpqConfigs: QPQConfig[], hosts: WebEntryHost[]): string[] =>
-  qpqConfigs.flatMap((qpqConfig) => {
-    const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-    return qpqWebServerUtils
-      .getWebEntryConfigs(qpqConfig)
-      .filter((entry) => !SAME_ORIGIN_WEB_ENTRIES.includes(entry.name))
-      .filter((entry) => !hosts.some((host) => host.service === service && host.entryName === entry.name))
-      .map((entry) => `${service}/${entry.name}`);
-  });
-
-// Each hosted entry's build output goes where the runtime looks for it. A missing build is
-// an error here rather than an empty site later: the entry asked to be hosted.
-const copyWebEntryHosts = (contextDir: string, hosts: WebEntryHost[]): void => {
-  for (const host of hosts) {
-    if (!host.webEntry.buildPath) {
-      throw new Error(`Web entry ${host.service}/${host.entryName} has a port but no buildPath, so there is nothing to host`);
+  if (entry.webEntry.domain.subDomainName === FEDERATED_VIEWS_SUBDOMAIN) {
+    for (const serviceName of viewServices) {
+      fs.cpSync(getViewsDistDir(appName, serviceName), path.join(targetDir, serviceName), { recursive: true });
     }
-    const buildDir = path.resolve(host.configRoot, host.webEntry.buildPath);
-    if (!fs.existsSync(path.join(buildDir, host.webEntry.indexRoot))) {
-      throw new Error(`Web entry ${host.service}/${host.entryName} has no ${host.webEntry.indexRoot} under ${buildDir}; build it before qpq go`);
-    }
-    fs.cpSync(buildDir, getWebEntryHostDir(path.join(contextDir, 'web'), host), { recursive: true });
+    return;
   }
+
+  if (!entry.webEntry.buildPath) {
+    throw new Error(`Web entry ${label} has no buildPath, so there is nothing to serve`);
+  }
+  const buildDir = path.resolve(entry.configRoot, entry.webEntry.buildPath);
+  if (!fs.existsSync(path.join(buildDir, entry.webEntry.indexRoot))) {
+    throw new Error(`Web entry ${label} has no ${entry.webEntry.indexRoot} under ${buildDir}; build it before qpq go`);
+  }
+  fs.cpSync(buildDir, targetDir, { recursive: true });
 };
 
 // The Dockerfile is shared; only its EXPOSE line depends on the app.
@@ -169,13 +165,10 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   console.log('Bundling server (dev server + all services)');
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
 
-  // Resolved before anything slow runs, so a bad port fails the build up front.
-  const webEntryHosts = getWebEntryHosts(qpqConfigs, BASE_CONTAINER_PORTS);
+  // Resolved before anything slow runs, so a bad port or domain fails the build up front.
+  const { hosts: webEntryHosts, routes: webEntryRoutes } = getWebEntryPlacements(qpqConfigs, BASE_CONTAINER_PORTS);
   const containerPorts = getContainerPorts(webEntryHosts);
   const portMappings = resolvePortMappings(deploymentName, dockerSettings, containerPorts);
-  for (const unhosted of listUnhostedWebEntries(qpqConfigs, webEntryHosts)) {
-    console.warn(`Web entry ${unhosted} has no port in defineDevServerOptions({ webEntries }) and will not be in the image`);
-  }
 
   const entry = writeDevServerEntry(root, appName);
   // The image installs its own node_modules next to the bundle, so externals
@@ -183,7 +176,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs, portableExternals: true }));
 
   // ---- Views: production builds with same-origin federation remotes ----
-  process.env.QPQ_VIEWS_REMOTE_BASE = '/views';
+  process.env.QPQ_VIEWS_REMOTE_BASE = `/${FEDERATED_VIEWS_SUBDOMAIN}`;
   const viewServices = getServiceNamesWithViews(appName);
   for (const serviceName of viewServices) {
     console.log(`Bundling views: [${serviceName}]`);
@@ -205,17 +198,9 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   fs.cpSync(path.join(root, 'dist', 'qpq', 'dev-server'), path.join(contextDir, 'server'), { recursive: true });
 
-  // Web root mirrors the AWS buckets: shell at website/, every views build
-  // (shell included) under views/<svc>/.
-  for (const serviceName of viewServices) {
-    const viewsDist = getViewsDistDir(appName, serviceName);
-    fs.cpSync(viewsDist, path.join(contextDir, 'web', 'views', serviceName), { recursive: true });
-    if (serviceName === 'shell') {
-      fs.cpSync(viewsDist, path.join(contextDir, 'web', 'website'), { recursive: true });
-    }
+  for (const entry of [...webEntryRoutes, ...webEntryHosts]) {
+    copyWebEntryContent(appName, contextDir, entry, viewServices);
   }
-
-  copyWebEntryHosts(contextDir, webEntryHosts);
 
   // ---- Build the image ----
   console.log('Building docker image');
@@ -228,7 +213,11 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     return hostPort === undefined ? `(container port ${containerPort} is not mapped)` : `http://localhost${hostPort === 80 ? '' : `:${hostPort}`}`;
   };
   const portFlags = portMappings.map((mapping) => `-p ${mapping.host}:${mapping.container}`).join(' ');
-  const entryLines = webEntryHosts.map((host) => `  ${host.service}/${host.entryName}: ${hostUrl(host.port)}`).join('\n');
+  const siteUrl = hostUrl(DEV_SERVER_PORTS.api);
+  const entryLines = [
+    ...webEntryRoutes.map((route) => `  ${route.service}/${route.entryName}: ${siteUrl}${route.path === '/' ? '' : route.path}`),
+    ...webEntryHosts.map((host) => `  ${host.service}/${host.entryName}: ${hostUrl(host.port)}`),
+  ].join('\n');
   console.log(`
 Done. The image is [${imageTag}] in the local docker store.
 
@@ -236,8 +225,8 @@ Run it here:
 
   docker run --rm ${portFlags} -v ${volumeName}:/app/.qpq-runtime ${imageTag}
 
-Then open ${hostUrl(DEV_SERVER_PORTS.api)}
-${entryLines ? `\nOther web entries:\n${entryLines}\n` : ''}
+Then open ${siteUrl}
+${entryLines ? `\nWeb entries:\n${entryLines}\n` : ''}
 Or export it for another host (Unraid: upload the tarball, map the same ports and the /app/.qpq-runtime volume):
 
   docker save ${imageTag} | gzip > ${path.join(contextDir, `${imageTag.replace(':', '-')}.tar.gz`)}

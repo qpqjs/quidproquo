@@ -5,7 +5,7 @@ assembled quickly.
 
 ## vNext
 
-- `defineDevServerOptions` (`quidproquo-dev-server`) takes `{ views?: { port }, webEntries?: { <name>: { port } } }` instead of `{ port }`; `getDevServerOptions(...).port` is now `getDevServerOptions(...).views?.port`. `webEntries` lets a service's non-shell web entries (docs and the like) be hosted on their own port in the docker image; an entry with no port there is skipped from the image build.
+- `defineDevServerOptions` (`quidproquo-dev-server`) takes `{ views?: { port }, webEntries?: { <name>: { port } } }` instead of `{ port }`; `getDevServerOptions(...).port` is now `getDevServerOptions(...).views?.port`. `webEntries` lets a web entry (docs and the like) be hosted on its own port in the docker image; every entry without a port there is instead routed same-origin on the api port by its domain (root-domain entry at `/`, a subdomain entry at `/<subdomain>`), so there is no longer an "unhosted" entry left out of the image.
 - The docker platform image (`qpq go` on a `platform: docker` deployment) is tagged `qpq-<deployment name>:<environment>` (was `qpq-<app folder>:<environment>`) and the data volume is `qpq-<deployment name>-data`. The printed run recipe and a `docker save` export command derive from the mappings. A docker deployment may set `platformSettings.portMappings` (comma-separated `host:container`; default is 80 to the site plus 8080, 8888 and 3001 to themselves); a container port the image does not listen on fails before the build.
 - `getDevServerRspackConfig` (`quidproquo-deploy-rspack`) gains a `portableExternals` option; the docker image is built with it so bare externals resolve inside the container instead of to paths on the building machine.
 
