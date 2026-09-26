@@ -118,9 +118,11 @@ extensions, extra MF shared packages, html tweaks). Don't add speculative option
 ### defineDevServerOptions({ views, webEntries }) — exported from quidproquo-dev-server
 
 `views: { port }` replaces the `"port": 3069` smuggled into views package.json.
-`webEntries: { <name>: { port } }` gives a service's other web entries (docs and
-the like) a port of their own, which the docker image listens on; the shell's
-website and views entries always ride the api port. The package that consumes
+`webEntries: { <name>: { port } }` gives a web entry (docs and the like) a port
+of its own, which the docker image listens on. Every other web entry is served on
+the api port by its domain: the root-domain entry at `/`, a subdomain entry at
+`/<subdomain>` (so the federated views land at `/views`). No service or entry
+names are assumed. The package that consumes
 the setting exports it, same pattern as AWS-only settings living in
 quidproquo-config-aws. No `defineDevServerBundleOptions` for now — the dev server
 runs from source with real node_modules, so bundling concerns dissolve there by

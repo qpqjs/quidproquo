@@ -5,7 +5,7 @@
 // http://localhost:<port>/mf-manifest.json.
 import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { requireDomainResolver } from 'quidproquo-deploy-awscdk';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
 import path from 'path';
@@ -117,7 +117,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
       }
       return service === 'shell'
         ? `https://${qpqWebServerUtils.resolvePrimaryHost(qpqConfig, {}, domainResolver)}`
-        : `https://${qpqWebServerUtils.resolvePrimaryHost(qpqConfig, { subdomain: 'views' }, domainResolver)}/${service}`;
+        : `https://${qpqWebServerUtils.resolvePrimaryHost(qpqConfig, { subdomain: FEDERATED_VIEWS_SUBDOMAIN }, domainResolver)}/${service}`;
     } catch (e) {
       console.warn(`[views-rspack] no prod URL for ${service}:`, (e as Error).message);
       return null;

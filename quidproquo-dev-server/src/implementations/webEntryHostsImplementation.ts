@@ -3,13 +3,10 @@ import fs from 'fs';
 import { Server } from 'http';
 import path from 'path';
 
-import { getWebEntryHosts, WebEntryHost } from '../config/webEntryHosts';
+import { getWebEntryDir, getWebEntryPlacements, WebEntryHost } from '../config/webEntryHosts';
 import { closeHttpServerGracefully } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
-
-/** Where a hosted web entry's files live under the web root. */
-export const getWebEntryHostDir = (webRoot: string, host: WebEntryHost): string => path.join(webRoot, 'entries', host.service, host.entryName);
 
 const startHost = (host: WebEntryHost, dir: string): Server => {
   const app = express();
@@ -43,11 +40,11 @@ export const webEntryHostsImplementation = async (devServerConfig: ResolvedDevSe
   const reservedPorts = [devServerConfig.serverPort, devServerConfig.webSocketPort, devServerConfig.fileStorageConfig.secureUrlPort].filter(
     (port): port is number => port !== undefined,
   );
-  const hosts = getWebEntryHosts(devServerConfig.qpqConfigs, reservedPorts);
+  const { hosts } = getWebEntryPlacements(devServerConfig.qpqConfigs, reservedPorts);
 
   const servers: Server[] = [];
   for (const host of hosts) {
-    const dir = getWebEntryHostDir(webRoot, host);
+    const dir = getWebEntryDir(webRoot, host);
     if (!fs.existsSync(path.join(dir, host.webEntry.indexRoot))) {
       console.warn(`[Qpq - Dev Server]: web entry ${host.service}/${host.entryName} has no ${host.webEntry.indexRoot} under ${dir}, not hosting it`);
       continue;
