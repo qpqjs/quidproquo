@@ -14,6 +14,7 @@ import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
 export const fileConfig: FileStorageConfig = {
   storagePath: '/storage',
   secureUrlPort: 4000,
+  secureUrlPublicPort: 4000,
   secureUrlHost: 'localhost',
   secureUrlSecret: 'secret',
 };

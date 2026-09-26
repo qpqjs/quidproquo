@@ -30,7 +30,7 @@ describe('assertContainerPorts', () => {
 
 describe('getDefaultPortMappings', () => {
   it('maps 80 to the site and every container port to itself', () => {
-    expect(getDefaultPortMappings([8080, 8888, 8100])).toEqual([
+    expect(getDefaultPortMappings(8080, [8080, 8888, 8100])).toEqual([
       { host: 80, container: 8080 },
       { host: 8080, container: 8080 },
       { host: 8888, container: 8888 },

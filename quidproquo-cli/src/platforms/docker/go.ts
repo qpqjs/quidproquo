@@ -25,7 +25,7 @@ import path from 'path';
 
 import { DeployPlan } from '../../lib/deployPrompts';
 import { writeDevServerEntry } from '../../lib/devServerEntry';
-import { DEV_SERVER_PORTS } from '../../lib/devServerPorts';
+import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
@@ -34,7 +34,7 @@ import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
 import { clearWebAddressingEnv, setWebAddressingEnv } from '../../lib/webAddressingEnv';
-import { BASE_CONTAINER_PORTS, getContainerPorts } from './getContainerPorts';
+import { getContainerPorts } from './getContainerPorts';
 import { getDockerPlatformSettings, ParsedDockerPlatformSettings } from './getDockerPlatformSettings';
 import { getImageName } from './getImageName';
 import { resolvePortMappings } from './resolvePortMappings';
@@ -182,17 +182,11 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
 
   // Resolved before anything slow runs, so a bad port or domain fails the build up front.
-  const { hosts: webEntryHosts, routes: webEntryRoutes } = getWebEntryPlacements(qpqConfigs, BASE_CONTAINER_PORTS);
-  const containerPorts = getContainerPorts(webEntryHosts);
-  const portMappings = resolvePortMappings(deploymentName, dockerSettings, containerPorts);
-
-  // Secure file urls carry the container's file-storage port, so the host must expose it as is.
-  const fileStorageMapping = portMappings.find((mapping) => mapping.container === DEV_SERVER_PORTS.fileStorage);
-  if (fileStorageMapping && fileStorageMapping.host !== DEV_SERVER_PORTS.fileStorage) {
-    throw new Error(
-      `Invalid docker deployment '${deploymentName}': file storage port ${DEV_SERVER_PORTS.fileStorage} must map to itself, not ${fileStorageMapping.host}`,
-    );
-  }
+  const devServerPorts = readDevServerPorts(appName);
+  const { hosts: webEntryHosts, routes: webEntryRoutes } = getWebEntryPlacements(qpqConfigs, Object.values(devServerPorts));
+  const containerPorts = getContainerPorts(devServerPorts, webEntryHosts);
+  const portMappings = resolvePortMappings(deploymentName, dockerSettings, devServerPorts.api, containerPorts);
+  const mapHostPort = (containerPort: number): number => portMappings.find((mapping) => mapping.container === containerPort)?.host ?? containerPort;
 
   // Nothing deploys into the container, so the image runs its own pending migrations on start.
   const entry = writeDevServerEntry(root, appName, 'migrate-then-serve');
@@ -203,8 +197,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   // ---- Views: production builds with same-origin federation remotes ----
   // The browser reaches everything on the page's own host, on the HOST side of the port
   // mappings; an unmapped port stays as is (nothing outside the container can reach it anyway).
-  const mapHostPort = (containerPort: number): number => portMappings.find((mapping) => mapping.container === containerPort)?.host ?? containerPort;
-  setWebAddressingEnv(qpqConfigs, { api: DEV_SERVER_PORTS.api, webSocket: DEV_SERVER_PORTS.webSocket, mapHostPort });
+  setWebAddressingEnv(qpqConfigs, { api: devServerPorts.api, webSocket: devServerPorts.webSocket, mapHostPort });
   process.env.QPQ_VIEWS_REMOTE_BASE = `/${FEDERATED_VIEWS_SUBDOMAIN}`;
   const viewServices = getServiceNamesWithViews(appName);
   for (const serviceName of viewServices) {
@@ -240,6 +233,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     portMappings,
     dataPath: dockerSettings.dataPath ?? null,
     publicHost: dockerSettings.publicHost ?? null,
+    publicFileStoragePort: mapHostPort(devServerPorts.fileStorage),
   });
 
   // ---- Build the image ----
@@ -254,7 +248,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     const hostPort = portMappings.find((mapping) => mapping.container === containerPort)?.host;
     return hostPort === undefined ? `(container port ${containerPort} is not mapped)` : `http://localhost${hostPort === 80 ? '' : `:${hostPort}`}`;
   };
-  const siteUrl = hostUrl(DEV_SERVER_PORTS.api);
+  const siteUrl = hostUrl(devServerPorts.api);
   const entryLines = [
     ...webEntryRoutes.map((route) => `  ${route.service}/${route.entryName}: ${siteUrl}${route.path === '/' ? '' : route.path}`),
     ...webEntryHosts.map((host) => `  ${host.service}/${host.entryName}: ${hostUrl(host.port)}`),

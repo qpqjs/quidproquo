@@ -16,7 +16,7 @@ import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { hasArgFlag } from '../lib/args';
-import { DEV_SERVER_PORTS } from '../lib/devServerPorts';
+import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
@@ -42,9 +42,10 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   await resolveDeployment(argv, appName);
 
   // Local pages address the api dev server and each other by port on localhost.
+  const devServerPorts = readDevServerPorts(appName);
   setWebAddressingEnv(getAppServiceQpqConfigs(root, appName), {
-    api: DEV_SERVER_PORTS.api,
-    webSocket: DEV_SERVER_PORTS.webSocket,
+    api: devServerPorts.api,
+    webSocket: devServerPorts.webSocket,
     mapHostPort: (port) => port,
   });
 

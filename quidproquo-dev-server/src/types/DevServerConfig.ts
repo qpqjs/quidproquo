@@ -1,10 +1,14 @@
 import { FileStorageConfig } from 'quidproquo-actionprocessor-node';
 import { QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
 
+import { DevServerPorts } from './DevServerPorts';
+
 // Optional file storage config for input
 export interface OptionalFileStorageConfig {
   storagePath?: string;
   secureUrlPort?: number;
+  // Port browsers reach the secure url server on, when a host maps it differently (docker). Default: secureUrlPort.
+  secureUrlPublicPort?: number;
   secureUrlHost?: string;
   secureUrlSecret?: string;
 }
@@ -64,7 +68,9 @@ export type ResolvedDevServerConfig = {
   delay?: DevServerDelayConfig;
 };
 
+/** What `apps/<app>/devServer.config.ts` may export: the app's ports and extra QPQ config for local runs. */
 export type DevServerConfigOverrides = {
+  ports?: DevServerPorts;
   allServices?: QPQConfig;
   byService?: {
     [key: string]: QPQConfig;

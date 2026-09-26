@@ -64,14 +64,15 @@ describe('verifySecureUrlToken', () => {
 });
 
 describe('getSecureUrlBaseUrl', () => {
-  it('builds the base url from host and port', () => {
+  it('builds the base url from the host and the public port, not the listening port', () => {
     const config: FileStorageConfig = {
       storagePath: '/storage',
-      secureUrlHost: 'localhost',
-      secureUrlPort: 4000,
+      secureUrlHost: '192.168.1.5',
+      secureUrlPort: 3001,
+      secureUrlPublicPort: 4000,
       secureUrlSecret: secret,
     };
 
-    expect(getSecureUrlBaseUrl(config)).toBe('http://localhost:4000');
+    expect(getSecureUrlBaseUrl(config)).toBe('http://192.168.1.5:4000');
   });
 });

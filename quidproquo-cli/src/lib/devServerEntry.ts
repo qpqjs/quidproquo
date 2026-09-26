@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { DEV_SERVER_PORTS } from './devServerPorts';
-import { getAppDirectory } from './discovery';
+import { DEFAULT_DEV_SERVER_PORTS, getDevServerConfigPath } from './devServerPorts';
 
 /**
  * What the generated bootstrap does: serve forever, run pending migrations once and exit, or
@@ -13,6 +12,7 @@ export type DevServerEntryMode = 'serve' | 'migrate' | 'migrate-then-serve';
 
 /** Env vars the docker image sets so the running server knows how the outside world reaches it. */
 export const DEV_SERVER_PUBLIC_HOST_ENV = 'QPQ_PUBLIC_HOST';
+export const DEV_SERVER_PUBLIC_FILE_STORAGE_PORT_ENV = 'QPQ_PUBLIC_FILE_STORAGE_PORT';
 
 const ENTRY_FILE_NAMES: Record<DevServerEntryMode, string> = {
   serve: 'entry.ts',
@@ -59,7 +59,7 @@ export const writeDevServerEntry = (root: string, appName: string, mode: DevServ
   const entryDir = path.join(root, 'dist', 'qpq', 'dev-server');
   const entryPath = path.join(entryDir, ENTRY_FILE_NAMES[mode]);
 
-  const overridesPath = path.join(getAppDirectory(appName), 'devServer.config.ts');
+  const overridesPath = getDevServerConfigPath(appName);
   const overridesImport = fs.existsSync(overridesPath)
     ? `import devServerConfigOverrides from ${JSON.stringify(overridesPath.replace(/\.ts$/, ''))};`
     : 'const devServerConfigOverrides = {};';
@@ -79,17 +79,19 @@ import {
 
 ${overridesImport}
 
+// Ports are defaults here; the app's devServer.config.ts \`ports\` win when the server resolves its config.
 const devServerConfig = {
   serverDomain: 'localhost',
-  serverPort: ${DEV_SERVER_PORTS.api},
-  webSocketPort: ${DEV_SERVER_PORTS.webSocket},
+  serverPort: ${DEFAULT_DEV_SERVER_PORTS.api},
+  webSocketPort: ${DEFAULT_DEV_SERVER_PORTS.webSocket},
   // Scoped per app so running the dev server for two apps out of the same
   // repo root doesn't share kvs/file-storage/config state.
   runtimePath: ${JSON.stringify(path.join('.qpq-runtime', appName))},
   fileStorageConfig: {
     // Secure file urls are absolute, so a container has to be told the address browsers use.
     secureUrlHost: process.env.${DEV_SERVER_PUBLIC_HOST_ENV} || 'localhost',
-    secureUrlPort: ${DEV_SERVER_PORTS.fileStorage},
+    secureUrlPort: ${DEFAULT_DEV_SERVER_PORTS.fileStorage},
+    secureUrlPublicPort: Number(process.env.${DEV_SERVER_PUBLIC_FILE_STORAGE_PORT_ENV}) || undefined,
     secureUrlSecret: 'dev-secure-url-secret',
   },
   qpqConfigs,

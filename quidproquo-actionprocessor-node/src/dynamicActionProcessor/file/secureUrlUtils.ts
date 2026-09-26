@@ -52,7 +52,7 @@ export const verifySecureUrlToken = (tokenString: string, secret: string): Secur
   }
 };
 
-// Get the secure URL base URL
+/** Origin of generated secure urls: the address and port browsers reach the file server on. */
 export const getSecureUrlBaseUrl = (config: FileStorageConfig): string => {
-  return `http://${config.secureUrlHost}:${config.secureUrlPort}`;
+  return `http://${config.secureUrlHost}:${config.secureUrlPublicPort}`;
 };

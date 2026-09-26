@@ -35,20 +35,33 @@ export const resolveDevServerConfig = (
 ): ResolvedDevServerConfig => {
   const runtimePath = devServerConfig.runtimePath || '.qpq-runtime';
 
+  // The app's own ports win over the entry's defaults, before anything derives a url from them.
+  const ports = devServerConfigOverrides?.ports;
+  const serverPort = ports?.api ?? devServerConfig.serverPort;
+  const webSocketPort = ports?.webSocket ?? devServerConfig.webSocketPort;
+  const secureUrlPort = ports?.fileStorage ?? devServerConfig.fileStorageConfig?.secureUrlPort ?? 3001;
+
   // Every plugin gets the same localised configs: dns base on the dev origin, local cors
   // origins. Doing it once here, rather than in the api plugin alone, is what keeps a
   // story in a queue or schedule worker from deriving urls on the deployed domain.
-  const qpqConfigs = getAllServiceConfigs({ ...devServerConfig, qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs, devServerConfigOverrides) });
+  const qpqConfigs = getAllServiceConfigs({
+    ...devServerConfig,
+    serverPort,
+    qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs, devServerConfigOverrides),
+  });
 
   return {
     ...devServerConfig,
+    serverPort,
+    webSocketPort,
     runtimePath,
     qpqConfigs,
 
     fileStorageConfig: {
       storagePath: path.join(runtimePath, devServerConfig.fileStorageConfig?.storagePath || 'storage'),
       secureUrlHost: devServerConfig.fileStorageConfig?.secureUrlHost || 'localhost',
-      secureUrlPort: devServerConfig.fileStorageConfig?.secureUrlPort || 3001,
+      secureUrlPort,
+      secureUrlPublicPort: devServerConfig.fileStorageConfig?.secureUrlPublicPort ?? secureUrlPort,
       secureUrlSecret: devServerConfig.fileStorageConfig?.secureUrlSecret || crypto.randomBytes(32).toString('hex'),
     },
 
