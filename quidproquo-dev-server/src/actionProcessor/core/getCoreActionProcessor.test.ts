@@ -31,6 +31,7 @@ const devServerConfig = {
     storagePath: '/tmp/files',
     secureUrlHost: 'localhost',
     secureUrlPort: 4000,
+    secureUrlPublicPort: 4000,
     secureUrlSecret: 'secret',
   },
 } as any;

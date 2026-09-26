@@ -7,8 +7,13 @@ import { assertContainerPorts, PortMapping } from './parsePortMappings';
  * port plus 80 for the site. Throws, naming the deployment, when a mapping targets a port the
  * image does not listen on.
  */
-export const resolvePortMappings = (deploymentName: string, settings: ParsedDockerPlatformSettings, containerPorts: number[]): PortMapping[] => {
-  const portMappings = settings.portMappings ?? getDefaultPortMappings(containerPorts);
+export const resolvePortMappings = (
+  deploymentName: string,
+  settings: ParsedDockerPlatformSettings,
+  apiPort: number,
+  containerPorts: number[],
+): PortMapping[] => {
+  const portMappings = settings.portMappings ?? getDefaultPortMappings(apiPort, containerPorts);
   try {
     assertContainerPorts(portMappings, containerPorts);
   } catch (error) {

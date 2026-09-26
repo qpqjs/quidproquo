@@ -15,6 +15,9 @@ export const dockerPlatformDriver: QpqPlatformDriver = {
   },
 
   go: dockerGo,
+  // A docker platform's deploy already is the containerised one, so `qpq go:docker`
+  // (what a scaffolded app's `npm run deploy` runs) is the same build.
+  goDocker: dockerGo,
 
   publish: publishNotSupported,
   publishBuild: publishNotSupported,

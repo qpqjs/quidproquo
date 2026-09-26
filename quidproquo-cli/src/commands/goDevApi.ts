@@ -19,6 +19,7 @@ import { rspack } from '@rspack/core';
 
 import { hasArgFlag } from '../lib/args';
 import { writeDevServerEntry } from '../lib/devServerEntry';
+import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
@@ -28,7 +29,7 @@ import { resolveDeployment } from '../lib/resolveDeployment';
 
 // 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
 // file-storage (secure URL) default port.
-const DEV_SERVER_PORTS = [8080, 8888, 3001];
+const getDevServerPortList = (appName: string): number[] => Object.values(readDevServerPorts(appName));
 const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
 
 export const goDevApiCommand = async (argv: string[]): Promise<void> => {
@@ -45,13 +46,13 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   // holds them, or that failure says nothing about the cause.
   if (hasArgFlag(argv, KEEP_OTHER_DEV_SERVERS_FLAG)) {
     console.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
-    reportPortHolders(DEV_SERVER_PORTS);
+    reportPortHolders(getDevServerPortList(appName));
   } else {
     // Catches a lingering watcher from a previous run even if its spawned
     // child already exited (see killOtherQpqDevProcesses) — then the usual
     // port-based sweep for anything else still bound to our ports.
     killOtherQpqDevProcesses(root);
-    killStaleListeners(DEV_SERVER_PORTS, (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
+    killStaleListeners(getDevServerPortList(appName), (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
   }
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);

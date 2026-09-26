@@ -40,5 +40,6 @@ describe('writeDevServerEntry', () => {
     const entry = fs.readFileSync(writeDevServerEntry(makeRoot(), 'app'), 'utf8');
 
     expect(entry).toContain("secureUrlHost: process.env.QPQ_PUBLIC_HOST || 'localhost'");
+    expect(entry).toContain('secureUrlPublicPort: Number(process.env.QPQ_PUBLIC_FILE_STORAGE_PORT) || undefined');
   });
 });

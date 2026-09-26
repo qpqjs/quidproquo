@@ -3,7 +3,7 @@ import { Nullable } from 'quidproquo-core';
 import fs from 'fs';
 import path from 'path';
 
-import { DEV_SERVER_PUBLIC_HOST_ENV } from '../../lib/devServerEntry';
+import { DEV_SERVER_PUBLIC_FILE_STORAGE_PORT_ENV, DEV_SERVER_PUBLIC_HOST_ENV } from '../../lib/devServerEntry';
 import { PortMapping } from './parsePortMappings';
 
 export type ComposeFileOptions = {
@@ -16,6 +16,8 @@ export type ComposeFileOptions = {
   dataPath: Nullable<string>;
   // The address browsers use for the host; null leaves secure file urls on localhost.
   publicHost: Nullable<string>;
+  // Host-side port of the file storage listener, for the secure urls it hands out.
+  publicFileStoragePort: number;
 };
 
 /**
@@ -30,10 +32,15 @@ export const writeComposeFile = ({
   portMappings,
   dataPath,
   publicHost,
+  publicFileStoragePort,
 }: ComposeFileOptions): string => {
   const ports = portMappings.map((mapping) => `      - "${mapping.host}:${mapping.container}"`).join('\n');
 
-  const environment = publicHost ? `    environment:\n      - ${DEV_SERVER_PUBLIC_HOST_ENV}=${publicHost}\n` : '';
+  const environmentLines = [
+    ...(publicHost ? [`${DEV_SERVER_PUBLIC_HOST_ENV}=${publicHost}`] : []),
+    `${DEV_SERVER_PUBLIC_FILE_STORAGE_PORT_ENV}=${publicFileStoragePort}`,
+  ];
+  const environment = `    environment:\n${environmentLines.map((line) => `      - ${line}`).join('\n')}\n`;
 
   // All app state (key-value stores, file storage) is this one directory.
   const stateSource = dataPath ?? volumeName;
