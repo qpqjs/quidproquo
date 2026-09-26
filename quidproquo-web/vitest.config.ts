@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       'quidproquo-core': path.resolve(__dirname, '../quidproquo-core/src'),
+      'quidproquo-webserver': path.resolve(__dirname, '../quidproquo-webserver/src'),
     },
   },
   test: {

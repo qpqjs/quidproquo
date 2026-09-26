@@ -1,5 +1,7 @@
 // federated.export: This file will be exported using module federation
 
+import { getApiUrl } from 'quidproquo-web';
+
 import { type CSSProperties, useState } from 'react';
 
 const containerStyle: CSSProperties = {
@@ -39,17 +41,7 @@ const resultStyle: CSSProperties = {
   color: '#1a2733',
 };
 
-// The shell API: the local QPQ dev server when running on localhost, otherwise
-// api.<domain root> (the page host, minus the views. prefix on remote views).
-const getShellApiBaseUrl = (): string => {
-  const { hostname, protocol, host } = window.location;
-
-  if (hostname === 'localhost' || hostname.endsWith('.localhost')) {
-    return 'http://localhost:8080/api/shell';
-  }
-
-  return `${protocol}//api.${host.replace(/^views\./, '')}/shell`;
-};
+const getShellApiBaseUrl = (): string => getApiUrl('shell');
 
 export const WelcomeScreen = () => {
   const [healthResult, setHealthResult] = useState<string | null>(null);

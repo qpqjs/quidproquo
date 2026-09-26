@@ -179,7 +179,8 @@ export const webSocketImplementation = async (devServerConfig: ResolvedDevServer
     }
   });
 
-  server.listen(devServerConfig.webSocketPort, 'localhost');
+  // All interfaces, like the api server: inside the docker image the browser is not local.
+  server.listen(devServerConfig.webSocketPort, '0.0.0.0');
 
   // Close the ws servers before the http server they upgraded from: that sends
   // a proper close frame, so a browser reconnects against the restarted server
