@@ -1,3 +1,4 @@
+import { generateUuid } from 'quidproquo-core';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
   WebSocketQueueServerEventMessageServiceRequestResponse,
@@ -58,7 +59,7 @@ export const useWebsocketQueueSendEvent = <TSend extends AnyWebSocketQueueEventM
       return Promise.resolve(undefined);
     }
 
-    const correlationId = crypto.randomUUID();
+    const correlationId = generateUuid();
     activeCorrelationsRef.current.add(correlationId);
 
     const isServiceRequest = event.type.startsWith('qpq/serviceRequest/');

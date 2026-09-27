@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { generateUuid, Nullable } from 'quidproquo-core';
 import {
   EventDocEffect,
   EventDocEvent,
@@ -124,10 +124,10 @@ export function MaintenanceEditor({ docId, onBack }: MaintenanceEditorProps) {
     } else if (dialog.kind === 'reopen') {
       const reopened = await applyEvent(EventDocEffect.CreateDraft, undefined);
       if (reopened) {
-        await applyEvent(MaintenanceEffect.AddUpdate, { updateId: crypto.randomUUID(), ...values });
+        await applyEvent(MaintenanceEffect.AddUpdate, { updateId: generateUuid(), ...values });
       }
     } else {
-      await applyEvent(MaintenanceEffect.AddUpdate, { updateId: crypto.randomUUID(), ...values });
+      await applyEvent(MaintenanceEffect.AddUpdate, { updateId: generateUuid(), ...values });
     }
     setDialog({ kind: 'closed' });
   };

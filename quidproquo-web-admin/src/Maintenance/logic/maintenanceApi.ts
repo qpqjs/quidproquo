@@ -1,4 +1,4 @@
-import { QpqPagedData } from 'quidproquo-core';
+import { generateUuid, QpqPagedData } from 'quidproquo-core';
 import { EventDocEvent, EventDocEventInput, EventDocSummary, MAINTENANCE_SCHEMA_VERSION, maintenanceBasePath } from 'quidproquo-features';
 
 import { apiRequestGet, apiRequestPost } from '../../logic';
@@ -47,7 +47,7 @@ export const appendMaintenanceEvent = async (
       data,
       metadata: {
         version: MAINTENANCE_SCHEMA_VERSION,
-        clientMessageId: crypto.randomUUID(),
+        clientMessageId: generateUuid(),
       },
     },
   };

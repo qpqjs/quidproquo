@@ -1,4 +1,4 @@
-import { getProcessCustomImplementation, ProcessorFor } from 'quidproquo-core';
+import { generateUuid, getProcessCustomImplementation, ProcessorFor } from 'quidproquo-core';
 import { ActionProcessorListResolverFactory } from 'quidproquo-web-react';
 
 import { AdminAppState } from '../AdminAppState';
@@ -15,6 +15,6 @@ export const getApplySessionEventActionProcessor: ActionProcessorListResolverFac
     'Apply Admin Session Event',
     null,
     () => new Date().toISOString(),
-    () => globalThis.crypto.randomUUID(),
+    () => generateUuid(),
   ),
 });

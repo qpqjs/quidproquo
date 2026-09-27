@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateUuid } from './generateUuid';
+import { generateUuid, generateUuidFromRandomValues } from './generateUuid';
 
 describe('generateUuid', () => {
   it('returns a string', () => {
@@ -79,5 +79,53 @@ describe('generateUuid', () => {
     for (let i = 0; i < 1_000; i++) {
       expect(generateUuid()).toMatch(v4Regex);
     }
+  });
+
+  describe('without crypto.randomUUID (plain-http browser context)', () => {
+    // Only getRandomValues is offered, as a browser does on an insecure origin.
+    const insecureCrypto = { getRandomValues: globalThis.crypto.getRandomValues.bind(globalThis.crypto) };
+
+    it('still produces a v4 uuid of the same shape', () => {
+      const uuid = generateUuidFromRandomValues(insecureCrypto);
+
+      expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    });
+
+    it('produces distinct values', () => {
+      const uuids = new Set(Array.from({ length: 200 }, () => generateUuidFromRandomValues(insecureCrypto)));
+
+      expect(uuids.size).toBe(200);
+    });
+
+    // The version and variant masks are the only part that can be subtly wrong,
+    // and only show at the extremes: all-ones must be forced down to 4 / [89ab],
+    // all-zeros must be forced up to them.
+    const fixedBytes = (fill: number) => ({
+      getRandomValues: <T extends ArrayBufferView | null>(array: T): T => {
+        (array as unknown as Uint8Array).fill(fill);
+        return array;
+      },
+    });
+
+    it('sets the version and variant bits when every random byte is 0xff', () => {
+      expect(generateUuidFromRandomValues(fixedBytes(0xff))).toBe('ffffffff-ffff-4fff-bfff-ffffffffffff');
+    });
+
+    it('sets the version and variant bits when every random byte is 0x00', () => {
+      expect(generateUuidFromRandomValues(fixedBytes(0x00))).toBe('00000000-0000-4000-8000-000000000000');
+    });
+  });
+
+  describe('without any Web Crypto API', () => {
+    it('throws a clear error rather than a property-of-undefined crash', () => {
+      const original = globalThis.crypto;
+      Object.defineProperty(globalThis, 'crypto', { value: undefined, configurable: true });
+
+      try {
+        expect(() => generateUuid()).toThrow('no Web Crypto API available');
+      } finally {
+        Object.defineProperty(globalThis, 'crypto', { value: original, configurable: true });
+      }
+    });
   });
 });

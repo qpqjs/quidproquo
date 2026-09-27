@@ -1,3 +1,4 @@
+import { generateUuid } from 'quidproquo-core';
 import { EventDocSummary, MaintenanceEffect, MaintenanceLevel, MaintenanceType, toEventDocListItem } from 'quidproquo-features';
 import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 
@@ -62,7 +63,7 @@ export function MaintenanceList({ onOpen }: MaintenanceListProps) {
       const apiBaseUrl = urlResolvers.getApiUrl();
       const summary = await createMaintenance(values.bannerText || values.reason, values.maintenanceType.toLowerCase(), apiBaseUrl, accessToken);
 
-      await appendMaintenanceEvent(summary.id, MaintenanceEffect.AddUpdate, { updateId: crypto.randomUUID(), ...values }, apiBaseUrl, accessToken);
+      await appendMaintenanceEvent(summary.id, MaintenanceEffect.AddUpdate, { updateId: generateUuid(), ...values }, apiBaseUrl, accessToken);
 
       setCreateOpen(false);
       onOpen(summary.id);
