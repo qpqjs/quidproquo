@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-js",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -37,12 +37,12 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
     "postal-mime": "^3.0.0",
-    "quidproquo-core": "0.1.28",
-    "quidproquo-webserver": "0.1.28",
+    "quidproquo-core": "0.1.29",
+    "quidproquo-webserver": "0.1.29",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.1.28",
+    "quidproquo-tsconfig": "0.1.29",
     "typescript": "^5.8.2"
   }
 }

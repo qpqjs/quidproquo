@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.29
+
+- core/web-react/web-admin: uuid generation works on plain-http browser origins (a self-hosted app on a LAN ip, say). `generateUuid` falls back to building a v4 id from `crypto.getRandomValues()` when the browser hides `crypto.randomUUID()` outside a secure context, and the frontend packages mint ids through it instead of calling `crypto.randomUUID()` directly
+
 ## 0.1.28
 
 - cli/core/config-aws/deploy-awscdk: `deploy.config.json` is a map of named deployments and `qpq` commands select one with `--deployment <name>`. Each entry carries its platform, name, environment, optional feature, platform settings (aws account and region) and a `settings` map that reaches `infrastructure.ts` as `DEPLOY_SETTING_<KEY>` env vars via `getDeploySetting`. The file is the source of truth: no env var or flag overrides it, and root domains come from a deploy setting instead of an app constant

@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.29
+
 ## 0.1.28
 
 - `defineDevServerOptions` (`quidproquo-dev-server`) takes `{ views?: { port }, webEntries?: { <name>: { port } } }` instead of `{ port }`; `getDevServerOptions(...).port` is now `getDevServerOptions(...).views?.port`. `webEntries` lets a web entry (docs and the like) be hosted on its own port in the docker image; every entry without a port there is instead routed same-origin on the api port by its domain (root-domain entry at `/`, a subdomain entry at `/<subdomain>`), so there is no longer an "unhosted" entry left out of the image.
