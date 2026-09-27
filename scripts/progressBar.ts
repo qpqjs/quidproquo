@@ -18,7 +18,8 @@ export type ProgressState = {
 
 export const formatElapsed = (ms: number): string => `${(ms / 1000).toFixed(1)}s`;
 
-const renderBar = (ratio: number): string => {
+/** Fixed-width block bar, filled in proportion to `ratio` (0..1). */
+export const renderBar = (ratio: number): string => {
   const filled = Math.min(BAR_WIDTH, Math.round(BAR_WIDTH * ratio));
   return '█'.repeat(filled) + '░'.repeat(BAR_WIDTH - filled);
 };

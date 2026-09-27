@@ -7,6 +7,8 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+import { renderBar } from './progressBar';
+
 const ROOT = join(__dirname, '..');
 const POLL_MS = Number(process.env.POLL_MS ?? 5000);
 const ONCE = process.argv.includes('--once');
@@ -84,6 +86,13 @@ const compareVersions = (a: string, b: string): number => {
   return 0;
 };
 
+const renderProgress = (matched: number, total: number): string => {
+  const ratio = total === 0 ? 1 : matched / total;
+  const colour = matched === total ? GREEN : YELLOW;
+  const pct = String(Math.round(ratio * 100)).padStart(3);
+  return `${colour}[${renderBar(ratio)}]${RESET} ${pct}%  ${matched}/${total} published`;
+};
+
 const render = (statuses: PackageStatus[], attempt: number, startMs: number): void => {
   const nameWidth = Math.max(...statuses.map((s) => s.name.length));
   const ordered = [...statuses].sort((a, b) => compareVersions(b.published, a.published) || a.name.localeCompare(b.name));
@@ -103,6 +112,7 @@ const render = (statuses: PackageStatus[], attempt: number, startMs: number): vo
   }
   console.log(`${DIM}poll #${attempt}  ${matched}/${statuses.length} published  ${elapsed}s elapsed${RESET}\n`);
   console.log(lines.join('\n'));
+  console.log(`\n${renderProgress(matched, statuses.length)}`);
 };
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
