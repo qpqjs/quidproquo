@@ -73,6 +73,7 @@ export interface WebDomainOptions {
 export interface StorageDriveOptions {
   sourceStorageDrive?: string;
   autoUpload: boolean;
+  syncServiceViews?: boolean;
 }
 ```
 
@@ -80,6 +81,7 @@ export interface StorageDriveOptions {
 | --- | --- | --- |
 | `autoUpload` | `boolean` | When `true`, the assets at `buildPath` are uploaded to the origin bucket on every deploy. Set `false` when something else (e.g. a separate publish step) populates the bucket. |
 | `sourceStorageDrive` | `string` (optional) | Serve the app from an **existing** [storage drive](../core/storage-drive.md) (by name) instead of a dedicated bucket created for this web entry. When set, that drive's bucket is used as the CDN origin. |
+| `syncServiceViews` | `boolean` (optional) | Serve the owning service's built views bundle from this entry. `qpq go` copies the service's views build to the root of `sourceStorageDrive`, as well as to its usual prefix in the shared federated views bucket. Makes the service a standalone host on its own domain, the way `shell` is the root site. |
 
 ### `ResponseSecurityHeaders`
 

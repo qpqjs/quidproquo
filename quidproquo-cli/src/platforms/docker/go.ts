@@ -57,6 +57,12 @@ const copyWebEntryContent = (appName: string, contextDir: string, entry: WebEntr
     return;
   }
 
+  // A standalone host entry serves its own service's views build, as on AWS.
+  if (entry.webEntry.storageDrive.syncServiceViews) {
+    fs.cpSync(getViewsDistDir(appName, entry.service), targetDir, { recursive: true });
+    return;
+  }
+
   if (!entry.webEntry.buildPath) {
     throw new Error(`Web entry ${label} has no buildPath, so there is nothing to serve`);
   }

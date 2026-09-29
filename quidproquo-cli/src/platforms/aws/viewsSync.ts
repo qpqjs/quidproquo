@@ -1,8 +1,10 @@
-// Views upload to S3. Bucket names resolve from the shell service's config.
-// shell is the module-federation host: its bundle is the root website, so it
-// syncs to the 'website' bucket root AND to its prefix in the shared 'views'
-// bucket (where every other service's views live).
+// Views upload to S3. Every service's views go to its prefix in the shared
+// 'views' bucket (owned by shell). A service can also be a standalone host on
+// its own domain: each of its web entries marked `storageDrive.syncServiceViews`
+// gets the bundle at its drive's root. shell is the root website, which predates
+// that flag, so it keeps its 'website' bucket root when it declares none.
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
 import path from 'path';
@@ -24,9 +26,18 @@ export const getViewsS3Destinations = (appName: string, serviceName: string): st
 
   const destinations = [`s3://${viewsBucketName}/${serviceName}`];
 
-  if (serviceName === 'shell') {
-    const websiteBucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfig('website', shellConfig);
-    destinations.push(`s3://${websiteBucketName}`);
+  const serviceConfig = serviceName === 'shell' ? shellConfig : loadServiceQpqConfig(appName, serviceName);
+  const hostDrives = qpqWebServerUtils
+    .getWebEntryConfigs(serviceConfig)
+    .filter((webEntry) => webEntry.storageDrive.syncServiceViews && webEntry.storageDrive.sourceStorageDrive)
+    .map((webEntry) => webEntry.storageDrive.sourceStorageDrive!);
+
+  if (serviceName === 'shell' && hostDrives.length === 0) {
+    hostDrives.push('website');
+  }
+
+  for (const drive of hostDrives) {
+    destinations.push(`s3://${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(drive, serviceConfig)}`);
   }
 
   return destinations;

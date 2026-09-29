@@ -11,6 +11,14 @@ export interface WebDomainOptions {
 export interface StorageDriveOptions {
   sourceStorageDrive?: string;
   autoUpload: boolean;
+
+  /**
+   * Serve the owning service's built views bundle from this entry: `qpq go`
+   * copies the service's views dist to the root of `sourceStorageDrive` (as
+   * well as its usual prefix in the shared federated views bucket). Makes the
+   * service a standalone host on its own domain, the way shell is the root site.
+   */
+  syncServiceViews?: boolean;
 }
 
 export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSettings {
