@@ -18,6 +18,7 @@ export * from './metric';
 export * from './network';
 export * from './platform';
 export * from './queue';
+export * from './secureToken';
 export * from './state';
 export * from './stream';
 export * from './system';

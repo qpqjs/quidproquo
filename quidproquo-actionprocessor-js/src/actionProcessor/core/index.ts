@@ -10,6 +10,7 @@ import { getMathActionProcessor } from './math';
 import { getMetricActionProcessor } from './metric';
 import { getNetworkActionProcessor } from './network';
 import { getPlatformActionProcessor } from './platform';
+import { getSecureTokenActionProcessor } from './secureToken';
 import { getSystemActionProcessor } from './system';
 
 export * from './config';
@@ -22,6 +23,7 @@ export * from './math';
 export * from './metric';
 export * from './network';
 export * from './platform';
+export * from './secureToken';
 export * from './system';
 
 // customActions is exported but deliberately NOT merged into getCoreActionProcessor:
@@ -44,5 +46,6 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getNetworkActionProcessor(qpqConfig, dynamicModuleLoader)),
   // Every real runtime overrides this with its own name.
   ...(await getPlatformActionProcessor('js')(qpqConfig, dynamicModuleLoader)),
+  ...(await getSecureTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
