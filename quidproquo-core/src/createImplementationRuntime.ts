@@ -1,7 +1,6 @@
 import { actionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
-import { getApplicationModuleName } from './qpqCoreUtils';
-import { createRuntime } from './runtime';
+import { createNestedRuntime, createRuntime } from './runtime';
 import {
   ActionProcessor,
   ActionProcessorList,
@@ -14,23 +13,7 @@ import {
   StreamRegistry,
 } from './types';
 
-// export const getDateNow = () => new Date().toISOString();
-// export const randomGuid = () => new Date().toISOString();
-
-// export type ActionProcessorReturnType<AP extends ActionProcessor<any, any>> =
-//   ReturnType<AP> extends AsyncActionProcessorResult<infer TReturn> ? TReturn : never;
-
-// export type ActionProcessorPayloadType<AP extends ActionProcessor<any, any>> = Parameters<AP>[0];
-
-// export type ActionProcessorNative<AP extends ActionProcessor<any, any>> = (
-//   payload: ActionProcessorPayloadType<AP>,
-// ) => Promise<ActionProcessorReturnType<AP>>;
-
-// export const resolveActionProcessorToNative = <AP extends ActionProcessor<any, any>>(actionProcessor: AP): ActionProcessorNative<AP> => {
-//   // return null as TReturn;
-//   return null as never;
-// };
-
+/** Creates the nested runtime for an implementation story (tool executor, drive file resolver, custom implementation) run inside the caller's story. */
 export const createImplementationRuntime = (
   qpqConfig: QPQConfig,
   tags: string[],
@@ -43,39 +26,20 @@ export const createImplementationRuntime = (
   logger: QpqLogger,
   dynamicModuleLoader: DynamicModuleLoader,
   streamRegistry?: StreamRegistry,
-): ReturnType<typeof createRuntime> => {
-  const moduleName = getApplicationModuleName(qpqConfig);
-
-  const resolveStory = createRuntime(
+): ReturnType<typeof createRuntime> =>
+  createNestedRuntime(
     qpqConfig,
-    {
-      context: session.context,
-      // Service-local context and the caller's function globals travel into the
-      // nested implementation runtime (a within-service child: tool executor,
-      // drive file resolver, custom implementation), so stories run under it can
-      // read route/function config (e.g. the eventDoc user-directory global an
-      // AI tool needs to resolve the actor, or the tenant scope resolver). Mirrors
-      // the inline-function execute processor, which carries the same fields.
-      localContext: session.localContext,
-      functionGlobals: session.functionGlobals,
-      depth: (session.depth || 0) + 1,
-      decodedAccessToken: session.decodedAccessToken,
-      correlation: session.correlation,
-    },
-    async () => actionProcessors,
+    session,
+    actionProcessors,
     getDateNow,
     logger,
-    // TODO: Share this logic.
-    `${moduleName}::${randomGuid()}`,
+    randomGuid,
     QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY,
     dynamicModuleLoader,
     undefined,
     tags,
     streamRegistry,
   );
-
-  return resolveStory;
-};
 
 export const getProcessCustomImplementation = <T extends ActionProcessor<any, any>>(
   qpqConfig: QPQConfig,

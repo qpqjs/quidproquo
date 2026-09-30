@@ -1,14 +1,14 @@
 import {
-  actionResult,
   actionResultError,
   askInlineFunctionExecuteBase,
   createActionProcessor,
-  createRuntime,
+  createNestedRuntime,
   ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
+  storyResultToActionResult,
 } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
@@ -16,8 +16,6 @@ import { randomUUID } from 'crypto';
 const getDateNow = () => new Date().toISOString();
 
 const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askInlineFunctionExecuteBase> => {
-  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const inlineFunctions = qpqCoreUtils.getAllInlineFunctions(qpqConfig);
     const inlineFunction = inlineFunctions.find((f) => f.functionName === payload.functionName);
@@ -32,23 +30,13 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askInlineF
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load inline function: [${payload.functionName}]`);
     }
 
-    const resolveStory = createRuntime(
+    const resolveStory = createNestedRuntime(
       qpqConfig,
-      {
-        context: session.context,
-        localContext: session.localContext,
-        depth: (session.depth || 0) + 1,
-        decodedAccessToken: session.decodedAccessToken,
-        correlation: session.correlation,
-        // Inline functions run WITHIN the caller's function - carry its globals
-        // so stories like the tenant scope resolver can read route config (the
-        // runtime merges these under the inline function's own registration).
-        functionGlobals: session.functionGlobals,
-      },
-      async () => actionProcessors,
+      session,
+      actionProcessors,
       getDateNow,
       logger,
-      `${moduleName}::${randomUUID()}`,
+      randomUUID,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       inlineFunction.runtime,
@@ -58,15 +46,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askInlineF
 
     const storyResult = await resolveStory(story, [payload.payload]);
 
-    if (storyResult.error) {
-      return actionResultError(
-        storyResult.error.errorType,
-        storyResult.error.errorText,
-        storyResult.error.errorStack ? `${payload.functionName} -> [${storyResult.error.errorStack}]` : payload.functionName,
-      );
-    }
-
-    return actionResult(storyResult.result);
+    return storyResultToActionResult(storyResult, payload.functionName);
   };
 };
 

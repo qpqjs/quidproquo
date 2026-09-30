@@ -1,61 +1,55 @@
 import {
-  actionResult,
   actionResultError,
   askExecuteStoryBase,
   createActionProcessor,
-  createRuntime,
+  createNestedRuntime,
   ErrorTypeEnum,
   getUniqueKeyFromQpqFunctionRuntime,
   ProcessorFor,
   QPQConfig,
-  qpqCoreUtils,
   QpqRuntimeType,
+  storyResultToActionResult,
+  StorySession,
 } from 'quidproquo-core';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import { getDateNow } from './getDateNow';
 
 const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askExecuteStoryBase> => {
-  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader) => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const story = await dynamicModuleLoader(payload.runtime);
 
     if (!story) {
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
-    const functionKey = getUniqueKeyFromQpqFunctionRuntime(payload.runtime);
+    // A payload session can come off the wire (askProcessEvent passes the incoming message's session).
+    // Its functionGlobals belong to the sending function in another service, so only the caller's own are kept.
+    const callerSession: StorySession = {
+      context: payload.storySession?.context || session.context,
+      localContext: payload.storySession?.localContext || session.localContext,
+      functionGlobals: session.functionGlobals,
+      depth: payload.storySession?.depth || session.depth || 0,
+      decodedAccessToken: payload.storySession?.decodedAccessToken || session.decodedAccessToken,
+      correlation: payload.storySession?.correlation || session.correlation,
+    };
 
-    const resolveStory = createRuntime(
+    const resolveStory = createNestedRuntime(
       qpqConfig,
-      {
-        context: payload.storySession?.context || session.context,
-        localContext: payload.storySession?.localContext || session.localContext,
-        depth: (payload.storySession?.depth || session.depth || 0) + 1,
-        decodedAccessToken: payload.storySession?.decodedAccessToken || session.decodedAccessToken,
-        correlation: payload.storySession?.correlation || session.correlation,
-      },
-      async () => actionProcessors,
+      callerSession,
+      actionProcessors,
       getDateNow,
       logger,
-      // TODO: Share this logic.
-      `${moduleName}::${randomGuid()}`,
+      randomGuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       payload.runtime,
       [],
+      streamRegistry,
     );
     const storyResult = await resolveStory(story, payload.params);
 
-    if (storyResult.error) {
-      return actionResultError(
-        storyResult.error.errorType,
-        storyResult.error.errorText,
-        storyResult.error.errorStack ? `${functionKey} -> [${storyResult.error.errorStack}]` : functionKey,
-      );
-    }
-
-    return actionResult(storyResult.result);
+    return storyResultToActionResult(storyResult, getUniqueKeyFromQpqFunctionRuntime(payload.runtime));
   };
 };
 

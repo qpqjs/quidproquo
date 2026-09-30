@@ -5,7 +5,7 @@ import {
   askDynamicFunctionExecuteBase,
   AskResponse,
   createActionProcessor,
-  createRuntime,
+  createNestedRuntime,
   DynamicFunctionsActionType,
   DynamicFunctionsExecuteActionPayload,
   DynamicFunctionsExecuteErrorTypeEnum,
@@ -16,6 +16,7 @@ import {
   qpqCoreUtils,
   QpqLogger,
   QpqRuntimeType,
+  storyResultToActionResult,
   StorySession,
   StorySessionUpdater,
   StreamRegistry,
@@ -37,8 +38,6 @@ const isStoryIterator = (value: unknown): value is AskResponse<unknown> => {
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDynamicFunctionExecuteBase> => {
-  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async (
     payload: DynamicFunctionsExecuteActionPayload,
     session: StorySession,
@@ -90,22 +89,13 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
     }
 
     if (isStoryIterator(invocationResult)) {
-      const resolveStory = createRuntime(
+      const resolveStory = createNestedRuntime(
         qpqConfig,
-        {
-          context: session.context,
-          localContext: session.localContext,
-          depth: (session.depth || 0) + 1,
-          decodedAccessToken: session.decodedAccessToken,
-          correlation: session.correlation,
-          // Dynamic function members run WITHIN the caller's function - carry its
-          // globals so stories can read route config (same rule as inline functions).
-          functionGlobals: session.functionGlobals,
-        },
-        async () => actionProcessors,
+        session,
+        actionProcessors,
         getDateNow,
         logger,
-        `${moduleName}::${randomUUID()}`,
+        randomUUID,
         QpqRuntimeType.EXECUTE_STORY,
         dynamicModuleLoader,
         dynamicFunctionsSetting.runtime,
@@ -117,17 +107,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
       // the live iterator to the runtime without invoking it a second time.
       const storyResult = await resolveStory(() => invocationResult, []);
 
-      if (storyResult.error) {
-        return actionResultError(
-          storyResult.error.errorType,
-          storyResult.error.errorText,
-          storyResult.error.errorStack
-            ? `${payload.dynamicFunctionsName}.${payload.functionName} -> [${storyResult.error.errorStack}]`
-            : `${payload.dynamicFunctionsName}.${payload.functionName}`,
-        );
-      }
-
-      return actionResult<R>(storyResult.result);
+      return storyResultToActionResult<R>(storyResult, `${payload.dynamicFunctionsName}.${payload.functionName}`);
     }
 
     try {

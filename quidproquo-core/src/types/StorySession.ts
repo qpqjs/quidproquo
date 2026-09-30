@@ -33,7 +33,8 @@ export interface StorySession {
   localContext?: QpqContext<any>;
 
   // Globals declared on the executing function's QpqFunctionRuntimeAdvanced.
-  // Set per-runtime from qpqFunctionRuntimeInfo; never inherited from the caller.
+  // Set per-runtime from qpqFunctionRuntimeInfo. In-process nested runs also inherit the
+  // caller's (their own win on collision); transport entries (http/queue/ws) never do.
   functionGlobals?: Record<string, unknown>;
 }
 
