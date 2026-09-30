@@ -172,10 +172,14 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     });
   };
 
-  // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract)
-  app.put('/secure-upload', express.raw({ type: '*/*', limit: '500mb' }), async (req: Request, res: Response): Promise<void> => {
+  // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract). S3 takes the body
+  // as-is whatever the Content-Type says, including when there is none, so read it raw for every
+  // request: a type pattern such as '*/*' would skip a PUT that sends no Content-Type and leave
+  // req.body as an empty object.
+  app.put('/secure-upload', express.raw({ type: () => true, limit: '500mb' }), async (req: Request, res: Response): Promise<void> => {
     try {
-      await writeUploadFromToken(req.query.token as string, req.body, res, {
+      const body = Buffer.isBuffer(req.body) ? req.body : undefined;
+      await writeUploadFromToken(req.query.token as string, body, res, {
         mimetype: req.headers['content-type'],
         contentDisposition: req.headers['content-disposition'],
       });
