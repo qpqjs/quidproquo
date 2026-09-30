@@ -1,5 +1,7 @@
 import { HTTPMethod } from 'quidproquo-core';
 
+import { HttpEventQuery } from './HTTPEvent';
+
 export interface SeoEventHeaders {
   [key: string]: undefined | string;
 }
@@ -10,7 +12,7 @@ export interface SeoEventRouteParams {
 
 export interface SeoEvent<T = null> {
   path: string;
-  query: { [key: string]: undefined | string | string[] };
+  query: HttpEventQuery;
   body: T;
   headers: SeoEventHeaders;
   method: HTTPMethod;

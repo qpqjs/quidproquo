@@ -7,7 +7,7 @@ description: Define a named CDN cache policy (TTLs) that web entries and SEO rou
 
 Defines a named **cache policy** — a set of CDN cache TTLs — that other web settings reference by name. A [web entry](./web-entry.md) applies it via `cacheSettingsName`, and a [defineSeo](./seo.md) route can reference its own cache policy the same way. Declaring caching once and referencing it by name keeps a consistent policy across behaviors.
 
-- **On AWS:** deploys a CloudFront `CachePolicy` (`QpqWebServerCacheConstruct` in `quidproquo-deploy-awscdk`) with the configured min/default/max TTLs. The policy caches on an allow-list of headers — `x-qpq-is-bot` (so bot vs. human responses cache separately, which pairs with SEO edge rendering) plus the CORS request headers (`Origin`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`) — and enables gzip and brotli. The policy id is exported so web entries in other stacks can attach it.
+- **On AWS:** deploys a CloudFront `CachePolicy` (`QpqWebServerCacheConstruct` in `quidproquo-deploy-awscdk`) with the configured min/default/max TTLs. The policy caches on an allow-list of headers — `x-qpq-is-bot` (so bot vs. human responses cache separately, which pairs with SEO edge rendering) plus the CORS request headers (`Origin`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`) — and enables gzip and brotli. The full query string is also part of the cache key, so `/page?a=1` and `/page?a=2` are cached separately. The policy id is exported so web entries in other stacks can attach it.
 
 ```typescript
 import { defineCache } from 'quidproquo-webserver';

@@ -42,6 +42,13 @@ describe('getEventGetRecordsActionProcessor (express)', () => {
     });
   });
 
+  it('passes a repeated query key through as a string array', async () => {
+    const result = await invoke({ method: 'GET', path: '/users', query: { a: '1', tag: ['x', 'y'] } });
+
+    const [record] = resolveActionResult(result);
+    expect(record.query).toEqual({ a: '1', tag: ['x', 'y'] });
+  });
+
   it('leaves an undefined body undefined and defaults the path to empty', async () => {
     const result = await invoke({ method: 'GET' });
 

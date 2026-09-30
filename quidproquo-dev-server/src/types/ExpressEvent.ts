@@ -1,4 +1,5 @@
 import { QPQBinaryData } from 'quidproquo-core';
+import { HttpEventQuery } from 'quidproquo-webserver';
 
 export interface ExpressEvent {
   protocol: string;
@@ -6,7 +7,7 @@ export interface ExpressEvent {
   path: string;
   ip: string;
   method: string;
-  query: { [key: string]: undefined | string | string[] };
+  query: HttpEventQuery;
 
   correlation: string;
   isBase64Encoded: boolean;
