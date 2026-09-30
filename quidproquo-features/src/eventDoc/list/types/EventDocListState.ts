@@ -29,6 +29,7 @@ export const createInitialEventDocListState = (): EventDocListState => ({
   editBasePath: '',
   listBasePath: '',
   canTransfer: false,
+  canCreate: false,
   items: [],
   isLoading: false,
   error: null,

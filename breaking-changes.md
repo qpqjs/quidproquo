@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocListConfig` has a new required `canCreate: boolean` field. Set it to `false` for collections the platform writes itself (no create route mounted), `true` otherwise.
+
 ## 0.1.29
 
 ## 0.1.28

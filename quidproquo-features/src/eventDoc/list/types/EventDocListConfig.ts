@@ -12,4 +12,7 @@ export type EventDocListConfig = {
   listBasePath: string;
   // Whether the collection's service mounts defineEventDocTransfer; Export/Import would 404 otherwise.
   canTransfer: boolean;
+  // Whether people create docs from the list (New). False for collections the platform writes itself
+  // (job records such as renders, builds, envelopes), whose create route isn't mounted.
+  canCreate: boolean;
 };
