@@ -3,4 +3,6 @@ export * from './REDACTION_FIELD_ONLY_KEYS';
 export * from './REDACTION_IGNORED_KEYS';
 export * from './REDACTION_MIN_SWEEP_LENGTH';
 export * from './REDACTION_SECRET_RESULT_ACTION_TYPES';
+export * from './REDACTION_SWEEP_KEY_FRAGMENTS';
 export * from './REDACTION_SWEEP_KEYS';
+export * from './REDACTION_URL_FRAGMENT_MIN_LENGTH';

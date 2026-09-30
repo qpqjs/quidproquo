@@ -5,6 +5,7 @@ export * from './expandJsonRedactions';
 export * from './getRedactedLogFilePath';
 export * from './mapEncodedJson';
 export * from './mapKeyedValues';
+export * from './mapMatchingKeyedValues';
 export * from './mapStrings';
 export * from './parseJsonContainer';
 export * from './parsers';
