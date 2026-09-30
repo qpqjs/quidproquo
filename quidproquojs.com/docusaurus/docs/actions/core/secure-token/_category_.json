@@ -1,0 +1,7 @@
+{
+  "label": "Secure Token",
+  "link": {
+    "type": "generated-index",
+    "description": "Generate random tokens for use as secrets."
+  }
+}

@@ -3,6 +3,7 @@ import { encryptInputParser } from './encryptInputParser';
 import { jwtParser } from './jwtParser';
 import { keyFragmentParser } from './keyFragmentParser';
 import { knownKeysParser } from './knownKeysParser';
+import { redactStringParser } from './redactStringParser';
 import { secretResultParser } from './secretResultParser';
 import { urlFragmentParser } from './urlFragmentParser';
 
@@ -14,4 +15,5 @@ export const logRedactionParsers: readonly LogRedactionParser[] = [
   secretResultParser,
   jwtParser,
   urlFragmentParser,
+  redactStringParser,
 ];

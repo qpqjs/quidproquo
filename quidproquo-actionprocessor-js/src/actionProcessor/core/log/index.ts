@@ -2,6 +2,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getLogCreateActionProcessor } from './getLogCreateActionProcessor';
 import { getLogDisableEventHistoryActionProcessor } from './getLogDisableEventHistoryActionProcessor';
+import { getLogRedactStringActionProcessor } from './getLogRedactStringActionProcessor';
 import { getLogTemplateLiteralActionProcessor } from './getLogTemplateLiteralActionProcessor';
 
 export const getLogActionProcessor: ActionProcessorListResolver = async (
@@ -11,4 +12,5 @@ export const getLogActionProcessor: ActionProcessorListResolver = async (
   ...(await getLogCreateActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getLogDisableEventHistoryActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getLogTemplateLiteralActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getLogRedactStringActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
