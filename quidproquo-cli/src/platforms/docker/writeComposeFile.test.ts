@@ -14,6 +14,7 @@ const base = {
     { host: 3090, container: 3090 },
   ],
   publicFileStoragePort: 3001,
+  mounts: [],
 };
 
 describe('writeComposeFile', () => {
@@ -43,5 +44,27 @@ describe('writeComposeFile', () => {
     expect(compose).toContain('- /mnt/user/appdata/qpq-qpqjs:/app/.qpq-runtime');
     expect(compose).not.toContain('\nvolumes:\n  qpq-qpqjs-data:');
     expect(compose).toContain('environment:\n      - QPQ_PUBLIC_HOST=192.168.8.88\n      - QPQ_PUBLIC_FILE_STORAGE_PORT=3002');
+  });
+
+  it('mounts extra host folders after the state directory, quoted, read-only when asked', () => {
+    const contextDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-compose-'));
+
+    const compose = fs.readFileSync(
+      writeComposeFile({
+        ...base,
+        contextDir,
+        dataPath: '/mnt/user/appdata/qpq-qpqjs',
+        publicHost: null,
+        mounts: [
+          { host: '/mnt/user/media/downloads', container: '/mnt/user/media/downloads', readOnly: false },
+          { host: '/mnt/user/my tv', container: '/tv', readOnly: true },
+        ],
+      }),
+      'utf8',
+    );
+
+    expect(compose).toContain(
+      '    volumes:\n      - /mnt/user/appdata/qpq-qpqjs:/app/.qpq-runtime\n      - "/mnt/user/media/downloads:/mnt/user/media/downloads"\n      - "/mnt/user/my tv:/tv:ro"\n',
+    );
   });
 });

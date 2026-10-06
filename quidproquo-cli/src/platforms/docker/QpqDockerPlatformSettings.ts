@@ -25,4 +25,10 @@ export type QpqDockerPlatformSettings = {
   // Host directory for the app's state (key-value stores, file storage), e.g.
   // "/mnt/user/appdata/qpq-myapp". Default: a docker named volume.
   dataPath?: string;
+
+  // Comma-separated host folders to mount into the container, as docker `host:container` pairs
+  // with both absolute, optionally ending ":ro" for read-only, e.g.
+  // "/mnt/user/media/downloads:/mnt/user/media/downloads, /mnt/user/tv:/tv:ro". For apps that
+  // read or write files on the host outside their own state. Default: none.
+  mounts?: string;
 };

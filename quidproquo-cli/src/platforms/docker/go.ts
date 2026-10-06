@@ -238,6 +238,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
     volumeName,
     portMappings,
     dataPath: dockerSettings.dataPath ?? null,
+    mounts: dockerSettings.mounts ?? [],
     publicHost: dockerSettings.publicHost ?? null,
     publicFileStoragePort: mapHostPort(devServerPorts.fileStorage),
   });
@@ -274,6 +275,10 @@ Then open ${siteUrl} (replace localhost with the host's address)
 ${entryLines ? `\nWeb entries:\n${entryLines}\n` : ''}
 Ports come from the deployment's platformSettings.portMappings (${portMappings.map((m) => `${m.host}:${m.container}`).join(', ')})
 and are baked into the frontend, so a host must map the same ones. App state lives in ${dockerSettings.dataPath ?? `the ${volumeName} volume`}.${
+    dockerSettings.mounts?.length
+      ? `\nAlso mounted: ${dockerSettings.mounts.map((mount) => `${mount.host} at ${mount.container}${mount.readOnly ? ' (read-only)' : ''}`).join(', ')}.`
+      : ''
+  }${
     dockerSettings.publicHost
       ? ''
       : `\nSecure file urls point at localhost; set platformSettings.publicHost to the address browsers use for this host.`

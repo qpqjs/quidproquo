@@ -16,6 +16,7 @@ describe('getDockerPlatformSettings', () => {
       tag: 'local',
       publicHost: undefined,
       dataPath: undefined,
+      mounts: undefined,
     });
   });
 
@@ -27,6 +28,7 @@ describe('getDockerPlatformSettings', () => {
       tag: 'latest',
       publicHost: '192.168.8.88',
       dataPath: '/mnt/user/appdata/qpq-app/',
+      mounts: '/mnt/user/media/downloads:/downloads',
     };
 
     expect(getDockerPlatformSettings('local', deployment(settings))).toEqual({
@@ -36,6 +38,7 @@ describe('getDockerPlatformSettings', () => {
       tag: 'latest',
       publicHost: '192.168.8.88',
       dataPath: '/mnt/user/appdata/qpq-app',
+      mounts: [{ host: '/mnt/user/media/downloads', container: '/downloads', readOnly: false }],
     });
   });
 
@@ -46,5 +49,6 @@ describe('getDockerPlatformSettings', () => {
     expect(() => getDockerPlatformSettings('local', deployment({ portMappings: 'nope' }))).toThrow(
       "Invalid docker deployment 'local': Port mapping 'nope'",
     );
+    expect(() => getDockerPlatformSettings('local', deployment({ mounts: 'nope' }))).toThrow("Invalid docker deployment 'local': Mount 'nope'");
   });
 });
