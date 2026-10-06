@@ -5,7 +5,7 @@ description: Recipient addresses a service may email while its SES account is st
 
 # defineEmailSenderAllowList
 
-Declares recipient addresses the service is allowed to email while the SES account is in **sandbox** mode. In sandbox, SES authorises a send against the recipient's identity as well as the sender's, so the exact-ARN send grant needs each recipient identity listed too. The addresses must also be verified identities in the SES console.
+Declares recipient addresses the service is allowed to email while the SES account is in **sandbox** mode. In sandbox, SES authorises a send against the recipient's identity as well as the sender's, so the exact-ARN send grant needs each recipient identity listed too. The deploy also creates each address as an SES email identity. SES then emails the address a confirmation link, and sends to it work once that link is clicked. An address already created outside the stack has to be removed (or imported) first, or the deploy fails because it already exists.
 
 This is an AWS-specific concession, not a portable email concept, which is why it lives in `quidproquo-config-aws` beside [defineEmailSender](../webserver/email-sender.md) rather than on that webserver setting. Once the account has SES production access this setting does nothing useful and can be deleted.
 

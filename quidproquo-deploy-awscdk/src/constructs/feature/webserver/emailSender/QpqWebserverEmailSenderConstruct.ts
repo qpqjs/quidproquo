@@ -34,6 +34,22 @@ export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
         identity: aws_ses.Identity.publicHostedZone(hostedZone as aws_route53.IPublicHostedZone),
       });
     }
+
+    QpqWebserverEmailSenderConstruct.createAllowListIdentities(this, props.qpqConfig);
+  }
+
+  // One SES email identity per defineEmailSenderAllowList address, so the deploy creates what the
+  // sandbox needs instead of someone creating it by hand. Creating one makes SES email that address
+  // a confirmation link; sends to it work once the link is clicked. The construct id is keyed by the
+  // address: an identity's physical id is the address itself, so a changed id would fail creation
+  // against the identity the stack already owns. An address created outside the stack has to be
+  // removed (or imported) first, or the deploy fails because it already exists.
+  public static createAllowListIdentities(scope: Construct, qpqConfig: QPQConfig): void {
+    for (const address of new Set(qpqConfigAwsUtils.getEmailSenderAllowedAddresses(qpqConfig))) {
+      new aws_ses.EmailIdentity(scope, `AllowListIdentity${address}`, {
+        identity: aws_ses.Identity.email(address),
+      });
+    }
   }
 
   // Scope email sending to this service's own verified identity domains (exact ARNs, per the
