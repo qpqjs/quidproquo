@@ -1,4 +1,5 @@
 import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, noopDynamicModuleLoader, resolveActionResult } from 'quidproquo-core';
+import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -21,6 +22,30 @@ describe('getEventTransformResponseResultActionProcessor (express)', () => {
     expect(output.isBase64Encoded).toBe(false);
     expect(output.headers['x-custom']).toBe('y');
     expect(output.headers['Access-Control-Allow-Origin']).toBeDefined();
+  });
+
+  it("answers with the matched route's own allowed origin, as its preflight does", async () => {
+    const config = buildTestQpqConfig([
+      {
+        configSettingType: QPQWebServerConfigSettingType.Route,
+        uniqueKey: 'POST/signer/session',
+        path: '/signer/session',
+        method: 'POST',
+        runtime: { src: 'handler', runtimeType: 'Function' },
+        options: { allowedOrigins: ['http://localhost:3082'] },
+      } as any,
+    ]);
+    const processors = await getEventTransformResponseResultActionProcessor(config, noopDynamicModuleLoader);
+    const fromSigningSite = async (path: string) =>
+      resolveActionResult(
+        await invokeProcessor(processors[EventActionType.TransformResponseResult], {
+          eventParams: [{ path, method: 'POST', headers: { origin: 'http://localhost:3082' } }],
+          qpqEventRecordResponses: [{ success: true, result: { status: 200, body: 'ok', isBase64Encoded: false } }],
+        } as any),
+      );
+
+    expect((await fromSigningSite('/signer/session')).headers['Access-Control-Allow-Origin']).toBe('http://localhost:3082');
+    expect((await fromSigningSite('/elsewhere')).headers['Access-Control-Allow-Origin']).not.toBe('http://localhost:3082');
   });
 
   it('defaults an empty body when the success record has none', async () => {

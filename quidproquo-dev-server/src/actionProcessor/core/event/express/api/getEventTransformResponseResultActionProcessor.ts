@@ -1,3 +1,4 @@
+import { awsLambdaUtils } from 'quidproquo-actionprocessor-awslambda';
 import {
   actionResult,
   askEventTransformResponseResultBase,
@@ -6,11 +7,12 @@ import {
   EitherActionResult,
   ErrorTypeEnum,
   EventActionType,
+  HTTPMethod,
   ProcessorFor,
   QPQConfig,
   QPQError,
 } from 'quidproquo-core';
-import { HttpEventHeaders, qpqWebServerUtils } from 'quidproquo-webserver';
+import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 
@@ -46,6 +48,15 @@ const getProcessTransformResponseResult = async (
   loader: DynamicModuleLoader,
 ): Promise<ProcessorFor<typeof askEventTransformResponseResultBase>> => {
   const domainResolver = await qpqWebServerUtils.loadDomainResolver(qpqConfig, loader);
+  const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
+
+  // The options of the route the request matched, so a response carries the same CORS headers as
+  // its preflight (e.g. a route's own allowedOrigins), as on lambda. No match (a 404) falls back
+  // to the defaults.
+  const getMatchedRouteOptions = (expressEvent: EventInput[0]): RouteOptions => {
+    const found = awsLambdaUtils.findApiRoute(routes, expressEvent.method as HTTPMethod, expressEvent.path || '');
+    return found ? qpqWebServerUtils.mergeAllRouteOptions('api', found.route, qpqConfig) : {};
+  };
 
   // We might need to JSON.stringify the body.
   return async ({ eventParams: rawEventParams, qpqEventRecordResponses }) => {
@@ -61,7 +72,7 @@ const getProcessTransformResponseResult = async (
 
     const recordHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, expressEvent.headers, domainResolver),
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, getMatchedRouteOptions(expressEvent), expressEvent.headers, domainResolver),
       ...recordHeaders,
     };
 

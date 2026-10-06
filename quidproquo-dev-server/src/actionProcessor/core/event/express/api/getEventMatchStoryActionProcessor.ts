@@ -21,18 +21,8 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    // Most specific route first (the shared helper, so local matching agrees with lambda's).
-    const sortedRoutes = qpqWebServerUtils.sortPathMatchConfigs(
-      routes.filter((r: any) => r.method === qpqEventRecord.method || qpqEventRecord.method === 'OPTIONS'),
-    );
-
-    // Find the most relevant match
-    const matchedRoute = sortedRoutes
-      .map((r) => ({
-        match: awsLambdaUtils.matchUrl(r.path, qpqEventRecord.path),
-        route: r,
-      }))
-      .find((m) => m.match.didMatch);
+    // The shared helper, so local matching agrees with lambda's.
+    const matchedRoute = awsLambdaUtils.findApiRoute(routes, qpqEventRecord.method, qpqEventRecord.path);
 
     if (!matchedRoute) {
       return actionResultError(
