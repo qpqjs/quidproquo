@@ -151,6 +151,35 @@ describe('apiGatwayEvent/api getEventTransformResponseResultActionProcessor', ()
     expect(JSON.parse((response as any).body)).toEqual({ errorType: ErrorTypeEnum.NotFound, errorText: 'nope' });
   });
 
+  it("answers with the matched route's own allowed origin, as its preflight does", async () => {
+    const config = buildTestQpqConfig([
+      {
+        configSettingType: QPQWebServerConfigSettingType.Route,
+        uniqueKey: 'POST/signer/session',
+        path: '/signer/session',
+        method: 'POST',
+        runtime: { src: 'handler', runtimeType: 'Function' },
+        options: { allowedOrigins: ['https://sign.example.com'] },
+      } as any,
+    ]);
+    const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult, config);
+    const record = { success: true, result: { status: 200, body: 'ok', headers: {} } };
+    const fromSigningSite = (path: string) =>
+      processor({
+        eventParams: [
+          buildApiGatewayEvent({ path: `/${MODULE_NAME}${path}`, httpMethod: 'POST', headers: { Origin: 'https://sign.example.com' } }),
+          context,
+        ],
+        qpqEventRecordResponses: [record],
+      });
+
+    const [matched] = await fromSigningSite('/signer/session');
+    const [unmatched] = await fromSigningSite('/elsewhere');
+
+    expect((matched as any).headers['Access-Control-Allow-Origin']).toBe('https://sign.example.com');
+    expect((unmatched as any).headers['Access-Control-Allow-Origin']).not.toBe('https://sign.example.com');
+  });
+
   it('rejects a non-string body with a generic error response', async () => {
     const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult);
     const record = { success: true, result: { status: 200, body: { not: 'a string' }, headers: {} } };

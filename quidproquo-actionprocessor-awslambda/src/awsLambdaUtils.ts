@@ -1,4 +1,5 @@
-import { Nullable, StorageDriveTier } from 'quidproquo-core';
+import { HTTPMethod, Nullable, StorageDriveTier } from 'quidproquo-core';
+import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
@@ -23,6 +24,28 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     didMatch: matchResult.matches,
     params: matchResult.params,
   };
+};
+
+export type FoundApiRoute = {
+  route: RouteQPQWebServerConfigSetting;
+  match: UrlMatch;
+};
+
+/**
+ * The most specific route for a request, or null. An OPTIONS preflight matches a route of any method
+ * on the path, and HEAD matches GET. Shared by route matching and the response's CORS headers (here
+ * and in the local dev server), so they always settle on the same route.
+ */
+export const findApiRoute = (routes: RouteQPQWebServerConfigSetting[], method: HTTPMethod, path: string): Nullable<FoundApiRoute> => {
+  const candidates = routes.filter((r) => r.method === method || method === 'OPTIONS' || (method === 'HEAD' && r.method === 'GET'));
+
+  // Note: We may need to filter variable routes out {} as the variables are length independent
+  return (
+    qpqWebServerUtils
+      .sortPathMatchConfigs(candidates)
+      .map((route) => ({ route, match: matchUrl(route.path, path) }))
+      .find((found) => found.match.didMatch) ?? null
+  );
 };
 
 /** Maps a qpq storage drive tier to its S3 storage class. An unset tier lets S3 pick (INTELLIGENT_TIERING). */

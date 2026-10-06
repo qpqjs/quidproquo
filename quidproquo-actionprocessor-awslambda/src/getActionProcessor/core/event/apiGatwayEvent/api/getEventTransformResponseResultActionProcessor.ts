@@ -5,12 +5,16 @@ import {
   DynamicModuleLoader,
   EitherActionResult,
   ErrorTypeEnum,
+  HTTPMethod,
   ProcessorFor,
   QPQConfig,
+  qpqCoreUtils,
   QPQError,
 } from 'quidproquo-core';
-import { HttpEventHeaders, qpqWebServerUtils } from 'quidproquo-webserver';
+import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
+import { findApiRoute } from '../../../../../awsLambdaUtils';
+import { getApiRecordPath } from './getApiRecordPath';
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 
 const ErrorTypeHttpResponseMap: Record<string, number> = {
@@ -55,6 +59,15 @@ const getProcessTransformResponseResult = async (
   loader: DynamicModuleLoader,
 ): Promise<ProcessorFor<typeof askEventTransformResponseResultBase>> => {
   const domainResolver = await qpqWebServerUtils.loadDomainResolver(qpqConfig, loader);
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
+
+  // The options of the route the request matched, so a response carries the same CORS headers as
+  // its preflight (e.g. a route's own allowedOrigins). No match (a 404) falls back to the defaults.
+  const getMatchedRouteOptions = (apiGatewayEvent: EventInput[0]): RouteOptions => {
+    const found = findApiRoute(routes, apiGatewayEvent.httpMethod as HTTPMethod, getApiRecordPath(apiGatewayEvent, serviceName));
+    return found ? qpqWebServerUtils.mergeAllRouteOptions('api', found.route, qpqConfig) : {};
+  };
 
   // We might need to JSON.stringify the body.
   return async ({ eventParams: rawEventParams, qpqEventRecordResponses: rawQpqEventRecordResponses }) => {
@@ -80,7 +93,7 @@ const getProcessTransformResponseResult = async (
     // Add the cors headers
     const currentHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, apiGatewayEvent.headers, domainResolver),
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, getMatchedRouteOptions(apiGatewayEvent), apiGatewayEvent.headers, domainResolver),
       ...currentHeaders,
     };
 

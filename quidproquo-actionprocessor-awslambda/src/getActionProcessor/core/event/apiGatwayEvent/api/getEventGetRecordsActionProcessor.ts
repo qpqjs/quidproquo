@@ -11,6 +11,7 @@ import {
 import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
+import { getApiRecordPath } from './getApiRecordPath';
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
@@ -22,13 +23,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const [apiGatewayEvent, context] = eventParams as EventInput;
 
-    // Initialize `path` by removing the service name prefix from `apiGatewayEvent.path`.
-    // This adjustment is necessary because the API gateway routes requests to services based on
-    // a base path that includes the service name. By subtracting `serviceName.length + 1` from the
-    // substring method's start index, we effectively strip the leading `/<serviceName>` segment,
-    // accounting for the leading slash. This ensures `path` reflects the intended resource location
-    // after the service name. Defaults to '/' if `apiGatewayEvent.path` is not provided.
-    const path = (apiGatewayEvent.path || '/').substring(serviceName.length + 1);
+    const path = getApiRecordPath(apiGatewayEvent, serviceName);
 
     const internalEventRecord: InternalEventRecord = {
       path,

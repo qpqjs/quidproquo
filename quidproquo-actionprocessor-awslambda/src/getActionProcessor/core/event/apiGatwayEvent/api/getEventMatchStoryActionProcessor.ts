@@ -10,7 +10,7 @@ import {
 } from 'quidproquo-core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { matchUrl } from '../../../../../awsLambdaUtils';
+import { findApiRoute } from '../../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
@@ -21,21 +21,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    // Sort the routes by string length
-    // Note: We may need to filter variable routes out {} as the variables are length independent
-    const routesWithNoOptions = routes.filter(
-      (r: any) =>
-        r.method === qpqEventRecord.method || qpqEventRecord.method === 'OPTIONS' || (qpqEventRecord.method === 'HEAD' && r.method === 'GET'),
-    );
-
-    // Find the most relevant match
-    const sortedRoutes = qpqWebServerUtils.sortPathMatchConfigs(routesWithNoOptions);
-    const matchedRoute = sortedRoutes
-      .map((r) => ({
-        match: matchUrl(r.path, qpqEventRecord.path),
-        route: r,
-      }))
-      .find((m) => m.match.didMatch);
+    const matchedRoute = findApiRoute(routes, qpqEventRecord.method, qpqEventRecord.path);
 
     if (!matchedRoute) {
       return actionResultError(
