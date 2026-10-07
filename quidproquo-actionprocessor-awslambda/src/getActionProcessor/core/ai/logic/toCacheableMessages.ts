@@ -2,7 +2,7 @@ import { omitKey } from 'quidproquo-core';
 
 import type { ModelMessage } from 'ai';
 
-import { BedrockCacheSettings } from '../types';
+import { BedrockCachePointRole, BedrockCacheSettings } from '../types';
 import { toBedrockCachePoint } from './toBedrockCachePoint';
 
 export type CacheableMessagesOptions = BedrockCacheSettings & {
@@ -46,11 +46,11 @@ const withoutCachePoint = (message: ModelMessage): ModelMessage => {
 };
 
 /** A copy of the message with a cache point, keeping any other provider options it carries. */
-const withCachePoint = (message: ModelMessage, cache: BedrockCacheSettings): ModelMessage => ({
+const withCachePoint = (message: ModelMessage, cache: BedrockCacheSettings, role: BedrockCachePointRole): ModelMessage => ({
   ...message,
   providerOptions: {
     ...message.providerOptions,
-    bedrock: { ...message.providerOptions?.bedrock, cachePoint: toBedrockCachePoint(cache) },
+    bedrock: { ...message.providerOptions?.bedrock, cachePoint: toBedrockCachePoint(cache, role) },
   },
 });
 
@@ -74,7 +74,11 @@ export const toCacheableMessages = (messages: ModelMessage[], caching: boolean |
   const anchorIndex = durableCount - 1;
   const tailIndex = options.markTail && messages.length > durableCount ? messages.length - 1 : -1;
 
-  return messages
-    .map(withoutCachePoint)
-    .map((message, index) => (index === anchorIndex || index === tailIndex ? withCachePoint(message, options) : message));
+  return messages.map(withoutCachePoint).map((message, index) => {
+    if (index === anchorIndex) {
+      return withCachePoint(message, options, BedrockCachePointRole.Anchor);
+    }
+
+    return index === tailIndex ? withCachePoint(message, options, BedrockCachePointRole.Tail) : message;
+  });
 };

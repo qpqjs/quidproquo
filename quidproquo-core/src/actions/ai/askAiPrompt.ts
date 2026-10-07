@@ -15,7 +15,7 @@ export type AskAiPromptOptions = {
   turnContext?: AiMessage[];
   reasoning?: AiReasoningConfig;
   caching?: boolean;
-  /** Lifetime of every cache point in the request. Unset means the provider's own default. */
+  /** Requested lifetime of the request's cache points. Unset means `AiCacheTtl.Dynamic`. */
   cacheTtl?: AiCacheTtl;
   /** Stop the tool loop between steps once this much wall-clock time has passed. The
    *  turn then finishes with `toolCalls` if the model still wanted to act, so it can be resumed. */

@@ -7,7 +7,9 @@ import { toCacheableMessages } from './toCacheableMessages';
 
 const cachePoint = { bedrock: { cachePoint: { type: 'default' } } };
 
-const cache = { model: AiModel.ClaudeSonnet46 };
+// Explicit five minutes keeps the structural cases on the plain point; the dynamic policy has
+// its own case below.
+const cache = { model: AiModel.ClaudeSonnet46, cacheTtl: AiCacheTtl.FiveMinutes };
 
 const countCachePoints = (messages: ModelMessage[]): number =>
   messages.filter((message) => message.providerOptions?.bedrock?.cachePoint || message.providerOptions?.amazonBedrock?.cachePoint).length;
@@ -136,7 +138,22 @@ describe('toCacheableMessages', () => {
     expect(countCachePoints(toCacheableMessages(messages, true, { ...cache, durableCount: 0 }))).toBe(0);
   });
 
-  it('puts the ttl on every cache point for a one hour cache and omits it otherwise', () => {
+  it('keeps the anchor for an hour and the tail for five minutes under the dynamic default', () => {
+    const messages: ModelMessage[] = [
+      { role: 'user', content: 'q1' },
+      { role: 'user', content: 'current state' },
+      { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 't1', toolName: 'read', input: {} }] },
+      { role: 'tool', content: [{ type: 'tool-result', toolCallId: 't1', toolName: 'read', output: { type: 'text', value: 'ok' } }] },
+    ];
+
+    const result = toCacheableMessages(messages, true, { model: AiModel.ClaudeSonnet46, durableCount: 1, markTail: true });
+
+    expect(result[0].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result[1].providerOptions).toBeUndefined();
+    expect(result[3].providerOptions).toEqual(cachePoint);
+  });
+
+  it('keeps the anchor for an hour when asked, never the tail, and omits the ttl otherwise', () => {
     const messages: ModelMessage[] = [
       { role: 'user', content: 'q1' },
       { role: 'assistant', content: 'a1' },
@@ -145,7 +162,7 @@ describe('toCacheableMessages', () => {
 
     const oneHour = toCacheableMessages(messages, true, { ...cache, cacheTtl: AiCacheTtl.OneHour, durableCount: 1, markTail: true });
     expect(oneHour[0].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(oneHour[2].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(oneHour[2].providerOptions).toEqual(cachePoint);
 
     const fiveMinutes = toCacheableMessages(messages, true, { ...cache, cacheTtl: AiCacheTtl.FiveMinutes, durableCount: 1, markTail: true });
     expect(fiveMinutes[0].providerOptions).toEqual(cachePoint);

@@ -6,6 +6,12 @@ import { toCacheableSystem } from './toCacheableSystem';
 
 const cache = { model: AiModel.ClaudeSonnet46 };
 
+const systemWith = (cachePoint: object) => ({
+  role: 'system',
+  content: 'sys',
+  providerOptions: { bedrock: { cachePoint } },
+});
+
 describe('toCacheableSystem', () => {
   it('returns undefined when there is no system prompt', () => {
     expect(toCacheableSystem(undefined, true, cache)).toBeUndefined();
@@ -16,34 +22,17 @@ describe('toCacheableSystem', () => {
     expect(toCacheableSystem('sys', undefined, cache)).toBe('sys');
   });
 
-  it('wraps the system prompt with a bedrock cache point when caching is requested', () => {
-    expect(toCacheableSystem('sys', true, cache)).toEqual({
-      role: 'system',
-      content: 'sys',
-      providerOptions: {
-        bedrock: { cachePoint: { type: 'default' } },
-      },
-    });
+  it('wraps the system prompt with an hour-long bedrock cache point by default', () => {
+    expect(toCacheableSystem('sys', true, cache)).toEqual(systemWith({ type: 'default', ttl: '1h' }));
   });
 
-  it('carries the one hour ttl on the cache point and omits it otherwise', () => {
-    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.OneHour })).toEqual({
-      role: 'system',
-      content: 'sys',
-      providerOptions: {
-        bedrock: { cachePoint: { type: 'default', ttl: '1h' } },
-      },
-    });
+  it('uses the default lifetime by default on a model that cannot cache for an hour', () => {
+    expect(toCacheableSystem('sys', true, { model: AiModel.ClaudeSonnet4 })).toEqual(systemWith({ type: 'default' }));
+  });
 
-    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.ProviderDefault })).toEqual(
-      toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.FiveMinutes }),
-    );
-    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.FiveMinutes })).toEqual({
-      role: 'system',
-      content: 'sys',
-      providerOptions: {
-        bedrock: { cachePoint: { type: 'default' } },
-      },
-    });
+  it('honours an explicit lifetime', () => {
+    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.OneHour })).toEqual(systemWith({ type: 'default', ttl: '1h' }));
+    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.FiveMinutes })).toEqual(systemWith({ type: 'default' }));
+    expect(toCacheableSystem('sys', true, { ...cache, cacheTtl: AiCacheTtl.ProviderDefault })).toEqual(systemWith({ type: 'default' }));
   });
 });

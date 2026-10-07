@@ -27,7 +27,7 @@ const stepMessages = (result: PrepareStepResult<ToolSet> | PromiseLike<PrepareSt
   return (result as { messages: ModelMessage[] }).messages;
 };
 
-const runStep = (durableCount: number, stepNumber: number, messages: ModelMessage[], cacheTtl?: AiCacheTtl): ModelMessage[] =>
+const runStep = (durableCount: number, stepNumber: number, messages: ModelMessage[], cacheTtl: AiCacheTtl = AiCacheTtl.FiveMinutes): ModelMessage[] =>
   stepMessages(createCachePrepareStep({ model: AiModel.ClaudeSonnet46, cacheTtl, durableCount })({ messages, stepNumber } as never));
 
 const markedIndexes = (messages: ModelMessage[]): number[] =>
@@ -67,10 +67,17 @@ describe('createCachePrepareStep', () => {
     expect(markedIndexes(runStep(0, 0, [turnContext]))).toEqual([]);
   });
 
-  it('applies the ttl to the points it places', () => {
+  it('keeps the anchor for an hour and the tail for five minutes by default', () => {
+    const result = runStep(3, 1, [...history, turnContext, ...toolTraffic], AiCacheTtl.Dynamic);
+
+    expect(result[2].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result[5].providerOptions).toEqual(cachePoint);
+  });
+
+  it('applies a requested hour to the anchor but never to the tail', () => {
     const result = runStep(3, 1, [...history, turnContext, ...toolTraffic], AiCacheTtl.OneHour);
 
     expect(result[2].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(result[5].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result[5].providerOptions).toEqual(cachePoint);
   });
 });

@@ -43,9 +43,9 @@ export type EventDocAiOptions = {
   // (8192) is too small for a reasoning block plus a large tool input, and a
   // call that hits it is cut off mid-JSON.
   maxOutputTokens?: number;
-  // Lifetime of the prompt cache entries a turn writes. Defaults to
-  // AiCacheTtl.ProviderDefault (five minutes on Bedrock, refreshed by every hit);
-  // AiCacheTtl.OneHour pays a dearer write and suits chats whose users pause more
-  // than five minutes between messages, on models that support it.
+  // Requested lifetime of the prompt cache entries a turn writes. Defaults to
+  // AiCacheTtl.Dynamic: on Bedrock an hour for the system prompt and the saved
+  // history, so they outlive a user's pause between messages, and five minutes
+  // for the tool loop, which is discarded when the turn ends.
   cacheTtl?: AiCacheTtl;
 };

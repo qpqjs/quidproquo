@@ -1,6 +1,6 @@
 import type { SystemModelMessage } from 'ai';
 
-import { BedrockCacheSettings } from '../types';
+import { BedrockCachePointRole, BedrockCacheSettings } from '../types';
 import { toBedrockCachePoint } from './toBedrockCachePoint';
 
 // Bedrock reads cache points off message objects, not the bare `system` string, so caching shapes
@@ -23,7 +23,7 @@ export const toCacheableSystem = (
     role: 'system',
     content: system,
     providerOptions: {
-      bedrock: { cachePoint: toBedrockCachePoint(cache) },
+      bedrock: { cachePoint: toBedrockCachePoint(cache, BedrockCachePointRole.System) },
     },
   };
 };

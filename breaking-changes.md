@@ -7,6 +7,7 @@ assembled quickly.
 
 - `defineEmailSenderAllowList` addresses are now created as SES email identities by the deploy. If you already created one by hand in SES, delete it (or import it into the stack) before deploying, or the deploy fails because it already exists.
 - `EventDocListConfig` has a new required `canCreate: boolean` field. Set it to `false` for collections the platform writes itself (no create route mounted), `true` otherwise.
+- `cacheTtl` on `askAiPrompt`, `askAiPromptStream` and `defineEventDocAi` now defaults to `AiCacheTtl.Dynamic` instead of the provider default. On Bedrock the system prompt and saved history are cached for an hour (dearer write). Pass `AiCacheTtl.ProviderDefault` to keep the old behaviour.
 
 ## 0.1.29
 
