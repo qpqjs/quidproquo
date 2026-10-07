@@ -48,8 +48,10 @@ function* askAiPrompt(
 | `system` | `string` | – | System prompt — high-level instructions that steer the model's behaviour for the whole request. |
 | `aiName` | `string` | – | Name of a [defineAi](../../../config/core/ai.md) config to bind. This is what wires up tool definitions (and their executors) for the model to call. Omit for a plain, tool-less prompt. |
 | `messages` | [`AiMessage[]`](#aimessage) | – | A full conversation history. When present, this is sent instead of `prompt`, letting you carry a multi-turn dialogue (including prior assistant turns and tool results). |
+| `turnContext` | [`AiMessage[]`](#aimessage) | – | Per-request messages sent after `messages` (or after `prompt`, which then becomes the first user message). They never receive a cache point and are not meant to be saved into a conversation's history, so live state such as a document's current contents belongs here rather than in `system`, where any change rewrites the whole cached conversation. |
 | `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on; `budgetTokens` caps how many tokens the model may spend thinking before it answers (defaults to `4096` on AWS). |
-| `caching` | `boolean` | – | Marks the system prompt and the last message (or the last `messages` entry) with a Bedrock cache point, so a following call in the same conversation can read everything up to there from cache instead of reprocessing it. |
+| `caching` | `boolean` | – | Places Bedrock cache points on the system prompt (which also covers the tool definitions) and on the last `messages` entry, and after every tool-calling step on the newest tool message, so the next call in the conversation and the next step in the loop read everything up to there from cache. `turnContext` is never marked. A point only takes effect once the prefix before it reaches the model's minimum: 1,024 tokens on Claude Sonnet 4.6, 4,096 on Claude Opus 4.6 and Haiku 4.5. |
+| `cacheTtl` | `AiCacheTtl` | provider default | Requested lifetime of every cache point in the request. `AiCacheTtl.ProviderDefault` leaves it to the provider (five minutes on Bedrock, refreshed free by each hit); `AiCacheTtl.FiveMinutes` asks for five minutes explicitly; `AiCacheTtl.OneHour` costs a dearer write and suits conversations whose turns are more than five minutes apart, on models that support it. A request, not a guarantee: each provider maps it onto what its models accept, and on Bedrock a model that cannot cache for an hour gets the provider default instead of a failed request. |
 | `maxSteps` | `number` | – | Cap on model/tool steps in one call. Unset means no cap: the loop runs until the model stops on its own or `maxDurationMs` trips. A client-side tool call (a tool with no executor) still halts it immediately. |
 | `maxOutputTokens` | `number` | provider default | Output token cap per model call. Bedrock defaults to 8192, which a reasoning block plus a large tool input can exceed; the step then finishes with `length` and the tool call arrives truncated. Raise it for agentic workloads (Claude Sonnet allows 64k). |
 | `maxDurationMs` | `number` | – | Wall-clock budget for the tool loop. Checked between steps, so the loop can overrun by one step; leave headroom. When it trips with tool calls still outstanding the result finishes with `toolCalls`, and re-sending the recorded history resumes the turn. Pair it with [askGetRuntimeRemainingTime](../system/ask-get-runtime-remaining-time.md) to stop before the platform deadline. |
@@ -103,7 +105,7 @@ interface AiReasoningConfig {
 
 ## Returns
 
-`AiPromptActionResult` — `{ text: string }`, the model's complete response text.
+`AiPromptActionResult`: `{ text: string; usage?: AiStreamUsage }`. `text` is the model's complete response; `usage` is the token usage summed across every step when the provider reports it, with `inputTokens`, `outputTokens`, `totalTokens` and, when caching on Bedrock, `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`.
 
 ## Errors
 

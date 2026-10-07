@@ -9,6 +9,12 @@ export interface AiStreamUsage {
   inputTokens?: number;
   /** Completion tokens produced. */
   outputTokens?: number;
-  /** Total tokens — typically `inputTokens + outputTokens` (+ reasoning, when applicable). */
+  /** Total tokens, typically `inputTokens + outputTokens` (+ reasoning, when applicable). */
   totalTokens?: number;
+  /** Prompt tokens served from the prompt cache. */
+  cacheReadInputTokens?: number;
+  /** Prompt tokens written to the prompt cache by this request. */
+  cacheWriteInputTokens?: number;
+  /** Prompt tokens neither read from nor written to the cache. */
+  noCacheInputTokens?: number;
 }

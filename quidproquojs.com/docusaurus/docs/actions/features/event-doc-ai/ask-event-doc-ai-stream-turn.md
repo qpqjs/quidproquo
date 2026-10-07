@@ -14,7 +14,7 @@ import { askEventDocAiStreamTurn } from 'quidproquo-features';
 
 // A resumed turn: the saved history already ends on the partial assistant reply.
 export function* askResume(docId: string, chatId: string, history: EventDocAiChatMessage[]) {
-  return yield* askEventDocAiStreamTurn(docId, chatId, history, true);
+  return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: true, lengthResumes: 0 });
 }
 ```
 
@@ -36,7 +36,7 @@ function* askEventDocAiStreamTurn(
 | `docId` | `string` | The trusted document the chat is scoped to (from session context). |
 | `chatId` | `string` | The chat being replied to. |
 | `history` | `EventDocAiChatMessage[]` | The full saved history to prompt with. Must already be persisted; this story only appends the reply. |
-| `options.isContinuation` | `boolean` | `true` when resuming. Appends a transport-only nudge as the final user message, because Anthropic rejects a conversation ending on an assistant turn when extended thinking is on. Never saved. |
+| `options.isContinuation` | `boolean` | `true` when resuming. Adds the continuation nudge to the turn context, so the request still ends on a user turn (Anthropic rejects a conversation ending on an assistant turn when extended thinking is on). Never saved. |
 | `options.lengthResumes` | `number` | How many consecutive resumes the output token cap has already caused. `0` for a new turn; each `length` handoff passes it on incremented, and the turn stops resuming after three. |
 
 ## Returns
@@ -49,9 +49,9 @@ function* askEventDocAiStreamTurn(
 ## What it does
 
 1. Reads the remaining runtime and subtracts the headroom. If nothing is left, hands off immediately.
-2. Resolves the AI name, model, reasoning budget, and system prompt (generator inline function first, else the static prompt, else a default; never persisted).
+2. Resolves the AI name, model, reasoning budget, cache ttl and system prompt (generator inline function first, else the static prompt, else a default). The system prompt heads the cached prefix, so it must come back identical every turn. Then builds the turn context: the `turnContextGenerator` output as a user message, plus the continuation nudge when resuming. Neither is persisted.
 3. Converts the history to model messages. File segments become drive-referenced file parts the action processor resolves at prompt time, under the collection's storage scope. Tools do **not** receive `docId` from the model; executors inherit the session context and read the trusted id there.
-4. Streams with the time budget as `maxDurationMs`, dispatching each part to the UI (`askUIEventDocAiAppendStreamChunk`) as it arrives, except `tool-input-delta` parts. Those are the argument JSON of a tool call streamed in fragments, often hundreds for one call; the UI only needs `tool-input-start` (show "calling X") and `tool-call` (the full input), so the fragments are collected for the saved message but never sent.
+4. Streams the history followed by the turn context (sent as `turnContext`, so it is never cached or saved), with caching on and the time budget as `maxDurationMs`, dispatching each part to the UI (`askUIEventDocAiAppendStreamChunk`) as it arrives, except `tool-input-delta` parts. Those are the argument JSON of a tool call streamed in fragments, often hundreds for one call; the UI only needs `tool-input-start` (show "calling X") and `tool-call` (the full input), so the fragments are collected for the saved message but never sent.
 5. Folds the parts into segments. If any were produced, saves the assistant message and dispatches it as the finalized message (`askUIEventDocAiAppendChatMessage`).
 6. Clears the UI's live-stream buffer and touches the chat (bumps `updatedAt`).
 7. Returns `{ complete: false }` on a pending client tool. Otherwise, if the reply made progress and the finish reason was `toolCalls` (the time budget tripped) or `length` (the output token cap tripped, and fewer than three such resumes have happened), hands off. Otherwise returns `{ complete: true }`, or `{ complete: false }` if the turn was cut off and not resumed.

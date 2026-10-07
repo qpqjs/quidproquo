@@ -1,17 +1,18 @@
-import {
-  actionResult,
-  actionResultError,
-  AiActionType,
-  askAiPrompt,
-  createActionProcessor,
-  ErrorTypeEnum,
-  ProcessorFor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, actionResultError, askAiPrompt, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { generateText } from 'ai';
 
-import { buildAiStopConditions, createDriveFileResolver, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
+import {
+  buildAiPromptInput,
+  buildAiStopConditions,
+  createCachePrepareStep,
+  createDriveFileResolver,
+  logAiCacheUsage,
+  prepareAiPromptCall,
+  toAiStreamUsage,
+  toCacheableSystem,
+} from './logic';
+import { BedrockCacheSettings } from './types';
 
 const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPrompt> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -21,17 +22,12 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
     }
 
     try {
-      const promptOrMessages = payload.messages
-        ? {
-            messages: toCacheableMessages(
-              await toSdkMessages(
-                payload.messages,
-                createDriveFileResolver(qpqConfig, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry),
-              ),
-              payload.caching,
-            ),
-          }
-        : { prompt: payload.prompt };
+      const input = await buildAiPromptInput(
+        payload,
+        createDriveFileResolver(qpqConfig, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry),
+      );
+
+      const cache: BedrockCacheSettings = { model: payload.model, cacheTtl: payload.cacheTtl };
 
       // Extended thinking: the model reasons before answering, within the token budget.
       const providerOptions = payload.reasoning
@@ -40,21 +36,22 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
 
       const result = await generateText({
         model: prepared.model,
-        system: toCacheableSystem(payload.system, payload.caching),
-        ...promptOrMessages,
+        system: toCacheableSystem(payload.system, payload.caching, cache),
+        ...input.promptOrMessages,
         tools: prepared.tools,
         providerOptions,
         stopWhen: buildAiStopConditions(payload),
         maxOutputTokens: payload.maxOutputTokens,
+        prepareStep: payload.caching ? createCachePrepareStep({ ...cache, durableCount: input.durableCount }) : undefined,
       });
 
+      const usage = toAiStreamUsage(result.usage);
+
       if (payload.caching) {
-        // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage; that
-        // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
-        console.log('AI prompt cache usage:', result.finalStep?.usage?.inputTokenDetails);
+        logAiCacheUsage(usage);
       }
 
-      return actionResult({ text: result.text });
+      return actionResult({ text: result.text, usage });
     } catch (error) {
       if (error instanceof Error) {
         return actionResultError(ErrorTypeEnum.GenericError, error.message);

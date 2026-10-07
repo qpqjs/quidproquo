@@ -2,20 +2,24 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
+import { AiCacheTtl } from './AiCacheTtl';
 import { AiModel } from './AiModel';
 import { askAiPrompt } from './askAiPrompt';
 
 describe('askAiPrompt', () => {
   it('yields a Prompt action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
+    const turnContext = [{ role: 'user', content: 'current state' }] as any;
 
     const { action } = captureRequester(
       askAiPrompt(AiModel.ClaudeSonnet45, 'do the thing', {
         system: 'be helpful',
         aiName: 'bob',
         messages,
+        turnContext,
         reasoning: { budgetTokens: 2048 },
         caching: true,
+        cacheTtl: AiCacheTtl.OneHour,
       }),
     );
 
@@ -25,10 +29,12 @@ describe('askAiPrompt', () => {
         model: AiModel.ClaudeSonnet45,
         prompt: 'do the thing',
         messages,
+        turnContext,
         system: 'be helpful',
         aiName: 'bob',
         reasoning: { budgetTokens: 2048 },
         caching: true,
+        cacheTtl: AiCacheTtl.OneHour,
       },
     });
   });
@@ -42,10 +48,12 @@ describe('askAiPrompt', () => {
         model: AiModel.ClaudeHaiku45,
         prompt: 'hello',
         messages: undefined,
+        turnContext: undefined,
         system: undefined,
         aiName: undefined,
         reasoning: undefined,
         caching: undefined,
+        cacheTtl: undefined,
       },
     });
   });

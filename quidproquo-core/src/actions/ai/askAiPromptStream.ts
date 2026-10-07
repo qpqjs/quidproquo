@@ -1,6 +1,7 @@
 import { createActionRequester } from '../../types';
 import { StreamHandle } from '../../types/StreamRegistry';
 import { AiActionType } from './AiActionType';
+import { AiCacheTtl } from './AiCacheTtl';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
 import { AiReasoningConfig } from './AiReasoningConfig';
@@ -10,8 +11,13 @@ export type AskAiPromptStreamOptions = {
   system?: string;
   aiName?: string;
   messages?: AiMessage[];
+  /** Per-request messages sent after `messages`. They never receive a cache point and the caller
+   *  never persists them; with only `prompt`, the prompt becomes the first user message. */
+  turnContext?: AiMessage[];
   reasoning?: AiReasoningConfig;
   caching?: boolean;
+  /** Lifetime of every cache point in the request. Unset means the provider's own default. */
+  cacheTtl?: AiCacheTtl;
   /** Stop the tool loop between steps once this much wall-clock time has passed. The
    *  turn then finishes with `toolCalls` if the model still wanted to act, so it can be resumed. */
   maxDurationMs?: number;
@@ -29,10 +35,12 @@ export const askAiPromptStream = createActionRequester<StreamHandle<'json', AiSt
     model,
     prompt,
     messages: options?.messages,
+    turnContext: options?.turnContext,
     system: options?.system,
     aiName: options?.aiName,
     reasoning: options?.reasoning,
     caching: options?.caching,
+    cacheTtl: options?.cacheTtl,
     maxDurationMs: options?.maxDurationMs,
     maxSteps: options?.maxSteps,
     maxOutputTokens: options?.maxOutputTokens,

@@ -5,6 +5,7 @@ export * from './functions';
 export * from './hash';
 export * from './logs';
 export * from './mimeTypes';
+export * from './object';
 export * from './path';
 export * from './types';
 export * from './uuid';

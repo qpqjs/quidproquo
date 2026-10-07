@@ -42,7 +42,7 @@ The parameters are identical to [askAiPrompt](./ask-ai-prompt.md) — see there 
 | --- | --- | --- |
 | `model` | `AiModel` | Which model to prompt. |
 | `prompt` | `string` | The user prompt. Ignored when `options.messages` is set. |
-| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, reasoning?, caching?, maxDurationMs?, maxSteps?, maxOutputTokens? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
+| `options` | `AskAiPromptStreamOptions` | `{ system?, aiName?, messages?, turnContext?, reasoning?, caching?, cacheTtl?, maxDurationMs?, maxSteps?, maxOutputTokens? }` — same shape and meaning as [`AskAiPromptOptions`](./ask-ai-prompt.md#askaipromptoptions). |
 
 ## Returns
 
@@ -63,7 +63,7 @@ Within a step, text / reasoning / tool-input events arrive as matched `*Start �
 | Member (`type`) | When it fires |
 | --- | --- |
 | `Start` (`start`) | Once, before anything else — the response is starting. |
-| `Finish` (`finish`) | Once, at the very end — includes aggregate usage. |
+| `Finish` (`finish`) | Once, at the very end. Its `usage` is the aggregate across steps and, when caching on Bedrock, carries `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`. |
 | `StartStep` (`start-step`) | A generation step (one round-trip to the model) started. |
 | `FinishStep` (`finish-step`) | The current step ended, with its finish reason and usage. |
 | `TextStart` / `TextDelta` / `TextEnd` | Beginning / incremental chunk / end of a text block. |

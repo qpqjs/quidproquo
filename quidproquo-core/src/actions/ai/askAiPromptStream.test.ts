@@ -2,20 +2,24 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
+import { AiCacheTtl } from './AiCacheTtl';
 import { AiModel } from './AiModel';
 import { askAiPromptStream } from './askAiPromptStream';
 
 describe('askAiPromptStream', () => {
   it('yields a PromptStream action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
+    const turnContext = [{ role: 'user', content: 'current state' }] as any;
 
     const { action } = captureRequester(
       askAiPromptStream(AiModel.ClaudeSonnet45, 'stream it', {
         system: 'be helpful',
         aiName: 'bob',
         messages,
+        turnContext,
         reasoning: { budgetTokens: 2048 },
         caching: true,
+        cacheTtl: AiCacheTtl.OneHour,
       }),
     );
 
@@ -25,10 +29,12 @@ describe('askAiPromptStream', () => {
         model: AiModel.ClaudeSonnet45,
         prompt: 'stream it',
         messages,
+        turnContext,
         system: 'be helpful',
         aiName: 'bob',
         reasoning: { budgetTokens: 2048 },
         caching: true,
+        cacheTtl: AiCacheTtl.OneHour,
       },
     });
   });
@@ -42,10 +48,12 @@ describe('askAiPromptStream', () => {
         model: AiModel.ClaudeHaiku45,
         prompt: 'hello',
         messages: undefined,
+        turnContext: undefined,
         system: undefined,
         aiName: undefined,
         reasoning: undefined,
         caching: undefined,
+        cacheTtl: undefined,
       },
     });
   });

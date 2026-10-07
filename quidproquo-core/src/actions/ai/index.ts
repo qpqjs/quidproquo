@@ -1,4 +1,5 @@
 export * from './AiActionType';
+export * from './AiCacheTtl';
 export * from './AiMessage';
 export * from './AiModel';
 export * from './AiReasoningConfig';

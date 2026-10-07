@@ -1,9 +1,16 @@
 import type { SystemModelMessage } from 'ai';
 
-// Bedrock only reads cache points off message objects, not the bare `system` string, so caching
-// requires shaping system as a SystemModelMessage. @ai-sdk/amazon-bedrock (5.0.11) has no
-// equivalent hook for the tools array, so tool definitions can't be cached this way yet.
-export const toCacheableSystem = (system: string | undefined, caching: boolean | undefined): string | SystemModelMessage | undefined => {
+import { BedrockCacheSettings } from '../types';
+import { toBedrockCachePoint } from './toBedrockCachePoint';
+
+// Bedrock reads cache points off message objects, not the bare `system` string, so caching shapes
+// the system prompt as a SystemModelMessage. Its checkpoint covers the cumulative prefix, tool
+// definitions included, so the tools need no checkpoint of their own.
+export const toCacheableSystem = (
+  system: string | undefined,
+  caching: boolean | undefined,
+  cache: BedrockCacheSettings,
+): string | SystemModelMessage | undefined => {
   if (!system) {
     return undefined;
   }
@@ -16,7 +23,7 @@ export const toCacheableSystem = (system: string | undefined, caching: boolean |
     role: 'system',
     content: system,
     providerOptions: {
-      bedrock: { cachePoint: { type: 'default' } },
+      bedrock: { cachePoint: toBedrockCachePoint(cache) },
     },
   };
 };

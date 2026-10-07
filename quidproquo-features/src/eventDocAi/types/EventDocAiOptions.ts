@@ -1,4 +1,4 @@
-import type { AiModel, AiToolDefinition } from 'quidproquo-core';
+import type { AiCacheTtl, AiModel, AiToolDefinition } from 'quidproquo-core';
 
 export type EventDocAiOptions = {
   // The eventDoc collection this AI works with (chats are scoped per document).
@@ -19,11 +19,19 @@ export type EventDocAiOptions = {
   // Defaults to AiModel.ClaudeSonnet46.
   model?: AiModel;
   systemPrompt?: string;
-  // A defineInlineFunction name invoked on every turn to build the system
-  // prompt (receives EventDocAiSystemPromptInput, returns the prompt string).
-  // Lets the prompt carry live document state. A non-empty result overrides
+  // A defineInlineFunction name invoked on every turn to build the system prompt
+  // (receives EventDocAiSystemPromptInput, returns the prompt string). It must return
+  // identical text every turn: the system prompt heads the cached prefix, and any
+  // change rewrites the whole conversation to cache. Per-turn document state belongs
+  // in `turnContextGenerator` or in tools. A non-empty result overrides
   // `systemPrompt`; an empty result falls back to it.
   systemPromptGenerator?: string;
+  // A defineInlineFunction name invoked on every turn to build the turn context
+  // (receives EventDocAiSystemPromptInput, returns a string). The text is sent as a
+  // user message after the saved history, never persisted and never cached, so this
+  // is where live document state goes. An empty result sends no context message.
+  // should be "small" where possible
+  turnContextGenerator?: string;
   // Tool executors are defineInlineFunction names registered by the caller.
   tools?: AiToolDefinition[];
   // Extended-thinking token budget. Defaults to 4096; pass 0 to disable
@@ -35,4 +43,9 @@ export type EventDocAiOptions = {
   // (8192) is too small for a reasoning block plus a large tool input, and a
   // call that hits it is cut off mid-JSON.
   maxOutputTokens?: number;
+  // Lifetime of the prompt cache entries a turn writes. Defaults to
+  // AiCacheTtl.ProviderDefault (five minutes on Bedrock, refreshed by every hit);
+  // AiCacheTtl.OneHour pays a dearer write and suits chats whose users pause more
+  // than five minutes between messages, on models that support it.
+  cacheTtl?: AiCacheTtl;
 };

@@ -1,6 +1,9 @@
 export * from './aiStreamPartMappers';
+export * from './buildAiPromptInput';
 export * from './buildAiStopConditions';
+export * from './createCachePrepareStep';
 export * from './createDriveFileResolver';
+export * from './logAiCacheUsage';
 export * from './mapAiStreamAbort';
 export * from './mapAiStreamCustom';
 export * from './mapAiStreamError';
@@ -31,6 +34,7 @@ export * from './mapAiStreamToolResult';
 export * from './prepareAiPromptCall';
 export * from './toAiStreamFinishReason';
 export * from './toAiStreamUsage';
+export * from './toBedrockCachePoint';
 export * from './toCacheableMessages';
 export * from './toCacheableSystem';
 export * from './toErrorMessage';

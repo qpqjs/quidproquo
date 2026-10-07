@@ -1,4 +1,5 @@
 import {
+  type AiCacheTtl,
   type AiModel,
   type AiStreamFinish,
   AiStreamFinishReasonEnum,
@@ -15,6 +16,7 @@ import {
 import { askEventDocResolveScope, EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
 import {
+  EVENT_DOC_AI_CACHE_TTL_GLOBAL,
   EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL,
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
@@ -33,6 +35,7 @@ import {
   mergeStreamParts,
 } from '../module';
 import { askEventDocAiContinueHandoff } from './askEventDocAiContinueHandoff';
+import { askEventDocAiTurnContextResolve } from './askEventDocAiTurnContextResolve';
 
 const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant. Use tools when appropriate.';
 
@@ -45,11 +48,6 @@ const HANDOFF_HEADROOM_MS = 90_000;
 // with its error output). Resuming lets the model retry with a smaller call, but
 // one that keeps overrunning the cap is stopped after this many resumes.
 const MAX_LENGTH_RESUMES = 3;
-
-// Anthropic rejects a conversation ending on an assistant turn when extended
-// thinking is enabled (it reads as a response prefill), and a resumed turn always
-// ends on the just-saved assistant message. Transport-only: never saved.
-const CONTINUATION_NUDGE = 'Continue the task. Your previous tool calls and their results are recorded above.';
 
 // The Finish part's reason says how the underlying AI SDK loop ended: `stop`
 // means the model finished its answer; `toolCalls` means a stop condition cut
@@ -66,10 +64,10 @@ const getFinishReason = (parts: AiStreamPart[]): AiStreamFinishReasonEnum | unde
 const segmentHasPendingToolUse = (segment: EventDocAiMessageSegment): boolean =>
   segment.type === 'tool-use' && segment.tools.some((tool) => tool.output === undefined);
 
-// The turn's system prompt, freshest source first: the configured generator
-// inline function (built per-turn so it can carry live document state), else
-// the static configured prompt, else the default. Never persisted — the chat
-// history stores messages only.
+// The turn's system prompt: the configured generator inline function, else the
+// static configured prompt, else the default. It heads the cached prefix, so it
+// must come back identical every turn; per-turn document state travels in the
+// turn context instead. Never persisted: the chat history stores messages only.
 function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
   const generatorFn = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL);
 
@@ -81,7 +79,7 @@ function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
 }
 
 export type EventDocAiStreamTurnOptions = {
-  // Appends the transport-only nudge so a resumed history ends on a user turn.
+  // Adds the continuation nudge to the turn context so a resumed history ends on a user turn.
   isContinuation: boolean;
   // Consecutive resumes caused by the output token cap so far.
   lengthResumes: number;
@@ -110,7 +108,9 @@ export function* askEventDocAiStreamTurn(
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
   const reasoningBudgetTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_REASONING_BUDGET_GLOBAL);
   const maxOutputTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL);
+  const cacheTtl = yield* askConfigGetGlobal<AiCacheTtl>(EVENT_DOC_AI_CACHE_TTL_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
+  const turnContext = yield* askEventDocAiTurnContextResolve(docId, isContinuation);
 
   // Attachments are doc assets — they live on the collection's storage drive
   // (uploaded via the eventDoc asset routes), not the chat-history drive.
@@ -124,18 +124,16 @@ export function* askEventDocAiStreamTurn(
 
   const aiMessages = chatMessagesToAiMessages(history, docStorageDrive, docId, scope);
 
-  if (isContinuation) {
-    aiMessages.push({ role: 'user', content: CONTINUATION_NUDGE });
-  }
-
   // Tools do NOT receive the docId from the model — executors inherit the
   // session context (provided around the handler) and read the trusted id there.
   const streamHandle = yield* askAiPromptStream(model, '', {
     system: systemPrompt,
     aiName,
     messages: aiMessages,
+    turnContext,
     reasoning: reasoningBudgetTokens ? { budgetTokens: reasoningBudgetTokens } : undefined,
     caching: true,
+    cacheTtl: cacheTtl || undefined,
     maxOutputTokens,
     maxDurationMs: budgetMs,
   });

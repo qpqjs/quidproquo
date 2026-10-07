@@ -1,24 +1,80 @@
+import { omitKey } from 'quidproquo-core';
+
 import type { ModelMessage } from 'ai';
 
-const withCachePoint = (message: ModelMessage): ModelMessage => ({
+import { BedrockCacheSettings } from '../types';
+import { toBedrockCachePoint } from './toBedrockCachePoint';
+
+export type CacheableMessagesOptions = BedrockCacheSettings & {
+  /** How many leading messages are the saved conversation. Defaults to all of them. */
+  durableCount?: number;
+  /** Also mark the last message when the list runs past the saved conversation. */
+  markTail?: boolean;
+};
+
+type ProviderOptions = NonNullable<ModelMessage['providerOptions']>;
+
+// The Bedrock provider reads a cache point from either spelling, so both have to be stripped.
+const CACHE_POINT_PROVIDERS = ['bedrock', 'amazonBedrock'] as const;
+
+/**
+ * A copy of the message without any cache point. A provider bag or `providerOptions` that held
+ * nothing but the point is dropped too, so a message comes back exactly as it was before it was
+ * marked. An unmarked message is returned as the same object.
+ */
+const withoutCachePoint = (message: ModelMessage): ModelMessage => {
+  if (!message.providerOptions) {
+    return message;
+  }
+
+  let providerOptions: ProviderOptions = message.providerOptions;
+
+  for (const provider of CACHE_POINT_PROVIDERS) {
+    const options = providerOptions[provider];
+
+    if (options && 'cachePoint' in options) {
+      const rest = omitKey(options, 'cachePoint');
+      providerOptions = Object.keys(rest).length > 0 ? { ...providerOptions, [provider]: rest } : omitKey(providerOptions, provider);
+    }
+  }
+
+  if (providerOptions === message.providerOptions) {
+    return message;
+  }
+
+  return Object.keys(providerOptions).length > 0 ? { ...message, providerOptions } : (omitKey(message, 'providerOptions') as ModelMessage);
+};
+
+/** A copy of the message with a cache point, keeping any other provider options it carries. */
+const withCachePoint = (message: ModelMessage, cache: BedrockCacheSettings): ModelMessage => ({
   ...message,
   providerOptions: {
     ...message.providerOptions,
-    bedrock: { cachePoint: { type: 'default' } },
+    bedrock: { ...message.providerOptions?.bedrock, cachePoint: toBedrockCachePoint(cache) },
   },
 });
 
-// Marks the newest TWO messages as cache points so the next call in the same conversation can
-// read everything up to here from cache. The last message alone is not enough: callers that
-// resume a halted turn append a transport-only continuation message each round, so the boundary
-// after it never matches again. The second-to-last boundary (the newest durable message) is the
-// one a resumed round's prefix actually re-sends byte-identically. See toCacheableSystem for the
-// fixed system/tools cache point this is meant to be used alongside; Bedrock's cache lookback
-// only covers a limited number of recent content blocks, so long conversations still need both.
-export const toCacheableMessages = (messages: ModelMessage[], caching: boolean | undefined): ModelMessage[] => {
+/**
+ * Places the request's message cache points. One goes on the last saved message (index
+ * `durableCount - 1`): the next turn re-sends the saved history byte for byte, so that is the
+ * boundary its own request hits. With `markTail`, and a list that runs past the saved messages,
+ * one more goes on the last message so the tool traffic a step appended is read from cache by
+ * the step after it. Existing points are removed first: the AI SDK hands each step the previous
+ * step's marked list, and Bedrock allows four checkpoints per request.
+ */
+export const toCacheableMessages = (messages: ModelMessage[], caching: boolean | undefined, options: CacheableMessagesOptions): ModelMessage[] => {
   if (!caching || messages.length === 0) {
     return messages;
   }
 
-  return messages.map((message, index) => (index >= messages.length - 2 ? withCachePoint(message) : message));
+  const durableCount = Math.min(options.durableCount ?? messages.length, messages.length);
+
+  // -1 matches no index: no anchor when every message is turn context, no tail until the list
+  // has grown past the saved messages.
+  const anchorIndex = durableCount - 1;
+  const tailIndex = options.markTail && messages.length > durableCount ? messages.length - 1 : -1;
+
+  return messages
+    .map(withoutCachePoint)
+    .map((message, index) => (index === anchorIndex || index === tailIndex ? withCachePoint(message, options) : message));
 };

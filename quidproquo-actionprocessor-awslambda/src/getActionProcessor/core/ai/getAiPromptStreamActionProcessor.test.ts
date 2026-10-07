@@ -1,18 +1,33 @@
-import { AiActionType, ErrorTypeEnum } from 'quidproquo-core';
+import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getAiPromptStreamActionProcessor } from './getAiPromptStreamActionProcessor';
-import { mapAiStreamPart, prepareAiPromptCall, toCacheableMessages, toCacheableSystem } from './logic';
+import { buildAiPromptInput, createCachePrepareStep, logAiCacheUsage, mapAiStreamPart, prepareAiPromptCall, toCacheableSystem } from './logic';
+
+// Echoes the payload so the order history -> turn context is observable in the SDK call.
+const { echoPromptInput } = vi.hoisted(() => ({
+  echoPromptInput: async (payload: { prompt: string; messages?: unknown[]; turnContext?: unknown[] }) => {
+    const turnContext = payload.turnContext ?? [];
+    if (!payload.messages && turnContext.length === 0) {
+      return { promptOrMessages: { prompt: payload.prompt }, durableCount: 0 };
+    }
+    const durable = payload.messages ?? [{ role: 'user', content: payload.prompt }];
+    return { promptOrMessages: { messages: [...durable, ...turnContext] }, durableCount: durable.length };
+  },
+}));
 
 vi.mock('./logic', () => ({
   prepareAiPromptCall: vi.fn(),
   createDriveFileResolver: vi.fn(() => vi.fn()),
-  toSdkMessages: vi.fn(async () => [{ role: 'user', content: 'mapped' }]),
+  buildAiPromptInput: vi.fn(echoPromptInput),
   mapAiStreamPart: vi.fn(() => ({ mapped: true })),
   toCacheableSystem: vi.fn((system: string | undefined) => system),
-  toCacheableMessages: vi.fn((messages: unknown) => messages),
+  createCachePrepareStep: vi.fn(() => 'prepare-step'),
+  toAiStreamUsage: vi.fn((usage: unknown) => usage),
+  logAiCacheUsage: vi.fn(),
+  toErrorMessage: vi.fn((error: unknown) => (error instanceof Error ? error.message : String(error))),
   buildAiStopConditions: vi.fn(() => []),
 }));
 
@@ -30,9 +45,29 @@ const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown)
   return invokeProcessor(processor, payload, { streamRegistry });
 };
 
+const drain = async (registry: { register: ReturnType<typeof vi.fn> }): Promise<string[]> => {
+  const iterator = registry.register.mock.calls[0][1] as AsyncIterableIterator<string>;
+  const chunks: string[] = [];
+  for await (const chunk of iterator) {
+    chunks.push(chunk);
+  }
+  return chunks;
+};
+
+const totalUsage = { inputTokens: 24281, inputTokenDetails: { noCacheTokens: 12, cacheReadTokens: 24112, cacheWriteTokens: 157 } };
+
+const textDeltaStream = () =>
+  (async function* () {
+    yield { type: 'text-delta' };
+  })();
+
 describe('getProcessAiPromptStream', () => {
   beforeEach(() => {
     vi.mocked(prepareAiPromptCall).mockReset();
+    vi.mocked(createCachePrepareStep).mockClear();
+    vi.mocked(logAiCacheUsage).mockClear();
+    vi.mocked(toCacheableSystem).mockReset();
+    vi.mocked(toCacheableSystem).mockImplementation((system: string | undefined) => system);
     streamText.mockReset();
   });
 
@@ -47,11 +82,7 @@ describe('getProcessAiPromptStream', () => {
 
   it('registers a json-encoded stream and returns its id', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
-    streamText.mockReturnValue({
-      fullStream: (async function* () {
-        yield { type: 'text-delta' };
-      })(),
-    });
+    streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
     const [result] = await invoke({ prompt: 'hi' }, registry);
@@ -59,96 +90,93 @@ describe('getProcessAiPromptStream', () => {
     expect(result?.encoding).toBe('json');
     expect(result?.id).toContain('ai-prompt-');
     expect(registry.register).toHaveBeenCalledWith(result?.id, expect.anything());
-
-    const iterator = registry.register.mock.calls[0][1] as AsyncIterableIterator<string>;
-    const chunks: string[] = [];
-    for await (const chunk of iterator) {
-      chunks.push(chunk);
-    }
-    expect(chunks).toEqual([JSON.stringify({ mapped: true })]);
+    expect(await drain(registry)).toEqual([JSON.stringify({ mapped: true })]);
     expect(mapAiStreamPart).toHaveBeenCalledWith({ type: 'text-delta' });
+    expect(streamText).toHaveBeenCalledWith(expect.objectContaining({ prompt: 'hi', prepareStep: undefined }));
+    expect(createCachePrepareStep).not.toHaveBeenCalled();
   });
 
-  it('passes system and caching through to toCacheableSystem', async () => {
+  it('passes system, caching and the ttl through to toCacheableSystem', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
     vi.mocked(toCacheableSystem).mockReturnValue({
       role: 'system',
       content: 'sys',
-      providerOptions: { bedrock: { cachePoint: { type: 'default' } } },
+      providerOptions: { bedrock: { cachePoint: { type: 'default', ttl: '1h' } } },
     });
-    streamText.mockReturnValue({ fullStream: (async function* () {})() });
+    streamText.mockReturnValue({ stream: (async function* () {})(), usage: Promise.resolve(totalUsage) });
 
-    await invoke({ prompt: 'hi', system: 'sys', caching: true }, buildRegistry());
+    await invoke({ model: AiModel.ClaudeSonnet46, prompt: 'hi', system: 'sys', caching: true, cacheTtl: AiCacheTtl.OneHour }, buildRegistry());
 
-    expect(toCacheableSystem).toHaveBeenCalledWith('sys', true);
+    expect(toCacheableSystem).toHaveBeenCalledWith('sys', true, { model: AiModel.ClaudeSonnet46, cacheTtl: AiCacheTtl.OneHour });
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
-        system: { role: 'system', content: 'sys', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
+        system: { role: 'system', content: 'sys', providerOptions: { bedrock: { cachePoint: { type: 'default', ttl: '1h' } } } },
       }),
     );
   });
 
-  it('passes mapped messages and caching through to toCacheableMessages', async () => {
+  it('sends the history then the turn context and installs the cache step hook when caching', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
-    vi.mocked(toCacheableMessages).mockReturnValue([
-      { role: 'user', content: 'mapped', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
-    ]);
-    streamText.mockReturnValue({ fullStream: (async function* () {})() });
+    streamText.mockReturnValue({ stream: (async function* () {})(), usage: Promise.resolve(totalUsage) });
+    const messages = [
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+    ];
+    const turnContext = [{ role: 'user', content: 'current state' }];
 
-    await invoke({ messages: [{ role: 'user', content: 'hi' }], caching: true }, buildRegistry());
+    await invoke(
+      { model: AiModel.ClaudeSonnet46, prompt: 'ignored', messages, turnContext, caching: true, cacheTtl: AiCacheTtl.OneHour },
+      buildRegistry(),
+    );
 
-    expect(toCacheableMessages).toHaveBeenCalledWith([{ role: 'user', content: 'mapped' }], true);
+    expect(buildAiPromptInput).toHaveBeenCalledWith(expect.objectContaining({ messages, turnContext }), expect.any(Function));
+    expect(createCachePrepareStep).toHaveBeenCalledWith({ model: AiModel.ClaudeSonnet46, cacheTtl: AiCacheTtl.OneHour, durableCount: 2 });
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
-        messages: [{ role: 'user', content: 'mapped', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } }],
+        messages: [...messages, ...turnContext],
+        prepareStep: 'prepare-step',
       }),
     );
+    expect(streamText.mock.calls[0][0]).not.toHaveProperty('prompt');
   });
 
-  it('logs cache usage from finalStep.usage.inputTokenDetails once the stream is fully consumed', async () => {
+  it('logs the total cache usage once the stream is fully consumed', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
-    streamText.mockReturnValue({
-      fullStream: (async function* () {
-        yield { type: 'text-delta' };
-      })(),
-      finalStep: Promise.resolve({
-        usage: { inputTokenDetails: { noCacheTokens: 12, cacheReadTokens: 24112, cacheWriteTokens: 157 } },
-      }),
-    });
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
     await invoke({ prompt: 'hi', caching: true }, registry);
 
-    const iterator = registry.register.mock.calls[0][1] as AsyncIterableIterator<string>;
-    for await (const _chunk of iterator) {
-      // drain the stream so the trailing cache-usage log runs
-    }
-
-    expect(logSpy).toHaveBeenCalledWith('AI prompt cache usage:', { noCacheTokens: 12, cacheReadTokens: 24112, cacheWriteTokens: 157 });
-    logSpy.mockRestore();
+    expect(logAiCacheUsage).not.toHaveBeenCalled();
+    await drain(registry);
+    expect(logAiCacheUsage).toHaveBeenCalledWith(totalUsage);
   });
 
   it('does not log cache usage when caching is off', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
-    streamText.mockReturnValue({
-      fullStream: (async function* () {
-        yield { type: 'text-delta' };
-      })(),
-      finalStep: Promise.resolve({ usage: { inputTokenDetails: { cacheReadTokens: 24112 } } }),
-    });
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
     await invoke({ prompt: 'hi' }, registry);
+    await drain(registry);
 
-    const iterator = registry.register.mock.calls[0][1] as AsyncIterableIterator<string>;
-    for await (const _chunk of iterator) {
-      // drain the stream
-    }
+    expect(logAiCacheUsage).not.toHaveBeenCalled();
+  });
 
-    expect(logSpy).not.toHaveBeenCalled();
-    logSpy.mockRestore();
+  it('warns instead of throwing when the usage is unavailable after a failed stream', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    const unavailable = Promise.reject(new Error('No output generated'));
+    unavailable.catch(() => {});
+    streamText.mockReturnValue({ stream: textDeltaStream(), usage: unavailable });
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const registry = buildRegistry();
+
+    await invoke({ prompt: 'hi', caching: true }, registry);
+    await drain(registry);
+
+    expect(logAiCacheUsage).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('AI prompt cache usage unavailable:', 'No output generated');
+    warnSpy.mockRestore();
   });
 
   it('maps a thrown Error to a GenericError result', async () => {

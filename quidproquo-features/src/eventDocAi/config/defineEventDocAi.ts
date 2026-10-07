@@ -1,4 +1,5 @@
 import {
+  AiCacheTtl,
   AiModel,
   defineAi,
   defineKeyValueStore,
@@ -16,6 +17,7 @@ import { eventDocAiChatDriveName } from '../constants/eventDocAiChatDriveName';
 import { eventDocAiChatListStoreName } from '../constants/eventDocAiChatListStoreName';
 import { eventDocAiContinueFunctionName } from '../constants/eventDocAiContinueFunctionName';
 import {
+  EVENT_DOC_AI_CACHE_TTL_GLOBAL,
   EVENT_DOC_AI_CHAT_DRIVE_GLOBAL,
   EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL,
   EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL,
@@ -25,6 +27,7 @@ import {
   EVENT_DOC_AI_SERVICE_NAME_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
+  EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import { eventDocAiQueueName } from '../constants/eventDocAiQueueName';
 import type { EventDocAiChatSummary } from '../models';
@@ -55,9 +58,11 @@ export const defineEventDocAi = ({
   model = AiModel.ClaudeSonnet46,
   systemPrompt,
   systemPromptGenerator,
+  turnContextGenerator,
   tools = [],
   reasoningBudgetTokens = 4096,
   maxOutputTokens = 65536,
+  cacheTtl = AiCacheTtl.ProviderDefault,
 }: EventDocAiOptions): QPQConfig => {
   const store = buildEventDocStore({ storeName, type });
   const chatDrive = eventDocAiChatDriveName(storeName);
@@ -78,6 +83,8 @@ export const defineEventDocAi = ({
     [EVENT_DOC_AI_MODEL_GLOBAL]: model,
     [EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL]: systemPrompt ?? '',
     [EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL]: systemPromptGenerator ?? '',
+    [EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL]: turnContextGenerator ?? '',
+    [EVENT_DOC_AI_CACHE_TTL_GLOBAL]: cacheTtl,
   };
 
   const runtime = (entryType: string, functionName: string): QpqFunctionRuntimeAdvanced => ({
