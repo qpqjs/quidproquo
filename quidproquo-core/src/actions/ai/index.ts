@@ -5,4 +5,5 @@ export * from './AiModel';
 export * from './AiReasoningConfig';
 export * from './askAiPrompt';
 export * from './askAiPromptStream';
+export * from './sumAiStreamUsage';
 export * from './types';

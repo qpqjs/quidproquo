@@ -1,6 +1,5 @@
 import {
   AiActionType,
-  AiCacheTtl,
   AiModel,
   AiStreamFinishReasonEnum,
   AiStreamPartType,
@@ -26,19 +25,21 @@ import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
   EVENT_DOC_AI_REASONING_BUDGET_GLOBAL,
+  EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
   EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiChatMessage } from '../models';
+import { EventDocAiEffect } from '../module/effects/EventDocAiEffect';
 import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
 
-const globals: Record<string, unknown> = {
+const baseGlobals: Record<string, unknown> = {
   [EVENT_DOC_AI_NAME_GLOBAL]: 'docs-ai',
   [EVENT_DOC_AI_MODEL_GLOBAL]: AiModel.ClaudeSonnet46,
   [EVENT_DOC_AI_REASONING_BUDGET_GLOBAL]: 0,
   [EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL]: 65536,
-  [EVENT_DOC_AI_CACHE_TTL_GLOBAL]: AiCacheTtl.OneHour,
+  [EVENT_DOC_AI_CACHE_TTL_GLOBAL]: '1h',
   [EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL]: 'You are the docs assistant.',
   [EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL]: '',
   [EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL]: 'buildContext',
@@ -53,16 +54,34 @@ const history: EventDocAiChatMessage[] = [
   { role: 'user', segments: [{ type: 'text', text: 'Add a third paragraph.' }] },
 ];
 
+const usage = {
+  inputTokens: 1200,
+  outputTokens: 40,
+  totalTokens: 1240,
+  cacheReadInputTokens: 1100,
+  cacheWriteInputTokens: 80,
+  noCacheInputTokens: 20,
+};
+
+type DispatchedEffect = { type: EventDocAiEffect; payload: Record<string, unknown> };
+
+type TurnOptions = {
+  isContinuation?: boolean;
+  sendUsageToFrontend?: boolean;
+};
+
 // Drives one turn to completion: the model streams a single text reply, then the
-// history save and chat touch run. Captures what the prompt and the save received.
-const runTurn = (isContinuation: boolean) => {
+// history save and chat touch run. Captures what the prompt, the save and the browser received.
+const runTurn = ({ isContinuation = false, sendUsageToFrontend }: TurnOptions = {}) => {
+  const globals: Record<string, unknown> = { ...baseGlobals, [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend };
   const chunks = [
     { data: JSON.stringify({ type: AiStreamPartType.TextDelta, id: 'text-1', text: 'Done.' }) },
-    { data: JSON.stringify({ type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage: {} }) },
+    { data: JSON.stringify({ type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage }) },
     { done: true },
   ];
   let promptPayload: Record<string, unknown> | undefined;
   let savedFile: { messages: EventDocAiChatMessage[] } | undefined;
+  const dispatched: DispatchedEffect[] = [];
 
   const result = runStory(askEventDocAiStreamTurn('doc-1', 'chat-1', history, { isContinuation, lengthResumes: 0 }), {
     [SystemActionType.GetRuntimeRemainingTime]: 600_000,
@@ -74,19 +93,29 @@ const runTurn = (isContinuation: boolean) => {
     },
     [StreamActionType.Read]: () => chunks.shift(),
     [StreamActionType.Close]: undefined,
-    [StateActionType.Dispatch]: undefined,
+    [StateActionType.Dispatch]: (action: { payload: { action: DispatchedEffect } }) => {
+      dispatched.push(action.payload.action);
+    },
     [FileActionType.WriteObjectJson]: (action: { payload: { data: { messages: EventDocAiChatMessage[] } } }) => {
       savedFile = action.payload.data;
     },
     [KeyValueStoreActionType.Query]: { items: [] },
   });
 
-  return { result, promptPayload, savedFile };
+  const streamedFinish = dispatched.find(
+    (effect) => effect.type === EventDocAiEffect.AppendStreamChunk && (effect.payload.part as { type: string }).type === AiStreamPartType.Finish,
+  )?.payload.part as { usage: unknown } | undefined;
+  const appendedMessage = dispatched.find((effect) => effect.type === EventDocAiEffect.AppendChatMessage)?.payload.message as
+    EventDocAiChatMessage | undefined;
+
+  return { result, promptPayload, savedFile, streamedFinish, appendedMessage };
 };
+
+const savedReply: EventDocAiChatMessage = { role: 'assistant', segments: [{ type: 'text', text: 'Done.' }], model: AiModel.ClaudeSonnet46, usage };
 
 describe('askEventDocAiStreamTurn', () => {
   it('sends the saved history as messages and the generated context as turn context, never mixing them', () => {
-    const { result, promptPayload } = runTurn(false);
+    const { result, promptPayload } = runTurn();
 
     expect(result).toEqual({ complete: true });
     expect(promptPayload).toEqual(
@@ -95,7 +124,7 @@ describe('askEventDocAiStreamTurn', () => {
         system: 'You are the docs assistant.',
         aiName: 'docs-ai',
         caching: true,
-        cacheTtl: AiCacheTtl.OneHour,
+        cacheTtl: '1h',
         maxOutputTokens: 65536,
         messages: [
           { role: 'user', content: 'What is in the document?' },
@@ -108,7 +137,7 @@ describe('askEventDocAiStreamTurn', () => {
   });
 
   it('adds the continuation nudge after the context when resuming', () => {
-    const { promptPayload } = runTurn(true);
+    const { promptPayload } = runTurn({ isContinuation: true });
 
     expect(promptPayload?.turnContext).toEqual([
       { role: 'user', content: 'Document is at version 3.' },
@@ -117,11 +146,24 @@ describe('askEventDocAiStreamTurn', () => {
     expect(promptPayload?.messages).toHaveLength(history.length);
   });
 
-  it('saves the history plus the reply, without the turn context', () => {
-    const { savedFile } = runTurn(true);
+  it('saves the reply with its model and usage, without the turn context', () => {
+    const { savedFile } = runTurn({ isContinuation: true });
 
-    expect(savedFile).toEqual({
-      messages: [...history, { role: 'assistant', segments: [{ type: 'text', text: 'Done.' }] }],
-    });
+    expect(savedFile).toEqual({ messages: [...history, savedReply] });
+  });
+
+  it('keeps usage away from the browser by default while still saving it', () => {
+    const { savedFile, streamedFinish, appendedMessage } = runTurn();
+
+    expect(savedFile?.messages[history.length]?.usage).toEqual(usage);
+    expect(streamedFinish?.usage).toEqual({});
+    expect(appendedMessage).toEqual({ role: 'assistant', segments: [{ type: 'text', text: 'Done.' }], model: AiModel.ClaudeSonnet46 });
+  });
+
+  it('lets usage through to the browser when the chat asks for it', () => {
+    const { streamedFinish, appendedMessage } = runTurn({ sendUsageToFrontend: true });
+
+    expect(streamedFinish?.usage).toEqual(usage);
+    expect(appendedMessage).toEqual(savedReply);
   });
 });

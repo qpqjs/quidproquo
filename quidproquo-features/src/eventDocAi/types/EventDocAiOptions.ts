@@ -48,4 +48,8 @@ export type EventDocAiOptions = {
   // history, so they outlive a user's pause between messages, and five minutes
   // for the tool loop, which is discarded when the turn ends.
   cacheTtl?: AiCacheTtl;
+  // Whether token usage reaches the browser. Off (the default), the stream's finish
+  // parts, the finalized message and the chat history are sent with usage stripped;
+  // usage is still saved on each assistant message. On, the frontend sees it as is.
+  sendUsageToFrontend?: boolean;
 };

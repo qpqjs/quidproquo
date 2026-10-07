@@ -36,6 +36,10 @@ import {
 } from '../module';
 import { askEventDocAiContinueHandoff } from './askEventDocAiContinueHandoff';
 import { askEventDocAiTurnContextResolve } from './askEventDocAiTurnContextResolve';
+import { askEventDocAiUsageVisible } from './askEventDocAiUsageVisible';
+import { getEventDocAiStreamUsage } from './getEventDocAiStreamUsage';
+import { redactAiStreamPartUsage } from './redactAiStreamPartUsage';
+import { redactEventDocAiChatMessageUsage } from './redactEventDocAiChatMessageUsage';
 
 const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant. Use tools when appropriate.';
 
@@ -111,6 +115,7 @@ export function* askEventDocAiStreamTurn(
   const cacheTtl = yield* askConfigGetGlobal<AiCacheTtl>(EVENT_DOC_AI_CACHE_TTL_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
   const turnContext = yield* askEventDocAiTurnContextResolve(docId, isContinuation);
+  const usageVisible = yield* askEventDocAiUsageVisible();
 
   // Attachments are doc assets — they live on the collection's storage drive
   // (uploaded via the eventDoc asset routes), not the chat-history drive.
@@ -144,7 +149,7 @@ export function* askEventDocAiStreamTurn(
     // (ToolInputStart) and what it was (ToolCall). They are still collected so
     // the saved message folds the same way.
     if (part.type !== AiStreamPartType.ToolInputDelta) {
-      yield* askUIEventDocAiAppendStreamChunk(part);
+      yield* askUIEventDocAiAppendStreamChunk(usageVisible ? part : redactAiStreamPartUsage(part));
     }
 
     return part;
@@ -155,14 +160,19 @@ export function* askEventDocAiStreamTurn(
   const segments = mergeStreamParts(assistantParts);
 
   if (segments.length > 0) {
+    // Usage is saved whatever the visibility setting says; the setting only decides what the
+    // browser is shown.
+    const usage = getEventDocAiStreamUsage(assistantParts);
     const assistantMessage: EventDocAiChatMessage = {
       role: 'assistant',
       segments,
+      model,
+      ...(usage ? { usage } : {}),
     };
 
     yield* askEventDocAiChatHistorySave(docId, chatId, [...history, assistantMessage]);
 
-    yield* askUIEventDocAiAppendChatMessage(assistantMessage);
+    yield* askUIEventDocAiAppendChatMessage(usageVisible ? assistantMessage : redactEventDocAiChatMessageUsage(assistantMessage));
   }
 
   yield* askUIEventDocAiClearStream();

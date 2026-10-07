@@ -1,6 +1,7 @@
 export * from './selectEventDocAiActiveChatId';
 export * from './selectEventDocAiChatMessages';
 export * from './selectEventDocAiChats';
+export * from './selectEventDocAiChatUsage';
 export * from './selectEventDocAiError';
 export * from './selectEventDocAiIsLoadingChats';
 export * from './selectEventDocAiIsLoadingHistory';
