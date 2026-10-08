@@ -8,4 +8,9 @@ export const bedrockOneHourCacheModels: ReadonlySet<AiModel> = new Set([
   AiModel.ClaudeOpus45,
   AiModel.ClaudeSonnet46,
   AiModel.ClaudeOpus46,
+  AiModel.ClaudeOpus47,
+  AiModel.ClaudeOpus48,
+  AiModel.ClaudeSonnet5,
+  AiModel.ClaudeOpus5,
+  AiModel.ClaudeOpus55,
 ]);

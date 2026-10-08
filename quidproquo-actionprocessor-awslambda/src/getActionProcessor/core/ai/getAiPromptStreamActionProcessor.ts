@@ -12,6 +12,7 @@ import {
   mapAiStreamPart,
   prepareAiPromptCall,
   toAiStreamUsage,
+  toBedrockReasoningOptions,
   toCacheableSystem,
   toErrorMessage,
 } from './logic';
@@ -32,10 +33,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
 
       const cache: BedrockCacheSettings = { model: payload.model, cacheTtl: payload.cacheTtl };
 
-      // Extended thinking: thinking progress streams out as Reasoning* parts.
-      const providerOptions = payload.reasoning
-        ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
-        : undefined;
+      const providerOptions = toBedrockReasoningOptions(payload.model, payload.reasoning);
 
       const { stream, usage } = streamText({
         model: prepared.model,

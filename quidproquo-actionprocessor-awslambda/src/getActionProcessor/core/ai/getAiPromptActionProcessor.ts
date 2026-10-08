@@ -10,6 +10,7 @@ import {
   logAiCacheUsage,
   prepareAiPromptCall,
   toAiStreamUsage,
+  toBedrockReasoningOptions,
   toCacheableSystem,
 } from './logic';
 import { BedrockCacheSettings } from './types';
@@ -29,10 +30,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
 
       const cache: BedrockCacheSettings = { model: payload.model, cacheTtl: payload.cacheTtl };
 
-      // Extended thinking: the model reasons before answering, within the token budget.
-      const providerOptions = payload.reasoning
-        ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
-        : undefined;
+      const providerOptions = toBedrockReasoningOptions(payload.model, payload.reasoning);
 
       const result = await generateText({
         model: prepared.model,
