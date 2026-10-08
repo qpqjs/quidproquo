@@ -85,7 +85,7 @@ Within a step, text / reasoning / tool-input events arrive as matched `*Start â†
 
 ### `AiStreamFinishReasonEnum`
 
-`Finish.finishReason` and `FinishStep.finishReason` are an `AiStreamFinishReasonEnum` value, not a raw string.
+`Finish.finishReason` and `FinishStep.finishReason` are an `AiStreamFinishReasonEnum` value, not a raw string. Both parts also carry `rawFinishReason`, the provider's own stop reason string when it reported one (on Bedrock, the Converse `stopReason`), which is what to log when the reason is `other` or `unknown`. A raw `refusal`, Anthropic's stop reason when its safety classifiers decline a request, is reported as `contentFilter`.
 
 | Member | Wire value | Meaning |
 | --- | --- | --- |

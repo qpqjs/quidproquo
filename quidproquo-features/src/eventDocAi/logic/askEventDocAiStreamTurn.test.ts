@@ -17,6 +17,8 @@ import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import { EVENT_DOC_AI_CONTINUATION_NUDGE } from '../constants/eventDocAiContinuationNudge';
+import { EVENT_DOC_AI_DECLINED_NOTICE } from '../constants/eventDocAiDeclinedNotice';
+import { EVENT_DOC_AI_ERROR_NOTICE } from '../constants/eventDocAiErrorNotice';
 import {
   EVENT_DOC_AI_CACHE_TTL_GLOBAL,
   EVENT_DOC_AI_CHAT_DRIVE_GLOBAL,
@@ -68,17 +70,20 @@ type DispatchedEffect = { type: EventDocAiEffect; payload: Record<string, unknow
 type TurnOptions = {
   isContinuation?: boolean;
   sendUsageToFrontend?: boolean;
+  /** The parts the model streams back; defaults to one text reply that ends normally. */
+  parts?: Record<string, unknown>[];
 };
 
 // Drives one turn to completion: the model streams a single text reply, then the
 // history save and chat touch run. Captures what the prompt, the save and the browser received.
-const runTurn = ({ isContinuation = false, sendUsageToFrontend }: TurnOptions = {}) => {
+const defaultParts: Record<string, unknown>[] = [
+  { type: AiStreamPartType.TextDelta, id: 'text-1', text: 'Done.' },
+  { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage },
+];
+
+const runTurn = ({ isContinuation = false, sendUsageToFrontend, parts = defaultParts }: TurnOptions = {}) => {
   const globals: Record<string, unknown> = { ...baseGlobals, [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend };
-  const chunks = [
-    { data: JSON.stringify({ type: AiStreamPartType.TextDelta, id: 'text-1', text: 'Done.' }) },
-    { data: JSON.stringify({ type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage }) },
-    { done: true },
-  ];
+  const chunks = [...parts.map((part) => ({ data: JSON.stringify(part) })), { done: true }];
   let promptPayload: Record<string, unknown> | undefined;
   let savedFile: { messages: EventDocAiChatMessage[] } | undefined;
   const dispatched: DispatchedEffect[] = [];
@@ -144,6 +149,39 @@ describe('askEventDocAiStreamTurn', () => {
       { role: 'user', content: EVENT_DOC_AI_CONTINUATION_NUDGE },
     ]);
     expect(promptPayload?.messages).toHaveLength(history.length);
+  });
+
+  it('saves an apology quoting the provider error when the request fails, so the turn is not silent', () => {
+    const message = 'The security token included in the request is expired';
+    const { savedFile, result } = runTurn({
+      parts: [
+        { type: AiStreamPartType.Error, message },
+        { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.error, usage: {} },
+      ],
+    });
+
+    expect(savedFile?.messages[history.length]).toEqual(
+      expect.objectContaining({
+        role: 'assistant',
+        segments: [{ type: 'text', text: `${EVENT_DOC_AI_ERROR_NOTICE} "${message}"` }],
+        model: AiModel.ClaudeSonnet46,
+      }),
+    );
+    expect(result).toEqual({ complete: true });
+  });
+
+  it('saves a declined notice as the reply when the model refuses, so the turn is not silent', () => {
+    const { savedFile, result } = runTurn({
+      parts: [{ type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.contentFilter, rawFinishReason: 'refusal', usage }],
+    });
+
+    expect(savedFile?.messages[history.length]).toEqual({
+      role: 'assistant',
+      segments: [{ type: 'text', text: EVENT_DOC_AI_DECLINED_NOTICE }],
+      model: AiModel.ClaudeSonnet46,
+      usage,
+    });
+    expect(result).toEqual({ complete: true });
   });
 
   it('saves the reply with its model and usage, without the turn context', () => {

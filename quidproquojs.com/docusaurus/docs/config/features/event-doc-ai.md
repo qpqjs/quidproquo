@@ -75,6 +75,10 @@ All options are a single `EventDocAiOptions` object.
 
 The four verbs — chat create, list, history, and send — are exposed to the browser as websocket service requests. See the [Event Doc AI actions](../../actions/features/event-doc-ai/ask-event-doc-ai-process-send.md) for the requesters, and the `askUIEventDocAi*` UI actions for driving the chat SPA's state.
 
+### Failed, declined and unexplained turns
+
+A turn whose AI request fails (an expired credential, a model the account cannot use, a provider outage) is saved with the reply "I am sorry, but I am currently having issues. Please pass this message on to an administrator:" followed by the provider's own error message in quotes. A turn the model declines (the provider reports a content filter, which is also how an Anthropic `refusal` arrives) is saved with the text "The model declined to answer this request." as its reply, so the person sees why nothing came back instead of an empty turn. A turn that stops for a reason the framework cannot name and produced nothing but reasoning is saved with "The model stopped without answering." and the provider's raw stop reason in brackets. Both are ordinary text segments in the history, so the conversation continues normally after them.
+
 ## Examples
 
 ```typescript

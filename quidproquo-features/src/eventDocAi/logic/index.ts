@@ -10,3 +10,4 @@ export * from './eventDocAiServiceRequest';
 export * from './getEventDocAiStreamUsage';
 export * from './redactAiStreamPartUsage';
 export * from './redactEventDocAiChatMessageUsage';
+export * from './withEventDocAiStopNotice';
