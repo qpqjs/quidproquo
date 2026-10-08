@@ -4,6 +4,7 @@ import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
 import { AiCacheTtl } from './AiCacheTtl';
 import { AiModel } from './AiModel';
+import { AiReasoningEffort } from './AiReasoningEffort';
 import { askAiPromptStream } from './askAiPromptStream';
 
 describe('askAiPromptStream', () => {
@@ -17,7 +18,7 @@ describe('askAiPromptStream', () => {
         aiName: 'bob',
         messages,
         turnContext,
-        reasoning: { budgetTokens: 2048 },
+        reasoning: { effort: AiReasoningEffort.Medium },
         caching: true,
         cacheTtl: AiCacheTtl.OneHour,
       }),
@@ -32,7 +33,7 @@ describe('askAiPromptStream', () => {
         turnContext,
         system: 'be helpful',
         aiName: 'bob',
-        reasoning: { budgetTokens: 2048 },
+        reasoning: { effort: AiReasoningEffort.Medium },
         caching: true,
         cacheTtl: AiCacheTtl.OneHour,
       },

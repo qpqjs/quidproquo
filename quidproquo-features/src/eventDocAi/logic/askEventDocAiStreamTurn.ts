@@ -1,6 +1,7 @@
 import {
   type AiCacheTtl,
   type AiModel,
+  type AiReasoningEffort,
   type AiStreamFinish,
   AiStreamFinishReasonEnum,
   type AiStreamPart,
@@ -11,6 +12,7 @@ import {
   askInlineFunctionExecute,
   AskResponse,
   askStreamMap,
+  type Nullable,
 } from 'quidproquo-core';
 
 import { askEventDocResolveScope, EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
@@ -20,7 +22,7 @@ import {
   EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL,
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
-  EVENT_DOC_AI_REASONING_BUDGET_GLOBAL,
+  EVENT_DOC_AI_REASONING_EFFORT_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
@@ -110,7 +112,7 @@ export function* askEventDocAiStreamTurn(
 
   const aiName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_NAME_GLOBAL);
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
-  const reasoningBudgetTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_REASONING_BUDGET_GLOBAL);
+  const reasoningEffort = yield* askConfigGetGlobal<Nullable<AiReasoningEffort>>(EVENT_DOC_AI_REASONING_EFFORT_GLOBAL);
   const maxOutputTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_MAX_OUTPUT_TOKENS_GLOBAL);
   const cacheTtl = yield* askConfigGetGlobal<AiCacheTtl>(EVENT_DOC_AI_CACHE_TTL_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
@@ -136,7 +138,7 @@ export function* askEventDocAiStreamTurn(
     aiName,
     messages: aiMessages,
     turnContext,
-    reasoning: reasoningBudgetTokens ? { budgetTokens: reasoningBudgetTokens } : undefined,
+    reasoning: reasoningEffort ? { effort: reasoningEffort } : undefined,
     caching: true,
     cacheTtl: cacheTtl || undefined,
     maxOutputTokens,

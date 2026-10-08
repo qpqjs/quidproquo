@@ -1,4 +1,4 @@
-import type { AiCacheTtl, AiModel, AiToolDefinition } from 'quidproquo-core';
+import type { AiCacheTtl, AiModel, AiReasoningEffort, AiToolDefinition, Nullable } from 'quidproquo-core';
 
 export type EventDocAiOptions = {
   // The eventDoc collection this AI works with (chats are scoped per document).
@@ -34,13 +34,11 @@ export type EventDocAiOptions = {
   turnContextGenerator?: string;
   // Tool executors are defineInlineFunction names registered by the caller.
   tools?: AiToolDefinition[];
-  // Extended-thinking token budget. Defaults to 4096; pass 0 to disable
-  // reasoning entirely. Claude 4.6 and older spend up to this many tokens
-  // thinking; Opus 4.7 and newer and Sonnet 5 run adaptive thinking and ignore
-  // the number, though a non-zero value still turns thinking on. Thinking
-  // streams to the chat as reasoning segments so the user sees progress
-  // instead of a silent wait.
-  reasoningBudgetTokens?: number;
+  // How hard the model thinks before it answers. Defaults to AiReasoningEffort.Medium;
+  // pass null to turn thinking off. On Claude 4.6 and older the effort becomes a
+  // thinking token budget; newer models take it directly. Thinking streams to the
+  // chat as reasoning segments so the user sees progress instead of a silent wait.
+  reasoningEffort?: Nullable<AiReasoningEffort>;
   // Output token cap per model call. Defaults to 65536 (the Claude Sonnet ceiling
   // on Bedrock; older or smaller models may reject it); the provider default
   // (8192) is too small for a reasoning block plus a large tool input, and a
