@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.1.30
+
+- core/actionprocessor-awslambda: `AiModel` gains Claude Opus 4.7, Opus 4.8, Sonnet 5, Opus 5, Opus 5.5, Sonnet 5.5, Fable 5 and Fable 5.1. `askAiGetModelRegions` returns the regions each model is offered in on the current platform, and on Bedrock the model id is resolved by region preference (au first, global for the global-only models)
+- core/actionprocessor-awslambda/features: `askAiPrompt` and `askAiPromptStream` cache the prompt, with a `cacheTtl` (`AiCacheTtl`) that defaults to `Dynamic`: an hour for the system prompt and saved history, five minutes for the tool loop. Stream usage reports cache reads and writes
+- core/actionprocessor-awslambda/features: reasoning is a single `AiReasoningEffort` level (`reasoning: { effort }`); on Claude 4.6 and older it maps to a thinking token budget. `defineEventDocAi` takes `reasoningEffort`, `null` to turn thinking off
+- features: event-doc ai gains `turnContextGenerator` for live document state sent as an uncached per-turn message, saves token usage on each assistant message (`sendUsageToFrontend` lets the browser see it), and posts a notice in the chat when a turn is declined, fails, or ends with no answer. Stream finish parts carry the provider's raw finish reason
+- core/actionprocessor-js/features: `askSecureTokenGenerate` mints a random token and `askRedactString` marks a string for log redaction. Log redaction also hides generated tokens, keys containing `secret` or `token`, and token-like url fragments
+- core: nested in-process runs (execute story, dynamic and inline functions) share one runtime creation and inherit the caller's function globals; globals never cross a service boundary
+- webserver/cli: a web entry with `syncServiceViews` on its storage drive serves its service's views bundle from the drive root, so the service is a standalone host on its own domain
+- cli: docker deployments can mount extra host folders into the container with `platformSettings.mounts`
+- config-aws/deploy-awscdk: `defineEmailSenderAllowList` addresses are created as SES email identities on deploy
+- actionprocessor-awslambda/dev-server: api responses use the matched route's cors options
+- features: `EventDocListConfig` has a `canCreate` flag for collections the platform writes itself
+- webserver: `unsafeDecodeJWTPayload` returns null for a non-jwt token instead of throwing
+- dev-server: a secure upload PUT with no content-type is read as a raw body
+
+### Breaking changes
+
+- `defineEmailSenderAllowList` addresses become SES identities on deploy; delete any hand-made ones first
+- `EventDocListConfig` requires `canCreate`
+- `cacheTtl` on `askAiPrompt`, `askAiPromptStream` and `defineEventDocAi` defaults to `AiCacheTtl.Dynamic`; pass `ProviderDefault` for the old behaviour
+- `AiReasoningConfig` is `{ effort }`; `budgetTokens` is gone
+- `defineEventDocAi` option `reasoningBudgetTokens` is now `reasoningEffort`
+
 ## 0.1.29
 
 - core/web-react/web-admin: uuid generation works on plain-http browser origins (a self-hosted app on a LAN ip, say). `generateUuid` falls back to building a v4 id from `crypto.getRandomValues()` when the browser hides `crypto.randomUUID()` outside a secure context, and the frontend packages mint ids through it instead of calling `crypto.randomUUID()` directly
