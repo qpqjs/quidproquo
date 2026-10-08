@@ -8,7 +8,7 @@ description: Look up where each AI model processes its requests, so a model pick
 Resolves with the data regions every [`AiModel`](./ask-ai-prompt.md#aimodel) is offered in on the current platform. Use it to build a model picker that shows the user where a request will be processed, or to refuse a model whose region your data must not reach. The mapping belongs to the platform (on AWS, the Bedrock inference profile behind each model), so a story asks for it instead of hard-coding it.
 
 - **Action type:** `AiActionType.GetModelRegions`
-- **On AWS:** reads the regions off the Bedrock model map in the lambda action processor, which holds an inference profile id per model per region. Every current entry is an `au.` profile, so every model lists only `AiDataRegion.Australia`. A prompt takes the Australian profile when the model has one, then Global, then the first region listed, so a model that lists only Global would run through its Global profile.
+- **On AWS:** reads the regions off the Bedrock model map in the lambda action processor, which holds an inference profile id per model per region. Most entries are `au.` profiles and list only `AiDataRegion.Australia`; Sonnet 5.5, Fable 5 and Fable 5.1 have only a `global.` profile and list only `AiDataRegion.Global`. A prompt takes the Australian profile when the model has one, then Global, then the first region listed, so those three run through their Global profile.
 
 ```typescript
 import { askAiGetModelRegions, AiDataRegion, AiModel } from 'quidproquo-core';
@@ -37,7 +37,7 @@ Takes no parameters.
 | Member | Meaning |
 | --- | --- |
 | `Australia` | Requests are processed in Australia (on AWS, an `au.` inference profile). |
-| `Global` | Requests may be processed anywhere the provider chooses (on AWS, a `global.` inference profile). No model lists it today; the member exists so adding one is a visible choice. |
+| `Global` | Requests may be processed anywhere the provider chooses, including outside Australia (on AWS, a `global.` inference profile). Sonnet 5.5, Fable 5 and Fable 5.1 are Global only. |
 
 ## Errors
 

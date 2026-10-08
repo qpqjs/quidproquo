@@ -2,8 +2,9 @@ import { AiDataRegion, AiModel } from 'quidproquo-core';
 
 import { BedrockModelRegions } from './types';
 
-// Each region's id is the cross-region inference profile that keeps the request in that region.
-// Only Australia is populated: a `global.` profile would be a Global entry, never an Australian one.
+// Each region's id is the cross-region inference profile that runs the request in that region. A
+// model with only a Global entry is processed wherever Bedrock chooses, so the resolver's preference
+// order is what keeps the rest in Australia.
 export const bedrockModelMap: Record<AiModel, BedrockModelRegions> = {
   [AiModel.ClaudeHaiku35]: { [AiDataRegion.Australia]: 'au.anthropic.claude-3-5-haiku-20241022-v1:0' },
   [AiModel.ClaudeSonnet35]: { [AiDataRegion.Australia]: 'au.anthropic.claude-3-5-sonnet-20241022-v2:0' },
@@ -19,4 +20,7 @@ export const bedrockModelMap: Record<AiModel, BedrockModelRegions> = {
   [AiModel.ClaudeSonnet5]: { [AiDataRegion.Australia]: 'au.anthropic.claude-sonnet-5' },
   [AiModel.ClaudeOpus5]: { [AiDataRegion.Australia]: 'au.anthropic.claude-opus-5' },
   [AiModel.ClaudeOpus55]: { [AiDataRegion.Australia]: 'au.anthropic.claude-opus-5-5' },
+  [AiModel.ClaudeSonnet55]: { [AiDataRegion.Global]: 'global.anthropic.claude-sonnet-5-5' },
+  [AiModel.ClaudeFable5]: { [AiDataRegion.Global]: 'global.anthropic.claude-fable-5' },
+  [AiModel.ClaudeFable51]: { [AiDataRegion.Global]: 'global.anthropic.claude-fable-5-1' },
 };

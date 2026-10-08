@@ -13,4 +13,7 @@ export enum AiModel {
   ClaudeSonnet5 = 'claude-sonnet-5',
   ClaudeOpus5 = 'claude-opus-5',
   ClaudeOpus55 = 'claude-opus-5-5',
+  ClaudeSonnet55 = 'claude-sonnet-5-5',
+  ClaudeFable5 = 'claude-fable-5',
+  ClaudeFable51 = 'claude-fable-5-1',
 }
