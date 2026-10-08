@@ -49,7 +49,7 @@ function* askAiPrompt(
 | `aiName` | `string` | – | Name of a [defineAi](../../../config/core/ai.md) config to bind. This is what wires up tool definitions (and their executors) for the model to call. Omit for a plain, tool-less prompt. |
 | `messages` | [`AiMessage[]`](#aimessage) | – | A full conversation history. When present, this is sent instead of `prompt`, letting you carry a multi-turn dialogue (including prior assistant turns and tool results). |
 | `turnContext` | [`AiMessage[]`](#aimessage) | – | Per-request messages sent after `messages` (or after `prompt`, which then becomes the first user message). They never receive a cache point and are not meant to be saved into a conversation's history, so live state such as a document's current contents belongs here rather than in `system`, where any change rewrites the whole cached conversation. |
-| `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on. On Claude 4.6 and older, `budgetTokens` caps how many tokens the model may spend thinking (defaults to `4096` on AWS) and `effort` is ignored. Opus 4.7 and newer and Sonnet 5 run adaptive thinking: the model decides how much to think, `effort` nudges it (`AiReasoningEffort.Low` to `Max`), and `budgetTokens` is ignored. |
+| `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking at an effort (`AiReasoningEffort.Low`, `Medium`, `High`, `XHigh`, `Max`). Its presence turns reasoning on. On Claude 4.6 and older the AWS processor turns the effort into a thinking token budget (1,024, 4,096, 8,192, 16,384 or 32,768 tokens). Opus 4.7 and newer and Sonnet 5 run adaptive thinking: the model decides how much to think and the effort steers it. |
 | `caching` | `boolean` | – | Places Bedrock cache points on the system prompt (which also covers the tool definitions) and on the last `messages` entry, and after every tool-calling step on the newest tool message, so the next call in the conversation and the next step in the loop read everything up to there from cache. `turnContext` is never marked. A point only takes effect once the prefix before it reaches the model's minimum: 512 tokens on Claude Opus 5 and 5.5, 1,024 on Sonnet 4.6, Sonnet 5 and Opus 4.8, 4,096 on Opus 4.6, Opus 4.7 and Haiku 4.5. |
 | `cacheTtl` | `AiCacheTtl` | `AiCacheTtl.Dynamic` | Requested lifetime of the request's cache points. `AiCacheTtl.Dynamic` lets the provider choose per point: on Bedrock an hour for the system prompt and the last `messages` entry, so they outlive a pause between turns, and five minutes for the tool-loop point, which is discarded when the call ends. `AiCacheTtl.ProviderDefault` leaves every point on the provider's default (five minutes on Bedrock); `AiCacheTtl.FiveMinutes` keeps every point on five minutes; `AiCacheTtl.OneHour` pins the hour on the system prompt and the last `messages` entry. The tool-loop point is always five minutes, whatever is requested, because it is discarded when the call ends. A request, not a guarantee: a Bedrock model that cannot cache for an hour gets the default instead of a failed request. |
 | `maxSteps` | `number` | – | Cap on model/tool steps in one call. Unset means no cap: the loop runs until the model stops on its own or `maxDurationMs` trips. A client-side tool call (a tool with no executor) still halts it immediately. |
@@ -109,12 +109,11 @@ type AiToolMessage      = { role: 'tool';      content: AiToolResultPart[] };
 
 ```typescript
 type AiReasoningConfig = {
-  budgetTokens?: number;
-  effort?: AiReasoningEffort; // Low | Medium | High | XHigh | Max
+  effort: AiReasoningEffort; // Low | Medium | High | XHigh | Max
 };
 ```
 
-Which field applies depends on the model, see `reasoning` above. A config may carry both; the model ignores the one it does not take.
+One knob for every model; what it means per model is under `reasoning` above.
 
 ## Returns
 

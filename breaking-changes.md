@@ -8,6 +8,8 @@ assembled quickly.
 - `defineEmailSenderAllowList` addresses are now created as SES email identities by the deploy. If you already created one by hand in SES, delete it (or import it into the stack) before deploying, or the deploy fails because it already exists.
 - `EventDocListConfig` has a new required `canCreate: boolean` field. Set it to `false` for collections the platform writes itself (no create route mounted), `true` otherwise.
 - `cacheTtl` on `askAiPrompt`, `askAiPromptStream` and `defineEventDocAi` now defaults to `AiCacheTtl.Dynamic` instead of the provider default. On Bedrock the system prompt and saved history are cached for an hour (dearer write). Pass `AiCacheTtl.ProviderDefault` to keep the old behaviour.
+- `AiReasoningConfig` is now `{ effort }` with `effort` required and `budgetTokens` removed. Replace `reasoning: { budgetTokens: n }` with `reasoning: { effort: AiReasoningEffort.X }`; on Claude 4.6 and older the effort maps to a token budget (Low 1,024, Medium 4,096, High 8,192, XHigh 16,384, Max 32,768).
+- `defineEventDocAi` option `reasoningBudgetTokens` is now `reasoningEffort` (`AiReasoningEffort`, default `Medium`, `null` turns thinking off). Replace `reasoningBudgetTokens: 0` with `reasoningEffort: null`.
 
 ## 0.1.29
 
