@@ -27,6 +27,7 @@ vi.mock('./logic', () => ({
   toAiStreamUsage: vi.fn((usage: unknown) => usage),
   logAiCacheUsage: vi.fn(),
   buildAiStopConditions: vi.fn(() => []),
+  toBedrockReasoningOptions: vi.fn(() => undefined),
 }));
 
 const generateText = vi.fn();

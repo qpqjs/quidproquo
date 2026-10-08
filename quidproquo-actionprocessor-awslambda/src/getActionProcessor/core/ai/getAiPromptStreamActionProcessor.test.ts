@@ -29,6 +29,7 @@ vi.mock('./logic', () => ({
   logAiCacheUsage: vi.fn(),
   toErrorMessage: vi.fn((error: unknown) => (error instanceof Error ? error.message : String(error))),
   buildAiStopConditions: vi.fn(() => []),
+  toBedrockReasoningOptions: vi.fn(() => undefined),
 }));
 
 const streamText = vi.fn();

@@ -49,8 +49,8 @@ function* askAiPrompt(
 | `aiName` | `string` | – | Name of a [defineAi](../../../config/core/ai.md) config to bind. This is what wires up tool definitions (and their executors) for the model to call. Omit for a plain, tool-less prompt. |
 | `messages` | [`AiMessage[]`](#aimessage) | – | A full conversation history. When present, this is sent instead of `prompt`, letting you carry a multi-turn dialogue (including prior assistant turns and tool results). |
 | `turnContext` | [`AiMessage[]`](#aimessage) | – | Per-request messages sent after `messages` (or after `prompt`, which then becomes the first user message). They never receive a cache point and are not meant to be saved into a conversation's history, so live state such as a document's current contents belongs here rather than in `system`, where any change rewrites the whole cached conversation. |
-| `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on; `budgetTokens` caps how many tokens the model may spend thinking before it answers (defaults to `4096` on AWS). |
-| `caching` | `boolean` | – | Places Bedrock cache points on the system prompt (which also covers the tool definitions) and on the last `messages` entry, and after every tool-calling step on the newest tool message, so the next call in the conversation and the next step in the loop read everything up to there from cache. `turnContext` is never marked. A point only takes effect once the prefix before it reaches the model's minimum: 1,024 tokens on Claude Sonnet 4.6, 4,096 on Claude Opus 4.6 and Haiku 4.5. |
+| `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on. On Claude 4.6 and older, `budgetTokens` caps how many tokens the model may spend thinking (defaults to `4096` on AWS) and `effort` is ignored. Opus 4.7 and newer and Sonnet 5 run adaptive thinking: the model decides how much to think, `effort` nudges it (`AiReasoningEffort.Low` to `Max`), and `budgetTokens` is ignored. |
+| `caching` | `boolean` | – | Places Bedrock cache points on the system prompt (which also covers the tool definitions) and on the last `messages` entry, and after every tool-calling step on the newest tool message, so the next call in the conversation and the next step in the loop read everything up to there from cache. `turnContext` is never marked. A point only takes effect once the prefix before it reaches the model's minimum: 512 tokens on Claude Opus 5 and 5.5, 1,024 on Sonnet 4.6, Sonnet 5 and Opus 4.8, 4,096 on Opus 4.6, Opus 4.7 and Haiku 4.5. |
 | `cacheTtl` | `AiCacheTtl` | `AiCacheTtl.Dynamic` | Requested lifetime of the request's cache points. `AiCacheTtl.Dynamic` lets the provider choose per point: on Bedrock an hour for the system prompt and the last `messages` entry, so they outlive a pause between turns, and five minutes for the tool-loop point, which is discarded when the call ends. `AiCacheTtl.ProviderDefault` leaves every point on the provider's default (five minutes on Bedrock); `AiCacheTtl.FiveMinutes` keeps every point on five minutes; `AiCacheTtl.OneHour` pins the hour on the system prompt and the last `messages` entry. The tool-loop point is always five minutes, whatever is requested, because it is discarded when the call ends. A request, not a guarantee: a Bedrock model that cannot cache for an hour gets the default instead of a failed request. |
 | `maxSteps` | `number` | – | Cap on model/tool steps in one call. Unset means no cap: the loop runs until the model stops on its own or `maxDurationMs` trips. A client-side tool call (a tool with no executor) still halts it immediately. |
 | `maxOutputTokens` | `number` | provider default | Output token cap per model call. Bedrock defaults to 8192, which a reasoning block plus a large tool input can exceed; the step then finishes with `length` and the tool call arrives truncated. Raise it for agentic workloads (Claude Sonnet allows 64k). |
@@ -58,19 +58,26 @@ function* askAiPrompt(
 
 ### `AiModel`
 
-The model to run. Values map to the underlying Bedrock model ids.
+The model to run. On AWS each value maps to a Bedrock cross-region inference profile per data region, and requests are resolved through the Australian one, so they are processed in Australia. [askAiGetModelRegions](./ask-ai-get-model-regions.md) returns the regions each member is offered in, for a model picker.
 
-| Member | Model |
-| --- | --- |
-| `ClaudeHaiku35` | Claude 3.5 Haiku |
-| `ClaudeSonnet35` | Claude 3.5 Sonnet |
-| `ClaudeSonnet4` | Claude Sonnet 4 |
-| `ClaudeOpus4` | Claude Opus 4 |
-| `ClaudeHaiku45` | Claude Haiku 4.5 |
-| `ClaudeSonnet45` | Claude Sonnet 4.5 |
-| `ClaudeOpus45` | Claude Opus 4.5 |
-| `ClaudeSonnet46` | Claude Sonnet 4.6 |
-| `ClaudeOpus46` | Claude Opus 4.6 |
+| Member | Model | Data regions |
+| --- | --- | --- |
+| `ClaudeHaiku35` | Claude 3.5 Haiku | Australia |
+| `ClaudeSonnet35` | Claude 3.5 Sonnet | Australia |
+| `ClaudeSonnet4` | Claude Sonnet 4 | Australia |
+| `ClaudeOpus4` | Claude Opus 4 | Australia |
+| `ClaudeHaiku45` | Claude Haiku 4.5 | Australia |
+| `ClaudeSonnet45` | Claude Sonnet 4.5 | Australia |
+| `ClaudeOpus45` | Claude Opus 4.5 | Australia |
+| `ClaudeSonnet46` | Claude Sonnet 4.6 | Australia |
+| `ClaudeOpus46` | Claude Opus 4.6 | Australia |
+| `ClaudeOpus47` | Claude Opus 4.7 | Australia |
+| `ClaudeOpus48` | Claude Opus 4.8 | Australia |
+| `ClaudeSonnet5` | Claude Sonnet 5 | Australia |
+| `ClaudeOpus5` | Claude Opus 5 | Australia |
+| `ClaudeOpus55` | Claude Opus 5.5 | Australia |
+
+Bedrock no longer lists an `au.` profile for `ClaudeHaiku35`, `ClaudeSonnet35`, `ClaudeSonnet4`, `ClaudeOpus4` or `ClaudeOpus45` (as of October 2026), so a request on one of them fails at call time with a Bedrock validation error. Models that Sydney serves only through a `global.` profile (Sonnet 5.5, Fable 5, Fable 5.1) are not in the enum, since that profile sends the request outside Australia.
 
 ### `AiMessage`
 
@@ -98,10 +105,13 @@ type AiToolMessage      = { role: 'tool';      content: AiToolResultPart[] };
 ### `AiReasoningConfig`
 
 ```typescript
-interface AiReasoningConfig {
+type AiReasoningConfig = {
   budgetTokens?: number;
-}
+  effort?: AiReasoningEffort; // Low | Medium | High | XHigh | Max
+};
 ```
+
+Which field applies depends on the model, see `reasoning` above. A config may carry both; the model ignores the one it does not take.
 
 ## Returns
 
@@ -111,7 +121,7 @@ interface AiReasoningConfig {
 
 | Error | When |
 | --- | --- |
-| `ErrorTypeEnum.NotImplemented` | The `model` has no mapping to an underlying provider model id. |
+| `ErrorTypeEnum.NotImplemented` | The `model` has no provider model id in the data region requests are resolved through. |
 | `ErrorTypeEnum.NotFound` | `options.aiName` names an AI config that does not exist. |
 | `ErrorTypeEnum.GenericError` | Any failure while generating, with the underlying provider message. |
 
@@ -129,5 +139,6 @@ if (!outcome.success) {
 ## Related
 
 - [askAiPromptStream](./ask-ai-prompt-stream.md) — stream the response token-by-token instead of waiting for the whole thing.
+- [askAiGetModelRegions](./ask-ai-get-model-regions.md) — where each model processes its requests, for a model picker.
 - [defineAi](../../../config/core/ai.md) — declares a named AI config with tool definitions the model can call.
 - [defineStorageDrive](../../../config/core/storage-drive.md) — the drive an `AiFileDrivePart` attachment reads from.

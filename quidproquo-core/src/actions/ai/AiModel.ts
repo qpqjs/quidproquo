@@ -8,4 +8,9 @@ export enum AiModel {
   ClaudeOpus45 = 'claude-opus-4-5',
   ClaudeSonnet46 = 'claude-sonnet-4-6',
   ClaudeOpus46 = 'claude-opus-4-6',
+  ClaudeOpus47 = 'claude-opus-4-7',
+  ClaudeOpus48 = 'claude-opus-4-8',
+  ClaudeSonnet5 = 'claude-sonnet-5',
+  ClaudeOpus5 = 'claude-opus-5',
+  ClaudeOpus55 = 'claude-opus-5-5',
 }

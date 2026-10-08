@@ -15,6 +15,12 @@ describe('toBedrockCachePoint', () => {
       expect(toBedrockCachePoint({ model: AiModel.ClaudeSonnet46, cacheTtl: AiCacheTtl.Dynamic }, BedrockCachePointRole.Anchor)).toEqual(hour);
     });
 
+    it('keeps the hour on the current generation too', () => {
+      for (const model of [AiModel.ClaudeOpus47, AiModel.ClaudeOpus48, AiModel.ClaudeSonnet5, AiModel.ClaudeOpus5, AiModel.ClaudeOpus55]) {
+        expect(toBedrockCachePoint({ model }, BedrockCachePointRole.System)).toEqual(hour);
+      }
+    });
+
     it('keeps the tool-loop tail on the default lifetime', () => {
       expect(toBedrockCachePoint({ model: AiModel.ClaudeSonnet46 }, BedrockCachePointRole.Tail)).toEqual(plain);
       expect(toBedrockCachePoint({ model: AiModel.ClaudeSonnet46 }, BedrockCachePointRole.Tail)).not.toHaveProperty('ttl');

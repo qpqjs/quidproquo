@@ -35,6 +35,7 @@ export * from './prepareAiPromptCall';
 export * from './toAiStreamFinishReason';
 export * from './toAiStreamUsage';
 export * from './toBedrockCachePoint';
+export * from './toBedrockReasoningOptions';
 export * from './toCacheableMessages';
 export * from './toCacheableSystem';
 export * from './toErrorMessage';

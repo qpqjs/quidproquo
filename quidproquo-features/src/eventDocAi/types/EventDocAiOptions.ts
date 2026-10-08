@@ -35,8 +35,11 @@ export type EventDocAiOptions = {
   // Tool executors are defineInlineFunction names registered by the caller.
   tools?: AiToolDefinition[];
   // Extended-thinking token budget. Defaults to 4096; pass 0 to disable
-  // reasoning entirely. Thinking streams to the chat as reasoning segments so
-  // the user sees progress instead of a silent wait.
+  // reasoning entirely. Claude 4.6 and older spend up to this many tokens
+  // thinking; Opus 4.7 and newer and Sonnet 5 run adaptive thinking and ignore
+  // the number, though a non-zero value still turns thinking on. Thinking
+  // streams to the chat as reasoning segments so the user sees progress
+  // instead of a silent wait.
   reasoningBudgetTokens?: number;
   // Output token cap per model call. Defaults to 65536 (the Claude Sonnet ceiling
   // on Bedrock; older or smaller models may reject it); the provider default

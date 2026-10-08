@@ -45,7 +45,7 @@ describe('prepareAiPromptCall', () => {
 
     const result = prepareAiPromptCall(config, { model: 'nope' as AiModel }, ...collaborators);
 
-    expect(result).toEqual({ error: { type: ErrorTypeEnum.NotImplemented, message: 'Unsupported AI model: nope' } });
+    expect(result).toEqual({ error: { type: ErrorTypeEnum.NotImplemented, message: 'Unsupported AI model in australia: nope' } });
   });
 
   it('errors with NotFound when the named ai config is missing', () => {
