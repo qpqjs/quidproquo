@@ -10,6 +10,8 @@ export interface AiStreamFinish {
   type: AiStreamPartType.Finish;
   /** Why the model stopped. `toolCalls` here means the loop was halted early and is resumable. */
   finishReason: AiStreamFinishReasonEnum;
+  /** The provider's own stop reason string, when it reported one; explains an `other` or `unknown` reason. */
+  rawFinishReason?: string;
   /** Aggregate token usage across all steps. */
   usage: AiStreamUsage;
 }

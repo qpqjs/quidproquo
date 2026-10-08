@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^5.0.11",
+    "@ai-sdk/amazon-bedrock": "^5.0.111",
     "@aws-sdk/client-acm": "^3.1093.0",
     "@aws-sdk/client-api-gateway": "^3.1093.0",
     "@aws-sdk/client-apigatewaymanagementapi": "^3.1093.0",
@@ -58,7 +58,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1093.0",
     "@module-federation/enhanced": "2.6.0",
     "@types/aws-lambda": "^8.10.162",
-    "ai": "^7.0.4",
+    "ai": "^7.0.133",
     "aws-jwt-verify": "^3.4.0",
     "busboy": "^1.6.0",
     "jsonwebtoken": "^9.0.0",

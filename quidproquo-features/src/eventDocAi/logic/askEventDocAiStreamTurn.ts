@@ -42,6 +42,7 @@ import { askEventDocAiUsageVisible } from './askEventDocAiUsageVisible';
 import { getEventDocAiStreamUsage } from './getEventDocAiStreamUsage';
 import { redactAiStreamPartUsage } from './redactAiStreamPartUsage';
 import { redactEventDocAiChatMessageUsage } from './redactEventDocAiChatMessageUsage';
+import { withEventDocAiStopNotice } from './withEventDocAiStopNotice';
 
 const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant. Use tools when appropriate.';
 
@@ -59,10 +60,8 @@ const MAX_LENGTH_RESUMES = 3;
 // means the model finished its answer; `toolCalls` means a stop condition cut
 // it off while it still wanted to keep acting; `length` means the output token
 // cap cut it off. Both of the latter can be resumed from the saved history.
-const getFinishReason = (parts: AiStreamPart[]): AiStreamFinishReasonEnum | undefined => {
-  const finishPart = parts.find((part): part is AiStreamFinish => part.type === AiStreamPartType.Finish);
-  return finishPart?.finishReason;
-};
+const getFinishPart = (parts: AiStreamPart[]): AiStreamFinish | undefined =>
+  parts.find((part): part is AiStreamFinish => part.type === AiStreamPartType.Finish);
 
 // A tool call with no output after the stream has ended is a client-side tool
 // (a config tool with no executor): nothing server-side can resolve it, so the
@@ -157,9 +156,12 @@ export function* askEventDocAiStreamTurn(
     return part;
   });
 
-  // Fold the transport parts into durable segments; a stream that produced no
-  // content (e.g. it errored before any text) saves no assistant message.
-  const segments = mergeStreamParts(assistantParts);
+  const finishPart = getFinishPart(assistantParts);
+
+  // Fold the transport parts into durable segments. A turn that failed, was
+  // declined, or ended without an answer for a reason this version cannot name
+  // saves a notice saying so, so the person is never left with silence.
+  const segments = withEventDocAiStopNotice(mergeStreamParts(assistantParts), assistantParts);
 
   if (segments.length > 0) {
     // Usage is saved whatever the visibility setting says; the setting only decides what the
@@ -190,7 +192,7 @@ export function* askEventDocAiStreamTurn(
     return { complete: false };
   }
 
-  const finishReason = getFinishReason(assistantParts);
+  const finishReason = finishPart?.finishReason;
 
   // 'tool-calls' means the time budget cut the model off mid-work; 'length'
   // means the output cap did. Only a reply that made progress is worth
