@@ -18,8 +18,7 @@ import { jsonSchema } from 'ai';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
 import { randomGuid } from '../../../../awsLambdaUtils';
-import { bedrockModelMap } from '../aiModelMap';
-import { bedrockDataRegion } from '../bedrockDataRegion';
+import { resolveBedrockModel } from './resolveBedrockModel';
 
 export type PrepareAiPromptCallPayload = {
   model: AiModel;
@@ -44,9 +43,9 @@ export const prepareAiPromptCall = (
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
   const bedrock = createAmazonBedrock({ region });
 
-  const bedrockModelId = bedrockModelMap[payload.model]?.[bedrockDataRegion];
-  if (!bedrockModelId) {
-    return { error: { type: ErrorTypeEnum.NotImplemented, message: `Unsupported AI model in ${bedrockDataRegion}: ${payload.model}` } };
+  const resolved = resolveBedrockModel(payload.model);
+  if (!resolved) {
+    return { error: { type: ErrorTypeEnum.NotImplemented, message: `Unsupported AI model: ${payload.model}` } };
   }
 
   const aiTools: ToolSet = {};
@@ -95,7 +94,7 @@ export const prepareAiPromptCall = (
   }
 
   return {
-    model: bedrock(bedrockModelId),
+    model: bedrock(resolved.modelId),
     tools: Object.keys(aiTools).length > 0 ? aiTools : undefined,
   };
 };

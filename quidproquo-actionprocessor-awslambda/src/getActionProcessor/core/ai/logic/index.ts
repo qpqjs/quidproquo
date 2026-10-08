@@ -32,6 +32,7 @@ export * from './mapAiStreamToolInputStart';
 export * from './mapAiStreamToolOutputDenied';
 export * from './mapAiStreamToolResult';
 export * from './prepareAiPromptCall';
+export * from './resolveBedrockModel';
 export * from './toAiStreamFinishReason';
 export * from './toAiStreamUsage';
 export * from './toBedrockCachePoint';
