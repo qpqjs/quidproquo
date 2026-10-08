@@ -30,6 +30,11 @@ describe('bedrockModelMap', () => {
     expect(bedrockModelMap[AiModel.ClaudeHaiku35][AiDataRegion.Australia]).toBe('au.anthropic.claude-3-5-haiku-20241022-v1:0');
   });
 
+  it('offers the Global-only models through their global. profile and nowhere else', () => {
+    expect(bedrockModelMap[AiModel.ClaudeSonnet55]).toEqual({ [AiDataRegion.Global]: 'global.anthropic.claude-sonnet-5-5' });
+    expect(bedrockModelMap[AiModel.ClaudeFable51]).toEqual({ [AiDataRegion.Global]: 'global.anthropic.claude-fable-5-1' });
+  });
+
   it('maps ClaudeOpus55 to its au. inference profile and nowhere else', () => {
     expect(bedrockModelMap[AiModel.ClaudeOpus55]).toEqual({ [AiDataRegion.Australia]: 'au.anthropic.claude-opus-5-5' });
   });

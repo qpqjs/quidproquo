@@ -14,5 +14,6 @@ describe('getAiGetModelRegionsActionProcessor', () => {
     expect(error).toBeUndefined();
     expect(Object.keys(result!).sort()).toEqual(Object.values(AiModel).sort());
     expect(result![AiModel.ClaudeOpus55]).toEqual([AiDataRegion.Australia]);
+    expect(result![AiModel.ClaudeFable51]).toEqual([AiDataRegion.Global]);
   });
 });

@@ -58,7 +58,7 @@ function* askAiPrompt(
 
 ### `AiModel`
 
-The model to run. On AWS each value maps to a Bedrock cross-region inference profile per data region. A request takes the Australian profile when the model has one, otherwise the Global one, otherwise the first the model lists; every current member has an Australian profile, so requests are processed in Australia. [askAiGetModelRegions](./ask-ai-get-model-regions.md) returns the regions each member is offered in, for a model picker.
+The model to run. On AWS each value maps to a Bedrock cross-region inference profile per data region. A request takes the Australian profile when the model has one, otherwise the Global one, otherwise the first the model lists. A model whose only region is Global is processed wherever Bedrock chooses, which may be outside Australia; check [askAiGetModelRegions](./ask-ai-get-model-regions.md) before offering it where data must stay onshore. [askAiGetModelRegions](./ask-ai-get-model-regions.md) returns the regions each member is offered in, for a model picker.
 
 | Member | Model | Data regions |
 | --- | --- | --- |
@@ -76,8 +76,11 @@ The model to run. On AWS each value maps to a Bedrock cross-region inference pro
 | `ClaudeSonnet5` | Claude Sonnet 5 | Australia |
 | `ClaudeOpus5` | Claude Opus 5 | Australia |
 | `ClaudeOpus55` | Claude Opus 5.5 | Australia |
+| `ClaudeSonnet55` | Claude Sonnet 5.5 | Global |
+| `ClaudeFable5` | Claude Fable 5 | Global |
+| `ClaudeFable51` | Claude Fable 5.1 | Global |
 
-Bedrock no longer lists an `au.` profile for `ClaudeHaiku35`, `ClaudeSonnet35`, `ClaudeSonnet4`, `ClaudeOpus4` or `ClaudeOpus45` (as of October 2026), so a request on one of them fails at call time with a Bedrock validation error. Models that Sydney serves only through a `global.` profile (Sonnet 5.5, Fable 5, Fable 5.1) are not in the enum, since that profile sends the request outside Australia.
+Bedrock no longer lists an `au.` profile for `ClaudeHaiku35`, `ClaudeSonnet35`, `ClaudeSonnet4`, `ClaudeOpus4` or `ClaudeOpus45` (as of October 2026), so a request on one of them fails at call time with a Bedrock validation error. Sonnet 5.5, Fable 5 and Fable 5.1 have no `au.` profile, so they are Global only.
 
 ### `AiMessage`
 
