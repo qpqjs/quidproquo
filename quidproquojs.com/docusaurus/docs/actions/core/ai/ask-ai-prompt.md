@@ -58,7 +58,7 @@ function* askAiPrompt(
 
 ### `AiModel`
 
-The model to run. On AWS each value maps to a Bedrock cross-region inference profile per data region, and requests are resolved through the Australian one, so they are processed in Australia. [askAiGetModelRegions](./ask-ai-get-model-regions.md) returns the regions each member is offered in, for a model picker.
+The model to run. On AWS each value maps to a Bedrock cross-region inference profile per data region. A request takes the Australian profile when the model has one, otherwise the Global one, otherwise the first the model lists; every current member has an Australian profile, so requests are processed in Australia. [askAiGetModelRegions](./ask-ai-get-model-regions.md) returns the regions each member is offered in, for a model picker.
 
 | Member | Model | Data regions |
 | --- | --- | --- |
@@ -121,7 +121,7 @@ Which field applies depends on the model, see `reasoning` above. A config may ca
 
 | Error | When |
 | --- | --- |
-| `ErrorTypeEnum.NotImplemented` | The `model` has no provider model id in the data region requests are resolved through. |
+| `ErrorTypeEnum.NotImplemented` | The `model` has no provider model id in any data region. |
 | `ErrorTypeEnum.NotFound` | `options.aiName` names an AI config that does not exist. |
 | `ErrorTypeEnum.GenericError` | Any failure while generating, with the underlying provider message. |
 
