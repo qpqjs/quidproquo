@@ -42,7 +42,7 @@ const invoke = async (
   return processor(
     { qpqEventRecord, matchResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
-    buildActionProcessorList(processors),
+    buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),
     createStubLogger(),
     () => {},
     dynamicModuleLoader,
@@ -206,5 +206,18 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     );
 
     expect(response).toBeNull();
+  });
+
+  it('responds 401 when the context resolver rejects', async () => {
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      {
+        [RouteAuthValidationActionType.Decode]: async () => actionResult(valid),
+        [RouteAuthValidationActionType.ResolveContext]: async () => actionResultError(ErrorTypeEnum.Forbidden, 'Not a member of this tenant'),
+      },
+    );
+
+    expect(response?.status).toBe(401);
   });
 });

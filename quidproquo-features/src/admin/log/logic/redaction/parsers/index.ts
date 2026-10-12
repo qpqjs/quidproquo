@@ -1,3 +1,4 @@
+export * from './basicAuthParser';
 export * from './encryptInputParser';
 export * from './jwtParser';
 export * from './keyFragmentParser';

@@ -1,4 +1,4 @@
-import { runStory } from 'quidproquo-core';
+import { ErrorTypeEnum, runStory, throwsError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -12,6 +12,7 @@ const buildEvent = (headers: Record<string, string> = {}) => ({ headers }) as un
 const notApplicable = { outcome: RouteAuthDecodeOutcome.notApplicable };
 const invalid = { outcome: RouteAuthDecodeOutcome.invalid };
 const valid = { outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: { wasValid: true, userId: 'u1' } };
+const noContext = { [RouteAuthValidationActionType.ResolveContext]: {} };
 
 describe('askValidateRouteAuth', () => {
   it('allows the request when there are no auth settings', () => {
@@ -21,6 +22,7 @@ describe('askValidateRouteAuth', () => {
   it('allows a public route when the decode is not applicable', () => {
     const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: {} }), {
       [RouteAuthValidationActionType.Decode]: notApplicable,
+      ...noContext,
     });
 
     expect(result).toBe(true);
@@ -45,6 +47,7 @@ describe('askValidateRouteAuth', () => {
   it('allows when the decode outcome is valid', () => {
     const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }), {
       [RouteAuthValidationActionType.Decode]: valid,
+      ...noContext,
     });
 
     expect(result).toBe(true);
@@ -79,9 +82,56 @@ describe('askValidateRouteAuth', () => {
       {
         [RouteAuthValidationActionType.Decode]: valid,
         [ApiKeyValidationActionType.Validate]: true,
+        ...noContext,
       },
     );
 
     expect(result).toBe(true);
+  });
+
+  it('resolves context with the validated token', () => {
+    let resolvedWith: unknown;
+    runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }), {
+      [RouteAuthValidationActionType.Decode]: valid,
+      [RouteAuthValidationActionType.ResolveContext]: (action: { payload: { decodedAccessToken: unknown } }) => {
+        resolvedWith = action.payload.decodedAccessToken;
+        return {};
+      },
+    });
+
+    expect(resolvedWith).toEqual(valid.decodedAccessToken);
+  });
+
+  it('resolves context with no token when the decode is not applicable', () => {
+    let resolvedWith: unknown = 'not called';
+    runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: {} }), {
+      [RouteAuthValidationActionType.Decode]: notApplicable,
+      [RouteAuthValidationActionType.ResolveContext]: (action: { payload: { decodedAccessToken: unknown } }) => {
+        resolvedWith = action.payload.decodedAccessToken;
+        return {};
+      },
+    });
+
+    expect(resolvedWith).toBeNull();
+  });
+
+  it('fails when the context override rejects, so the preamble 401s', () => {
+    const story = askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } });
+
+    expect(() =>
+      runStory(story, {
+        [RouteAuthValidationActionType.Decode]: valid,
+        [RouteAuthValidationActionType.ResolveContext]: throwsError(ErrorTypeEnum.Forbidden, 'Not a member of this tenant'),
+      }),
+    ).toThrow('Not a member of this tenant');
+  });
+
+  it('does not resolve context for a request that already failed auth', () => {
+    // No ResolveContext mock: yielding it would throw a test setup error.
+    const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }), {
+      [RouteAuthValidationActionType.Decode]: invalid,
+    });
+
+    expect(result).toBe(false);
   });
 });

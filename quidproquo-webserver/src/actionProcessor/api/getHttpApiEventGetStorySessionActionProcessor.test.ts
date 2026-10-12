@@ -35,7 +35,7 @@ const invoke = async (
   return processor(
     { qpqEventRecord, matchStoryResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
-    buildActionProcessorList(processors),
+    buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),
     createStubLogger(),
     () => {},
     dynamicModuleLoader,
@@ -61,7 +61,7 @@ describe('getHttpApiEventGetStorySessionActionProcessor', () => {
     expect(session.decodedAccessToken).toEqual(decoded);
   });
 
-  it('returns an undefined session when the decode action errors (no identity is attached)', async () => {
+  it('fails the request when the session story errors, rather than running it with no identity', async () => {
     const [session, error] = await invoke(
       { headers: { authorization: 'Bearer token' } },
       { routeAuthSettings: { userDirectoryName: 'users' } },
@@ -69,7 +69,46 @@ describe('getHttpApiEventGetStorySessionActionProcessor', () => {
     );
 
     expect(session).toBeUndefined();
-    expect(error).toBeUndefined();
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+  });
+
+  it('fails the request when the context resolver rejects', async () => {
+    const decoded = { wasValid: true, userId: 'u1' };
+    const [session, error] = await invoke(
+      { headers: { authorization: 'Bearer token' } },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      {
+        [RouteAuthValidationActionType.Decode]: async () => actionResult({ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: decoded }),
+        [RouteAuthValidationActionType.ResolveContext]: async () => actionResultError(ErrorTypeEnum.Forbidden, 'Not a member of this tenant'),
+      },
+    );
+
+    expect(session).toBeUndefined();
+    expect(error).toEqual(expect.objectContaining({ errorType: ErrorTypeEnum.Forbidden, errorText: 'Not a member of this tenant' }));
+  });
+
+  it('seeds context from the matched runtime context override', async () => {
+    const decoded = { wasValid: true, userId: 'u1' };
+    const resolveTenant = async () => actionResult({ storageScope: 'TENANT#t1' });
+    const loadOverrideSource = async () => async () => ({ [RouteAuthValidationActionType.ResolveContext]: resolveTenant });
+
+    const [session] = await invoke(
+      { headers: { authorization: 'Bearer token' } },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ outcome: RouteAuthDecodeOutcome.valid, decodedAccessToken: decoded }) },
+      {
+        runtime: {
+          basePath: '/svc/src',
+          relativePath: '/mcp::mcpPost',
+          functionName: 'mcpPost',
+          actionProcessors: [{ basePath: '/svc/src', relativePath: '/auth/impl::getOverrides', functionName: 'getOverrides' }],
+        },
+      },
+      loadOverrideSource,
+    );
+
+    expect(session.decodedAccessToken).toEqual(decoded);
+    expect(session.context).toEqual(expect.objectContaining({ storageScope: 'TENANT#t1' }));
   });
 
   it('marks an unverified token as wasValid false on an unauthenticated route', async () => {
