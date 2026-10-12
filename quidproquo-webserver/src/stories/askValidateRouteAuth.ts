@@ -1,7 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 
 import { askApiKeyValidationValidate } from '../actions/apiKeyValidation';
-import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from '../actions/routeAuthValidation';
+import { askRouteAuthValidationDecode, askRouteAuthValidationResolveContext, RouteAuthDecodeOutcome } from '../actions/routeAuthValidation';
 import { RouteAuthSettings } from '../config/settings/route';
 import { HTTPEvent } from '../types/HTTPEvent';
 import { getHeaderValue } from '../utils/headerUtils';
@@ -38,6 +38,12 @@ export function* askValidateRouteAuth({ event, routeAuthSettings }: ValidateRout
       return false;
     }
   }
+
+  // Run here too, not only when seeding the session, so an override that rejects
+  // (say, a user no longer in the token's tenant) is a clean 401. Its context is
+  // discarded; askGetHttpApiEventStorySession resolves it again for the session.
+  const decodedAccessToken = decodeResult.outcome === RouteAuthDecodeOutcome.valid ? decodeResult.decodedAccessToken : null;
+  yield* askRouteAuthValidationResolveContext(event, routeAuthSettings, decodedAccessToken);
 
   return true;
 }

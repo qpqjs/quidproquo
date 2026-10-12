@@ -1,5 +1,6 @@
 export * from './eventDocAiChatDriveName';
 export * from './eventDocAiChatListStoreName';
+export * from './eventDocAiConfigSettingType';
 export * from './eventDocAiContinuationNudge';
 export * from './eventDocAiContinueFunctionName';
 export * from './eventDocAiDeclinedNotice';

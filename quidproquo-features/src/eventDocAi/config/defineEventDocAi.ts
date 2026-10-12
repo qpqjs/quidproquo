@@ -41,6 +41,7 @@ import {
   EVENT_DOC_AI_METHOD_CHAT_SEND,
 } from '../module';
 import { EventDocAiOptions } from '../types/EventDocAiOptions';
+import { defineEventDocAiRegistration } from './defineEventDocAiRegistration';
 
 // AI chats attached to an eventDoc collection — the AI sibling of defineEventDoc.
 // Provisions a chat-history drive + chat-list KVS, registers the AI (tools are
@@ -111,6 +112,7 @@ export const defineEventDocAi = ({
     defineKeyValueStore<EventDocAiChatSummary>(chatListStore, 'docId', ['chatId'], { scoped }),
     defineStorageDrive(chatDrive, { scoped }),
     defineAi(aiName, { tools }),
+    defineEventDocAiRegistration({ aiName, serviceName, storeName, type, userDirectoryName }),
     defineQueue(eventDocAiQueueName(storeName), processors, {
       eventBusSubscriptions: [eventBusName],
     }),

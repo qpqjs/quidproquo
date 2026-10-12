@@ -2,13 +2,14 @@ import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-co
 import { RouteOptions } from 'quidproquo-webserver';
 
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
+import { defineEventDocCollectionRegistration } from '../config/defineEventDocCollectionRegistration';
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../context/buildEventDocStore';
 import { buildEventDocStoreGlobals } from '../globals/buildEventDocStoreGlobals';
 import { EventDocRouteName } from '../types/EventDocRouteName';
 import { EventDocRoutesOptions } from '../types/EventDocRoutesOptions';
 
-/** The CRUD/event/asset routes for one collection. Controllers ship in this package and read the store from per-route globals. */
+/** The CRUD/event/asset routes for one collection, plus its registration setting. Controllers ship in this package and read the store from per-route globals. */
 export const defineEventDocRoutes = ({
   storeName,
   type,
@@ -62,5 +63,8 @@ export const defineEventDocRoutes = ({
     ['DELETE', `${basePath}/{id}`, 'remove'],
   ];
 
-  return allRoutes.filter(([, , name]) => !excludeRoutes.includes(name)).map(([method, path, name]) => route(method, path, name));
+  return [
+    defineEventDocCollectionRegistration(store, routeAuthSettings?.userDirectoryName),
+    allRoutes.filter(([, , name]) => !excludeRoutes.includes(name)).map(([method, path, name]) => route(method, path, name)),
+  ];
 };

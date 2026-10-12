@@ -1,5 +1,6 @@
 export * from './EventDocAuthoriseInput';
 export * from './EventDocCollectionOptions';
+export * from './EventDocCollectionQPQConfigSetting';
 export * from './EventDocPermissionAction';
 export * from './EventDocPermissions';
 export * from './EventDocRouteName';

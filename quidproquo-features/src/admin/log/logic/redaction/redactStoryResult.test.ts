@@ -47,6 +47,18 @@ describe('redactStoryResult', () => {
     expect(redacted.history[4].act.payload.url).toBe(`postgres://${REDACTED_STRING}:${REDACTED_STRING}@host`);
   });
 
+  it('sweeps a Basic auth password from the whole log, keeping the client id', () => {
+    const basic = Buffer.from('client-1:ca_secret-123').toString('base64');
+    const redacted = redactStoryResult({
+      ...storyResult,
+      input: [{ headers: { Authorization: `Basic ${basic}` } }],
+      history: [{ act: { type: 'Log/Create', payload: { msg: 'client-1 sent ca_secret-123' } }, res: [undefined, undefined] }],
+    });
+
+    expect(redacted.input[0].headers.Authorization).toBe(REDACTED_STRING);
+    expect(redacted.history[0].act.payload.msg).toBe(`client-1 sent ${REDACTED_STRING}`);
+  });
+
   it('does not mutate the input', () => {
     const before = JSON.stringify(storyResult);
 

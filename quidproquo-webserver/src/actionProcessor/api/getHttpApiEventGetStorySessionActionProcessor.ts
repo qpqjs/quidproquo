@@ -1,5 +1,6 @@
 import {
   actionResult,
+  actionResultError,
   askEventGetStorySessionBase,
   createActionProcessor,
   EventActionType,
@@ -49,8 +50,10 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
 
     const [storySession, error] = await getSession(payload, session, mergedActionProcessorList, logger, updateSession, dynamicModuleLoader);
 
+    // Fail closed: running the route anonymously would drop context a
+    // ResolveContext override was meant to enforce.
     if (error) {
-      return actionResult(void 0);
+      return actionResultError(error.errorType, error.errorText, error.errorStack);
     }
 
     return actionResult(storySession);
