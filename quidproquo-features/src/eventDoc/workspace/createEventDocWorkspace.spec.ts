@@ -1322,7 +1322,7 @@ describe('createEventDocWorkspace historyViews', () => {
 
     expect(state.historyViews.noteA).toEqual(createInitialNoteState());
     expect(state.historyViews.noteB).toEqual(createInitialNoteState());
-    expect(state.historyViews.chrome).toEqual({ historyOpen: false, helpOpen: false, historySlotKey: null });
+    expect(state.historyViews.chrome).toEqual({ historyOpen: false, helpOpen: false, historySlotKey: null, historyAssetUrls: {} });
   });
 
   it('init full-folds the loaded log into the stored view', () => {

@@ -1,4 +1,5 @@
 import { askChromeSetHelpOpen } from './actionCreators/askChromeSetHelpOpen';
+import { askChromeSetHistoryAssetUrls } from './actionCreators/askChromeSetHistoryAssetUrls';
 import { askChromeSetHistoryOpen } from './actionCreators/askChromeSetHistoryOpen';
 import { askChromeSetHistorySlotKey } from './actionCreators/askChromeSetHistorySlotKey';
 
@@ -7,4 +8,5 @@ export const eventDocWorkspaceChromeApi = {
   askChromeSetHistoryOpen,
   askChromeSetHelpOpen,
   askChromeSetHistorySlotKey,
+  askChromeSetHistoryAssetUrls,
 };

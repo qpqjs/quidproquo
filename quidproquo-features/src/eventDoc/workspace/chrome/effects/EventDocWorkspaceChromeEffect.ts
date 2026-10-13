@@ -3,4 +3,5 @@ export enum EventDocWorkspaceChromeEffect {
   SetHistoryOpen = 'workspaceChromeSetHistoryOpen',
   SetHelpOpen = 'workspaceChromeSetHelpOpen',
   SetHistorySlotKey = 'workspaceChromeSetHistorySlotKey',
+  SetHistoryAssetUrls = 'workspaceChromeSetHistoryAssetUrls',
 }

@@ -5,6 +5,7 @@ import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceChromeEffect } from './effects/EventDocWorkspaceChromeEffect';
 import { EventDocWorkspaceChromeEffects } from './effects/EventDocWorkspaceChromeEffects';
 import { setHelpOpen } from './stateUpdaters/setHelpOpen';
+import { setHistoryAssetUrls } from './stateUpdaters/setHistoryAssetUrls';
 import { setHistoryOpen } from './stateUpdaters/setHistoryOpen';
 import { setHistorySlotKey } from './stateUpdaters/setHistorySlotKey';
 import { EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
@@ -17,4 +18,5 @@ export const eventDocWorkspaceChromeFoldReducer = buildEffectReducer<
   [EventDocWorkspaceChromeEffect.SetHistoryOpen]: setHistoryOpen,
   [EventDocWorkspaceChromeEffect.SetHelpOpen]: setHelpOpen,
   [EventDocWorkspaceChromeEffect.SetHistorySlotKey]: setHistorySlotKey,
+  [EventDocWorkspaceChromeEffect.SetHistoryAssetUrls]: setHistoryAssetUrls,
 }) as QpqReducer<EventDocWorkspaceChromeState, EventDocEvent>;
