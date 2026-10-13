@@ -125,4 +125,19 @@ describe('askMcpHandleRequest', () => {
       result: { content: [{ type: 'text', text: 'Forbidden: Not a Flow author' }], isError: true },
     });
   });
+
+  it("sends a call carrying a toolset's prefix straight to its runTool, without listing any toolset", () => {
+    const executed: ExecuteAction[] = [];
+    const prefixedConfig: McpConfig = {
+      ...config,
+      toolsets: [{ name: 'remote_template', listTools: 'remoteListFn', runTool: 'remoteRunFn', prefix: 'template' }],
+    };
+
+    runStory(askMcpHandleRequest(callTool('template_setLayout', { docId: 'd1' }), event), {
+      ...buildMocks(executed),
+      [McpActionType.ReadConfig]: prefixedConfig,
+    });
+
+    expect(executed.map(({ payload }) => payload!.functionName)).toEqual(['remoteRunFn']);
+  });
 });

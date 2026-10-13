@@ -2,6 +2,8 @@ export * from './askMcpEventDocAiAuthorise';
 export * from './askMcpEventDocAiDocToolRun';
 export * from './askMcpEventDocAiListDocs';
 export * from './askMcpEventDocAiListTools';
+export * from './askMcpEventDocAiOfferedRead';
 export * from './askMcpEventDocAiRunTool';
 export * from './buildMcpEventDocAis';
 export * from './buildMcpEventDocAiToolBindings';
+export * from './withoutMcpEventDocAiTools';

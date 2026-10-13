@@ -5,6 +5,10 @@ assembled quickly.
 
 ## vNext
 
+- Every API request now yields the new `askRouteAuthValidationResolveContext` action, in the auth preamble and again when the story session is built. The Lambda and dev-server runtimes register its default processor through `getRouteAuthValidationActionProcessor`; a runtime that builds its own action processor list without that resolver must add it, or every route request fails.
+- Building an API request's story session now fails the request when it errors, instead of running the route with no session (no user, no context). This only shows where a custom `askRouteAuthValidationDecode` or `askRouteAuthValidationResolveContext` override throws: the default processors never do. An override that used to fall back to an anonymous session now gets a failed request.
+- `defineEventDocRoutes` (and so `defineEventDoc` and `defineTenantedEventDoc`) returns `[registrationSetting, routes]` rather than just the routes, and `defineEventDocAi` adds a registration setting after the AI's own config. Config used as returned is unaffected, since QPQ flattens nested arrays; code that indexes, filters or maps over these results must allow for the extra setting.
+
 ## 0.1.30
 
 - `defineEmailSenderAllowList` addresses are now created as SES email identities by the deploy. If you already created one by hand in SES, delete it (or import it into the stack) before deploying, or the deploy fails because it already exists.

@@ -1,10 +1,9 @@
 import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { MCP_SERVER_CONFIG_SETTING_TYPE } from '../constants/mcpServerConfigSettingType';
-import { MCP_TOOLSET_CONFIG_SETTING_TYPE } from '../constants/mcpToolsetConfigSettingType';
 import { McpConfig } from '../models/McpConfig';
 import { McpServerQPQConfigSetting } from '../types/McpServerQPQConfigSetting';
-import { McpToolsetQPQConfigSetting } from '../types/McpToolsetQPQConfigSetting';
+import { buildMcpToolsets } from './buildMcpToolsets';
 
 /** defineMcpServer's setting plus every defineMcpToolset in the service. Null without defineMcpServer. */
 export const buildMcpConfig = (qpqConfig: QPQConfig): Nullable<McpConfig> => {
@@ -16,6 +15,6 @@ export const buildMcpConfig = (qpqConfig: QPQConfig): Nullable<McpConfig> => {
   return {
     serverName: server.serverName,
     tools: server.tools,
-    toolsets: qpqCoreUtils.getConfigSettings<McpToolsetQPQConfigSetting>(qpqConfig, MCP_TOOLSET_CONFIG_SETTING_TYPE).map(({ toolset }) => toolset),
+    toolsets: buildMcpToolsets(qpqConfig),
   };
 };

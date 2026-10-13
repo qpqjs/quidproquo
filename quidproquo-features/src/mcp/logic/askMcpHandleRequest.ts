@@ -33,7 +33,7 @@ export function* askMcpHandleRequest(body: unknown, event: HTTPEvent): AskRespon
       return buildMcpJsonRpcResult(id, {});
 
     case McpMethod.ToolsList: {
-      const bindings = yield* askMcpToolBindingsBuild(config, event);
+      const bindings = yield* askMcpToolBindingsBuild(config.tools, config.toolsets, event);
       return buildMcpJsonRpcResult(id, { tools: bindings.map(({ tool }) => tool) });
     }
 

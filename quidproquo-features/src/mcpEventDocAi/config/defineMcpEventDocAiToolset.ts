@@ -4,6 +4,7 @@ import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventD
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { defineMcpToolset } from '../../mcp/config/defineMcpToolset';
 import { MCP_DOC_ID_ARG } from '../constants/mcpDocIdArg';
+import { MCP_EVENT_DOC_AI_EXCLUDED_TOOLS_GLOBAL } from '../constants/mcpEventDocAiExcludedToolsGlobal';
 import { MCP_EVENT_DOC_AI_LIST_TOOLS_FN } from '../constants/mcpEventDocAiListToolsFn';
 import { MCP_EVENT_DOC_AI_RUN_TOOL_FN } from '../constants/mcpEventDocAiRunToolFn';
 import { McpEventDocAiToolName } from '../constants/McpEventDocAiToolName';
@@ -14,10 +15,10 @@ import { McpEventDocAiToolsetOptions } from '../types/McpEventDocAiToolsetOption
  * Offers every eventDoc AI's tools in this service on its MCP server, plus listDocs. Each AI tool takes a docId and
  * runs in that document's AI context, as it would in the chat.
  */
-export const defineMcpEventDocAiToolset = ({ userDirectoryName }: McpEventDocAiToolsetOptions): QPQConfig => {
+export const defineMcpEventDocAiToolset = ({ userDirectoryName, excludeTools = [] }: McpEventDocAiToolsetOptions): QPQConfig => {
   // Collection hooks (e.g. the tenant authoriser) resolve the caller through the eventDoc user-directory global, which
   // eventDoc routes set per route. An inline function's own globals reach everything it calls, so these carry it.
-  const globals = { [EVENT_DOC_USER_DIRECTORY_GLOBAL]: userDirectoryName };
+  const globals = { [EVENT_DOC_USER_DIRECTORY_GLOBAL]: userDirectoryName, [MCP_EVENT_DOC_AI_EXCLUDED_TOOLS_GLOBAL]: excludeTools };
 
   return [
     defineMcpToolset({

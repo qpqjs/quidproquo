@@ -21,7 +21,9 @@ function* askAssertDocReadable(eventDocAi: McpEventDocAi, event: HTTPEvent, docI
 
 /**
  * Runs an eventDoc AI tool's executor inside the same doc context the chat gives it (serviceName, type, docId), so
- * the tool cannot tell MCP from chat. Without a docId the context's docId is empty. Must run inside the call's storage scope.
+ * the tool cannot tell MCP from chat. A collection's docId is checked first, as its get route would; an AI over a store
+ * of its own resolves the id in its tools, as in the chat. Without a docId the context's docId is empty. Must run inside
+ * the call's storage scope.
  */
 export function* askMcpEventDocAiDocToolRun(
   eventDocAi: McpEventDocAi,
@@ -30,7 +32,7 @@ export function* askMcpEventDocAiDocToolRun(
   docId: Nullable<string>,
   args: Record<string, unknown>,
 ): AskResponse<unknown> {
-  if (docId) {
+  if (docId && eventDocAi.isCollection) {
     yield* askEventDocStoreProvide(eventDocAi.store, askAssertDocReadable(eventDocAi, event, docId));
   }
 

@@ -18,7 +18,7 @@ describe('buildMcpEventDocAis', () => {
     const eventDocAis = buildMcpEventDocAis(appConfig);
 
     expect(eventDocAis).toHaveLength(1);
-    expect(eventDocAis[0]).toMatchObject({ aiName: 'mimirPlans-ai', serviceName: 'mimir', type: 'plan', tools: [tool] });
+    expect(eventDocAis[0]).toMatchObject({ aiName: 'mimirPlans-ai', serviceName: 'mimir', type: 'plan', tools: [tool], isCollection: true });
     expect(eventDocAis[0].store).toMatchObject({ storeName: 'mimirPlans', type: 'plan', authorise: 'authoriseFn', scopeResolver: 'scopeFn' });
   });
 
@@ -29,5 +29,6 @@ describe('buildMcpEventDocAis', () => {
     ]);
 
     expect(eventDocAis[0].store).toMatchObject({ storeName: 'notes', type: 'note', authorise: undefined });
+    expect(eventDocAis[0].isCollection).toBe(false);
   });
 });

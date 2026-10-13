@@ -1,4 +1,4 @@
-import { Action, InlineFunctionActionType, KeyValueStoreActionType, runStory, StoryError } from 'quidproquo-core';
+import { Action, ConfigActionType, InlineFunctionActionType, KeyValueStoreActionType, runStory, StoryError } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -12,6 +12,7 @@ const event = { headers: {} } as unknown as HTTPEvent;
 
 const eventDocAis: McpEventDocAi[] = [
   {
+    isCollection: true,
     aiName: 'mimir',
     serviceName: 'mimir',
     type: 'plan',
@@ -24,8 +25,9 @@ const plan = { id: 'doc-1', code: 'P1', name: 'Onboarding plan', type: 'plan', u
 
 type ExecuteAction = Action<{ functionName: string; payload: unknown }> & { context?: Record<string, unknown> };
 
-const buildMocks = (plans: unknown[], executed: ExecuteAction[] = []) => ({
+const buildMocks = (plans: unknown[], executed: ExecuteAction[] = [], excludedTools: string[] = []) => ({
   [McpEventDocAiActionType.ReadConfig]: eventDocAis,
+  [ConfigActionType.GetGlobal]: excludedTools,
   [KeyValueStoreActionType.Query]: { items: plans },
   [InlineFunctionActionType.Execute]: (action: ExecuteAction) => {
     executed.push(action);
@@ -76,5 +78,26 @@ describe('askMcpEventDocAiRunTool', () => {
 
   it('fails for a tool it does not offer', () => {
     expect(() => runStory(askMcpEventDocAiRunTool({ name: 'dropTables', args: {}, event }), buildMocks([]))).toThrow(StoryError);
+  });
+
+  it('refuses a tool the toolset excludes, as if it did not exist', () => {
+    const executed: ExecuteAction[] = [];
+
+    expect(() =>
+      runStory(askMcpEventDocAiRunTool({ name: 'describeFlow', args: { flowId: 'f1' }, event }), buildMocks([], executed, ['describeFlow'])),
+    ).toThrow(/Unknown tool: describeFlow/);
+    expect(executed).toEqual([]);
+  });
+
+  it("hands a chat-only AI's docId straight to its tool, with no collection check", () => {
+    const executed: ExecuteAction[] = [];
+
+    runStory(askMcpEventDocAiRunTool({ name: 'describeFlow', args: { docId: 'reg-1', flowId: 'f1' }, event }), {
+      ...buildMocks([], executed),
+      [McpEventDocAiActionType.ReadConfig]: [{ ...eventDocAis[0], type: 'register', isCollection: false }],
+    });
+
+    expect(executed.map((action) => action.payload!.functionName)).toEqual(['describeFlowFn']);
+    expect(executed[0].context).toMatchObject({ 'event-doc-ai-context': { type: 'register', docId: 'reg-1' } });
   });
 });
