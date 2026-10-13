@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.31
+
+- features: `defineMcpServer` serves an MCP endpoint from a service, so AI clients can call its tools as the signed-in user (Bearer token checked against a user directory). It offers its own `tools` plus every `defineMcpToolset` in the service
+- features: `defineMcpEventDocAiToolset` puts every event-doc ai's tools on the MCP server, each taking a `docId`, plus a `listDocs` tool to find a doc by name. `excludeTools` hides tools, and names that clash across ais are offered as `<type>_<name>`
+- features: `defineMcpToolsetExport` and `defineMcpRemoteToolset` let one service's MCP server offer another service's toolsets under a prefix. The caller and their context cross the hop, the `Authorization`, `Cookie` and `x-api-key` headers don't
+- webserver: `askRouteAuthValidationResolveContext` lets a route's auth override add story context (a tenant's storage scope, say) once the caller is known. If it errors the request fails instead of running without that context
+- features: workspace chrome gains `historyAssetUrls` and `askChromeSetHistoryAssetUrls`, so the history panel can show assets like an adopted signature
+- features: log redaction hides Basic auth credentials, password included, wherever they turn up in a log
+
+### Breaking changes
+
+- every api request yields `askRouteAuthValidationResolveContext`; a runtime with its own processor list must register the resolver
+- a story session that fails to build now fails the request instead of running with no session
+- `defineEventDocRoutes` and `defineEventDocAi` return an extra registration setting; code indexing or mapping over their results must allow for it
+
 ## 0.1.30
 
 - core/actionprocessor-awslambda: `AiModel` gains Claude Opus 4.7, Opus 4.8, Sonnet 5, Opus 5, Opus 5.5, Sonnet 5.5, Fable 5 and Fable 5.1. `askAiGetModelRegions` returns the regions each model is offered in on the current platform, and on Bedrock the model id is resolved by region preference (au first, global for the global-only models)
