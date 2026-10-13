@@ -1,7 +1,6 @@
-import { askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
+import { AiToolDefinition, askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
-import { McpConfig } from '../models/McpConfig';
 import { McpTool } from '../models/McpTool';
 import { McpToolBinding } from '../models/McpToolBinding';
 import { McpToolset } from '../models/McpToolset';
@@ -15,12 +14,12 @@ function* askListToolset(toolset: McpToolset, event: HTTPEvent): AskResponse<Mcp
   return { toolset, tools };
 }
 
-/** Asks every toolset for its tools, then binds them with the server's own. Runs as the caller, in the context the route's auth resolved. */
-export function* askMcpToolBindingsBuild(config: McpConfig, event: HTTPEvent): AskResponse<McpToolBinding[]> {
+/** Asks every toolset for its tools, then binds them after `tools`. Runs as the caller, in the context the request's auth resolved. */
+export function* askMcpToolBindingsBuild(tools: AiToolDefinition[], toolsets: McpToolset[], event: HTTPEvent): AskResponse<McpToolBinding[]> {
   const listings: McpToolsetListing[] = [];
-  for (const toolset of config.toolsets) {
+  for (const toolset of toolsets) {
     listings.push(yield* askListToolset(toolset, event));
   }
 
-  return buildMcpToolBindings(config, listings);
+  return buildMcpToolBindings(tools, listings);
 }

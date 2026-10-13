@@ -55,10 +55,56 @@ Offers a pluggable source of tools on this service's MCP server. A toolset is a 
 | `listTools` | `string` | Inline function that gets `McpToolsetListToolsInput` and returns `McpTool[]`. |
 | `runTool` | `string` | Inline function that gets `McpToolsetRunToolInput` and returns the tool's result. |
 | `instructions` | `string` | Optional. Added to the server's `instructions` when a client connects. |
+| `prefix` | `string` | Optional. Every tool this toolset lists is named `<prefix>_…`, so a call to such a name goes straight to its `runTool` without listing every toolset first. Remote toolsets set it. |
 
 Both functions already run as the caller, with whatever context the route's auth resolved. The two inline functions must be registered separately with `defineInlineFunction`.
+
+Tool names must be unique across the server: the server's own `tools` come first, then each toolset's in config order, and on a clash the earlier tool wins.
+
+## Toolsets from another service
+
+One service's MCP server can offer the toolsets of other services, so a client connects once and reaches them all.
+
+In the service that owns the tools, `defineMcpToolsetExport()` offers its toolsets (its `defineMcpToolset` registrations) as two backend-only service functions, one to list the tools and one to run one:
+
+```typescript
+import { defineMcpEventDocAiToolset, defineMcpToolsetExport } from 'quidproquo-features';
+
+// in the template service
+export default [
+  defineMcpEventDocAiToolset({ userDirectoryName: 'users' }),
+  defineMcpToolsetExport(),
+];
+```
+
+In the service with the MCP server, `defineMcpRemoteToolset` adds them under a prefix:
+
+```typescript
+import { defineMcpRemoteToolset, defineMcpServer } from 'quidproquo-features';
+
+export default [
+  defineMcpServer({ userDirectoryName: 'users' }),
+  defineMcpRemoteToolset({
+    service: 'template',
+    prefix: 'template',
+    instructions: 'Tools named template_… work on templates. Find their docId with template_listDocs.',
+  }),
+];
+```
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `service` | `string` | – (required) | The service that calls `defineMcpToolsetExport`. |
+| `prefix` | `string` | – (required) | Put in front of each of its tool names (`template_setLayout`), so two services cannot clash. Letters, digits and dashes. |
+| `instructions` | `string` | – | Added to the server's `instructions`. The exporting service's own toolset instructions are not forwarded, so say here how a client finds the ids its tools take. |
+
+- Calls cross by service function, so the caller and their context (a tenant's storage scope, say) go with them, and the remote tools run as that caller. Auth happens once, at the MCP endpoint.
+- The request's `Authorization`, `Cookie` and `x-api-key` headers are removed before the hop: credentials never leave the endpoint.
+- A service that cannot list its tools is logged and offers none, so one service being down never takes the whole server with it.
+- A call to `<prefix>_…` goes straight to that service. Listing still asks every remote service, one hop each.
 
 ## Related
 
 - [defineMcpEventDocAiToolset](./mcp-event-doc-ai-toolset.md)
+- [askRouteAuthValidationResolveContext](../../actions/webserver/route-auth-validation/ask-route-auth-validation-resolve-context.md)
 - [defineEventDocAi](./event-doc-ai.md)

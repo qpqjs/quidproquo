@@ -15,7 +15,9 @@ const hasExecutor = (tool: AiToolDefinition): tool is ToolWithExecutor => !!tool
 const buildDocProperty = (eventDocAi: McpEventDocAi): Record<string, unknown> => ({
   [MCP_DOC_ID_ARG]: {
     type: 'string',
-    description: `Id of the ${eventDocAi.type} to work on, from ${McpEventDocAiToolName.ListDocs}. Needed by tools that read or change one ${eventDocAi.type}.`,
+    description: eventDocAi.isCollection
+      ? `Id of the ${eventDocAi.type} to work on, from ${McpEventDocAiToolName.ListDocs}. Needed by tools that read or change one ${eventDocAi.type}.`
+      : `Id of the ${eventDocAi.type} to work on. Needed by tools that read or change one ${eventDocAi.type}.`,
   },
 });
 
@@ -38,20 +40,39 @@ const buildListDocsBinding = (eventDocAis: McpEventDocAi[]): McpEventDocAiToolBi
   };
 };
 
-/** listDocs, then every eventDoc AI's tools with a docId argument added. Nothing at all when the service has no eventDoc AI. */
+// Tool names two of the service's AIs both use. Each AI's copy is then offered under its doc type, so neither is lost.
+const findSharedToolNames = (eventDocAis: McpEventDocAi[]): Set<string> => {
+  const names = eventDocAis.flatMap((eventDocAi) => [...new Set(eventDocAi.tools.filter(hasExecutor).map(({ name }) => name))]);
+
+  return new Set(names.filter((name, index) => names.indexOf(name) !== index));
+};
+
+/**
+ * listDocs (over the AIs whose store is a collection, when there are any), then every eventDoc AI's tools with a docId
+ * argument added. A name more than one AI uses is offered once per AI as `${type}_${name}`; every other name is
+ * unchanged. Nothing at all when the service has no eventDoc AI.
+ */
 export const buildMcpEventDocAiToolBindings = (eventDocAis: McpEventDocAi[]): McpEventDocAiToolBinding[] => {
   if (eventDocAis.length === 0) {
     return [];
   }
+
+  const sharedNames = findSharedToolNames(eventDocAis);
 
   const docBindings = eventDocAis.flatMap((eventDocAi) =>
     eventDocAi.tools.filter(hasExecutor).map((tool): McpEventDocAiToolBinding => ({
       kind: McpEventDocAiToolKind.Doc,
       executor: tool.executor,
       eventDocAi,
-      tool: { name: tool.name, description: tool.description, inputSchema: buildMcpToolInputSchema(tool.inputSchema, buildDocProperty(eventDocAi)) },
+      tool: {
+        name: sharedNames.has(tool.name) ? `${eventDocAi.type}_${tool.name}` : tool.name,
+        description: tool.description,
+        inputSchema: buildMcpToolInputSchema(tool.inputSchema, buildDocProperty(eventDocAi)),
+      },
     })),
   );
 
-  return [buildListDocsBinding(eventDocAis), ...docBindings];
+  const collections = eventDocAis.filter(({ isCollection }) => isCollection);
+
+  return [...(collections.length > 0 ? [buildListDocsBinding(collections)] : []), ...docBindings];
 };

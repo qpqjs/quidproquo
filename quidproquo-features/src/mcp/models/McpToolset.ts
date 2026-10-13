@@ -10,4 +10,7 @@ export type McpToolset = {
   runTool: string;
   // Added to the server's `instructions` on initialize.
   instructions?: string;
+  // Every tool this toolset lists is named `${prefix}_…`, so a call to such a name goes straight to its runTool
+  // without listing every toolset first (a remote toolset would otherwise cost a hop per service on every call).
+  prefix?: string;
 };

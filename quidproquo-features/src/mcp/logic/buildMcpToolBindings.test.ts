@@ -21,19 +21,19 @@ const listings: McpToolsetListing[] = [{ toolset, tools: [{ name: 'describeFlow'
 
 describe('buildMcpToolBindings', () => {
   it('offers the server tools, then toolset tools', () => {
-    const names = buildMcpToolBindings(config, listings).map(({ tool }) => tool.name);
+    const names = buildMcpToolBindings(config.tools, listings).map(({ tool }) => tool.name);
 
     expect(names).toEqual(['createPlan', 'describeFlow']);
   });
 
   it('skips server tools with no executor, since a browser answers those', () => {
-    const names = buildMcpToolBindings(config, listings).map(({ tool }) => tool.name);
+    const names = buildMcpToolBindings(config.tools, listings).map(({ tool }) => tool.name);
 
     expect(names).not.toContain('askUser');
   });
 
   it('binds a toolset tool to its toolset runTool, with its schema as listed', () => {
-    const describeFlow = buildMcpToolBindings(config, listings).find(({ tool }) => tool.name === 'describeFlow');
+    const describeFlow = buildMcpToolBindings(config.tools, listings).find(({ tool }) => tool.name === 'describeFlow');
 
     expect(describeFlow).toEqual({
       kind: McpToolKind.Toolset,
@@ -44,7 +44,7 @@ describe('buildMcpToolBindings', () => {
 
   it('keeps the first tool when two share a name', () => {
     const clash: McpToolsetListing[] = [{ toolset, tools: [{ name: 'createPlan', description: 'clash', inputSchema: {} }] }];
-    const bindings = buildMcpToolBindings(config, clash);
+    const bindings = buildMcpToolBindings(config.tools, clash);
 
     expect(bindings.filter(({ tool }) => tool.name === 'createPlan')).toEqual([expect.objectContaining({ kind: McpToolKind.Executor })]);
   });

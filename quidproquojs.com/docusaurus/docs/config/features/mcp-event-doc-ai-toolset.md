@@ -29,11 +29,15 @@ function defineMcpEventDocAiToolset(options: McpEventDocAiToolsetOptions): QPQCo
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `userDirectoryName` | `string` | – (required) | The user directory the collections' hooks resolve the caller against. |
+| `excludeTools` | `string[]` | `[]` | AI tool names not to offer, such as tools another toolset on the same server already offers. Excluded tools are neither listed nor runnable. |
 
 ## Notes
 
-- The toolset finds collections and AIs through the registration settings that `defineEventDocRoutes` and `defineEventDocAi` now add to config, so both must be in the same service.
+- The toolset finds collections and AIs through the registration settings that `defineEventDocRoutes` and `defineEventDocAi` add to config, so both must be in the same service.
 - It tells the client to look up a document id with `listDocs` first, and to ask the user if more than one document matches the name.
+- When two AIs in the service have a tool with the same name, each is offered as `<type>_<name>` so neither is lost. Every other name is unchanged.
+- An AI whose store is not a collection mounted with `defineEventDocRoutes` (one that only borrows the chat over a store of its own) is left out of `listDocs`, and its `docId` goes to its tools unchecked, for them to resolve as they do in the chat. When no AI in the service has a collection, there is no `listDocs`.
+- To offer these tools from another service's MCP server, add [defineMcpToolsetExport](./mcp-server.md#toolsets-from-another-service) here and `defineMcpRemoteToolset` there.
 
 ## Related
 

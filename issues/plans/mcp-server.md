@@ -61,7 +61,8 @@ The proof of concept hard-codes eventDoc and tenant handling into the server. Th
    - Credentials: Mímir accepts `Authorization: Basic base64(id:secret)` (checked on every request through client-access's `clientAccessAuthenticateSecret` service function, so nothing to refresh, and revoking applies at once) or `Bearer <token>` from the token endpoint. Mímir hashes the secret before the hop. The token endpoint and the direct check share `askClientAccessCheckCredentials`.
    - Mímir: decode override (caller becomes the client's owner) and resolve context override (the client's tenant, owner membership rechecked per request). No tool takes a tenant.
    - Logs: stored raw, redacted on read. `basicAuthParser` in the admin redaction pipeline sweeps the decoded secret from the whole log.
-3. OAuth, last, because Cognito has no dynamic client registration.
+3. Remote toolsets, built. A service exports its toolsets with `defineMcpToolsetExport()` (two backend-only service functions, `mcpExportListTools` and `mcpExportRunTool`); the MCP server's service adds them with `defineMcpRemoteToolset({ service, prefix })`. Tool names carry the prefix (`template_setLayout`), and a toolset with a `prefix` takes a call straight to its runTool without listing every toolset first. Calls cross by service function, so the caller and context (the tenant's storage scope) go with them; the request's `Authorization`, `Cookie` and `x-api-key` headers do not. A service that cannot list its tools is logged and offers none, rather than failing the server. Where two eventDoc AIs in one service share a tool name, each is offered as `${type}_${name}`. Kiln: the template service exports its four assistants (templates, template tests, transformers, content) and Mímir offers them under `template_`. Creating a template still needs an app tool like `createPlan` (Kiln's create route is permission-checked app code).
+4. OAuth, last, because Cognito has no dynamic client registration.
 
 ## Using it in doccypoccy (local only, on `harry-kiln`, uncommitted)
 
@@ -101,6 +102,8 @@ Client: the app client's Connect tab shows `claude mcp add --scope user --transp
 - [x] **End-to-end run.** Run against the local dev server with a dev token: tools/list, listTenants, listDocs, getPlan, wrong-tenant and bad-docId errors all behaved. Write tools and `createPlan` not yet exercised.
 
 ## Changelog
+
+- 2026-10-13: remote toolsets (`defineMcpToolsetExport`, `defineMcpRemoteToolset`, toolset `prefix` routing), shared-name handling in the eventDoc AI toolset, Kiln template assistants on Mímir's endpoint, tests for Mímir's MCP auth and the direct secret check.
 
 - 2026-10-12: removed the proof of concept's tenant-by-argument mode (`tenanted`, `listTenants`, `tenantId` on tools) and the tenant feature's `tenantListMine` service function and owner globals added for it. Tenancy comes only from route auth.
 
