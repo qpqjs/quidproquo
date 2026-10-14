@@ -13,5 +13,13 @@ export const getCdkAppCommand = (): string => {
   return `node -r "${tsNodeRegister}" "${cdkAppScript}"`;
 };
 
+// The CLI's own aws-cdk. The go:docker deployer image pins to it and a saved
+// build records it, so the CDK that deploys an assembly is always the one that
+// synthesized it and can read its schema.
+export const getCdkCliVersion = (): string => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('aws-cdk/package.json').version as string;
+};
+
 // The docker build context for the go:docker deployer image.
 export const getDockerDir = (): string => path.join(getOwnPackageRoot(), 'docker', 'cdk-deployer');
