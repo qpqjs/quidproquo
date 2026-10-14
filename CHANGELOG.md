@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.32
+
+- core/actionprocessor-awslambda/dev-server: `askKeyValueStoreUpdate` takes a `condition` (same vocabulary as a query filter) checked against the stored item; when it is false nothing is written and the action fails with `ConditionFailed`
+- features: event-doc lifecycle appends (publish, delete, restore, rename, recode, draft) write the summary row before the append returns, so a hook or reader that follows the append sees the change without waiting for the stream projector. Summary writes are guarded on the view's `eventId` so an older fold never overwrites a newer row
+
+### Breaking changes
+
+- `EventDocSummaryView` has a required `eventId`; hand-built summaries must set it, and `askEventDocSummaryViewWrite` now returns a boolean
+
 ## 0.1.31
 
 - features: `defineMcpServer` serves an MCP endpoint from a service, so AI clients can call its tools as the signed-in user (Bearer token checked against a user directory). It offers its own `tools` plus every `defineMcpToolset` in the service
