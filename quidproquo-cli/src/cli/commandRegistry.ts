@@ -46,7 +46,13 @@ export const cliCommands: CliCommand[] = [
   },
   {
     name: 'go:docker',
+    usageArgs: '[svc] [stack]',
     summary: 'Same as go (incl. positional args), but deploys in parallel via docker',
+    usageExtra: [
+      '--build-only builds and saves everything a deploy needs (no docker needed);',
+      '--from-build deploys the chosen stack from that saved build without rebuilding',
+      '(an api deploy also publishes the federated remote). One CI job per service and phase.',
+    ],
     run: (a) => require('../commands/goDocker').goDockerCommand(a),
   },
   {
