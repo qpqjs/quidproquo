@@ -1,4 +1,15 @@
-import { KvsCoreDataType, KvsUpdate, KvsUpdateActionType } from 'quidproquo-core';
+import {
+  askKeyValueStoreUpdateBase,
+  KvsCoreDataType,
+  KvsLogicalOperator,
+  KvsLogicalOperatorType,
+  KvsQueryCondition,
+  KvsQueryOperation,
+  KvsQueryOperationType,
+  KvsUpdate,
+  KvsUpdateActionType,
+  throwsError,
+} from 'quidproquo-core';
 
 type Row = Record<string, unknown>;
 
@@ -7,7 +18,7 @@ export type KvsUpdatePayload = {
   key: KvsCoreDataType;
   sortKey?: KvsCoreDataType;
   updates: KvsUpdate;
-  options?: { scope?: string };
+  options?: { scope?: string; condition?: KvsQueryOperation };
 };
 
 export type KvsUpdateMockConfig = {
@@ -20,25 +31,58 @@ export type KvsUpdateMockConfig = {
   onScope?: (scope: string | undefined) => void;
 };
 
+// The write condition as the processors evaluate it: against the stored row, a missing row holding only its keys.
+const conditionHolds = (row: Row, operation: KvsQueryOperation): boolean => {
+  if ('conditions' in operation) {
+    const logical = operation as KvsLogicalOperator;
+    const results = logical.conditions.map((condition) => conditionHolds(row, condition));
+    return logical.operation === KvsLogicalOperatorType.And ? results.every(Boolean) : results.some(Boolean);
+  }
+
+  const condition = operation as KvsQueryCondition;
+  const value = row[condition.key] as number | string | undefined | null;
+
+  switch (condition.operation) {
+    case KvsQueryOperationType.NotExists:
+      return value === undefined || value === null;
+    case KvsQueryOperationType.Exists:
+      return value !== undefined && value !== null;
+    case KvsQueryOperationType.Equal:
+      return value === condition.valueA;
+    case KvsQueryOperationType.LessThan:
+      return value !== undefined && value !== null && value < (condition.valueA as number | string);
+    default:
+      throw new Error(`Test KVS mock does not support update condition: ${condition.operation}`);
+  }
+};
+
 // In-memory stand-in for the KeyValueStore/Update action, matching the DynamoDB semantics
 // the real processor produces: UpdateItem UPSERTS (a missing row is created from the key),
-// Increment renders as `if_not_exists(attr, :default) + :value`, and the call returns the
-// whole row as stored afterwards (ReturnValues ALL_NEW).
+// Increment renders as `if_not_exists(attr, :default) + :value`, a false `condition` refuses
+// the write with ConditionFailed, and the call returns the whole row as stored afterwards
+// (ReturnValues ALL_NEW).
 //
-// Shared by the eventDoc round-trip tests because the append path now claims its log index
+// Shared by the eventDoc round-trip tests because the append path claims its log index
 // through this action, so every test that drives a real append needs it.
 export const createKvsUpdateMock =
   ({ tableFor, keyName, sortKeyName, onScope }: KvsUpdateMockConfig) =>
-  (action: { payload: KvsUpdatePayload }): Row => {
+  (action: { payload: KvsUpdatePayload }): Row | ReturnType<typeof throwsError> => {
     const { keyValueStoreName, key, sortKey, updates, options } = action.payload;
     onScope?.(options?.scope);
 
     const table = tableFor(options?.scope, keyValueStoreName);
 
-    let row = table.find((item) => item[keyName] === key && (sortKey === undefined || item[sortKeyName] === sortKey));
+    const existing = table.find((item) => item[keyName] === key && (sortKey === undefined || item[sortKeyName] === sortKey));
+    const base: Row = { [keyName]: key, ...(sortKey === undefined ? {} : { [sortKeyName]: sortKey }) };
+
+    if (options?.condition && !conditionHolds(existing ?? base, options.condition)) {
+      return throwsError(askKeyValueStoreUpdateBase.errorType.ConditionFailed, `KVS update condition failed in ${keyValueStoreName}`);
+    }
+
+    let row = existing;
 
     if (!row) {
-      row = { [keyName]: key, ...(sortKey === undefined ? {} : { [sortKeyName]: sortKey }) };
+      row = base;
       table.push(row);
     }
 

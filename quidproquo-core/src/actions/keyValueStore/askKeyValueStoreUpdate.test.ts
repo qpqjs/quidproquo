@@ -42,8 +42,18 @@ describe('askKeyValueStoreUpdate', () => {
     expect(() => requester.throw(new Error('kvs unavailable'))).toThrow('kvs unavailable');
   });
 
+  it('carries a write condition through in the options', () => {
+    const updates = { set: { name: 'new' } } as any;
+    const condition = { key: 'headEventId', operation: 'LessThan', valueA: 7 } as any;
+
+    const { action } = captureRequester(askKeyValueStoreUpdate('users', updates, 'user-1', undefined, { condition }));
+
+    expect(action.payload.options).toEqual({ condition });
+  });
+
   it('namespaces its error enum values under the action type', () => {
     expect(askKeyValueStoreUpdateBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Update}-StoreNotFound`);
     expect(askKeyValueStoreUpdateBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Update}-InvalidScope`);
+    expect(askKeyValueStoreUpdateBase.errorType.ConditionFailed).toBe(`${KeyValueStoreActionType.Update}-ConditionFailed`);
   });
 });

@@ -62,6 +62,12 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
         return typeof actual === typeof op.valueA && (actual as string | number) > (op.valueA as string | number);
       case KvsQueryOperationType.LessThanOrEqual:
         return typeof actual === typeof op.valueA && (actual as string | number) <= (op.valueA as string | number);
+      case KvsQueryOperationType.Between:
+        return (
+          typeof actual === typeof op.valueA &&
+          (actual as string | number) >= (op.valueA as string | number) &&
+          (actual as string | number) <= (op.valueB as string | number)
+        );
       default:
         throw new Error(`Test KVS mock does not support operator: ${op.operation}`);
     }

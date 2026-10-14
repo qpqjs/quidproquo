@@ -79,7 +79,8 @@ export function* askEventDocWriteForeignEvents(
     yield* askEventDocEventWrite(docId, event);
   }
 
-  // Folded from the localised log so the summary's createdBy/updatedBy are local ids too.
+  // Folded from the localised log so the summary's createdBy/updatedBy are local ids too. An unconditional put: an
+  // import may have rewritten the log, which is the one case the row must be allowed to move backwards.
   const summary = foldEventDocSummary(localised);
   yield* askValidateModelOrThrowError(summary, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(summary);

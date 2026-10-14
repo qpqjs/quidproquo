@@ -59,7 +59,17 @@ export interface KvsRepository {
   // BatchWriteItem. The caller validates the batch first either way.
   upsertMany(keyValueStoreName: string, items: any[], options?: { ifNotExists?: boolean }, scope?: string): Promise<KvsUpsertManyResult[]>;
 
-  update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any>;
+  // With a condition, the update only lands when it holds against the stored item (a missing
+  // row counts as holding only its keys, as dynamo's UpdateItem sees it); otherwise it throws
+  // ConditionalCheckFailedException and the row is untouched.
+  update(
+    keyValueStoreName: string,
+    key: string,
+    sortKey: string | undefined,
+    updates: KvsUpdate,
+    scope?: string,
+    options?: { condition?: KvsQueryOperation },
+  ): Promise<any>;
 
   delete(keyValueStoreName: string, key: string, scope?: string): Promise<boolean>;
 

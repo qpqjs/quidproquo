@@ -7,6 +7,9 @@ import {
   isErroredActionResult,
   KeyValueStoreActionType,
   kvsKey,
+  kvsLessThan,
+  kvsNotExists,
+  kvsOr,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   ProcessorFor,
@@ -47,7 +50,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, sortKey: 2, updates: { name: 'x' } });
 
-    expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' }, undefined);
+    expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' }, undefined, { condition: undefined });
     expect(resolveActionResult(result)).toEqual({ id: 1 });
   });
 
@@ -57,7 +60,26 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
 
     await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' } });
 
-    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined);
+    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined, { condition: undefined });
+  });
+
+  it('passes a write condition through to the repository', async () => {
+    repo.update.mockResolvedValue({});
+    const process = await getProcessor();
+
+    const condition = kvsOr([kvsNotExists('headEventId'), kvsLessThan('headEventId', 7)]);
+    await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' }, options: { condition } });
+
+    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined, { condition });
+  });
+
+  it('maps a failed condition to ConditionFailed', async () => {
+    repo.update.mockRejectedValue(Object.assign(new Error('condition failed'), { name: 'ConditionalCheckFailedException' }));
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpdateBase.errorType.ConditionFailed);
   });
 
   it('maps a missing store to the typed StoreNotFound', async () => {

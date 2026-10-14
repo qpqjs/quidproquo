@@ -1,5 +1,14 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsUpdateActionType } from 'quidproquo-core';
+import {
+  askKeyValueStoreUpdateBase,
+  buildTestQpqConfig,
+  defineKeyValueStore,
+  KeyValueStoreActionType,
+  kvsLessThan,
+  kvsNotExists,
+  kvsOr,
+  KvsUpdateActionType,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,7 +43,27 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     const result = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates });
 
     expect(result).toEqual([{ id: 'k1', updated: true }]);
-    expect(updateItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', updates, 'pk', 'k1', 'sk', 's1');
+    expect(updateItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', updates, 'pk', 'k1', 'sk', 's1', undefined);
+  });
+
+  it('passes a write condition through to the update', async () => {
+    vi.mocked(updateItem).mockResolvedValue({ id: 'k1', headEventId: 7 } as any);
+    const processor = await resolveProcessor();
+
+    const condition = kvsOr([kvsNotExists('headEventId'), kvsLessThan('headEventId', 7)]);
+    const updates = [{ attributePath: 'headEventId', action: KvsUpdateActionType.Set, value: 7 }];
+    await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates, options: { condition } });
+
+    expect(vi.mocked(updateItem).mock.calls[0][7]).toEqual(condition);
+  });
+
+  it('maps a failed condition to ConditionFailed', async () => {
+    vi.mocked(updateItem).mockRejectedValue(Object.assign(new Error('The conditional request failed'), { name: 'ConditionalCheckFailedException' }));
+    const processor = await resolveProcessor();
+
+    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates: [] });
+
+    expect(error?.errorType).toBe(askKeyValueStoreUpdateBase.errorType.ConditionFailed);
   });
 
   it('mirrors a scoped GSI partition key update onto its hidden copy and strips the result', async () => {

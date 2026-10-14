@@ -35,7 +35,9 @@ const getProcessKeyValueStoreUpdate = (
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
       validateScopedKvsUpdatesOrThrow(qpqConfig, keyValueStoreName, scope, updates);
 
-      const result = await repository.update(keyValueStoreName, String(key), sortKey ? String(sortKey) : undefined, updates, scope);
+      const result = await repository.update(keyValueStoreName, String(key), sortKey ? String(sortKey) : undefined, updates, scope, {
+        condition: options?.condition,
+      });
 
       // Stand in for the change stream, AFTER the write has committed. An update always
       // targets an existing item (UpdateItem upserts, but the result is the item as it now
@@ -51,6 +53,8 @@ const getProcessKeyValueStoreUpdate = (
       return actionResult(result);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
+        // Nothing was written, so no stream event was emitted above either.
+        ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpdateBase.errorType.ConditionFailed, 'KVS update condition failed'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpdateBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpdateBase.errorType.StoreNotFound, error.message),
       });

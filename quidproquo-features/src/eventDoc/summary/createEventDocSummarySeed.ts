@@ -13,4 +13,6 @@ export const createEventDocSummarySeed = (): EventDocSummaryView => ({
   createdBy: 'NO_INIT',
   updatedBy: 'NO_INIT',
   versions: [],
+  // Nothing folded yet; INIT_STATE is event 0.
+  eventId: -1,
 });

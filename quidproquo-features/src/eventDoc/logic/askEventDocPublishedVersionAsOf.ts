@@ -21,7 +21,9 @@ export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTi
     return null;
   }
 
-  const stateAtVersion = yield* askEventDocDocumentStateAsOf(id, version.eventId);
+  // Consistent: the version's head is usually the Publish event written moments earlier, and a stale gap read would
+  // fold short of it.
+  const stateAtVersion = yield* askEventDocDocumentStateAsOf(id, version.eventId, { consistentRead: true });
   if (!stateAtVersion) {
     return null;
   }

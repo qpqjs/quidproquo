@@ -28,7 +28,9 @@ import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
 import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 import { askEventDocHookStates } from './askEventDocHookStates';
+import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
 import { askEventDocValidateAppend } from './askEventDocValidateAppend';
+import { isEventDocReservedEffect } from './isEventDocReservedEffect';
 
 /** Options shared by the single and batch appends (their defaults differ). */
 export type EventDocEventAppendOptions = {
@@ -40,7 +42,8 @@ export type EventDocEventAppendOptions = {
 /**
  * Append an event at head + 1 with a conditional write; a Conflict re-laps by advancing the held state past
  * the winners and validating again, up to EVENT_DOC_APPEND_MAX_RETRIES. Hooks run after the write, outside the retry.
- * The summary read model is maintained by the stream projector, not here.
+ * A reserved lifecycle event brings the summary row up to date before this returns, so a reader that follows the
+ * append sees it; a domain event leaves the row to the stream projector.
  */
 const isSlotRaceError = (errorType: string): boolean =>
   errorType === askKeyValueStoreUpsertBase.errorType.Conflict || errorType === askKeyValueStoreUpsertBase.errorType.WriteContention;
@@ -109,12 +112,14 @@ export function* askEventDocEventAppend(
 
   const event = result.result;
 
+  const refolded = isEventDocReservedEffect(event.type) ? yield* askEventDocSummaryRefold(modelId, event.payload.metadata.eventId) : null;
+
   // Hooks run outside the retry: a hook that throws Conflict must not re-run the append.
   const { onPublish, onAppend } = yield* askEventDocStoreRead();
   const firePublishHook = !!onPublish && event.type === EventDocEffect.Publish;
 
   if (firePublishHook || onAppend) {
-    const summary = yield* askEventDocGetByIdOrThrow(modelId);
+    const summary = refolded ?? (yield* askEventDocGetByIdOrThrow(modelId));
     const { state, previousState } = yield* askEventDocHookStates(modelId, event);
 
     if (firePublishHook) {

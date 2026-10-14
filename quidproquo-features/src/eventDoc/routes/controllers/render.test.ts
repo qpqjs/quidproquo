@@ -79,6 +79,7 @@ const buildSummary = (versions: EventDocVersion[]): EventDocSummary => ({
   createdBy: 'user-1',
   updatedBy: 'user-1',
   versions,
+  eventId: eventId(3),
 });
 
 const httpEvent = (query: Record<string, string>): HTTPEvent => ({

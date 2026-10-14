@@ -1,11 +1,15 @@
 import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { KvsCoreDataType, KvsUpdate } from './types';
+import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from './types';
 
 export type KeyValueStoreUpdateOptions = {
   // Composed into the partition key value by the processor; requires a string-typed partition key.
   scope?: string;
+  // Evaluated against the item as stored before the update; when false nothing is written and the
+  // action fails with ConditionFailed. A missing item evaluates as having no attributes, so a
+  // NotExists leg passes for it. Same vocabulary as a query filter.
+  condition?: KvsQueryOperation;
 };
 
 export const askKeyValueStoreUpdateBase = createActionRequester<unknown>()({
@@ -15,6 +19,10 @@ export const askKeyValueStoreUpdateBase = createActionRequester<unknown>()({
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
+    // The write's `condition` was false against the stored item, so nothing was written. Final for
+    // this attempt and distinct from Upsert's Conflict: a caller guarding a watermark treats it as
+    // "something newer is already stored", not as a race to retry.
+    'ConditionFailed',
   ],
   getPayload: (
     keyValueStoreName: string,

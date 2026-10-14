@@ -59,6 +59,7 @@ function* askKeyValueStoreUpdate<Value>(
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `scope` | `string` | – | Optional storage scope. The processor composes it into the partition key value, so the update only addresses the record written under that scope (used by tenant/scoped features). Requires the store's partition key to be string-typed. |
+| `condition` | `KvsQueryOperation` | – | Checked against the item as stored before the update. When it is false nothing is written and the action fails with `ConditionFailed`. A missing item counts as having no attributes, so a `NotExists` leg passes for it. Uses the same operations as a query filter. |
 
 ## Update operations (`KvsUpdate`)
 
@@ -103,6 +104,7 @@ Each `path` is a `KvsAttributePath` — either a top-level attribute name (`'bal
 | `KeyValueStoreUpdateErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreUpdateErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, the partition-key value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped calls reject it too), a scoped update names an attribute containing `@@QPQ`, or a scoped update targets an [index](../../../config/core/key-value-store.md#indexes-gsis) partition key with anything other than a whole-value `Set`/`SetIfNotExists`/`Remove` of the declared type (`Increment`, `Add`, `Delete`, and nested paths are refused). |
 | `KeyValueStoreUpdateErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
+| `KeyValueStoreUpdateErrorTypeEnum.ConditionFailed` | The `condition` was false against the stored item, so nothing was written. Final for this attempt, not a race to retry: treat it as "something newer is already stored". |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

@@ -19,6 +19,7 @@ import { eventDocEventsStoreName } from '../../constants/eventDocEventsStoreName
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../../constants/eventDocSnapshotsStoreName';
 import { EventDocEffect, EventDocEvent, EventDocSnapshotViews } from '../../models';
+import { foldEventDocSummary } from '../../summary';
 import { createKvsUpdateMock } from '../../testing/kvsUpdateActionMock';
 import { EventDocStoredSnapshot } from '../../types/EventDocStoredSnapshot';
 import { projectEventDocSummary } from './eventDocSummaryProjector';
@@ -194,7 +195,7 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
       });
       return {
         document: { foldedEvents: events.length },
-        summary: { name: 'from-fold' },
+        summary: { ...foldEventDocSummary(events), name: 'from-fold' },
       };
     },
   };
@@ -286,7 +287,7 @@ describe('projectEventDocSummary snapshots', () => {
     // Only the document row carries the manifest, and it lands LAST — the set's commit
     // marker, so a seed reader anchored on it never sees a partially written set.
     const summaryRow = rows.find((row) => row.pk === 'doc-1#summary')!;
-    expect(summaryRow.data).toEqual({ type: 'inline', snapshot: { name: 'from-fold' } });
+    expect(summaryRow.data).toEqual({ type: 'inline', snapshot: expect.objectContaining({ name: 'from-fold' }) });
   });
 
   it('derives the summary row from the fold, not a whole-log refold', () => {
@@ -320,7 +321,7 @@ describe('projectEventDocSummary snapshots', () => {
         ? ''
         : {
             document: {},
-            summary: { name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
+            summary: { ...foldEventDocSummary(action.payload.args[0]), name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
           };
     // A fresh event id so the seed-at-event replay skip doesn't short-circuit the fold.
     tables[eventDocEventsStoreName(STORE)].push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
@@ -455,7 +456,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
         member: action.payload.functionName,
         input: { events, seedViews },
       });
-      return { document: { huge: 'x'.repeat(301 * 1024) }, summary: { name: 'from-fold' } };
+      return { document: { huge: 'x'.repeat(301 * 1024) }, summary: { ...foldEventDocSummary(LOG), name: 'from-fold' } };
     };
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
@@ -512,7 +513,12 @@ describe('projectEventDocSummary incremental snapshots', () => {
     // seed's own summary view rather than trusting it landed.
     const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
-      { pk: 'doc-1#summary', sk: eventId(1), type: 'template', data: { type: 'inline', snapshot: { name: 'from-seed' } } },
+      {
+        pk: 'doc-1#summary',
+        sk: eventId(1),
+        type: 'template',
+        data: { type: 'inline', snapshot: { ...foldEventDocSummary(LOG), name: 'from-seed' } },
+      },
       {
         pk: 'doc-1#document',
         sk: eventId(1),

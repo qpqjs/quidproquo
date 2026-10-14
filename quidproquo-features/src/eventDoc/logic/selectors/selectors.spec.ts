@@ -23,6 +23,7 @@ const model = (versions: EventDocVersion[]): EventDocSummary => ({
   createdBy: 'user-1',
   updatedBy: 'user-1',
   versions,
+  eventId: eventId(0),
 });
 
 const v = (version: number, publishedAt?: string): EventDocVersion => ({

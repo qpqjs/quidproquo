@@ -1,13 +1,31 @@
-import { KvsCoreDataType, KvsUpdate } from 'quidproquo-core';
+import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from 'quidproquo-core';
 
 import { DynamoDBClient, ReturnValue, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';
 import { buildDynamoKey } from './utils/buildDynamoKey';
 import { convertDynamoMapToObject } from './convertDynamoMapToObject';
-import { buildDynamoUpdateExpression, buildUpdateExpressionAttributeNames, buildUpdateExpressionAttributeValues } from './qpqDynamoOrm';
+import {
+  buildDynamoQueryExpression,
+  buildDynamoUpdateExpression,
+  buildExpressionAttributeNames,
+  buildExpressionAttributeValues,
+  buildUpdateExpressionAttributeNames,
+  buildUpdateExpressionAttributeValues,
+} from './qpqDynamoOrm';
 
-/** Apply a kvs update to one item and return the full item as stored after the update. */
+// Placeholders are hashed from the attribute name or the value, so the update's and the condition's maps agree
+// wherever they overlap and can simply be merged. Empty maps must stay undefined: DynamoDB rejects an empty one.
+const mergeExpressionMaps = <T>(...maps: (Record<string, T> | undefined)[]): Record<string, T> | undefined => {
+  const merged = Object.assign({}, ...maps.filter((map) => map !== undefined));
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+};
+
+/**
+ * Apply a kvs update to one item and return the full item as stored after the update. With `condition`, the write is
+ * guarded by a ConditionExpression over the stored item and a failed check throws ConditionalCheckFailedException.
+ */
 export async function updateItem<Item>(
   tableName: string,
   region: string,
@@ -16,6 +34,7 @@ export async function updateItem<Item>(
   key: KvsCoreDataType,
   sortKeyName?: string,
   sortKey?: KvsCoreDataType,
+  condition?: KvsQueryOperation,
 ): Promise<Item> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
@@ -24,8 +43,9 @@ export async function updateItem<Item>(
       TableName: tableName,
       Key: buildDynamoKey(keyName, key, sortKeyName, sortKey),
       UpdateExpression: buildDynamoUpdateExpression(update),
-      ExpressionAttributeValues: buildUpdateExpressionAttributeValues(update),
-      ExpressionAttributeNames: buildUpdateExpressionAttributeNames(update),
+      ConditionExpression: buildDynamoQueryExpression(condition),
+      ExpressionAttributeValues: mergeExpressionMaps(buildUpdateExpressionAttributeValues(update), buildExpressionAttributeValues([condition])),
+      ExpressionAttributeNames: mergeExpressionMaps(buildUpdateExpressionAttributeNames(update), buildExpressionAttributeNames([condition])),
       ReturnValues: ReturnValue.ALL_NEW,
     }),
   );

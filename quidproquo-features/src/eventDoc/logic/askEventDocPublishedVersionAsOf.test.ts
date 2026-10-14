@@ -55,6 +55,7 @@ const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): 
   createdBy: 'user-1',
   updatedBy: 'user-1',
   versions,
+  eventId: eventId(5),
 });
 
 // v1 published 03-01 (head @1), v2 published 05-01 (head @3), v3 published 06-01 but not effective
@@ -106,28 +107,54 @@ const skAtOrBefore = (keyCondition: KvsQueryOperation): number | undefined => {
 // action, so the mock partitions by store name: no snapshots exist (the resolver folds
 // from scratch), and the registered fold echoes the event ids it was handed so the
 // assertions can see exactly which prefix reached it.
-const resolveAsOf = (summary: EventDocSummary | null, clock: string) =>
-  runStory(askEventDocProvideStore({ storeName: STORE_NAME, type: 'template' }, askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime)), {
-    [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation } }) => {
-      if (action.payload.keyValueStoreName === SNAPSHOTS_STORE_NAME) {
-        return { items: [], nextPageKey: undefined };
-      }
-      if (action.payload.keyValueStoreName === EVENTS_STORE_NAME) {
-        const upTo = skAtOrBefore(action.payload.keyCondition);
-        return { items: storedEvents.filter((row) => upTo === undefined || row.sk <= upTo), nextPageKey: undefined };
-      }
-      return { items: summary ? [summary] : [], nextPageKey: undefined };
-    },
+let eventQueries: { consistentRead?: boolean }[] = [];
 
-    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) =>
-      action.payload.functionName === 'getSnapshotCacheKey'
-        ? ''
-        : {
-            foldedEventIds: action.payload.args[0].map((event) => event.payload.metadata.eventId),
-          },
-  });
+const resolveAsOf = (summary: EventDocSummary | null, clock: string) => {
+  eventQueries = [];
+
+  return runStory(
+    askEventDocProvideStore({ storeName: STORE_NAME, type: 'template' }, askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime)),
+    {
+      [KeyValueStoreActionType.Query]: (action: {
+        payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { consistentRead?: boolean } };
+      }) => {
+        if (action.payload.keyValueStoreName === SNAPSHOTS_STORE_NAME) {
+          return { items: [], nextPageKey: undefined };
+        }
+        if (action.payload.keyValueStoreName === EVENTS_STORE_NAME) {
+          eventQueries.push({ consistentRead: action.payload.options?.consistentRead });
+          const upTo = skAtOrBefore(action.payload.keyCondition);
+          return { items: storedEvents.filter((row) => upTo === undefined || row.sk <= upTo), nextPageKey: undefined };
+        }
+        return { items: summary ? [summary] : [], nextPageKey: undefined };
+      },
+
+      [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) =>
+        action.payload.functionName === 'getSnapshotCacheKey'
+          ? ''
+          : {
+              foldedEventIds: action.payload.args[0].map((event) => event.payload.metadata.eventId),
+            },
+    },
+  );
+};
 
 describe('askEventDocPublishedVersionAsOf', () => {
+  it('folds the version state with a consistent read, since its head was usually written moments earlier', () => {
+    resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_DRAFT]), '2026-07-15T00:00:00.000Z');
+
+    expect(eventQueries.length).toBeGreaterThan(0);
+    expect(eventQueries.every((query) => query.consistentRead === true)).toBe(true);
+  });
+
+  it('answers from the summary row as stored, which is why a lifecycle append keeps that row current', () => {
+    // The log already holds events past v1's head, but the row only lists v1: the resolver trusts the row. The append
+    // path writes the row before returning (askEventDocProjectAfterAppend), so in practice it never reads a stale one.
+    const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_DRAFT]), '2026-07-15T00:00:00.000Z');
+
+    expect(slice?.version).toEqual(VERSION_1);
+  });
+
   it('returns the effective version with the log truncated at its head', () => {
     const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_DRAFT]), '2026-07-15T00:00:00.000Z');
 

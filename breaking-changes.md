@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocSummaryView` (and so `EventDocSummary`) has a new required `eventId: number`, the event the view is folded through; `applyEventDocSummaryEvent` sets it on every event, so folded views carry it automatically. Code that builds a summary by hand (test fixtures, a custom `foldSnapshotViews` that assembles the summary itself) must add it: the projector now parses the fold's summary view with `eventDocSummaryViewSchema` and rederives the row from the log when it does not parse. Rows and snapshots stored before the field existed are handled the same way, on their next write. `askEventDocSummaryViewWrite` now returns `boolean` (false when a newer row refused the write) and every summary write is guarded on `eventId`; reserved lifecycle appends (publish, delete, restore, rename, recode, draft) write the summary row before the append returns, so a hook or a reader that follows the append sees the change without waiting for the stream projector.
+
 ## 0.1.31
 
 - Every API request now yields the new `askRouteAuthValidationResolveContext` action, in the auth preamble and again when the story session is built. The Lambda and dev-server runtimes register its default processor through `getRouteAuthValidationActionProcessor`; a runtime that builds its own action processor list without that resolver must add it, or every route request fails.

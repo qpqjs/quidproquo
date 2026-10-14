@@ -210,6 +210,42 @@ export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRep
         expect((await repo.get('users', 'u1')).name).toBe('Joey');
       });
 
+      // A watermark guard: "no stamp yet, or the stored stamp is below mine".
+      const newerThan = (headEventId: number) => ({
+        operation: KvsLogicalOperatorType.Or,
+        conditions: [
+          { key: 'headEventId', operation: KvsQueryOperationType.NotExists },
+          { key: 'headEventId', operation: KvsQueryOperationType.LessThan, valueA: headEventId },
+        ],
+      });
+
+      it('applies an update whose condition holds, on a missing row and on an older one', async () => {
+        const repo = usersStore();
+        await repo.update('users', 'u1', undefined, [{ attributePath: 'headEventId', action: KvsUpdateActionType.Set, value: 3 }], undefined, {
+          condition: newerThan(3),
+        });
+        await repo.update('users', 'u1', undefined, [{ attributePath: 'headEventId', action: KvsUpdateActionType.Set, value: 5 }], undefined, {
+          condition: newerThan(5),
+        });
+
+        expect(await repo.get('users', 'u1')).toEqual({ id: 'u1', headEventId: 5 });
+      });
+
+      it('throws a ConditionalCheckFailedException and leaves the row untouched when the condition fails', async () => {
+        const repo = usersStore();
+        await repo.upsert('users', { id: 'u1', name: 'Joe', headEventId: 5 });
+
+        const error = await repo
+          .update('users', 'u1', undefined, [{ attributePath: 'headEventId', action: KvsUpdateActionType.Set, value: 4 }], undefined, {
+            condition: newerThan(4),
+          })
+          .catch((e) => e);
+
+        expect(error).toBeInstanceOf(Error);
+        expect(error.name).toBe('ConditionalCheckFailedException');
+        expect(await repo.get('users', 'u1')).toEqual({ id: 'u1', name: 'Joe', headEventId: 5 });
+      });
+
       it('Increment seeds from defaultValue then adds when attribute is missing', async () => {
         const repo = usersStore();
         await repo.upsert('users', { id: 'u1' });

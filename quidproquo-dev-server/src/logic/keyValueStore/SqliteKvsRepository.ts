@@ -375,9 +375,21 @@ export class SqliteKvsRepository implements KvsRepository {
     );
   }
 
-  async update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any> {
+  async update(
+    keyValueStoreName: string,
+    key: string,
+    sortKey: string | undefined,
+    updates: KvsUpdate,
+    scope?: string,
+    options?: { condition?: KvsQueryOperation },
+  ): Promise<any> {
     const access = this.accessStore(keyValueStoreName);
     const scopeValue = scope ?? '';
+    const condition = options?.condition;
+
+    if (condition) {
+      validateKvsQueryOperation(condition);
+    }
 
     const pk = coerceKvsKeyValue(key, access.storeConfig.partitionKey.type);
     const sk = access.hasSortKey && sortKey !== undefined ? coerceKvsKeyValue(sortKey, access.storeConfig.sortKeys[0].type) : null;
@@ -396,6 +408,10 @@ export class SqliteKvsRepository implements KvsRepository {
             [access.storeConfig.partitionKey.key]: pk,
             ...(access.hasSortKey && sortKey !== undefined ? { [access.storeConfig.sortKeys[0].key]: sk } : {}),
           };
+
+      if (condition && !evaluateKvsQueryOperation(currentItem, condition, access.storeConfig)) {
+        throw new ConditionalCheckFailedException(`KVS update condition failed in '${keyValueStoreName}'`);
+      }
 
       const updatedItem = applyUpdateToItem(currentItem, updates);
 
