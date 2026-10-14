@@ -28,12 +28,27 @@ Running `qpq` with no command opens an interactive menu. Every command also take
 | --- | --- |
 | `qpq setup` | Prepares a cloud environment for its first deploy: checks every step (credentials, IAM, hosted zones, bucket names, CDK bootstrap, then the account, domain and bootstrap stacks with the GitHub OIDC provider and deploy role they create), shows what is already in place, and runs the ones you tick in order. Services are deployed afterwards with `qpq go` or `qpq go:docker`. `--check` only reports, `--yes` runs everything, `--only <ids>` a subset |
 | `qpq go [svc] [stack]` | Deploys services. Interactive unless you pass the positional args |
-| `qpq go:docker` | The same, but deploys in parallel via docker |
+| `qpq go:docker` | The same, but deploys in parallel via docker. `--build-only` and `--from-build` split it across machines (see below) |
 | `qpq synth [service]` | Synthesises the configs to `dist/apps/<app>/infrastructure` without deploying |
 | `qpq teardown` | Destroys the web, api, and inf stacks for selected services |
 | `qpq clear-resources` | Empties selected buckets and tables. Data only, stacks are untouched |
 
 For `go`, `svc` is `all`, a comma-separated list, or one of `account`, `domain`, `bootstrap`. `stack` is `all`, `inf`, `api`, `web`, or `views`. A full `all all` or `all api` deploy also publishes federated backends.
+
+**Splitting a docker deploy across machines**
+
+`qpq go:docker` can stop after its build half and resume from the result on another machine, so a CI deploy of a multi-service app can run one job per service and phase while keeping the orders a single `go:docker all all` enforces: every inf stack lands before any api stack, and each api deploy is followed by its federated publish.
+
+| Command | Does |
+| --- | --- |
+| `qpq go:docker <svc> <stack> --build-only` | Builds the workspace, bundles the api, views and federated remote, synthesises the CDK assembly and writes a manifest. No docker needed. AWS credentials are, since `cdk synth` looks up hosted zones and VPCs |
+| `qpq go:docker <svc> <stack> --from-build` | Deploys the chosen stack from that saved build without rebuilding. After `api` it also publishes the federated remote. Needs docker and the same `--deployment`; the workspace does not need to be built |
+
+The build prints the directories that make up each service's saved build: `dist/qpq/go-docker/<app>/<svc>` (the assembly and the manifest), plus `dist/apps/<app>/services/<svc>/views` and `dist/apps/<app>/services/<svc>/service-remote-published` when the service has them. Upload those as the job's artifact. A build made with `all` can deploy any stack. One made with a single stack can only deploy that stack, so a build for `inf` cannot deploy `api` and skip the publish.
+
+The CI shape is a build matrix (`<svc> all --build-only`, one job per service, in parallel), then `<svc> inf --from-build` for every service, then `api` and `web`, then `views`, each job downloading its artifact first. The `qpq:predeploy` hook runs in the build half only. The saved build holds your bundled code and synthesised templates, never credentials; keep the artifact retention short all the same.
+
+`GO_DOCKER_BUILD_CONCURRENCY` caps how many bundles and synths run at once and defaults to the machine's core count. `GO_DOCKER_DEPLOY_CONCURRENCY` caps the deploy containers and defaults to unlimited.
 
 **Federated remotes**
 
