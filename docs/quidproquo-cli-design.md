@@ -240,7 +240,13 @@ implementation:
   one CDK cloud assembly per service via `cdk synth --app <workspace app>`),
   then docker waves (inf → api+web → views sync). The deployer Dockerfile
   ships inside quidproquo-cli (`docker/`), pinned to the CLI's own aws-cdk
-  version. Same knobs: GO_DOCKER_BUILD_CONCURRENCY / GO_DOCKER_DEPLOY_CONCURRENCY.
+  version. Same knobs: GO_DOCKER_BUILD_CONCURRENCY (default: the core count) /
+  GO_DOCKER_DEPLOY_CONCURRENCY. `--build-only` stops after the local builds and
+  writes a per-service manifest (`dist/qpq/go-docker/<app>/<svc>/deploy.json`,
+  beside the assembly) with the stack names, views destinations and federated
+  store resolved from the live config; `--from-build` runs the docker waves from
+  that, so a CI deploy can run one job per service and phase on machines that
+  never build the workspace.
 - **doccypoccy is slimmed**: tools/ deleted, 33 per-service rspack.config.ts
   deleted, ports migrated to defineDevServerOptions, chromium layer declares
   `modules: ['@sparticuz/chromium']` (fixing the found bug), the ignore-cruft
