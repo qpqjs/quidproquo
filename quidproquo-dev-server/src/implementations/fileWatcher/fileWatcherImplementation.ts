@@ -13,7 +13,6 @@ import {
 } from 'quidproquo-core';
 import { StorageDriveEvent, StorageDriveEventType } from 'quidproquo-webserver';
 
-import * as chokidar from 'chokidar';
 import { randomUUID } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -23,6 +22,7 @@ import { trackInFlight } from '../../logic';
 import { DevServerPluginStop } from '../../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerLogger } from '../logger';
+import { watchStorageDirectory } from './watchStorageDirectory';
 
 interface FileEventPayload {
   service: string;
@@ -57,28 +57,6 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
   } catch (error) {
     console.error('Error creating storage directory:', error);
   }
-
-  // Create a watcher for the storage directory. Requires chokidar v3: on macOS
-  // v3 watches via FSEvents (one fd for the whole tree), while v4 dropped
-  // FSEvents and holds a kqueue fd PER FILE — high-churn drives (qpq-logs
-  // writes a file per story execution) then grow the fd table until
-  // child_process.spawn fails with EBADF (~80k fds), killing anything that
-  // launches a subprocess (e.g. puppeteer).
-  const watcher = chokidar.watch(storagePath, {
-    persistent: true,
-    ignoreInitial: true, // Don't fire events for existing files
-    followSymlinks: false,
-    awaitWriteFinish: {
-      stabilityThreshold: 500, // Wait for file to be stable for 500ms
-      pollInterval: 100,
-    },
-    ignored: [
-      '**/node_modules/**',
-      '**/.git/**',
-      '**/.*', // Ignore hidden files
-      '**/*.tmp', // Ignore temp files
-    ],
-  });
 
   // Parse file path to extract service, drive, and relative filepath
   const parseFilePath = (fullPath: string): FileEventPayload | null => {
@@ -247,22 +225,19 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     await handleFileDelete(filePath);
   };
 
-  // Set up event listeners. Chokidar does not await its listeners either, so a
-  // storage-drive handler is in-flight work exactly like a queue message is:
-  // without tracking it, a restart kills a drive event mid-story.
-  watcher
-    .on('add', (filePath) => {
-      void trackInFlight(handleWatcherAdd(filePath));
-    })
-    .on('unlink', (filePath) => {
-      void trackInFlight(handleWatcherUnlink(filePath));
-    })
-    .on('error', (error) => {
-      console.error('File watcher error:', error);
-    })
-    .on('ready', () => {
-      console.log(`File watcher ready. Watching: ${storagePath}`);
-    });
+  // The watcher does not await its callbacks, so a storage-drive handler is
+  // in-flight work exactly like a queue message is: without tracking it, a
+  // restart kills a drive event mid-story.
+  const onFileCreated = (filePath: string): void => {
+    void trackInFlight(handleWatcherAdd(filePath));
+  };
+
+  const onFileDeleted = (filePath: string): void => {
+    void trackInFlight(handleWatcherUnlink(filePath));
+  };
+
+  const watcher = await watchStorageDirectory(storagePath, { onFileCreated, onFileDeleted });
+  console.log(`File watcher ready. Watching: ${storagePath}`);
 
   const closeWatcher = async (): Promise<void> => {
     await watcher.close();

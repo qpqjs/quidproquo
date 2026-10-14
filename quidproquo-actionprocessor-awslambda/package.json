@@ -56,7 +56,7 @@
     "@aws-sdk/client-ssm": "^3.1093.0",
     "@aws-sdk/s3-presigned-post": "^3.1093.0",
     "@aws-sdk/s3-request-presigner": "^3.1093.0",
-    "@module-federation/enhanced": "2.6.0",
+    "@module-federation/enhanced": "2.9.2",
     "@types/aws-lambda": "^8.10.162",
     "ai": "^7.0.133",
     "aws-jwt-verify": "^3.4.0",

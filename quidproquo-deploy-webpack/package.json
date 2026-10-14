@@ -36,8 +36,8 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@module-federation/enhanced": "2.6.0",
-    "@module-federation/node": "2.7.45",
+    "@module-federation/enhanced": "2.9.2",
+    "@module-federation/node": "2.7.52",
     "quidproquo-actionprocessor-awslambda": "0.1.32",
     "quidproquo-actionprocessor-node": "0.1.32",
     "quidproquo-config-aws": "0.1.32",
