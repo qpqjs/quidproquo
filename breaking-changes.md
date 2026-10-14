@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.33
+
 ## 0.1.32
 
 - `EventDocSummaryView` (and so `EventDocSummary`) has a new required `eventId: number`, the event the view is folded through; `applyEventDocSummaryEvent` sets it on every event, so folded views carry it automatically. Code that builds a summary by hand (test fixtures, a custom `foldSnapshotViews` that assembles the summary itself) must add it: the projector now parses the fold's summary view with `eventDocSummaryViewSchema` and rederives the row from the log when it does not parse. Rows and snapshots stored before the field existed are handled the same way, on their next write. `askEventDocSummaryViewWrite` now returns `boolean` (false when a newer row refused the write) and every summary write is guarded on `eventId`; reserved lifecycle appends (publish, delete, restore, rename, recode, draft) write the summary row before the append returns, so a hook or a reader that follows the append sees the change without waiting for the stream projector.

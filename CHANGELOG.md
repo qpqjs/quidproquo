@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.33
+
+- cli: `qpq go:docker` can be split across machines. `--build-only` builds, bundles and synthesises each service and writes a manifest to `dist/qpq/go-docker/<app>/<svc>/deploy.json` (no docker needed); `--from-build` deploys a stack from that saved build on a machine that never built the workspace, publishing the federated remote after `api`. Lets a CI deploy run one job per service and phase while keeping the inf-before-api ordering
+- cli: `GO_DOCKER_BUILD_CONCURRENCY` defaults to the machine's core count instead of 4
+
 ## 0.1.32
 
 - core/actionprocessor-awslambda/dev-server: `askKeyValueStoreUpdate` takes a `condition` (same vocabulary as a query filter) checked against the stored item; when it is false nothing is written and the action fails with `ConditionFailed`
