@@ -2,6 +2,7 @@ import { QpqAppDeployment } from 'quidproquo-core';
 
 import { ClearResourcesPlan } from '../lib/clearResourcesPlan';
 import { DeployPlan, TeardownPlan } from '../lib/deployPrompts';
+import { GoDockerMode } from '../lib/goDockerMode';
 import { SetupStep } from '../lib/setupStep';
 
 export enum QpqDeployPlatform {
@@ -24,8 +25,10 @@ export interface QpqPlatformDriver {
   go: (appName: string, plan: DeployPlan) => Promise<void>;
 
   // Parallel containerized deploy (`qpq go:docker`) — optional; drivers that
-  // have no docker strategy simply omit it.
-  goDocker?: (appName: string, plan: DeployPlan) => Promise<void>;
+  // have no docker strategy simply omit it. The mode splits the run into a
+  // build half and a deploy half (`--build-only` / `--from-build`); a driver
+  // whose build and deploy cannot be separated refuses anything but 'full'.
+  goDocker?: (appName: string, plan: DeployPlan, mode: GoDockerMode) => Promise<void>;
 
   // Destroy the web/api/inf stacks for selected services (`qpq teardown`) —
   // optional; drivers with no teardown strategy simply omit it.
