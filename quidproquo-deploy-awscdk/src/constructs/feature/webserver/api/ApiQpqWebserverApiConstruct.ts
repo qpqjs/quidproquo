@@ -7,7 +7,7 @@ import { aws_apigateway, aws_cloudwatch, aws_ec2, aws_lambda, aws_logs, aws_ssm,
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
+import { getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -65,7 +65,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
     });
 
     const accessLogGroup = new aws_logs.LogGroup(this, 'access-logs', {
-      retention: aws_logs.RetentionDays.ONE_YEAR,
+      retention: resolveLogRetention(qpqConfigAwsUtils.getCloudWatchLogRetentionDays(props.qpqConfig)),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 

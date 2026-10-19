@@ -9,7 +9,7 @@ import { Construct } from 'constructs';
 import { join } from 'upath';
 
 import { BootstrapResource } from '../../constants';
-import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils } from '../../utils';
+import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
 import * as qpqDeployAwsCdkUtils from '../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
@@ -117,7 +117,7 @@ export class Function extends QpqConstructBlock {
       tracing: qpqConfigAwsUtils.isTracingDisabled(props.qpqConfig) ? aws_lambda.Tracing.DISABLED : aws_lambda.Tracing.ACTIVE,
 
       logGroup: new aws_logs.LogGroup(this, 'LogGroup', {
-        retention: aws_logs.RetentionDays.ONE_YEAR,
+        retention: resolveLogRetention(qpqConfigAwsUtils.getCloudWatchLogRetentionDays(props.qpqConfig)),
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       }),
 

@@ -35,6 +35,7 @@ import {
   getAwsServiceDashboardConfig,
   getAwsVirtualNetworkSettings,
   getBootstrapWafConfig,
+  getCloudWatchLogRetentionDays,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
   getDynamoTableNameOverrride,
@@ -276,6 +277,7 @@ describe('disable flag selectors', () => {
       disableLambdaWarming: true,
       disableReservedConcurrency: true,
       disableTracing: true,
+      cloudWatchLogRetentionDays: 14,
     }),
   ]);
 
@@ -289,6 +291,10 @@ describe('disable flag selectors', () => {
 
   it('reads disableTracing', () => {
     expect(isTracingDisabled(config)).toBe(true);
+  });
+
+  it('reads cloudWatchLogRetentionDays', () => {
+    expect(getCloudWatchLogRetentionDays(config)).toBe(14);
   });
 });
 

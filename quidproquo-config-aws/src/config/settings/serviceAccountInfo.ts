@@ -7,6 +7,10 @@ export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfi
   apiLayers?: ApiLayer[];
   lambdaMaxMemoryInMiB?: number;
 
+  // How long CloudWatch keeps function and API access logs. Rounded up to the
+  // nearest retention CloudWatch supports. Default: a week.
+  cloudWatchLogRetentionDays?: number;
+
   logServiceName?: string;
 
   disableLogs?: boolean;
@@ -26,6 +30,7 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   apiLayers: ApiLayer[];
 
   lambdaMaxMemoryInMiB: number;
+  cloudWatchLogRetentionDays: number;
 
   disableLogs: boolean;
   disableLambdaWarming: boolean;
@@ -51,6 +56,7 @@ export const defineAwsServiceAccountInfo = (
   apiLayers: options?.apiLayers ?? [],
 
   lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024,
+  cloudWatchLogRetentionDays: options?.cloudWatchLogRetentionDays || 7,
 
   logServiceName: options?.logServiceName,
 

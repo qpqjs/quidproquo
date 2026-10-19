@@ -63,6 +63,7 @@ type ServiceAccountInfo = {
 | --- | --- | --- | --- |
 | `apiLayers` | `ApiLayer[]` | `[]` | Lambda layers to attach to the service's functions. See [ApiLayer](#apilayer). |
 | `lambdaMaxMemoryInMiB` | `number` | `1024` | Default memory (MiB) for the service's Lambda functions. Individual functions may still override this. |
+| `cloudWatchLogRetentionDays` | `number` | `7` | How long CloudWatch keeps the service's Lambda function logs and API access logs. Rounded up to the nearest retention CloudWatch supports (1, 3, 5, 7, 14, 30, 60, 90 days and so on). |
 | `logServiceName` | `string` | – | The service name used when writing structured logs. |
 | `disableLogs` | `boolean` | `false` | Turn off the log-shipping pipeline for the service. |
 | `disableLambdaWarming` | `boolean` | `false` | Don't create the scheduled warming rule that keeps functions warm. |

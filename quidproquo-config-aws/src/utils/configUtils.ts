@@ -284,6 +284,11 @@ export const isTracingDisabled = (qpqConfig: QPQConfig): boolean => {
   return awsServiceAccountInfoConfig.disableTracing;
 };
 
+export const getCloudWatchLogRetentionDays = (qpqConfig: QPQConfig): number => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.cloudWatchLogRetentionDays;
+};
+
 export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertificateQPQConfigSetting[] => {
   return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsDomainCertificate);
 };

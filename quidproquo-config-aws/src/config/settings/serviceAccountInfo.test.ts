@@ -13,6 +13,7 @@ describe('defineAwsServiceAccountInfo', () => {
       serviceInfoMap: [],
       apiLayers: [],
       lambdaMaxMemoryInMiB: 1024,
+      cloudWatchLogRetentionDays: 7,
       logServiceName: undefined,
       disableLogs: false,
       disableLambdaWarming: false,
@@ -29,6 +30,7 @@ describe('defineAwsServiceAccountInfo', () => {
     const setting = defineAwsServiceAccountInfo('111', 'eu-west-1', serviceInfoMap, {
       apiLayers,
       lambdaMaxMemoryInMiB: 2048,
+      cloudWatchLogRetentionDays: 30,
       logServiceName: 'logs',
       disableLogs: true,
       disableLambdaWarming: true,
@@ -45,6 +47,7 @@ describe('defineAwsServiceAccountInfo', () => {
       serviceInfoMap,
       apiLayers,
       lambdaMaxMemoryInMiB: 2048,
+      cloudWatchLogRetentionDays: 30,
       logServiceName: 'logs',
       disableLogs: true,
       disableLambdaWarming: true,
@@ -56,5 +59,9 @@ describe('defineAwsServiceAccountInfo', () => {
 
   it('falls back to the default memory when lambdaMaxMemoryInMiB is zero', () => {
     expect(defineAwsServiceAccountInfo('111', 'eu-west-1', [], { lambdaMaxMemoryInMiB: 0 }).lambdaMaxMemoryInMiB).toBe(1024);
+  });
+
+  it('falls back to a week of CloudWatch retention when cloudWatchLogRetentionDays is zero', () => {
+    expect(defineAwsServiceAccountInfo('111', 'eu-west-1', [], { cloudWatchLogRetentionDays: 0 }).cloudWatchLogRetentionDays).toBe(7);
   });
 });
