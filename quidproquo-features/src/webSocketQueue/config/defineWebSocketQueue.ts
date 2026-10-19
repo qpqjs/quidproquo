@@ -28,6 +28,11 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // clients must also see). Runs in the websocket-owning service; failures are
   // swallowed so a sync problem never breaks the connect.
   onConnected?: string;
+
+  // Registered inline-function name invoked with WebSocketQueueTopicAuthoriseInput
+  // on every Subscribe message; it throws to refuse. Without one, any
+  // authenticated connection may subscribe to any topic within its own scope.
+  topicAuthoriser?: string;
 }
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
@@ -46,8 +51,16 @@ export function getWebSocketQueueGlobalConfigKeyForOnConnected(apiName: string):
   return `qpq-wsq-on-connected-${apiName}`;
 }
 
+export function getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName: string): string {
+  return `qpq-wsq-topic-authoriser-${apiName}`;
+}
+
 export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
   return `qpq-wsq-${apiName}`;
+}
+
+export function getWebSocketQueueSubscriptionsKeyValueStoreName(apiName: string): string {
+  return `qpq-wsq-subs-${apiName}`;
 }
 
 export const defineWebSocketQueue = (
@@ -61,10 +74,17 @@ export const defineWebSocketQueue = (
     defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {
       indexes: ['userId'],
+      owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.owner),
+    }),
+
+    // Which connections want pushes for which scoped topic; the connectionId index is for cleanup on disconnect.
+    defineKeyValueStore(getWebSocketQueueSubscriptionsKeyValueStoreName(apiName), 'topic', ['connectionId'], {
+      indexes: ['connectionId'],
       owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.owner),
     }),
 

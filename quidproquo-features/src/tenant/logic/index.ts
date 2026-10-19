@@ -23,6 +23,7 @@ export * from './askTenantResolveRequestScope';
 export * from './askTenantResolveUserId';
 export * from './askTenantRolesConfigRead';
 export * from './askTenantScopeResolver';
+export * from './askTenantTopicAuthoriser';
 export * from './askTenantValidateMembership';
 export * from './file';
 export * from './isTenantId';

@@ -11,10 +11,19 @@ export type EventDocStoreOptions = {
   onAppend?: string;
   scopeResolver?: string;
   authorise?: string;
+  syncWebsocketApiName?: string;
 };
 
 /** Builds an EventDocStore from storeName + type. Single source of the naming convention shared by built-in and custom routes. */
-export const buildEventDocStore = ({ storeName, type, onPublish, onAppend, scopeResolver, authorise }: EventDocStoreOptions): EventDocStore => ({
+export const buildEventDocStore = ({
+  storeName,
+  type,
+  onPublish,
+  onAppend,
+  scopeResolver,
+  authorise,
+  syncWebsocketApiName,
+}: EventDocStoreOptions): EventDocStore => ({
   storeName,
   eventsStoreName: eventDocEventsStoreName(storeName),
   snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
@@ -24,4 +33,5 @@ export const buildEventDocStore = ({ storeName, type, onPublish, onAppend, scope
   onAppend,
   scopeResolver,
   authorise,
+  syncWebsocketApiName,
 });

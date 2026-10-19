@@ -10,4 +10,6 @@ export type EventDocStore = {
   onAppend?: string;
   scopeResolver?: string;
   authorise?: string;
+  // The websocket queue api head-moved pushes go out on; absent means no pushes.
+  syncWebsocketApiName?: string;
 };

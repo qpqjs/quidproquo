@@ -1,6 +1,7 @@
 import { RouteAuthSettings } from 'quidproquo-webserver';
 
 import { EventDocRouteName } from './EventDocRouteName';
+import { EventDocSyncOptions } from './EventDocSyncOptions';
 
 /** Options for defineEventDocRoutes. */
 export type EventDocRoutesOptions = {
@@ -22,4 +23,6 @@ export type EventDocRoutesOptions = {
   scopeResolver?: string;
   // Inline-function name invoked with EventDocAuthoriseInput inside the request's scope before each route; it throws to refuse.
   authorise?: string;
+  // Push a head-moved message to subscribed workspaces after every append. Omit for no pushes.
+  sync?: EventDocSyncOptions;
 };

@@ -2,6 +2,7 @@ import {
   askKeyValueStoreUpdateBase,
   DateActionType,
   DynamicFunctionsActionType,
+  ErrorTypeEnum,
   InlineFunctionActionType,
   KeyValueStoreActionType,
   kvsLessThan,
@@ -18,6 +19,7 @@ import {
   runStory,
   throwsError,
 } from 'quidproquo-core';
+import { WebsocketActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -93,6 +95,9 @@ type Harness = {
   rowWithoutEventId?: boolean;
   rowEventId?: number;
   summaryWriteFails?: boolean;
+  // Connections subscribed to this doc's head-moved topic on the 'ws' api.
+  subscribers?: string[];
+  pushFails?: boolean;
 };
 
 const buildHarness = (options: Harness = {}) => {
@@ -101,7 +106,10 @@ const buildHarness = (options: Harness = {}) => {
   const summaryUpdates: { updates: unknown; condition: unknown }[] = [];
   const hookPayloads: { summary: EventDocSummary }[] = [];
   const logs: { logLevel: LogLevelEnum; msg: string }[] = [];
+  const pushes: { connectionId: string; payload: unknown }[] = [];
   let clock = Date.parse(T0);
+
+  tables['qpq-wsq-subs-ws'] = (options.subscribers ?? []).map((connectionId) => ({ topic: `eventDoc#${STORE.storeName}#${DOC_ID}`, connectionId }));
 
   const log = [INIT, ...(options.unprojected ?? [])];
   tables[EVENTS_STORE] = log.map((e) => ({ pk: DOC_ID, sk: e.payload.metadata.eventId, type: STORE.type, data: e }));
@@ -151,6 +159,15 @@ const buildHarness = (options: Harness = {}) => {
       return { items: queryOptions?.limit === undefined ? items : items.slice(0, queryOptions.limit), nextPageKey: undefined };
     },
 
+    [WebsocketActionType.SendMessage]: (action: { payload: { connectionId: string; payload: unknown } }) => {
+      sequence.push('push');
+      if (options.pushFails) {
+        return throwsError(ErrorTypeEnum.GenericError, 'socket down');
+      }
+      pushes.push({ connectionId: action.payload.connectionId, payload: action.payload.payload });
+      return undefined;
+    },
+
     [KeyValueStoreActionType.Upsert]: (action: { payload: { keyValueStoreName: string; item: Row } }) => {
       const { keyValueStoreName, item } = action.payload;
       sequence.push(`upsert:${keyValueStoreName}`);
@@ -176,7 +193,7 @@ const buildHarness = (options: Harness = {}) => {
   const summaryRow = () => tables[STORE.storeName][0] as EventDocSummary;
   const snapshotRows = () => tables[SNAPSHOTS_STORE] ?? [];
 
-  return { append, summaryRow, snapshotRows, sequence, summaryUpdates, hookPayloads, logs };
+  return { append, summaryRow, snapshotRows, sequence, summaryUpdates, hookPayloads, logs, pushes };
 };
 
 describe('askEventDocEventAppend', () => {
@@ -262,5 +279,44 @@ describe('askEventDocEventAppend', () => {
     expect(appended.payload.metadata.eventId).toBe(1);
     expect(summaryRow().eventId).toBe(0);
     expect(logs).toEqual([{ logLevel: LogLevelEnum.Warn, msg: expect.stringContaining(DOC_ID), data: expect.anything() }]);
+  });
+});
+
+describe('askEventDocEventAppend head-moved push', () => {
+  const SYNCED: EventDocStoreOptions = { ...STORE, syncWebsocketApiName: 'ws' };
+
+  it('pushes the new head to every subscriber of the document after the hooks, ids only', () => {
+    const harness = buildHarness({ subscribers: ['c1', 'c2'] });
+
+    const appended = harness.append(input('template/rename', { name: 'Renamed' }), { ...SYNCED, onAppend: 'afterAppend' });
+
+    expect(harness.sequence.filter((step) => step === 'hook' || step === 'push')).toEqual(['hook', 'push', 'push']);
+    expect(harness.pushes.map((push) => push.connectionId)).toEqual(['c1', 'c2']);
+    expect(harness.pushes[0].payload).toMatchObject({
+      type: 'Qpq/WebSocketQueue/EventDocHeadMoved',
+      payload: {
+        storeName: STORE.storeName,
+        type: STORE.type,
+        docId: DOC_ID,
+        headEventId: 1,
+        clientMessageId: appended.payload.metadata.clientMessageId,
+      },
+    });
+  });
+
+  it('pushes nothing for a collection without sync', () => {
+    const harness = buildHarness({ subscribers: ['c1'] });
+
+    harness.append(input('template/rename', { name: 'Renamed' }));
+
+    expect(harness.pushes).toEqual([]);
+  });
+
+  it('still returns the event when the push fails', () => {
+    const harness = buildHarness({ subscribers: ['c1'], pushFails: true });
+
+    const appended = harness.append(input('template/rename', { name: 'Renamed' }), SYNCED);
+
+    expect(appended.payload.metadata.eventId).toBe(1);
   });
 });

@@ -1,5 +1,6 @@
 export enum WebSocketQueueServerMessageEventType {
   Authenticated = 'Qpq/WebSocketQueue/Authenticated',
+  EventDocHeadMoved = 'Qpq/WebSocketQueue/EventDocHeadMoved',
   Maintenance = 'Qpq/WebSocketQueue/Maintenance',
   Pong = 'Qpq/WebSocketQueue/Pong',
   ServiceRequestResponse = 'Qpq/WebSocketQueue/ServiceRequestResponse',

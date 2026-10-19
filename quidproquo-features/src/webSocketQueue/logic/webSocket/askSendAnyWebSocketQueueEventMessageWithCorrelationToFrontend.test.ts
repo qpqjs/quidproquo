@@ -42,7 +42,8 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
 
     runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message, 'direct', 'u1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [{ id: 'user-conn' }] },
+      // The connection store answers the user lookup; the subscriptions store has nothing for the dead connection.
+      [KeyValueStoreActionType.Query]: (action: any) => ({ items: action.payload.keyValueStoreName === 'qpq-wsq-demo' ? [{ id: 'user-conn' }] : [] }),
       [KeyValueStoreActionType.Delete]: (action: any) => {
         deletes.push(action.payload.key);
         return undefined;
@@ -76,15 +77,18 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     expect(sends).toEqual(['a', 'b']);
   });
 
-  it('keeps broadcasting past a dead connection and deletes its stale record', () => {
+  it('keeps broadcasting past a dead connection and deletes its stale record and subscriptions', () => {
     const sends: any[] = [];
     const deletes: any[] = [];
 
     runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'dead' }, { id: 'b' }] },
+      [KeyValueStoreActionType.Query]: (action: any) => ({
+        items: action.payload.keyValueStoreName === 'qpq-wsq-subs-demo' ? [{ topic: 'scope#topic', connectionId: 'dead' }] : [],
+      }),
       [KeyValueStoreActionType.Delete]: (action: any) => {
-        deletes.push(action.payload.key);
+        deletes.push([action.payload.keyValueStoreName, action.payload.key, action.payload.sortKey]);
         return undefined;
       },
       [WebsocketActionType.SendMessage]: (action: any) => {
@@ -98,7 +102,10 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     });
 
     expect(sends).toEqual(['a', 'dead', 'b']);
-    expect(deletes).toEqual(['dead']);
+    expect(deletes).toEqual([
+      ['qpq-wsq-demo', 'dead', undefined],
+      ['qpq-wsq-subs-demo', 'scope#topic', 'dead'],
+    ]);
   });
 
   it('skips a throttled connection without deleting its record or aborting the loop', () => {

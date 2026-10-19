@@ -6,10 +6,14 @@ import { askTryAuthenticateConnection } from './askTryAuthenticateConnection';
 import {
   askProcessOnAuthenticate,
   askProcessOnPing,
+  askProcessOnSubscribe,
   askProcessOnUnauthenticate,
+  askProcessOnUnsubscribe,
   isWebSocketAuthenticateMessage,
   isWebSocketPingMessage,
+  isWebSocketSubscribeMessage,
   isWebSocketUnauthenticateMessage,
+  isWebSocketUnsubscribeMessage,
 } from './messageProcessors';
 
 export function* askProcessOnMessage(connectionId: string, message: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<void> {
@@ -31,6 +35,14 @@ export function* askProcessOnMessage(connectionId: string, message: AnyWebSocket
 
   // Make sure any messages below have access to the authenticated user
   const connection = yield* askTryAuthenticateConnection(connectionId);
+
+  if (isWebSocketSubscribeMessage(message)) {
+    return yield* askProcessOnSubscribe(connection, message.payload.topic);
+  }
+
+  if (isWebSocketUnsubscribeMessage(message)) {
+    return yield* askProcessOnUnsubscribe(connection, message.payload.topic);
+  }
 
   // The connection's validated scope becomes the ambient storage scope for the
   // whole message - the event-bus send serializes it with the session, so queue

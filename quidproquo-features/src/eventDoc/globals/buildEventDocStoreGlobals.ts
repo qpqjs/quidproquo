@@ -6,6 +6,7 @@ import {
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_STORAGE_DRIVE_GLOBAL,
   EVENT_DOC_STORE_NAME_GLOBAL,
+  EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
 } from '../constants/eventDocGlobalNames';
 import { EventDocStore } from '../types/EventDocStore';
@@ -23,4 +24,5 @@ export const buildEventDocStoreGlobals = (store: EventDocStore): Record<string, 
   [EVENT_DOC_ON_APPEND_GLOBAL]: store.onAppend ?? '',
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: store.scopeResolver ?? '',
   [EVENT_DOC_AUTHORISER_GLOBAL]: store.authorise ?? '',
+  [EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL]: store.syncWebsocketApiName ?? '',
 });

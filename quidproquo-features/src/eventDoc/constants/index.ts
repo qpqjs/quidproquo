@@ -3,6 +3,7 @@ export * from './eventDocCollectionConfigSettingType';
 export * from './eventDocEventsStoreName';
 export * from './eventDocFunctionsName';
 export * from './eventDocGlobalNames';
+export * from './eventDocHeadMovedTopic';
 export * from './eventDocPermissions';
 export * from './eventDocRecentClientMessageIdWindow';
 export * from './eventDocRouteAction';

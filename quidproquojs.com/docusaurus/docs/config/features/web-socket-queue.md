@@ -65,6 +65,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   userDirectoryName?: string;
   connectionScopeResolver?: string;
   onConnected?: string;
+  topicAuthoriser?: string;
 }
 ```
 
@@ -73,12 +74,19 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 | `userDirectoryName` | `string` | `''` | Name of the [user directory](../core/user-directory.md) used to authenticate clients (stored in the `qpq-wsq-kvs-name-<apiName>` global). Enables the authenticate client/server message flow. |
 | `connectionScopeResolver` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ userId, requestedScope }` on **every** Authenticate message, whether or not it claims a storage scope (stored in the `qpq-wsq-scope-resolver-<apiName>` global). It returns the effective scope to store on the connection (e.g. a membership-checked tenant scope for a claim, or the user's own scope for no claim), or throws to reject the authenticate. A scope claim with no resolver configured is rejected outright, leaving the connection unauthenticated. |
 | `onConnected` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId }` as soon as a connection opens, **before** any authenticate — so it must only push public state (e.g. broadcasting an already-active maintenance notice to a pre-login client). Runs in the websocket-owning service; failures are swallowed so a sync problem never breaks the connect. |
+| `topicAuthoriser` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId, userId, scope, topic }` on every Subscribe message; it throws to refuse. Without one, any authenticated connection may subscribe to any topic within its own scope. |
 | `owner` | `CrossModuleOwnerWithNoResourceOverride` | – | Declares the queue's resources as owned by another module/service, so this service references them instead of deploying its own. Applied to both the WebSocket API and the connection store. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; when set, the underlying WebSocket API is not deployed. |
 
+## Topic subscriptions
+
+A client sends `Subscribe { topic }` to receive server pushes for a topic and `Unsubscribe { topic }` to stop. The queue files the subscription under the connection's validated storage scope (`<scope>#<topic>`), so a client can never subscribe into another scope, and clears every subscription for a connection on disconnect or when a send finds it dead. An unauthenticated connection's subscribe is ignored.
+
+A server story pushes with `askWebSocketQueueSendToTopic(apiName, scopedTopic, message)`, building `scopedTopic` with `buildScopedWebSocketQueueTopic(scope, topic)` from its own ambient scope. Only subscribers in the same scope receive it. The eventDoc feature's `sync` option uses this to push `EventDocHeadMoved` after an append.
+
 ## Returns
 
-A `QPQConfig` array containing: three globals, the connection [key-value store](../core/key-value-store.md), and the [WebSocket API](../webserver/websocket.md) with the queue's built-in handlers.
+A `QPQConfig` array containing: five globals, the connection and subscription [key-value stores](../core/key-value-store.md) (`qpq-wsq-<apiName>` and `qpq-wsq-subs-<apiName>`), and the [WebSocket API](../webserver/websocket.md) with the queue's built-in handlers.
 
 ## Related
 
@@ -86,5 +94,6 @@ A `QPQConfig` array containing: three globals, the connection [key-value store](
 - [defineStateDispatchOverWebsockets](./state-dispatch-over-websockets.md) — routes core State-domain dispatches to clients through this queue.
 - [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md) — this define with the tenant connection-scope resolver pre-wired.
 - [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md) — send a raw message to a connection on the queue's API.
+- `askWebSocketQueueSendToTopic` — push a server-initiated message to the connections subscribed to a scoped topic (see [Topic subscriptions](#topic-subscriptions)).
 - [askWebSocketQueueBroadcastMessage](../../actions/features/web-socket-queue/ask-web-socket-queue-broadcast-message.md), [askWebSocketQueueBroadcastServiceUpdated](../../actions/features/web-socket-queue/ask-web-socket-queue-broadcast-service-updated.md) — push a server-initiated message to every live connection on this queue's API.
 - [defineEventBus](../core/event-bus.md), [defineKeyValueStore](../core/key-value-store.md), [defineUserDirectory](../core/user-directory.md) — the underlying resources it depends on.

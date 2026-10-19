@@ -1,4 +1,5 @@
 import {
+  askCatch,
   askDateNow,
   askInlineFunctionExecute,
   askKeyValueStoreUpsertBase,
@@ -28,6 +29,7 @@ import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
 import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 import { askEventDocHookStates } from './askEventDocHookStates';
+import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
 import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
 import { askEventDocValidateAppend } from './askEventDocValidateAppend';
 import { isEventDocReservedEffect } from './isEventDocReservedEffect';
@@ -143,6 +145,9 @@ export function* askEventDocEventAppend(
       });
     }
   }
+
+  // Best-effort: the event has landed and a subscriber that misses the push catches up on its next refresh.
+  yield* askCatch(askEventDocSendHeadMoved(modelId, event));
 
   return event;
 }

@@ -1,4 +1,5 @@
 import {
+  askCatch,
   askDateNow,
   askKeyValueStoreUpsertManyBase,
   askNewSortableGuids,
@@ -19,6 +20,7 @@ import { EventDocAppendBase, EventDocEffect, EventDocEvent, EventDocEventActor, 
 import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
 import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
 import { EventDocEventAppendOptions } from './askEventDocEventAppend';
+import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
 import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
 import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
 import { isEventDocReservedEffect } from './isEventDocReservedEffect';
@@ -113,6 +115,9 @@ export function* askEventDocAppendServerEvents(
   if (events.some((event) => isEventDocReservedEffect(event.type))) {
     yield* askEventDocSummaryRefold(modelId, events[events.length - 1].payload.metadata.eventId);
   }
+
+  // One push for the batch, at its last event. Best-effort, as in the single append.
+  yield* askCatch(askEventDocSendHeadMoved(modelId, events[events.length - 1]));
 
   return events;
 }

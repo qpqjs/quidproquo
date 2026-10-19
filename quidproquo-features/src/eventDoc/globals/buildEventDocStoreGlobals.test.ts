@@ -28,6 +28,7 @@ describe('buildEventDocStoreGlobals', () => {
       onAppend: 'broadcastWidget',
       scopeResolver: 'resolveWidgetScope',
       authorise: 'authoriseWidget',
+      syncWebsocketApiName: 'widgets-ws',
     });
 
     const globals = buildEventDocStoreGlobals(store);

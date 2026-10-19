@@ -1,4 +1,5 @@
 export * from './WebSocketQueueServerEventMessageAuthenticated';
+export * from './WebSocketQueueServerEventMessageEventDocHeadMoved';
 export * from './WebSocketQueueServerEventMessagePong';
 export * from './WebSocketQueueServerEventMessageServiceRequestResponse';
 export * from './WebSocketQueueServerEventMessageServiceUpdated';

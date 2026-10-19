@@ -8,6 +8,7 @@ import {
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_STORAGE_DRIVE_GLOBAL,
   EVENT_DOC_STORE_NAME_GLOBAL,
+  EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
 } from '../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
@@ -30,6 +31,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
   const onAppend = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_ON_APPEND_GLOBAL);
   const scopeResolver = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_SCOPE_RESOLVER_GLOBAL);
   const authorise = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_AUTHORISER_GLOBAL);
+  const syncWebsocketApiName = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL);
 
   return yield* askEventDocStoreProvide(
     {
@@ -43,6 +45,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
       onAppend,
       scopeResolver,
       authorise,
+      syncWebsocketApiName: syncWebsocketApiName || undefined,
     },
     story,
   );

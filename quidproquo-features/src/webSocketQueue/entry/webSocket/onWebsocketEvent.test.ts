@@ -41,6 +41,7 @@ describe('onDisconnect', () => {
     let captured: any;
 
     runStory(onDisconnect(baseEvent), {
+      [KeyValueStoreActionType.Query]: { items: [] },
       [KeyValueStoreActionType.Delete]: (action: any) => {
         captured = action;
         return undefined;

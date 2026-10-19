@@ -1,44 +1,16 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
-import { askWebsocketSendMessage, askWebsocketSendMessageBase } from 'quidproquo-webserver';
+import { AskResponse } from 'quidproquo-core';
 
-import { askWebsocketReadApiNameOrThrow, askWebsocketReadConnectionInfo } from '../../context';
+import { askWebsocketReadConnectionInfo } from '../../context';
 import { webSocketConnectionData } from '../../data';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';
+import { askSendToConnectionCleaningUpStale } from './askSendToConnectionCleaningUpStale';
 
 export type askSendMessageToFrontendArgs = {
   userId?: string;
   connectionId?: string;
   payload: AnyWebSocketQueueEventMessage;
 };
-
-function* askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(
-  connectionId: string,
-  payload: AnyWebSocketQueueEventMessageWithCorrelation,
-): AskResponse<void> {
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
-
-  yield* askWebsocketSendMessage(apiName, connectionId, payload);
-}
-
-// A send that never throws: the connection store can hold records for sockets that
-// died without their onDisconnect firing, and one dead connection must not abort a
-// multi-connection send. A Disconnected failure deletes the stale record so the
-// store self-heals; any other failure (e.g. Throttled) just drops this message for
-// this connection. Returns whether the send succeeded.
-function* askSendToConnectionCleaningUpStale(connectionId: string, payload: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<boolean> {
-  const result = yield* askCatch(askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payload));
-
-  if (result.success) {
-    return true;
-  }
-
-  if (result.error.errorType === askWebsocketSendMessageBase.errorType.Disconnected) {
-    yield* webSocketConnectionData.askDeleteByConnectionId(connectionId);
-  }
-
-  return false;
-}
 
 function* askSendMessageToEveryone(payload: AnyWebSocketQueueEventMessageWithCorrelation) {
   const connections = yield* webSocketConnectionData.askGetAllConnections();

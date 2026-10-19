@@ -28,3 +28,8 @@ export const TENANT_CONNECTION_SCOPE_RESOLVER_FN = 'askTenantConnectionScopeReso
 // Inline-function name for the eventDoc `authorise` hook: refuses a collection
 // route unless the caller holds eventDoc:<store>:<action> in the active tenant.
 export const TENANT_EVENT_DOC_AUTHORISER_FN = 'askTenantEventDocAuthoriser';
+
+// Inline-function name for the websocket queue's `topicAuthoriser` hook: a
+// subscribe to a document's head-moved topic needs eventDoc:<store>:read in
+// the connection's tenant.
+export const TENANT_TOPIC_AUTHORISER_FN = 'askTenantTopicAuthoriser';

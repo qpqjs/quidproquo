@@ -8,8 +8,10 @@ import {
   getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver,
   getWebSocketQueueGlobalConfigKeyForEventBusName,
   getWebSocketQueueGlobalConfigKeyForOnConnected,
+  getWebSocketQueueGlobalConfigKeyForTopicAuthoriser,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
   getWebSocketQueueKeyValueStoreName,
+  getWebSocketQueueSubscriptionsKeyValueStoreName,
 } from './defineWebSocketQueue';
 
 describe('webSocketQueue key helpers', () => {
@@ -18,12 +20,14 @@ describe('webSocketQueue key helpers', () => {
     expect(getWebSocketQueueGlobalConfigKeyForUserDirectoryName('chat')).toBe('qpq-wsq-kvs-name-chat');
     expect(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver('chat')).toBe('qpq-wsq-scope-resolver-chat');
     expect(getWebSocketQueueGlobalConfigKeyForOnConnected('chat')).toBe('qpq-wsq-on-connected-chat');
+    expect(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser('chat')).toBe('qpq-wsq-topic-authoriser-chat');
     expect(getWebSocketQueueKeyValueStoreName('chat')).toBe('qpq-wsq-chat');
+    expect(getWebSocketQueueSubscriptionsKeyValueStoreName('chat')).toBe('qpq-wsq-subs-chat');
   });
 });
 
 describe('defineWebSocketQueue', () => {
-  it('emits four globals, a connection kvs and a websocket', () => {
+  it('emits five globals, the connection and subscription kvs and a websocket', () => {
     const config = defineWebSocketQueue('chat-bus', 'chat');
     const types = config.map((setting) => (setting as { configSettingType: string }).configSettingType);
 
@@ -32,6 +36,8 @@ describe('defineWebSocketQueue', () => {
       QPQCoreConfigSettingType.global,
       QPQCoreConfigSettingType.global,
       QPQCoreConfigSettingType.global,
+      QPQCoreConfigSettingType.global,
+      QPQCoreConfigSettingType.keyValueStore,
       QPQCoreConfigSettingType.keyValueStore,
       QPQWebServerConfigSettingType.WebSocket,
     ]);

@@ -20,6 +20,7 @@ export const defineEventDocRoutes = ({
   onAppend,
   scopeResolver,
   authorise,
+  sync,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
   const store = buildEventDocStore({
@@ -29,6 +30,7 @@ export const defineEventDocRoutes = ({
     onAppend,
     scopeResolver,
     authorise,
+    syncWebsocketApiName: sync?.websocketApiName,
   });
 
   const globals: Record<string, unknown> = buildEventDocStoreGlobals(store);

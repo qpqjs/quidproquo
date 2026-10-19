@@ -16,3 +16,5 @@ export const EVENT_DOC_SCOPE_RESOLVER_GLOBAL = 'eventDocScopeResolver';
 export const EVENT_DOC_STORAGE_DRIVE_GLOBAL = 'eventDocStorageDrive';
 
 export const EVENT_DOC_AUTHORISER_GLOBAL = 'eventDocAuthoriser';
+
+export const EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL = 'eventDocSyncWebsocketApi';

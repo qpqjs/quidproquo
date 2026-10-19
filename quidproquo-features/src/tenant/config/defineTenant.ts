@@ -11,6 +11,7 @@ import {
   TENANT_MEMBERSHIPS_STORE,
   TENANT_ON_PUBLISH_FN,
   TENANT_SCOPE_RESOLVER_FN,
+  TENANT_TOPIC_AUTHORISER_FN,
 } from '../constants/tenantStoreNames';
 import { buildTenantRolesConfig } from '../logic/roles/buildTenantRolesConfig';
 import { TenantMembership } from '../models/TenantMembership';
@@ -63,6 +64,14 @@ export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): 
       functionName: 'askTenantEventDocAuthoriser',
     },
     { functionName: TENANT_EVENT_DOC_AUTHORISER_FN },
+  ),
+  defineInlineFunction(
+    {
+      basePath: __dirname,
+      relativePath: '../logic/askTenantTopicAuthoriser',
+      functionName: 'askTenantTopicAuthoriser',
+    },
+    { functionName: TENANT_TOPIC_AUTHORISER_FN },
   ),
 
   // The membership table (pk userId, sk tenantId, GSI tenantId/userId for the member
