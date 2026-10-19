@@ -19,6 +19,11 @@ const connection = { id: 'c1', requestTime: 't', requestTimeEpoch: 1, ip: '1.1.1
 
 const globalByKey = (values: Record<string, string>) => (action: any) => values[action.payload.globalName] ?? '';
 
+// The connection row from the connections store; the subscriptions store answers with whatever the test files there.
+const queryByStore =
+  (subscriptions: { topic: string; connectionId: string }[] = []) =>
+  (action: any) => ({ items: action.payload.keyValueStoreName === 'qpq-wsq-subs-demo' ? subscriptions : [connection] });
+
 describe('isWebSocketAuthenticateMessage', () => {
   it('accepts an authenticate message', () => {
     expect(isWebSocketAuthenticateMessage({ type: WebSocketQueueClientMessageEventType.Authenticate } as any)).toBe(true);
@@ -97,7 +102,7 @@ describe('askProcessOnAuthenticate', () => {
 
     runStory(askProcessOnAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
@@ -130,7 +135,7 @@ describe('askProcessOnAuthenticate', () => {
 
     runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
@@ -163,7 +168,7 @@ describe('askProcessOnAuthenticate', () => {
 
     runStory(askProcessOnAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
@@ -241,7 +246,9 @@ describe('askProcessOnAuthenticate', () => {
 
     runStory(askProcessOnAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [{ ...connection, scope: 'tenant-a' }] },
+      [KeyValueStoreActionType.Query]: (action: any) => ({
+        items: action.payload.keyValueStoreName === 'qpq-wsq-subs-demo' ? [] : [{ ...connection, scope: 'tenant-a' }],
+      }),
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
@@ -256,5 +263,24 @@ describe('askProcessOnAuthenticate', () => {
     });
 
     expect(upsert.payload.item.scope).toBeUndefined();
+  });
+  it('drops the subscriptions filed under the previous authentication', () => {
+    const deletes: [string, string, string | undefined][] = [];
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: queryByStore([{ topic: 'TENANT#old#eventDoc#docs#1', connectionId: 'c1' }]),
+      [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory', 'qpq-wsq-eb-name-demo': 'event-bus' }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [KeyValueStoreActionType.Upsert]: undefined,
+      [KeyValueStoreActionType.Delete]: (action: any) => {
+        deletes.push([action.payload.keyValueStoreName, action.payload.key, action.payload.sortKey]);
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: undefined,
+      [EventBusActionType.SendMessages]: undefined,
+    });
+
+    expect(deletes).toEqual([['qpq-wsq-subs-demo', 'TENANT#old#eventDoc#docs#1', 'c1']]);
   });
 });

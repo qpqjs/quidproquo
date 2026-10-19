@@ -46,6 +46,9 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
   const slotEntries = Object.entries(slotsConfig);
   const documentSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.document).map(([slotKey]) => slotKey);
   const localSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.local).map(([slotKey]) => slotKey);
+  const storeNames = Object.fromEntries(
+    slotEntries.flatMap(([slotKey, slot]) => (slot.kind === EventDocWorkspaceSlotKind.document && slot.storeName ? [[slotKey, slot.storeName]] : [])),
+  );
   const slotSnapshotCacheKeys = Object.fromEntries(
     slotEntries.flatMap(([slotKey, slot]) =>
       slot.kind === EventDocWorkspaceSlotKind.document ? [[slotKey, slot.getSnapshotCacheKey?.() ?? '']] : [],
@@ -71,6 +74,7 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
   return {
     docs,
     api: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
+    storeNames,
     reducer: createEventDocWorkspaceReducer(slotsConfig),
     createInitialState: () => createInitialEventDocWorkspaceState(slotsConfig),
     createSnapshot: (state: EventDocWorkspaceState) => createEventDocWorkspaceSnapshot(state, documentSlotKeys, localSlotKeys),

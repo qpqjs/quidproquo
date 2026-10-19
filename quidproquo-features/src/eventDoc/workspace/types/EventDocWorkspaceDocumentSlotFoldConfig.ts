@@ -9,6 +9,9 @@ import { EventDocWorkspaceSlotKind } from './EventDocWorkspaceSlotKind';
 export type EventDocWorkspaceDocumentSlotFoldConfig<TView extends EventDocDocument = EventDocDocument> =
   EventDocWorkspaceSlotFoldConfigBase<TView> & {
     kind: EventDocWorkspaceSlotKind.document;
+    // The collection's store name (the `storeName` of its defineEventDocRoutes). Needed only for live sync: a slot
+    // without one is never subscribed to head-moved pushes.
+    storeName?: string;
     migrations?: EventDocMigrations;
     // The key a usable fold base must carry (see EventDocSavedDefinitionConfig.snapshotCacheKey). A held base filed under
     // another key is stale fold output and is refetched. Absent (a slot with no saved definition) reads as ''.

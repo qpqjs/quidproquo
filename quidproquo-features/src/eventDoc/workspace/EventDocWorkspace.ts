@@ -39,11 +39,12 @@ export type EventDocWorkspaceAggregateSelectors = {
 
 /**
  * What createEventDocWorkspace returns. createSnapshot captures identity, pending and history so api.askInit can restore
- * into another runtime of the same workspace.
+ * into another runtime of the same workspace. storeNames lists the document slots that declared one, for live sync.
  */
 export type EventDocWorkspace<TSlots extends EventDocWorkspaceSlotsConfig> = {
   docs: { [K in keyof TSlots]: EventDocWorkspaceDoc<TSlots[K]> };
   api: EventDocWorkspaceBuiltInApi;
+  storeNames: Record<string, string>;
   reducer: QpqReducer<EventDocWorkspaceState, EventDocWorkspaceEffects>;
   createInitialState: () => EventDocWorkspaceState;
   createSnapshot: (state: EventDocWorkspaceState) => EventDocWorkspaceSnapshot;

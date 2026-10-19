@@ -5,6 +5,7 @@ export * from './api';
 export * from './auth';
 export * from './baseUrl';
 export * from './dateTime';
+export * from './eventDocWorkspace';
 export * from './hooks';
 export * from './qpqContext';
 export * from './runtime';

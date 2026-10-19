@@ -14,6 +14,7 @@ import {
 } from '../../../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../../../context';
 import { webSocketConnectionData } from '../../../data';
+import { webSocketSubscriptionData } from '../../../data/subscriptionData';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
   WebSocketQueueClientEventMessageAuthenticate,
@@ -113,6 +114,10 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
       // resolves to the user's own personal scope, never unscoped.
       scope: scopeResolution.scope,
     });
+
+    // Subscriptions are filed under the scope the connection held when it subscribed, so a re-authenticate (a tenant
+    // switch, say) drops them all; the client subscribes again on Authenticated.
+    yield* webSocketSubscriptionData.askDeleteByConnectionId(connectionId);
 
     yield* askSendMessage(connectionId, {
       type: WebSocketQueueServerMessageEventType.Authenticated,

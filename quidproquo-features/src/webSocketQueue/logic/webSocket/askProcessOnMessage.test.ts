@@ -67,7 +67,7 @@ describe('askProcessOnMessage', () => {
       } as any),
       {
         [ContextActionType.Read]: { apiName: 'demo' },
-        [KeyValueStoreActionType.Query]: { items: [connection] },
+        [KeyValueStoreActionType.Query]: (action: any) => ({ items: action.payload.keyValueStoreName === 'qpq-wsq-subs-demo' ? [] : [connection] }),
         [ConfigActionType.GetGlobal]: globalByKey({
           'qpq-wsq-kvs-name-demo': 'user-directory',
           'qpq-wsq-eb-name-demo': 'event-bus',

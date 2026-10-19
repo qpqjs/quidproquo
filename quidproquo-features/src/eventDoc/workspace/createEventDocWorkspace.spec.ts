@@ -29,6 +29,7 @@ import {
   EventDocStatus,
 } from '../models';
 import { EventDocEditorValidator } from '../validation';
+import { askEventDocWorkspaceReadState } from './logic/askEventDocWorkspaceReadState';
 import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
 import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
 import {
@@ -38,6 +39,7 @@ import {
   askUIEventDocWorkspaceReset,
   askUIEventDocWorkspaceSetHistoryEvents,
   askUIEventDocWorkspaceSetPendingEvents,
+  askUIEventDocWorkspaceSetSaving,
 } from './actionCreators';
 import { createEventDocWorkspace } from './createEventDocWorkspace';
 import {
@@ -973,6 +975,59 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(2));
     expect(state.slots.noteA.error).toBeNull();
+  });
+
+  it('a head-moved push past the held head tail-pulls the new events', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'pushed' }, 1)]);
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), 'server-1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(1));
+    expect(workspace.docs.noteA.view(state).title).toBe('pushed');
+  });
+
+  it('a head-moved push the slot already holds, or for its own pending save, pulls nothing', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(0));
+
+      // Our own save: the push arrives before the ack, naming the pending event's clientMessageId.
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'mine');
+      const pending = (yield* askEventDocWorkspaceReadState()).pending.noteA[0];
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), pending.payload.metadata.clientMessageId);
+
+      // Mid-save, the ack path owns gap handling.
+      yield* askUIEventDocWorkspaceSetSaving('noteA', true);
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(5));
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }]);
+    expect(state.bases.noteA?.eventId).toBe(eventId(0));
+  });
+
+  it('storeNames lists only the document slots that declare one', () => {
+    const workspace = createEventDocWorkspace({
+      slots: {
+        noteA: { ...createNoteSlot(), storeName: 'notes' },
+        noteB: createNoteSlot(),
+      },
+    });
+
+    expect(workspace.storeNames).toEqual({ noteA: 'notes' });
   });
 
   it('appending a saved event past a gap leaves the slot unchanged', () => {

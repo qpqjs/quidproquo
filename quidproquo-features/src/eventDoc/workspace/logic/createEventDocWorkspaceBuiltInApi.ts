@@ -11,6 +11,7 @@ import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
 import { askEventDocWorkspaceRestoreLocalPending } from './askEventDocWorkspaceRestoreLocalPending';
 import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
 import { askEventDocWorkspaceSave } from './askEventDocWorkspaceSave';
+import { askEventDocWorkspaceSyncHeadMoved } from './askEventDocWorkspaceSyncHeadMoved';
 
 // The transport is optional so all-local workspaces stay zero-config; transport verbs fail loudly without one.
 function* askEnsureTransport(transport?: EventDocWorkspaceTransport): AskResponse<EventDocWorkspaceTransport> {
@@ -63,6 +64,15 @@ const getAskResync = (transport: EventDocWorkspaceTransport | undefined, documen
     yield* askMapParallel(resolveSlotKeys(documentSlotKeys, slotKey), (documentSlotKey) => askEventDocWorkspaceResync(ensured, documentSlotKey));
   };
 
+const getAskSyncHeadMoved = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+  function* askSyncHeadMoved(slotKey: string, headEventId: number, clientMessageId?: string): AskResponse<void> {
+    if (!documentSlotKeys.includes(slotKey)) {
+      return;
+    }
+
+    yield* askEventDocWorkspaceSyncHeadMoved(yield* askEnsureTransport(transport), slotKey, headEventId, clientMessageId);
+  };
+
 const getAskLoadHistory = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
   function* askLoadHistory(slotKey?: string): AskResponse<void> {
     yield* askEventDocWorkspaceLoadFullHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
@@ -74,7 +84,7 @@ const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefine
   };
 
 /**
- * Builds the workspace's built-in init/save/cancel/refresh/resync/history verbs. slotKey omitted means every document slot.
+ * Builds the workspace's built-in init/save/cancel/refresh/resync/syncHeadMoved/history verbs. slotKey omitted means every document slot.
  * `slotSnapshotCacheKeys` is each document slot's definition key, so init can reject a held base filed under another key.
  */
 export const createEventDocWorkspaceBuiltInApi = (
@@ -88,6 +98,7 @@ export const createEventDocWorkspaceBuiltInApi = (
   askCancel: getAskCancel(documentSlotKeys),
   askRefresh: getAskRefresh(transport, documentSlotKeys),
   askResync: getAskResync(transport, documentSlotKeys),
+  askSyncHeadMoved: getAskSyncHeadMoved(transport, documentSlotKeys),
   askLoadHistory: getAskLoadHistory(transport, documentSlotKeys),
   askLoadOlderHistory: getAskLoadOlderHistory(transport, documentSlotKeys),
 });
