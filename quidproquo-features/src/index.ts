@@ -1,4 +1,5 @@
 export * from './admin';
+export * from './consoleLogRedaction';
 export * from './eventDoc';
 export * from './eventDocAi';
 export * from './eventDocTransfer';
