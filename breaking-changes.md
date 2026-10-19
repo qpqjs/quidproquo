@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `preformNetworkRequest` no longer turns a failed request into a fake `500` response. It still resolves with any real HTTP response (any status), but now throws a `NetworkRequestError` (new export) when no response came back. Check `error.code` against `NetworkRequestErrorCode` (`timeout`, `unsupportedMethod`, `network`) instead of testing for `status === 500`. `executeNetworkRequest` throws `NetworkRequestError` with code `unsupportedMethod` for refused methods.
+
 ## 0.1.33
 
 ## 0.1.32

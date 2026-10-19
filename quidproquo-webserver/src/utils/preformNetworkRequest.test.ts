@@ -1,7 +1,8 @@
 import type { NetworkRequestActionPayload } from 'quidproquo-core';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { NetworkRequestError, NetworkRequestErrorCode } from './NetworkRequestError';
 import { preformNetworkRequest } from './preformNetworkRequest';
 
 const { executeNetworkRequest } = vi.hoisted(() => ({ executeNetworkRequest: vi.fn() }));
@@ -19,18 +20,26 @@ const buildPayload = (overrides: Partial<NetworkRequestActionPayload<any>> = {})
     ...overrides,
   }) as NetworkRequestActionPayload<any>;
 
-beforeEach(() => {
-  vi.spyOn(console, 'log').mockImplementation(() => undefined);
-});
+const rejectWith = async (error: unknown): Promise<NetworkRequestError> => {
+  executeNetworkRequest.mockRejectedValue(error);
+
+  try {
+    await preformNetworkRequest(buildPayload());
+  } catch (caught) {
+    expect(caught).toBeInstanceOf(NetworkRequestError);
+    return caught as NetworkRequestError;
+  }
+
+  throw new Error('expected preformNetworkRequest to throw');
+};
 
 afterEach(() => {
-  vi.restoreAllMocks();
   executeNetworkRequest.mockReset();
 });
 
 describe('preformNetworkRequest', () => {
-  it('returns the executed network response', async () => {
-    const response = { headers: { 'content-type': 'application/json' }, status: 200, statusText: 'OK', data: { ok: true } };
+  it('returns the executed network response, whatever its status', async () => {
+    const response = { headers: {}, setCookies: [], status: 503, statusText: 'Service Unavailable', data: 'down' };
     executeNetworkRequest.mockResolvedValue(response);
 
     const payload = buildPayload();
@@ -40,13 +49,31 @@ describe('preformNetworkRequest', () => {
     expect(result).toEqual(response);
   });
 
-  it('returns a 500 response when the request rejects', async () => {
-    executeNetworkRequest.mockRejectedValue(new Error('boom'));
+  it('maps an abort to a timeout error', async () => {
+    const error = await rejectWith(Object.assign(new Error('aborted'), { name: 'AbortError' }));
 
-    const result = await preformNetworkRequest(buildPayload());
+    expect(error.code).toBe(NetworkRequestErrorCode.timeout);
+  });
 
-    expect(result.status).toBe(500);
-    expect(result.statusText).toBe('Internal Server Error');
-    expect(result.headers).toEqual({});
+  it('passes an unsupported-method error through unchanged', async () => {
+    const thrown = new NetworkRequestError(NetworkRequestErrorCode.unsupportedMethod, 'Request method not implemented [CONNECT]');
+
+    const error = await rejectWith(thrown);
+
+    expect(error).toBe(thrown);
+  });
+
+  it('wraps any other failure as a network error carrying its message', async () => {
+    const error = await rejectWith(new TypeError('Failed to fetch'));
+
+    expect(error.code).toBe(NetworkRequestErrorCode.network);
+    expect(error.message).toBe('Failed to fetch');
+  });
+
+  it('stringifies a non-Error rejection', async () => {
+    const error = await rejectWith('offline');
+
+    expect(error.code).toBe(NetworkRequestErrorCode.network);
+    expect(error.message).toBe('offline');
   });
 });

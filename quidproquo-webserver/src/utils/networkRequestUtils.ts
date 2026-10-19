@@ -7,6 +7,8 @@ import {
   QPQBinaryData,
 } from 'quidproquo-core';
 
+import { NetworkRequestError, NetworkRequestErrorCode } from './NetworkRequestError';
+
 // Outgoing requests abort after this many milliseconds. 30s outlasts API Gateway's 29s
 // integration timeout, so slow requests surface as real gateway errors instead of
 // client-side "(canceled)" aborts.
@@ -155,7 +157,7 @@ const headersToRecord = (headers: Headers): Record<string, string> => {
 
 export const executeNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
   if (unsupportedMethods.includes(payload.method)) {
-    throw new Error(`Request method not implemented [${payload.method}]`);
+    throw new NetworkRequestError(NetworkRequestErrorCode.unsupportedMethod, `Request method not implemented [${payload.method}]`);
   }
 
   const controller = new AbortController();
