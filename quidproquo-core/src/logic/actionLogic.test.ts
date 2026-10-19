@@ -107,14 +107,13 @@ describe('actionResultErrorFromCaughtError', () => {
     vi.restoreAllMocks();
   });
 
-  it('logs only the unmapped key, never the raw error object', () => {
+  it('never writes to the console for an unmapped error', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     const error = Object.assign(new Error('boom'), { name: 'SomeUnknownAwsError' });
 
     actionResultErrorFromCaughtError(error, {});
 
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log).toHaveBeenCalledWith('Error: SomeUnknownAwsError');
+    expect(log).not.toHaveBeenCalled();
     vi.restoreAllMocks();
   });
 

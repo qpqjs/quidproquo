@@ -17,7 +17,6 @@ export const getExportedValue = memoFuncAsync(async (variableName: string, regio
 
     const value = (result.Exports || []).find((e) => e.Name === variableName)?.Value;
     if (value !== undefined) {
-      console.log(`CF Found: [${variableName}] = [${value}]`);
       return value;
     }
 

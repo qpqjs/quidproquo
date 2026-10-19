@@ -56,8 +56,6 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   });
 
   return async (event: E, context: Context) => {
-    console.log('tick: ', JSON.stringify(event, null, 2));
-
     const logger = getLogger(qpqConfig);
 
     const resolveStory = createRuntime(
@@ -79,7 +77,6 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
         throw new Error(result.error.errorText);
       }
 
-      console.log('Finished, returning: ', result.result);
       return result.result;
     };
 

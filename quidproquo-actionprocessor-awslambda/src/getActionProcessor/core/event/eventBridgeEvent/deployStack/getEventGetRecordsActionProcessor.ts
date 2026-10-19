@@ -43,8 +43,6 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       internalEventRecord.deployEventType = DeployEventType.Web;
     }
 
-    console.log('internalEventRecord', internalEventRecord);
-
     return actionResult([internalEventRecord]);
   };
 };

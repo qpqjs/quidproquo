@@ -37,8 +37,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    console.log('qpqEventRecord', JSON.stringify(qpqEventRecord, null, 2));
-
     // Find the most relevant match
     const matchedQueueType = queueTypes
       .map((qt) => ({

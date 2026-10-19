@@ -112,11 +112,9 @@ export async function resolveStory<TArgs extends Array<any>>(
         finishedAt: getTimeNow(),
       };
 
-      // console.log(`${action.type}: took ${new Date(historyEntry.finishedAt).getTime() - new Date(historyEntry.startedAt).getTime()}ms`);
       response.history.push(historyEntry);
 
       if (isErroredActionResult(actionResult) && !action.returnErrors) {
-        console.log('Caught Error:', JSON.stringify(resolveActionResultError(actionResult)));
         return {
           ...response,
           finishedAt: getTimeNow(),
@@ -137,7 +135,6 @@ export async function resolveStory<TArgs extends Array<any>>(
     }
   } catch (err) {
     if (err instanceof Error) {
-      console.log(`Uncaught Error: [${JSON.stringify(storyProgress?.value?.type)}] ${err.message}`);
       return {
         ...response,
         finishedAt: getTimeNow(),
@@ -165,6 +162,5 @@ export async function resolveStory<TArgs extends Array<any>>(
     result: storyProgress.value,
   };
 
-  // console.log(`story took ${new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()}ms`);
   return storyResult;
 }

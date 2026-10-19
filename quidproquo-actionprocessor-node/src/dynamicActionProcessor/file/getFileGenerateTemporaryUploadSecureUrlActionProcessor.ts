@@ -47,8 +47,6 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
       const baseUrl = getSecureUrlBaseUrl(config);
       const url = `${baseUrl}/secure-upload?token=${token}`;
 
-      console.log(`Generated upload URL for ${filepath} in drive ${drive}, expires at ${new Date(expiresAt).toISOString()}`);
-
       return actionResult(url);
     } catch (error: unknown) {
       // Name-keyed, not instanceof: under npm link / module federation the

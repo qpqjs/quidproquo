@@ -70,8 +70,6 @@ export function* askListLogs(
     filters.push(kvsContains('userInfo', userFilter));
   }
 
-  console.log('filters', JSON.stringify(filters, null, 2));
-
   const logs = yield* askKeyValueStoreQuery<LogMetadata>(
     metadataStoreName,
     kvsAnd([kvsEqual('runtimeType', runtimeType), kvsBetween('startedAt', startDateTime, endDateTime)]),

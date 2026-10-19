@@ -58,9 +58,7 @@ export const decodeValidJwt = async (
       exp: payload.exp,
       wasValid: true,
     };
-  } catch (e) {
-    const summary = e instanceof Error ? `${e.name}: ${e.message}` : 'unknown error';
-    console.log('Failed to decode jwt token:', summary);
+  } catch {
     return null;
   }
 };

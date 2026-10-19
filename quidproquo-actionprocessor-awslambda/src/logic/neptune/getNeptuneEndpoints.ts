@@ -23,7 +23,6 @@ export const getNeptuneEndpoints = async (clusterIdentifier: string, region: str
       readEndpoint: cluster.ReaderEndpoint && cluster.Port ? `https://${cluster.ReaderEndpoint}:${cluster.Port}` : undefined,
     };
   } catch (error) {
-    console.error('Error fetching Neptune cluster endpoints:', error);
     throw new Error(`Failed to retrieve Neptune endpoints: ${error}`);
   }
 };

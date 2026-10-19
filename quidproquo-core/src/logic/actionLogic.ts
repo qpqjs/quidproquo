@@ -68,11 +68,8 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
       return actionResultError(ErrorTypeEnum.OutOfResources, `A transient error occurred, retry [${unmappedKey}].`);
     }
 
-    console.log(`Error: ${unmappedKey}`);
     return actionResultError(ErrorTypeEnum.GenericError, `An unexpected error occurred [${unmappedKey}].`);
   }
-
-  console.log('Caught non-error:', error);
 
   return actionResultError(ErrorTypeEnum.GenericError, 'An unknown error occurred.');
 };
