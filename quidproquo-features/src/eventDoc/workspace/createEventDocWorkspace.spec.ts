@@ -751,7 +751,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.history.noteA).toHaveLength(1);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(0));
     expect(state.slots.noteA.documentIdentity).toEqual(identityA);
     expect(state.slots.noteA.isLoading).toBe(false);
     expect(state.slots.noteA.error).toBeNull();
@@ -798,10 +799,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(fake.appended[0].payload.metadata).toEqual({ version: 1, clientMessageId: 'guid-1' });
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.history.noteA).toHaveLength(3);
-    // Server-stamped metadata replaces the provisional buffer metadata.
-    expect(state.history.noteA[1].payload.metadata.createdBy.userId).toBe('server');
-    expect(state.history.noteA[1].payload.metadata.eventId).toBe(eventId(1));
+    // Each landing is folded then compacted: the slot holds the state at head and no history.
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
+    expect(workspace.docs.noteA.view(state).lines.map((line) => line.lineId)).toEqual(['l1', 'l2']);
     expect(state.slots.noteA.isSaving).toBe(false);
   });
 
@@ -819,7 +820,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.history.noteA).toHaveLength(2); // init + first line
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(1)); // init + first line landed
     expect(state.pending.noteA).toHaveLength(1);
     expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l2', text: 'two' });
     expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
@@ -862,8 +864,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
-    expect(state.history.noteA).toHaveLength(2);
-    expect(state.history.noteA[1].payload.data).toEqual({ title: 'from elsewhere' });
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(1));
+    expect(workspace.docs.noteA.view(state).title).toBe('from elsewhere');
   });
 
   it('init seeds the fold from a server snapshot base and holds only the tail', () => {
@@ -886,9 +889,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    // Only the tail crossed the wire and is held; the base fills in the rest.
-    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(2)]);
-    expect(state.bases.noteA).toEqual(base);
+    // Only the tail crossed the wire; folding it onto the base and compacting leaves the slot at head with no history.
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
 
     // Resuming from the base equals folding the whole log from scratch.
     expect(state.historyViews.noteA).toEqual(foldNoteHistory(allEvents));
@@ -917,7 +920,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     // Both calls cursor from the base's event — never a full refetch.
     expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(1) }, { afterEventId: eventId(1) }]);
-    expect(state.history.noteA).toHaveLength(1);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
     expect(workspace.docs.noteA.view(state).lines).toEqual([{ lineId: 'l1', text: 'from elsewhere' }]);
   });
 
@@ -940,8 +944,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(fake.appended).toHaveLength(2);
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: undefined }]);
 
-    // The held log is the server log, in order and without a hole.
-    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
+    // The slot sits at the server head with nothing skipped.
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(3));
     expect(state.pending.noteA).toHaveLength(0);
     expect(state.slots.noteA.error).toBeNull();
 
@@ -965,7 +970,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     // init, the refresh fetch, then the bootstrap instead of an append.
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }, { afterEventId: undefined }]);
-    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(2)]);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
     expect(state.slots.noteA.error).toBeNull();
   });
 
@@ -980,7 +986,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0)]);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(0));
     expect(workspace.docs.noteA.view(state).title).not.toBe('skipped ahead');
   });
 
@@ -1023,9 +1030,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
 
-    // The snapshot's history is partial (post-base only) — the base must ride along.
-    expect(snapshot.slots.noteA.history).toHaveLength(1);
-    expect(snapshot.slots.noteA.base).toEqual(base);
+    // Compaction folded the tail into the base, so the snapshot carries the base at head and no history.
+    const compactedBase: EventDocSnapshotBase = { eventId: eventId(1), state: foldNoteHistory(allEvents) };
+    expect(snapshot.slots.noteA.history).toHaveLength(0);
+    expect(snapshot.slots.noteA.base).toEqual(compactedBase);
 
     function* swappedSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA }, snapshot);
@@ -1033,8 +1041,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, swappedSession);
 
-    // Restored partial history refolds from the restored base, not from pristine.
-    expect(state.bases.noteA).toEqual(base);
+    // Restore seeds from the carried base, not from pristine.
+    expect(state.bases.noteA).toEqual(compactedBase);
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('snapped');
     expect(view.lines).toEqual([{ lineId: 'l1', text: 'unsaved' }]);
@@ -1094,7 +1102,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.history.noteA).toHaveLength(1);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(0));
     expect(state.slots.noteA.error).toBeNull();
   });
 
@@ -1210,7 +1219,8 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
-    expect(snapshot.slots.noteA.history).toHaveLength(1);
+    expect(snapshot.slots.noteA.history).toHaveLength(0);
+    expect(snapshot.slots.noteA.base?.eventId).toBe(eventId(0));
 
     // The server log grew between the runtimes (another editor appended): the
     // restore must NOT full-fetch — only the tail after the snapshot's last event.
@@ -1226,7 +1236,9 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect(state.slots.noteA.isLoading).toBe(false);
 
-    expect(state.history.noteA).toHaveLength(2);
+    // The synced tail was folded in and compacted away.
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(1));
     expect(state.pending.noteA).toHaveLength(2);
     expectStrictlyIncreasing(state.pending.noteA);
     expect(workspace.selectors.isDirty(state)).toBe(true);
@@ -1258,7 +1270,8 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     // Two FULL loads — no tail-pull.
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: undefined }]);
-    expect(state.history.noteA).toHaveLength(1);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(0));
     expect(state.pending.noteA).toHaveLength(1);
     expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
   });
@@ -1313,7 +1326,8 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
-    expect(snapshot.slots.noteA.base).toEqual(base);
+    // The tail after the server base was folded in and the compacted base keeps the slot's key.
+    expect(snapshot.slots.noteA.base).toEqual({ eventId: eventId(1), state: foldNoteHistory(allEvents), snapshotCacheKey: 'k2' });
 
     function* swappedSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA }, snapshot);
@@ -1350,7 +1364,8 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
       { lineId: 'l2', text: 'two' },
     ]);
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.history.noteA).toHaveLength(3);
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
   });
 
   it('drops snapshot pending when the identity does not match: intent never leaks across documents', () => {
@@ -1422,7 +1437,7 @@ describe('createEventDocWorkspace historyViews', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory([initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Loaded' }, 1)]));
     expect((state.historyViews.noteA as NoteState).title).toBe('Loaded');
   });
 
@@ -1439,8 +1454,9 @@ describe('createEventDocWorkspace historyViews', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.history.noteA).toHaveLength(3);
-    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+    // After compaction the base IS the stored view, at head.
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.bases.noteA?.state).toBe(state.historyViews.noteA);
     expect((state.historyViews.noteA as NoteState).lines).toEqual([
       { lineId: 'l1', text: 'one' },
       { lineId: 'l2', text: 'two' },
@@ -1463,7 +1479,7 @@ describe('createEventDocWorkspace historyViews', () => {
     // the reference full refold.
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect((state.historyViews.noteA as NoteState).title).toBe('from elsewhere');
-    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]));
   });
 
   it('an all-old-version log stores the raw accumulator; refresh tails at that version fold fine; the view reads latest', () => {

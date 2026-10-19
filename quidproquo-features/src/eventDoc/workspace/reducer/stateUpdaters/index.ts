@@ -5,6 +5,7 @@ export * from './createAppendHistoryEventsUpdater';
 export * from './createAppendHistoryEventUpdater';
 export * from './createApplyEventUpdater';
 export * from './createApplyTransientEventUpdater';
+export * from './createCompactUpdater';
 export * from './createResetUpdater';
 export * from './createSetHistoryEventsUpdater';
 export * from './dropTransient';

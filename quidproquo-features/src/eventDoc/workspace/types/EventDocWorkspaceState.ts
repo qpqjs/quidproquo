@@ -6,9 +6,11 @@ import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsCo
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 
 /**
- * Per-slot event streams. `history` is the saved log after `bases[slot]` (null base means the whole log); `pending` is the
- * unsaved buffer every commit lands in; `transient` holds never-saved observations by transientKey. `historyViews` is the
- * reducer-maintained fold of base + history, at the last folded event's schema version. `fullHistory` is display-only.
+ * Per-slot event streams. `history` is the saved log after `bases[slot]` (null base means the whole log); the stories
+ * compact after every server-sourced append, moving the base up to the last held event, so at rest it is empty and never
+ * grows with the session. `pending` is the unsaved buffer every commit lands in; `transient` holds never-saved observations
+ * by transientKey. `historyViews` is the reducer-maintained fold of base + history, at the last folded event's schema
+ * version. `fullHistory` is display-only.
  */
 export type EventDocWorkspaceState = {
   history: Record<string, EventDocEvent[]>;

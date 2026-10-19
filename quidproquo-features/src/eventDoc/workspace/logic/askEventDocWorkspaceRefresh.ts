@@ -2,6 +2,7 @@ import { askCatch, askMapParallel, AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvents';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
+import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -39,6 +40,7 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
     // A tail that does not start at head + 1 cannot be folded on; the bootstrap rebuilds the slot from a known base.
     if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, result.result)) {
       yield* askUIEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
+      yield* askUIEventDocWorkspaceCompact(slotKey);
     } else {
       yield* askEventDocWorkspaceResync(transport, slotKey);
     }

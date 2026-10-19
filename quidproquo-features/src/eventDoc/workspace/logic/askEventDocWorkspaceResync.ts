@@ -1,6 +1,7 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
+import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
@@ -8,8 +9,8 @@ import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport'
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
 /**
- * Replaces a slot's base and saved history with the server's bootstrap (newest snapshot plus the tail to head). Pending is
- * untouched and keeps folding on top. The recovery for any gap between the held history and the server log, and the plain
+ * Replaces a slot's base and saved history with the server's bootstrap (newest snapshot plus the tail to head), then
+ * compacts so the slot holds the state at head and no history. Pending is untouched and keeps folding on top. The recovery for any gap between the held history and the server log, and the plain
  * load for a slot with nothing held. A slot with no identity is skipped; a failed fetch surfaces as a load error.
  */
 export function* askEventDocWorkspaceResync(transport: EventDocWorkspaceTransport, slotKey: string): AskResponse<void> {
@@ -30,4 +31,5 @@ export function* askEventDocWorkspaceResync(transport: EventDocWorkspaceTranspor
   }
 
   yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result.events, result.result.base);
+  yield* askUIEventDocWorkspaceCompact(slotKey);
 }

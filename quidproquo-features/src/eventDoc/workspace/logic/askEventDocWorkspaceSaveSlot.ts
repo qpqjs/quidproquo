@@ -2,6 +2,7 @@ import { askCatch, AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocWorkspaceAppendHistoryEvent } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvent';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
+import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
 import { askUIEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askUIEventDocWorkspaceRemovePendingEvent';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDocWorkspaceSetSaving';
@@ -42,6 +43,7 @@ export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransp
     // saves on top of the corrected base.
     if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, [result.result])) {
       yield* askUIEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
+      yield* askUIEventDocWorkspaceCompact(slotKey);
     } else {
       yield* askEventDocWorkspaceResync(transport, slotKey);
     }

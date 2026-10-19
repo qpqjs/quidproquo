@@ -4,6 +4,7 @@ export * from './askUIEventDocWorkspaceAppendHistoryEvents';
 export * from './askUIEventDocWorkspaceApplyEvent';
 export * from './askUIEventDocWorkspaceApplyTransientEvent';
 export * from './askUIEventDocWorkspaceClearError';
+export * from './askUIEventDocWorkspaceCompact';
 export * from './askUIEventDocWorkspaceDropTransient';
 export * from './askUIEventDocWorkspaceRemovePendingEvent';
 export * from './askUIEventDocWorkspaceReset';

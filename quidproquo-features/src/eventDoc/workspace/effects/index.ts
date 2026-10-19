@@ -4,6 +4,7 @@ export * from './EventDocWorkspaceAppendHistoryEventsEffect';
 export * from './EventDocWorkspaceApplyEventEffect';
 export * from './EventDocWorkspaceApplyTransientEventEffect';
 export * from './EventDocWorkspaceClearErrorEffect';
+export * from './EventDocWorkspaceCompactEffect';
 export * from './EventDocWorkspaceDropTransientEffect';
 export * from './EventDocWorkspaceEffect';
 export * from './EventDocWorkspaceEffects';

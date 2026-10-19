@@ -10,6 +10,7 @@ import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHi
 import { createAppendHistoryEventUpdater } from './stateUpdaters/createAppendHistoryEventUpdater';
 import { createApplyEventUpdater } from './stateUpdaters/createApplyEventUpdater';
 import { createApplyTransientEventUpdater } from './stateUpdaters/createApplyTransientEventUpdater';
+import { createCompactUpdater } from './stateUpdaters/createCompactUpdater';
 import { createResetUpdater } from './stateUpdaters/createResetUpdater';
 import { createSetHistoryEventsUpdater } from './stateUpdaters/createSetHistoryEventsUpdater';
 import { dropTransient } from './stateUpdaters/dropTransient';
@@ -40,6 +41,7 @@ export const createEventDocWorkspaceReducer = (
     [EventDocWorkspaceEffect.AppendFullHistory]: appendFullHistory,
     [EventDocWorkspaceEffect.AppendHistoryEvent]: createAppendHistoryEventUpdater(slots),
     [EventDocWorkspaceEffect.AppendHistoryEvents]: createAppendHistoryEventsUpdater(slots),
+    [EventDocWorkspaceEffect.Compact]: createCompactUpdater(slots),
     [EventDocWorkspaceEffect.SetPendingEvents]: setPendingEvents,
     [EventDocWorkspaceEffect.RemovePendingEvent]: removePendingEvent,
     [EventDocWorkspaceEffect.SetDocumentIdentity]: setDocumentIdentity,
