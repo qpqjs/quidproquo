@@ -921,6 +921,93 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(workspace.docs.noteA.view(state).lines).toEqual([{ lineId: 'l1', text: 'from elsewhere' }]);
   });
 
+  it("a save ack that skips another writer's event resyncs, and the next pending event saves on the corrected base", () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+      // Another editor lands event 1 before our save, so our first event is stored as 2.
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
+      yield* workspace.api.askSave();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // Both events saved; the gap triggered one bootstrap pull between them.
+    expect(fake.appended).toHaveLength(2);
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: undefined }]);
+
+    // The held log is the server log, in order and without a hole.
+    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.slots.noteA.error).toBeNull();
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('from elsewhere');
+    expect(view.lines.map((line) => line.lineId)).toEqual(['l1', 'l2']);
+  });
+
+  it('a refresh tail that does not follow the held head rebuilds the slot from the bootstrap', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      // The tail the fetch returns starts at 2: event 1 is missing from what the slot would fold.
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'gap' }, 2)]);
+      yield* workspace.api.askRefresh('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // init, the refresh fetch, then the bootstrap instead of an append.
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }, { afterEventId: undefined }]);
+    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(2)]);
+    expect(state.slots.noteA.error).toBeNull();
+  });
+
+  it('appending a saved event past a gap leaves the slot unchanged', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* askUIEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.SetTitle, { title: 'skipped ahead' }, 5));
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0)]);
+    expect(workspace.docs.noteA.view(state).title).not.toBe('skipped ahead');
+  });
+
+  it('resync replaces base and history from the bootstrap and keeps pending', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'mine');
+      const serverLog = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'moved on' }, 1)];
+      fake.setServerEvents(serverLog);
+      fake.setServerBase({ eventId: eventId(1), state: foldNoteHistory(serverLog) });
+      yield* workspace.api.askResync('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.bases.noteA?.eventId).toBe(eventId(1));
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.pending.noteA).toHaveLength(1);
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('moved on');
+    expect(view.lines.map((line) => line.lineId)).toEqual(['l1']);
+  });
+
   it('a runtime snapshot carries the fold base and restores it with the partial history', () => {
     const allEvents = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'snapped' }, 1)];
     const base: EventDocSnapshotBase = { eventId: eventId(0), state: foldNoteHistory(allEvents.slice(0, 1)) };

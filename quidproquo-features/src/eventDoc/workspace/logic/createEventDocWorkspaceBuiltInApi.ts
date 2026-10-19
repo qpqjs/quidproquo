@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askMapParallel, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { EventDocWorkspaceBuiltInApi } from '../types/EventDocWorkspaceBuiltInApi';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
@@ -9,6 +9,7 @@ import { askEventDocWorkspaceInit } from './askEventDocWorkspaceInit';
 import { askEventDocWorkspaceLoadFullHistory, askEventDocWorkspaceLoadOlderHistory } from './askEventDocWorkspaceLoadFullHistory';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
 import { askEventDocWorkspaceRestoreLocalPending } from './askEventDocWorkspaceRestoreLocalPending';
+import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
 import { askEventDocWorkspaceSave } from './askEventDocWorkspaceSave';
 
 // The transport is optional so all-local workspaces stay zero-config; transport verbs fail loudly without one.
@@ -56,6 +57,12 @@ const getAskRefresh = (transport: EventDocWorkspaceTransport | undefined, docume
     yield* askEventDocWorkspaceRefresh(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
+const getAskResync = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+  function* askResync(slotKey?: string): AskResponse<void> {
+    const ensured = yield* askEnsureTransport(transport);
+    yield* askMapParallel(resolveSlotKeys(documentSlotKeys, slotKey), (documentSlotKey) => askEventDocWorkspaceResync(ensured, documentSlotKey));
+  };
+
 const getAskLoadHistory = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
   function* askLoadHistory(slotKey?: string): AskResponse<void> {
     yield* askEventDocWorkspaceLoadFullHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
@@ -67,7 +74,7 @@ const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefine
   };
 
 /**
- * Builds the workspace's built-in init/save/cancel/refresh/history verbs. slotKey omitted means every document slot.
+ * Builds the workspace's built-in init/save/cancel/refresh/resync/history verbs. slotKey omitted means every document slot.
  * `slotSnapshotCacheKeys` is each document slot's definition key, so init can reject a held base filed under another key.
  */
 export const createEventDocWorkspaceBuiltInApi = (
@@ -80,6 +87,7 @@ export const createEventDocWorkspaceBuiltInApi = (
   askSave: getAskSave(transport, documentSlotKeys),
   askCancel: getAskCancel(documentSlotKeys),
   askRefresh: getAskRefresh(transport, documentSlotKeys),
+  askResync: getAskResync(transport, documentSlotKeys),
   askLoadHistory: getAskLoadHistory(transport, documentSlotKeys),
   askLoadOlderHistory: getAskLoadOlderHistory(transport, documentSlotKeys),
 });

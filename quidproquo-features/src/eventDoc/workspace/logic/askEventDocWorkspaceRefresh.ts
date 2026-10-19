@@ -6,6 +6,9 @@ import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocW
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
+import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
+import { getSlotHeadEventId } from './getSlotHeadEventId';
+import { isContiguousWithSlotHead } from './isContiguousWithSlotHead';
 
 // afterEventId is exclusive. It falls back to the fold base when the held history is empty, so a slot whose snapshot was
 // current does not refetch from event zero.
@@ -18,9 +21,7 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
       return;
     }
 
-    const history = state.history[slotKey] ?? [];
-    const lastEvent = history[history.length - 1];
-    const afterEventId = lastEvent?.payload.metadata.eventId ?? state.bases[slotKey]?.eventId;
+    const afterEventId = getSlotHeadEventId(state, slotKey) ?? undefined;
 
     yield* askUIEventDocWorkspaceClearError(slotKey);
 
@@ -31,8 +32,15 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
       return;
     }
 
-    if (result.result.length > 0) {
+    if (result.result.length === 0) {
+      return;
+    }
+
+    // A tail that does not start at head + 1 cannot be folded on; the bootstrap rebuilds the slot from a known base.
+    if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, result.result)) {
       yield* askUIEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
+    } else {
+      yield* askEventDocWorkspaceResync(transport, slotKey);
     }
   };
 

@@ -1,17 +1,16 @@
-import { askCatch, askMapParallel, AskResponse, Nullable } from 'quidproquo-core';
+import { askMapParallel, AskResponse, Nullable } from 'quidproquo-core';
 
 import { EventDocEvent, EventDocSnapshotBase } from '../../models';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceSetDocumentIdentity } from '../actionCreators/askUIEventDocWorkspaceSetDocumentIdentity';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
 import { askUIEventDocWorkspaceSetLoading } from '../actionCreators/askUIEventDocWorkspaceSetLoading';
 import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
-import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceSlotSnapshot, EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
+import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
 import { isSameEventDocWorkspaceIdentity } from './isSameEventDocWorkspaceIdentity';
 
 // Runtime hand-off: seed history and pending from the snapshot so the view renders at once, then tail-pull what landed since.
@@ -71,21 +70,7 @@ const getAskInitDocumentSlot = (
     yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
     yield* askUIEventDocWorkspaceClearError(slotKey);
     yield* askUIEventDocWorkspaceSetLoading(slotKey, true);
-
-    const result = yield* askCatch(transport.askFetchBootstrap(documentIdentity));
-
-    if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
-      yield* askUIEventDocWorkspaceSetLoading(slotKey, false);
-      return;
-    }
-
-    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result.events, result.result.base);
-
-    if (preservedPending.length > 0) {
-      yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
-    }
-
+    yield* askEventDocWorkspaceResync(transport, slotKey);
     yield* askUIEventDocWorkspaceSetLoading(slotKey, false);
   };
 

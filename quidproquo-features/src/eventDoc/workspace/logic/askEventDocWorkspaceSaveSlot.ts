@@ -8,6 +8,8 @@ import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDoc
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
+import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
+import { isContiguousWithSlotHead } from './isContiguousWithSlotHead';
 import { toEventDocEventInput } from './toEventDocEventInput';
 
 /**
@@ -35,7 +37,15 @@ export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransp
       break;
     }
 
-    yield* askUIEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
+    // The server stored the event either way, so it leaves pending. An ack that does not follow the held head means
+    // another writer landed events in between: the bootstrap brings them (and this ack) in, and the next pending event
+    // saves on top of the corrected base.
+    if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, [result.result])) {
+      yield* askUIEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
+    } else {
+      yield* askEventDocWorkspaceResync(transport, slotKey);
+    }
+
     yield* askUIEventDocWorkspaceRemovePendingEvent(slotKey, result.result.payload.metadata.clientMessageId);
   }
 
