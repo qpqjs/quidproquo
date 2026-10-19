@@ -73,6 +73,8 @@ The response is returned for any completed HTTP exchange, including non-2xx stat
 | Error | Meaning |
 | --- | --- |
 | `NetworkRequestErrorTypeEnum.Timeout` | The request exceeded the request timeout and was aborted. |
+| `UnsupportedMethod` | The HTTP method is one the runtime refuses to send. |
+| `NetworkError` | No response came back: no connection, DNS failure, CORS block, unparseable body. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

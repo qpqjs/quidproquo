@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { ApiActionType } from './ApiActionType';
-import { askApiRequest } from './askApiRequest';
+import { askApiRequest, askApiRequestBase } from './askApiRequest';
 
 describe('askApiRequest', () => {
   it('yields a Request action defaulting the response type to json', () => {
@@ -51,5 +51,15 @@ describe('askApiRequest', () => {
     const { returned } = captureRequester(askApiRequest('userService', 'GET', '/users'), { ok: true });
 
     expect(returned).toEqual({ ok: true });
+  });
+});
+
+describe('errorType', () => {
+  it('lists every error the processor can produce, namespaced by the action type', () => {
+    expect(askApiRequestBase.errorType).toEqual({
+      Timeout: `${ApiActionType.Request}-Timeout`,
+      UnsupportedMethod: `${ApiActionType.Request}-UnsupportedMethod`,
+      NetworkError: `${ApiActionType.Request}-NetworkError`,
+    });
   });
 });

@@ -1,5 +1,13 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, Nullable, ProcessorFor } from 'quidproquo-core';
-import { ApiActionType, askApiRequestBase, preformNetworkRequest } from 'quidproquo-webserver';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  Nullable,
+  ProcessorFor,
+} from 'quidproquo-core';
+import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, preformNetworkRequest } from 'quidproquo-webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
@@ -20,20 +28,29 @@ const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): Proce
   return async ({ service, endpoint, method, body, params, headers, responseType }) => {
     const basePath = (options?.resolveServiceBaseUrl ?? defaultResolveServiceBaseUrl)(service);
 
-    const res = await preformNetworkRequest({
-      url: endpoint,
-      basePath,
-      method,
-      body,
-      params,
-      responseType,
-      headers: {
-        ...headers,
-        ...options?.getHeaders?.(),
-      },
-    });
+    try {
+      const res = await preformNetworkRequest({
+        url: endpoint,
+        basePath,
+        method,
+        body,
+        params,
+        responseType,
+        headers: {
+          ...headers,
+          ...options?.getHeaders?.(),
+        },
+      });
 
-    return actionResult(res);
+      return actionResult(res);
+    } catch (error: unknown) {
+      // Keyed on NetworkRequestError.code, which the mapper checks before the error name.
+      return actionResultErrorFromCaughtError(error, {
+        [NetworkRequestErrorCode.timeout]: () => actionResultError(askApiRequestBase.errorType.Timeout, 'Network request timed out'),
+        [NetworkRequestErrorCode.unsupportedMethod]: (error) => actionResultError(askApiRequestBase.errorType.UnsupportedMethod, error.message),
+        [NetworkRequestErrorCode.network]: (error) => actionResultError(askApiRequestBase.errorType.NetworkError, error.message),
+      });
+    }
   };
 };
 

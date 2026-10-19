@@ -21,6 +21,11 @@ export interface ApiRequestAction<T> extends Action<ApiRequestActionPayload<T>> 
 
 export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
   actionType: ApiActionType.Request,
+  errorTypes: [
+    'Timeout', // the request exceeded the request timeout and was aborted
+    'UnsupportedMethod', // the HTTP method is one the runtime refuses to send
+    'NetworkError', // no response came back: no connection, DNS failure, CORS block, unparseable body
+  ],
   getPayload: (service: string, method: HTTPMethod, endpoint: string, options?: ApiRequestOptions<unknown>) => ({
     service,
     endpoint,

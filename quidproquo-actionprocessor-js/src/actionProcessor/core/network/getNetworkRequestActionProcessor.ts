@@ -7,15 +7,18 @@ import {
   ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
-import { executeNetworkRequest } from 'quidproquo-webserver';
+import { NetworkRequestErrorCode, preformNetworkRequest } from 'quidproquo-webserver';
 
 const getProcessNetworkRequest = (qpqConfig: QPQConfig): ProcessorFor<typeof askNetworkRequestBase> => {
   return async (payload) => {
     try {
-      return actionResult(await executeNetworkRequest(payload));
+      return actionResult(await preformNetworkRequest(payload));
     } catch (error: unknown) {
+      // Keyed on NetworkRequestError.code, which the mapper checks before the error name.
       return actionResultErrorFromCaughtError(error, {
-        AbortError: () => actionResultError(askNetworkRequestBase.errorType.Timeout, 'Network request timed out'),
+        [NetworkRequestErrorCode.timeout]: () => actionResultError(askNetworkRequestBase.errorType.Timeout, 'Network request timed out'),
+        [NetworkRequestErrorCode.unsupportedMethod]: (error) => actionResultError(askNetworkRequestBase.errorType.UnsupportedMethod, error.message),
+        [NetworkRequestErrorCode.network]: (error) => actionResultError(askNetworkRequestBase.errorType.NetworkError, error.message),
       });
     }
   };

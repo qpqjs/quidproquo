@@ -19,6 +19,8 @@ export const askNetworkRequestBase = createActionRequester<HTTPNetworkResponse<u
   actionType: NetworkActionType.Request,
   errorTypes: [
     'Timeout', // the request exceeded the request timeout and was aborted
+    'UnsupportedMethod', // the HTTP method is one the runtime refuses to send
+    'NetworkError', // no response came back: no connection, DNS failure, CORS block, unparseable body
   ],
   getPayload: (method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<unknown>): NetworkRequestActionPayload<unknown> => ({
     url,

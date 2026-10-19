@@ -1,12 +1,16 @@
-import { buildTestQpqConfig, ErrorTypeEnum, NetworkActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askNetworkRequestBase, buildTestQpqConfig, NetworkActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { NetworkRequestError, NetworkRequestErrorCode } from 'quidproquo-webserver';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getNetworkRequestActionProcessor } from './getNetworkRequestActionProcessor';
 
-const { executeNetworkRequest } = vi.hoisted(() => ({ executeNetworkRequest: vi.fn() }));
+const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
 
-vi.mock('quidproquo-webserver', () => ({ executeNetworkRequest }));
+vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<typeof import('quidproquo-webserver')>()),
+  preformNetworkRequest,
+}));
 
 describe('getNetworkRequestActionProcessor', () => {
   const resolve = async () =>
@@ -15,33 +19,45 @@ describe('getNetworkRequestActionProcessor', () => {
       ...rest: any[]
     ) => Promise<any>;
 
+  const rejectWith = async (error: unknown) => {
+    preformNetworkRequest.mockRejectedValue(error);
+    const processor = await resolve();
+    return resolveActionResultError(await processor({ method: 'GET', url: '/x', responseType: 'json' }));
+  };
+
   afterEach(() => {
     vi.restoreAllMocks();
-    executeNetworkRequest.mockReset();
+    preformNetworkRequest.mockReset();
   });
 
   it('wraps the network response in a successful action result', async () => {
     const response = { headers: { 'content-type': 'application/json' }, status: 200, statusText: 'OK', data: { hello: 'world' } };
-    executeNetworkRequest.mockResolvedValue(response);
+    preformNetworkRequest.mockResolvedValue(response);
     const processor = await resolve();
 
     const result = await processor({ method: 'GET', url: '/users', responseType: 'json' });
 
-    expect(executeNetworkRequest).toHaveBeenCalledWith({ method: 'GET', url: '/users', responseType: 'json' });
+    expect(preformNetworkRequest).toHaveBeenCalledWith({ method: 'GET', url: '/users', responseType: 'json' });
     expect(resolveActionResult(result)).toEqual(response);
   });
 
-  it('maps an unmapped rejected request to a generic error keyed by its name', async () => {
-    const error = new Error('network down');
-    executeNetworkRequest.mockRejectedValue(error);
-    const processor = await resolve();
+  it('maps a timeout to the Timeout error type', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.timeout, 'Network request timed out'));
 
-    const result = await processor({ method: 'GET', url: '/x', responseType: 'json' });
+    expect(error.errorType).toBe(askNetworkRequestBase.errorType.Timeout);
+  });
 
-    expect(resolveActionResultError(result)).toEqual({
-      errorType: ErrorTypeEnum.GenericError,
-      errorText: 'An unexpected error occurred [Error].',
-      errorStack: undefined,
-    });
+  it('maps an unsupported method to the UnsupportedMethod error type with its message', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.unsupportedMethod, 'Request method not implemented [CONNECT]'));
+
+    expect(error.errorType).toBe(askNetworkRequestBase.errorType.UnsupportedMethod);
+    expect(error.errorText).toBe('Request method not implemented [CONNECT]');
+  });
+
+  it('maps any other transport failure to the NetworkError error type with its message', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.network, 'Failed to fetch'));
+
+    expect(error.errorType).toBe(askNetworkRequestBase.errorType.NetworkError);
+    expect(error.errorText).toBe('Failed to fetch');
   });
 });

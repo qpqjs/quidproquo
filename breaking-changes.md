@@ -6,6 +6,7 @@ assembled quickly.
 ## vNext
 
 - `preformNetworkRequest` no longer turns a failed request into a fake `500` response. It still resolves with any real HTTP response (any status), but now throws a `NetworkRequestError` (new export) when no response came back. Check `error.code` against `NetworkRequestErrorCode` (`timeout`, `unsupportedMethod`, `network`) instead of testing for `status === 500`. `executeNetworkRequest` throws `NetworkRequestError` with code `unsupportedMethod` for refused methods.
+- `askNetworkRequest` and `askApiRequest` now fail with `UnsupportedMethod` or `NetworkError` (alongside `Timeout`) when no response came back, instead of an unmapped generic error. Code that caught the generic error for a dead connection should catch the new error types.
 
 ## 0.1.33
 

@@ -50,6 +50,8 @@ describe('errorType', () => {
   it('lists every error the processor can produce, namespaced by the action type', () => {
     expect(askNetworkRequestBase.errorType).toEqual({
       Timeout: `${NetworkActionType.Request}-Timeout`,
+      UnsupportedMethod: `${NetworkActionType.Request}-UnsupportedMethod`,
+      NetworkError: `${NetworkActionType.Request}-NetworkError`,
     });
   });
 });

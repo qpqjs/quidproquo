@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { ApiActionType } from 'quidproquo-webserver';
+import { ApiActionType, askApiRequestBase, NetworkRequestError, NetworkRequestErrorCode } from 'quidproquo-webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -73,5 +73,32 @@ describe('createApiRequestActionProcessor', () => {
     await processor(buildRequest());
 
     expect(preformNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ headers: { 'x-call': 'override', authorization: 'Bearer t' } }));
+  });
+
+  const rejectWith = async (error: unknown) => {
+    preformNetworkRequest.mockRejectedValue(error);
+    const processor = await getProcessor();
+    const [, actionError] = await processor(buildRequest());
+    return actionError;
+  };
+
+  it('maps a timeout to the Timeout error type', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.timeout, 'Network request timed out'));
+
+    expect(error.errorType).toBe(askApiRequestBase.errorType.Timeout);
+  });
+
+  it('maps an unsupported method to the UnsupportedMethod error type with its message', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.unsupportedMethod, 'Request method not implemented [CONNECT]'));
+
+    expect(error.errorType).toBe(askApiRequestBase.errorType.UnsupportedMethod);
+    expect(error.errorText).toBe('Request method not implemented [CONNECT]');
+  });
+
+  it('maps any other transport failure to the NetworkError error type with its message', async () => {
+    const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.network, 'Failed to fetch'));
+
+    expect(error.errorType).toBe(askApiRequestBase.errorType.NetworkError);
+    expect(error.errorText).toBe('Failed to fetch');
   });
 });
