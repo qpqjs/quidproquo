@@ -35,7 +35,7 @@ describe('defineTenantedWebSocketQueue', () => {
     const config = defineTenantedWebSocketQueue('chat-bus', 'chat', { userDirectoryName: 'users' });
 
     // Same shape as defineWebSocketQueue: five globals, the connection and subscription kvs and a websocket.
-    expect(config).toHaveLength(8);
+    expect(config).toHaveLength(9);
     expect(config.some((setting) => (setting as { value?: unknown }).value === 'users')).toBe(true);
   });
 });

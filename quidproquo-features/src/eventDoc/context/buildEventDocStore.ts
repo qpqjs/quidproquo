@@ -11,7 +11,16 @@ export type EventDocStoreOptions = {
   onAppend?: string;
   scopeResolver?: string;
   authorise?: string;
-  syncWebsocketApiName?: string;
+  syncWebsocketApiName?: string | string[];
+};
+
+/** One list whichever way the sync option was written; '' and [] both mean no pushes. */
+export const toSyncWebsocketApiNames = (syncWebsocketApiName: unknown): string[] => {
+  if (Array.isArray(syncWebsocketApiName)) {
+    return syncWebsocketApiName.filter((name): name is string => typeof name === 'string' && name !== '');
+  }
+
+  return typeof syncWebsocketApiName === 'string' && syncWebsocketApiName !== '' ? [syncWebsocketApiName] : [];
 };
 
 /** Builds an EventDocStore from storeName + type. Single source of the naming convention shared by built-in and custom routes. */
@@ -33,5 +42,5 @@ export const buildEventDocStore = ({
   onAppend,
   scopeResolver,
   authorise,
-  syncWebsocketApiName,
+  syncWebsocketApiNames: toSyncWebsocketApiNames(syncWebsocketApiName),
 });

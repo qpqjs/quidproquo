@@ -33,6 +33,8 @@ export const envelopeEventDoc = createEventDocDefinition({
 
 The definition is what both the built-in routes (through `defineEventDoc` / `defineTenantedEventDoc`) and a service-side `createEventDocBackend` read, so one setting covers client-authored appends and the server-authored ones a signing step or a build worker makes. A hand-mounted `defineEventDocRoutes` can still take `sync` directly, and an explicit routes option wins over the definition's.
 
+`websocketApiName` also takes a list, for a collection whose readers sit on more than one queue (an admin viewer on the tenant queue and a public page on a queue of its own); every queue gets the same push.
+
 Every append through that collection, client-authored or server-authored, then pushes under the append's storage scope. Only connections validated into the same scope receive it. The push is best-effort and runs after the hooks: a failed push never fails the append.
 
 ### 3. The slot and the hook in the editor
@@ -71,6 +73,18 @@ useEventDocWorkspaceSync(workspace.storeNames, state, api);
 - For every opted-in slot with a bound identity it sends `Subscribe { topic: 'eventDoc#<store>#<docId>' }` as soon as the connection is authenticated, `Unsubscribe` when the slot rebinds to another document, and `Unsubscribe` on unmount while the socket is open.
 - Subscriptions live on the server connection, and the server drops them all on every authenticate. So every `Authenticated` message (first open, a reconnect, a tenant switch) makes the hook subscribe again, and after a re-authentication it tail-pulls each slot to cover pushes missed while away. A slot still loading its bootstrap is not pulled; the bootstrap lands current.
 - A head-moved push is mapped back to a slot by store name and document id and handed to `askSyncHeadMoved`.
+
+### A page that is not a workspace
+
+A page that reads a document through its own api (a public signing page that GETs a view, say) can still follow pushes with `useEventDocHeadMovedSubscription`:
+
+```typescript
+import { useEventDocHeadMovedSubscription } from 'quidproquo-web-react';
+
+useEventDocHeadMovedSubscription('envelopes', envelopeId, api.refresh);
+```
+
+It subscribes to that one document once authenticated, again on every `Authenticated`, and calls back with the push payload for pushes about that document only. A null id follows nothing.
 
 ## What `askSyncHeadMoved` does
 

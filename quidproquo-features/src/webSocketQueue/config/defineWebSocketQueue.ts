@@ -33,6 +33,15 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // on every Subscribe message; it throws to refuse. Without one, any
   // authenticated connection may subscribe to any topic within its own scope.
   topicAuthoriser?: string;
+
+  // Registered inline-function name invoked with WebSocketQueueAuthenticateInput
+  // on every Authenticate message and again on every later message, in place of
+  // the user directory: it returns the principal to store on the connection
+  // (WebSocketQueueAuthenticateResult) or throws to reject. The scope it returns
+  // is final; connectionScopeResolver does not run. For queues whose clients
+  // hold a token the owning service validates itself (a signing session, say).
+  // Mutually exclusive with userDirectoryName.
+  connectionAuthenticator?: string;
 }
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
@@ -55,6 +64,10 @@ export function getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName: stri
   return `qpq-wsq-topic-authoriser-${apiName}`;
 }
 
+export function getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName: string): string {
+  return `qpq-wsq-authenticator-${apiName}`;
+}
+
 export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
   return `qpq-wsq-${apiName}`;
 }
@@ -68,6 +81,10 @@ export const defineWebSocketQueue = (
   apiName: string,
   advancedSettings?: QPQConfigAdvancedWebsocketQueueSettings,
 ): QPQConfig => {
+  if (advancedSettings?.userDirectoryName && advancedSettings?.connectionAuthenticator) {
+    throw new Error(`websocket queue '${apiName}' sets both userDirectoryName and connectionAuthenticator - a connection authenticates one way.`);
+  }
+
   return [
     // User defined vars (stored in config)
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
@@ -75,6 +92,7 @@ export const defineWebSocketQueue = (
     defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected || ''),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName), advancedSettings?.connectionAuthenticator || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {

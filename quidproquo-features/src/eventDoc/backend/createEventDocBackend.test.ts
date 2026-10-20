@@ -54,7 +54,7 @@ describe('createEventDocBackend', () => {
 
     const store = runStory(backend.askProvideStore(askEventDocStoreRead()), {});
 
-    expect(store.syncWebsocketApiName).toBe('ws');
+    expect(store.syncWebsocketApiNames).toEqual(['ws']);
   });
 
   it('leaves the store context without a websocket when the definition has no sync', () => {
@@ -62,7 +62,7 @@ describe('createEventDocBackend', () => {
 
     const store = runStory(backend.askProvideStore(askEventDocStoreRead()), {});
 
-    expect(store.syncWebsocketApiName).toBeUndefined();
+    expect(store.syncWebsocketApiNames).toEqual([]);
   });
 
   it('throws at build time for a definition with no identity', () => {

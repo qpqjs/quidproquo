@@ -66,6 +66,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   connectionScopeResolver?: string;
   onConnected?: string;
   topicAuthoriser?: string;
+  connectionAuthenticator?: string;
 }
 ```
 
@@ -74,7 +75,8 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 | `userDirectoryName` | `string` | `''` | Name of the [user directory](../core/user-directory.md) used to authenticate clients (stored in the `qpq-wsq-kvs-name-<apiName>` global). Enables the authenticate client/server message flow. |
 | `connectionScopeResolver` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ userId, requestedScope }` on **every** Authenticate message, whether or not it claims a storage scope (stored in the `qpq-wsq-scope-resolver-<apiName>` global). It returns the effective scope to store on the connection (e.g. a membership-checked tenant scope for a claim, or the user's own scope for no claim), or throws to reject the authenticate. A scope claim with no resolver configured is rejected outright, leaving the connection unauthenticated. |
 | `onConnected` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId }` as soon as a connection opens, **before** any authenticate — so it must only push public state (e.g. broadcasting an already-active maintenance notice to a pre-login client). Runs in the websocket-owning service; failures are swallowed so a sync problem never breaks the connect. |
-| `topicAuthoriser` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId, userId, scope, topic }` on every Subscribe message; it throws to refuse. Without one, any authenticated connection may subscribe to any topic within its own scope. |
+| `topicAuthoriser` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId, userId, scope, accessToken, topic }` on every Subscribe message; it throws to refuse. Without one, any authenticated connection may subscribe to any topic within its own scope. `accessToken` is the token the connection authenticated with, for an authoriser on a `connectionAuthenticator` queue that needs to resolve it. |
+| `connectionAuthenticator` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ accessToken, requestedScope }` on every Authenticate message and again on every later message, in place of the user directory (stored in the `qpq-wsq-authenticator-<apiName>` global). It returns `{ userId, scope? }` to store on the connection, or throws to reject; the scope it returns is final and `connectionScopeResolver` does not run. For a queue whose clients hold a token the owning service validates itself, such as a signing session. Mutually exclusive with `userDirectoryName`: setting both throws at define time. |
 | `owner` | `CrossModuleOwnerWithNoResourceOverride` | – | Declares the queue's resources as owned by another module/service, so this service references them instead of deploying its own. Applied to both the WebSocket API and the connection store. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; when set, the underlying WebSocket API is not deployed. |
 

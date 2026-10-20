@@ -7,6 +7,7 @@ import {
   EVENT_DOC_ON_APPEND_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
+  EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL,
 } from '../constants/eventDocGlobalNames';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { buildEventDocStore } from '../context/buildEventDocStore';
@@ -28,7 +29,7 @@ describe('buildEventDocStoreGlobals', () => {
       onAppend: 'broadcastWidget',
       scopeResolver: 'resolveWidgetScope',
       authorise: 'authoriseWidget',
-      syncWebsocketApiName: 'widgets-ws',
+      syncWebsocketApiName: ['widgets-ws', 'widgets-public-ws'],
     });
 
     const globals = buildEventDocStoreGlobals(store);
@@ -70,5 +71,16 @@ describe('buildEventDocStoreGlobals', () => {
     });
 
     expect(resolved).toEqual({ ...store, onPublish: '', onAppend: '', scopeResolver: '', authorise: '' });
+  });
+
+  it('reads a sync global written as a single name by an older registration', () => {
+    const store = buildEventDocStore({ storeName: 'widgets', type: 'widget' });
+    const globals = { ...buildEventDocStoreGlobals(store), [EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL]: 'widgets-ws' };
+
+    const resolved = runStory(askEventDocProvideStoreFromGlobals(askEventDocStoreRead()), {
+      [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
+    });
+
+    expect(resolved.syncWebsocketApiNames).toEqual(['widgets-ws']);
   });
 });

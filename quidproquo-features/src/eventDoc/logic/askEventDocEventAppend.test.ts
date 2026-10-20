@@ -97,6 +97,7 @@ type Harness = {
   summaryWriteFails?: boolean;
   // Connections subscribed to this doc's head-moved topic on the 'ws' api.
   subscribers?: string[];
+  signerSubscribers?: string[];
   pushFails?: boolean;
 };
 
@@ -110,6 +111,10 @@ const buildHarness = (options: Harness = {}) => {
   let clock = Date.parse(T0);
 
   tables['qpq-wsq-subs-ws'] = (options.subscribers ?? []).map((connectionId) => ({ topic: `eventDoc#${STORE.storeName}#${DOC_ID}`, connectionId }));
+  tables['qpq-wsq-subs-signws'] = (options.signerSubscribers ?? []).map((connectionId) => ({
+    topic: `eventDoc#${STORE.storeName}#${DOC_ID}`,
+    connectionId,
+  }));
 
   const log = [INIT, ...(options.unprojected ?? [])];
   tables[EVENTS_STORE] = log.map((e) => ({ pk: DOC_ID, sk: e.payload.metadata.eventId, type: STORE.type, data: e }));
@@ -302,6 +307,14 @@ describe('askEventDocEventAppend head-moved push', () => {
         clientMessageId: appended.payload.metadata.clientMessageId,
       },
     });
+  });
+
+  it('pushes to every queue the collection syncs to', () => {
+    const harness = buildHarness({ subscribers: ['c1'], signerSubscribers: ['s1', 's2'] });
+
+    harness.append(input('template/rename', { name: 'Renamed' }), { ...STORE, syncWebsocketApiName: ['ws', 'signws'] });
+
+    expect(harness.pushes.map((push) => push.connectionId)).toEqual(['c1', 's1', 's2']);
   });
 
   it('pushes nothing for a collection without sync', () => {

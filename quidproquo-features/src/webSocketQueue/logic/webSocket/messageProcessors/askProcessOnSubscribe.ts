@@ -31,6 +31,7 @@ function* askIsSubscriptionAllowed(connection: Connection, topic: string): AskRe
       connectionId: connection.id,
       userId: connection.userId,
       scope: connection.scope,
+      accessToken: connection.accessToken,
       topic,
     }),
   );

@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { Connection, WebSocketQueueClientMessageEventType } from '../../../types';
 import { askProcessOnSubscribe, isWebSocketSubscribeMessage } from './askProcessOnSubscribe';
 
-const connection: Connection = { id: 'c1', requestTime: '', requestTimeEpoch: 0, ip: '', userId: 'u1', scope: 'TENANT#t1' };
+const connection: Connection = { id: 'c1', requestTime: '', requestTimeEpoch: 0, ip: '', userId: 'u1', scope: 'TENANT#t1', accessToken: 'token-1' };
 
 const subscribe = (conn: Connection | null, topicAuthoriser = '', authoriserThrows = false) => {
   const upserts: any[] = [];
@@ -60,7 +60,7 @@ describe('askProcessOnSubscribe', () => {
   it('asks the configured topic authoriser and files the subscription when it allows', () => {
     const { upserts, authorised } = subscribe(connection, 'authoriseTopic');
 
-    expect(authorised).toEqual([{ connectionId: 'c1', userId: 'u1', scope: 'TENANT#t1', topic: 'eventDoc#docs#1' }]);
+    expect(authorised).toEqual([{ connectionId: 'c1', userId: 'u1', scope: 'TENANT#t1', accessToken: 'token-1', topic: 'eventDoc#docs#1' }]);
     expect(upserts).toHaveLength(1);
   });
 

@@ -9,4 +9,5 @@ export const eventDocStoreContext = createLocalContextIdentifier<EventDocStore>(
   snapshotsStoreName: '',
   type: '',
   storageDriveName: '',
+  syncWebsocketApiNames: [],
 });

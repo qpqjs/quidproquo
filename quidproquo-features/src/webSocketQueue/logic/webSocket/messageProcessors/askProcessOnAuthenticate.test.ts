@@ -283,4 +283,85 @@ describe('askProcessOnAuthenticate', () => {
 
     expect(deletes).toEqual([['qpq-wsq-subs-demo', 'TENANT#old#eventDoc#docs#1', 'c1']]);
   });
+
+  describe('with a connectionAuthenticator', () => {
+    const globals = globalByKey({ 'qpq-wsq-authenticator-demo': 'authenticateSigner', 'qpq-wsq-eb-name-demo': 'event-bus' });
+
+    it('stores the principal the authenticator returns and never touches the user directory', () => {
+      let setAccessTokenCalled = false;
+      const executed: any[] = [];
+      const sends: any[] = [];
+      let upsert: any;
+
+      runStory(askProcessOnAuthenticate('c1', 'session-1'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [KeyValueStoreActionType.Query]: queryByStore(),
+        [ConfigActionType.GetGlobal]: globals,
+        [UserDirectoryActionType.SetAccessToken]: () => {
+          setAccessTokenCalled = true;
+          return { userId: 'u1' };
+        },
+        [InlineFunctionActionType.Execute]: (action: any) => {
+          executed.push([action.payload.functionName, action.payload.payload]);
+          return { userId: 'signer:s1', scope: 'TENANT#t1' };
+        },
+        [KeyValueStoreActionType.Upsert]: (action: any) => {
+          upsert = action;
+          return undefined;
+        },
+        [WebsocketActionType.SendMessage]: (action: any) => {
+          sends.push(action.payload.payload.type);
+          return undefined;
+        },
+        [EventBusActionType.SendMessages]: undefined,
+      });
+
+      expect(setAccessTokenCalled).toBe(false);
+      expect(executed).toEqual([['authenticateSigner', { accessToken: 'session-1', requestedScope: null }]]);
+      expect(upsert.payload.item).toEqual({ ...connection, userId: 'signer:s1', accessToken: 'session-1', scope: 'TENANT#t1' });
+      expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
+    });
+
+    it('hands a scope claim to the authenticator', () => {
+      let input: any;
+
+      runStory(askProcessOnAuthenticate('c1', 'session-1', 'TENANT#t1'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [KeyValueStoreActionType.Query]: queryByStore(),
+        [ConfigActionType.GetGlobal]: globals,
+        [InlineFunctionActionType.Execute]: (action: any) => {
+          input = action.payload.payload;
+          return { userId: 'signer:s1' };
+        },
+        [KeyValueStoreActionType.Upsert]: undefined,
+        [WebsocketActionType.SendMessage]: undefined,
+        [EventBusActionType.SendMessages]: undefined,
+      });
+
+      expect(input).toEqual({ accessToken: 'session-1', requestedScope: 'TENANT#t1' });
+    });
+
+    it('clears the connection auth and notifies it is unauthenticated when the authenticator throws', () => {
+      const sends: any[] = [];
+      let upsert: any;
+
+      runStory(askProcessOnAuthenticate('c1', 'stale-session'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [KeyValueStoreActionType.Query]: queryByStore(),
+        [ConfigActionType.GetGlobal]: globals,
+        [InlineFunctionActionType.Execute]: throwsError('Unauthorized', 'expired'),
+        [KeyValueStoreActionType.Upsert]: (action: any) => {
+          upsert = action;
+          return undefined;
+        },
+        [WebsocketActionType.SendMessage]: (action: any) => {
+          sends.push(action.payload.payload.type);
+          return undefined;
+        },
+      });
+
+      expect(upsert.payload.item).toEqual(connection);
+      expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
+    });
+  });
 });

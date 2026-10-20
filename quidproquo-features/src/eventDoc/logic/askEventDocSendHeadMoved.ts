@@ -11,14 +11,14 @@ import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { EventDocEvent } from '../models';
 
 /**
- * Tells subscribed workspaces that the document's log now ends at `event`. Sent under the ambient storage scope, so
- * only connections validated into the same scope receive it. Nothing to do for a collection without `sync`. Carries
- * ids only; the client pulls the bootstrap. Requires the store context.
+ * Tells subscribed workspaces that the document's log now ends at `event`, on every queue the collection syncs to.
+ * Sent under the ambient storage scope, so only connections validated into the same scope receive it. Nothing to do
+ * for a collection without `sync`. Carries ids only; the client pulls the bootstrap. Requires the store context.
  */
 export function* askEventDocSendHeadMoved(docId: string, event: EventDocEvent): AskResponse<void> {
-  const { storeName, type, syncWebsocketApiName } = yield* askEventDocStoreRead();
+  const { storeName, type, syncWebsocketApiNames } = yield* askEventDocStoreRead();
 
-  if (!syncWebsocketApiName) {
+  if (syncWebsocketApiNames.length === 0) {
     return;
   }
 
@@ -34,5 +34,9 @@ export function* askEventDocSendHeadMoved(docId: string, event: EventDocEvent): 
     },
   };
 
-  yield* askWebSocketQueueSendToTopic(syncWebsocketApiName, buildScopedWebSocketQueueTopic(scope, eventDocHeadMovedTopic(storeName, docId)), message);
+  const topic = buildScopedWebSocketQueueTopic(scope, eventDocHeadMovedTopic(storeName, docId));
+
+  for (const websocketApiName of syncWebsocketApiNames) {
+    yield* askWebSocketQueueSendToTopic(websocketApiName, topic, message);
+  }
 }

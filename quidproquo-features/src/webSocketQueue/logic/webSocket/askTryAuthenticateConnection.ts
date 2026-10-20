@@ -1,25 +1,39 @@
-import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken, Nullable } from 'quidproquo-core';
+import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askUserDirectorySetAccessToken, Nullable } from 'quidproquo-core';
 
-import { getWebSocketQueueGlobalConfigKeyForUserDirectoryName } from '../../config/defineWebSocketQueue';
+import {
+  getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,
+  getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
+} from '../../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../../context';
 import { webSocketConnectionData } from '../../data';
-import { Connection } from '../../types';
+import { Connection, WebSocketQueueAuthenticateInput, WebSocketQueueAuthenticateResult } from '../../types';
 
-// Re-stamp the connection's auth onto this message's session, and hand the
-// connection record back so the caller can also apply its stored storage scope.
+/**
+ * Re-checks the connection's stored token for this message and hands the connection record back so the caller can
+ * apply its stored storage scope. A user-directory queue also stamps the token onto the session, so spawned events
+ * and service functions see the user. A connectionAuthenticator queue re-runs the authenticator; its throw propagates,
+ * as an expired user-directory token does. Null when the queue authenticates nobody.
+ */
 export function* askTryAuthenticateConnection(connectionId: string): AskResponse<Nullable<Connection>> {
   const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const connectionAuthenticator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName));
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
-  if (!userDirectoryName) {
+
+  if (!connectionAuthenticator && !userDirectoryName) {
     return null;
   }
 
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
+
   if (connection?.accessToken) {
-    // Set the access token inside the context of this session
-    // this lets us read the access token out in spawned events
-    // and service functions
-    yield* askUserDirectorySetAccessToken(userDirectoryName, connection?.accessToken);
+    if (connectionAuthenticator) {
+      yield* askInlineFunctionExecute<WebSocketQueueAuthenticateResult, WebSocketQueueAuthenticateInput>(connectionAuthenticator, {
+        accessToken: connection.accessToken,
+        requestedScope: connection.scope ?? null,
+      });
+    } else {
+      yield* askUserDirectorySetAccessToken(userDirectoryName, connection.accessToken);
+    }
   }
 
   return connection ?? null;

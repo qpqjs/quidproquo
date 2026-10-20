@@ -24,5 +24,5 @@ export const buildEventDocStoreGlobals = (store: EventDocStore): Record<string, 
   [EVENT_DOC_ON_APPEND_GLOBAL]: store.onAppend ?? '',
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: store.scopeResolver ?? '',
   [EVENT_DOC_AUTHORISER_GLOBAL]: store.authorise ?? '',
-  [EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL]: store.syncWebsocketApiName ?? '',
+  [EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL]: store.syncWebsocketApiNames,
 });

@@ -9,6 +9,7 @@ import {
 } from 'quidproquo-core';
 
 import {
+  getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,
   getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
 } from '../../../config/defineWebSocketQueue';
@@ -17,6 +18,9 @@ import { webSocketConnectionData } from '../../../data';
 import { webSocketSubscriptionData } from '../../../data/subscriptionData';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
+  Connection,
+  WebSocketQueueAuthenticateInput,
+  WebSocketQueueAuthenticateResult,
   WebSocketQueueClientEventMessageAuthenticate,
   WebSocketQueueClientMessageEventType,
   WebSocketQueueServerEventMessageAuthenticated,
@@ -65,6 +69,75 @@ function* askResolveConnectionScope(apiName: string, userId: string, requestedSc
   return { accepted: true, scope: resolution.result ?? undefined };
 }
 
+// The user directory validates the token and the scope resolver settles the scope; either refusing rejects the whole
+// authenticate, so the client never ends up authenticated on a different scope than it asked for.
+function* askAuthenticateWithUserDirectory(
+  apiName: string,
+  userDirectoryName: string,
+  accessToken: string,
+  requestedScope: Nullable<string>,
+): AskResponse<Nullable<WebSocketQueueAuthenticateResult>> {
+  const result = yield* askCatch(askUserDirectorySetAccessToken(userDirectoryName, accessToken));
+
+  if (!result.success) {
+    return null;
+  }
+
+  const decodedAccessToken: DecodedAccessToken = result.result;
+  const scopeResolution = yield* askResolveConnectionScope(apiName, decodedAccessToken.userId, requestedScope);
+
+  if (!scopeResolution.accepted) {
+    return null;
+  }
+
+  return { userId: decodedAccessToken.userId, scope: scopeResolution.scope };
+}
+
+// The owning service's authenticator owns both the token and the scope; a throw rejects.
+function* askAuthenticateWithAuthenticator(
+  connectionAuthenticator: string,
+  accessToken: string,
+  requestedScope: Nullable<string>,
+): AskResponse<Nullable<WebSocketQueueAuthenticateResult>> {
+  const result = yield* askCatch(
+    askInlineFunctionExecute<WebSocketQueueAuthenticateResult, WebSocketQueueAuthenticateInput>(connectionAuthenticator, {
+      accessToken,
+      requestedScope,
+    }),
+  );
+
+  return result.success ? result.result : null;
+}
+
+function* askStoreAuthenticated(connection: Connection, accessToken: string, principal: WebSocketQueueAuthenticateResult): AskResponse<void> {
+  yield* webSocketConnectionData.askUpsert({
+    ...connection,
+
+    userId: principal.userId,
+    accessToken,
+
+    // Always re-stamped: on a plain queue no claim stays unscoped; on a queue with a resolver (tenant queues) no claim
+    // resolves to the user's own personal scope, never unscoped.
+    scope: principal.scope,
+  });
+
+  // Subscriptions are filed under the scope the connection held when it subscribed, so a re-authenticate (a tenant
+  // switch, say) drops them all; the client subscribes again on Authenticated.
+  yield* webSocketSubscriptionData.askDeleteByConnectionId(connection.id);
+
+  yield* askSendMessage(connection.id, {
+    type: WebSocketQueueServerMessageEventType.Authenticated,
+  } satisfies WebSocketQueueServerEventMessageAuthenticated);
+
+  // Send a websocket message to the event buss WITHOUT an access token
+  const webSocketQueueClientEventMessageAuthenticate: WebSocketQueueClientEventMessageAuthenticate = {
+    type: WebSocketQueueClientMessageEventType.Authenticate,
+    payload: {},
+  };
+
+  yield* askBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
+}
+
 export function* askProcessOnAuthenticate(connectionId: string, accessToken: string, scope?: string): AskResponse<void> {
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
 
@@ -79,56 +152,26 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
   }
 
   const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const connectionAuthenticator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName));
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 
-  if (userDirectoryName) {
-    const result = yield* askCatch(askUserDirectorySetAccessToken(userDirectoryName, accessToken));
-
-    // A rejected authenticate downgrades the CONNECTION, not just the reply:
-    // on a re-authenticate the row still holds the previous userId/accessToken/
-    // scope, and later messages re-stamp auth from the row, so leaving it
-    // untouched would keep the session alive under the old identity and scope
-    // while the client believes it is unauthenticated.
-    if (!result.success) {
-      return yield* askProcessOnUnauthenticate(connectionId);
-    }
-
-    const decodedAccessToken: DecodedAccessToken = result.result;
-
-    // A failed scope resolution rejects the whole authenticate: the client
-    // must never end up authenticated on a different scope than it asked for.
-    const scopeResolution = yield* askResolveConnectionScope(apiName, decodedAccessToken.userId, scope || null);
-
-    if (!scopeResolution.accepted) {
-      return yield* askProcessOnUnauthenticate(connectionId);
-    }
-
-    yield* webSocketConnectionData.askUpsert({
-      ...connection,
-
-      userId: decodedAccessToken.userId,
-      accessToken,
-
-      // Always re-stamped from the resolution: on a plain queue no claim
-      // stays unscoped; on a queue with a resolver (tenant queues) no claim
-      // resolves to the user's own personal scope, never unscoped.
-      scope: scopeResolution.scope,
-    });
-
-    // Subscriptions are filed under the scope the connection held when it subscribed, so a re-authenticate (a tenant
-    // switch, say) drops them all; the client subscribes again on Authenticated.
-    yield* webSocketSubscriptionData.askDeleteByConnectionId(connectionId);
-
-    yield* askSendMessage(connectionId, {
-      type: WebSocketQueueServerMessageEventType.Authenticated,
-    } satisfies WebSocketQueueServerEventMessageAuthenticated);
-
-    // Send a websocket message to the event buss WITHOUT an access token
-    const webSocketQueueClientEventMessageAuthenticate: WebSocketQueueClientEventMessageAuthenticate = {
-      type: WebSocketQueueClientMessageEventType.Authenticate,
-      payload: {},
-    };
-
-    yield* askBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
+  // A queue with neither cannot authenticate anyone; the message is ignored.
+  if (!connectionAuthenticator && !userDirectoryName) {
+    return;
   }
+
+  const principal = connectionAuthenticator
+    ? yield* askAuthenticateWithAuthenticator(connectionAuthenticator, accessToken, scope || null)
+    : yield* askAuthenticateWithUserDirectory(apiName, userDirectoryName, accessToken, scope || null);
+
+  // A rejected authenticate downgrades the CONNECTION, not just the reply:
+  // on a re-authenticate the row still holds the previous userId/accessToken/
+  // scope, and later messages re-stamp auth from the row, so leaving it
+  // untouched would keep the session alive under the old identity and scope
+  // while the client believes it is unauthenticated.
+  if (!principal) {
+    return yield* askProcessOnUnauthenticate(connectionId);
+  }
+
+  yield* askStoreAuthenticated(connection, accessToken, principal);
 }
