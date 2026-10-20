@@ -1,3 +1,4 @@
+import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from 'quidproquo-config-aws';
 import {
   filterLogHistoryByActionTypes,
   LogActionType,
@@ -14,12 +15,25 @@ import * as path from 'path';
 
 import { ResolvedDevServerConfig } from '../types';
 
+// A service turns its logs off with defineAwsServiceAccountInfo's `disableLogs`. Honoured here as on
+// Lambda, so the one switch works on both; a service without that setting keeps logging.
+const isServiceLoggingDisabled = (qpqConfig: QPQConfig): boolean =>
+  qpqCoreUtils
+    .getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAccountInfo)
+    .some((setting) => setting.disableLogs);
+
 export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig, storySession?: StorySession): QpqLogger => {
   // Check if we're processing a storage event from the qpq-logs drive
   const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === QPQ_LOGS_STORAGE_DRIVE_NAME;
 
-  // If we have no log service, or we're processing logs drive events, return a no-op logger
-  if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
+  // If we have no log service, the service has its logs turned off, or we're processing logs drive
+  // events, return a no-op logger
+  if (
+    !devServerConfig.logServiceName ||
+    isServiceLoggingDisabled(qpqConfig) ||
+    isProcessingLogDriveEvent ||
+    process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME
+  ) {
     return {
       enableLogs: async () => {},
       log: () => {},

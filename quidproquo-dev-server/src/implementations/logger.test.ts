@@ -1,3 +1,4 @@
+import { QPQAwsConfigSettingType } from 'quidproquo-config-aws';
 import { QPQ_LOGS_STORAGE_DRIVE_NAME } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -33,7 +34,7 @@ describe('getDevServerLogger', () => {
   });
 
   it('returns a no-op logger that never writes when logServiceName is missing', async () => {
-    const logger = getDevServerLogger({} as any, buildDevServerConfig({ logServiceName: undefined }));
+    const logger = getDevServerLogger([], buildDevServerConfig({ logServiceName: undefined }));
 
     logger.log(buildResult() as any);
     await logger.enableLogs(true, 'reason', 'corr-123');
@@ -43,9 +44,29 @@ describe('getDevServerLogger', () => {
     expect(fs.writeFile).not.toHaveBeenCalled();
   });
 
+  it('returns a no-op logger when the service turns its logs off with disableLogs', async () => {
+    const qpqConfig = [{ configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo, disableLogs: true }] as any;
+    const logger = getDevServerLogger(qpqConfig, buildDevServerConfig());
+
+    logger.log(buildResult() as any);
+    await logger.waitToFinishWriting();
+
+    expect(fs.writeFile).not.toHaveBeenCalled();
+  });
+
+  it('keeps writing when the service leaves disableLogs off', async () => {
+    const qpqConfig = [{ configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo, disableLogs: false }] as any;
+    const logger = getDevServerLogger(qpqConfig, buildDevServerConfig());
+
+    logger.log(buildResult() as any);
+    await logger.waitToFinishWriting();
+
+    expect(fs.writeFile).toHaveBeenCalledTimes(1);
+  });
+
   it('returns a no-op logger when processing a qpq-logs drive storage event', async () => {
     const storySession = { depth: 0, context: { storageEvent: { drive: QPQ_LOGS_STORAGE_DRIVE_NAME } } } as any;
-    const logger = getDevServerLogger({} as any, buildDevServerConfig(), storySession);
+    const logger = getDevServerLogger([], buildDevServerConfig(), storySession);
 
     logger.log(buildResult() as any);
     await logger.waitToFinishWriting();
@@ -55,7 +76,7 @@ describe('getDevServerLogger', () => {
 
   it('returns a no-op logger when env storageDriveName is the qpq-logs drive', async () => {
     process.env.storageDriveName = QPQ_LOGS_STORAGE_DRIVE_NAME;
-    const logger = getDevServerLogger({} as any, buildDevServerConfig());
+    const logger = getDevServerLogger([], buildDevServerConfig());
 
     logger.log(buildResult() as any);
     await logger.waitToFinishWriting();
@@ -64,7 +85,7 @@ describe('getDevServerLogger', () => {
   });
 
   it('writes the result json to a path containing the correlation', async () => {
-    const logger = getDevServerLogger({} as any, buildDevServerConfig());
+    const logger = getDevServerLogger([], buildDevServerConfig());
 
     logger.log(buildResult({ correlation: 'abc-789' }) as any);
     await logger.waitToFinishWriting();
@@ -75,7 +96,7 @@ describe('getDevServerLogger', () => {
   });
 
   it('still writes after a correlation is disabled, filtering its history', async () => {
-    const logger = getDevServerLogger({} as any, buildDevServerConfig());
+    const logger = getDevServerLogger([], buildDevServerConfig());
 
     await logger.enableLogs(false, 'noisy', 'corr-123');
     logger.log(buildResult() as any);
@@ -85,7 +106,7 @@ describe('getDevServerLogger', () => {
   });
 
   it('treats moveToPermanentStorage as a no-op', async () => {
-    const logger = getDevServerLogger({} as any, buildDevServerConfig());
+    const logger = getDevServerLogger([], buildDevServerConfig());
 
     await logger.moveToPermanentStorage();
 

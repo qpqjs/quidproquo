@@ -48,4 +48,5 @@ Same as [defineWebSocketQueue](./web-socket-queue.md#returns) — a `QPQConfig` 
 ## Related
 
 - [defineWebSocketQueue](./web-socket-queue.md) — the underlying define this pre-configures.
+- [Event doc workspace sync](./event-doc-workspace-sync.md): the feature whose subscriptions the topic authoriser gates.
 - [defineTenant](./tenant.md) — registers `TENANT_CONNECTION_SCOPE_RESOLVER_FN` (the inline function this wires in by name) plus the rest of the tenant setup.

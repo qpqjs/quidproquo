@@ -47,6 +47,7 @@
     "quidproquo-actionprocessor-awslambda": "0.1.33",
     "quidproquo-actionprocessor-js": "0.1.33",
     "quidproquo-actionprocessor-node": "0.1.33",
+    "quidproquo-config-aws": "0.1.33",
     "quidproquo-core": "0.1.33",
     "quidproquo-webserver": "0.1.33",
     "ws": "^8.18.0"

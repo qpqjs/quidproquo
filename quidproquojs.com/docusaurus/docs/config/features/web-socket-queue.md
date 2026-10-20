@@ -80,9 +80,9 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 
 ## Topic subscriptions
 
-A client sends `Subscribe { topic }` to receive server pushes for a topic and `Unsubscribe { topic }` to stop. The queue files the subscription under the connection's validated storage scope (`<scope>#<topic>`), so a client can never subscribe into another scope, and clears every subscription for a connection on disconnect or when a send finds it dead. An unauthenticated connection's subscribe is ignored.
+A client sends `Subscribe { topic }` to receive server pushes for a topic and `Unsubscribe { topic }` to stop. The queue files the subscription under the connection's validated storage scope (`<scope>#<topic>`), so a client can never subscribe into another scope, and clears every subscription for a connection on disconnect, when a send finds it dead, and on every successful Authenticate (a re-authentication may carry a new scope). A client therefore subscribes again after each `Authenticated` message. An unauthenticated connection's subscribe is ignored.
 
-A server story pushes with `askWebSocketQueueSendToTopic(apiName, scopedTopic, message)`, building `scopedTopic` with `buildScopedWebSocketQueueTopic(scope, topic)` from its own ambient scope. Only subscribers in the same scope receive it. The eventDoc feature's `sync` option uses this to push `EventDocHeadMoved` after an append.
+A server story pushes with `askWebSocketQueueSendToTopic(apiName, scopedTopic, message)`, building `scopedTopic` with `buildScopedWebSocketQueueTopic(scope, topic)` from its own ambient scope. Only subscribers in the same scope receive it. The eventDoc feature's `sync` option uses this to push `EventDocHeadMoved` after an append; see [Event doc workspace sync](./event-doc-workspace-sync.md).
 
 ## Returns
 
