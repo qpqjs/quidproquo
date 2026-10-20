@@ -23,6 +23,7 @@ export type EventDocRoutesOptions = {
   scopeResolver?: string;
   // Inline-function name invoked with EventDocAuthoriseInput inside the request's scope before each route; it throws to refuse.
   authorise?: string;
-  // Push a head-moved message to subscribed workspaces after every append. Omit for no pushes.
+  // Push a head-moved message to subscribed workspaces after every append. defineEventDoc fills it from the definition's
+  // own `sync`; set here only for hand-mounted routes. Omit for no pushes.
   sync?: EventDocSyncOptions;
 };

@@ -1,6 +1,7 @@
 import { AskResponse, Nullable } from 'quidproquo-core';
 
 import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult, EventDocSnapshotViews } from '../../models';
+import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 
 /**
  * The callable surface a collection registers via defineDynamicFunctions. A saved EventDocDefinition satisfies it
@@ -9,6 +10,8 @@ import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult,
 export type EventDocFunctions = {
   storeName?: string;
   type?: string;
+  // The websocket queue head-moved pushes go out on; read by the routes and by createEventDocBackend.
+  sync?: EventDocSyncOptions;
 
   // The snapshot cache key the collection's snapshots are filed under (see EventDocSavedDefinitionConfig.snapshotCacheKey).
   // A member rather than a value because the data layer reaches a definition only through dynamic functions.

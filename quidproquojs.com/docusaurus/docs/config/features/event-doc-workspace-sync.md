@@ -20,17 +20,18 @@ Three things, in order: the queue, the collection, the editor.
 
 Any [defineWebSocketQueue](./web-socket-queue.md); in a tenanted app, [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md), which refuses a subscription to a document the connection's tenant membership cannot read. The queue can be owned by another module, as long as this service references it.
 
-### 2. `sync` on the collection's routes
+### 2. `sync` on the definition
 
 ```typescript
-defineEventDocRoutes({
+export const envelopeEventDoc = createEventDocDefinition({
   storeName: 'envelopes',
   type: 'envelope',
-  basePath: '/envelopes',
   sync: { websocketApiName: 'ws' },
   // ...
 });
 ```
+
+The definition is what both the built-in routes (through `defineEventDoc` / `defineTenantedEventDoc`) and a service-side `createEventDocBackend` read, so one setting covers client-authored appends and the server-authored ones a signing step or a build worker makes. A hand-mounted `defineEventDocRoutes` can still take `sync` directly, and an explicit routes option wins over the definition's.
 
 Every append through that collection, client-authored or server-authored, then pushes under the append's storage scope. Only connections validated into the same scope receive it. The push is best-effort and runs after the hooks: a failed push never fails the append.
 

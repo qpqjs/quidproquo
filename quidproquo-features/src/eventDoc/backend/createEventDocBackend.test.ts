@@ -3,6 +3,7 @@ import { KeyValueStoreActionType, runStory } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { EventDocFunctions } from '../definition/types/EventDocFunctions';
 import { createEventDocBackend } from './createEventDocBackend';
 
@@ -46,6 +47,22 @@ describe('createEventDocBackend', () => {
     });
 
     expect(queriedStores).toEqual(['memos']);
+  });
+
+  it('carries the definition sync option into the store context, so backend appends push head-moved', () => {
+    const backend = createEventDocBackend({ ...memoFunctions, sync: { websocketApiName: 'ws' } });
+
+    const store = runStory(backend.askProvideStore(askEventDocStoreRead()), {});
+
+    expect(store.syncWebsocketApiName).toBe('ws');
+  });
+
+  it('leaves the store context without a websocket when the definition has no sync', () => {
+    const backend = createEventDocBackend(memoFunctions);
+
+    const store = runStory(backend.askProvideStore(askEventDocStoreRead()), {});
+
+    expect(store.syncWebsocketApiName).toBeUndefined();
   });
 
   it('throws at build time for a definition with no identity', () => {

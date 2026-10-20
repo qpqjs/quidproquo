@@ -53,7 +53,7 @@ export function createEventDocDefinition(
     };
   }
 
-  const { saved: _saved, api, versions, schemaVersion, references, coalesceEventTypes, storeName, type } = config;
+  const { saved: _saved, api, versions, schemaVersion, references, coalesceEventTypes, storeName, type, sync } = config;
 
   assertEventDocVersions(versions, schemaVersion);
 
@@ -62,6 +62,10 @@ export function createEventDocDefinition(
     throw new Error(
       `event doc definition sets ${storeName ? 'storeName' : 'type'} without ${storeName ? 'type' : 'storeName'} - set both or neither.`,
     );
+  }
+
+  if (sync && !storeName) {
+    throw new Error('event doc definition sets sync without an identity - a client-only definition has nothing to push.');
   }
 
   // The reserved guard is always merged in, even when the doc declares no rules of its own; without it, edits made
@@ -145,6 +149,7 @@ export function createEventDocDefinition(
   return {
     storeName,
     type,
+    sync,
     // TODO: This seems like the wrong place for a workspace slot kind...
     // likely should be defined at the workspace, when we define the slots.
     kind: EventDocWorkspaceSlotKind.document,

@@ -37,9 +37,10 @@ export function createEventDocBackend<TState>(functions: EventDocFunctionsWithDo
 export function createEventDocBackend(functions: EventDocFunctions): EventDocBackend;
 export function createEventDocBackend<TState>(functions: EventDocFunctions): EventDocBackend<TState> {
   const identity = getEventDocFunctionsIdentity(functions);
+  const store = { ...identity, syncWebsocketApiName: functions.sync?.websocketApiName };
 
   function* askProvideStore<T>(story: AskResponse<T>): AskResponse<T> {
-    return yield* askEventDocProvideStore(identity, story);
+    return yield* askEventDocProvideStore(store, story);
   }
 
   return {

@@ -1,6 +1,7 @@
 import { QpqReducer } from 'quidproquo-core';
 
 import { EventDocEvent } from '../../models';
+import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 import { EventDocEventValidators } from '../../validation/types/EventDocEventValidators';
 import { CoalesceEventType } from '../../workspace/types/CoalesceEventType';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
@@ -15,6 +16,10 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
   // The collection's identity. Set both for a backend collection, neither for client-only definitions; one without the other throws.
   storeName?: string;
   type?: string;
+
+  // Push a head-moved message over this websocket queue after every append to the collection, whether through the
+  // built-in routes or a service-side backend. Needs an identity. Omit for no pushes.
+  sync?: EventDocSyncOptions;
 
   // Stamped on every event the doc authors and the fold's migration target. Must equal the last entry in `versions`.
   schemaVersion: number;

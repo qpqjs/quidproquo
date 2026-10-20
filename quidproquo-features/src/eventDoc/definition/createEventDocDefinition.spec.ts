@@ -691,4 +691,29 @@ describe('createEventDocDefinition identity', () => {
 
     expect(half).toThrow('set both or neither');
   });
+
+  it('carries sync alongside the identity', () => {
+    const definition = createEventDocDefinition({
+      storeName: 'memos',
+      type: 'memo',
+      sync: { websocketApiName: 'ws' },
+      schemaVersion: 1,
+      versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+      api: memoApi,
+    });
+
+    expect(definition.sync).toEqual({ websocketApiName: 'ws' });
+  });
+
+  it('throws on sync without an identity', () => {
+    const clientOnlyWithSync = () =>
+      createEventDocDefinition({
+        sync: { websocketApiName: 'ws' },
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+        api: memoApi,
+      });
+
+    expect(clientOnlyWithSync).toThrow('sync without an identity');
+  });
 });

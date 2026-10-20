@@ -1,6 +1,7 @@
 import { Nullable } from 'quidproquo-core';
 
 import { EventDocEvent, EventDocLink, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
+import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
@@ -25,6 +26,7 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // Present on a doc type registered as a backend collection; absent on client-only definitions.
   storeName?: string;
   type?: string;
+  sync?: EventDocSyncOptions;
 
   // The key this collection's snapshots are filed under ('' = legacy layout); see EventDocSavedDefinitionConfig.
   // A member, not a property: the backend reaches a definition only through dynamic functions, so one shape serves both.
