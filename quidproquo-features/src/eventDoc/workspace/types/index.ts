@@ -9,6 +9,7 @@ export * from './EventDocWorkspaceDocumentSlotFoldConfig';
 export * from './EventDocWorkspaceHistoryPage';
 export * from './EventDocWorkspaceLocalSlotConfig';
 export * from './EventDocWorkspaceLocalSlotFoldConfig';
+export * from './EventDocWorkspaceRebaseResult';
 export * from './EventDocWorkspaceResolvedFoldSlots';
 export * from './EventDocWorkspaceSelectors';
 export * from './EventDocWorkspaceSlotApiOf';

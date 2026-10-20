@@ -4,16 +4,18 @@ import { askUIEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/ask
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
+import { askEventDocWorkspaceRebasePending } from './askEventDocWorkspaceRebasePending';
 import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
 import { getSlotHeadEventId } from './getSlotHeadEventId';
 import { isContiguousWithSlotHead } from './isContiguousWithSlotHead';
 
 // afterEventId is exclusive. It falls back to the fold base when the held history is empty, so a slot whose snapshot was
 // current does not refetch from event zero.
-const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
+const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport, slots: EventDocWorkspaceSlotFoldsConfig) =>
   function* askRefreshDocumentSlot(slotKey: string): AskResponse<void> {
     const state = yield* askEventDocWorkspaceReadState();
     const documentIdentity = state.slots[slotKey]?.documentIdentity;
@@ -41,15 +43,20 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
     if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, result.result)) {
       yield* askUIEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
       yield* askUIEventDocWorkspaceCompact(slotKey);
+      yield* askEventDocWorkspaceRebasePending(slots, slotKey);
     } else {
-      yield* askEventDocWorkspaceResync(transport, slotKey);
+      yield* askEventDocWorkspaceResync(transport, slots, slotKey);
     }
   };
 
 /**
- * Appends the events saved since the last held one to each slot's history; pending stays intact. Slots with no identity
- * are skipped.
+ * Appends the events saved since the last held one to each slot's history, then rebases pending: events that no longer
+ * validate against the moved state are dropped and reported on the slot error. Slots with no identity are skipped.
  */
-export function* askEventDocWorkspaceRefresh(transport: EventDocWorkspaceTransport, slotKeys: string[]): AskResponse<void> {
-  yield* askMapParallel(slotKeys, getAskRefreshDocumentSlot(transport));
+export function* askEventDocWorkspaceRefresh(
+  transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
+  slotKeys: string[],
+): AskResponse<void> {
+  yield* askMapParallel(slotKeys, getAskRefreshDocumentSlot(transport, slots));
 }

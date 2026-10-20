@@ -1,5 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
@@ -13,6 +14,7 @@ import { getSlotHeadEventId } from './getSlotHeadEventId';
  */
 export function* askEventDocWorkspaceSyncHeadMoved(
   transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   slotKey: string,
   headEventId: number,
   clientMessageId?: string,
@@ -32,5 +34,5 @@ export function* askEventDocWorkspaceSyncHeadMoved(
     return;
   }
 
-  yield* askEventDocWorkspaceRefresh(transport, [slotKey]);
+  yield* askEventDocWorkspaceRefresh(transport, slots, [slotKey]);
 }

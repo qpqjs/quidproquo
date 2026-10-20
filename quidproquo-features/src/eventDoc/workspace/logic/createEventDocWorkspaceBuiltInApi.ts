@@ -2,6 +2,7 @@ import { askMapParallel, AskResponse, askThrowError, ErrorTypeEnum } from 'quidp
 
 import { EventDocWorkspaceBuiltInApi } from '../types/EventDocWorkspaceBuiltInApi';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceCancel } from './askEventDocWorkspaceCancel';
@@ -30,6 +31,7 @@ const resolveSlotKeys = (documentSlotKeys: string[], slotKey?: string): string[]
 
 const getAskInit = (
   transport: EventDocWorkspaceTransport | undefined,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   documentSlotKeys: string[],
   localSlotKeys: string[],
   slotSnapshotCacheKeys: Record<string, string>,
@@ -40,12 +42,12 @@ const getAskInit = (
     // Unknown keys are dropped rather than growing phantom slots.
     const known = Object.fromEntries(Object.entries(identities).filter(([slotKey]) => documentSlotKeys.includes(slotKey)));
 
-    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), known, snapshot ?? null, slotSnapshotCacheKeys);
+    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), slots, known, snapshot ?? null, slotSnapshotCacheKeys);
   };
 
-const getAskSave = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+const getAskSave = (transport: EventDocWorkspaceTransport | undefined, slots: EventDocWorkspaceSlotFoldsConfig, documentSlotKeys: string[]) =>
   function* askSave(slotKey?: string): AskResponse<void> {
-    yield* askEventDocWorkspaceSave(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
+    yield* askEventDocWorkspaceSave(yield* askEnsureTransport(transport), slots, resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
 const getAskCancel = (documentSlotKeys: string[]) =>
@@ -53,24 +55,30 @@ const getAskCancel = (documentSlotKeys: string[]) =>
     yield* askEventDocWorkspaceCancel(resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
-const getAskRefresh = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+const getAskRefresh = (transport: EventDocWorkspaceTransport | undefined, slots: EventDocWorkspaceSlotFoldsConfig, documentSlotKeys: string[]) =>
   function* askRefresh(slotKey?: string): AskResponse<void> {
-    yield* askEventDocWorkspaceRefresh(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
+    yield* askEventDocWorkspaceRefresh(yield* askEnsureTransport(transport), slots, resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
-const getAskResync = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+const getAskResync = (transport: EventDocWorkspaceTransport | undefined, slots: EventDocWorkspaceSlotFoldsConfig, documentSlotKeys: string[]) =>
   function* askResync(slotKey?: string): AskResponse<void> {
     const ensured = yield* askEnsureTransport(transport);
-    yield* askMapParallel(resolveSlotKeys(documentSlotKeys, slotKey), (documentSlotKey) => askEventDocWorkspaceResync(ensured, documentSlotKey));
+    yield* askMapParallel(resolveSlotKeys(documentSlotKeys, slotKey), (documentSlotKey) =>
+      askEventDocWorkspaceResync(ensured, slots, documentSlotKey),
+    );
   };
 
-const getAskSyncHeadMoved = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+const getAskSyncHeadMoved = (
+  transport: EventDocWorkspaceTransport | undefined,
+  slots: EventDocWorkspaceSlotFoldsConfig,
+  documentSlotKeys: string[],
+) =>
   function* askSyncHeadMoved(slotKey: string, headEventId: number, clientMessageId?: string): AskResponse<void> {
     if (!documentSlotKeys.includes(slotKey)) {
       return;
     }
 
-    yield* askEventDocWorkspaceSyncHeadMoved(yield* askEnsureTransport(transport), slotKey, headEventId, clientMessageId);
+    yield* askEventDocWorkspaceSyncHeadMoved(yield* askEnsureTransport(transport), slots, slotKey, headEventId, clientMessageId);
   };
 
 const getAskLoadHistory = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
@@ -85,20 +93,22 @@ const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefine
 
 /**
  * Builds the workspace's built-in init/save/cancel/refresh/resync/syncHeadMoved/history verbs. slotKey omitted means every document slot.
- * `slotSnapshotCacheKeys` is each document slot's definition key, so init can reject a held base filed under another key.
+ * `slots` supplies each slot's validator for rebasing pending after a pull; `slotSnapshotCacheKeys` is each document slot's
+ * definition key, so init can reject a held base filed under another key.
  */
 export const createEventDocWorkspaceBuiltInApi = (
   transport: EventDocWorkspaceTransport | undefined,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   documentSlotKeys: string[],
   localSlotKeys: string[],
   slotSnapshotCacheKeys: Record<string, string> = {},
 ): EventDocWorkspaceBuiltInApi => ({
-  askInit: getAskInit(transport, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
-  askSave: getAskSave(transport, documentSlotKeys),
+  askInit: getAskInit(transport, slots, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
+  askSave: getAskSave(transport, slots, documentSlotKeys),
   askCancel: getAskCancel(documentSlotKeys),
-  askRefresh: getAskRefresh(transport, documentSlotKeys),
-  askResync: getAskResync(transport, documentSlotKeys),
-  askSyncHeadMoved: getAskSyncHeadMoved(transport, documentSlotKeys),
+  askRefresh: getAskRefresh(transport, slots, documentSlotKeys),
+  askResync: getAskResync(transport, slots, documentSlotKeys),
+  askSyncHeadMoved: getAskSyncHeadMoved(transport, slots, documentSlotKeys),
   askLoadHistory: getAskLoadHistory(transport, documentSlotKeys),
   askLoadOlderHistory: getAskLoadOlderHistory(transport, documentSlotKeys),
 });

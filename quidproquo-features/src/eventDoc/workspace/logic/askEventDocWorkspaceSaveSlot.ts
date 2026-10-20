@@ -1,23 +1,33 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
 
+import { EventDocEvent } from '../../models';
 import { askUIEventDocWorkspaceAppendHistoryEvent } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvent';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
 import { askUIEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askUIEventDocWorkspaceRemovePendingEvent';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDocWorkspaceSetSaving';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
+import { getSlotPending } from './getSlotPending';
 import { isContiguousWithSlotHead } from './isContiguousWithSlotHead';
 import { toEventDocEventInput } from './toEventDocEventInput';
+
+const isStillPending = (pending: EventDocEvent[], clientMessageId: string | undefined): boolean =>
+  pending.some((event) => event.payload.metadata.clientMessageId === clientMessageId);
 
 /**
  * Streams one slot's pending events, each moving into history as it lands. Per-event so an interrupted save leaves only the
  * unsaved tail pending; the backend dedups against the latest event only. Skipped while the slot is already saving.
  */
-export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransport, slotKey: string): AskResponse<void> {
+export function* askEventDocWorkspaceSaveSlot(
+  transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
+  slotKey: string,
+): AskResponse<void> {
   const state = yield* askEventDocWorkspaceReadState();
   const slotState = state.slots[slotKey];
   const documentIdentity = slotState?.documentIdentity;
@@ -31,6 +41,11 @@ export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransp
   yield* askUIEventDocWorkspaceClearError(slotKey);
 
   for (const pending of pendingEvents) {
+    // A resync below rebases pending, so a later event in this batch may have been dropped since the loop started.
+    if (!isStillPending(getSlotPending(yield* askEventDocWorkspaceReadState(), slotKey), pending.payload.metadata.clientMessageId)) {
+      continue;
+    }
+
     const result = yield* askCatch(transport.askAppendEvent(documentIdentity, toEventDocEventInput(pending)));
 
     if (!result.success) {
@@ -45,7 +60,7 @@ export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransp
       yield* askUIEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
       yield* askUIEventDocWorkspaceCompact(slotKey);
     } else {
-      yield* askEventDocWorkspaceResync(transport, slotKey);
+      yield* askEventDocWorkspaceResync(transport, slots, slotKey);
     }
 
     yield* askUIEventDocWorkspaceRemovePendingEvent(slotKey, result.result.payload.metadata.clientMessageId);

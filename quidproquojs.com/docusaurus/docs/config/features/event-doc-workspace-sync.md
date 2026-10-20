@@ -79,13 +79,25 @@ Nothing, when the push is one of:
 - the slot's own save: the push names a `clientMessageId` still pending in the slot, so the save ack is about to bring the event in;
 - a slot that is saving, where the ack's own contiguity check catches anything another writer landed.
 
-Otherwise a tail pull from the held head. A tail that follows the head is appended and compacted; a tail with a gap triggers a resync, which replaces base and history from the bootstrap and compacts. Pending events are never touched by either path and keep folding on top of the new base.
+Otherwise a tail pull from the held head. A tail that follows the head is appended and compacted; a tail with a gap triggers a resync, which replaces base and history from the bootstrap and compacts. Both paths then rebase the slot's pending events, as described next.
+
+## Unsaved edits after a pull
+
+A pull can change what the document allows. The common case is another writer publishing: every edit still unsaved here was made against a draft and would now be rejected by the server's append gate, so holding on to it only delays the failure to save time.
+
+After every pull or resync (and never after the slot's own save ack) the workspace re-runs the slot's validator over the pending buffer in order, each event against the new state plus the events kept before it, exactly as its original commit was judged. Events that still apply stay pending in their original order. Events that no longer apply are dropped, and the slot error is set with operation `rebase` and a message such as:
+
+```
+2 unsaved changes were discarded because the document changed: Create a draft first, the document is published.
+```
+
+The message clears the same way other slot errors do: on the next successful commit, on Cancel, or at the start of the next pull. A slot with no validator (a local slot without `validate`) never drops anything. `rebaseSlotPending` is exported for code that wants the verdict without the state change.
 
 ## Notes
 
 - The push does not replay. Anything missed while disconnected is covered by the tail pull after the next `Authenticated`.
 - `api.askResync(slotKey?)` is also available to call by hand, for a "reload from server" control.
-- Pending events are not rebased or re-validated after a resync. A pending event that no longer validates against the new base fails at save time, the same as it would have without sync.
+- Pending events are rebased, not merged. An edit that still validates is kept as is, even if it now overwrites something another writer changed.
 
 ## Related
 

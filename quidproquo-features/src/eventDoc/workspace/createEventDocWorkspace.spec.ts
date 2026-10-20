@@ -28,10 +28,11 @@ import {
   EventDocSnapshotBase,
   EventDocStatus,
 } from '../models';
-import { EventDocEditorValidator } from '../validation';
+import { createEventDocEventValidator, EventDocEditorValidator } from '../validation';
 import { askEventDocWorkspaceReadState } from './logic/askEventDocWorkspaceReadState';
 import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
 import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
+import { rebaseSlotPending } from './logic/rebaseSlotPending';
 import {
   askUIEventDocWorkspaceAppendHistoryEvent,
   askUIEventDocWorkspaceApplyTransientEvent,
@@ -47,6 +48,7 @@ import {
   EventDocWorkspaceDocumentIdentity,
   EventDocWorkspaceDocumentSlotConfig,
   EventDocWorkspaceEventsPageRequest,
+  EventDocWorkspaceLocalSlotFoldConfig,
   EventDocWorkspaceSlotKind,
   EventDocWorkspaceSlotOperation,
   EventDocWorkspaceState,
@@ -1984,5 +1986,163 @@ describe('createEventDocWorkspace history validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(workspace.docs.noteA.view(state).id).toBe('doc-1');
+  });
+});
+
+// ─── Pending rebase: a pull that moves the base re-judges the unsaved buffer ───────
+
+// A domain rule on top of the lifecycle guard: no two lines with the same text.
+const rejectDuplicateLine = createEventDocEventValidator<NoteState>({
+  [NoteEvent.AddLine]: (event, state) => (state.lines.some((line) => line.text === event.payload.data.text) ? 'Duplicate line' : null),
+});
+
+describe('createEventDocWorkspace pending rebase', () => {
+  it('a pull that lands PUBLISH drops the pending edits and says why', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'mine');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('also mine');
+      // Another writer published while these edits sat unsaved.
+      fake.setServerEvents([initStateEvent(), publishEvent(1)]);
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), 'server-1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(state.slots.noteA.error?.error.errorText).toMatch(/^2 unsaved changes were discarded because the document changed: /);
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.status).toBe(EventDocStatus.Published);
+    expect(view.lines).toEqual([]);
+    expect(view.title).toBe('');
+  });
+
+  it('only the events that no longer apply drop; the rest keep their order', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createEventDocWorkspace({
+      slots: { noteA: { ...createNoteSlot(), validate: rejectDuplicateLine } },
+      transport: fake.transport,
+    });
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'a');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'dup');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l3', 'b');
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.AddLine, { lineId: 'srv', text: 'dup' }, 1)]);
+      yield* workspace.api.askRefresh('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.noteA.map((event) => event.payload.data)).toEqual([
+      { lineId: 'l1', text: 'a' },
+      { lineId: 'l3', text: 'b' },
+    ]);
+    expect(state.slots.noteA.error?.error.errorText).toBe('1 unsaved change was discarded because the document changed: Duplicate line');
+    expect(workspace.docs.noteA.view(state).lines.map((line) => line.lineId)).toEqual(['srv', 'l1', 'l3']);
+  });
+
+  it('a pull that leaves the edits valid keeps pending and sets no error', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'mine');
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'theirs' }, 1)]);
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), 'server-1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.slots.noteA.error).toBeNull();
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('theirs');
+    expect(view.lines.map((line) => line.lineId)).toEqual(['l1']);
+  });
+
+  it('a publish that lands mid-save drops the unsent tail instead of sending it', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+      // Another writer publishes before our save starts; the slot has not heard about it, so the first ack lands at 2,
+      // not after the held head 0, and the slot resyncs.
+      fake.setServerEvents([initStateEvent(), publishEvent(1)]);
+      yield* workspace.api.askSave('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The first append went out; the resync found the document published, so the second never did.
+    expect(fake.appended.map((input) => input.payload.data)).toEqual([{ lineId: 'l1', text: 'one' }]);
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(state.slots.noteA.isSaving).toBe(false);
+    expect(state.bases.noteA?.eventId).toBe(eventId(2));
+  });
+
+  it('restored snapshot pending is rebased against what the document became meanwhile', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'unsaved');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+    fake.setServerEvents([initStateEvent(), publishEvent(1)]);
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(workspace.docs.noteA.view(state).status).toBe(EventDocStatus.Published);
+  });
+
+  it('rebaseSlotPending keeps everything on a slot with no validator', () => {
+    const localSlot: EventDocWorkspaceLocalSlotFoldConfig<{ count: number }> = {
+      kind: EventDocWorkspaceSlotKind.local,
+      foldReducer: (state) => [{ count: state.count + 1 }],
+      createInitialViewState: () => ({ count: 0 }),
+    };
+    const pending = [serverEvent('TICK', {}, 0), serverEvent('TICK', {}, 1)];
+
+    expect(rebaseSlotPending(localSlot, { count: 0 }, pending)).toEqual({ kept: pending, dropped: [] });
+  });
+
+  it('rebaseSlotPending threads the kept events through the running state, migrating a mixed-version tail', () => {
+    const slot = { ...createNoteV2Slot(), validate: rejectDuplicateLine };
+    const historyView = foldNoteHistory([initStateEvent()]);
+    const pending = [
+      eventAtVersion(serverEvent(NoteEvent.AddLine, { lineId: 'p1', text: 'x' }, 10), 1),
+      eventAtVersion(serverEvent(NoteEvent.AddLine, { lineId: 'p2', text: 'x' }, 11), 2),
+      eventAtVersion(serverEvent(NoteEvent.AddLine, { lineId: 'p3', text: 'y' }, 12), 2),
+    ];
+
+    const { kept, dropped } = rebaseSlotPending(slot, historyView, pending);
+
+    // p2 duplicates p1, which only shows if p1 was folded into the state p2 is judged against (across the v2 migration).
+    expect(kept.map((event) => event.payload.data)).toEqual([
+      { lineId: 'p1', text: 'x' },
+      { lineId: 'p3', text: 'y' },
+    ]);
+    expect(dropped).toEqual([{ event: pending[1], reason: 'Duplicate line' }]);
   });
 });

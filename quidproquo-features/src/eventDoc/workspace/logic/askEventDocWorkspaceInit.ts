@@ -7,6 +7,7 @@ import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIE
 import { askUIEventDocWorkspaceSetLoading } from '../actionCreators/askUIEventDocWorkspaceSetLoading';
 import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotSnapshot, EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
@@ -14,7 +15,7 @@ import { askEventDocWorkspaceResync } from './askEventDocWorkspaceResync';
 import { isSameEventDocWorkspaceIdentity } from './isSameEventDocWorkspaceIdentity';
 
 // Runtime hand-off: seed history and pending from the snapshot so the view renders at once, then tail-pull what landed since.
-const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTransport) =>
+const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTransport, slots: EventDocWorkspaceSlotFoldsConfig) =>
   function* askInitDocumentSlotFromSnapshot(
     slotKey: string,
     documentIdentity: EventDocWorkspaceDocumentIdentity,
@@ -27,7 +28,7 @@ const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTranspor
     yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, pending);
     yield* askUIEventDocWorkspaceClearError(slotKey);
 
-    yield* askEventDocWorkspaceRefresh(transport, [slotKey]);
+    yield* askEventDocWorkspaceRefresh(transport, slots, [slotKey]);
   };
 
 // Was a captured base produced by the fold code this slot runs now? A base records the snapshotCacheKey it was filed
@@ -40,6 +41,7 @@ const isBaseFromCurrentFold = (base: Nullable<EventDocSnapshotBase> | undefined,
 // Pending is dropped unless the snapshot slot's identity matches, and it is seeded before the fetch so a failed load never discards it.
 const getAskInitDocumentSlot = (
   transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   snapshot: Nullable<EventDocWorkspaceSnapshot>,
   slotSnapshotCacheKeys: Record<string, string>,
 ) =>
@@ -54,7 +56,7 @@ const getAskInitDocumentSlot = (
       snapshotMatches && !!capturedHistory && isBaseFromCurrentFold(snapshotSlot.base, slotSnapshotCacheKeys[slotKey] ?? '');
 
     if (canRestoreFromSnapshot) {
-      yield* getAskInitDocumentSlotFromSnapshot(transport)(
+      yield* getAskInitDocumentSlotFromSnapshot(transport, slots)(
         slotKey,
         documentIdentity,
         capturedHistory,
@@ -70,19 +72,21 @@ const getAskInitDocumentSlot = (
     yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
     yield* askUIEventDocWorkspaceClearError(slotKey);
     yield* askUIEventDocWorkspaceSetLoading(slotKey, true);
-    yield* askEventDocWorkspaceResync(transport, slotKey);
+    yield* askEventDocWorkspaceResync(transport, slots, slotKey);
     yield* askUIEventDocWorkspaceSetLoading(slotKey, false);
   };
 
 /**
  * Initialises the requested document slots in parallel: identity, pending (restored from a matching snapshot slot), then the
- * bootstrap load. `slotSnapshotCacheKeys` is each document slot's definition key, for judging a held base.
+ * bootstrap load, which rebases the restored pending. `slotSnapshotCacheKeys` is each document slot's definition key, for
+ * judging a held base.
  */
 export function* askEventDocWorkspaceInit(
   transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   identities: Record<string, EventDocWorkspaceDocumentIdentity>,
   snapshot: Nullable<EventDocWorkspaceSnapshot> = null,
   slotSnapshotCacheKeys: Record<string, string> = {},
 ): AskResponse<void> {
-  yield* askMapParallel(Object.entries(identities), getAskInitDocumentSlot(transport, snapshot, slotSnapshotCacheKeys));
+  yield* askMapParallel(Object.entries(identities), getAskInitDocumentSlot(transport, slots, snapshot, slotSnapshotCacheKeys));
 }

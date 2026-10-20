@@ -1,4 +1,3 @@
-import { defaultEventDocEventValidator } from '../validation';
 import { eventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlot';
 import { bindEventDocWorkspaceApi } from './logic/bindEventDocWorkspaceApi';
 import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
@@ -6,6 +5,7 @@ import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspace
 import { foldSlotPendingTail } from './logic/foldSlotPendingTail';
 import { getSlotHistoryView } from './logic/getSlotHistoryView';
 import { getSlotPending } from './logic/getSlotPending';
+import { getSlotValidator } from './logic/getSlotValidator';
 import { createEventDocWorkspaceReducer } from './reducer/createEventDocWorkspaceReducer';
 import { createEventDocWorkspaceSelectors } from './selectors/createEventDocWorkspaceSelectors';
 import { EventDocWorkspaceDefinition } from './types/EventDocWorkspaceDefinition';
@@ -16,7 +16,6 @@ import { EventDocWorkspaceSlotsConfig } from './types/EventDocWorkspaceSlotsConf
 import { createInitialEventDocWorkspaceState, EventDocWorkspaceState } from './types/EventDocWorkspaceState';
 import { EventDocWorkspace, EventDocWorkspaceResolvedSlots } from './EventDocWorkspace';
 
-// A document slot without a validator falls back to the lifecycle guard so a published document cannot be silently mutated.
 const getSlotBinding = (
   slotKey: string,
   slot: EventDocWorkspaceSlotConfig,
@@ -24,7 +23,7 @@ const getSlotBinding = (
 ): EventDocWorkspaceSlotBinding => ({
   slotKey,
   schemaVersion: slot.schemaVersion ?? 1,
-  validate: slot.kind === EventDocWorkspaceSlotKind.document ? (slot.validate ?? defaultEventDocEventValidator) : (slot.validate ?? null),
+  validate: getSlotValidator(slot),
   getView,
   // Unmemoized on purpose: the view selector's cache includes transients, so it cannot serve a transient-free fold.
   getValidationView: (state) => foldSlotPendingTail(slot, getSlotHistoryView(state, slotKey), getSlotPending(state, slotKey)),
@@ -73,7 +72,7 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
 
   return {
     docs,
-    api: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
+    api: createEventDocWorkspaceBuiltInApi(definition.transport, slotsConfig, documentSlotKeys, localSlotKeys, slotSnapshotCacheKeys),
     storeNames,
     reducer: createEventDocWorkspaceReducer(slotsConfig),
     createInitialState: () => createInitialEventDocWorkspaceState(slotsConfig),
