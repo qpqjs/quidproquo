@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.34
+
+- features: event-doc workspace live sync. A collection whose definition (or routes option) carries `sync: { websocketApiName }` pushes a head-moved message over the websocket queue on every append, including appends made by service code through `createEventDocBackend`, and can push to several queues. `useEventDocWorkspaceSync` subscribes a workspace to its docs' topics and pulls the tail when a push arrives, so other clients see changes without polling
+- features: websocket queues gain topic subscriptions (a `qpq-wsq-subs-<apiName>` store, cleared on each Authenticate) and a `connectionAuthenticator` option that validates the token inline instead of through a user directory
+- features: the workspace keeps its slot history honest. `askResync` reloads a slot from the server, history appends are refused when they are not contiguous with the slot head, pending events that no longer validate after a pull or resync are dropped and reported under the new `rebase` operation, and slot history is compacted after each server append so it stays bounded
+- features: `defineConsoleLogRedaction` redacts `askLog` console output before it is printed, using the same rules the admin log viewer applies on read, for services whose console reaches a shared log store
+- config-aws: `cloudWatchLogRetentionDays` on `defineAwsServiceAccountInfo` sets Lambda and API Gateway log retention, default 7 days
+- core/webserver/web: `askNetworkRequest` and `askApiRequest` fail with `Timeout`, `UnsupportedMethod` or `NetworkError` when no response came back, and `preformNetworkRequest` throws a `NetworkRequestError` instead of a fake 500
+- dev-server: the dev server logger honours `disableLogs`
+- removed stray console logging across the runtimes
+
+### Breaking changes
+
+- CloudWatch log retention defaults to 7 days instead of a year; set `cloudWatchLogRetentionDays` to keep more
+- `preformNetworkRequest` throws `NetworkRequestError` instead of resolving with a fake 500
+- `askNetworkRequest` and `askApiRequest` fail with `UnsupportedMethod` or `NetworkError` instead of a generic error
+- `EventDocWorkspace` gains `storeNames` and the built-in api gains `askSyncHeadMoved`; hand-built objects must add them
+- `defineWebSocketQueue` creates a subscriptions store and clears subscriptions on Authenticate; clients must resubscribe
+- `sync` moves from the `defineEventDoc` options onto the definition
+- `EventDocStore.syncWebsocketApiName` becomes `syncWebsocketApiNames: string[]`; websocket queues gain a sixth global
+- `EventDocWorkspaceSlotOperation` gains `rebase`; workspace stories take slot fold configs after the transport
+
 ## 0.1.33
 
 - cli: `qpq go:docker` can be split across machines. `--build-only` builds, bundles and synthesises each service and writes a manifest to `dist/qpq/go-docker/<app>/<svc>/deploy.json` (no docker needed); `--from-build` deploys a stack from that saved build on a machine that never built the workspace, publishing the federated remote after `api`. Lets a CI deploy run one job per service and phase while keeping the inf-before-api ordering

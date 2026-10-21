@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.34
+
 - CloudWatch log groups for Lambda functions and API Gateway access logs now default to 7 days of retention instead of a year. Set `cloudWatchLogRetentionDays` on `defineAwsServiceAccountInfo` options to keep more (for example `365` for the previous behaviour). The next deploy applies the new retention to existing log groups, so older entries beyond the window are deleted.
 - `preformNetworkRequest` no longer turns a failed request into a fake `500` response. It still resolves with any real HTTP response (any status), but now throws a `NetworkRequestError` (new export) when no response came back. Check `error.code` against `NetworkRequestErrorCode` (`timeout`, `unsupportedMethod`, `network`) instead of testing for `status === 500`. `executeNetworkRequest` throws `NetworkRequestError` with code `unsupportedMethod` for refused methods.
 - `EventDocWorkspace` (what `createEventDocWorkspace` returns) gains `storeNames`, and `EventDocWorkspaceBuiltInApi` gains `askSyncHeadMoved`. Workspaces built by `createEventDocWorkspace` get both for free; only code that builds either object by hand (test doubles, a wrapper that re-declares the api) must add them.
