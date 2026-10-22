@@ -15,3 +15,4 @@ export * from './signingKey';
 export * from './smokeSuites';
 export * from './storageDrive';
 export * from './storageDriveEvent';
+export * from './userScript';

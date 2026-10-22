@@ -15,6 +15,7 @@ import { secretSmokeSuite } from './secret/secretSmokeSuite';
 import { signingKeySmokeSuite } from './signingKey/signingKeySmokeSuite';
 import { storageDriveSmokeSuite } from './storageDrive/storageDriveSmokeSuite';
 import { storageDriveEventSmokeSuite } from './storageDriveEvent/storageDriveEventSmokeSuite';
+import { userScriptSmokeSuite } from './userScript/userScriptSmokeSuite';
 
 /**
  * Every suite a smoke run executes. Adding one: a folder under suites/
@@ -43,4 +44,5 @@ export const smokeSuites: SmokeSuite[] = [
   keyValueStoreStreamSmokeSuite,
   encryptedResourcesSmokeSuite,
   emailReceiveSmokeSuite,
+  userScriptSmokeSuite,
 ];

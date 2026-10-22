@@ -4,14 +4,18 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 import { getDynamicFunctionsActionProcessor } from './dynamicFunctions';
 import { getInlineFunctionActionProcessor } from './inlineFunction';
 import { getStreamActionProcessor } from './stream';
+import { getUserScriptActionProcessor } from './userScript';
 
 // The shared core processors (config, context, date, error, guid, log,
 // math, network, platform, system, customActions) are owned by
 // quidproquo-actionprocessor-js. Node builds on top of js and only adds the
-// processors that need a Node runtime (stream, inlineFunction, dynamicFunctions).
+// processors that need a Node runtime (stream, inlineFunction, dynamicFunctions,
+// userScript).
 export * from './dynamicFunctions';
 export * from './inlineFunction';
+export * from './logic';
 export * from './stream';
+export * from './userScript';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -22,4 +26,5 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getStreamActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getInlineFunctionActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getDynamicFunctionsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserScriptActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
