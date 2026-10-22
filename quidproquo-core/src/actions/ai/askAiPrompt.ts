@@ -2,6 +2,7 @@ import { createActionRequester } from '../../types';
 import { AiStreamUsage } from './types/AiStreamUsage';
 import { AiActionType } from './AiActionType';
 import { AiCacheTtl } from './AiCacheTtl';
+import { AiJsonSchema } from './AiJsonSchema';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
 import { AiReasoningConfig } from './AiReasoningConfig';
@@ -26,10 +27,20 @@ export type AskAiPromptOptions = {
   /** Output token cap per model call. Unset uses the provider default (8192 on Bedrock), which a
    *  large tool input plus reasoning can exceed; the step then finishes with `length`. */
   maxOutputTokens?: number;
+  /** The reply must be a JSON value matching this schema. It is checked before it is returned, and
+   *  a reply that does not match is an `Invalid` action error, never a result. */
+  outputSchema?: AiJsonSchema;
+  /** With `outputSchema`: how many times a reply that does not match is shown back to the model with
+   *  the problems listed, to correct. Each is another model call. Unset means none. */
+  outputRepairAttempts?: number;
 };
 
 export type AiPromptActionResult = {
   text: string;
+  /** The reply, parsed and checked against `outputSchema`. Set only when a schema was given. */
+  object?: unknown;
+  /** How many repair calls the reply took (see `outputRepairAttempts`). Set only with a schema. */
+  repairs?: number;
   /** Token usage summed across every step, when the provider reports it. */
   usage?: AiStreamUsage;
 };
@@ -49,5 +60,7 @@ export const askAiPrompt = createActionRequester<AiPromptActionResult>()({
     maxDurationMs: options?.maxDurationMs,
     maxSteps: options?.maxSteps,
     maxOutputTokens: options?.maxOutputTokens,
+    outputSchema: options?.outputSchema,
+    outputRepairAttempts: options?.outputRepairAttempts,
   }),
 });

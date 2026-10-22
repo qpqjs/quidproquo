@@ -54,6 +54,8 @@ function* askAiPrompt(
 | `cacheTtl` | `AiCacheTtl` | `AiCacheTtl.Dynamic` | Requested lifetime of the request's cache points. `AiCacheTtl.Dynamic` lets the provider choose per point: on Bedrock an hour for the system prompt and the last `messages` entry, so they outlive a pause between turns, and five minutes for the tool-loop point, which is discarded when the call ends. `AiCacheTtl.ProviderDefault` leaves every point on the provider's default (five minutes on Bedrock); `AiCacheTtl.FiveMinutes` keeps every point on five minutes; `AiCacheTtl.OneHour` pins the hour on the system prompt and the last `messages` entry. The tool-loop point is always five minutes, whatever is requested, because it is discarded when the call ends. A request, not a guarantee: a Bedrock model that cannot cache for an hour gets the default instead of a failed request. |
 | `maxSteps` | `number` | – | Cap on model/tool steps in one call. Unset means no cap: the loop runs until the model stops on its own or `maxDurationMs` trips. A client-side tool call (a tool with no executor) still halts it immediately. |
 | `maxOutputTokens` | `number` | provider default | Output token cap per model call. Bedrock defaults to 8192, which a reasoning block plus a large tool input can exceed; the step then finishes with `length` and the tool call arrives truncated. Raise it for agentic workloads (Claude Sonnet allows 64k). |
+| `outputSchema` | `AiJsonSchema` (a JSON Schema object) | – | The reply must be a JSON value matching this schema. It is checked before it is returned, and a reply that does not match is an `Invalid` error, never a result. The parsed value comes back as `object`. |
+| `outputRepairAttempts` | `number` | `0` | With `outputSchema`: how many times a reply that does not match is shown back to the model with the problems listed, to correct. Each attempt is another model call. |
 | `maxDurationMs` | `number` | – | Wall-clock budget for the tool loop. Checked between steps, so the loop can overrun by one step; leave headroom. When it trips with tool calls still outstanding the result finishes with `toolCalls`, and re-sending the recorded history resumes the turn. Pair it with [askGetRuntimeRemainingTime](../system/ask-get-runtime-remaining-time.md) to stop before the platform deadline. |
 
 ### `AiModel`
@@ -117,7 +119,7 @@ One knob for every model; what it means per model is under `reasoning` above.
 
 ## Returns
 
-`AiPromptActionResult`: `{ text: string; usage?: AiStreamUsage }`. `text` is the model's complete response; `usage` is the token usage summed across every step when the provider reports it, with `inputTokens`, `outputTokens`, `totalTokens` and, when caching on Bedrock, `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`.
+`AiPromptActionResult`: `{ text: string; object?: unknown; repairs?: number; usage?: AiStreamUsage }`. `text` is the model's complete response; `object` is the reply parsed and checked against `outputSchema`, and `repairs` is how many repair calls it took (both set only when a schema was given); `usage` is the token usage summed across every step when the provider reports it, with `inputTokens`, `outputTokens`, `totalTokens` and, when caching on Bedrock, `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`.
 
 ## Errors
 
@@ -125,6 +127,7 @@ One knob for every model; what it means per model is under `reasoning` above.
 | --- | --- |
 | `ErrorTypeEnum.NotImplemented` | The `model` has no provider model id in any data region. |
 | `ErrorTypeEnum.NotFound` | `options.aiName` names an AI config that does not exist. |
+| `ErrorTypeEnum.Invalid` | `outputSchema` was given and the reply is not JSON, or does not match the schema after all `outputRepairAttempts`. |
 | `ErrorTypeEnum.GenericError` | Any failure while generating, with the underlying provider message. |
 
 Catch failures with `askCatch`, which returns an `EitherActionResult` — `{ success: true, result }` or `{ success: false, error }`:

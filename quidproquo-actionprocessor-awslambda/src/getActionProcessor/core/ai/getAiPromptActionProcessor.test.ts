@@ -4,7 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getAiPromptActionProcessor } from './getAiPromptActionProcessor';
-import { buildAiPromptInput, createCachePrepareStep, logAiCacheUsage, prepareAiPromptCall, toCacheableSystem } from './logic';
+import {
+  buildAiPromptInput,
+  createCachePrepareStep,
+  logAiCacheUsage,
+  prepareAiPromptCall,
+  toBedrockReasoningOptions,
+  toCacheableSystem,
+} from './logic';
 
 // Echoes the payload so the order history -> turn context is observable in the SDK call.
 const { echoPromptInput } = vi.hoisted(() => ({
@@ -18,7 +25,10 @@ const { echoPromptInput } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('./logic', () => ({
+vi.mock('./logic', async () => ({
+  // The real check: a test that mocked it could not tell a guarded reply from an unguarded one.
+  generateAiOutputObject: ((await vi.importActual('./logic/generateAiOutputObject')) as typeof import('./logic/generateAiOutputObject'))
+    .generateAiOutputObject,
   prepareAiPromptCall: vi.fn(),
   createDriveFileResolver: vi.fn(() => vi.fn()),
   buildAiPromptInput: vi.fn(echoPromptInput),
@@ -31,9 +41,30 @@ vi.mock('./logic', () => ({
 }));
 
 const generateText = vi.fn();
+const { FakeNoObjectGeneratedError } = vi.hoisted(() => ({
+  FakeNoObjectGeneratedError: class extends Error {
+    constructor(
+      message: string,
+      readonly text?: string,
+      readonly usage?: { outputTokens: number },
+    ) {
+      super(message);
+    }
+  },
+}));
 vi.mock('ai', () => ({
   generateText: (args: unknown) => generateText(args),
+  jsonSchema: (schema: unknown) => ({ jsonSchema: schema }),
+  Output: { object: (options: unknown) => ({ objectOutput: options }) },
+  NoObjectGeneratedError: { isInstance: (error: unknown) => error instanceof FakeNoObjectGeneratedError },
 }));
+
+const loanSchema = {
+  type: 'object',
+  properties: { applicants: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' } } } } },
+  required: ['applicants'],
+  additionalProperties: false,
+};
 
 const invoke = async (payload: Record<string, unknown>) => {
   const processor = (await getAiPromptActionProcessor({} as never, null as any))[AiActionType.Prompt];
@@ -140,5 +171,139 @@ describe('getProcessAiPrompt', () => {
     const [, error] = await invoke({ prompt: 'hi' });
 
     expect(error?.errorText).toBe('An error occurred during AI prompt execution.');
+  });
+
+  it('asks for no structured output and returns no object without an output schema', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    generateText.mockResolvedValue({ text: 'plain', usage: totalUsage });
+
+    const [result] = await invoke({ prompt: 'hi' });
+
+    expect(generateText).toHaveBeenCalledWith(expect.objectContaining({ output: undefined, providerOptions: undefined }));
+    expect(result).toEqual({ text: 'plain', usage: totalUsage });
+  });
+
+  it('asks for the output schema and returns the reply as the object when it matches', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    const reply = { applicants: [{ name: 'Jo' }] };
+    generateText.mockResolvedValue({ text: '', output: reply, usage: totalUsage });
+
+    const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
+
+    expect(error).toBeUndefined();
+    expect(generateText).toHaveBeenCalledWith(
+      expect.objectContaining({
+        output: { objectOutput: { schema: { jsonSchema: loanSchema } } },
+        providerOptions: { bedrock: { structuredOutputMode: 'jsonTool' } },
+      }),
+    );
+    // Usage is summed across calls, which keeps the standard token fields.
+    expect(result).toEqual({ text: '', usage: { inputTokens: totalUsage.inputTokens }, object: reply, repairs: 0 });
+  });
+
+  it('keeps reasoning settings beside the json tool mode', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(toBedrockReasoningOptions).mockReturnValueOnce({ bedrock: { reasoningConfig: { type: 'enabled', budgetTokens: 1024 } } } as never);
+    generateText.mockResolvedValue({ text: '', output: { applicants: [] }, usage: totalUsage });
+
+    await invoke({ prompt: 'hi', outputSchema: loanSchema });
+
+    expect(generateText).toHaveBeenCalledWith(
+      expect.objectContaining({
+        providerOptions: { bedrock: { reasoningConfig: { type: 'enabled', budgetTokens: 1024 }, structuredOutputMode: 'jsonTool' } },
+      }),
+    );
+  });
+
+  it('refuses a reply with a key the schema does not allow', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    generateText.mockResolvedValue({ text: '', output: { applicants: [], total_interest_amount: 5 }, usage: totalUsage });
+
+    const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
+
+    expect(result).toBeUndefined();
+    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorText).toBe('The reply does not match the output schema: (root) must NOT have additional properties (total_interest_amount)');
+  });
+
+  it('refuses a reply whose list came back as text', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    generateText.mockResolvedValue({ text: '', output: { applicants: '[{"name":"Jo"}]' }, usage: totalUsage });
+
+    const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
+
+    expect(result).toBeUndefined();
+    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorText).toBe('The reply does not match the output schema: /applicants must be array');
+  });
+
+  it('shows a refused reply back to the model with the problems, and returns the repaired one', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    const repaired = { applicants: [{ name: 'Jo' }] };
+    generateText
+      .mockResolvedValueOnce({ text: '', output: { applicants: [], total_interest_amount: 5 }, usage: { inputTokens: 100, outputTokens: 10 } })
+      .mockResolvedValueOnce({ text: '', output: repaired, usage: { inputTokens: 120, outputTokens: 12 } });
+
+    const [result, error] = await invoke({ prompt: 'read this', outputSchema: loanSchema, outputRepairAttempts: 2 });
+
+    expect(error).toBeUndefined();
+    expect(result).toEqual({ text: '', usage: { inputTokens: 220, outputTokens: 22 }, object: repaired, repairs: 1 });
+    expect(generateText).toHaveBeenCalledTimes(2);
+    expect(generateText.mock.calls[1][0].messages).toEqual([
+      { role: 'user', content: 'read this' },
+      { role: 'assistant', content: JSON.stringify({ applicants: [], total_interest_amount: 5 }) },
+      {
+        role: 'user',
+        content:
+          'That reply does not match the required schema: (root) must NOT have additional properties (total_interest_amount). Send the whole reply again with only those problems fixed, changing nothing else.',
+      },
+    ]);
+  });
+
+  it('refuses once the repairs run out, with the last problems', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    generateText
+      .mockResolvedValueOnce({ text: '', output: { applicants: 'x' }, usage: totalUsage })
+      .mockResolvedValueOnce({ text: '', output: { applicants: [], extra: 1 }, usage: totalUsage })
+      .mockResolvedValueOnce({ text: '', output: { applicants: [] }, usage: totalUsage });
+
+    const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema, outputRepairAttempts: 1 });
+
+    expect(result).toBeUndefined();
+    expect(generateText).toHaveBeenCalledTimes(2);
+    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorText).toBe('The reply does not match the output schema: (root) must NOT have additional properties (extra)');
+  });
+
+  it('refuses a reply that is not JSON at all when no repair is allowed', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    generateText.mockRejectedValue(new FakeNoObjectGeneratedError('No object generated: could not parse the response.', 'Sure! Here it is'));
+
+    const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
+
+    expect(result).toBeUndefined();
+    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorText).toBe('The reply does not match the output schema: the reply is not JSON');
+  });
+
+  it('repairs a reply that is not JSON by showing the model its own text, and counts its usage', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    const repaired = { applicants: [] };
+    generateText
+      .mockRejectedValueOnce(new FakeNoObjectGeneratedError('No object generated.', 'Sure! Here it is: {"applicants": [', { outputTokens: 7 }))
+      .mockResolvedValueOnce({ text: '', output: repaired, usage: { outputTokens: 5 } });
+
+    const [result, error] = await invoke({ prompt: 'read this', outputSchema: loanSchema, outputRepairAttempts: 1 });
+
+    expect(error).toBeUndefined();
+    expect(result).toEqual({ text: '', usage: { outputTokens: 12 }, object: repaired, repairs: 1 });
+    expect(generateText.mock.calls[1][0].messages.slice(1)).toEqual([
+      { role: 'assistant', content: 'Sure! Here it is: {"applicants": [' },
+      {
+        role: 'user',
+        content:
+          'That reply does not match the required schema: the reply is not JSON. Send the whole reply again with only those problems fixed, changing nothing else.',
+      },
+    ]);
   });
 });
