@@ -1,4 +1,4 @@
-import { RuleSetRule } from '@rspack/core';
+import type { RuleSetRule } from '@rspack/core';
 
 /**
  * TypeScript through rspack's builtin swc loader, no type check. The same options as a

@@ -1,5 +1,5 @@
 import path from 'path';
-import { Configuration } from '@rspack/core';
+import type { Configuration } from '@rspack/core';
 
 import { createUserScriptExternals } from './createUserScriptExternals';
 import { USER_SCRIPT_OUTPUT_FILENAME } from './USER_SCRIPT_OUTPUT_FILENAME';

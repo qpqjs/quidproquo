@@ -1,7 +1,7 @@
 import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-core';
 
 import { builtinModules } from 'module';
-import { ExternalItemFunctionData } from '@rspack/core';
+import type { ExternalItemFunctionData } from '@rspack/core';
 
 type ExternalsCallback = (error?: Error, result?: string) => void;
 
