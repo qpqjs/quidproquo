@@ -37,5 +37,7 @@ describe('getDevServerActionProcessors', () => {
     expect(processors[FileActionType.ReadTextContents]).toBeDefined();
     expect(processors[DynamicFunctionsActionType.Execute]).toBeDefined();
     expect(processors[UserScriptActionType.Execute]).toBeDefined();
+    // Building is opt-in per service through defineUserScriptBuilder, never in the base list.
+    expect(processors[UserScriptActionType.Build]).toBeUndefined();
   });
 });

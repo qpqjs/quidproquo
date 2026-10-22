@@ -7,4 +7,3 @@ export * from './getRspackConfigForQpq';
 export * from './plugins';
 export * from './runRspack';
 export * from './setupRspackQPQRuntime';
-export * from './userScript';

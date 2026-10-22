@@ -1,0 +1,69 @@
+---
+title: askUserScriptBuild
+description: Build a user script project that is already on a storage drive into a single main.js, on whichever runtime is calling.
+---
+
+# askUserScriptBuild
+
+Builds a user script project that is already stored on a drive into `<outputDirectory>/main.js` (plus `main.js.map`). The output is what [askUserScriptExecute](./ask-user-script-execute.md) is then pointed at.
+
+- **Action type:** `UserScriptActionType.Build`
+
+```typescript
+import { askUserScriptBuild, askUserScriptExecute } from 'quidproquo-core';
+
+export function* askBuildAndRunReport(drive: string) {
+  const { exports } = yield* askUserScriptBuild(drive, 'scripts/report/source', 'scripts/report');
+
+  return yield* askUserScriptExecute(drive, 'scripts/report', 'buildReport', 2026);
+}
+```
+
+## Signature
+
+```typescript
+function* askUserScriptBuild(
+  drive: string,
+  sourceDirectory: string,
+  outputDirectory: string,
+  scope?: string,
+): AskResponse<UserScriptBuildOutcome>;
+```
+
+## Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `drive` | `string` | Name of the storage drive holding the project and receiving the output. |
+| `sourceDirectory` | `string` | Directory holding the project: `src/main.ts` and whatever it imports. |
+| `outputDirectory` | `string` | Directory that receives `main.js` and `main.js.map`. |
+| `scope` | `string` (optional) | Storage scope, a single path segment. |
+
+## Returns
+
+`UserScriptBuildOutcome`: `{ exports: string[] }`, the export names of the built module.
+
+## Errors
+
+`askUserScriptBuild` exposes its catalog as `askUserScriptBuild.errorType`:
+
+| Error | Cause |
+| --- | --- |
+| `SourceNotFound` | There is no `src/main.ts` or `src/main.js` under the source directory. |
+| `SourceTooLarge` | More than 200 files, more than 2MB, or a `node_modules` folder in the source. |
+| `BuildFailed` | The bundler reported errors, including a refused import. |
+| `OutputNotSingleFile` | The build emitted more than one JavaScript file. |
+| `NoExports` | The built module exports nothing. |
+| `NonFunctionExport` | An export of the built module is not a function. |
+| `DriveNotFound` | The storage drive does not exist. |
+| `InvalidScope` | The scope is not a valid single path segment, or the drive refuses it. |
+
+## Notes
+
+- Only services that opt in can process this action. Call `defineUserScriptBuilder()` from `quidproquo-user-script` in the service config; services that do not call it never load rspack.
+- On lambda the service also needs rspack from a layer. Pass `getUserScriptBuilderApiLayer()` in its api layers and produce the layer with `qpq script:builder-layer --app <app>`, normally from the app's `qpq:predeploy` hook.
+- A script project may import `quidproquo-core` and its own files. Other npm packages and Node builtins are refused.
+
+## Related
+
+- [askUserScriptExecute](./ask-user-script-execute.md) to call a function from the built script.

@@ -1,9 +1,9 @@
 import path from 'path';
 import { Configuration } from '@rspack/core';
 
-import { serviceTsRules } from '../appWorkspace/serviceTsRules';
 import { createUserScriptExternals } from './createUserScriptExternals';
 import { USER_SCRIPT_OUTPUT_FILENAME } from './USER_SCRIPT_OUTPUT_FILENAME';
+import { userScriptTsRule } from './userScriptTsRule';
 
 export type UserScriptRspackConfigOptions = {
   projectDir: string;
@@ -15,8 +15,8 @@ export type UserScriptRspackConfigOptions = {
 /**
  * The rspack config that bundles a script project into one CommonJS `main.js`: the
  * author's files and npm packages folded in, the shared framework packages external,
- * no chunks, a full source map beside it. TypeScript goes through the same swc rules
- * as a service build, so nothing is type checked here.
+ * no chunks, a full source map beside it. TypeScript goes through swc, so nothing is
+ * type checked here.
  */
 export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir }: UserScriptRspackConfigOptions): Configuration => ({
   context: projectDir,
@@ -52,6 +52,6 @@ export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir }: Use
   module: {
     // A dynamic import must land in the one file, not a sibling chunk.
     parser: { javascript: { dynamicImportMode: 'eager' } },
-    rules: serviceTsRules(),
+    rules: [userScriptTsRule()],
   },
 });

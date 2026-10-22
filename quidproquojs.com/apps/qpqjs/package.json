@@ -1,0 +1,8 @@
+{
+  "name": "@qpqjs/app",
+  "private": true,
+  "description": "App-level qpq hooks for the qpqjs app",
+  "scripts": {
+    "qpq:predeploy": "cd ../.. && qpq script:builder-layer --app qpqjs"
+  }
+}

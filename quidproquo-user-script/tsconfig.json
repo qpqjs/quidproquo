@@ -1,0 +1,14 @@
+{
+  "//": "Editor-facing config only (VS Code TS server loads tsconfig.json) — builds use tsconfig.commonjs.json / tsconfig.esm.json. vitest-env.d.ts shims the vitest exports that node10 module resolution cannot see.",
+  "extends": "./tsconfig.commonjs.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "../vitest-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

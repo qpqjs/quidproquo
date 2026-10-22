@@ -54,6 +54,7 @@
     "quidproquo-core": "0.1.34",
     "quidproquo-deploy-awscdk": "0.1.34",
     "quidproquo-deploy-rspack": "0.1.34",
+    "quidproquo-user-script": "0.1.34",
     "quidproquo-dev-server": "0.1.34",
     "quidproquo-webserver": "0.1.34",
     "ts-node": "^10.9.1",

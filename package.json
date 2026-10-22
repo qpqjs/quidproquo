@@ -71,6 +71,7 @@
     "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo",
+    "quidproquo-user-script",
     "quidproquo-cli",
     "create-qpq-app"
   ],

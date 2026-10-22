@@ -135,6 +135,12 @@ export const cliCommands: CliCommand[] = [
     run: (a) => require('../commands/scriptBuild').scriptBuildCommand(a),
   },
   {
+    name: 'script:builder-layer',
+    usageArgs: '--app <app>',
+    summary: 'Install rspack for the lambda architecture into the user-script builder layer, for services that build user scripts',
+    run: (a) => require('../commands/scriptBuilderLayer').scriptBuilderLayerCommand(a),
+  },
+  {
     name: 'check:circular',
     summary: 'Scan workspace sources for circular imports (fails on cycles; --warn to only report)',
     run: (a) => require('../commands/checkCircular').checkCircularCommand(a),

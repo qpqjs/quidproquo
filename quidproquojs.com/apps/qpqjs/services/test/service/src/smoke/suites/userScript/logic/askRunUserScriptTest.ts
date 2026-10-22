@@ -5,35 +5,52 @@ import {
   askFileWriteTextContents,
   askNewGuid,
   AskResponse,
+  askUserScriptBuild,
   createUserScriptCaller,
 } from 'quidproquo';
 
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
-import { SMOKE_USER_SCRIPT_BUILT } from '../generated/SMOKE_USER_SCRIPT_BUILT';
+import { SMOKE_USER_SCRIPT_SOURCES } from '../generated/SMOKE_USER_SCRIPT_SOURCES';
 import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 
-// A user script built from a real TypeScript project (apps/qpqjs/userScripts/smoke,
-// bundled by the service's build step) is stored on a drive, loaded by the runtime
-// that is calling, and its exports are callable by name: a generator export runs
-// as a story whose own actions reach the real processors (it writes a file we
-// can read back), and a plain export returns its value.
+// The whole user-script loop on the runtime that is calling: a TypeScript project
+// (apps/qpqjs/userScripts/smoke) is written to a drive, built on the platform with
+// askUserScriptBuild, and its exports are then callable by name. A generator
+// export runs as a story whose own actions reach the real processors (it writes a
+// file we can read back), and a plain export returns its value.
 export function* askRunUserScriptTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
   const directory = `smoke/userScript/${scriptId}`;
-  const entryPath = `${directory}/main.js`;
+  const sourceDirectory = `${directory}/source`;
+  const builtDirectory = `${directory}/built`;
   const outputPath = `${directory}/output.txt`;
 
-  yield* askFileWriteTextContents(
+  const sourcePaths = Object.keys(SMOKE_USER_SCRIPT_SOURCES).map(
+    (relativePath) => `${sourceDirectory}/${relativePath}`
+  );
+  for (const relativePath of Object.keys(SMOKE_USER_SCRIPT_SOURCES)) {
+    yield* askFileWriteTextContents(
+      SMOKE_PROBE_DRIVE,
+      `${sourceDirectory}/${relativePath}`,
+      SMOKE_USER_SCRIPT_SOURCES[relativePath]
+    );
+  }
+
+  const built = yield* askUserScriptBuild(
     SMOKE_PROBE_DRIVE,
-    entryPath,
-    SMOKE_USER_SCRIPT_BUILT
+    sourceDirectory,
+    builtDirectory
+  );
+  yield* askSmokeAssert(
+    built.exports.includes('add') && built.exports.includes('greet'),
+    `platform build did not report the script's exports: [${built.exports.join(', ')}]`
   );
 
   const script = createUserScriptCaller<SmokeUserScriptFunctions>(
     SMOKE_PROBE_DRIVE,
-    directory
+    builtDirectory
   );
 
   const sum = yield* script.add(SMOKE_PROBE_DRIVE, outputPath, 20, 22);
@@ -57,5 +74,10 @@ export function* askRunUserScriptTest(): AskResponse<void> {
     'plain export did not return its value'
   );
 
-  yield* askFileDelete(SMOKE_PROBE_DRIVE, [entryPath, outputPath]);
+  yield* askFileDelete(SMOKE_PROBE_DRIVE, [
+    ...sourcePaths,
+    `${builtDirectory}/main.js`,
+    `${builtDirectory}/main.js.map`,
+    outputPath,
+  ]);
 }

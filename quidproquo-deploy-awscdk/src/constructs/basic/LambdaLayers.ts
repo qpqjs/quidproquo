@@ -14,7 +14,9 @@ export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] =
 
   return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
     name: layer.name,
-    buildPath: layer.buildPath ? path.join(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath) : undefined,
+    // resolve, not join: a layer produced by tooling (see getUserScriptBuilderApiLayer) names an
+    // absolute directory, which must pass through untouched.
+    buildPath: layer.buildPath ? path.resolve(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath) : undefined,
     layerArn: layer.layerArn,
   }));
 };

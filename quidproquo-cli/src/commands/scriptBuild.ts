@@ -1,6 +1,6 @@
 // `qpq script:build <dir> [--out <dir>]` — bundle a user-script project into one
 // main.js (plus source map) that askUserScriptExecute can load from a drive.
-import { buildUserScript, UserScriptBuildError } from 'quidproquo-deploy-rspack';
+import { buildUserScript, UserScriptBuildError } from 'quidproquo-user-script';
 
 import path from 'path';
 
