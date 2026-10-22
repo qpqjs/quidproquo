@@ -114,3 +114,6 @@ cdk.out/
 @mf-type
 .pnotes/
 .qpq-runtime/
+
+# Built by the test service build step (scripts/buildSmokeUserScript.mjs)
+apps/qpqjs/services/test/service/src/smoke/suites/userScript/generated/

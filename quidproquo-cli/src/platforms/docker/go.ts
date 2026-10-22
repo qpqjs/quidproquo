@@ -16,7 +16,7 @@
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from 'quidproquo-config-aws';
 import { QpqDeployEnvVar } from 'quidproquo-core';
-import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
+import { getAppServiceQpqConfigs, getDevServerRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
 import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from 'quidproquo-dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN } from 'quidproquo-webserver';
 
@@ -29,7 +29,6 @@ import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
-import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';

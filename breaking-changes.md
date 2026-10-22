@@ -7,6 +7,8 @@ assembled quickly.
 
 - `FEDERATED_SHARED_PACKAGE_NAMES` now lives in `quidproquo-core` and is no longer exported from `quidproquo-actionprocessor-awslambda`. Import it from core.
 - New `UserScript` action domain in core: `askUserScriptExecute(drive, directory, functionName, args)` calls a named export of a hand-written CommonJS script stored at `<directory>/main.js` on a storage drive, and `createUserScriptCaller` is its typed proxy. The node processor (composed into the lambda and dev-server runtimes) loads the script in-process with only the shared framework packages requirable. No sandbox: the script runs with the caller's permissions, so only trusted authors may store scripts. The script's actions run through the calling runtime's processors.
+- `runRspack` moves from `quidproquo-cli` (an internal module) to `quidproquo-deploy-rspack`, exported from its package root.
+- `quidproquo-deploy-rspack` exports `buildUserScript({ projectDir, outDir })`, which bundles a user-script project (`src/main.ts` exporting functions) into one `main.js` with the shared framework packages external and everything else, npm packages included, folded in; Node builtins are refused at build time and the output is checked against the execute loader. `qpq script:new <dir>` writes the template project and `qpq script:build <dir> [--out <dir>]` runs the build.
 
 ## 0.1.34
 

@@ -44,7 +44,7 @@
 // unlimited — deploys just wait on CloudFormation).
 import { QpqDeployEnvVar } from 'quidproquo-core';
 import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
-import { getServiceRspackConfig } from 'quidproquo-deploy-rspack';
+import { getServiceRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
 
 import fs from 'fs';
 import os from 'os';
@@ -56,7 +56,6 @@ import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../li
 import { GoDockerMode } from '../../lib/goDockerMode';
 import { runAppHook } from '../../lib/hooks';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
-import { runRspack } from '../../lib/rspackRun';
 import { nextPrefixColor, runCommand, runCommandBestEffort, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';

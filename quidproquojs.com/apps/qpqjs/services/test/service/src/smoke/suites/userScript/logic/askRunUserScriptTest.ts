@@ -11,13 +11,14 @@ import {
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
-import { SMOKE_USER_SCRIPT_SOURCE } from '../constants/SMOKE_USER_SCRIPT_SOURCE';
+import { SMOKE_USER_SCRIPT_BUILT } from '../generated/SMOKE_USER_SCRIPT_BUILT';
 import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 
-// A user script stored on a drive is loaded by the runtime that is calling and
-// its exports are callable by name: a generator export runs as a story whose
-// own actions reach the real processors (it writes a file we can read back),
-// and a plain export returns its value.
+// A user script built from a real TypeScript project (apps/qpqjs/userScripts/smoke,
+// bundled by the service's build step) is stored on a drive, loaded by the runtime
+// that is calling, and its exports are callable by name: a generator export runs
+// as a story whose own actions reach the real processors (it writes a file we
+// can read back), and a plain export returns its value.
 export function* askRunUserScriptTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
   const directory = `smoke/userScript/${scriptId}`;
@@ -27,7 +28,7 @@ export function* askRunUserScriptTest(): AskResponse<void> {
   yield* askFileWriteTextContents(
     SMOKE_PROBE_DRIVE,
     entryPath,
-    SMOKE_USER_SCRIPT_SOURCE
+    SMOKE_USER_SCRIPT_BUILT
   );
 
   const script = createUserScriptCaller<SmokeUserScriptFunctions>(

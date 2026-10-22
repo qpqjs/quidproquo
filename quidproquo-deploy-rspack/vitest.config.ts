@@ -13,6 +13,7 @@ export default defineConfig({
       'quidproquo-webserver': fileURLToPath(new URL('../quidproquo-webserver/src/index.ts', import.meta.url)),
       'quidproquo-config-aws': fileURLToPath(new URL('../quidproquo-config-aws/src/index.ts', import.meta.url)),
       'quidproquo-deploy-awscdk': fileURLToPath(new URL('../quidproquo-deploy-awscdk/src/index.ts', import.meta.url)),
+      'quidproquo-actionprocessor-node': fileURLToPath(new URL('../quidproquo-actionprocessor-node/src/index.ts', import.meta.url)),
     },
   },
 });

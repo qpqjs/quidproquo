@@ -1,12 +1,11 @@
 // Views build — programmatic (getViewsRspackConfig), platform-neutral. Where
 // the built views get hosted is a platform driver concern (see
 // platforms/<platform>/viewsSync).
-import { getViewsRspackConfig } from 'quidproquo-deploy-rspack';
+import { getViewsRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
 
 import path from 'path';
 
 import { getRoot, getServiceDirectory } from './discovery';
-import { runRspack } from './rspackRun';
 
 export const bundleViews = async (appName: string, serviceName: string): Promise<void> => {
   const viewsDir = path.join(getServiceDirectory(appName, serviceName), 'views');
