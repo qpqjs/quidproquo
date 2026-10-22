@@ -3,14 +3,12 @@ import {
   actionResult,
   actionResultError,
   askDynamicFunctionExecuteBase,
-  AskResponse,
   createActionProcessor,
   createNestedRuntime,
   DynamicFunctionsActionType,
   DynamicFunctionsExecuteActionPayload,
   DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
-  Nullable,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -24,16 +22,9 @@ import {
 
 import { randomUUID } from 'crypto';
 
+import { isStoryIterator } from '../logic/isStoryIterator';
+
 const getDateNow = () => new Date().toISOString();
-
-// The member execution contract: a member returning an iterable iterator (a sync
-// generator - the shape of every qpq story) is driven through the runtime as a
-// logged sub-story; anything else is a plain result, awaited if it is a promise.
-const isStoryIterator = (value: unknown): value is AskResponse<unknown> => {
-  const candidate = value as Nullable<{ next?: unknown; [Symbol.iterator]?: unknown }>;
-
-  return typeof candidate?.next === 'function' && typeof candidate?.[Symbol.iterator] === 'function';
-};
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 

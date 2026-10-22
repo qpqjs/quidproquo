@@ -11,8 +11,7 @@
 // lambda can require() it from /tmp, and `shared` keeps the framework packages OUT of
 // the bundle (the host provides them), so a remote carries only user code.
 // ─────────────────────────────────────────────────────────────────────────────
-import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { FEDERATED_SHARED_PACKAGE_NAMES, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
 import { Configuration, IgnorePlugin } from '@rspack/core';

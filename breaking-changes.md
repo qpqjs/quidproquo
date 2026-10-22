@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- `FEDERATED_SHARED_PACKAGE_NAMES` now lives in `quidproquo-core` and is no longer exported from `quidproquo-actionprocessor-awslambda`. Import it from core.
+- New `UserScript` action domain in core: `askUserScriptExecute(drive, directory, functionName, args)` calls a named export of a hand-written CommonJS script stored at `<directory>/main.js` on a storage drive, and `createUserScriptCaller` is its typed proxy. The node processor (composed into the lambda and dev-server runtimes) loads the script in-process with only the shared framework packages requirable. No sandbox: the script runs with the caller's permissions, so only trusted authors may store scripts. The script's actions run through the calling runtime's processors.
+
 ## 0.1.34
 
 - CloudWatch log groups for Lambda functions and API Gateway access logs now default to 7 days of retention instead of a year. Set `cloudWatchLogRetentionDays` on `defineAwsServiceAccountInfo` options to keep more (for example `365` for the previous behaviour). The next deploy applies the new retention to existing log groups, so older entries beyond the window are deleted.

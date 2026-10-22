@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import * as quidproquoCore from 'quidproquo-core';
-import { getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
+import { FEDERATED_SHARED_PACKAGE_NAMES, getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 import * as quidproquoWebserver from 'quidproquo-webserver';
 
 import * as fs from 'fs';
@@ -13,7 +13,6 @@ import { init, loadRemote, registerRemotes } from '@module-federation/enhanced/r
 import { createAwsClient } from '../createAwsClient';
 import { FederatedModuleLoadError, FederatedModuleLoadErrorCode } from './FederatedModuleLoadError';
 import { FederatedModuleStoreManifest } from './FederatedModuleStoreManifest';
-import { FEDERATED_SHARED_PACKAGE_NAMES } from './sharedPackages';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // loadFederatedStory: the RUNTIME half of module federation on lambda. Given a
@@ -129,7 +128,7 @@ const isManifestNotFoundError = (error: unknown): boolean => {
 // ── Module-federation shared scope ───────────────────────────────────────────
 // The host provides the framework packages to the container's share scope so remote
 // story code resolves the SAME module instances as the bundled runtime. The package
-// list is shared with the remote build so the two can't drift (see sharedPackages).
+// list is shared with the remote build so the two can't drift (FEDERATED_SHARED_PACKAGE_NAMES in core).
 const SHARED_LIBS: Record<string, unknown> = {
   'quidproquo-core': quidproquoCore,
   'quidproquo-webserver': quidproquoWebserver,
