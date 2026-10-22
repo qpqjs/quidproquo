@@ -1,34 +1,35 @@
-// `qpq script:builder-layer --app <app>` — produce the lambda layer that gives a
-// service rspack, for services that registered defineUserScriptBuilder. The directory
+// `qpq script:builder-layer [--arch arm64|x86_64]` — produce the lambda layer that gives
+// a service rspack, for services that registered defineUserScriptBuilder. The directory
 // is the one getUserScriptBuilderApiLayer points at, so nothing is told a path. Run from
-// the app's qpq:predeploy hook so every deploy ships a layer matching the lambda
-// architecture.
-import { qpqCoreUtils } from 'quidproquo-core';
+// the app's qpq:predeploy hook, which go:docker fires before the workspace is built, so
+// this command deliberately loads no service config (that would import unbuilt packages)
+// and takes the lambda architecture as a flag instead.
+import { JavascriptRuntimeArchitecture } from 'quidproquo-core';
 import { getUserScriptBuilderLayerDir } from 'quidproquo-user-script';
 
-import { getServiceNames } from '../lib/discovery';
-import { loadServiceQpqConfig } from '../lib/qpqConfigs';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
-import { resolveDeployment } from '../lib/resolveDeployment';
+import { getArgValue } from '../lib/args';
 import { buildUserScriptBuilderLayer } from '../lib/userScriptBuilderLayer';
+
+const ARCH_FLAG = '--arch';
+const DEFAULT_ARCHITECTURE = JavascriptRuntimeArchitecture.Arm64;
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 // The rspack the CLI itself resolves is the one the dev server builds with; the layer
 // pins the same version so a script builds identically on both runtimes.
 const getRspackVersion = (): string => require('@rspack/core/package.json').version as string;
 
-export const scriptBuilderLayerCommand = async (argv: string[]): Promise<void> => {
-  const appName = await resolveAppSelection({ argv });
-  // A service config only loads with a deployment's settings primed; under a parent
-  // qpq command (the predeploy hook) DEPLOY_NAME already says which.
-  await resolveDeployment(argv, appName);
-  const [firstService] = getServiceNames(appName);
-  if (!firstService) {
-    console.error(`script:builder-layer: app [${appName}] has no services to read the lambda architecture from`);
+const parseArchitecture = (argv: string[]): JavascriptRuntimeArchitecture => {
+  const requested = getArgValue(argv, ARCH_FLAG) ?? DEFAULT_ARCHITECTURE;
+  const known = Object.values(JavascriptRuntimeArchitecture);
+  if (!known.includes(requested as JavascriptRuntimeArchitecture)) {
+    console.error(`script:builder-layer: unknown ${ARCH_FLAG} [${requested}]; expected one of ${known.join(', ')}`);
     process.exit(1);
   }
+  return requested as JavascriptRuntimeArchitecture;
+};
 
-  const { architecture } = qpqCoreUtils.getJavascriptRuntimeConfig(loadServiceQpqConfig(appName, firstService));
+export const scriptBuilderLayerCommand = async (argv: string[]): Promise<void> => {
+  const architecture = parseArchitecture(argv);
   const rspackVersion = getRspackVersion();
   const outDir = getUserScriptBuilderLayerDir();
 
