@@ -92,6 +92,7 @@
     "quidproquo-web-admin": "file:../quidproquo-web-admin",
     "quidproquo-web-react": "file:../quidproquo-web-react",
     "quidproquo-features": "file:../quidproquo-features",
+    "quidproquo-user-script": "file:../quidproquo-user-script",
     "re-resizable": "^6.9.11",
     "react": "18.3.1",
     "react-dom": "18.3.1",

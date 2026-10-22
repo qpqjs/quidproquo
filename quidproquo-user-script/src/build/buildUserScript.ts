@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import { runRspack } from '../runRspack';
 import { checkUserScriptOutput } from './checkUserScriptOutput';
 import { getUserScriptRspackConfig } from './getUserScriptRspackConfig';
 import { resolveUserScriptEntry } from './resolveUserScriptEntry';
+import { runUserScriptRspack } from './runUserScriptRspack';
 import { USER_SCRIPT_OUTPUT_FILENAME } from './USER_SCRIPT_OUTPUT_FILENAME';
 import { UserScriptBuildError, UserScriptBuildErrorCode } from './UserScriptBuildError';
 import { UserScriptBuildResult } from './UserScriptBuildResult';
@@ -28,7 +28,7 @@ export const buildUserScript = async ({ projectDir, outDir }: BuildUserScriptOpt
   const entrySource = resolveUserScriptEntry(absoluteProjectDir);
 
   try {
-    await runRspack(getUserScriptRspackConfig({ projectDir: absoluteProjectDir, entryPath: entrySource, outDir: absoluteOutDir }));
+    await runUserScriptRspack(getUserScriptRspackConfig({ projectDir: absoluteProjectDir, entryPath: entrySource, outDir: absoluteOutDir }));
   } catch (error) {
     throw new UserScriptBuildError(UserScriptBuildErrorCode.BuildFailed, `Building [${absoluteProjectDir}] failed:\n${getErrorMessage(error)}`);
   }

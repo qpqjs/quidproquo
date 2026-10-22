@@ -17,7 +17,7 @@ describe('getUserScriptRspackConfig', () => {
     expect(config.module?.parser).toEqual({ javascript: { dynamicImportMode: 'eager' } });
   });
 
-  it('compiles TypeScript with the service swc rules', () => {
+  it('compiles TypeScript with the swc rule', () => {
     const tsRule = config.module?.rules?.find((rule) => rule && typeof rule === 'object' && String(rule.test) === String(/\.ts$/));
 
     expect(tsRule).toMatchObject({ loader: 'builtin:swc-loader' });
