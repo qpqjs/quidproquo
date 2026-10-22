@@ -136,8 +136,8 @@ export const cliCommands: CliCommand[] = [
   },
   {
     name: 'script:builder-layer',
-    usageArgs: '--app <app>',
-    summary: 'Install rspack for the lambda architecture into the user-script builder layer, for services that build user scripts',
+    usageArgs: '[--arch arm64|x86_64]',
+    summary: 'Install rspack for the lambda architecture (default arm64) into the user-script builder layer, for services that build user scripts',
     run: (a) => require('../commands/scriptBuilderLayer').scriptBuilderLayerCommand(a),
   },
   {

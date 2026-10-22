@@ -68,13 +68,13 @@ Splitting upload from deploy is what makes a rollback a manifest change rather t
 | `qpq prep` | Regenerates `apps/<app>/tsconfig.federated.json` |
 | `qpq script:new <dir>` | Writes a user-script template project: `src/main.ts` exporting functions, built into one `main.js` a service loads from a storage drive with `askUserScriptExecute` |
 | `qpq script:build <dir> [--out <dir>]` | Bundles a user-script project into `dist/main.js` (or `--out`), npm packages folded in, framework packages external, Node builtins refused. Needs no `npm install` in the project |
-| `qpq script:builder-layer --app <app>` | Installs rspack for the app's lambda architecture into the builder layer directory (owned by `quidproquo-user-script`), so a service that registered `defineUserScriptBuilder` can build scripts on lambda. Run it from the app's `qpq:predeploy` hook |
+| `qpq script:builder-layer [--arch arm64\|x86_64]` | Installs rspack for the lambda architecture (default arm64, matching `defineJavascriptRuntime`'s default) into the builder layer directory owned by `quidproquo-user-script`, so a service that registered `defineUserScriptBuilder` can build scripts on lambda. Run it from the app's `qpq:predeploy` hook; it loads no config, since that hook fires before the workspace is built |
 | `qpq check:circular` | Scans workspace sources for circular imports. `--warn` to report without failing |
 | `qpq hooks <name>` | Runs `qpq:<name>` in every app and package that defines it, dependency ordered and in parallel |
 
 ## User scripts
 
-A user script is a small TypeScript project (`src/main.ts` exporting functions) that a service loads from a storage drive and calls by name with `askUserScriptExecute`. `qpq script:new` writes one and `qpq script:build` bundles it on your machine. To build on the platform instead, a service registers `defineUserScriptBuilder()` from `quidproquo-user-script` and calls `askUserScriptBuild` with the source and output directories on a drive; on the dev server that just works, and on lambda the service also needs the rspack layer: pass `getUserScriptBuilderApiLayer()` in its api layers and have the app's `qpq:predeploy` hook run `qpq script:builder-layer --app <app>`. Both sides use the one directory the package owns, so no path is configured anywhere.
+A user script is a small TypeScript project (`src/main.ts` exporting functions) that a service loads from a storage drive and calls by name with `askUserScriptExecute`. `qpq script:new` writes one and `qpq script:build` bundles it on your machine. To build on the platform instead, a service registers `defineUserScriptBuilder()` from `quidproquo-user-script` and calls `askUserScriptBuild` with the source and output directories on a drive; on the dev server that just works, and on lambda the service also needs the rspack layer: pass `getUserScriptBuilderApiLayer()` in its api layers and have the app's `qpq:predeploy` hook run `qpq script:builder-layer` (with `--arch x86_64` if the app's lambdas are x86). Both sides use the one directory the package owns, so no path is configured anywhere.
 
 ## Platforms
 
