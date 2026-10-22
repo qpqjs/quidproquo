@@ -2,6 +2,7 @@ export * from './buildUserScript';
 export * from './checkUserScriptOutput';
 export * from './createUserScriptExternals';
 export * from './getUserScriptRspackConfig';
+export * from './loadRspackModule';
 export * from './resolveUserScriptEntry';
 export * from './runUserScriptRspack';
 export * from './USER_SCRIPT_ENTRY_CANDIDATES';
