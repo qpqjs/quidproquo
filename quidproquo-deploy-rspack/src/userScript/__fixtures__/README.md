@@ -1,0 +1,1 @@
+Script projects the build tests run rspack on. They have no package.json or node_modules on purpose: module resolution walks up to the monorepo root, which is how a template project builds with no install.

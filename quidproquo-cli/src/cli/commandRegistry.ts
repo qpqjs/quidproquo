@@ -123,6 +123,18 @@ export const cliCommands: CliCommand[] = [
     run: (a) => require('../commands/publish').publishDeployCommand(a),
   },
   {
+    name: 'script:new',
+    usageArgs: '<dir>',
+    summary: 'Write a user-script template project (src/main.ts exporting functions) into a new directory',
+    run: (a) => require('../commands/scriptNew').scriptNewCommand(a),
+  },
+  {
+    name: 'script:build',
+    usageArgs: '<dir> [--out <dir>]',
+    summary: 'Bundle a user-script project into one main.js that askUserScriptExecute loads from a drive',
+    run: (a) => require('../commands/scriptBuild').scriptBuildCommand(a),
+  },
+  {
     name: 'check:circular',
     summary: 'Scan workspace sources for circular imports (fails on cycles; --warn to only report)',
     run: (a) => require('../commands/checkCircular').checkCircularCommand(a),

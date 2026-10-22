@@ -12,6 +12,8 @@ export default defineConfig({
       'quidproquo-core': fileURLToPath(new URL('../quidproquo-core/src/index.ts', import.meta.url)),
       'quidproquo-config-aws': fileURLToPath(new URL('../quidproquo-config-aws/src/index.ts', import.meta.url)),
       'quidproquo-webserver': fileURLToPath(new URL('../quidproquo-webserver/src/index.ts', import.meta.url)),
+      'quidproquo-deploy-rspack': fileURLToPath(new URL('../quidproquo-deploy-rspack/src/index.ts', import.meta.url)),
+      'quidproquo-actionprocessor-node': fileURLToPath(new URL('../quidproquo-actionprocessor-node/src/index.ts', import.meta.url)),
     },
   },
 });

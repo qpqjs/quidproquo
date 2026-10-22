@@ -66,6 +66,8 @@ Splitting upload from deploy is what makes a rollback a manifest change rather t
 | Command | Does |
 | --- | --- |
 | `qpq prep` | Regenerates `apps/<app>/tsconfig.federated.json` |
+| `qpq script:new <dir>` | Writes a user-script template project: `src/main.ts` exporting functions, built into one `main.js` a service loads from a storage drive with `askUserScriptExecute` |
+| `qpq script:build <dir> [--out <dir>]` | Bundles a user-script project into `dist/main.js` (or `--out`), npm packages folded in, framework packages external, Node builtins refused. Needs no `npm install` in the project |
 | `qpq check:circular` | Scans workspace sources for circular imports. `--warn` to report without failing |
 | `qpq hooks <name>` | Runs `qpq:<name>` in every app and package that defines it, dependency ordered and in parallel |
 

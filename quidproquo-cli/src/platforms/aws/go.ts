@@ -7,7 +7,7 @@
 // code also republishes the code the lambdas federate.
 import { QpqDeployEnvVar } from 'quidproquo-core';
 import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
-import { getServiceRspackConfig } from 'quidproquo-deploy-rspack';
+import { getServiceRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
 
 import path from 'path';
 
@@ -16,7 +16,6 @@ import { DeployPlan } from '../../lib/deployPrompts';
 import { getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
-import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews } from '../../lib/views';

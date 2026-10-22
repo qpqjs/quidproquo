@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo';
 
-/** The exports of SMOKE_USER_SCRIPT_SOURCE, typed so the caller proxy checks member names and args. */
+/** The exports of apps/qpqjs/userScripts/smoke, typed so the caller proxy checks member names and args. */
 export type SmokeUserScriptFunctions = {
   add: (
     drive: string,

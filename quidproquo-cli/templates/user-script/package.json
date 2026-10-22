@@ -1,0 +1,16 @@
+{
+  "name": "__PACKAGE_NAME__",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A quidproquo user script: functions called by name from a storage drive",
+  "scripts": {
+    "build": "qpq script:build .",
+    "validate-ts": "tsc --noEmit"
+  },
+  "dependencies": {
+    "quidproquo-core": "__QPQ_VERSION__"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

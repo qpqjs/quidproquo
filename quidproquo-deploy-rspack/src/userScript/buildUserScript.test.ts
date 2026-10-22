@@ -1,0 +1,95 @@
+import { getUserScriptModuleMap, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
+import { FileActionType, runStory } from 'quidproquo-core';
+
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+
+import { buildUserScript } from './buildUserScript';
+import { UserScriptBuildError, UserScriptBuildErrorCode } from './UserScriptBuildError';
+
+const fixtures = path.join(__dirname, '__fixtures__');
+
+let tempRoot: string;
+const outDirFor = (name: string): string => path.join(tempRoot, name);
+
+const expectBuildError = async (promise: Promise<unknown>, code: UserScriptBuildErrorCode, messagePart: string) => {
+  const error = await promise.then(
+    () => undefined,
+    (caught) => caught,
+  );
+
+  expect(error).toBeInstanceOf(UserScriptBuildError);
+  expect((error as UserScriptBuildError).code).toBe(code);
+  expect((error as UserScriptBuildError).message).toContain(messagePart);
+};
+
+beforeAll(() => {
+  tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-user-script-build-'));
+  vi.spyOn(console, 'log').mockImplementation(() => undefined);
+});
+
+afterAll(() => {
+  vi.restoreAllMocks();
+  fs.rmSync(tempRoot, { recursive: true, force: true });
+});
+
+// These run rspack for real, so each takes a few seconds.
+describe('buildUserScript', () => {
+  it('builds a TypeScript project with a helper file and an npm package into one loadable main.js', async () => {
+    const outDir = outDirFor('basic');
+
+    const result = await buildUserScript({ projectDir: path.join(fixtures, 'basic'), outDir });
+
+    expect(result.entryPath).toBe(path.join(outDir, 'main.js'));
+    expect(fs.existsSync(result.sourceMapPath)).toBe(true);
+    expect(fs.readdirSync(outDir).filter((name) => name.endsWith('.js'))).toEqual(['main.js']);
+    expect(result.exports).toEqual(['add', 'greet', 'makeId']);
+
+    const built = fs.readFileSync(result.entryPath, 'utf8');
+    expect(built).toContain('require("quidproquo-core")');
+    expect(built).not.toContain('require("uuidv7")');
+
+    const scriptExports = loadUserScriptModule(result.entryPath, built, getUserScriptModuleMap());
+    expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');
+    expect((scriptExports.makeId as () => string)()).toMatch(/^[0-9a-f-]{36}$/);
+
+    const written: unknown[] = [];
+    const sum = runStory((scriptExports.add as (...args: unknown[]) => any)('drive', 'out.txt', 20, 22), {
+      [FileActionType.WriteTextContents]: (action) => {
+        written.push(action.payload);
+        return undefined;
+      },
+    });
+    expect(sum).toBe(42);
+    expect(written).toEqual([
+      { drive: 'drive', filepath: 'out.txt', data: 'added 42', storageDriveAdvancedWriteOptions: undefined, scope: undefined },
+    ]);
+    expect(written[0]).toHaveProperty('data', 'added 42');
+  }, 60_000);
+
+  it('fails BuildFailed naming the builtin when a script imports fs', async () => {
+    await expectBuildError(
+      buildUserScript({ projectDir: path.join(fixtures, 'builtin'), outDir: outDirFor('builtin') }),
+      UserScriptBuildErrorCode.BuildFailed,
+      'imports the Node builtin [fs]',
+    );
+  }, 60_000);
+
+  it('fails NoEntry before running rspack when there is no src/main', async () => {
+    await expectBuildError(
+      buildUserScript({ projectDir: path.join(fixtures, 'noEntry'), outDir: outDirFor('noEntry') }),
+      UserScriptBuildErrorCode.NoEntry,
+      'src/main.ts, src/main.js',
+    );
+  });
+
+  it('fails NonFunctionExport when the script exports a value', async () => {
+    await expectBuildError(
+      buildUserScript({ projectDir: path.join(fixtures, 'nonFunction'), outDir: outDirFor('nonFunction') }),
+      UserScriptBuildErrorCode.NonFunctionExport,
+      'export [version] is not a function',
+    );
+  }, 60_000);
+});

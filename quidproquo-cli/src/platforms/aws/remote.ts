@@ -19,14 +19,13 @@
 // lambda never sees a manifest whose files aren't all present yet.
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqCoreUtils } from 'quidproquo-core';
-import { getServiceRemoteRspackConfig, publishFederatedRemote } from 'quidproquo-deploy-rspack';
+import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from 'quidproquo-deploy-rspack';
 
 import fs from 'fs';
 import path from 'path';
 
 import { getRoot, getServiceDirectory } from '../../lib/discovery';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
-import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 
 // Everything the upload/deploy phases need to publish a built remote. Resolved
