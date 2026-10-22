@@ -1,6 +1,7 @@
 export * from './AiActionType';
 export * from './AiCacheTtl';
 export * from './AiDataRegion';
+export * from './AiJsonSchema';
 export * from './AiMessage';
 export * from './AiModel';
 export * from './AiModelRegionMap';

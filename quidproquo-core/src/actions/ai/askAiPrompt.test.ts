@@ -21,6 +21,8 @@ describe('askAiPrompt', () => {
         reasoning: { effort: AiReasoningEffort.Medium },
         caching: true,
         cacheTtl: AiCacheTtl.OneHour,
+        outputSchema: { type: 'object' },
+        outputRepairAttempts: 2,
       }),
     );
 
@@ -36,6 +38,8 @@ describe('askAiPrompt', () => {
         reasoning: { effort: AiReasoningEffort.Medium },
         caching: true,
         cacheTtl: AiCacheTtl.OneHour,
+        outputSchema: { type: 'object' },
+        outputRepairAttempts: 2,
       },
     });
   });
@@ -55,6 +59,8 @@ describe('askAiPrompt', () => {
         reasoning: undefined,
         caching: undefined,
         cacheTtl: undefined,
+        outputSchema: undefined,
+        outputRepairAttempts: undefined,
       },
     });
   });
