@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { createUserScriptExternals } from './createUserScriptExternals';
 
-const resolveAsync = (request: string, issuer?: string) =>
+const resolveAsync = (request: string, issuer?: string, hostModuleNames: string[] = []) =>
   new Promise<{ error?: Error; result?: string }>((done) => {
-    createUserScriptExternals()({ request, context: '/project', contextInfo: { issuer, issuerLayer: null } } as any, (error, result) =>
+    createUserScriptExternals(hostModuleNames)({ request, context: '/project', contextInfo: { issuer, issuerLayer: null } } as any, (error, result) =>
       done({ error, result }),
     );
   });
@@ -14,6 +14,11 @@ const resolveAsync = (request: string, issuer?: string) =>
 describe('createUserScriptExternals', () => {
   it.each([...FEDERATED_SHARED_PACKAGE_NAMES])('leaves the shared package %s external as commonjs', async (name) => {
     expect(await resolveAsync(name)).toEqual({ error: undefined, result: `commonjs ${name}` });
+  });
+
+  it("leaves the service's own script modules external, and only those", async () => {
+    expect(await resolveAsync('my-sdk/v1', undefined, ['my-sdk/v1'])).toEqual({ error: undefined, result: 'commonjs my-sdk/v1' });
+    expect(await resolveAsync('my-sdk/v1')).toEqual({ error: undefined, result: undefined });
   });
 
   it.each(['fs', 'node:fs', 'path', 'crypto'])('refuses the Node builtin %s, naming the importer', async (name) => {

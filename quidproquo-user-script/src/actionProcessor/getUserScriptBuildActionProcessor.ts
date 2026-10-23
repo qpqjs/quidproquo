@@ -1,3 +1,4 @@
+import { loadUserScriptHostModules } from 'quidproquo-actionprocessor-node';
 import {
   ActionProcessorList,
   actionResult,
@@ -72,9 +73,17 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
       return actionResultError(COLLECT_ERROR_TYPES[collected.error.errorType] ?? collected.error.errorType, collected.error.errorText);
     }
 
+    // The service's own script modules: external to the bundle, supplied to the output check. One
+    // that does not load is the service's fault, so it throws rather than failing the build.
+    const hostModules = await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader);
+
     let built: BuiltUserScript;
     try {
-      built = await buildUserScriptInTempDir((projectDir) => materialiseUserScriptSource(projectDir, collected.result), payload.sourceMap);
+      built = await buildUserScriptInTempDir(
+        (projectDir) => materialiseUserScriptSource(projectDir, collected.result),
+        payload.sourceMap,
+        hostModules,
+      );
     } catch (error) {
       if (error instanceof UserScriptBuildError) {
         return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);

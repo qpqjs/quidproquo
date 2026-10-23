@@ -1,3 +1,5 @@
+import { UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
+
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -14,6 +16,7 @@ import { BuiltUserScript } from './BuiltUserScript';
 export const buildUserScriptInTempDir = async (
   materialise: (projectDir: string) => Promise<void> | void,
   sourceMap: boolean,
+  hostModules: UserScriptModuleMap,
 ): Promise<BuiltUserScript> => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-user-script-'));
   const projectDir = path.join(tempDir, 'project');
@@ -22,7 +25,7 @@ export const buildUserScriptInTempDir = async (
   try {
     fs.mkdirSync(projectDir, { recursive: true });
     await materialise(projectDir);
-    const result = await buildUserScript({ projectDir, outDir, sourceMap });
+    const result = await buildUserScript({ projectDir, outDir, sourceMap, hostModules });
 
     return {
       script: fs.readFileSync(result.entryPath, 'utf8'),

@@ -1,4 +1,4 @@
-import { getUserScriptModuleMap, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
+import { getUserScriptModuleMap, loadUserScriptModule, UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
 
 import fs from 'fs';
 
@@ -6,11 +6,12 @@ import { UserScriptBuildError, UserScriptBuildErrorCode } from './UserScriptBuil
 
 /**
  * The output contract, enforced once here: the built file loads under the same loader
- * the execute processor uses, with the real shared packages, and every own enumerable
- * export is a function. Returns the export names in definition order.
+ * the execute processor uses, with the real shared packages and the service's own script
+ * modules (`hostModules`), and every own enumerable export is a function. Returns the
+ * export names in definition order.
  */
-export const checkUserScriptOutput = (entryPath: string): string[] => {
-  const scriptExports = loadUserScriptModule(entryPath, fs.readFileSync(entryPath, 'utf8'), getUserScriptModuleMap());
+export const checkUserScriptOutput = (entryPath: string, hostModules: UserScriptModuleMap = {}): string[] => {
+  const scriptExports = loadUserScriptModule(entryPath, fs.readFileSync(entryPath, 'utf8'), getUserScriptModuleMap(hostModules));
   const names = Object.keys(scriptExports);
 
   if (names.length === 0) {

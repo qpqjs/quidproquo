@@ -6,6 +6,8 @@ import {
   buildTestQpqConfig,
   createStreamRegistry,
   createStubLogger,
+  defineUserScriptModule,
+  DynamicModuleLoader,
   ErrorTypeEnum,
   FileActionType,
   resolveActionResult,
@@ -15,6 +17,7 @@ import {
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { UserScriptHostModuleLoadError } from './logic/UserScriptHostModuleLoadError';
 import { getUserScriptExecuteActionProcessor } from './getUserScriptExecuteActionProcessor';
 
 const qpqConfig = buildTestQpqConfig();
@@ -32,11 +35,23 @@ const createFileReadProcessor = (files: Record<string, string>) => ({
   },
 });
 
-const invoke = async (payload: Payload, actionProcessors: Record<string, any>, callerSession: any = session) => {
-  const processors = await getUserScriptExecuteActionProcessor(qpqConfig, async () => null);
+const invoke = async (
+  payload: Payload,
+  actionProcessors: Record<string, any>,
+  callerSession: any = session,
+  config = qpqConfig,
+  dynamicModuleLoader: DynamicModuleLoader = async () => null,
+) => {
+  const processors = await getUserScriptExecuteActionProcessor(config, dynamicModuleLoader);
   const process = processors[UserScriptActionType.Execute] as (p: any, ...rest: any[]) => Promise<any>;
-  return process(payload, callerSession, actionProcessors, logger, undefined, async () => null, createStreamRegistry());
+  return process(payload, callerSession, actionProcessors, logger, undefined, dynamicModuleLoader, createStreamRegistry());
 };
+
+// A service that lets its scripts import `my-sdk/v1`, served by a loader that knows only it.
+const SDK_RUNTIME = '/entry/scriptModules::mySdkV1';
+const sdkConfig = buildTestQpqConfig([defineUserScriptModule('my-sdk/v1', SDK_RUNTIME)]);
+const sdkModule = { shout: (text: string) => `${text.toUpperCase()}!` };
+const sdkLoader: DynamicModuleLoader = async (runtime) => (runtime === SDK_RUNTIME ? sdkModule : null);
 
 const SCRIPT = `
   const { askFileReadTextContents } = require('quidproquo-core');
@@ -72,6 +87,34 @@ afterEach(() => {
 });
 
 describe('getUserScriptExecuteActionProcessor', () => {
+  it('lets a script require a module the service declared, served by the dynamic module loader', async () => {
+    const sdkFiles = { 'scripts:sdk.js': `const { shout } = require('my-sdk/v1'); exports.run = (text) => shout(text);` };
+
+    const result = await invoke(
+      { ...payloadFor('run', ['hi']), filepath: 'sdk.js' },
+      createFileReadProcessor(sdkFiles),
+      session,
+      sdkConfig,
+      sdkLoader,
+    );
+
+    expect(resolveActionResult(result)).toBe('HI!');
+  });
+
+  it('still refuses a module the service did not declare', async () => {
+    const otherFiles = { 'scripts:other.js': `require('other-sdk/v1'); exports.run = () => 1;` };
+
+    const result = await invoke({ ...payloadFor('run'), filepath: 'other.js' }, createFileReadProcessor(otherFiles), session, sdkConfig, sdkLoader);
+
+    expect(resolveActionResultError(result).errorType).toBe(askUserScriptExecute.errorType.ModuleNotFound);
+  });
+
+  it('throws when a declared module does not load, rather than blaming the script', async () => {
+    await expect(invoke(payloadFor('add', [1, 2]), createFileReadProcessor(files), session, sdkConfig, async () => null)).rejects.toBeInstanceOf(
+      UserScriptHostModuleLoadError,
+    );
+  });
+
   it('runs a generator export as a sub-story whose actions go through the passed processors', async () => {
     const actionProcessors = {
       ...createFileReadProcessor(files),

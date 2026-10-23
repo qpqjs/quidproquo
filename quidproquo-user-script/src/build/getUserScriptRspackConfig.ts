@@ -12,6 +12,8 @@ export type UserScriptRspackConfigOptions = {
   outDir: string;
   // Embed a source map in main.js; never a separate .map file.
   sourceMap: boolean;
+  // The service's own script modules (defineUserScriptModule), kept external like the shared packages.
+  hostModuleNames?: readonly string[];
 };
 
 /**
@@ -20,7 +22,13 @@ export type UserScriptRspackConfigOptions = {
  * no chunks, and a source map only when asked for, embedded in `main.js`. TypeScript goes
  * through swc, so nothing is type checked here.
  */
-export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir, sourceMap }: UserScriptRspackConfigOptions): Configuration => ({
+export const getUserScriptRspackConfig = ({
+  projectDir,
+  entryPath,
+  outDir,
+  sourceMap,
+  hostModuleNames = [],
+}: UserScriptRspackConfigOptions): Configuration => ({
   context: projectDir,
   mode: 'production',
   target: 'node',
@@ -34,7 +42,7 @@ export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir, sourc
     clean: true,
   },
 
-  externals: [createUserScriptExternals()],
+  externals: [createUserScriptExternals(hostModuleNames)],
   externalsType: 'commonjs',
 
   // The build is ONE file, so a map can only ride inside it. The output is read from a

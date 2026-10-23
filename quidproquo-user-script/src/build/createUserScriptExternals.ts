@@ -13,19 +13,20 @@ const isNodeBuiltin = (request: string): boolean => request.startsWith('node:') 
 const isSharedPackageSubpath = (request: string): boolean => sharedPackageNames.some((name) => request.startsWith(`${name}/`));
 
 /**
- * The externals rule for a user-script build: the shared framework packages stay
+ * The externals rule for a user-script build: the shared framework packages and the
+ * service's own script modules (`hostModuleNames`, from defineUserScriptModule) stay
  * external (the host provides them at run time), Node builtins are refused here with
  * the importing file named, because the loader would refuse them at run time anyway,
  * and everything else is bundled.
  */
 export const createUserScriptExternals =
-  () =>
+  (hostModuleNames: readonly string[] = []) =>
   ({ request, contextInfo }: ExternalItemFunctionData, callback: ExternalsCallback): void => {
     if (!request) {
       return callback();
     }
 
-    if (sharedPackageNames.includes(request)) {
+    if (sharedPackageNames.includes(request) || hostModuleNames.includes(request)) {
       return callback(undefined, `commonjs ${request}`);
     }
 

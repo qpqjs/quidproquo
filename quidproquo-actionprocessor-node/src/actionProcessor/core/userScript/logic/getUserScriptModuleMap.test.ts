@@ -12,4 +12,12 @@ describe('getUserScriptModuleMap', () => {
     expect(Object.keys(map).sort()).toEqual([...FEDERATED_SHARED_PACKAGE_NAMES].sort());
     expect((map['quidproquo-core'] as typeof quidproquoCore).askFileReadTextContents).toBe(quidproquoCore.askFileReadTextContents);
   });
+
+  it('adds the host modules beside the shared packages, which they can never replace', () => {
+    const sdk = { greet: () => 'hi' };
+    const map = getUserScriptModuleMap({ 'my-sdk/v1': sdk, 'quidproquo-core': { fake: true } });
+
+    expect(map['my-sdk/v1']).toBe(sdk);
+    expect((map['quidproquo-core'] as typeof quidproquoCore).askFileReadTextContents).toBe(quidproquoCore.askFileReadTextContents);
+  });
 });
