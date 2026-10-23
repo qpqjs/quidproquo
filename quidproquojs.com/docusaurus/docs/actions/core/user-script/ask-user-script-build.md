@@ -66,4 +66,5 @@ function* askUserScriptBuild(
 
 ## Related
 
+- [askUserScriptBuildFromZip](./ask-user-script-build-from-zip.md) to build from a single zip file instead of a directory.
 - [askUserScriptExecute](./ask-user-script-execute.md) to call a function from the built script.

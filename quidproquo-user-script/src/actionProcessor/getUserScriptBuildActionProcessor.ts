@@ -19,15 +19,14 @@ import {
 } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
 
-import { buildUserScript } from '../build/buildUserScript';
-import { UserScriptBuildError, UserScriptBuildErrorCode } from '../build/UserScriptBuildError';
+import { UserScriptBuildError } from '../build/UserScriptBuildError';
 import { askUserScriptCollectSource } from './logic/askUserScriptCollectSource';
 import { askUserScriptPublishOutput } from './logic/askUserScriptPublishOutput';
-import { UserScriptSourceFile } from './logic/UserScriptSourceFile';
+import { buildUserScriptInTempDir } from './logic/buildUserScriptInTempDir';
+import { BuiltUserScript } from './logic/BuiltUserScript';
+import { getUserScriptBuildErrorType } from './logic/getUserScriptBuildErrorType';
+import { materialiseUserScriptSource } from './logic/materialiseUserScriptSource';
 
 const { errorType } = askUserScriptBuild;
 
@@ -40,31 +39,6 @@ const COLLECT_ERROR_TYPES: Record<string, string> = {
   [askFileListDirectory.errorType.DriveNotFound]: errorType.DriveNotFound,
   [askFileListDirectory.errorType.InvalidScope]: errorType.InvalidScope,
   [askFileReadTextContents.errorType.InvalidScope]: errorType.InvalidScope,
-};
-
-// The build's own codes map one to one, except that a missing entry is the caller's
-// source being wrong, not the build.
-const BUILD_ERROR_TYPES: Record<UserScriptBuildErrorCode, string> = {
-  [UserScriptBuildErrorCode.NoEntry]: errorType.SourceNotFound,
-  [UserScriptBuildErrorCode.BuildFailed]: errorType.BuildFailed,
-  [UserScriptBuildErrorCode.OutputNotSingleFile]: errorType.OutputNotSingleFile,
-  [UserScriptBuildErrorCode.NoExports]: errorType.NoExports,
-  [UserScriptBuildErrorCode.NonFunctionExport]: errorType.NonFunctionExport,
-};
-
-// A listing entry is a drive path, never a filesystem path, so a segment that would
-// climb out of the project directory is refused rather than written.
-const isInsideProject = (relativePath: string): boolean => !relativePath.split('/').some((segment) => segment === '..' || segment === '');
-
-const materialise = (projectDir: string, files: UserScriptSourceFile[]): void => {
-  for (const file of files) {
-    if (!isInsideProject(file.path)) {
-      throw new UserScriptBuildError(UserScriptBuildErrorCode.BuildFailed, `Refusing source path [${file.path}]`);
-    }
-    const target = path.join(projectDir, ...file.path.split('/'));
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, file.text);
-  }
 };
 
 const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScriptBuild> => {
@@ -98,39 +72,25 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
       return actionResultError(COLLECT_ERROR_TYPES[collected.error.errorType] ?? collected.error.errorType, collected.error.errorText);
     }
 
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-user-script-'));
-    const projectDir = path.join(tempDir, 'project');
-    const outDir = path.join(tempDir, 'out');
-
+    let built: BuiltUserScript;
     try {
-      let built: { script: string; sourceMap: string; exports: string[] };
-      try {
-        materialise(projectDir, collected.result);
-        const result = await buildUserScript({ projectDir, outDir });
-        built = {
-          script: fs.readFileSync(result.entryPath, 'utf8'),
-          sourceMap: fs.readFileSync(result.sourceMapPath, 'utf8'),
-          exports: result.exports,
-        };
-      } catch (error) {
-        if (error instanceof UserScriptBuildError) {
-          return actionResultError(BUILD_ERROR_TYPES[error.code], error.message);
-        }
-        throw error;
+      built = await buildUserScriptInTempDir((projectDir) => materialiseUserScriptSource(projectDir, collected.result));
+    } catch (error) {
+      if (error instanceof UserScriptBuildError) {
+        return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
       }
-
-      const published = await resolveStory(
-        () => askUserScriptPublishOutput(payload.drive, payload.outputDirectory, built.script, built.sourceMap, payload.scope),
-        [],
-      );
-      if (published.error) {
-        return actionResultError(published.error.errorType, published.error.errorText);
-      }
-
-      return actionResult({ exports: built.exports });
-    } finally {
-      fs.rmSync(tempDir, { recursive: true, force: true });
+      throw error;
     }
+
+    const published = await resolveStory(
+      () => askUserScriptPublishOutput(payload.drive, payload.outputDirectory, built.script, built.sourceMap, payload.scope),
+      [],
+    );
+    if (published.error) {
+      return actionResultError(published.error.errorType, published.error.errorText);
+    }
+
+    return actionResult({ exports: built.exports });
   };
 };
 
