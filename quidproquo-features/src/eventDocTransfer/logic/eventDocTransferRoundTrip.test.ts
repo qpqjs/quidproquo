@@ -513,6 +513,30 @@ describe('eventDoc transfer round trip', () => {
     expect(target.files[`${eventDocStorageDriveName(STYLES_STORE)}/${eventDocAssetPath('style-shared', 'font-1')}`]).toEqual(asset('brand.woff2'));
   });
 
+  it('imports a server-only event verbatim: a copied log is trusted history, not a client append', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    // The source's build worker recorded a build on the template; the import must carry it across even though a
+    // client could never append it, since the whole log is replayed as it was written at its origin.
+    const built = event(4, 'SET_BUILD', { assetId: 'build-1' });
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({ pk: 'template-1', sk: eventId(4), data: built });
+
+    const exportResult = runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    expect(exportResult.status).toBe(200);
+    const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const bundle = source.files[exportedKey] as EventDocBundle;
+
+    const uploadTarget = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(uploadTarget.transferId)}`] = bundle;
+    runStory(importBundle(httpEvent({ transferId: uploadTarget.transferId })), target.mocks);
+
+    const imported = eventsFor(target, TEMPLATE_TYPE, 'template-1');
+    expect(imported.map((candidate) => candidate.type)).toContain('SET_BUILD');
+    expect(withoutActorIds(imported)).toEqual(withoutActorIds(eventsFor(source, TEMPLATE_TYPE, 'template-1')));
+  });
+
   it('is idempotent: a second import of the same bundle writes nothing', () => {
     const source = buildEnvironment('dev');
     const target = buildEnvironment('uat');

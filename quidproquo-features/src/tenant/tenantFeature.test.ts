@@ -176,6 +176,9 @@ const buildMocks = () => {
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return tenantRegistryEventDoc.getSnapshotCacheKey();
       }
+      if (action.payload.functionName === 'getServerEventTypes') {
+        return tenantRegistryEventDoc.getServerEventTypes();
+      }
       if (action.payload.functionName === 'foldDocumentState') {
         return tenantRegistryEventDoc.foldDocumentState(action.payload.args[0], action.payload.args[1]);
       }

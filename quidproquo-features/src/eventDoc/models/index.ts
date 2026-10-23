@@ -12,6 +12,7 @@ export * from './EventDocEventActor';
 export * from './EventDocEventBootstrapPage';
 export * from './EventDocEventInput';
 export * from './EventDocEventMetadata';
+export * from './EventDocEventOrigin';
 export * from './EventDocEventPayload';
 export * from './EventDocInitData';
 export * from './EventDocLink';

@@ -22,11 +22,13 @@ import {
   EventDocEvent,
   EventDocEventActor,
   EventDocEventInput,
+  EventDocEventOrigin,
   EventDocOnAppendInput,
   EventDocOnPublishInput,
 } from '../models';
 import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
 import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
+import { askEventDocAssertClientEventType } from './askEventDocAssertClientEventType';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 import { askEventDocHookStates } from './askEventDocHookStates';
 import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
@@ -39,6 +41,9 @@ export type EventDocEventAppendOptions = {
   // Run the registered validator against the state at head before the write. True at the client boundary
   // (the append route); server writers may skip it, but should set it when other writers can touch the document.
   validate: boolean;
+  // Who authored the event. A client append refuses the collection's server-only types before anything is written;
+  // only trusted server code passes `server`. Defaults to client, so a caller that forgets is refused, never trusted.
+  origin?: EventDocEventOrigin;
 };
 
 /**
@@ -57,6 +62,10 @@ export function* askEventDocEventAppend(
   options: EventDocEventAppendOptions = { validate: true },
 ): AskResponse<EventDocEvent> {
   const { metadata } = input.payload;
+
+  if ((options.origin ?? EventDocEventOrigin.client) === EventDocEventOrigin.client) {
+    yield* askEventDocAssertClientEventType(input.type);
+  }
 
   const now = yield* askDateNow();
 

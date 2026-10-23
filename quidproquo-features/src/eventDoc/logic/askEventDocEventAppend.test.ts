@@ -2,7 +2,9 @@ import {
   askKeyValueStoreUpdateBase,
   DateActionType,
   DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
   ErrorTypeEnum,
+  GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
   kvsLessThan,
@@ -27,9 +29,10 @@ import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
 import { EventDocStoreOptions } from '../context/buildEventDocStore';
-import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocSummary } from '../models';
+import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocEventOrigin, EventDocSummary } from '../models';
 import { foldEventDocSummary } from '../summary';
 import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
+import { askEventDocAppendServerEvent } from './askEventDocAppendServerEvent';
 import { askEventDocEventAppend } from './askEventDocEventAppend';
 
 // The summary row is what every "which version is in effect" read answers from, and the stream projector rebuilds it
@@ -99,6 +102,10 @@ type Harness = {
   subscribers?: string[];
   signerSubscribers?: string[];
   pushFails?: boolean;
+  // What the registered definition declares server-only; undefined registers no definition at all.
+  serverEventTypes?: string[];
+  // The registered validateEvent's verdict when a validated append runs it.
+  verdict?: string;
 };
 
 const buildHarness = (options: Harness = {}) => {
@@ -135,17 +142,27 @@ const buildHarness = (options: Harness = {}) => {
       logs.push(action.payload);
     },
 
-    // Only the hooks' state derivation reaches the registered functions; the refold itself never does.
+    // Only the client gate and the hooks' state derivation reach the registered functions; the refold itself never does.
     [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) => {
       sequence.push(`fn:${action.payload.functionName}`);
+      if (action.payload.functionName === 'getServerEventTypes') {
+        return options.serverEventTypes === undefined
+          ? throwsError(DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound, 'no definition registered')
+          : options.serverEventTypes;
+      }
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return '';
+      }
+      if (action.payload.functionName === 'validateEvent') {
+        return options.verdict ?? null;
       }
       if (action.payload.functionName === 'foldDocumentState') {
         return { foldedEventIds: action.payload.args[0].map((e) => e.payload.metadata.eventId) };
       }
       throw new Error(`Unexpected dynamic function: ${action.payload.functionName}`);
     },
+
+    [GuidActionType.New]: () => 'server-guid',
 
     [InlineFunctionActionType.Execute]: (action: { payload: { payload: { summary: EventDocSummary } } }) => {
       sequence.push('hook');
@@ -192,13 +209,17 @@ const buildHarness = (options: Harness = {}) => {
     },
   };
 
-  const append = (next: EventDocEventInput, store: EventDocStoreOptions = STORE) =>
-    runStory(askEventDocProvideStore(store, askEventDocEventAppend(DOC_ID, next, ACTOR, { validate: false })), mocks);
+  const append = (next: EventDocEventInput, store: EventDocStoreOptions = STORE, origin?: EventDocEventOrigin) =>
+    runStory(askEventDocProvideStore(store, askEventDocEventAppend(DOC_ID, next, ACTOR, { validate: false, origin })), mocks);
+
+  const appendServer = (type: string, validate?: boolean) =>
+    runStory(askEventDocProvideStore(STORE, askEventDocAppendServerEvent(DOC_ID, type, {}, 1, ACTOR, { validate })), mocks);
 
   const summaryRow = () => tables[STORE.storeName][0] as EventDocSummary;
   const snapshotRows = () => tables[SNAPSHOTS_STORE] ?? [];
+  const logRows = () => tables[EVENTS_STORE];
 
-  return { append, summaryRow, snapshotRows, sequence, summaryUpdates, hookPayloads, logs, pushes };
+  return { append, appendServer, summaryRow, snapshotRows, logRows, sequence, summaryUpdates, hookPayloads, logs, pushes };
 };
 
 describe('askEventDocEventAppend', () => {
@@ -213,7 +234,7 @@ describe('askEventDocEventAppend', () => {
     expect(summaryUpdates).toHaveLength(1);
     expect(summaryUpdates[0].condition).toEqual(kvsOr([kvsNotExists('eventId'), kvsLessThan('eventId', 1)]));
     expect(snapshotRows()).toHaveLength(0);
-    expect(sequence.filter((step) => step.startsWith('fn:'))).toEqual([]);
+    expect(sequence.filter((step) => step.startsWith('fn:'))).toEqual(['fn:getServerEventTypes']);
   });
 
   it('a Delete append writes deletedAt before it returns', () => {
@@ -284,6 +305,78 @@ describe('askEventDocEventAppend', () => {
     expect(appended.payload.metadata.eventId).toBe(1);
     expect(summaryRow().eventId).toBe(0);
     expect(logs).toEqual([{ logLevel: LogLevelEnum.Warn, msg: expect.stringContaining(DOC_ID), data: expect.anything() }]);
+  });
+});
+
+describe('askEventDocEventAppend server-only event types', () => {
+  const SERVER_ONLY = 'SET_BUILD';
+
+  it('refuses a client append of a server-only type with Forbidden, before anything is written', () => {
+    const { append, logRows, sequence } = buildHarness({ serverEventTypes: [SERVER_ONLY] });
+
+    expect(() => append(input(SERVER_ONLY))).toThrow(/server-only/);
+    expect(logRows()).toHaveLength(1);
+    expect(sequence.filter((step) => step.startsWith('upsert:') || step.startsWith('update:'))).toEqual([]);
+  });
+
+  it('still accepts a client append of any other type on the same collection', () => {
+    const { append, logRows } = buildHarness({ serverEventTypes: [SERVER_ONLY] });
+
+    expect(append(input('SET_BODY', { body: 'x' })).payload.metadata.eventId).toBe(1);
+    expect(logRows()).toHaveLength(2);
+  });
+
+  it('a caller that names no origin is treated as a client', () => {
+    const { append } = buildHarness({ serverEventTypes: [SERVER_ONLY] });
+
+    expect(() => append(input(SERVER_ONLY), STORE, undefined)).toThrow(/server-only/);
+  });
+
+  it('a server-origin append writes the server-only type', () => {
+    const { append, logRows } = buildHarness({ serverEventTypes: [SERVER_ONLY] });
+
+    expect(append(input(SERVER_ONLY), STORE, EventDocEventOrigin.server).type).toBe(SERVER_ONLY);
+    expect(logRows()).toHaveLength(2);
+  });
+
+  it('askEventDocAppendServerEvent writes the server-only type', () => {
+    const { appendServer, logRows } = buildHarness({ serverEventTypes: [SERVER_ONLY] });
+
+    expect(appendServer(SERVER_ONLY).payload.metadata.eventId).toBe(1);
+    expect(logRows()).toHaveLength(2);
+  });
+
+  it('a collection with no registered definition declares no server-only types', () => {
+    const { append, logRows } = buildHarness();
+
+    expect(append(input(SERVER_ONLY)).type).toBe(SERVER_ONLY);
+    expect(logRows()).toHaveLength(2);
+  });
+});
+
+describe('askEventDocAppendServerEvent validation', () => {
+  it('skips the domain rules by default: the event is written even when the rules would reject it', () => {
+    const { appendServer, logRows, sequence } = buildHarness({ serverEventTypes: [], verdict: 'only on a draft' });
+
+    appendServer('SET_BUILD');
+
+    expect(logRows()).toHaveLength(2);
+    expect(sequence).not.toContain('fn:validateEvent');
+  });
+
+  it('with validate, a rejected event throws Invalid and nothing is written', () => {
+    const { appendServer, logRows } = buildHarness({ serverEventTypes: [], verdict: 'only on a draft' });
+
+    expect(() => appendServer('SET_BUILD', true)).toThrow(/only on a draft/);
+    expect(logRows()).toHaveLength(1);
+  });
+
+  it('with validate, an accepted event is written after the rules ran', () => {
+    const { appendServer, logRows, sequence } = buildHarness({ serverEventTypes: [] });
+
+    expect(appendServer('SET_BUILD', true).payload.metadata.eventId).toBe(1);
+    expect(logRows()).toHaveLength(2);
+    expect(sequence).toContain('fn:validateEvent');
   });
 });
 

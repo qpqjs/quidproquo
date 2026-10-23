@@ -454,6 +454,87 @@ describe('createEventDocDefinition validators', () => {
   });
 });
 
+// ─── Server-only event types ─────────────────────────────────────────────────────────
+
+describe('createEventDocDefinition serverEventTypes', () => {
+  const SET_BUILD = 'MEMO_SET_BUILD';
+
+  // An editor verb that tries to queue the server-only event, as a mistaken client verb would.
+  function* askMemoRecordBuild(assetId: string): AskResponse<void> {
+    yield* askApplyEventDocEvent(SET_BUILD, { assetId });
+  }
+
+  const withServerTypes = () =>
+    createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+      serverEventTypes: [SET_BUILD],
+      api: { ...memoApi, askMemoRecordBuild },
+    });
+
+  it('exposes the declared types as a member, the shape dynamic functions read; none by default', () => {
+    expect(withServerTypes().getServerEventTypes()).toEqual([SET_BUILD]);
+    expect(createMemoDefinition().getServerEventTypes()).toEqual([]);
+  });
+
+  it('the editor pre-flight refuses a server-only type, and still runs the domain rules for the rest', () => {
+    const definition = withServerTypes();
+    const state = definition.views.document.fold([]);
+
+    expect(definition.validate?.(serverEvent(SET_BUILD, { assetId: 'a' }, 0), state)).toMatch(/server-only/);
+    expect(definition.validate?.(serverEvent(MemoEvent.SetBody, { body: 'x' }, 0), state)).toBeNull();
+  });
+
+  it('the append gate does NOT refuse it: a server append that opts into validation is judged on the domain rules alone', () => {
+    const definition = withServerTypes();
+    const state = definition.views.document.fold([]);
+
+    expect(definition.validateEvent(serverEvent(SET_BUILD, { assetId: 'a' }, 0), state)).toBeNull();
+  });
+
+  it('a workspace commit of a server-only type is dropped with the refusal as the slot error', () => {
+    const workspace = createEventDocWorkspace({ slots: { memo: withServerTypes() } });
+
+    function* story(): AskResponse<void> {
+      yield* workspace.docs.memo.api.askMemoRecordBuild('a');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.memo).toHaveLength(0);
+    expect(state.slots.memo.error?.error.errorText).toMatch(/server-only/);
+  });
+
+  it('the fold still accepts a server-only event that reached the log', () => {
+    const definition = createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [
+        {
+          version: 1,
+          views: {
+            document: {
+              foldReducer: buildEventDocFoldReducer<
+                MemoState & { assetId?: string },
+                Effect<typeof SET_BUILD, EventDocEventPayload<{ assetId: string }>>
+              >(createInitialMemoState, { [SET_BUILD]: (state, payload) => ({ ...state, assetId: payload.data.assetId }) }) as QpqReducer<
+                MemoState,
+                EventDocEvent
+              >,
+              createInitialViewState: createInitialMemoState,
+            },
+          },
+        },
+      ],
+      serverEventTypes: [SET_BUILD],
+      api: memoApi,
+    });
+
+    const state = definition.views.document.fold([serverEvent(SET_BUILD, { assetId: 'a' }, 0)]) as MemoState & { assetId?: string };
+
+    expect(state.assetId).toBe('a');
+  });
+});
+
 // ─── The built-in summary view ──────────────────────────────────────────────────────
 
 describe('createEventDocDefinition summary view', () => {

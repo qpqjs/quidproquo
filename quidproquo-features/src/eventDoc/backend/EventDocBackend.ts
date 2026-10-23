@@ -2,6 +2,7 @@ import { AskResponse, Nullable, QpqIsoDateTime } from 'quidproquo-core';
 
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocList } from '../data/askEventDocList';
+import { EventDocServerEventAppendOptions } from '../logic/askEventDocAppendServerEvent';
 import {
   EventDocAssetDownloadUrl,
   EventDocAssetRef,
@@ -29,7 +30,15 @@ export type EventDocBackend<TState = unknown> = {
   askDocumentStateLatest: (id: string) => AskResponse<Nullable<EventDocDocumentStateAtEvent<TState>>>;
   askDocumentStateAsOfTime: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocDocumentStateAtEvent<TState>>>;
   askPublishedVersionAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocVersionState<TState>>>;
-  askAppendServerEvent: <T>(modelId: string, type: string, data: T, version: number, actor: EventDocEventActor) => AskResponse<EventDocEvent>;
+  // `options.validate` runs the domain rules first and throws instead of letting the fold drop a rejected event.
+  askAppendServerEvent: <T>(
+    modelId: string,
+    type: string,
+    data: T,
+    version: number,
+    actor: EventDocEventActor,
+    options?: EventDocServerEventAppendOptions,
+  ) => AskResponse<EventDocEvent>;
   askGenerateAssetUploadUrl: (docId: string, contentType: string, contentDisposition?: string) => AskResponse<EventDocAssetUploadUrl>;
   askGenerateAssetDownloadUrl: (docId: string, assetId: string) => AskResponse<EventDocAssetDownloadUrl>;
   // Copies another collection's asset onto one of THIS collection's documents (server-side, same scope).

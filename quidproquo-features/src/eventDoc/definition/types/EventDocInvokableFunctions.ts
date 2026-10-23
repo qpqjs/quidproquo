@@ -8,6 +8,7 @@ import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult,
  */
 export type EventDocInvokableFunctions = {
   getSnapshotCacheKey: () => string;
+  getServerEventTypes: () => string[];
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
   foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];

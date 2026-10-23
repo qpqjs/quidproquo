@@ -73,8 +73,8 @@ export function createEventDocBackend<TState>(functions: EventDocFunctions): Eve
     *askPublishedVersionAsOf(id, clock) {
       return (yield* askProvideStore(askEventDocPublishedVersionAsOf(id, clock))) as Nullable<EventDocVersionState<TState>>;
     },
-    *askAppendServerEvent(modelId, type, data, version, actor) {
-      return yield* askProvideStore(askEventDocAppendServerEvent(modelId, type, data, version, actor));
+    *askAppendServerEvent(modelId, type, data, version, actor, options) {
+      return yield* askProvideStore(askEventDocAppendServerEvent(modelId, type, data, version, actor, options));
     },
     *askGenerateAssetUploadUrl(docId, contentType, contentDisposition) {
       return yield* askProvideStore(askEventDocGenerateAssetUploadUrl(docId, contentType, contentDisposition));

@@ -10,6 +10,7 @@ import { foldEventDocSummary } from '../summary/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { withEventDocSchemaVersionCeiling } from '../validation/withEventDocSchemaVersionCeiling';
+import { withEventDocServerEventTypes } from '../validation/withEventDocServerEventTypes';
 import { EventDocWorkspaceSlotKind } from '../workspace/types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceStoryApi } from '../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocDefinition, EventDocUnsavedDefinition, EventDocView } from './types/EventDocDefinition';
@@ -54,6 +55,7 @@ export function createEventDocDefinition(
   }
 
   const { saved: _saved, api, versions, schemaVersion, references, coalesceEventTypes, storeName, type, sync } = config;
+  const serverEventTypes = [...(config.serverEventTypes ?? [])];
 
   assertEventDocVersions(versions, schemaVersion);
 
@@ -143,8 +145,12 @@ export function createEventDocDefinition(
     return migrateEventDocDocumentTo(state, schemaVersion, primaryFoldConfig.migrations);
   };
 
-  // The editor's pre-flight, derived from the same rules the fold applies. Runs against the folded live state, never the raw log.
-  const validate = createEventDocEventValidator(config.validators ?? {});
+  // The domain rules as one validator, derived from the same registry the fold applies. Runs against the folded live
+  // state, never the raw log.
+  const domainValidate = createEventDocEventValidator(config.validators ?? {});
+
+  // The editor's pre-flight: a client may never queue a server-only type, so it is refused here before the domain rules.
+  const validate = withEventDocServerEventTypes(serverEventTypes, domainValidate);
 
   return {
     storeName,
@@ -159,13 +165,16 @@ export function createEventDocDefinition(
     createInitialViewState: () => migrateEventDocDocumentTo(primaryFoldConfig.seed, schemaVersion, primaryFoldConfig.migrations),
     schemaVersion,
     getSnapshotCacheKey: () => config.snapshotCacheKey ?? '',
+    getServerEventTypes: () => serverEventTypes,
     migrations: primaryFoldConfig.migrations,
     coalesceEventTypes,
     validators,
     validate,
-    // The append pre-write gate: the editor's rules under the schema-version ceiling. The fold has no reducer above
-    // `schemaVersion`, and an event it cannot read must never reach the append-only log.
-    validateEvent: withEventDocSchemaVersionCeiling(schemaVersion, validate),
+    // The append pre-write gate: the domain rules under the schema-version ceiling. The fold has no reducer above
+    // `schemaVersion`, and an event it cannot read must never reach the append-only log. Server-only types pass
+    // here on purpose: the client refusal is decided by the append's origin, so a server append that opts into
+    // validation is judged on the domain rules alone.
+    validateEvent: withEventDocSchemaVersionCeiling(schemaVersion, domainValidate),
     api: withGenericVerbs(api),
     views,
     foldSnapshotViews,
