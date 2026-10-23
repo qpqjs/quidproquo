@@ -18,11 +18,13 @@ import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 // The zip form of the user-script loop: the same project arrives as one zip file on
 // the drive (wrapped in a top-level folder, as a tool would make it), is built on the
 // platform with askUserScriptBuildFromZip, and its exports are then callable by name.
+// The build goes to an extensionless, asset-style path with its source map turned on, so
+// this also proves the output is exactly one file with the map embedded in it.
 export function* askRunUserScriptZipTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
   const directory = `smoke/userScript/${scriptId}`;
   const zipPath = `${directory}/script.zip`;
-  const builtDirectory = `${directory}/built`;
+  const builtPath = `${directory}/assets/built`;
   const outputPath = `${directory}/output.txt`;
 
   yield* askFileWriteBinaryContents(SMOKE_PROBE_DRIVE, zipPath, {
@@ -34,16 +36,34 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
   const built = yield* askUserScriptBuildFromZip(
     SMOKE_PROBE_DRIVE,
     zipPath,
-    builtDirectory
+    builtPath,
+    undefined,
+    { sourceMap: true }
   );
   yield* askSmokeAssert(
     built.exports.includes('add') && built.exports.includes('greet'),
     `zip build did not report the script's exports: [${built.exports.join(', ')}]`
   );
 
+  const builtSource = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, builtPath);
+  yield* askSmokeAssert(
+    builtSource.includes(
+      '//# sourceMappingURL=data:application/json;charset=utf-8;base64,'
+    ),
+    'zip build with sourceMap on did not embed the source map'
+  );
+  const separateMapExists = yield* askFileExists(
+    SMOKE_PROBE_DRIVE,
+    `${builtPath}.map`
+  );
+  yield* askSmokeAssert(
+    !separateMapExists,
+    'zip build wrote a separate .map file'
+  );
+
   const script = createUserScriptCaller<SmokeUserScriptFunctions>(
     SMOKE_PROBE_DRIVE,
-    builtDirectory
+    builtPath
   );
 
   const sum = yield* script.add(SMOKE_PROBE_DRIVE, outputPath, 20, 22);
@@ -69,8 +89,7 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
 
   yield* askFileDelete(SMOKE_PROBE_DRIVE, [
     zipPath,
-    `${builtDirectory}/main.js`,
-    `${builtDirectory}/main.js.map`,
+    builtPath,
     outputPath,
   ]);
 }

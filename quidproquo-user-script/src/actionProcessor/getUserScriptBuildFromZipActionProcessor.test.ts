@@ -23,7 +23,7 @@ const qpqConfig = buildTestQpqConfig();
 const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {} } as any;
 const logger = createStubLogger();
 
-type Payload = { drive: string; zipFilepath: string; outputDirectory: string; scope?: string };
+type Payload = { drive: string; zipFilepath: string; outputFilepath: string; scope?: string; sourceMap: boolean };
 
 const text = (value: string): Uint8Array => new TextEncoder().encode(value);
 const makeZip = (files: Record<string, Uint8Array>): Buffer => Buffer.from(zipSync(files));
@@ -68,7 +68,14 @@ const PROJECT_ZIP = makeZip({
   'my-script/src/helpers/formatSum.ts': text(`export const formatSum = (sum: number): string => 'added ' + sum;`),
 });
 
-const payload: Payload = { drive: 'scripts', zipFilepath: 'doc-1/assets/script.zip', outputDirectory: 'doc-1/built', scope: 'tenant-a' };
+// The output is an asset-style path with no extension: the build writes exactly where it is told.
+const payload: Payload = {
+  drive: 'scripts',
+  zipFilepath: 'doc-1/assets/script.zip',
+  outputFilepath: 'doc-1/assets/built',
+  scope: 'tenant-a',
+  sourceMap: false,
+};
 
 beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => undefined);
@@ -79,16 +86,28 @@ afterEach(() => {
 });
 
 describe('getUserScriptBuildFromZipActionProcessor', () => {
-  it('builds a zipped two-file project off the drive and publishes main.js and its map, passing the scope through', async () => {
+  it('builds a zipped two-file project off the drive and publishes exactly one file at the output path', async () => {
     const drive = createDrive({ 'scripts:doc-1/assets/script.zip': PROJECT_ZIP });
 
     const result = await invoke(payload, drive.processors);
 
     expect(resolveActionResult(result)).toEqual({ exports: ['add', 'greet'] });
-    expect(drive.files['scripts:doc-1/built/main.js']).toContain('require("quidproquo-core")');
-    expect(drive.files['scripts:doc-1/built/main.js.map']).toContain('"sources"');
-    const scriptExports = loadUserScriptModule('main.js', drive.files['scripts:doc-1/built/main.js'], getUserScriptModuleMap());
+    expect(Object.keys(drive.files)).toEqual(['scripts:doc-1/assets/built']);
+    const built = drive.files['scripts:doc-1/assets/built'];
+    expect(built).toContain('require("quidproquo-core")');
+    expect(built).not.toContain('sourceMappingURL');
+    const scriptExports = loadUserScriptModule('built', built, getUserScriptModuleMap());
     expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');
+  }, 60_000);
+
+  it('embeds the source map in the one output file when asked', async () => {
+    const drive = createDrive({ 'scripts:doc-1/assets/script.zip': PROJECT_ZIP });
+
+    const result = await invoke({ ...payload, sourceMap: true }, drive.processors);
+
+    expect(resolveActionResult(result)).toEqual({ exports: ['add', 'greet'] });
+    expect(Object.keys(drive.files)).toEqual(['scripts:doc-1/assets/built']);
+    expect(drive.files['scripts:doc-1/assets/built']).toContain('//# sourceMappingURL=data:application/json;charset=utf-8;base64,');
   }, 60_000);
 
   it('returns SourceNotFound when there is no zip at the path', async () => {

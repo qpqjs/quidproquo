@@ -43,11 +43,12 @@ describe('buildUserScript', () => {
     const result = await buildUserScript({ projectDir: path.join(fixtures, 'basic'), outDir });
 
     expect(result.entryPath).toBe(path.join(outDir, 'main.js'));
-    expect(fs.existsSync(result.sourceMapPath)).toBe(true);
-    expect(fs.readdirSync(outDir).filter((name) => name.endsWith('.js'))).toEqual(['main.js']);
+    // The whole output is the one file: no .map beside it, no source map inside it.
+    expect(fs.readdirSync(outDir)).toEqual(['main.js']);
     expect(result.exports).toEqual(['add', 'greet', 'makeId']);
 
     const built = fs.readFileSync(result.entryPath, 'utf8');
+    expect(built).not.toContain('sourceMappingURL');
     expect(built).toContain('require("quidproquo-core")');
     expect(built).not.toContain('require("uuidv7")');
 
@@ -67,6 +68,21 @@ describe('buildUserScript', () => {
       { drive: 'drive', filepath: 'out.txt', data: 'added 42', storageDriveAdvancedWriteOptions: undefined, scope: undefined },
     ]);
     expect(written[0]).toHaveProperty('data', 'added 42');
+  }, 60_000);
+
+  it('embeds the source map in main.js when asked, still writing no other file', async () => {
+    const outDir = outDirFor('basicWithMap');
+
+    const result = await buildUserScript({ projectDir: path.join(fixtures, 'basic'), outDir, sourceMap: true });
+
+    expect(fs.readdirSync(outDir)).toEqual(['main.js']);
+    const built = fs.readFileSync(result.entryPath, 'utf8');
+    const inlineMap = built.match(/\/\/# sourceMappingURL=data:application\/json;charset=utf-8;base64,(\S+)/);
+    expect(inlineMap).not.toBeNull();
+
+    const map = JSON.parse(Buffer.from(inlineMap?.[1] ?? '', 'base64').toString('utf8'));
+    expect(map.sources.some((source: string) => source.endsWith('src/main.ts'))).toBe(true);
+    expect(result.exports).toEqual(['add', 'greet', 'makeId']);
   }, 60_000);
 
   it('fails BuildFailed naming the builtin when a script imports fs', async () => {

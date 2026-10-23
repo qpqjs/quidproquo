@@ -10,7 +10,7 @@ type ReportScriptFunctions = {
 
 describe('createUserScriptCaller', () => {
   it('yields the same Execute action askUserScriptExecute would', () => {
-    const caller = createUserScriptCaller<ReportScriptFunctions>('scripts', 'tenant-a/report');
+    const caller = createUserScriptCaller<ReportScriptFunctions>('scripts', 'tenant-a/report/main.js');
 
     const { action } = captureRequester(caller.build([1, 2], undefined));
 
@@ -18,7 +18,7 @@ describe('createUserScriptCaller', () => {
       type: UserScriptActionType.Execute,
       payload: {
         drive: 'scripts',
-        directory: 'tenant-a/report',
+        filepath: 'tenant-a/report/main.js',
         functionName: 'build',
         args: [[1, 2], undefined],
         scope: undefined,
@@ -27,7 +27,7 @@ describe('createUserScriptCaller', () => {
   });
 
   it('returns the result the runtime resolves', () => {
-    const caller = createUserScriptCaller<ReportScriptFunctions>('scripts', 'tenant-a/report');
+    const caller = createUserScriptCaller<ReportScriptFunctions>('scripts', 'tenant-a/report/main.js');
 
     const { returned } = captureRequester(caller.build([1]), 'report');
 

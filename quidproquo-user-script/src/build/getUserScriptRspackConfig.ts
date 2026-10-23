@@ -10,15 +10,17 @@ export type UserScriptRspackConfigOptions = {
   // Absolute path of the entry file (see resolveUserScriptEntry).
   entryPath: string;
   outDir: string;
+  // Embed a source map in main.js; never a separate .map file.
+  sourceMap: boolean;
 };
 
 /**
  * The rspack config that bundles a script project into one CommonJS `main.js`: the
  * author's files and npm packages folded in, the shared framework packages external,
- * no chunks, a full source map beside it. TypeScript goes through swc, so nothing is
- * type checked here.
+ * no chunks, and a source map only when asked for, embedded in `main.js`. TypeScript goes
+ * through swc, so nothing is type checked here.
  */
-export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir }: UserScriptRspackConfigOptions): Configuration => ({
+export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir, sourceMap }: UserScriptRspackConfigOptions): Configuration => ({
   context: projectDir,
   mode: 'production',
   target: 'node',
@@ -35,9 +37,9 @@ export const getUserScriptRspackConfig = ({ projectDir, entryPath, outDir }: Use
   externals: [createUserScriptExternals()],
   externalsType: 'commonjs',
 
-  // The output is read from a drive, never served, so size does not matter and the
-  // map must point at the author's TypeScript for lambda stack traces.
-  devtool: 'source-map',
+  // The build is ONE file, so a map can only ride inside it. The output is read from a
+  // drive, never served, so the size an inline map adds does not matter.
+  devtool: sourceMap ? 'inline-source-map' : false,
   optimization: {
     minimize: false,
     splitChunks: false,

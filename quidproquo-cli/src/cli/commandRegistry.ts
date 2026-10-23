@@ -130,8 +130,8 @@ export const cliCommands: CliCommand[] = [
   },
   {
     name: 'script:build',
-    usageArgs: '<dir> [--out <dir>]',
-    summary: 'Bundle a user-script project into one main.js that askUserScriptExecute loads from a drive',
+    usageArgs: '<dir> [--out <dir>] [--source-map]',
+    summary: 'Bundle a user-script project into one main.js that askUserScriptExecute loads from a drive (--source-map embeds the map in it)',
     run: (a) => require('../commands/scriptBuild').scriptBuildCommand(a),
   },
   {

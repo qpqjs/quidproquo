@@ -74,7 +74,7 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
 
     let built: BuiltUserScript;
     try {
-      built = await buildUserScriptInTempDir((projectDir) => materialiseUserScriptSource(projectDir, collected.result));
+      built = await buildUserScriptInTempDir((projectDir) => materialiseUserScriptSource(projectDir, collected.result), payload.sourceMap);
     } catch (error) {
       if (error instanceof UserScriptBuildError) {
         return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
@@ -82,10 +82,7 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
       throw error;
     }
 
-    const published = await resolveStory(
-      () => askUserScriptPublishOutput(payload.drive, payload.outputDirectory, built.script, built.sourceMap, payload.scope),
-      [],
-    );
+    const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
     if (published.error) {
       return actionResultError(published.error.errorType, published.error.errorText);
     }

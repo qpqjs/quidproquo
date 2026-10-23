@@ -1,22 +1,23 @@
-// `qpq script:build <dir> [--out <dir>]` — bundle a user-script project into one
-// main.js (plus source map) that askUserScriptExecute can load from a drive.
+// `qpq script:build <dir> [--out <dir>] [--source-map]` — bundle a user-script project
+// into one main.js that askUserScriptExecute can load from a drive. `--source-map`
+// embeds the map in main.js; no separate .map file is ever written.
 import { buildUserScript, UserScriptBuildError } from 'quidproquo-user-script';
 
 import path from 'path';
 
-import { getArgValue, getPositionalArgs } from '../lib/args';
+import { getArgValue, getPositionalArgs, hasArgFlag } from '../lib/args';
 
 export const scriptBuildCommand = async (argv: string[]): Promise<void> => {
   const [projectDir] = getPositionalArgs(argv, ['--out']);
   if (!projectDir) {
-    console.error('Usage: qpq script:build <dir> [--out <dir>]');
+    console.error('Usage: qpq script:build <dir> [--out <dir>] [--source-map]');
     process.exit(1);
   }
 
   const outDir = getArgValue(argv, '--out') ?? path.join(projectDir, 'dist');
 
   try {
-    const result = await buildUserScript({ projectDir, outDir });
+    const result = await buildUserScript({ projectDir, outDir, sourceMap: hasArgFlag(argv, '--source-map') });
     console.log(`script:build: wrote ${result.entryPath}`);
     console.log(`  exports: ${result.exports.join(', ')}`);
   } catch (error) {

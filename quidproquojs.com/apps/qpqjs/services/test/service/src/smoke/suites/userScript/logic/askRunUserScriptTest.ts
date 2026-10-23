@@ -17,14 +17,14 @@ import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 
 // The whole user-script loop on the runtime that is calling: a TypeScript project
 // (apps/qpqjs/userScripts/smoke) is written to a drive, built on the platform with
-// askUserScriptBuild, and its exports are then callable by name. A generator
+// askUserScriptBuild into one file, and that file's exports are then callable by name. A generator
 // export runs as a story whose own actions reach the real processors (it writes a
 // file we can read back), and a plain export returns its value.
 export function* askRunUserScriptTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
   const directory = `smoke/userScript/${scriptId}`;
   const sourceDirectory = `${directory}/source`;
-  const builtDirectory = `${directory}/built`;
+  const builtPath = `${directory}/built.js`;
   const outputPath = `${directory}/output.txt`;
 
   const sourcePaths = Object.keys(SMOKE_USER_SCRIPT_SOURCES).map(
@@ -41,7 +41,7 @@ export function* askRunUserScriptTest(): AskResponse<void> {
   const built = yield* askUserScriptBuild(
     SMOKE_PROBE_DRIVE,
     sourceDirectory,
-    builtDirectory
+    builtPath
   );
   yield* askSmokeAssert(
     built.exports.includes('add') && built.exports.includes('greet'),
@@ -50,7 +50,7 @@ export function* askRunUserScriptTest(): AskResponse<void> {
 
   const script = createUserScriptCaller<SmokeUserScriptFunctions>(
     SMOKE_PROBE_DRIVE,
-    builtDirectory
+    builtPath
   );
 
   const sum = yield* script.add(SMOKE_PROBE_DRIVE, outputPath, 20, 22);
@@ -76,8 +76,7 @@ export function* askRunUserScriptTest(): AskResponse<void> {
 
   yield* askFileDelete(SMOKE_PROBE_DRIVE, [
     ...sourcePaths,
-    `${builtDirectory}/main.js`,
-    `${builtDirectory}/main.js.map`,
+    builtPath,
     outputPath,
   ]);
 }

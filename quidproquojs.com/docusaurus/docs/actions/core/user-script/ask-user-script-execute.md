@@ -5,7 +5,7 @@ description: Call one exported function of a hand-written script stored on a sto
 
 # askUserScriptExecute
 
-Calls one exported function of a user script stored on a storage drive. A script is a directory whose `main.js` is a CommonJS module that exports functions. The named member runs with the same contract as a [dynamic functions](../dynamic-functions/ask-dynamic-function-execute.md) member: a **generator member** is driven through the runtime as a nested story, sharing the caller's action processors and session context, and a **promise-returning member** is awaited.
+Calls one exported function of a user script stored on a storage drive. A script is one file, the CommonJS module a [build](./ask-user-script-build.md) wrote, that exports functions. The named member runs with the same contract as a [dynamic functions](../dynamic-functions/ask-dynamic-function-execute.md) member: a **generator member** is driven through the runtime as a nested story, sharing the caller's action processors and session context, and a **promise-returning member** is awaited.
 
 - **Action type:** `UserScriptActionType.Execute`
 
@@ -15,7 +15,7 @@ import { askUserScriptExecute } from 'quidproquo-core';
 import { ScriptFunctions } from '../types/ScriptFunctions';
 
 export function* askRunReport(drive: string) {
-  return yield* askUserScriptExecute<ScriptFunctions>(drive, 'scripts/report', 'buildReport', 2026);
+  return yield* askUserScriptExecute<ScriptFunctions>(drive, 'scripts/report/main.js', 'buildReport', 2026);
 }
 ```
 
@@ -24,7 +24,7 @@ export function* askRunReport(drive: string) {
 ```typescript
 function* askUserScriptExecute<TFunctions extends DynamicFunctions, TName extends keyof TFunctions & string>(
   drive: string,
-  directory: string,
+  filepath: string,
   functionName: TName,
   ...args: Parameters<TFunctions[TName]>
 ): AskResponse<DynamicFunctionResult<TFunctions[TName]>>;
@@ -37,7 +37,7 @@ Pass the script's functions type as `TFunctions` so `functionName` and `args` ar
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive the script is stored on. |
-| `directory` | `string` | The script directory on the drive. The entry is always `<directory>/main.js`. |
+| `filepath` | `string` | The built script file on the drive: the `outputFilepath` a build wrote. Loaded exactly; no `main.js` is assumed. |
 | `functionName` | `TName` | Name of the exported member to call. |
 | `args` | `Parameters<TFunctions[TName]>` | Positional arguments passed to the member. |
 
@@ -51,9 +51,9 @@ Pass the script's functions type as `TFunctions` so `functionName` and `args` ar
 
 | Error | Cause |
 | --- | --- |
-| `ScriptNotFound` | There is no `main.js` in the script directory. |
+| `ScriptNotFound` | There is no file at `filepath`. |
 | `InvalidScope` | The scope is not a valid single path segment, or the drive refuses it. |
-| `InvalidStorageClass` | The entry is in cold storage and cannot be read. |
+| `InvalidStorageClass` | The file is in cold storage and cannot be read. |
 | `ModuleNotFound` | The script required a module outside the shared package list. |
 | `ScriptInvalid` | The script threw while its module body was being loaded. |
 | `FunctionNotFound` | The named export is not an own enumerable function of the module. |
@@ -66,7 +66,9 @@ If the member is a generator and its own story throws, that error propagates wit
 - There is no sandbox. The script runs in-process with the caller's permissions, so only store scripts from trusted authors.
 - Scripts are plain CommonJS and can only `require` the shared framework packages.
 - Actions yielded by the script run through the calling runtime's processors.
-- `createUserScriptCaller<TFunctions>(drive, directory)` wraps this action in a typed proxy: `yield* caller.buildReport(2026)` yields the same action as calling `askUserScriptExecute` directly.
+- To pass a storage scope, use `askUserScriptExecuteBase(drive, filepath, functionName, args, scope)`: the typed requester spreads the arguments, so it has no place for one.
+- A source map embedded by the build is not applied to error stack traces: positions in a thrown error point into the built file, not the original TypeScript.
+- `createUserScriptCaller<TFunctions>(drive, filepath)` wraps this action in a typed proxy: `yield* caller.buildReport(2026)` yields the same action as calling `askUserScriptExecute` directly.
 
 ## Related
 
