@@ -44,6 +44,10 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`):
 | `POST` | `/transfer/plan` | What importing an uploaded bundle (`{ transferId }`) would do to each of its docs (`new`, `fastForward`, `same`, or a blocking `diverged`/`codeConflict`) without writing anything. |
 | `POST` | `/transfer/import` | Apply an uploaded bundle (`{ transferId, force? }`) and report what happened per doc. `force` opts into overwriting docs the target has edited directly (the divergent tail is backed up to the transfer drive and discarded); off unless the caller asks for it explicitly. |
 
+### Server-only event types
+
+An import replays the bundle's log verbatim (apart from re-attributing `createdBy.userId` to the importer); it does not go through the client append path, so a collection's [server-only event types](./event-doc.md#server-only-event-types) travel with the document. That is deliberate: a bundle is a copy of a log that was gated when it was written, and the import route is an operator action behind the transfer's own auth, not a user editing a document. Stripping them would turn a promoted script into one whose build never happened.
+
 ## Signature
 
 ```typescript

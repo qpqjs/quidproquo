@@ -73,20 +73,31 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
   throw new Error(`Test KVS mock does not support logical operator: ${logical.operation}`);
 };
 
-const buildMocks = () => {
+type SessionMocks = {
+  // A registered definition's server-only types; undefined registers no definition at all.
+  serverEventTypes?: string[];
+};
+
+const buildMocks = ({ serverEventTypes }: SessionMocks = {}) => {
   const tables: Record<string, Record<string, unknown>[]> = {};
   let guidCounter = 0;
   let clock = Date.parse('2026-07-11T00:00:00.000Z');
 
+  // Without `serverEventTypes` no functions object is registered: the append's pre-write gate and any
+  // state read fall back exactly as an unregistered collection does. With it, only the client gate's
+  // member answers; everything else still reads as unregistered.
+  const functionsMissing = throwsError(
+    DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+    'Dynamic functions not found (test collection registers none)',
+  );
+
   return {
+    tables,
+
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName] ?? '',
 
-    // No functions object registered for this collection: the append's pre-write gate
-    // and any state read fall back exactly as an unregistered collection does.
-    [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
-      'Dynamic functions not found (test collection registers none)',
-    ),
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string } }) =>
+      serverEventTypes !== undefined && action.payload.functionName === 'getServerEventTypes' ? serverEventTypes : functionsMissing,
 
     [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-1', username: 'joe', exp: 0, userDirectory: 'test-user-directory', wasValid: true },
 
@@ -209,5 +220,37 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     expect(page.items[0].type).toBe('INIT_STATE');
     expect(page.items[1].type).toBe('tabChanged');
     expect(page.items[1].payload.data).toEqual({ tab: 2 });
+  });
+
+  it('refuses a client append of a server-only type with Forbidden and writes nothing, while other types still append', () => {
+    const mocks = buildMocks({ serverEventTypes: ['buildRecorded'] });
+
+    const summary = JSON.parse(runStory(create(baseHttpEvent({ name: 'session', code: 'guid-1' })), mocks).body!);
+    const logRows = () => mocks.tables[store.eventsStoreName].filter((row) => row.pk === summary.id);
+
+    const forbidden = () =>
+      runStory(
+        appendEvent(
+          baseHttpEvent({
+            type: 'buildRecorded',
+            payload: { data: { assetId: 'asset-1' }, metadata: { version: 1, clientMessageId: 'client-msg-1' } },
+          }),
+          { id: summary.id },
+        ),
+        mocks,
+      );
+
+    expect(forbidden).toThrow(/server-only/);
+    expect(logRows()).toHaveLength(1);
+
+    const allowed = runStory(
+      appendEvent(baseHttpEvent({ type: 'tabChanged', payload: { data: { tab: 1 }, metadata: { version: 1, clientMessageId: 'client-msg-2' } } }), {
+        id: summary.id,
+      }),
+      mocks,
+    );
+
+    expect(allowed.status).toBe(200);
+    expect(logRows()).toHaveLength(2);
   });
 });

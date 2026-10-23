@@ -35,6 +35,10 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
   // Merged after the reserved rules (SET_CODE/SET_NAME coalesce; lifecycle events never do). Unlisted types append.
   coalesceEventTypes?: CoalesceEventType[];
 
+  // Event types only server code may append (a build result, a generated secret). The client append route refuses
+  // them and the editor pre-flight rejects them before they are queued; askEventDocAppendServerEvent(s) still write them.
+  serverEventTypes?: string[];
+
   // Domain rules keyed by event type; the reserved lifecycle guard is always merged in. One registry per doc type, never
   // per view: the primary view is the acceptance gate. The append gate and the editor pre-flight derive from these same rules.
   // Declare it as EventDocEventValidators<View, TheDocsEffects> so each rule reads its effect's data typed.

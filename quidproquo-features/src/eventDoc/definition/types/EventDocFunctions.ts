@@ -17,6 +17,9 @@ export type EventDocFunctions = {
   // A member rather than a value because the data layer reaches a definition only through dynamic functions.
   getSnapshotCacheKey: () => string;
 
+  // The event types only server code may append; the client append path refuses them. Absent reads as none.
+  getServerEventTypes?: () => string[];
+
   // Every view of the log prefix, era-pinned: what a snapshot stores. Invoked by the event store's stream projector.
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
 

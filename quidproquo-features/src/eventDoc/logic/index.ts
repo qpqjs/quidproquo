@@ -2,6 +2,7 @@ export * from './askEventDocAppendBaseAdvance';
 export * from './askEventDocAppendBaseResolve';
 export * from './askEventDocAppendServerEvent';
 export * from './askEventDocAppendServerEvents';
+export * from './askEventDocAssertClientEventType';
 export * from './askEventDocCreate';
 export * from './askEventDocDocumentStateAdvance';
 export * from './askEventDocDocumentStateAsOf';

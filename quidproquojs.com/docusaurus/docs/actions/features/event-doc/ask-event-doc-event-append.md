@@ -44,7 +44,7 @@ function* askEventDocEventAppend(
   modelId: string,
   input: EventDocEventInput,
   actor: EventDocEventActor,
-  options?: EventDocEventAppendOptions, // default { validate: true }
+  options?: EventDocEventAppendOptions, // default { validate: true, origin: EventDocEventOrigin.client }
 ): AskResponse<EventDocEvent>;
 ```
 
@@ -55,7 +55,8 @@ function* askEventDocEventAppend(
 | `modelId` | `string` | The document id whose log the event is appended to. The base resolve throws `NotFound` when the log has no head to append after — every real log opens with `INIT_STATE`, so a missing document (not an empty log) is what this catches. |
 | `input` | `EventDocEventInput` | The client-authored event envelope — see below. |
 | `actor` | `EventDocEventActor` | Who authored the event; stamped onto the event as `createdBy`. Usually obtained from [askEventDocResolveActor](./ask-event-doc-resolve-actor.md). |
-| `options.validate` | `boolean` | Default `true`. Whether to resolve the document state at the append's head, run the collection's registered `validateEvent`, and fold the candidate onto that state as a readability check before the write. The append route (the client trust boundary) leaves this on; [askEventDocAppendServerEvent](./ask-event-doc-append-server-event.md) passes `false` for trusted server-authored writes, since the fold remains their gate. |
+| `options.validate` | `boolean` | Default `true`. Whether to resolve the document state at the append's head, run the collection's registered `validateEvent`, and fold the candidate onto that state as a readability check before the write. The append route (the client trust boundary) leaves this on; [askEventDocAppendServerEvent](./ask-event-doc-append-server-event.md) passes `false` unless its caller opts in, since the fold remains the server's gate. |
+| `options.origin` | `EventDocEventOrigin` | Default `client`. Who authored the event. A client append asks the collection's registered `getServerEventTypes` and throws `ErrorTypeEnum.Forbidden` for a listed type before anything is written (see [server-only event types](../../../config/features/event-doc.md#server-only-event-types)); only trusted server code passes `server`. A collection with no registered definition declares none. |
 
 ### `EventDocEventInput`
 
@@ -90,6 +91,7 @@ What the client POSTs to append an event. `modelId` and the server-stamped prove
 ## Notes
 
 - **Dedup and version monotonicity are still decided at fold time**, against the accepted events before the one in question: a repeated `clientMessageId` is ignored, and an event whose version is older than the log's highest accepted version is ignored. The append does not check either.
+- **A server-only event type is refused by origin, not by the validator.** The check runs first, before the head is even read, so a refused client append costs one dynamic-function call and writes nothing. It is deliberately separate from `validateEvent` so a server append that passes `{ validate: true }` is judged on the domain rules alone.
 - **Domain/lifecycle validation now runs at append time too, when enabled.** When `options.validate` is `true`, the event is checked against the document state at the head it will land on, before the write; a rejection throws `ErrorTypeEnum.Invalid` and nothing is written. It is then folded onto that same state — a schema version the fold has no reducer for (or any other fold failure) also throws `ErrorTypeEnum.Invalid` and writes nothing, rather than landing an unreadable event in the append-only log. `{ validate: false }` skips both checks and falls back to write-and-go.
 - **Write contention is expected and retried, not treated as a bug.** [askEventDocEventWrite](./ask-event-doc-event-write.md)'s conditional (`ifNotExists`) write is the slot two writers that resolved the same head race for; the loser gets `KeyValueStoreUpsertErrorTypeEnum.Conflict`, folds just the events that beat it onto the state it already holds, re-validates, and re-laps at the new head. Retries are bounded (`EVENT_DOC_APPEND_MAX_RETRIES`, with linear backoff and jitter); exhausting them throws `ErrorTypeEnum.Conflict` — sustained contention on one document means something is hammering it, not ordinary concurrent editing. Different documents are different partition keys and never contend with each other.
 - **Log order is commit order.** Because the id is the log's next contiguous position rather than a value minted independently by each writer, `afterEventId` cursors and snapshot positions (`upToEventId`) are exact — no two events can claim the same position, and there is no "arbitrary but stable" ordering case to reason about.

@@ -56,6 +56,7 @@ The collection's callable surface, read for its identity (`storeName`, `type`) a
 | `storeName` | `string` | yes | Name of the summary store to create and serve. Also derives the events table and asset bucket names. |
 | `type` | `string` | yes | The document type this collection holds — the store's partition value, so one store can (via the split helpers) hold several types. |
 | `getSnapshotCacheKey` | `() => string` | yes | The key this collection's snapshots are filed under (see [Snapshot cache key](#snapshot-cache-key)). `''` is the legacy layout. A member rather than a value because the data layer reaches a definition only through dynamic functions. |
+| `getServerEventTypes` | `() => string[]` | no | The event types only server code may append (see [Server-only event types](#server-only-event-types)). `createEventDocDefinition` fills it from `serverEventTypes`; a hand-rolled functions object that omits it declares none. |
 | `foldSnapshotViews` | `(events, seedViews?) => Nullable<EventDocSnapshotViews>` | yes | Every view of a log prefix, era-pinned — what a snapshot stores. Invoked by the event store's stream projector (which also writes the summary row from the fold's `summary` view). |
 | `foldDocumentState` | `(events, seedState?) => unknown` | yes | The document view at one point, LATEST-shaped, resumable from a stored snapshot's era-pinned document state. The read side's fold: render, references, as-of reads, and the append hooks' state derivation all go through it. |
 | `collectReferences` | `(events) => EventDocLink[]` | yes | The `EventDocLink`s this doc's whole HISTORY depends on; `[]` for a leaf doc type. Invoked by the transfer manifest walk (it exports the whole history). |
@@ -82,6 +83,32 @@ export const contentItemEventDoc = createEventDocDefinition({
 ```
 
 Refolding is lazy: a document pays one whole-log fold per reader until its next append reprojects it. To pay that up front, an admin job can walk each collection's documents (inside each storage scope) and call `askEventDocReprojectHead(docId)`, which re-runs the projector at the log head under the current key.
+
+#### Server-only event types
+
+Some events record something only the server can vouch for: a build that ran, a secret that was generated, a signature that was adopted. Anyone with write permission on a collection can `POST` any event type to `{basePath}/{id}/events`, and the stored metadata cannot tell a client append from a server one, so without help a user could append their own `SET_BUILD` pointing at a file they uploaded and claim it was built from the document's source.
+
+`serverEventTypes` on `createEventDocDefinition` closes that. List the event types only server code may append:
+
+```typescript
+export const scriptEventDoc = createEventDocDefinition({
+  storeName: SCRIPTS_STORE,
+  type: 'script',
+  schemaVersion: 1,
+  versions: [scriptV1],
+  // Only the build route records a build; a client posting one is refused.
+  serverEventTypes: [ScriptEffect.SetBuild],
+  api,
+});
+```
+
+What it does:
+
+- **The client append route refuses them.** `POST {basePath}/{id}/events` with a listed type throws `ErrorTypeEnum.Forbidden` (a 403) before anything is written. The refusal is decided by the append's origin ([askEventDocEventAppend](../../actions/features/event-doc/ask-event-doc-event-append.md)'s `options.origin`, which the route leaves at its client default), not by `validateEvent`, so a server append that opts into validation is judged on the domain rules alone. The route is the only client write path: the workspace save streams each pending event through it one at a time, the create route writes only `INIT_STATE`, and the remove route appends its `DELETE` as a server event.
+- **The editor pre-flight refuses them.** The definition's derived `validate` runs on every workspace commit, so an editor verb that tries to queue a server-only type gets the slot's validation error at once instead of failing at save.
+- **Server appends still write them.** [askEventDocAppendServerEvent](../../actions/features/event-doc/ask-event-doc-append-server-event.md), `askEventDocAppendServerEvents` and `createEventDocBackend(...).askAppendServerEvent` pass the server origin.
+- **Transfer keeps them.** An imported bundle's log is replayed verbatim ([event-doc-transfer](./event-doc-transfer.md#server-only-event-types)), so a build recorded in one environment survives the copy to another.
+- **The fold does not care.** A server-only event already in the log folds like any other; the list gates writes, never reads.
 
 ### `runtime` — `QpqFunctionRuntime` (required)
 

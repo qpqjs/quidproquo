@@ -32,6 +32,10 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // A member, not a property: the backend reaches a definition only through dynamic functions, so one shape serves both.
   getSnapshotCacheKey: () => string;
 
+  // The event types only server code may append (see EventDocSavedDefinitionConfig.serverEventTypes). A member for
+  // the same reason as getSnapshotCacheKey.
+  getServerEventTypes: () => string[];
+
   // Every projection, typed at the latest version. `summary` is built in: it folds only the reserved lifecycle events.
   views: {
     [K in keyof EventDocLatestViews<TVersions>]: EventDocView<EventDocLatestViews<TVersions>[K]>;
