@@ -15,16 +15,21 @@ type PackageJson = {
   peerDependencies?: Record<string, string>;
 };
 
-// One workspace's work for this run. Stages run in order, the scripts inside a stage
-// run concurrently, and the first stage doesn't start until every workspace listed in
+// One workspace's work for this run. `anytime` scripts start as soon as the run does,
+// regardless of dependencies, and only take a job slot no staged step is waiting for.
+// Stages run in order, the scripts inside a stage run concurrently, and the first stage
+// doesn't start until every `anytime` script has finished and every workspace listed in
 // `deps` has finished all of its stages.
 type PkgTask = {
   dir: string; // workspace directory, passed to `npm -w`
   name: string; // package name, for display
   version: string;
+  anytime: string[];
   stages: string[][];
   deps: string[]; // workspace dirs (within this run) that must build first
 };
+
+type StepPlan = Pick<PkgTask, 'anytime' | 'stages'>;
 
 const repoRoot = path.join(__dirname, '..');
 
@@ -37,15 +42,17 @@ const readPackageJson = (dir: string): PackageJson =>
 // and deploy-rspack sit before quidproquo-deploy-awscdk, which both declare as a dep).
 const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspaces || [];
 
-// Scripts whose aggregate form is driven as sub-scripts, expressed as stages: the
-// outer array runs in order, scripts inside one stage run concurrently. esm and cjs
+// Scripts whose aggregate form is driven as sub-scripts. `anytime` scripts have no
+// ordering constraints: clean only deletes the package's own outputs, which nothing
+// reads until its own compile, so it can soak up idle slots while unrelated packages
+// build. `stages` run in order, scripts inside one stage concurrently. esm and cjs
 // compile the same src into separate outDirs (no shared tsbuildinfo), so they overlap
 // safely; build:extension (only quidproquo-actionprocessor-awslambda) esbuild-bundles
 // the log-extension layer straight from src into lib/extension-layer, independent of
 // tsc; build:bin-perms (quidproquo-cli, create-qpq-app) chmods a bin file tsc just
 // emitted, so it must wait for the compiles. Packages missing a sub-script skip it.
-const STEP_STAGES: Record<string, string[][]> = {
-  build: [['clean'], ['build:esm', 'build:cjs', 'build:extension'], ['build:bin-perms']],
+const STEP_PLANS: Record<string, StepPlan> = {
+  build: { anytime: ['clean'], stages: [['build:esm', 'build:cjs', 'build:extension'], ['build:bin-perms']] },
 };
 
 // Only `build` reads other workspaces' lib/ outputs (and its clean deletes them), so
@@ -57,15 +64,18 @@ const DEPENDENCY_ORDERED_SCRIPTS = new Set(['build']);
 // so they're excluded here and such workspaces contribute zero steps.
 // useStages=false (--no-stages) skips the sub-script expansion and runs the package's
 // own aggregate script as a single step, for comparing against staged execution.
-const getStages = (pkg: PackageJson, script: string, useStages: boolean): string[][] => {
-  const stages = useStages ? STEP_STAGES[script] : undefined;
-  if (stages) {
-    const present = stages.map((stage) => stage.filter((sub) => pkg.scripts?.[sub])).filter((stage) => stage.length > 0);
-    if (present.length > 0) {
-      return present;
+const getStepPlan = (pkg: PackageJson, script: string, useStages: boolean): StepPlan => {
+  const hasScript = (sub: string): boolean => Boolean(pkg.scripts?.[sub]);
+  const plan = useStages ? STEP_PLANS[script] : undefined;
+  if (plan) {
+    const stages = plan.stages.map((stage) => stage.filter(hasScript)).filter((stage) => stage.length > 0);
+    // A package with only the anytime scripts (no compile) falls through to its aggregate
+    // script, which is expected to do its own clean.
+    if (stages.length > 0) {
+      return { anytime: plan.anytime.filter(hasScript), stages };
     }
   }
-  return pkg.scripts?.[script] ? [[script]] : [];
+  return { anytime: [], stages: hasScript(script) ? [[script]] : [] };
 };
 
 // Every path git reports maps to at most one top-level workspace dir.
@@ -101,9 +111,9 @@ const buildTasks = (script: string, mode: 'all' | 'changed', useStages: boolean)
       continue;
     }
     const pkg = pkgs.get(dir)!;
-    const stages = getStages(pkg, script, useStages);
-    if (stages.length > 0) {
-      tasks.push({ dir, name: pkg.name, version: pkg.version ?? '', stages, deps: [] });
+    const plan = getStepPlan(pkg, script, useStages);
+    if (plan.stages.length > 0) {
+      tasks.push({ dir, name: pkg.name, version: pkg.version ?? '', ...plan, deps: [] });
     }
   }
 
@@ -144,23 +154,27 @@ const runStep = (dir: string, script: string): Promise<{ code: number; output: s
     child.on('error', (err) => resolve({ code: 1, output: String(err) }));
   });
 
+type Priority = 'high' | 'low';
+
 // Minimal counting semaphore, capping how many npm child processes run at once
-// across all workspaces and stages.
+// across all workspaces and stages. A freed slot always goes to a waiting high
+// priority step before any low priority one, so anytime scripts can never hold up a
+// compile that is ready to go.
 class Semaphore {
-  private waiting: Array<() => void> = [];
+  private waiting: Record<Priority, Array<() => void>> = { high: [], low: [] };
 
   constructor(private slots: number) {}
 
-  async acquire(): Promise<void> {
+  async acquire(priority: Priority): Promise<void> {
     if (this.slots > 0) {
       this.slots -= 1;
       return;
     }
-    await new Promise<void>((resolve) => this.waiting.push(resolve));
+    await new Promise<void>((resolve) => this.waiting[priority].push(resolve));
   }
 
   release(): void {
-    const next = this.waiting.shift();
+    const next = this.waiting.high.shift() ?? this.waiting.low.shift();
     if (next) {
       next();
     } else {
@@ -183,7 +197,7 @@ const getJobs = (args: string[]): number => {
 };
 
 const countSteps = (tasks: PkgTask[]): number =>
-  tasks.reduce((sum, task) => sum + task.stages.reduce((stageSum, stage) => stageSum + stage.length, 0), 0);
+  tasks.reduce((sum, task) => sum + task.anytime.length + task.stages.reduce((stageSum, stage) => stageSum + stage.length, 0), 0);
 
 const main = async (): Promise<void> => {
   const [script, ...args] = process.argv.slice(2);
@@ -249,11 +263,11 @@ const main = async (): Promise<void> => {
   // Runs one script in one workspace under the global job cap, tracked as an active
   // lane in the progress display. A failure flips `aborted`: nothing new starts,
   // steps already in flight drain to completion so their output can't interleave.
-  const runTrackedStep = async (task: PkgTask, scriptName: string): Promise<boolean> => {
+  const runTrackedStep = async (task: PkgTask, scriptName: string, priority: Priority): Promise<boolean> => {
     if (aborted) {
       return false;
     }
-    await semaphore.acquire();
+    await semaphore.acquire(priority);
     if (aborted) {
       semaphore.release();
       return false;
@@ -285,12 +299,29 @@ const main = async (): Promise<void> => {
     return true;
   };
 
-  // Runs a workspace's stages in order (scripts within a stage concurrently), then
-  // unblocks whatever was waiting on this workspace. On failure the task stops
-  // between stages and never unblocks its dependents.
+  // Every workspace's anytime scripts are kicked off up front at low priority. Tasks
+  // with no dependencies go first so the packages that can compile soonest are the
+  // first ones ready to.
+  const anytimeOrder = [...tasks].sort((a, b) => Number(a.deps.length > 0) - Number(b.deps.length > 0));
+  const anytimeDone = new Map<string, Promise<boolean>>();
+  for (const task of anytimeOrder) {
+    const results = Promise.all(task.anytime.map((scriptName) => runTrackedStep(task, scriptName, 'low')));
+    anytimeDone.set(
+      task.dir,
+      results.then((flags) => !flags.includes(false)),
+    );
+  }
+
+  // Waits for the workspace's anytime scripts, then runs its stages in order (scripts
+  // within a stage concurrently), then unblocks whatever was waiting on this
+  // workspace. On failure the task stops between stages and never unblocks its
+  // dependents.
   const runTask = async (task: PkgTask): Promise<void> => {
+    if (!(await anytimeDone.get(task.dir))) {
+      return;
+    }
     for (const stage of task.stages) {
-      const results = await Promise.all(stage.map((scriptName) => runTrackedStep(task, scriptName)));
+      const results = await Promise.all(stage.map((scriptName) => runTrackedStep(task, scriptName, 'high')));
       if (results.includes(false)) {
         return;
       }
