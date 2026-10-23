@@ -85,7 +85,7 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
     try {
       built = await buildUserScriptInTempDir(async (projectDir) => {
         await extractUserScriptZip(zip, projectDir);
-      });
+      }, payload.sourceMap);
     } catch (error) {
       if (error instanceof UserScriptArchiveError) {
         return actionResultError(getArchiveErrorType(error), `[${payload.drive}:${payload.zipFilepath}] ${error.message}`);
@@ -96,10 +96,7 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       throw error;
     }
 
-    const published = await resolveStory(
-      () => askUserScriptPublishOutput(payload.drive, payload.outputDirectory, built.script, built.sourceMap, payload.scope),
-      [],
-    );
+    const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
     if (published.error) {
       return actionResultError(published.error.errorType, published.error.errorText);
     }

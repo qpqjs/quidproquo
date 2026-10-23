@@ -1,21 +1,23 @@
 ---
 title: askUserScriptBuildFromZip
-description: Build a user script project stored as one zip file on a storage drive into a single main.js, on whichever runtime is calling.
+description: Build a user script project stored as one zip file on a storage drive into one JavaScript file, on whichever runtime is calling.
 ---
 
 # askUserScriptBuildFromZip
 
-Builds a user script project that is stored on a drive as a single zip file into `<outputDirectory>/main.js` (plus `main.js.map`). The same contract, limits and output as [askUserScriptBuild](./ask-user-script-build.md); only the source arrives as an archive instead of loose files. The output is what [askUserScriptExecute](./ask-user-script-execute.md) is then pointed at.
+Builds a user script project that is stored on a drive as a single zip file into one file at `outputFilepath`. The same contract, limits and output as [askUserScriptBuild](./ask-user-script-build.md); only the source arrives as an archive instead of loose files. That one file is what [askUserScriptExecute](./ask-user-script-execute.md) is then pointed at, so both the zip and the build can be event doc assets.
 
 - **Action type:** `UserScriptActionType.BuildFromZip`
 
 ```typescript
-import { askUserScriptBuildFromZip, askUserScriptExecute } from 'quidproquo-core';
+import { askUserScriptBuildFromZip, askUserScriptExecuteBase } from 'quidproquo-core';
 
-export function* askBuildAndRunUploadedScript(drive: string, docId: string, assetId: string, scope: string) {
-  const { exports } = yield* askUserScriptBuildFromZip(drive, `${docId}/assets/${assetId}`, `${docId}/built`, scope);
+export function* askBuildAndRunUploadedScript(drive: string, docId: string, zipAssetId: string, builtAssetId: string, scope: string) {
+  const builtFilepath = `${docId}/assets/${builtAssetId}`;
+  const { exports } = yield* askUserScriptBuildFromZip(drive, `${docId}/assets/${zipAssetId}`, builtFilepath, scope);
 
-  return yield* askUserScriptExecute(drive, `${docId}/built`, exports[0], [], scope);
+  // The base requester takes the args as one array and a scope; the typed one spreads the args.
+  return yield* askUserScriptExecuteBase(drive, builtFilepath, exports[0], [], scope);
 }
 ```
 
@@ -25,8 +27,9 @@ export function* askBuildAndRunUploadedScript(drive: string, docId: string, asse
 function* askUserScriptBuildFromZip(
   drive: string,
   zipFilepath: string,
-  outputDirectory: string,
+  outputFilepath: string,
   scope?: string,
+  options?: UserScriptBuildOptions,
 ): AskResponse<UserScriptBuildOutcome>;
 ```
 
@@ -36,8 +39,9 @@ function* askUserScriptBuildFromZip(
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive holding the zip and receiving the output. |
 | `zipFilepath` | `string` | Path of the zip file on the drive. |
-| `outputDirectory` | `string` | Directory that receives `main.js` and `main.js.map`. |
-| `scope` | `string` (optional) | Storage scope, a single path segment, applied to the read and the writes. |
+| `outputFilepath` | `string` | The exact file the built JavaScript is written to. Any path works, including an event doc asset path with no extension. |
+| `scope` | `string` (optional) | Storage scope, a single path segment, applied to the read and the write. |
+| `options.sourceMap` | `boolean` (optional) | Embed a source map in the output file. Off by default. A separate `.map` file is never written. |
 
 ## Zip layout
 
@@ -63,7 +67,7 @@ A root `src/` always wins, so a zip holding only `src/...` is never stripped. Di
 | `InvalidArchive` | The file is not a zip this runtime can read, or an entry is encrypted or corrupt (including a size claim that does not match the data). |
 | `UnsafeArchiveEntry` | An entry path is absolute, contains `..` or an empty segment, uses backslashes, or the entry is a symlink. |
 | `BuildFailed` | The bundler reported errors, including a refused import. |
-| `OutputNotSingleFile` | The build emitted more than one JavaScript file. |
+| `OutputNotSingleFile` | The build emitted anything besides the one output file. |
 | `NoExports` | The built module exports nothing. |
 | `NonFunctionExport` | An export of the built module is not a function. |
 | `DriveNotFound` | The storage drive does not exist. |

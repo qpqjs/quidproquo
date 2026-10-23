@@ -31,9 +31,19 @@ describe('scriptBuildCommand', () => {
 
     await scriptBuildCommand([project]);
 
-    expect(fs.existsSync(path.join(project, 'dist', 'main.js'))).toBe(true);
-    expect(fs.existsSync(path.join(project, 'dist', 'main.js.map'))).toBe(true);
+    expect(fs.readdirSync(path.join(project, 'dist'))).toEqual(['main.js']);
+    expect(fs.readFileSync(path.join(project, 'dist', 'main.js'), 'utf8')).not.toContain('sourceMappingURL');
     expect(logged.join('\n')).toContain('exports: add, greet');
+  }, 60_000);
+
+  it('embeds the source map in main.js with --source-map, still writing one file', async () => {
+    const project = path.join(tempRoot, 'mapped');
+    createUserScriptProject(project);
+
+    await scriptBuildCommand([project, '--source-map']);
+
+    expect(fs.readdirSync(path.join(project, 'dist'))).toEqual(['main.js']);
+    expect(fs.readFileSync(path.join(project, 'dist', 'main.js'), 'utf8')).toContain('//# sourceMappingURL=data:application/json');
   }, 60_000);
 
   it('honours --out', async () => {

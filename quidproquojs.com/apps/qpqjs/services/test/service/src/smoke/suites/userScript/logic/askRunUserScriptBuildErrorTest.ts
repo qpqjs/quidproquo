@@ -20,7 +20,7 @@ export function* askRunUserScriptBuildErrorTest(): AskResponse<void> {
     askUserScriptBuild(
       SMOKE_PROBE_DRIVE,
       `${directory}/source`,
-      `${directory}/built`
+      `${directory}/built.js`
     )
   );
 

@@ -24,7 +24,7 @@ const qpqConfig = buildTestQpqConfig();
 const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {} } as any;
 const logger = createStubLogger();
 
-type Payload = { drive: string; sourceDirectory: string; outputDirectory: string; scope?: string };
+type Payload = { drive: string; sourceDirectory: string; outputFilepath: string; scope?: string; sourceMap: boolean };
 
 // An in-memory drive keyed `drive:path`. The listing answers one level like the real
 // processors do; `missingDirectoryIsError` mimics the dev server, which refuses to list a
@@ -85,7 +85,7 @@ const PROJECT = {
   'scripts:a/source/src/helpers/formatSum.ts': `export const formatSum = (sum: number): string => 'added ' + sum;`,
 };
 
-const payload: Payload = { drive: 'scripts', sourceDirectory: 'a/source', outputDirectory: 'a/built' };
+const payload: Payload = { drive: 'scripts', sourceDirectory: 'a/source', outputFilepath: 'a/built.js', sourceMap: false };
 
 let tempDirsCreated: string[];
 
@@ -105,16 +105,18 @@ afterEach(() => {
 });
 
 describe('getUserScriptBuildActionProcessor', () => {
-  it('builds a two-file project off the drive and publishes main.js and its map to the output directory', async () => {
+  it('builds a two-file project off the drive and publishes exactly one file at the output path', async () => {
     const drive = createDrive(PROJECT);
 
     const result = await invoke(payload, drive.processors);
 
     expect(resolveActionResult(result)).toEqual({ exports: ['add', 'greet'] });
-    expect(drive.files['scripts:a/built/main.js']).toContain('require("quidproquo-core")');
-    expect(drive.files['scripts:a/built/main.js.map']).toContain('"sources"');
+    const written = Object.keys(drive.files).filter((key) => !(key in PROJECT));
+    expect(written).toEqual(['scripts:a/built.js']);
+    expect(drive.files['scripts:a/built.js']).toContain('require("quidproquo-core")');
+    expect(drive.files['scripts:a/built.js']).not.toContain('sourceMappingURL');
 
-    const scriptExports = loadUserScriptModule('main.js', drive.files['scripts:a/built/main.js'], getUserScriptModuleMap());
+    const scriptExports = loadUserScriptModule('built.js', drive.files['scripts:a/built.js'], getUserScriptModuleMap());
     expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');
     expect(tempDirsCreated).toHaveLength(1);
     expect(fs.existsSync(tempDirsCreated[0])).toBe(false);
@@ -153,7 +155,7 @@ describe('getUserScriptBuildActionProcessor', () => {
     expect(error.errorType).toBe(askUserScriptBuild.errorType.BuildFailed);
     expect(error.errorText).toContain('[fs]');
     expect(fs.existsSync(tempDirsCreated[0])).toBe(false);
-    expect(drive.files['scripts:a/built/main.js']).toBeUndefined();
+    expect(drive.files['scripts:a/built.js']).toBeUndefined();
   }, 60_000);
 
   it('returns NonFunctionExport for a value export', async () => {

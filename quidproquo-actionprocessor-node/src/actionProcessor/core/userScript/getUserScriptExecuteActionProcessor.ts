@@ -25,8 +25,6 @@ import { getUserScriptModuleMap } from './logic/getUserScriptModuleMap';
 import { loadUserScriptModule } from './logic/loadUserScriptModule';
 import { UserScriptModuleNotFoundError } from './logic/UserScriptModuleNotFoundError';
 
-const USER_SCRIPT_ENTRY_FILENAME = 'main.js';
-
 const getDateNow = () => new Date().toISOString();
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
@@ -51,7 +49,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askUser
     dynamicModuleLoader: DynamicModuleLoader,
     streamRegistry: StreamRegistry,
   ): Promise<any> => {
-    const entryPath = `${payload.directory.replace(/\/+$/, '')}/${USER_SCRIPT_ENTRY_FILENAME}`;
+    const entryPath = payload.filepath;
     const label = `${payload.drive}:${entryPath}#${payload.functionName}`;
 
     const resolveStory = createNestedRuntime(
@@ -68,7 +66,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askUser
       streamRegistry,
     );
 
-    // The entry is read through the file action so each runtime's own drive
+    // The built file is read through the file action so each runtime's own drive
     // implementation serves it; this processor never touches storage itself.
     const readResult = await resolveStory(() => askFileReadTextContents(payload.drive, entryPath, payload.scope), []);
     if (readResult.error) {

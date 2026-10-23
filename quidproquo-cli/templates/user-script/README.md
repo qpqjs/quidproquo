@@ -14,14 +14,14 @@ A quidproquo user script. It builds to one JavaScript file that a quidproquo ser
 npm run build
 ```
 
-Writes `dist/main.js` and `dist/main.js.map`. The build needs no `npm install`: `quidproquo-core` is provided by the service that runs the script, and the build does not type check. Run `npm install` for editor types and `npm run validate-ts` to type check.
+Writes `dist/main.js`, and nothing else. Add `--source-map` to the build to embed a source map in it (no separate `.map` file is written). The build needs no `npm install`: `quidproquo-core` is provided by the service that runs the script, and the build does not type check. Run `npm install` for editor types and `npm run validate-ts` to type check.
 
 ## Run
 
-Copy `dist/main.js` to a directory on a storage drive, for example `scripts/my-script/main.js`, then call it from a story:
+Copy `dist/main.js` to a storage drive, for example to `scripts/my-script/main.js`, then call it from a story, naming that file and passing the arguments after the export name:
 
 ```ts
-const sum = yield* askUserScriptExecute('my-drive', 'scripts/my-script', 'add', ['my-drive', 'out.txt', 20, 22]);
+const sum = yield* askUserScriptExecute('my-drive', 'scripts/my-script/main.js', 'add', 'my-drive', 'out.txt', 20, 22);
 ```
 
-On the dev server a drive is a folder under `.qpq-runtime/<app>/storage/<service>/<drive>/`, so `qpq script:build . --out <that folder>/scripts/my-script` publishes locally.
+On the dev server a drive is a folder under `.qpq-runtime/<app>/storage/<service>/<drive>/`, so `qpq script:build . --out <that folder>/scripts/my-script` publishes locally to `scripts/my-script/main.js`.

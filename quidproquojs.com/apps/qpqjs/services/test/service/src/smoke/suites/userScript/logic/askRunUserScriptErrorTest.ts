@@ -17,7 +17,7 @@ export function* askRunUserScriptErrorTest(): AskResponse<void> {
   const result = yield* askCatch(
     askUserScriptExecute(
       SMOKE_PROBE_DRIVE,
-      `smoke/userScript/missing-${scriptId}`,
+      `smoke/userScript/missing-${scriptId}.js`,
       'anything'
     )
   );

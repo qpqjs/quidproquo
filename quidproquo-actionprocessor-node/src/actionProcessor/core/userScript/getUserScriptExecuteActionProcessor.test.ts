@@ -21,7 +21,7 @@ const qpqConfig = buildTestQpqConfig();
 const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {} } as any;
 const logger = createStubLogger();
 
-type Payload = { drive: string; directory: string; functionName: string; args: unknown[]; scope?: string };
+type Payload = { drive: string; filepath: string; functionName: string; args: unknown[]; scope?: string };
 
 // A fake drive: the ReadTextContents processor serves text by `drive:filepath`, so a
 // test writes a script with one line and reads it back through the real seam.
@@ -54,8 +54,14 @@ const SCRIPT = `
   exports.capturesSession = function* () { yield { type: 'Capture' }; return 'ok'; };
 `;
 
-const files = { 'scripts:tenant-a/report/main.js': SCRIPT };
-const payloadFor = (functionName: string, args: unknown[] = []): Payload => ({ drive: 'scripts', directory: 'tenant-a/report', functionName, args });
+// Any file name: the filepath names the built file exactly, `main.js` is not assumed.
+const files = { 'scripts:tenant-a/report/build-7.js': SCRIPT };
+const payloadFor = (functionName: string, args: unknown[] = []): Payload => ({
+  drive: 'scripts',
+  filepath: 'tenant-a/report/build-7.js',
+  functionName,
+  args,
+});
 
 beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => undefined);
@@ -89,18 +95,22 @@ describe('getUserScriptExecuteActionProcessor', () => {
     expect(resolveActionResult(result)).toBe(42);
   });
 
-  it('reads the entry as main.js inside the directory, tolerating a trailing slash', async () => {
-    const result = await invoke({ ...payloadFor('add', [1, 1]), directory: 'tenant-a/report/' }, createFileReadProcessor(files));
-
-    expect(resolveActionResult(result)).toBe(2);
-  });
-
-  it('returns ScriptNotFound when the directory has no main.js', async () => {
-    const result = await invoke({ ...payloadFor('add'), directory: 'nowhere' }, createFileReadProcessor(files));
+  it('loads exactly the given file, never a main.js beside it', async () => {
+    const result = await invoke(
+      { ...payloadFor('add'), filepath: 'tenant-a/report' },
+      createFileReadProcessor({ ...files, 'scripts:tenant-a/report/main.js': SCRIPT }),
+    );
 
     const error = resolveActionResultError(result);
     expect(error.errorType).toBe(askUserScriptExecute.errorType.ScriptNotFound);
-    expect(error.errorText).toContain('scripts:nowhere/main.js');
+  });
+
+  it('returns ScriptNotFound when there is no file at the filepath', async () => {
+    const result = await invoke({ ...payloadFor('add'), filepath: 'nowhere.js' }, createFileReadProcessor(files));
+
+    const error = resolveActionResultError(result);
+    expect(error.errorType).toBe(askUserScriptExecute.errorType.ScriptNotFound);
+    expect(error.errorText).toContain('scripts:nowhere.js');
   });
 
   it('re-labels a scope refusal from the read into its own catalog', async () => {
@@ -126,7 +136,7 @@ describe('getUserScriptExecuteActionProcessor', () => {
 
   it('returns ModuleNotFound when the script requires outside the shared packages', async () => {
     const error = resolveActionResultError(
-      await invoke(payloadFor('anything'), createFileReadProcessor({ 'scripts:tenant-a/report/main.js': `require('fs');` })),
+      await invoke(payloadFor('anything'), createFileReadProcessor({ 'scripts:tenant-a/report/build-7.js': `require('fs');` })),
     );
 
     expect(error.errorType).toBe(askUserScriptExecute.errorType.ModuleNotFound);
@@ -135,7 +145,7 @@ describe('getUserScriptExecuteActionProcessor', () => {
 
   it('returns ScriptInvalid when the module body throws while loading', async () => {
     const error = resolveActionResultError(
-      await invoke(payloadFor('anything'), createFileReadProcessor({ 'scripts:tenant-a/report/main.js': `throw new Error('top');` })),
+      await invoke(payloadFor('anything'), createFileReadProcessor({ 'scripts:tenant-a/report/build-7.js': `throw new Error('top');` })),
     );
 
     expect(error.errorType).toBe(askUserScriptExecute.errorType.ScriptInvalid);
@@ -146,7 +156,7 @@ describe('getUserScriptExecuteActionProcessor', () => {
     const error = resolveActionResultError(await invoke(payloadFor('nope'), createFileReadProcessor(files)));
 
     expect(error.errorType).toBe(askUserScriptExecute.errorType.FunctionNotFound);
-    expect(error.errorText).toContain('main.js#nope');
+    expect(error.errorText).toContain('build-7.js#nope');
   });
 
   it('returns FunctionNotFound for a non-function export', async () => {

@@ -2,14 +2,25 @@ import { describe, expect, it } from 'vitest';
 
 import { getUserScriptRspackConfig } from './getUserScriptRspackConfig';
 
-const config = getUserScriptRspackConfig({ projectDir: '/project', entryPath: '/project/src/main.ts', outDir: '/project/dist' });
+const config = getUserScriptRspackConfig({ projectDir: '/project', entryPath: '/project/src/main.ts', outDir: '/project/dist', sourceMap: false });
 
 describe('getUserScriptRspackConfig', () => {
-  it('builds the one entry to main.js as a commonjs module with a source map', () => {
+  it('builds the one entry to main.js as a commonjs module, with no source map by default', () => {
     expect(config.entry).toEqual({ main: '/project/src/main.ts' });
     expect(config.output).toMatchObject({ path: '/project/dist', filename: 'main.js', library: { type: 'commonjs2' } });
-    expect(config.devtool).toBe('source-map');
+    expect(config.devtool).toBe(false);
     expect(config.target).toBe('node');
+  });
+
+  it('embeds the source map inline when asked, never as a separate file', () => {
+    const withMap = getUserScriptRspackConfig({
+      projectDir: '/project',
+      entryPath: '/project/src/main.ts',
+      outDir: '/project/dist',
+      sourceMap: true,
+    });
+
+    expect(withMap.devtool).toBe('inline-source-map');
   });
 
   it('forces a single file: no chunk splitting, no runtime chunk, eager dynamic imports', () => {

@@ -11,7 +11,10 @@ import { BuiltUserScript } from './BuiltUserScript';
  * directory removed whatever happened. Errors from `materialise` and from the build
  * propagate for the caller to map.
  */
-export const buildUserScriptInTempDir = async (materialise: (projectDir: string) => Promise<void> | void): Promise<BuiltUserScript> => {
+export const buildUserScriptInTempDir = async (
+  materialise: (projectDir: string) => Promise<void> | void,
+  sourceMap: boolean,
+): Promise<BuiltUserScript> => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-user-script-'));
   const projectDir = path.join(tempDir, 'project');
   const outDir = path.join(tempDir, 'out');
@@ -19,11 +22,10 @@ export const buildUserScriptInTempDir = async (materialise: (projectDir: string)
   try {
     fs.mkdirSync(projectDir, { recursive: true });
     await materialise(projectDir);
-    const result = await buildUserScript({ projectDir, outDir });
+    const result = await buildUserScript({ projectDir, outDir, sourceMap });
 
     return {
       script: fs.readFileSync(result.entryPath, 'utf8'),
-      sourceMap: fs.readFileSync(result.sourceMapPath, 'utf8'),
       exports: result.exports,
     };
   } finally {
