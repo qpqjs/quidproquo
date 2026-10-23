@@ -7,6 +7,8 @@ import {
   buildTestQpqConfig,
   createStreamRegistry,
   createStubLogger,
+  defineUserScriptModule,
+  DynamicModuleLoader,
   FileActionType,
   resolveActionResult,
   resolveActionResultError,
@@ -48,11 +50,27 @@ const createDrive = (binaries: Record<string, Buffer>) => {
   };
 };
 
-const invoke = async (payload: Payload, actionProcessors: Record<string, any>) => {
-  const processors = await getUserScriptBuildFromZipActionProcessor(qpqConfig, async () => null);
+const invoke = async (
+  payload: Payload,
+  actionProcessors: Record<string, any>,
+  config = qpqConfig,
+  dynamicModuleLoader: DynamicModuleLoader = async () => null,
+) => {
+  const processors = await getUserScriptBuildFromZipActionProcessor(config, dynamicModuleLoader);
   const process = processors[UserScriptActionType.BuildFromZip] as (p: any, ...rest: any[]) => Promise<any>;
-  return process(payload, session, actionProcessors, logger, undefined, async () => null, createStreamRegistry());
+  return process(payload, session, actionProcessors, logger, undefined, dynamicModuleLoader, createStreamRegistry());
 };
+
+// A service that lets its scripts import `my-sdk/v1`, served by a loader that knows only it.
+const SDK_RUNTIME = '/entry/scriptModules::mySdkV1';
+const sdkConfig = buildTestQpqConfig([defineUserScriptModule('my-sdk/v1', SDK_RUNTIME)]);
+const sdkLoader: DynamicModuleLoader = async (runtime) => (runtime === SDK_RUNTIME ? { shout: (text: string) => `${text.toUpperCase()}!` } : null);
+const SDK_ZIP = makeZip({
+  'src/main.ts': text(`
+    import { shout } from 'my-sdk/v1';
+    export const run = (value: string): string => shout(value);
+  `),
+});
 
 const PROJECT_ZIP = makeZip({
   'my-script/src/main.ts': text(`
@@ -86,6 +104,27 @@ afterEach(() => {
 });
 
 describe('getUserScriptBuildFromZipActionProcessor', () => {
+  it("keeps a declared script module external and checks the output against the service's instance", async () => {
+    const drive = createDrive({ 'scripts:doc-1/assets/script.zip': SDK_ZIP });
+
+    const result = await invoke(payload, drive.processors, sdkConfig, sdkLoader);
+
+    expect(resolveActionResult(result)).toEqual({ exports: ['run'] });
+    const built = drive.files['scripts:doc-1/assets/built'];
+    expect(built).toContain('require("my-sdk/v1")');
+    const scriptExports = loadUserScriptModule('built', built, getUserScriptModuleMap({ 'my-sdk/v1': await sdkLoader(SDK_RUNTIME) }));
+    expect((scriptExports.run as (value: string) => string)('hi')).toBe('HI!');
+  }, 60_000);
+
+  it('fails the build when the module is not declared by the service', async () => {
+    const drive = createDrive({ 'scripts:doc-1/assets/script.zip': SDK_ZIP });
+
+    const error = resolveActionResultError(await invoke(payload, drive.processors));
+
+    expect(error.errorType).toBe(askUserScriptBuildFromZip.errorType.BuildFailed);
+    expect(error.errorText).toContain('my-sdk/v1');
+  }, 60_000);
+
   it('builds a zipped two-file project off the drive and publishes exactly one file at the output path', async () => {
     const drive = createDrive({ 'scripts:doc-1/assets/script.zip': PROJECT_ZIP });
 

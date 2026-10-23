@@ -35,6 +35,7 @@ import {
   SigningKeyQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
+  UserScriptModuleQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
 import {
@@ -409,6 +410,11 @@ export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctions
   return getOwnedItems(getAllDynamicFunctions(qpqConfig), qpqConfig);
 };
 
+// The modules this service lets user scripts import (defineUserScriptModule).
+export const getAllUserScriptModules = (qpqConfig: QPQConfig): UserScriptModuleQPQConfigSetting[] => {
+  return getConfigSettings<UserScriptModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptModule);
+};
+
 // Runtime-attached action processor override sources must join the bundler sweep,
 // or the deployed bundle omits them and the dynamic load fails at runtime.
 export const expandSrcEntriesWithActionProcessors = (runtimes: QpqFunctionRuntime[]): QpqFunctionRuntime[] => {
@@ -433,6 +439,8 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
       .filter((runtime) => !!runtime) as QpqFunctionRuntime[]),
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
     ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
+    // Loaded only when a script is built or run, so nothing else would make the bundler see it.
+    ...getAllUserScriptModules(qpqConfig).map((m) => m.runtime),
   ];
 
   return expandSrcEntriesWithActionProcessors(result);

@@ -30,6 +30,7 @@ export enum QPQCoreConfigSettingType {
   dynamicFunctions = '@quidproquo-core/config/DynamicFunctions',
   javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
   federatedModuleStore = '@quidproquo-core/config/FederatedModuleStore',
+  userScriptModule = '@quidproquo-core/config/UserScriptModule',
 }
 
 export interface QPQConfigSetting {

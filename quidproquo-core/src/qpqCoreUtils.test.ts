@@ -21,6 +21,7 @@ import {
   defineServiceSettings,
   defineStorageDrive,
   defineUserDirectory,
+  defineUserScriptModule,
   defineVirtualNetwork,
   QPQCoreConfigSettingType,
 } from './config';
@@ -37,6 +38,7 @@ import {
   getAllParameterConfigs,
   getAllSecretConfigs,
   getAllSrcEntries,
+  getAllUserScriptModules,
   getApiBuildPath,
   getApplicationConfigRoot,
   getApplicationConfigSetting,
@@ -583,6 +585,14 @@ describe('qpqCoreUtils', () => {
       ]);
 
       expect(getAllSrcEntries(withOverrides)).toContainEqual(overrideSource);
+    });
+
+    it('includes the modules user scripts may import', () => {
+      // Only a script build or run loads one, so without this the bundle would omit it.
+      const withModule = buildTestQpqConfig([defineUserScriptModule('my-sdk/v1', '/entry/scriptModules::mySdkV1')]);
+
+      expect(getAllUserScriptModules(withModule).map((m) => m.moduleName)).toEqual(['my-sdk/v1']);
+      expect(getAllSrcEntries(withModule)).toContain('/entry/scriptModules::mySdkV1');
     });
 
     it("includes a store's change-stream handler", () => {

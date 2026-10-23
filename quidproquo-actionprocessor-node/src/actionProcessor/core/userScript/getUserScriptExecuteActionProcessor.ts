@@ -22,6 +22,7 @@ import { randomUUID } from 'crypto';
 
 import { isStoryIterator } from '../logic/isStoryIterator';
 import { getUserScriptModuleMap } from './logic/getUserScriptModuleMap';
+import { loadUserScriptHostModules } from './logic/loadUserScriptHostModules';
 import { loadUserScriptModule } from './logic/loadUserScriptModule';
 import { UserScriptModuleNotFoundError } from './logic/UserScriptModuleNotFoundError';
 
@@ -77,9 +78,13 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askUser
       return actionResultError(readErrorType, readResult.error.errorText);
     }
 
+    // A declared module that fails to load is the service's fault, not the script's, so it
+    // throws out of the processor rather than being reported as one of the script's errors.
+    const hostModules = await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader);
+
     let scriptExports: Record<string, unknown>;
     try {
-      scriptExports = loadUserScriptModule(entryPath, readResult.result as string, getUserScriptModuleMap());
+      scriptExports = loadUserScriptModule(entryPath, readResult.result as string, getUserScriptModuleMap(hostModules));
     } catch (error) {
       if (error instanceof UserScriptModuleNotFoundError) {
         return actionResultError(errorType.ModuleNotFound, error.message);

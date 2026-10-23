@@ -1,3 +1,5 @@
+import { UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
+
 import fs from 'fs';
 import path from 'path';
 
@@ -14,6 +16,9 @@ export type BuildUserScriptOptions = {
   outDir: string;
   // Embed a source map in main.js. Off by default; a separate .map file is never written.
   sourceMap?: boolean;
+  // The service's own script modules (defineUserScriptModule), by import name: kept external by
+  // the bundler and supplied to the output check. A local build has none.
+  hostModules?: UserScriptModuleMap;
 };
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
@@ -24,14 +29,25 @@ const getErrorMessage = (error: unknown): string => (error instanceof Error ? er
  * `code` says whether the project, the bundle, or the output contract was at fault.
  * `outDir` is emptied first.
  */
-export const buildUserScript = async ({ projectDir, outDir, sourceMap = false }: BuildUserScriptOptions): Promise<UserScriptBuildResult> => {
+export const buildUserScript = async ({
+  projectDir,
+  outDir,
+  sourceMap = false,
+  hostModules = {},
+}: BuildUserScriptOptions): Promise<UserScriptBuildResult> => {
   const absoluteProjectDir = path.resolve(projectDir);
   const absoluteOutDir = path.resolve(outDir);
   const entrySource = resolveUserScriptEntry(absoluteProjectDir);
 
   try {
     await runUserScriptRspack(
-      getUserScriptRspackConfig({ projectDir: absoluteProjectDir, entryPath: entrySource, outDir: absoluteOutDir, sourceMap }),
+      getUserScriptRspackConfig({
+        projectDir: absoluteProjectDir,
+        entryPath: entrySource,
+        outDir: absoluteOutDir,
+        sourceMap,
+        hostModuleNames: Object.keys(hostModules),
+      }),
     );
   } catch (error) {
     throw new UserScriptBuildError(UserScriptBuildErrorCode.BuildFailed, `Building [${absoluteProjectDir}] failed:\n${getErrorMessage(error)}`);
@@ -51,6 +67,6 @@ export const buildUserScript = async ({ projectDir, outDir, sourceMap = false }:
 
   return {
     entryPath,
-    exports: checkUserScriptOutput(entryPath),
+    exports: checkUserScriptOutput(entryPath, hostModules),
   };
 };
