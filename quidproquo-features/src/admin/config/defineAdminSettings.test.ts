@@ -1,4 +1,5 @@
 import { GlobalQPQConfigSetting, KeyValueStoreQPQConfigSetting, QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from 'quidproquo-core';
+import { QPQWebServerConfigSettingType, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -46,6 +47,21 @@ describe('defineAdminSettings', () => {
     const config = defineAdminSettings('log', { services: ['billing', 'auth'] });
 
     expect(findOwnedGlobal(config, 'log', 'qpq-serviceNames')).toEqual(['billing', 'auth']);
+  });
+
+  it('puts every admin route except the login flow behind the admin user pool', () => {
+    const config = defineAdminSettings('log');
+
+    const routes = findLogServiceSettings(config, 'log').filter(
+      (s) => s.configSettingType === QPQWebServerConfigSettingType.Route,
+    ) as RouteQPQWebServerConfigSetting[];
+    const loginFlow = ['/login', '/refreshToken', '/challenge'];
+    const unguarded = routes
+      .filter((route) => !loginFlow.includes(route.path) && route.options.routeAuthSettings?.userDirectoryName !== 'qpq-admin')
+      .map((route) => `${route.method} ${route.path}`);
+
+    expect(routes.length).toBeGreaterThan(loginFlow.length);
+    expect(unguarded).toEqual([]);
   });
 
   it('includes the core admin log stores', () => {

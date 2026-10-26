@@ -215,7 +215,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
 
         defineAdminServiceLogLogRoute('POST', '/loglog/list', 'getLogLogs', routeAuthSettings),
 
-        defineAdminServiceLogRoute('GET', '/admin/services', 'getServiceNames'),
+        defineAdminServiceLogRoute('GET', '/admin/services', 'getServiceNames', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/list', 'getLogs', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/{correlationId}', 'getLog', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/{correlationId}/toggle', 'toggleLogCheck', routeAuthSettings),
