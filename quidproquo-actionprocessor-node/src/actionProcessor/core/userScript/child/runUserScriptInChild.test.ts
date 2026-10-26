@@ -15,6 +15,27 @@ const eventFor = (functionName: string, args: unknown[] = []): UserScriptRunnerE
   request: { kind: UserScriptRunnerRequestKind.call, functionName, args },
 });
 
+// Signal 0 only checks the process exists; a reaped process is gone, a zombie or a live one is not.
+const isAlive = (pid: number): boolean => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === 'EPERM';
+  }
+};
+
+// Polls because the kill is delivered asynchronously and the grandchild is reaped by init.
+const waitUntilDead = async (pids: number[]): Promise<boolean> => {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    if (pids.every((pid) => !isAlive(pid))) {
+      return true;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return false;
+};
+
 describe('runUserScriptInChild', () => {
   it('forks the module with exactly the given environment and returns its answer', async () => {
     const result = await runUserScriptInChild({
@@ -37,6 +58,13 @@ describe('runUserScriptInChild', () => {
 
     expect(result.success).toBe(false);
     expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.TimedOut);
+  });
+
+  it('kills the child and what it spawned once it has answered, even when they ignore SIGTERM', async () => {
+    const result = await runUserScriptInChild({ modulePath, event: eventFor('survive'), timeoutMs: 5000, env: process.env });
+    expect(result.success).toBe(true);
+    const { pid, grandchildPid } = (result as { result: { pid: number; grandchildPid: number } }).result;
+    expect(await waitUntilDead([pid, grandchildPid])).toBe(true);
   });
 
   it('reports RunnerUnavailable when the child exits before answering', async () => {

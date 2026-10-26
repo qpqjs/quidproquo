@@ -1,6 +1,6 @@
 import { askUserScriptExecuteBase, UserScriptRunnerEvent, UserScriptRunnerResult } from 'quidproquo-core';
 
-import { fork } from 'child_process';
+import { ChildProcess, fork } from 'child_process';
 
 const { errorType } = askUserScriptExecuteBase;
 
@@ -18,11 +18,26 @@ export type RunUserScriptInChildInput = {
 
 const failed = (type: string, errorText: string): UserScriptRunnerResult => ({ success: false, error: { errorType: type, errorText } });
 
+// SIGKILL to the child's whole process group (it leads its own, see `detached`), because a
+// script can ignore SIGTERM and can spawn processes that would outlive it. A group kill
+// is not available everywhere; the plain kill is the fallback.
+const killProcessGroup = (child: ChildProcess): void => {
+  if (child.pid === undefined) {
+    return;
+  }
+  try {
+    process.kill(-child.pid, 'SIGKILL');
+  } catch {
+    child.kill('SIGKILL');
+  }
+};
+
 /**
  * Runs one script call in a fresh child process and resolves with its answer. The child
- * gets only the given environment and is killed when `timeoutMs` passes, so nothing a script
- * does can outlive the call or leak into the next one. Never rejects: every failure of the
- * child itself becomes a TimedOut or RunnerUnavailable result.
+ * gets only the given environment, and it and everything it started are killed once it has
+ * answered or when `timeoutMs` passes, so nothing a script does can outlive the call or
+ * leak into the next one. The answer is only resolved once the child is gone. Never rejects:
+ * every failure of the child itself becomes a TimedOut or RunnerUnavailable result.
  */
 export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<UserScriptRunnerResult> =>
   new Promise((resolve) => {
@@ -30,9 +45,12 @@ export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<
       env: input.env,
       serialization: 'json',
       stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
+      // Its own process group, so the kill below reaches what the script spawned too.
+      detached: true,
     });
 
     let settled = false;
+    let answer: UserScriptRunnerResult | undefined;
     const settle = (result: UserScriptRunnerResult): void => {
       if (settled) {
         return;
@@ -43,17 +61,17 @@ export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<
     };
 
     const timer = setTimeout(() => {
-      child.kill('SIGKILL');
-      settle(failed(errorType.TimedOut, `User script did not finish within ${input.timeoutMs}ms`));
+      killProcessGroup(child);
+      settle(answer ?? failed(errorType.TimedOut, `User script did not finish within ${input.timeoutMs}ms`));
     }, input.timeoutMs);
 
     child.on('message', (message) => {
-      settle(message as UserScriptRunnerResult);
-      child.kill();
+      answer = message as UserScriptRunnerResult;
+      killProcessGroup(child);
     });
     child.on('error', (error) => settle(failed(errorType.RunnerUnavailable, `User script runner could not start: ${error.message}`)));
     child.on('exit', (code, signal) =>
-      settle(failed(errorType.RunnerUnavailable, `User script runner exited before answering (code ${code}, signal ${signal})`)),
+      settle(answer ?? failed(errorType.RunnerUnavailable, `User script runner exited before answering (code ${code}, signal ${signal})`)),
     );
 
     child.send(input.event);
