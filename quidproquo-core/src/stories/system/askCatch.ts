@@ -30,14 +30,15 @@ export function* askCatch<T extends AskResponse<any>>(
       success: true,
       result: nextResult.value,
     };
-  } catch (e: any) {
-    // Return the error result
+  } catch (e: unknown) {
+    // Same rule as the runtime: the thrown message is for the logs (errorStack), callers get a generic text.
+    const errorName = e instanceof Error && e.name ? ` [${e.name}]` : '';
     return {
       success: false,
       error: {
         errorType: ErrorTypeEnum.GenericError,
-        errorText: e?.message || 'A generic error has occurred.',
-        errorStack: e?.stack,
+        errorText: `An unexpected error occurred${errorName}.`,
+        errorStack: e instanceof Error ? e.stack : undefined,
       },
     };
   } finally {

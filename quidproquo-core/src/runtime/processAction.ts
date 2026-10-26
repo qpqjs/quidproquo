@@ -21,8 +21,14 @@ export async function processAction(
     // in their get trap (see createDebugLogActionProcessor in qpqExecuteLog).
     const candidate = actionProcessors?.[action?.type];
     const processor = candidate === (Object.prototype as any)[action?.type] ? undefined : candidate;
+    // The registered list goes in the stack, not the text: the text reaches callers, and the list
+    // describes the runtime. The user-script sandbox relies on this text naming the action.
     if (!processor) {
-      throw new Error(`Unable to process action: ${action?.type} from [${Object.keys(actionProcessors).join(', ')}]`);
+      return actionResultError(
+        ErrorTypeEnum.GenericError,
+        `Unable to process action: ${action?.type}`,
+        `Registered actions: [${Object.keys(actionProcessors).join(', ')}]`,
+      );
     }
 
     // Merge any context carried on the action into the session
@@ -36,10 +42,11 @@ export async function processAction(
 
     return await processor(action.payload, effectiveSession, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry);
   } catch (e: unknown) {
+    // The exception's own message stays in the stack for the logs. The text reaches callers, and an
+    // unmapped failure's message can name resources, paths, or accounts.
     if (e instanceof Error) {
-      const errorName = (e as any).name;
-      const errorText = errorName ? `[${errorName}] - ${e.message}` : e.message;
-      return actionResultError(ErrorTypeEnum.GenericError, errorText, e.stack);
+      const errorName = e.name ? ` [${e.name}]` : '';
+      return actionResultError(ErrorTypeEnum.GenericError, `An unexpected error occurred in [${action?.type}]${errorName}.`, e.stack);
     }
     return actionResultError(ErrorTypeEnum.GenericError, `An unknown error occurred in [${action?.type}]`);
   }

@@ -76,7 +76,7 @@ describe('askStreamMap', () => {
         [StreamActionType.Read]: readsFrom([{ done: false, data: 'a' }, { done: true }]),
         [StreamActionType.Close]: close,
       }),
-    ).toThrow('callback exploded');
+    ).toThrow('An unexpected error occurred [Error].');
 
     expect(close).toHaveBeenCalledTimes(1);
   });

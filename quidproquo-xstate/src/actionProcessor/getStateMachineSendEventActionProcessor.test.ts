@@ -227,7 +227,8 @@ describe('getStateMachineSendEventActionProcessor', () => {
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
-    expect(error?.errorText).toContain('guard failed');
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorText).toBe('An unexpected error occurred [Error].');
   });
 
   it('runs the side-effect story for actions fired during the transition', async () => {
@@ -254,7 +255,8 @@ describe('getStateMachineSendEventActionProcessor', () => {
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
-    expect(error?.errorText).toContain('side effect failed');
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorText).toBe('An unexpected error occurred [Error].');
   });
 
   it('returns the upsert error when persisting the new snapshot fails', async () => {
