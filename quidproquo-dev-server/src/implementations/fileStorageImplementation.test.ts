@@ -56,6 +56,21 @@ describe('fileStorageImplementation secure upload (PUT)', () => {
     vi.restoreAllMocks();
   });
 
+  it('refuses an upload token whose path is outside the storage root', async () => {
+    const outside = path.join(os.tmpdir(), 'qpq-escape-' + Date.now(), 'pwned.txt');
+    const response = await fetch(uploadUrl(outside), { method: 'PUT', body: 'x' });
+
+    expect(response.status).toBe(403);
+    await expect(fs.access(outside)).rejects.toBeDefined();
+  });
+
+  it('refuses a download token whose path is outside the storage root', async () => {
+    const token = createSecureUrlToken({ fullFilepath: '/etc/hosts', operation: 'download', expiresAt: Date.now() + 60_000 }, SECRET);
+    const response = await fetch(`http://localhost:${port}/secure-download?token=${encodeURIComponent(token)}`);
+
+    expect(response.status).toBe(403);
+  });
+
   it('stores the exact bytes of a PUT that sends no Content-Type, as S3 does', async () => {
     const filepath = path.join(storagePath, 'uploads', 'no-type.json');
     const bytes = Buffer.from('{"bundle":true,"n":1}');

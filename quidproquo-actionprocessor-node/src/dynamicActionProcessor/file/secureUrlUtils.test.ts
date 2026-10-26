@@ -33,6 +33,12 @@ describe('verifySecureUrlToken', () => {
     expect(verifySecureUrlToken(token, secret)).toEqual(original);
   });
 
+  it('returns null for a signature of the wrong length', () => {
+    const [payload] = createSecureUrlToken(buildToken(), secret).split('.');
+
+    expect(verifySecureUrlToken(`${payload}.abc`, secret)).toBeNull();
+  });
+
   it('returns null when the secret does not match', () => {
     const token = createSecureUrlToken(buildToken(), secret);
 

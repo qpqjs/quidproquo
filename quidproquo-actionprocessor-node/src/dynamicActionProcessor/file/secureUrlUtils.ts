@@ -30,10 +30,12 @@ export const verifySecureUrlToken = (tokenString: string, secret: string): Secur
       return null;
     }
 
-    // Verify signature
+    // Constant-time compare: a plain string compare leaks how many leading bytes matched.
     const expectedSignature = crypto.createHmac('sha256', secret).update(payloadBase64).digest('base64url');
+    const given = Buffer.from(signature);
+    const expected = Buffer.from(expectedSignature);
 
-    if (signature !== expectedSignature) {
+    if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
       return null;
     }
 
