@@ -10,8 +10,8 @@ import { findRegisteredWebSocketServer, sendMessageToWebSocketConnection } from 
 import { webSocketImplementation } from './webSocketImplementation';
 
 // The connect/message/disconnect stories are not under test; only the socket bookkeeping is.
-vi.mock('../../logic', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../../logic')>()),
+vi.mock('../../logic', async (importOriginal: () => Promise<Record<string, unknown>>) => ({
+  ...(await importOriginal()),
   processEvent: vi.fn(async () => undefined),
 }));
 
