@@ -40,6 +40,25 @@ describe('askAuthLogin', () => {
     expect(dispatched).toContain(AuthEffect.SetAuthInfo);
   });
 
+  // The typed password has done its job once the server answers; keeping it in state would
+  // expose it to every component (and devtools) for the whole session.
+  it('clears the password from state once the login request has been answered', () => {
+    const dispatched: string[] = [];
+    const payloads: unknown[] = [];
+    const loginResponse = { challenge: AuthenticateUserChallenge.NONE, authenticationInfo: { accessToken: 'tok' } };
+    const mocks = baseMocks(dispatched, { status: 200, data: loginResponse });
+    mocks[StateActionType.Dispatch] = (action: { payload: { action: { type: string; payload?: unknown } } }) => {
+      dispatched.push(action.payload.action.type);
+      payloads.push(action.payload.action.payload);
+    };
+
+    runStory(askAuthLogin(), mocks);
+
+    const setPasswordIndex = dispatched.indexOf(AuthEffect.SetPassword);
+    expect(setPasswordIndex).toBeGreaterThanOrEqual(0);
+    expect(payloads[setPasswordIndex]).toBe('');
+  });
+
   it('does nothing when the login request fails', () => {
     const dispatched: string[] = [];
 
