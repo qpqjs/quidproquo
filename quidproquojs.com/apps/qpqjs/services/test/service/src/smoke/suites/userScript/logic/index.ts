@@ -2,6 +2,7 @@ export * from './askRunSmokeUserScriptCalls';
 export * from './askRunUserScriptAwsLockdownTest';
 export * from './askRunUserScriptBuildErrorTest';
 export * from './askRunUserScriptErrorTest';
+export * from './askRunUserScriptSurvivorTest';
 export * from './askRunUserScriptTest';
 export * from './askRunUserScriptZipTest';
 export * from './parseS3ObjectFromUrl';
