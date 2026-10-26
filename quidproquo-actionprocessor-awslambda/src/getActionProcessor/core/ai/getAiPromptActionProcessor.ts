@@ -109,8 +109,10 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
         return actionResultError(ErrorTypeEnum.Invalid, `The reply is not JSON matching the output schema: ${error.message}`);
       }
 
+      // The SDK's message carries the provider's response body and request url; that is for the
+      // logs (errorStack), not for the caller, who may be an end user looking at a chat.
       if (error instanceof Error) {
-        return actionResultError(ErrorTypeEnum.GenericError, error.message);
+        return actionResultError(ErrorTypeEnum.GenericError, `An unexpected error occurred${error.name ? ` [${error.name}]` : ''}.`, error.stack);
       }
 
       return actionResultError(ErrorTypeEnum.GenericError, 'An error occurred during AI prompt execution.');
