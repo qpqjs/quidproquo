@@ -6,6 +6,7 @@ export * from './getDevServerRspackConfig';
 export * from './getServiceRemoteRspackConfig';
 export * from './getServiceRspackConfig';
 export * from './getViewsContext';
+export * from './getViewsDevtool';
 export * from './getViewsRspackConfig';
 export * from './getWorkspacePackageDirs';
 export * from './getWorkspaceSourceAliases';

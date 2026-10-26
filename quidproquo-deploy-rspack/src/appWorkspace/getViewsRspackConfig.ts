@@ -17,6 +17,7 @@ import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 import { getQpqCircularCheckPlugin } from '../plugins';
 import { getAppServiceQpqConfigs } from './getAppServiceQpqConfigs';
 import { getViewsContext } from './getViewsContext';
+import { getViewsDevtool } from './getViewsDevtool';
 import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
 import { requireQpqConfig } from './requireQpqConfig';
 import { scanFederatedExposes } from './scanFederatedExposes';
@@ -174,7 +175,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     mode: isDev ? 'development' : 'production',
     context: viewsDir,
     entry,
-    devtool: isDev ? 'eval-cheap-module-source-map' : 'source-map',
+    devtool: getViewsDevtool(isDev),
 
     output: {
       path: path.join(root, 'dist', 'apps', self.appName, 'services', self.service, 'views'),
