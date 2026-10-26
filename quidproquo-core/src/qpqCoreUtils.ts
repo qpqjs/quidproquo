@@ -36,6 +36,7 @@ import {
   StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   UserScriptModuleQPQConfigSetting,
+  UserScriptRunnerQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
 import {
@@ -45,6 +46,7 @@ import {
   CustomFullyQualifiedResource,
   FullyQualifiedResource,
   KeyOf,
+  Nullable,
   QpqFunctionRuntime,
   ResourceName,
 } from './types';
@@ -413,6 +415,12 @@ export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctions
 // The modules this service lets user scripts import (defineUserScriptModule).
 export const getAllUserScriptModules = (qpqConfig: QPQConfig): UserScriptModuleQPQConfigSetting[] => {
   return getConfigSettings<UserScriptModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptModule);
+};
+
+// The sandbox this service runs user scripts in (defineUserScriptRunner), or null when
+// the service has not declared one.
+export const getUserScriptRunner = (qpqConfig: QPQConfig): Nullable<UserScriptRunnerQPQConfigSetting> => {
+  return getConfigSetting<UserScriptRunnerQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptRunner) ?? null;
 };
 
 // Runtime-attached action processor override sources must join the bundler sweep,

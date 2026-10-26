@@ -31,6 +31,7 @@ export enum QPQCoreConfigSettingType {
   javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
   federatedModuleStore = '@quidproquo-core/config/FederatedModuleStore',
   userScriptModule = '@quidproquo-core/config/UserScriptModule',
+  userScriptRunner = '@quidproquo-core/config/UserScriptRunner',
 }
 
 export interface QPQConfigSetting {

@@ -7,3 +7,5 @@ export * from './UserScriptActionType';
 export * from './UserScriptBuildOptions';
 export * from './UserScriptBuildOutcome';
 export * from './UserScriptModuleTypes';
+export * from './UserScriptRunnerEvent';
+export * from './UserScriptRunnerResult';

@@ -1,6 +1,5 @@
 import {
   ActionProcessorList,
-  actionResult,
   actionResultError,
   askFileReadTextContents,
   askUserScriptExecuteBase,
@@ -11,7 +10,6 @@ import {
   QPQConfig,
   QpqLogger,
   QpqRuntimeType,
-  storyResultToActionResult,
   StorySession,
   StorySessionUpdater,
   StreamRegistry,
@@ -20,15 +18,11 @@ import {
 
 import { randomUUID } from 'crypto';
 
-import { isStoryIterator } from '../logic/isStoryIterator';
 import { getUserScriptModuleMap } from './logic/getUserScriptModuleMap';
 import { loadUserScriptHostModules } from './logic/loadUserScriptHostModules';
-import { loadUserScriptModule } from './logic/loadUserScriptModule';
-import { UserScriptModuleNotFoundError } from './logic/UserScriptModuleNotFoundError';
+import { runUserScript } from './logic/runUserScript';
 
 const getDateNow = () => new Date().toISOString();
-
-const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 const { errorType } = askUserScriptExecuteBase;
 
@@ -82,44 +76,15 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askUser
     // throws out of the processor rather than being reported as one of the script's errors.
     const hostModules = await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader);
 
-    let scriptExports: Record<string, unknown>;
-    try {
-      scriptExports = loadUserScriptModule(entryPath, readResult.result as string, getUserScriptModuleMap(hostModules));
-    } catch (error) {
-      if (error instanceof UserScriptModuleNotFoundError) {
-        return actionResultError(errorType.ModuleNotFound, error.message);
-      }
-      return actionResultError(errorType.ScriptInvalid, getErrorMessage(error));
-    }
-
-    // Own enumerable function properties only: the module's exports ARE the callable
-    // surface, nothing is reachable through the prototype.
-    const member = Object.prototype.hasOwnProperty.call(scriptExports, payload.functionName) ? scriptExports[payload.functionName] : undefined;
-
-    if (typeof member !== 'function') {
-      return actionResultError(errorType.FunctionNotFound, `Function not found: [${label}]`);
-    }
-
-    let invocationResult: unknown;
-    try {
-      invocationResult = member(...payload.args);
-    } catch (error) {
-      return actionResultError(errorType.FunctionThrew, `[${label}] threw: ${getErrorMessage(error)}`);
-    }
-
-    if (isStoryIterator(invocationResult)) {
-      // The member was already invoked to discover it is a story; the thunk hands
-      // the live iterator to the runtime without invoking it a second time.
-      const storyResult = await resolveStory(() => invocationResult, []);
-
-      return storyResultToActionResult<R>(storyResult, label);
-    }
-
-    try {
-      return actionResult<R>((await invocationResult) as R);
-    } catch (error) {
-      return actionResultError(errorType.FunctionThrew, `[${label}] threw: ${getErrorMessage(error)}`);
-    }
+    return runUserScript<R>({
+      source: readResult.result as string,
+      filename: entryPath,
+      functionName: payload.functionName,
+      args: payload.args,
+      modules: getUserScriptModuleMap(hostModules),
+      resolveStory,
+      label,
+    });
   };
 };
 
