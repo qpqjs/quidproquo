@@ -5,7 +5,8 @@ A quidproquo user script. It builds to one JavaScript file that a quidproquo ser
 ## The contract
 
 - The entry is `src/main.ts`. Split the code across other files and folders as you like; the build folds them in.
-- Every export of `src/main.ts` must be a function. A generator export runs as a story: it yields quidproquo actions (file reads and writes, network calls, and so on) and its return value is what the caller gets. A plain function export returns its value.
+- Every export of `src/main.ts` must be a function. A generator export runs as a story: it yields quidproquo actions and its return value is what the caller gets. A plain function export returns its value.
+- Scripts run in a sandbox. The only actions available are the pure ones (`askDateNow`, `askNewGuid`, logging, random numbers); a story that yields a file, store or network action fails at that point. The service that hosts scripts may offer its own module to import instead (see `defineUserScriptModule`).
 - Import from `quidproquo-core`. npm packages you add to `package.json` are bundled into the output. Node builtins such as `fs` are refused at build time.
 
 ## Build
@@ -21,7 +22,7 @@ Writes `dist/main.js`, and nothing else. Add `--source-map` to the build to embe
 Copy `dist/main.js` to a storage drive, for example to `scripts/my-script/main.js`, then call it from a story, naming that file and passing the arguments after the export name:
 
 ```ts
-const sum = yield* askUserScriptExecute('my-drive', 'scripts/my-script/main.js', 'add', 'my-drive', 'out.txt', 20, 22);
+const sum = yield* askUserScriptExecute('my-drive', 'scripts/my-script/main.js', 'add', 20, 22);
 ```
 
 On the dev server a drive is a folder under `.qpq-runtime/<app>/storage/<service>/<drive>/`, so `qpq script:build . --out <that folder>/scripts/my-script` publishes locally to `scripts/my-script/main.js`.

@@ -1,13 +1,14 @@
-import { askFileWriteTextContents, AskResponse } from 'quidproquo-core';
+import { askDateNow, AskResponse } from 'quidproquo-core';
 
 // Every export of this file is callable by name through askUserScriptExecute. A
 // generator export is a story: it yields quidproquo actions and its return value is
-// the result. A plain function export just returns its value.
+// the result. A plain function export just returns its value. Scripts run in a sandbox
+// whose only actions are the pure ones (date, guid, log, math), so a story may stamp a
+// time or mint an id, but not read or write the service's resources.
 
-export function* add(drive: string, filepath: string, a: number, b: number): AskResponse<number> {
-  const sum = a + b;
-  yield* askFileWriteTextContents(drive, filepath, `added ${sum}`);
-  return sum;
+export const add = (a: number, b: number): number => a + b;
+
+export function* stampedGreeting(name: string): AskResponse<string> {
+  const now = yield* askDateNow();
+  return `hello ${name} @ ${now}`;
 }
-
-export const greet = (name: string): string => `hello ${name}`;

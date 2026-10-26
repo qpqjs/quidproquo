@@ -1,3 +1,4 @@
+export * from './askRunSmokeUserScriptCalls';
 export * from './askRunUserScriptBuildErrorTest';
 export * from './askRunUserScriptErrorTest';
 export * from './askRunUserScriptTest';
