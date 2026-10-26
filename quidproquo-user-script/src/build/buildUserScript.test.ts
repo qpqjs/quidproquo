@@ -7,6 +7,7 @@ import path from 'path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { buildUserScript } from './buildUserScript';
+import { checkUserScriptOutput } from './checkUserScriptOutput';
 import { UserScriptBuildError, UserScriptBuildErrorCode } from './UserScriptBuildError';
 
 const fixtures = path.join(__dirname, '__fixtures__');
@@ -45,7 +46,7 @@ describe('buildUserScript', () => {
     expect(result.entryPath).toBe(path.join(outDir, 'main.js'));
     // The whole output is the one file: no .map beside it, no source map inside it.
     expect(fs.readdirSync(outDir)).toEqual(['main.js']);
-    expect(result.exports).toEqual(['add', 'greet', 'makeId']);
+    expect(checkUserScriptOutput(result.entryPath)).toEqual(['add', 'greet', 'makeId']);
 
     const built = fs.readFileSync(result.entryPath, 'utf8');
     expect(built).not.toContain('sourceMappingURL');
@@ -82,7 +83,7 @@ describe('buildUserScript', () => {
 
     const map = JSON.parse(Buffer.from(inlineMap?.[1] ?? '', 'base64').toString('utf8'));
     expect(map.sources.some((source: string) => source.endsWith('src/main.ts'))).toBe(true);
-    expect(result.exports).toEqual(['add', 'greet', 'makeId']);
+    expect(checkUserScriptOutput(result.entryPath)).toEqual(['add', 'greet', 'makeId']);
   }, 60_000);
 
   it('fails BuildFailed naming the builtin when a script imports fs', async () => {
@@ -101,9 +102,12 @@ describe('buildUserScript', () => {
     );
   });
 
-  it('fails NonFunctionExport when the script exports a value', async () => {
+  it('builds a script that exports a value, leaving the check to fail NonFunctionExport', async () => {
+    const outDir = outDirFor('nonFunction');
+    const result = await buildUserScript({ projectDir: path.join(fixtures, 'nonFunction'), outDir });
+
     await expectBuildError(
-      buildUserScript({ projectDir: path.join(fixtures, 'nonFunction'), outDir: outDirFor('nonFunction') }),
+      Promise.resolve().then(() => checkUserScriptOutput(result.entryPath)),
       UserScriptBuildErrorCode.NonFunctionExport,
       'export [version] is not a function',
     );

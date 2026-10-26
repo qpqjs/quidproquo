@@ -1,3 +1,4 @@
+export * from './askUserScriptCheckPublishedOutput';
 export * from './askUserScriptCollectSource';
 export * from './askUserScriptPublishOutput';
 export * from './buildUserScriptInTempDir';

@@ -1,3 +1,4 @@
+export * from './assertUserScriptExports';
 export * from './buildUserScript';
 export * from './checkUserScriptOutput';
 export * from './createUserScriptExternals';

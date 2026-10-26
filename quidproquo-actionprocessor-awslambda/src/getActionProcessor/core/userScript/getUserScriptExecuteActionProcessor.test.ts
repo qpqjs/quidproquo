@@ -65,8 +65,7 @@ describe('getUserScriptExecuteActionProcessor (lambda)', () => {
     expect(event).toMatchObject({
       sourceUrl: 'https://signed.test/scripts/tenant-a/main.js?scope=tenant-a',
       filename: 'tenant-a/main.js',
-      functionName: 'add',
-      args: [20, 22],
+      request: { kind: 'call', functionName: 'add', args: [20, 22] },
     });
     expect((event as { storySession: unknown }).storySession).toBeDefined();
     expect(isAsync).toBe(false);

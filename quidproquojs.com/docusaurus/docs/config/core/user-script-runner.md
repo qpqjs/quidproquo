@@ -41,6 +41,7 @@ function defineUserScriptRunner(options?: UserScriptRunnerOptions): UserScriptRu
 ## Notes
 
 - The script reaches the runner as a temporary read URL for the built file, so the runner needs no drive access and the service's drive permissions stay with the service.
+- A platform build also goes through the runner to check its output ([askUserScriptListExports](../../actions/core/user-script/ask-user-script-list-exports.md)), so no script code runs in the build either.
 - Each call runs in a fresh child process inside the runner, so nothing a script leaves behind is visible to the next call.
 - A service that calls `askUserScriptExecute` without declaring a runner gets `RunnerUnavailable` from the call, naming this define.
 - Letting a script reach the service's own resources through host-provided actions is a later step; see [defineUserScriptModule](./user-script-module.md) for what a script can import today.

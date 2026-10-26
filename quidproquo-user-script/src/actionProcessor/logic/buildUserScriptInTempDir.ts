@@ -9,7 +9,7 @@ import { BuiltUserScript } from './BuiltUserScript';
 
 /**
  * The part of a platform build that is the same whatever the source is: a temp project
- * directory that `materialise` fills, the build, the outputs read back, and the temp
+ * directory that `materialise` fills, the build, the output read back, and the temp
  * directory removed whatever happened. Errors from `materialise` and from the build
  * propagate for the caller to map.
  */
@@ -27,10 +27,7 @@ export const buildUserScriptInTempDir = async (
     await materialise(projectDir);
     const result = await buildUserScript({ projectDir, outDir, sourceMap, hostModules });
 
-    return {
-      script: fs.readFileSync(result.entryPath, 'utf8'),
-      exports: result.exports,
-    };
+    return { script: fs.readFileSync(result.entryPath, 'utf8') };
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

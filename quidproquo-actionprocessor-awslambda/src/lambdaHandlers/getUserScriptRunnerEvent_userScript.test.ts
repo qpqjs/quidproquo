@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, StorySession, UserScriptRunnerEvent } from 'quidproquo-core';
+import { buildTestQpqConfig, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from 'quidproquo-core';
 
 import { Context, SNSEvent } from 'aws-lambda';
 import path from 'path';
@@ -17,18 +17,23 @@ const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {}
 const handler = getUserScriptRunnerEvent_userScript(async () => null, qpqConfig, { childModulePath });
 
 describe('getUserScriptRunnerEvent_userScript', () => {
-  it('runs the call in a child and returns its answer', async () => {
+  afterEach(() => {
+    delete process.env.AWS_SESSION_TOKEN;
+  });
+
+  it('runs the call in a child without the AWS variables and returns its answer', async () => {
+    process.env.AWS_SESSION_TOKEN = 'secret';
     const event: UserScriptRunnerEvent = {
       sourceUrl: 'https://x.test/main.js',
       filename: 'main.js',
-      functionName: 'echo',
-      args: [7],
       storySession: session,
+      request: { kind: UserScriptRunnerRequestKind.call, functionName: 'echo', args: [7] },
     };
 
     const result = await handler(event, context);
 
     expect(result).toMatchObject({ success: true, result: { echoed: [7] } });
+    expect((result as { result: { env: string[] } }).result.env).not.toContain('AWS_SESSION_TOKEN');
   });
 
   it('answers a warmer ping without forking', async () => {
@@ -43,9 +48,8 @@ describe('getUserScriptRunnerEvent_userScript', () => {
     const event: UserScriptRunnerEvent = {
       sourceUrl: 'https://x.test/main.js',
       filename: 'main.js',
-      functionName: 'hang',
-      args: [],
       storySession: session,
+      request: { kind: UserScriptRunnerRequestKind.call, functionName: 'hang', args: [] },
     };
 
     const result = await handler(event, { getRemainingTimeInMillis: () => 1800 } as Context);
