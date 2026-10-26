@@ -40,7 +40,9 @@ const startServer = (
   console.log(`WebSocket: ws://${devServerConfig.serverDomain}:${devServerConfig.webSocketPort}/${settingsMap.service}/${settingsMap.apiName}`);
 
   webSocketServer.on('connection', (ws, req) => {
-    const connectionId: string = req.headers['sec-websocket-key'] || crypto.randomUUID();
+    // Server-minted, like API Gateway's: the handshake key is chosen by the client, so two
+    // sockets presenting the same key would otherwise share (and steal) one registry entry.
+    const connectionId: string = crypto.randomUUID();
     const sourceIp = req.socket.remoteAddress === '::1' || !req.socket.remoteAddress ? '127.0.0.1' : req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown agent';
 
