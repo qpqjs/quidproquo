@@ -25,6 +25,11 @@ export const entryNames = [
 
   's3Event_fileEvent',
   'sqsEvent_queueEvent',
+
+  'userScriptRunnerEvent_userScript',
+  // The runner's child process. The slash puts it inside the runner's bundle folder
+  // (output is `[name]/index.js`), which is the only folder that lambda's zip contains.
+  'userScriptRunnerEvent_userScript/child',
 ];
 
 /**

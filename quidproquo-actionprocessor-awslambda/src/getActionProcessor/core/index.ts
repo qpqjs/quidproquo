@@ -11,6 +11,7 @@ export * from './metric';
 export * from './queue';
 export * from './system';
 export * from './userDirectory';
+export * from './userScript';
 
 import { getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
@@ -29,6 +30,7 @@ import { getMetricActionProcessor } from './metric';
 import { getQueueActionProcessor } from './queue';
 import { getSystemActionProcessor } from './system';
 import { getUserDirectoryActionProcessor } from './userDirectory';
+import { getUserScriptActionProcessor } from './userScript';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -49,4 +51,6 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
+  // Overrides the node package's in-process execute: on lambda a script only ever runs in the runner.
+  ...(await getUserScriptActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

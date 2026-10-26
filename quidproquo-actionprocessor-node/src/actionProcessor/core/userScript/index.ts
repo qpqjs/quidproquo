@@ -15,3 +15,4 @@ export const getUserScriptActionProcessor: ActionProcessorListResolver = async (
   ...(await getUserScriptExecuteActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserScriptModuleTypesActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
+export * from './child';

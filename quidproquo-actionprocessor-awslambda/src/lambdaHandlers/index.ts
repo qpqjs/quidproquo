@@ -13,5 +13,6 @@ export * from './getEventBridgeEvent_recurringSchedule';
 export * from './getEventBridgeEvent_stackDeploy';
 export * from './getS3Event_fileEvent';
 export * from './getSqsEvent_queueEvent';
+export * from './getUserScriptRunnerEvent_userScript';
 export * from './helpers';
 export * from './types';
