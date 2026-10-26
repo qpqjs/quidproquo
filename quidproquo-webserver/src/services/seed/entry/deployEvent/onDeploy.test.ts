@@ -20,4 +20,20 @@ describe('seed deployEvent onDeploy', () => {
 
     expect(messages).toEqual([{ queueName: 'qpqSeeds', queueMessages: [{ type: 'seed/a::run', payload: undefined }] }]);
   });
+
+  it('ignores a create event from a stack that is not this service\'s api', () => {
+    const event: DeployEvent = { deployEventType: DeployEventType.Unknown, deployEventStatusType: DeployEventStatusType.Create };
+
+    const messages: any[] = [];
+
+    runStory(onDeploy(event), {
+      [ConfigActionType.GetGlobal]: ['seed/a::run'],
+      [QueueActionType.SendMessages]: (action: any) => {
+        messages.push(action.payload);
+        return undefined;
+      },
+    });
+
+    expect(messages).toEqual([]);
+  });
 });

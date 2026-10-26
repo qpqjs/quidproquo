@@ -1,4 +1,4 @@
-import { ConfigActionType, DeployEventStatusType, QueueActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, DeployEventStatusType, DeployEventType, QueueActionType, runStory } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -27,7 +27,7 @@ describe('onDeploy', () => {
   it('runs the create path on a create status', () => {
     const messages: any[] = [];
 
-    runStory(onDeploy(DeployEventStatusType.Create), {
+    runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
       [QueueActionType.SendMessages]: (action: any) => {
         messages.push(action.payload.queueName);
@@ -39,6 +39,35 @@ describe('onDeploy', () => {
   });
 
   it('does nothing on other statuses', () => {
-    expect(runStory(onDeploy(DeployEventStatusType.Update))).toBeUndefined();
+    expect(runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Update))).toBeUndefined();
+  });
+
+  // The deploy rule hears every stack in the account; a stranger's CREATE_COMPLETE must not re-seed this service.
+  it('does nothing when the created stack is not one of this service\'s own', () => {
+    const messages: any[] = [];
+
+    runStory(onDeploy(DeployEventType.Unknown, DeployEventStatusType.Create), {
+      [ConfigActionType.GetGlobal]: ['seed/a::run'],
+      [QueueActionType.SendMessages]: (action: any) => {
+        messages.push(action.payload.queueName);
+        return undefined;
+      },
+    });
+
+    expect(messages).toEqual([]);
+  });
+
+  it('does not re-seed when the web stack is created after the api stack', () => {
+    const messages: any[] = [];
+
+    runStory(onDeploy(DeployEventType.Web, DeployEventStatusType.Create), {
+      [ConfigActionType.GetGlobal]: ['seed/a::run'],
+      [QueueActionType.SendMessages]: (action: any) => {
+        messages.push(action.payload.queueName);
+        return undefined;
+      },
+    });
+
+    expect(messages).toEqual([]);
   });
 });
