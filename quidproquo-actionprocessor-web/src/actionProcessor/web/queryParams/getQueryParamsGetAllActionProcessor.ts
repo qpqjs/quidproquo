@@ -7,7 +7,14 @@ const getProcessQueryParamsGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeof 
     const paramsObject: Record<string, string[]> = {};
 
     urlParams.forEach((value, key) => {
-      paramsObject[key] = [...(paramsObject[key] ?? []), value];
+      // Keys come from the url. `__proto__` cannot be an own entry of a plain object (assigning
+      // it swaps the prototype), so it is dropped; any other inherited name (`toString`,
+      // `constructor`) is shadowed as an own entry rather than read off Object.prototype.
+      if (key === '__proto__') {
+        return;
+      }
+      const existing = Object.prototype.hasOwnProperty.call(paramsObject, key) ? paramsObject[key] : [];
+      paramsObject[key] = [...existing, value];
     });
 
     return actionResult(paramsObject);
