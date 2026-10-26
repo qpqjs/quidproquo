@@ -1,8 +1,10 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getUserScriptExecuteActionProcessor } from './getUserScriptExecuteActionProcessor';
+import { getUserScriptModuleTypesActionProcessor } from './getUserScriptModuleTypesActionProcessor';
 
 export * from './getUserScriptExecuteActionProcessor';
+export * from './getUserScriptModuleTypesActionProcessor';
 export * from './logic';
 
 export const getUserScriptActionProcessor: ActionProcessorListResolver = async (
@@ -10,4 +12,5 @@ export const getUserScriptActionProcessor: ActionProcessorListResolver = async (
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
   ...(await getUserScriptExecuteActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserScriptModuleTypesActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

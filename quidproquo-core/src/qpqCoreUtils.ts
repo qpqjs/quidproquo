@@ -440,7 +440,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
     ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
     // Loaded only when a script is built or run, so nothing else would make the bundler see it.
-    ...getAllUserScriptModules(qpqConfig).map((m) => m.runtime),
+    ...getAllUserScriptModules(qpqConfig).flatMap((m) => (m.typesRuntime ? [m.runtime, m.typesRuntime] : [m.runtime])),
   ];
 
   return expandSrcEntriesWithActionProcessors(result);

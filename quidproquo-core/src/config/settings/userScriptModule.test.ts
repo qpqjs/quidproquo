@@ -10,7 +10,18 @@ describe('defineUserScriptModule', () => {
       uniqueKey: 'my-sdk/v1',
       moduleName: 'my-sdk/v1',
       runtime: '/entry/scriptModules::mySdkV1',
+      typesRuntime: undefined,
     });
+  });
+
+  it('turns `types` into a runtime the bundler answers with the declarations', () => {
+    const setting = defineUserScriptModule('my-sdk/v1', '/entry/scriptModules::mySdkV1', { types: '/../sdk/src/v1/index.ts' });
+
+    expect(setting.typesRuntime).toBe('/../sdk/src/v1/index.ts?qpq-user-script-module-types::declarations');
+  });
+
+  it.each(['relative/a.ts', '/a.ts?x', '/a.ts::b'])('refuses [%s] as a types path', (types) => {
+    expect(() => defineUserScriptModule('my-sdk/v1', '/x::y', { types: types as `/${string}` })).toThrow('plain file path');
   });
 
   it('refuses to shadow a shared framework package', () => {
