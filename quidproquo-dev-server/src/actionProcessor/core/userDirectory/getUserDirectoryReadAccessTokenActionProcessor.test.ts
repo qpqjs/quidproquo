@@ -47,6 +47,20 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
   });
 
+  it('rejects an unverified session-cached token even while it is unexpired', async () => {
+    const decodedAccessToken = { ...buildDecodedToken(nowInSeconds + 3600), wasValid: false };
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(
+      process,
+      { userDirectoryName: 'directory', ignoreExpiration: false },
+      buildTestStorySession({ decodedAccessToken }),
+    );
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);
+  });
+
   it('rejects an expired session-cached token when expiration is enforced', async () => {
     const decodedAccessToken = buildDecodedToken(nowInSeconds - 60);
     const process = await getProcessor();

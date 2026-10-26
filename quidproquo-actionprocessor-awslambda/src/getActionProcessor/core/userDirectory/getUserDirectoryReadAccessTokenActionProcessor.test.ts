@@ -42,6 +42,19 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     expect(decodeAccessToken).not.toHaveBeenCalled();
   });
 
+  it('returns Unauthorized for an unverified session token, even when it has not expired', async () => {
+    const processor = await resolveProcessor();
+
+    const [, error] = await invokeProcessor(
+      processor,
+      { userDirectoryName: 'users', ignoreExpiration: false },
+      { session: { decodedAccessToken: { ...decodedToken, wasValid: false } } },
+    );
+
+    expect(error?.errorType).toBe(ErrorTypeEnum.Unauthorized);
+    expect(decodeAccessToken).not.toHaveBeenCalled();
+  });
+
   it('returns Invalid when the session token has expired and expiry matters', async () => {
     const processor = await resolveProcessor();
 
