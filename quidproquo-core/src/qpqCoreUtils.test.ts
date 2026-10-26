@@ -595,6 +595,12 @@ describe('qpqCoreUtils', () => {
       expect(getAllSrcEntries(withModule)).toContain('/entry/scriptModules::mySdkV1');
     });
 
+    it("includes a script module's types entry, so the bundler ships its declarations", () => {
+      const withTypes = buildTestQpqConfig([defineUserScriptModule('my-sdk/v1', '/entry/scriptModules::mySdkV1', { types: '/../sdk/v1.ts' })]);
+
+      expect(getAllSrcEntries(withTypes)).toContain('/../sdk/v1.ts?qpq-user-script-module-types::declarations');
+    });
+
     it("includes a store's change-stream handler", () => {
       // Anything missing here is never bundled, so its handler cannot be resolved at runtime
       // and simply never runs. Nothing throws — the only symptom is whatever it maintained

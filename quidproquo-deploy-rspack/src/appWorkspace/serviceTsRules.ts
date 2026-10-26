@@ -3,6 +3,9 @@
 // react-flavoured swc options in getViewsRspackConfig. Dependency-specific
 // build quirks (ignored modules/warnings) are config-driven via
 // `defineBackendBundleOptions`: nothing package-specific lives here.
+import { USER_SCRIPT_MODULE_TYPES_QUERY } from 'quidproquo-core';
+
+import path from 'path';
 import { RuleSetRule } from '@rspack/core';
 
 // TypeScript via rspack's builtin swc loader. Decorators on to match
@@ -15,12 +18,24 @@ const swcNodeOptions = (tsx: boolean) => ({
   },
 });
 
+// A user script module's `types` entry is required with this query (defineUserScriptModule):
+// it is never compiled, only read for its declarations.
+const userScriptModuleTypesQuery = new RegExp(USER_SCRIPT_MODULE_TYPES_QUERY);
+
 export const serviceTsRules = (): RuleSetRule[] => [
   {
     test: /\.ts$/,
     exclude: /node_modules/,
+    resourceQuery: { not: [userScriptModuleTypesQuery] },
     loader: 'builtin:swc-loader',
     options: swcNodeOptions(false),
+  },
+  {
+    test: /\.tsx?$/,
+    resourceQuery: userScriptModuleTypesQuery,
+    type: 'javascript/auto',
+    // A plain path, resolved by rspack: the compiled loader is .js, its source .ts under tests.
+    loader: path.join(__dirname, '../loaders/userScriptModuleTypesLoader'),
   },
   {
     test: /\.tsx$/,

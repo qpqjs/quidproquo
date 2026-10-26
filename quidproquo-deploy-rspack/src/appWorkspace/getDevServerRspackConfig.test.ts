@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { buildTestQpqConfig, USER_SCRIPT_MODULE_TYPES_QUERY } from 'quidproquo-core';
 
 import fs from 'fs';
 import os from 'os';
@@ -65,6 +65,18 @@ describe('getDevServerRspackConfig', () => {
 
     const assetRule = rules.find((rule) => String(rule.test) === String(/\.(txt|map)$/));
     expect(assetRule?.type).toBe('asset/resource');
+  });
+
+  it("sends a user script module's types entry to the types loader instead of compiling it", () => {
+    const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
+    const rules = (config.module?.rules ?? []) as RuleSetRule[];
+    const typesQuery = String(new RegExp(USER_SCRIPT_MODULE_TYPES_QUERY));
+
+    const typesRule = rules.find((rule) => String(rule.resourceQuery) === typesQuery);
+    expect(String(typesRule?.loader)).toContain('userScriptModuleTypesLoader');
+
+    const tsRule = rules.find((rule) => String(rule.test) === String(/\.ts$/));
+    expect(tsRule?.resourceQuery).toEqual({ not: [new RegExp(USER_SCRIPT_MODULE_TYPES_QUERY)] });
   });
 
   it('externalises bare packages but keeps the dynamic loader bundled', () => {
