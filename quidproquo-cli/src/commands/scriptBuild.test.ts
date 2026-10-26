@@ -33,7 +33,7 @@ describe('scriptBuildCommand', () => {
 
     expect(fs.readdirSync(path.join(project, 'dist'))).toEqual(['main.js']);
     expect(fs.readFileSync(path.join(project, 'dist', 'main.js'), 'utf8')).not.toContain('sourceMappingURL');
-    expect(logged.join('\n')).toContain('exports: add, greet');
+    expect(logged.join('\n')).toContain('exports: add, stampedGreeting');
   }, 60_000);
 
   it('embeds the source map in main.js with --source-map, still writing one file', async () => {

@@ -29,7 +29,7 @@ describe('createUserScriptProject', () => {
     expect(packageJson.name).toBe('my-report');
     expect(packageJson.dependencies['quidproquo-core']).toBe(ownVersion);
     expect(fs.readFileSync(path.join(target, 'README.md'), 'utf8')).toContain('# my-report');
-    expect(fs.readFileSync(path.join(target, 'src/main.ts'), 'utf8')).toContain('export function* add');
+    expect(fs.readFileSync(path.join(target, 'src/main.ts'), 'utf8')).toContain('export function* stampedGreeting');
   });
 
   it('refuses a directory that already has files in it', () => {

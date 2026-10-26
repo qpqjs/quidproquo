@@ -1,5 +1,5 @@
 # smoke-user-script
 
-The user script the test service's smoke suite proves end to end. The service's `build` script bundles it with `qpq script:build` and writes the output into a generated constant, which the `userScript` smoke test stores on the probe drive and calls by export name on the dev server and on lambda.
+The user script the test service's smoke suite proves end to end. The service's `build` script gathers its sources into generated constants, which the `userScript` smoke test stores on the probe drive, builds on the platform and calls by export name, inside the sandbox, on the dev server and on lambda.
 
-`src/main.ts` exports `add` (a story that writes a file and returns a sum) and `greet` (plain). The greeting comes from `src/helpers/formatGreeting.ts` so the build has two files to fold together.
+`src/main.ts` exports `add` and `greet` (plain), `stampedGreeting` (a story that yields `askDateNow`, which the sandbox allows) and `writeFile` (a story that yields a file write, which the sandbox refuses; the test asserts it fails and nothing is written). The greeting comes from `src/helpers/formatGreeting.ts` so the build has two files to fold together.

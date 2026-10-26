@@ -1,3 +1,4 @@
+import { defineUserScriptRunner } from 'quidproquo';
 import { defineDevServerOptions } from 'quidproquo-dev-server/config';
 import {
   defineUserScriptBuilder,
@@ -21,8 +22,9 @@ export default [
     [getUserScriptBuilderApiLayer()]
   ),
 
-  // The smoke suite builds its user script on the platform.
+  // The smoke suite builds its user script on the platform and runs it in the sandbox.
   defineUserScriptBuilder(),
+  defineUserScriptRunner(),
 
   defineSmoke(),
 ];

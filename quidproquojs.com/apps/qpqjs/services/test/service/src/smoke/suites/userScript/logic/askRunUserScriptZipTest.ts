@@ -6,14 +6,13 @@ import {
   askNewGuid,
   AskResponse,
   askUserScriptBuildFromZip,
-  createUserScriptCaller,
 } from 'quidproquo';
 
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_USER_SCRIPT_ZIP_BASE64 } from '../generated/SMOKE_USER_SCRIPT_ZIP_BASE64';
-import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
+import { askRunSmokeUserScriptCalls } from './askRunSmokeUserScriptCalls';
 
 // The zip form of the user-script loop: the same project arrives as one zip file on
 // the drive (wrapped in a top-level folder, as a tool would make it), is built on the
@@ -45,7 +44,10 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
     `zip build did not report the script's exports: [${built.exports.join(', ')}]`
   );
 
-  const builtSource = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, builtPath);
+  const builtSource = yield* askFileReadTextContents(
+    SMOKE_PROBE_DRIVE,
+    builtPath
+  );
   yield* askSmokeAssert(
     builtSource.includes(
       '//# sourceMappingURL=data:application/json;charset=utf-8;base64,'
@@ -61,35 +63,7 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
     'zip build wrote a separate .map file'
   );
 
-  const script = createUserScriptCaller<SmokeUserScriptFunctions>(
-    SMOKE_PROBE_DRIVE,
-    builtPath
-  );
+  yield* askRunSmokeUserScriptCalls(builtPath, outputPath, 'zip');
 
-  const sum = yield* script.add(SMOKE_PROBE_DRIVE, outputPath, 20, 22);
-  yield* askSmokeAssert(sum === 42, 'generator export did not return its sum');
-
-  const outputExists = yield* askFileExists(SMOKE_PROBE_DRIVE, outputPath);
-  yield* askSmokeAssert(
-    outputExists,
-    'file written by the script story does not exist'
-  );
-
-  const output = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, outputPath);
-  yield* askSmokeAssert(
-    output === 'added 42',
-    'file written by the script story has the wrong contents'
-  );
-
-  const greeting = yield* script.greet('zip');
-  yield* askSmokeAssert(
-    greeting === 'hello zip',
-    'plain export did not return its value'
-  );
-
-  yield* askFileDelete(SMOKE_PROBE_DRIVE, [
-    zipPath,
-    builtPath,
-    outputPath,
-  ]);
+  yield* askFileDelete(SMOKE_PROBE_DRIVE, [zipPath, builtPath, outputPath]);
 }
