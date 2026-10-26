@@ -1,8 +1,14 @@
 import { AskResponse, askStorageScopeProvide } from 'quidproquo-core';
 
-import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
+import {
+  AnyWebSocketQueueEventMessageWithCorrelation,
+  WebSocketQueueServerEventMessageUnauthenticated,
+  WebSocketQueueServerMessageEventType,
+} from '../../types';
 import { askBroadcastUnknownMessage } from './askBroadcastUnknownMessage';
+import { askSendMessage } from './askSendMessage';
 import { askTryAuthenticateConnection } from './askTryAuthenticateConnection';
+import { askWebSocketQueueAuthenticatesConnections } from './askWebSocketQueueAuthenticatesConnections';
 import {
   askProcessOnAuthenticate,
   askProcessOnPing,
@@ -35,6 +41,16 @@ export function* askProcessOnMessage(connectionId: string, message: AnyWebSocket
 
   // Make sure any messages below have access to the authenticated user
   const connection = yield* askTryAuthenticateConnection(connectionId);
+
+  // On a queue that authenticates, nothing else goes through for a connection that has not: a subscribe
+  // would be ignored anyway, and an unknown message would land on the service's event bus with no user
+  // behind it, for any handler that forgets to check.
+  if (!connection?.accessToken && (yield* askWebSocketQueueAuthenticatesConnections())) {
+    yield* askSendMessage(connectionId, {
+      type: WebSocketQueueServerMessageEventType.Unauthenticated,
+    } satisfies WebSocketQueueServerEventMessageUnauthenticated);
+    return;
+  }
 
   if (isWebSocketSubscribeMessage(message)) {
     return yield* askProcessOnSubscribe(connection, message.payload.topic);
