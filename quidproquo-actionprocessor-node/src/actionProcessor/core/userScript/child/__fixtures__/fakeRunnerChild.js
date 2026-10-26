@@ -9,7 +9,7 @@ process.on('message', (event) => {
   process.send(
     {
       success: true,
-      result: { echoed: event.args, env: Object.keys(process.env).sort() },
+      result: { echoed: event.args, env: Object.keys(process.env).sort(), argv: process.argv.slice(2) },
     },
     () => process.exit(0),
   );

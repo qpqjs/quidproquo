@@ -40,6 +40,10 @@ export type DevServerConfig = {
   // Service name to use for logging (optional)
   logServiceName?: string;
 
+  // The user-script child bundle (built beside the server by the CLI). Forked per script
+  // call; without it askUserScriptExecute answers RunnerUnavailable.
+  userScriptChildModulePath?: string;
+
   // Artificial latency added before each action processor runs.
   // Number = same ms for all actions; map = per-action-type with optional `default` fallback.
   delay?: DevServerDelayConfig;
@@ -63,6 +67,9 @@ export type ResolvedDevServerConfig = {
 
   // Service name to use for logging (optional)
   logServiceName?: string;
+
+  // Pass-through of DevServerConfig.userScriptChildModulePath.
+  userScriptChildModulePath?: string;
 
   // Pass-through of DevServerConfig.delay; resolved at processor-wrap time.
   delay?: DevServerDelayConfig;

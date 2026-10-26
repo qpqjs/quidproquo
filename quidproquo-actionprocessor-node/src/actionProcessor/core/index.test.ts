@@ -13,7 +13,7 @@ describe('getCoreActionProcessor', () => {
     expect(keys).toContain(StreamActionType.Close);
     expect(keys).toContain(InlineFunctionActionType.Execute);
     expect(keys).toContain(DynamicFunctionsActionType.Execute);
-    expect(keys).toContain(UserScriptActionType.Execute);
+    expect(keys).toContain(UserScriptActionType.ModuleTypes);
     expect(keys.length).toBeGreaterThan(3);
   });
 });

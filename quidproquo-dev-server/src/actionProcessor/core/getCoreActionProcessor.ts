@@ -13,6 +13,7 @@ import { getKeyValueStoreActionProcessor } from './keyValueStore';
 import { getLogActionProcessor } from './log';
 import { getQueueActionProcessor } from './queue';
 import { getUserDirectoryActionProcessor } from './userDirectory';
+import { getUserScriptActionProcessor } from './userScriptOverride';
 
 // The dev server bundles every hosted service plus the whole framework (aliased to
 // workspace src/, not node_modules) into one script — the tracer's default "not
@@ -56,5 +57,7 @@ export const getCoreActionProcessor = async (
     ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectoryActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getSystemTraceStoryActionProcessor([], resolveDevServerOwnCodeMarkers)(qpqConfig, dynamicModuleLoader)),
+    // Replaces the lambda execute underneath (which would invoke a runner function) with the child-process sandbox.
+    ...(await getUserScriptActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
   };
 };

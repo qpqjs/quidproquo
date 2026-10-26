@@ -66,7 +66,7 @@ If the member is a generator and its own story throws, that error propagates wit
 
 ## Notes
 
-- On AWS, scripts run in the sandbox declared by [defineUserScriptRunner](../../../config/core/user-script-runner.md): a separate function with no resource access and only the pure action processors (date, guid, log, math, error). Inside it, an action that needs a resource fails with "Unable to process action". On the dev server the node processor still runs scripts in-process with the caller's permissions until the dev-server runner lands, so only store scripts from trusted authors.
+- Scripts run in the sandbox declared by [defineUserScriptRunner](../../../config/core/user-script-runner.md), never in the calling process: on AWS a separate function with no resource access, on the dev server a child process with no cloud credentials. Both see only the pure action processors (date, guid, log, math, error); an action that needs a resource fails with "Unable to process action".
 - Scripts are plain CommonJS and can only `require` the shared framework packages.
 - The caller's session crosses to the runner as a cross-service session (decoded token and context, never the raw access token or local context).
 - To pass a storage scope, use `askUserScriptExecuteBase(drive, filepath, functionName, args, scope)`: the typed requester spreads the arguments, so it has no place for one.

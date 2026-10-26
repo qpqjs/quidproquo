@@ -24,7 +24,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { DeployPlan } from '../../lib/deployPrompts';
-import { writeDevServerEntry } from '../../lib/devServerEntry';
+import { writeDevServerEntry, writeUserScriptChildEntry } from '../../lib/devServerEntry';
 import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
@@ -195,9 +195,10 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   // Nothing deploys into the container, so the image runs its own pending migrations on start.
   const entry = writeDevServerEntry(root, appName, 'migrate-then-serve');
+  const userScriptChildEntry = writeUserScriptChildEntry(root);
   // The image installs its own node_modules next to the bundle, so externals
   // must stay bare; host-resolved absolute paths do not exist in the container.
-  await runRspack(getDevServerRspackConfig({ root, entry, qpqConfigs, portableExternals: true }));
+  await runRspack(getDevServerRspackConfig({ root, entry, userScriptChildEntry, qpqConfigs, portableExternals: true }));
 
   // ---- Views: production builds with same-origin federation remotes ----
   // The browser reaches everything on the page's own host, on the HOST side of the port
