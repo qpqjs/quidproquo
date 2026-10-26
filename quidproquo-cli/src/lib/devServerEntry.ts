@@ -97,7 +97,8 @@ const devServerConfig = {
     secureUrlHost: process.env.${DEV_SERVER_PUBLIC_HOST_ENV} || 'localhost',
     secureUrlPort: ${DEFAULT_DEV_SERVER_PORTS.fileStorage},
     secureUrlPublicPort: Number(process.env.${DEV_SERVER_PUBLIC_FILE_STORAGE_PORT_ENV}) || undefined,
-    secureUrlSecret: 'dev-secure-url-secret',
+    // No fixed secret: the server mints a random one per process, so a secure url token
+    // (which names a filesystem path) cannot be forged by anyone who has read this file.
   },
   qpqConfigs,
   dynamicModuleLoader: qpqDynamicModuleLoaderForService,

@@ -16,6 +16,13 @@ const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
   await fs.mkdir(parentDir, { recursive: true });
 };
 
+// A token names an absolute path. Only paths under the storage root are served or written,
+// whatever the token says: the signature proves who minted it, not that the path is sane.
+const isInsideStoragePath = (storagePath: string, fullFilepath: string): boolean => {
+  const relative = path.relative(path.resolve(storagePath), path.resolve(fullFilepath));
+  return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
+};
+
 export const fileStorageImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const app: Express = express();
   const upload = multer({ storage: multer.memoryStorage() });
@@ -64,6 +71,11 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
 
       if (tokenData.operation !== 'download') {
         res.status(403).json({ error: 'Invalid token operation' });
+        return;
+      }
+
+      if (!isInsideStoragePath(devServerConfig.fileStorageConfig.storagePath, tokenData.fullFilepath)) {
+        res.status(403).json({ error: 'Token path is outside the storage root' });
         return;
       }
 
@@ -138,6 +150,11 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
 
     if (tokenData.operation !== 'upload') {
       res.status(403).json({ error: 'Invalid token operation' });
+      return;
+    }
+
+    if (!isInsideStoragePath(devServerConfig.fileStorageConfig.storagePath, tokenData.fullFilepath)) {
+      res.status(403).json({ error: 'Token path is outside the storage root' });
       return;
     }
 
