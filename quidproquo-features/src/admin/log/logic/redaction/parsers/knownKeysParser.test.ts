@@ -17,6 +17,23 @@ describe('knownKeysParser', () => {
     expect(redactions.sort()).toEqual(['Bearer abc', 'k1', 't1']);
   });
 
+  it('redacts the underscore and hyphen spellings of api keys and private keys', () => {
+    const log = {
+      correlation: 'c1',
+      history: [{ act: { payload: { body: { api_key: 'k-under', 'api-key': 'k-hyphen', private_key: 'pk-1', passphrase: 'pp-1' } } } }],
+    } as any;
+
+    const { redactedLog, redactions } = knownKeysParser(log);
+
+    expect(redactedLog.history[0].act.payload.body).toEqual({
+      api_key: REDACTED_STRING,
+      'api-key': REDACTED_STRING,
+      private_key: REDACTED_STRING,
+      passphrase: REDACTED_STRING,
+    });
+    expect(redactions.sort()).toEqual(['k-hyphen', 'k-under', 'pk-1', 'pp-1']);
+  });
+
   it('redacts field-only keys without reporting them', () => {
     const log = { correlation: 'c1', input: [{ password: 'hunter2', username: 'joe' }] } as any;
 
