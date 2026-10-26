@@ -57,6 +57,8 @@ function* askUserScriptBuild(
 | `OutputNotSingleFile` | The build emitted anything besides the one output file. |
 | `NoExports` | The built module exports nothing. |
 | `NonFunctionExport` | An export of the built module is not a function. |
+
+The last two, and `BuildFailed` for a built file that does not load, come from checking the published file inside the sandbox with [askUserScriptListExports](./ask-user-script-list-exports.md); a runner failure there (`RunnerUnavailable`, `TimedOut`) passes through with that action's type. The build never loads the script in the host.
 | `DriveNotFound` | The storage drive does not exist. |
 | `InvalidScope` | The scope is not a valid single path segment, or the drive refuses it. |
 

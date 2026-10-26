@@ -1,4 +1,5 @@
 export * from './getUserScriptModuleMap';
+export * from './listUserScriptExports';
 export * from './loadUserScriptHostModules';
 export * from './loadUserScriptModule';
 export * from './runUserScript';

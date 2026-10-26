@@ -1,4 +1,4 @@
-import { askUserScriptExecute, StorySession, UserScriptRunnerEvent } from 'quidproquo-core';
+import { askUserScriptExecute, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from 'quidproquo-core';
 
 import path from 'path';
 import { describe, expect, it } from 'vitest';
@@ -11,9 +11,8 @@ const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {}
 const eventFor = (functionName: string, args: unknown[] = []): UserScriptRunnerEvent => ({
   sourceUrl: 'https://example.test/main.js',
   filename: 'main.js',
-  functionName,
-  args,
   storySession: session,
+  request: { kind: UserScriptRunnerRequestKind.call, functionName, args },
 });
 
 describe('runUserScriptInChild', () => {

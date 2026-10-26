@@ -2,5 +2,4 @@
 export type BuiltUserScript = {
   // The built JavaScript, with its source map embedded when one was asked for.
   script: string;
-  exports: string[];
 };

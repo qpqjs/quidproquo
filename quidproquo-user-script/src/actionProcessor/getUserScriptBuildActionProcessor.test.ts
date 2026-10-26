@@ -1,10 +1,11 @@
 import { getErrorActionProcessor } from 'quidproquo-actionprocessor-js';
-import { getUserScriptModuleMap, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
+import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
 import {
   actionResult,
   actionResultError,
   askFileListDirectory,
   askUserScriptBuild,
+  askUserScriptListExports,
   buildTestQpqConfig,
   createStreamRegistry,
   createStubLogger,
@@ -57,6 +58,14 @@ const createDrive = (initial: Record<string, string>, missingDirectoryIsError = 
       [FileActionType.WriteTextContents]: async ({ drive, filepath, data }: { drive: string; filepath: string; data: string }) => {
         files[`${drive}:${filepath}`] = data;
         return actionResult(undefined);
+      },
+      // The runner's part, done in-process here: load what was published and report its exports.
+      [UserScriptActionType.ListExports]: async ({ drive, filepath }: { drive: string; filepath: string }) => {
+        try {
+          return actionResult(listUserScriptExports(filepath, files[`${drive}:${filepath}`], getUserScriptModuleMap()));
+        } catch (error) {
+          return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, String(error));
+        }
       },
     },
   };

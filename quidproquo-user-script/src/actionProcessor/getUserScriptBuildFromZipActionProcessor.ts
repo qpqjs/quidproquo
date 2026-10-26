@@ -21,6 +21,7 @@ import {
 import { randomUUID } from 'crypto';
 
 import { UserScriptBuildError } from '../build/UserScriptBuildError';
+import { askUserScriptCheckPublishedOutput } from './logic/askUserScriptCheckPublishedOutput';
 import { askUserScriptPublishOutput } from './logic/askUserScriptPublishOutput';
 import { buildUserScriptInTempDir } from './logic/buildUserScriptInTempDir';
 import { BuiltUserScript } from './logic/BuiltUserScript';
@@ -82,8 +83,8 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       );
     }
 
-    // The service's own script modules: external to the bundle, supplied to the output check. One
-    // that does not load is the service's fault, so it throws rather than failing the build.
+    // The service's own script modules, which the bundler keeps external. One that does not
+    // load is the service's fault, so it throws rather than failing the build.
     const hostModules = await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader);
 
     let built: BuiltUserScript;
@@ -110,7 +111,13 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       return actionResultError(published.error.errorType, published.error.errorText);
     }
 
-    return actionResult({ exports: built.exports });
+    // The output contract is judged where the script's top-level code cannot reach the host.
+    const checked = await resolveStory(() => askUserScriptCheckPublishedOutput(payload.drive, payload.outputFilepath, payload.scope, errorType), []);
+    if (checked.error) {
+      return actionResultError(checked.error.errorType, checked.error.errorText);
+    }
+
+    return actionResult({ exports: checked.result });
   };
 };
 

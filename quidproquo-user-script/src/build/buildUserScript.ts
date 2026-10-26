@@ -3,7 +3,6 @@ import { UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
 import fs from 'fs';
 import path from 'path';
 
-import { checkUserScriptOutput } from './checkUserScriptOutput';
 import { getUserScriptRspackConfig } from './getUserScriptRspackConfig';
 import { resolveUserScriptEntry } from './resolveUserScriptEntry';
 import { runUserScriptRspack } from './runUserScriptRspack';
@@ -16,18 +15,18 @@ export type BuildUserScriptOptions = {
   outDir: string;
   // Embed a source map in main.js. Off by default; a separate .map file is never written.
   sourceMap?: boolean;
-  // The service's own script modules (defineUserScriptModule), by import name: kept external by
-  // the bundler and supplied to the output check. A local build has none.
+  // The service's own script modules (defineUserScriptModule), by import name, which the
+  // bundler keeps external. A local build has none.
   hostModules?: UserScriptModuleMap;
 };
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 /**
- * Builds a script project into `<outDir>/main.js`, the only file written, and checks the
- * result loads under the execute processor's loader. Throws UserScriptBuildError; the
- * `code` says whether the project, the bundle, or the output contract was at fault.
- * `outDir` is emptied first.
+ * Builds a script project into `<outDir>/main.js`, the only file written. The output is not
+ * loaded here: a platform build has the sandbox report its exports (askUserScriptListExports)
+ * and a local build uses checkUserScriptOutput. Throws UserScriptBuildError; the `code` says
+ * whether the project or the bundle was at fault. `outDir` is emptied first.
  */
 export const buildUserScript = async ({
   projectDir,
@@ -63,10 +62,5 @@ export const buildUserScript = async ({
     );
   }
 
-  const entryPath = path.join(absoluteOutDir, USER_SCRIPT_OUTPUT_FILENAME);
-
-  return {
-    entryPath,
-    exports: checkUserScriptOutput(entryPath, hostModules),
-  };
+  return { entryPath: path.join(absoluteOutDir, USER_SCRIPT_OUTPUT_FILENAME) };
 };

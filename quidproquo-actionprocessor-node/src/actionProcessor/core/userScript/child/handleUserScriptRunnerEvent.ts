@@ -1,6 +1,9 @@
 import {
+  ActionProcessorResult,
+  actionResult,
   actionResultError,
   askUserScriptExecuteBase,
+  askUserScriptListExports,
   createRuntime,
   DynamicModuleLoader,
   isErroredActionResult,
@@ -9,7 +12,9 @@ import {
   QpqRuntimeType,
   resolveActionResult,
   resolveActionResultError,
+  UserScriptModuleExports,
   UserScriptRunnerEvent,
+  UserScriptRunnerRequestKind,
   UserScriptRunnerResult,
 } from 'quidproquo-core';
 
@@ -17,8 +22,11 @@ import { randomUUID } from 'crypto';
 
 import { getUserScriptRunnerActionProcessors } from '../getUserScriptRunnerActionProcessors';
 import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
+import { listUserScriptExports } from '../logic/listUserScriptExports';
 import { loadUserScriptHostModules } from '../logic/loadUserScriptHostModules';
 import { runUserScript } from '../logic/runUserScript';
+import { UserScriptModuleMap } from '../logic/UserScriptModuleMap';
+import { UserScriptModuleNotFoundError } from '../logic/UserScriptModuleNotFoundError';
 import { fetchUserScriptSource } from './fetchUserScriptSource';
 
 const { errorType } = askUserScriptExecuteBase;
@@ -33,10 +41,23 @@ const silentLogger: QpqLogger = {
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
+// The list request's failures in its own action's catalog.
+const listExports = (filename: string, source: string, modules: UserScriptModuleMap): ActionProcessorResult<UserScriptModuleExports> => {
+  try {
+    return actionResult(listUserScriptExports(filename, source, modules));
+  } catch (error) {
+    if (error instanceof UserScriptModuleNotFoundError) {
+      return actionResultError(askUserScriptListExports.errorType.ModuleNotFound, error.message);
+    }
+    return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, getErrorMessage(error));
+  }
+};
+
 /**
- * One script call inside the sandbox: fetch the built file, load the service's script
- * modules, and run the export against the pure processor list only. The whole answer is
- * an EitherActionResult so it crosses the process and lambda boundaries as plain JSON.
+ * One unit of runner work inside the sandbox: fetch the built file, load the service's script
+ * modules, then either run the named export against the pure processor list only, or just
+ * load the module and report its exports. The whole answer is an EitherActionResult so it
+ * crosses the process and lambda boundaries as plain JSON.
  */
 export const handleUserScriptRunnerEvent = async (
   event: UserScriptRunnerEvent,
@@ -44,6 +65,9 @@ export const handleUserScriptRunnerEvent = async (
   dynamicModuleLoader: DynamicModuleLoader,
   fetchSource: (sourceUrl: string) => Promise<string> = fetchUserScriptSource,
 ): Promise<UserScriptRunnerResult> => {
+  const notFoundType =
+    event.request.kind === UserScriptRunnerRequestKind.listExports ? askUserScriptListExports.errorType.ScriptNotFound : errorType.ScriptNotFound;
+
   let source: string;
   try {
     source = await fetchSource(event.sourceUrl);
@@ -51,32 +75,33 @@ export const handleUserScriptRunnerEvent = async (
     return {
       success: false,
       error: resolveActionResultError(
-        actionResultError(errorType.ScriptNotFound, `User script [${event.filename}] could not be fetched: ${getErrorMessage(error)}`),
+        actionResultError(notFoundType, `User script [${event.filename}] could not be fetched: ${getErrorMessage(error)}`),
       ),
     };
   }
 
-  const hostModules = await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader);
+  const modules = getUserScriptModuleMap(await loadUserScriptHostModules(qpqConfig, dynamicModuleLoader));
 
-  const resolveStory = createRuntime(
-    qpqConfig,
-    event.storySession,
-    getUserScriptRunnerActionProcessors,
-    () => new Date().toISOString(),
-    silentLogger,
-    `${event.filename}::${randomUUID()}`,
-    QpqRuntimeType.EXECUTE_STORY,
-    dynamicModuleLoader,
-  );
-
-  const result = await runUserScript({
-    source,
-    filename: event.filename,
-    functionName: event.functionName,
-    args: event.args,
-    modules: getUserScriptModuleMap(hostModules),
-    resolveStory,
-  });
+  const result =
+    event.request.kind === UserScriptRunnerRequestKind.listExports
+      ? listExports(event.filename, source, modules)
+      : await runUserScript({
+          source,
+          filename: event.filename,
+          functionName: event.request.functionName,
+          args: event.request.args,
+          modules,
+          resolveStory: createRuntime(
+            qpqConfig,
+            event.storySession,
+            getUserScriptRunnerActionProcessors,
+            () => new Date().toISOString(),
+            silentLogger,
+            `${event.filename}::${randomUUID()}`,
+            QpqRuntimeType.EXECUTE_STORY,
+            dynamicModuleLoader,
+          ),
+        });
 
   return isErroredActionResult(result)
     ? { success: false, error: resolveActionResultError(result) }

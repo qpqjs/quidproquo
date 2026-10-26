@@ -1,9 +1,10 @@
-import { getUserScriptModuleMap, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
+import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule, UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
 import {
   actionResult,
   actionResultError,
   askFileReadBinaryContents,
   askUserScriptBuildFromZip,
+  askUserScriptListExports,
   buildTestQpqConfig,
   createStreamRegistry,
   createStubLogger,
@@ -31,11 +32,19 @@ const text = (value: string): Uint8Array => new TextEncoder().encode(value);
 const makeZip = (files: Record<string, Uint8Array>): Buffer => Buffer.from(zipSync(files));
 
 // An in-memory drive: binary reads answer base64 by `drive:path`, text writes land in `files`.
-const createDrive = (binaries: Record<string, Buffer>) => {
+// `hostModules` is what the stand-in runner hands a published script when it lists its exports.
+const createDrive = (binaries: Record<string, Buffer>, hostModules: UserScriptModuleMap = {}) => {
   const files: Record<string, string> = {};
   return {
     files,
     processors: {
+      [UserScriptActionType.ListExports]: async ({ drive, filepath }: { drive: string; filepath: string }) => {
+        try {
+          return actionResult(listUserScriptExports(filepath, files[`${drive}:${filepath}`], getUserScriptModuleMap(hostModules)));
+        } catch (error) {
+          return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, String(error));
+        }
+      },
       [FileActionType.ReadBinaryContents]: async ({ drive, filepath }: { drive: string; filepath: string }) => {
         const found = binaries[`${drive}:${filepath}`];
         return found
@@ -105,7 +114,7 @@ afterEach(() => {
 
 describe('getUserScriptBuildFromZipActionProcessor', () => {
   it("keeps a declared script module external and checks the output against the service's instance", async () => {
-    const drive = createDrive({ 'scripts:doc-1/assets/script.zip': SDK_ZIP });
+    const drive = createDrive({ 'scripts:doc-1/assets/script.zip': SDK_ZIP }, { 'my-sdk/v1': await sdkLoader(SDK_RUNTIME) });
 
     const result = await invoke(payload, drive.processors, sdkConfig, sdkLoader);
 

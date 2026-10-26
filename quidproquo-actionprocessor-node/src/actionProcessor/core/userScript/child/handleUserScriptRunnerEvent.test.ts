@@ -1,11 +1,14 @@
 import {
   askUserScriptExecute,
+  askUserScriptListExports,
   buildTestQpqConfig,
   defineUserScriptModule,
   DynamicModuleLoader,
   FileActionType,
   StorySession,
   UserScriptRunnerEvent,
+  UserScriptRunnerRequest,
+  UserScriptRunnerRequestKind,
 } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
@@ -25,17 +28,18 @@ const SDK_RUNTIME = '/entry/scriptModules::mySdkV1';
 const qpqConfig = buildTestQpqConfig([defineUserScriptModule('my-sdk/v1', SDK_RUNTIME)]);
 const sdkLoader: DynamicModuleLoader = async (runtime) => (runtime === SDK_RUNTIME ? { shout: (text: string) => `${text.toUpperCase()}!` } : null);
 
-const eventFor = (functionName: string, args: unknown[] = []): UserScriptRunnerEvent => ({
+const eventFor = (request: UserScriptRunnerRequest): UserScriptRunnerEvent => ({
   sourceUrl: 'https://example.test/main.js',
   filename: 'tenant-a/main.js',
-  functionName,
-  args,
   storySession: session,
+  request,
 });
 
 const fetchScript = async () => SCRIPT;
 const handle = (functionName: string, args: unknown[] = [], fetchSource = fetchScript) =>
-  handleUserScriptRunnerEvent(eventFor(functionName, args), qpqConfig, sdkLoader, fetchSource);
+  handleUserScriptRunnerEvent(eventFor({ kind: UserScriptRunnerRequestKind.call, functionName, args }), qpqConfig, sdkLoader, fetchSource);
+const list = (fetchSource = fetchScript) =>
+  handleUserScriptRunnerEvent(eventFor({ kind: UserScriptRunnerRequestKind.listExports }), qpqConfig, sdkLoader, fetchSource);
 
 describe('handleUserScriptRunnerEvent', () => {
   it('fetches the script and returns a plain export result', async () => {
@@ -71,5 +75,20 @@ describe('handleUserScriptRunnerEvent', () => {
     const result = await handle('nope');
 
     expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.FunctionNotFound);
+  });
+
+  it('lists the exports without calling any, with the service modules available', async () => {
+    expect(await list()).toEqual({ success: true, result: { functions: ['add', 'stamped', 'readsAFile', 'shouts'], nonFunctions: [] } });
+  });
+
+  it("reports a list request's load failure in the list action's catalog", async () => {
+    const result = await list(async () => `require('fs');`);
+
+    expect(result.error?.errorType).toBe(askUserScriptListExports.errorType.ModuleNotFound);
+
+    const unfetchable = await list(async () => {
+      throw new Error('source url answered 404');
+    });
+    expect(unfetchable.error?.errorType).toBe(askUserScriptListExports.errorType.ScriptNotFound);
   });
 });
