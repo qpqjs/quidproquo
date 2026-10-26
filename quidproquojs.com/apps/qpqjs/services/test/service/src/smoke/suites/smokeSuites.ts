@@ -12,6 +12,7 @@ import { scheduleSmokeSuite } from './schedule/scheduleSmokeSuite';
 import { scopedKeyValueStoreSmokeSuite } from './scopedKeyValueStore/scopedKeyValueStoreSmokeSuite';
 import { scopedStorageDriveSmokeSuite } from './scopedStorageDrive/scopedStorageDriveSmokeSuite';
 import { secretSmokeSuite } from './secret/secretSmokeSuite';
+import { securitySmokeSuite } from './security/securitySmokeSuite';
 import { signingKeySmokeSuite } from './signingKey/signingKeySmokeSuite';
 import { storageDriveSmokeSuite } from './storageDrive/storageDriveSmokeSuite';
 import { storageDriveEventSmokeSuite } from './storageDriveEvent/storageDriveEventSmokeSuite';
@@ -45,4 +46,5 @@ export const smokeSuites: SmokeSuite[] = [
   encryptedResourcesSmokeSuite,
   emailReceiveSmokeSuite,
   userScriptSmokeSuite,
+  securitySmokeSuite,
 ];

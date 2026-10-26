@@ -11,6 +11,7 @@ export * from './schedule';
 export * from './scopedKeyValueStore';
 export * from './scopedStorageDrive';
 export * from './secret';
+export * from './security';
 export * from './signingKey';
 export * from './smokeSuites';
 export * from './storageDrive';
