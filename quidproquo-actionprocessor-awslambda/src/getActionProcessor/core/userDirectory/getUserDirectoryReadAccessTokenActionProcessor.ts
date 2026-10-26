@@ -18,8 +18,9 @@ const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof as
 
       // A route without token auth still records an UNVERIFIED decode of any bearer header on the
       // session, for the logs. wasValid false on a token that has not expired is that case: the
-      // signature was never checked, so it is nobody's identity.
-      if (!decodedAccessToken.wasValid && decodedAccessToken.exp >= nowInSeconds) {
+      // signature was never checked, so it is nobody's identity. A token with no exp claim decodes
+      // to 0 and counts as unexpired here, or it would slip through an expiry-ignoring read.
+      if (!decodedAccessToken.wasValid && (decodedAccessToken.exp === 0 || decodedAccessToken.exp >= nowInSeconds)) {
         return actionResultError(ErrorTypeEnum.Unauthorized, 'Access token was not verified');
       }
 
