@@ -102,6 +102,31 @@ describe('askProcessOnMessage', () => {
     expect(broadcast.context?.['qpq-storage-scope']).toBeUndefined();
   });
 
+  it('answers Unauthenticated and does not broadcast an unknown message from an unauthenticated connection on an authenticating queue', () => {
+    const sends: any[] = [];
+    let broadcast = false;
+
+    runStory(askProcessOnMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-eb-name-demo': 'event-bus',
+      }),
+      [EventBusActionType.SendMessages]: () => {
+        broadcast = true;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        sends.push(action.payload.payload.type);
+        return undefined;
+      },
+    });
+
+    expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
+    expect(broadcast).toBe(false);
+  });
+
   it('broadcasts a message on a tenant connection under the connection storage scope', () => {
     let broadcast: any;
 
