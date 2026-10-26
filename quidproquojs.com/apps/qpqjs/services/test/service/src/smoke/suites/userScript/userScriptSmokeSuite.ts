@@ -5,6 +5,7 @@ import { SMOKE_PROBE_USER_SCRIPT_MODULE } from './constants/SMOKE_PROBE_USER_SCR
 import { askRunUserScriptAwsLockdownTest } from './logic/askRunUserScriptAwsLockdownTest';
 import { askRunUserScriptBuildErrorTest } from './logic/askRunUserScriptBuildErrorTest';
 import { askRunUserScriptErrorTest } from './logic/askRunUserScriptErrorTest';
+import { askRunUserScriptSurvivorTest } from './logic/askRunUserScriptSurvivorTest';
 import { askRunUserScriptTest } from './logic/askRunUserScriptTest';
 import { askRunUserScriptZipTest } from './logic/askRunUserScriptZipTest';
 
@@ -21,6 +22,7 @@ export const userScriptSmokeSuite: SmokeSuite = {
     { name: 'userScriptNotFound', askRun: askRunUserScriptErrorTest },
     { name: 'userScriptBuildNotFound', askRun: askRunUserScriptBuildErrorTest },
     { name: 'userScriptZip', askRun: askRunUserScriptZipTest },
+    { name: 'userScriptSurvivor', askRun: askRunUserScriptSurvivorTest },
     {
       name: 'userScriptAwsLockdown',
       askRun: askRunUserScriptAwsLockdownTest,

@@ -6,7 +6,7 @@ import {
   HTTPNetworkResponse,
 } from 'quidproquo-core';
 
-import { probeAws } from 'smoke-probe';
+import { probeAws, probeSurvivor, spawnSurvivor } from 'smoke-probe';
 
 import { formatGreeting } from './helpers/formatGreeting';
 
@@ -14,7 +14,8 @@ import { formatGreeting } from './helpers/formatGreeting';
 // greet, stampedGreeting and postJson, and expects writeFile to fail: a script runs in a
 // sandbox whose actions are the pure ones plus network requests, so a file write has no
 // processor there. probeAwsAccess goes around the framework at AWS directly, through the
-// service's probe module, and must be refused there too.
+// service's probe module, and must be refused there too. startSurvivor leaves processes
+// behind on purpose and checkSurvivor, called next, must find them gone.
 
 export const add = (a: number, b: number): number => a + b;
 
@@ -42,3 +43,8 @@ export function* writeFile(
 
 export const probeAwsAccess = (bucket: string, key: string): Promise<unknown> =>
   probeAws(bucket, key);
+
+export const startSurvivor = (port: number): number => spawnSurvivor(port);
+
+export const checkSurvivor = (port: number): Promise<unknown> =>
+  probeSurvivor(port);
