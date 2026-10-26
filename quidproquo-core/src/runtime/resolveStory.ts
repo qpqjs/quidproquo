@@ -134,14 +134,16 @@ export async function resolveStory<TArgs extends Array<any>>(
       }
     }
   } catch (err) {
+    // Same rule as processAction: the message is for the logs (errorStack), callers get a generic text.
     if (err instanceof Error) {
+      const errorName = err.name ? ` [${err.name}]` : '';
       return {
         ...response,
         finishedAt: getTimeNow(),
         error: {
-          errorText: err.message,
+          errorText: `An unexpected error occurred${errorName}.`,
           errorType: ErrorTypeEnum.GenericError,
-          errorStack: storyProgress?.value?.type,
+          errorStack: [storyProgress?.value?.type, err.stack].filter(Boolean).join(' -> '),
         },
       };
     }

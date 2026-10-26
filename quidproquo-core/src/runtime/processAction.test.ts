@@ -62,10 +62,10 @@ describe('processAction', () => {
     }
   });
 
-  it('wraps a thrown Error as a GenericError result with [name] - message text', async () => {
+  it('wraps a thrown Error as a GenericError naming the action and error, with the message only in the stack', async () => {
     const processors = buildActionProcessorList({
       Boom: async () => {
-        throw Object.assign(new Error('it broke'), { name: 'CustomError' });
+        throw Object.assign(new Error('it broke: table arn:aws:dynamodb:internal'), { name: 'CustomError' });
       },
     });
 
@@ -80,7 +80,28 @@ describe('processAction', () => {
     );
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorText).toBe('[CustomError] - it broke');
+    const error = resolveActionResultError(result);
+    expect(error.errorText).toBe('An unexpected error occurred in [Boom] [CustomError].');
+    expect(error.errorText).not.toContain('arn:aws');
+    expect(error.errorStack).toContain('it broke: table arn:aws:dynamodb:internal');
+  });
+
+  it('names only the unknown action in the text, keeping the registered list in the stack', async () => {
+    const result = await processAction(
+      { type: 'Nope' },
+      buildActionProcessorList({ KnownOne: async () => actionResult('a'), KnownTwo: async () => actionResult('b') }),
+      buildTestStorySession(),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader as any,
+      streamRegistry,
+    );
+
+    const error = resolveActionResultError(result);
+    expect(error.errorText).toBe('Unable to process action: Nope');
+    expect(error.errorText).not.toContain('KnownOne');
+    expect(error.errorStack).toContain('KnownOne');
+    expect(error.errorStack).toContain('KnownTwo');
   });
 
   it('merges action.context and action.localContext into the session given to the processor', async () => {

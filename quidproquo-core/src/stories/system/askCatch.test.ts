@@ -61,7 +61,7 @@ describe('askCatch', () => {
 
   it('converts a thrown exception in the body into a failed result', () => {
     function* throwing(): AskResponse<number> {
-      throw new Error('boom');
+      throw new Error('boom: /srv/internal/path');
     }
     function* story(): AskResponse<EitherActionResult<number>> {
       return yield* askCatch(throwing());
@@ -70,7 +70,9 @@ describe('askCatch', () => {
     const result = runStory(story());
 
     expect(result.success).toBe(false);
-    expect(expectError(result)).toMatchObject({ errorType: ErrorTypeEnum.GenericError, errorText: 'boom' });
+    const error = expectError(result);
+    expect(error).toMatchObject({ errorType: ErrorTypeEnum.GenericError, errorText: 'An unexpected error occurred [Error].' });
+    expect(error.errorStack).toContain('boom: /srv/internal/path');
   });
 
   it('passes the either result down to a nested askCatch', () => {

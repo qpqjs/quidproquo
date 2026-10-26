@@ -123,6 +123,7 @@ describe('getStateMachineCreateActionProcessor', () => {
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
 
-    expect(error?.errorText).toContain('side effect failed');
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorText).toBe('An unexpected error occurred [Error].');
   });
 });

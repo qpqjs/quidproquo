@@ -78,7 +78,8 @@ describe('getProcessCustomImplementation', () => {
     const result = await invoke(processor, undefined);
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorText).toBe('impl boom');
+    expect(resolveActionResultError(result).errorText).toBe('An unexpected error occurred [Error].');
+    expect(resolveActionResultError(result).errorStack).toContain('impl boom');
 
     vi.restoreAllMocks();
   });

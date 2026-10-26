@@ -192,13 +192,15 @@ describe('resolveStory', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
     function* story(): AskResponse<string> {
-      throw new Error('kaboom');
+      throw new Error('kaboom at /srv/internal/path');
     }
 
     const result = await run(story, [], {});
 
     expect(result.error?.errorType).toBe(ErrorTypeEnum.GenericError);
-    expect(result.error?.errorText).toBe('kaboom');
+    expect(result.error?.errorText).toBe('An unexpected error occurred [Error].');
+    expect(result.error?.errorText).not.toContain('kaboom');
+    expect(result.error?.errorStack).toContain('kaboom at /srv/internal/path');
 
     vi.restoreAllMocks();
   });

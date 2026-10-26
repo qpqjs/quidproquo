@@ -76,7 +76,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
     const storyResult = await resolveStory(story, [payload]);
 
     if (storyResult.error) {
-      return actionResultError(storyResult.error.errorType, storyResult.error.errorText);
+      return actionResultError(storyResult.error.errorType, storyResult.error.errorText, storyResult.error.errorStack);
     }
 
     return actionResult(storyResult.result);
