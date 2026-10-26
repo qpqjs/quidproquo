@@ -60,7 +60,6 @@ export function Auth({ children }: AuthProps) {
             challenge: state.authenticateUserResponse?.challenge,
             session: state.authenticateUserResponse?.session,
             username: state.username,
-            password: state.password,
             authenticationInfo: state.authenticateUserResponse?.authenticationInfo,
           }}
         >
