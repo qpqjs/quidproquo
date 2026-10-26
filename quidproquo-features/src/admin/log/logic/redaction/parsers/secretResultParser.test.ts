@@ -1,4 +1,4 @@
-import { ConfigActionType, CryptoActionType, SecureTokenActionType } from 'quidproquo-core';
+import { ConfigActionType, CryptoActionType, FileActionType, SecureTokenActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -38,6 +38,31 @@ describe('secretResultParser', () => {
     expect(redactedLog.history[0].act.payload).toEqual({ byteLength: 32 });
     expect(redactedLog.history[0].res).toEqual([REDACTED_STRING, undefined]);
     expect(redactions).toEqual([token]);
+  });
+
+  it('redacts and reports a presigned file url so the capability does not sit in the admin log', () => {
+    const url = 'https://bucket.s3.amazonaws.com/scope/file.pdf?X-Amz-Signature=abcdef0123456789&X-Amz-Expires=300';
+    const log = {
+      correlation: 'c1',
+      history: [
+        {
+          act: { type: FileActionType.GenerateTemporarySecureUrl, payload: { drive: 'd', filepath: 'file.pdf', expirationMs: 300000 } },
+          res: [url, undefined],
+        },
+        {
+          act: { type: FileActionType.GenerateTemporaryUploadSecureUrl, payload: { drive: 'd', filepath: 'up.pdf', expirationMs: 300000 } },
+          res: [`${url}&upload=1`, undefined],
+        },
+        { act: { type: 'Log/Create', payload: { msg: `sent ${url} to the client` } }, res: [undefined, undefined] },
+      ],
+    } as any;
+
+    const redacted = redactStoryResult(log);
+
+    expect(redacted.history[0].act.payload).toEqual({ drive: 'd', filepath: 'file.pdf', expirationMs: 300000 });
+    expect(redacted.history[0].res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted.history[1].res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted.history[2].act.payload.msg).toBe(`sent ${REDACTED_STRING} to the client`);
   });
 
   it('through the pipeline, sweeps a generated token from everywhere it went in the log', () => {

@@ -14,5 +14,11 @@ export const REDACTION_SWEEP_KEYS: readonly string[] = [
   'cookie',
   'set-cookie',
   'x-api-key',
+  'x_api_key',
   'apikey',
+  'api_key',
+  'api-key',
+  'privatekey',
+  'private_key',
+  'passphrase',
 ];
