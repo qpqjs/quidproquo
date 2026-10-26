@@ -30,4 +30,5 @@ export * from './signingKey';
 export * from './storageDrive';
 export * from './userDirectory';
 export * from './userScriptModule';
+export * from './userScriptRunner';
 export * from './virtualNetwork';

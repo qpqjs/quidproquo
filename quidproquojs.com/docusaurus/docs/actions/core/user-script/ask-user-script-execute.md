@@ -58,12 +58,15 @@ Pass the script's functions type as `TFunctions` so `functionName` and `args` ar
 | `ScriptInvalid` | The script threw while its module body was being loaded. |
 | `FunctionNotFound` | The named export is not an own enumerable function of the module. |
 | `FunctionThrew` | The function threw before returning a story, or its promise rejected. |
+| `RunnerUnavailable` | The sandboxed runner could not be invoked, or answered with something other than a result. |
+| `TimedOut` | The runner did not finish within the timeout set by [defineUserScriptRunner](../../../config/core/user-script-runner.md). |
+| `PayloadTooLarge` | The args or the result exceed what can cross to the runner in one invoke. |
 
 If the member is a generator and its own story throws, that error propagates with its original error type.
 
 ## Notes
 
-- There is no sandbox. The script runs in-process with the caller's permissions, so only store scripts from trusted authors.
+- Scripts run in the sandbox declared by [defineUserScriptRunner](../../../config/core/user-script-runner.md): a separate function with no resource access and only the pure action processors. Until the runner lands on every runtime, the node processor still runs scripts in-process with the caller's permissions, so only store scripts from trusted authors.
 - Scripts are plain CommonJS and can only `require` the shared framework packages.
 - Actions yielded by the script run through the calling runtime's processors.
 - To pass a storage scope, use `askUserScriptExecuteBase(drive, filepath, functionName, args, scope)`: the typed requester spreads the arguments, so it has no place for one.

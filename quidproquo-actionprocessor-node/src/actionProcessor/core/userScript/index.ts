@@ -5,6 +5,7 @@ import { getUserScriptModuleTypesActionProcessor } from './getUserScriptModuleTy
 
 export * from './getUserScriptExecuteActionProcessor';
 export * from './getUserScriptModuleTypesActionProcessor';
+export * from './getUserScriptRunnerActionProcessors';
 export * from './logic';
 
 export const getUserScriptActionProcessor: ActionProcessorListResolver = async (
