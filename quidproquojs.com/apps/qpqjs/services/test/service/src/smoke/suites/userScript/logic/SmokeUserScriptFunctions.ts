@@ -1,5 +1,7 @@
 import { AskResponse } from 'quidproquo';
 
+import { SmokeAwsProbeResult } from '../models/SmokeAwsProbeResult';
+
 /** The exports of apps/qpqjs/userScripts/smoke, typed so the caller proxy checks member names and args. */
 export type SmokeUserScriptFunctions = {
   add: (a: number, b: number) => number;
@@ -10,4 +12,5 @@ export type SmokeUserScriptFunctions = {
     filepath: string,
     text: string
   ) => AskResponse<void>;
+  probeAwsAccess: (bucket: string, key: string) => Promise<SmokeAwsProbeResult>;
 };
