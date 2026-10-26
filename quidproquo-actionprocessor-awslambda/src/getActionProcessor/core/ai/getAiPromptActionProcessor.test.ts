@@ -161,7 +161,9 @@ describe('getProcessAiPrompt', () => {
 
     const [, error] = await invoke({ prompt: 'hi' });
 
-    expect(error).toEqual({ errorType: ErrorTypeEnum.GenericError, errorText: 'exploded', errorStack: undefined });
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorText).toBe('An unexpected error occurred [Error].');
+    expect(error?.errorStack).toContain('exploded');
   });
 
   it('maps a thrown non-Error to a generic message', async () => {

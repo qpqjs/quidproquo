@@ -188,7 +188,9 @@ describe('getProcessAiPromptStream', () => {
 
     const [, error] = await invoke({ prompt: 'hi' }, buildRegistry());
 
-    expect(error).toEqual({ errorType: ErrorTypeEnum.GenericError, errorText: 'stream boom', errorStack: undefined });
+    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorText).toBe('An unexpected error occurred [Error].');
+    expect(error?.errorStack).toContain('stream boom');
   });
 
   it('maps a thrown non-Error to a generic message', async () => {
