@@ -43,7 +43,7 @@ describe('onDeploy', () => {
   });
 
   // The deploy rule hears every stack in the account; a stranger's CREATE_COMPLETE must not re-seed this service.
-  it('does nothing when the created stack is not one of this service\'s own', () => {
+  it("does nothing when the created stack is not one of this service's own", () => {
     const messages: any[] = [];
 
     runStory(onDeploy(DeployEventType.Unknown, DeployEventStatusType.Create), {
