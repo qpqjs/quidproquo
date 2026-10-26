@@ -1,4 +1,12 @@
-import { actionResult, askEventGetStorySessionBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import {
+  actionResult,
+  askEventGetStorySessionBase,
+  createActionProcessor,
+  EventActionType,
+  ProcessorFor,
+  QPQConfig,
+  toCrossServiceSession,
+} from 'quidproquo-core';
 
 import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';
 
@@ -13,7 +21,8 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
     const srcRecord = sqsEvent.Records.find((r) => r.messageId === qpqEventRecord.id);
     if (srcRecord) {
       const parsedInternalEventRecord = JSON.parse(srcRecord.body) as AnyQueueMessageWithSession;
-      return actionResult(parsedInternalEventRecord.storySession);
+      // The body is just bytes on a queue: never let it plant local context, globals or a raw token.
+      return actionResult(parsedInternalEventRecord.storySession && toCrossServiceSession(parsedInternalEventRecord.storySession));
     }
 
     return actionResult(void 0);

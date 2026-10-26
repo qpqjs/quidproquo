@@ -170,6 +170,23 @@ describe('sqs/queue getEventGetStorySessionActionProcessor', () => {
     expect(result).toEqual(session);
   });
 
+  it('drops local context, function globals and the raw access token planted in the message body', async () => {
+    const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
+    const planted = {
+      depth: 1,
+      context: { a: 1 },
+      localContext: { secret: 'x' },
+      functionGlobals: { g: 1 },
+      accessToken: 'raw.bearer',
+      decodedAccessToken: { userId: 'u1' },
+    };
+    const sqsEvent = { Records: [{ messageId: 'm1', body: JSON.stringify({ type: 't', payload: {}, storySession: planted }) }] };
+
+    const [result] = await processor({ qpqEventRecord: { id: 'm1' }, eventParams: [sqsEvent] });
+
+    expect(result).toEqual({ depth: 1, context: { a: 1 }, decodedAccessToken: { userId: 'u1' } });
+  });
+
   it('returns no session when the source record is missing', async () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
 

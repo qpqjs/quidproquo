@@ -1,15 +1,16 @@
 import { StorySession } from '../../types';
 
-// Strip service-local state before a session crosses a service boundary.
-// Local context (created via createLocalContextIdentifier) and the executing function's
-// globals must never be serialized onto the wire to another service - they stay within
-// the service that owns them. Cross-service send processors run the outgoing session
-// through this before serializing it.
+/**
+ * Strips service-local state before a session crosses a service boundary (queue, event bus,
+ * service function) or comes back in from one. Local context, the executing function's globals
+ * and the raw access token stay inside the service that owns them; only the decoded token travels.
+ * Receivers run the inbound session through this too, so a crafted message cannot plant them.
+ */
 export const toCrossServiceSession = (session: StorySession): StorySession => {
-  if (!session.localContext && !session.functionGlobals) {
+  if (!session.localContext && !session.functionGlobals && !session.accessToken) {
     return session;
   }
 
-  const { localContext, functionGlobals, ...crossServiceSession } = session;
+  const { localContext, functionGlobals, accessToken, ...crossServiceSession } = session;
   return crossServiceSession;
 };
