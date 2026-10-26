@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession } from 'quidproquo-core';
+import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession, toCrossServiceSession } from 'quidproquo-core';
 import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
 import { getLambdaServiceFunctionEventProcessor } from '../getActionProcessor';
@@ -14,8 +14,9 @@ export const getAnyExecuteServiceFunctionEvent_serviceFunction = (dynamicModuleL
   getQpqLambdaRuntimeForEvent<AnyExecuteServiceFunctionEventWithSession>(
     QpqRuntimeType.SERVICE_FUNCTION_EXE,
     // Service functions are invoked by another qpq service, which passes its
-    // session along so depth/context carry across the boundary.
-    (event) => event.storySession,
+    // session along so depth/context carry across the boundary. Filtered on the
+    // way in as well as out, so the payload cannot plant service-local state.
+    (event) => toCrossServiceSession(event.storySession),
     getLambdaServiceFunctionEventProcessor,
     dynamicModuleLoader,
     qpqConfig,

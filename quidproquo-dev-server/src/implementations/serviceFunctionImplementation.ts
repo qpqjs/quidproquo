@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, toCrossServiceSession } from 'quidproquo-core';
 import { ServiceFunctionActionType } from 'quidproquo-webserver';
 
 import { getNodeServiceFunctionEventProcessor } from '../actionProcessor';
@@ -23,7 +23,7 @@ export const serviceFunctionImplementation = async (devServerConfig: ResolvedDev
       getDynamicModuleLoader(qpqConfig!, devServerConfig),
       getNodeServiceFunctionEventProcessor,
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
-      (e: AnyExecuteServiceFunctionEventWithSession) => e.storySession,
+      (e: AnyExecuteServiceFunctionEventWithSession) => toCrossServiceSession(e.storySession),
       devServerConfig,
     );
 

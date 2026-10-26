@@ -28,6 +28,16 @@ describe('toCrossServiceSession', () => {
     expect('functionGlobals' in result).toBe(false);
   });
 
+  it('strips the raw access token while keeping the decoded one', () => {
+    const decodedAccessToken = { userId: 'u1', username: 'u1', userDirectory: 'users', exp: 1, wasValid: true };
+    const session: StorySession = { depth: 1, context: {}, accessToken: 'eyJraWQ.raw.bearer', decodedAccessToken };
+
+    const result = toCrossServiceSession(session);
+
+    expect(result).toEqual({ depth: 1, context: {}, decodedAccessToken });
+    expect('accessToken' in result).toBe(false);
+  });
+
   it('does not mutate the input session', () => {
     const session: StorySession = { depth: 1, context: {}, localContext: { secret: 'x' }, functionGlobals: { routeGlobal: 'g' } };
 
