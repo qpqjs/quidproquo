@@ -1,5 +1,6 @@
 import { SmokeSuite } from '../../harness/types/SmokeSuite';
 import { defineSecuritySmoke } from './config/defineSecuritySmoke';
+import { askRunAdminServicesRequireAuthTest } from './probes/askRunAdminServicesRequireAuthTest';
 import { askRunRuntimeErrorTextLeakTest } from './probes/askRunRuntimeErrorTextLeakTest';
 import { askRunSourceMapNotServedTest } from './probes/askRunSourceMapNotServedTest';
 import { askRunUnverifiedBearerNoExpiryTest } from './probes/askRunUnverifiedBearerNoExpiryTest';
@@ -9,6 +10,10 @@ import { askRunUnverifiedBearerTest } from './probes/askRunUnverifiedBearerTest'
 export const securitySmokeSuite: SmokeSuite = {
   defineConfig: defineSecuritySmoke,
   tests: [
+    {
+      name: 'securityAdminServicesRequireAuth',
+      askRun: askRunAdminServicesRequireAuthTest,
+    },
     {
       name: 'securityRuntimeErrorTextLeak',
       askRun: askRunRuntimeErrorTextLeakTest,
