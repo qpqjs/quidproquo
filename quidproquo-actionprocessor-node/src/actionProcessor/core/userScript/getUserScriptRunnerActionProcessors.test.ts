@@ -8,6 +8,7 @@ import {
   DateActionType,
   FileActionType,
   GuidActionType,
+  NetworkActionType,
   QpqRuntimeType,
 } from 'quidproquo-core';
 
@@ -31,11 +32,12 @@ const runInSandbox = (story: () => Generator<any, any, any>) =>
   )(story, []);
 
 describe('getUserScriptRunnerActionProcessors', () => {
-  it('serves the pure actions and nothing that reaches a resource', async () => {
+  it('serves the pure actions and network requests, nothing that reaches a resource', async () => {
     const processors = await getUserScriptRunnerActionProcessors(qpqConfig, async () => null);
 
     expect(processors[DateActionType.Now]).toBeTypeOf('function');
     expect(processors[GuidActionType.New]).toBeTypeOf('function');
+    expect(processors[NetworkActionType.Request]).toBeTypeOf('function');
     expect(Object.keys(processors).some((type) => type.includes('/File/') || type.includes('/KeyValueStore/') || type.includes('/Config/'))).toBe(
       false,
     );
