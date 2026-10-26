@@ -30,8 +30,8 @@ export type RunUserScriptInput = {
 };
 
 /**
- * The one place a user script is loaded and one export called: used in-process today and by
- * the sandboxed runner. A generator export is driven through `resolveStory`, a promise is
+ * The one place a user script is loaded and one export called, inside a sandbox's child
+ * process. A generator export is driven through `resolveStory`, a promise is
  * awaited, anything else is returned as is. Every failure maps onto the execute catalog,
  * except an error thrown by the script's own story, which keeps its type.
  */

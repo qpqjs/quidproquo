@@ -23,9 +23,10 @@ describe('runUserScriptInChild', () => {
       event: eventFor('echo', [1, 'two']),
       timeoutMs: 5000,
       env: { PATH: process.env.PATH, MARKER: 'yes' },
+      args: ['my-service'],
     });
 
-    expect(result).toMatchObject({ success: true, result: { echoed: [1, 'two'] } });
+    expect(result).toMatchObject({ success: true, result: { echoed: [1, 'two'], argv: ['my-service'] } });
     // The OS may add a variable or two of its own; nothing of the parent's beyond the given keys gets through.
     const env = (result as { result: { env: string[] } }).result.env;
     expect(env).toContain('MARKER');

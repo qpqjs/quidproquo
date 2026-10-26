@@ -21,7 +21,7 @@ export default [
 ```
 
 - **On AWS:** deploys one Lambda function with a dedicated role. The service role gains permission to invoke exactly that function.
-- **Dev server:** runs each script in a child process with no cloud credentials in its environment, so a script that works locally works deployed and the other way round.
+- **Dev server:** runs each script in a child process (a second bundle `qpq go:dev:api` builds beside the server) with no cloud credentials in its environment and the same timeout, so a script that works locally works deployed and the other way round.
 
 ## Signature
 

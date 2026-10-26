@@ -3,7 +3,7 @@ import os from 'os';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
-import { writeDevServerEntry } from './devServerEntry';
+import { writeDevServerEntry, writeUserScriptChildEntry } from './devServerEntry';
 
 const makeRoot = (): string => fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-entry-'));
 
@@ -41,5 +41,23 @@ describe('writeDevServerEntry', () => {
 
     expect(entry).toContain("secureUrlHost: process.env.QPQ_PUBLIC_HOST || 'localhost'");
     expect(entry).toContain('secureUrlPublicPort: Number(process.env.QPQ_PUBLIC_FILE_STORAGE_PORT) || undefined');
+  });
+
+  it('points the server at the user-script child bundle beside it', () => {
+    const entry = fs.readFileSync(writeDevServerEntry(makeRoot(), 'app'), 'utf8');
+
+    expect(entry).toContain("userScriptChildModulePath: path.join(path.dirname(process.argv[1]), \"user-script-child.js\")");
+  });
+});
+
+describe('writeUserScriptChildEntry', () => {
+  it('writes a child entry that serves the service named on its command line', () => {
+    const entryPath = writeUserScriptChildEntry(makeRoot());
+    const entry = fs.readFileSync(entryPath, 'utf8');
+
+    expect(path.basename(entryPath)).toBe('user-script-child.entry.ts');
+    expect(entry).toContain('const serviceName = process.argv[2];');
+    expect(entry).toContain('runUserScriptChildMain(qpqConfig, (runtime) => qpqDynamicModuleLoaderForService(serviceName, runtime));');
+    expect(entry).toContain('main();');
   });
 });

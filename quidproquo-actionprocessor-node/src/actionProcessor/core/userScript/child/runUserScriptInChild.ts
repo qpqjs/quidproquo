@@ -12,6 +12,8 @@ export type RunUserScriptInChildInput = {
   // The child's whole environment. The caller builds it, leaving out whatever its platform
   // puts in the parent's that a script must not see (credentials above all).
   env: NodeJS.ProcessEnv;
+  // Command-line arguments for the child, for a module that serves more than one service.
+  args?: readonly string[];
 };
 
 const failed = (type: string, errorText: string): UserScriptRunnerResult => ({ success: false, error: { errorType: type, errorText } });
@@ -24,7 +26,7 @@ const failed = (type: string, errorText: string): UserScriptRunnerResult => ({ s
  */
 export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<UserScriptRunnerResult> =>
   new Promise((resolve) => {
-    const child = fork(input.modulePath, [], {
+    const child = fork(input.modulePath, [...(input.args ?? [])], {
       env: input.env,
       serialization: 'json',
       stdio: ['ignore', 'inherit', 'inherit', 'ipc'],

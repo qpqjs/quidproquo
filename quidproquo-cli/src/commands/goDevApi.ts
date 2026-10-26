@@ -18,7 +18,7 @@ import path from 'path';
 import { rspack } from '@rspack/core';
 
 import { hasArgFlag } from '../lib/args';
-import { writeDevServerEntry } from '../lib/devServerEntry';
+import { writeDevServerEntry, writeUserScriptChildEntry } from '../lib/devServerEntry';
 import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
@@ -57,7 +57,8 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);
-  const rspackConfig = getDevServerRspackConfig({ root, entry, qpqConfigs });
+  const userScriptChildEntry = writeUserScriptChildEntry(root);
+  const rspackConfig = getDevServerRspackConfig({ root, entry, userScriptChildEntry, qpqConfigs });
   const bundlePath = path.join(root, DEV_SERVER_BUNDLE_PATH);
   const env = { ...process.env, QPQ_DEV_APP: appName };
 

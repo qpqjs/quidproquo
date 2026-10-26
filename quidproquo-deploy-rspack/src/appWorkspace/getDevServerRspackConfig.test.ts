@@ -28,6 +28,15 @@ describe('getDevServerRspackConfig', () => {
     expect(config.output?.path).toBe(path.join(root, 'dist', 'qpq', 'dev-server'));
   });
 
+  it('keeps a lone entry at main.js, and builds the user-script child beside it when given', () => {
+    const alone = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
+    const withChild = getDevServerRspackConfig({ root, entry: './entry.ts', userScriptChildEntry: './child.ts', qpqConfigs: [buildTestQpqConfig()] });
+
+    expect(alone.entry).toBe('./entry.ts');
+    expect(alone.output?.filename).toBe('[name].js');
+    expect(withChild.entry).toEqual({ main: './entry.ts', 'user-script-child': './child.ts' });
+  });
+
   it('externalises node:sqlite to the runtime builtin (the dev-server kvs engine loads it)', async () => {
     const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()] });
     const externalise = (config.externals as any[])[0] as (data: any, callback: (err?: Error, result?: string) => void) => void;

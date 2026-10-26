@@ -69,6 +69,8 @@ export const resolveDevServerConfig = (
 
     logServiceName: devServerConfig.logServiceName,
 
+    userScriptChildModulePath: devServerConfig.userScriptChildModulePath,
+
     delay: devServerConfig.delay,
   };
 };
