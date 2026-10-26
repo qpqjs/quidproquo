@@ -4,4 +4,5 @@ export * from './getLambdaRuntimeRemainingTimeActionProcessor';
 export * from './getLogger';
 export * from './getQpqLambdaRuntimeForEvent';
 export * from './getRuntimeCorrelation';
+export * from './getUserScriptRunnerChildEnv';
 export * from './isSnsWarmerRecord';

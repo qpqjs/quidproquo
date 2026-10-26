@@ -17,6 +17,7 @@ import {
   QpqCoreDeployEventConstruct,
   QpqCoreNotifyErrorConstruct,
   QpqCoreRecurringScheduleConstruct,
+  QpqCoreUserScriptRunnerConstruct,
   QpqWebserverServiceFunctionConstruct,
   QpqWebserverSubdomainRedirectConstruct,
   QpqWebserverWebsocketConstruct,
@@ -95,6 +96,16 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           apiLayerVersions: layers.layers,
         }),
     );
+
+    // User script runner: the sandbox that askUserScriptExecute hands scripts to
+    const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunner(props.qpqConfig);
+    const userScriptRunner = userScriptRunnerConfig
+      ? new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
+          qpqConfig: props.qpqConfig,
+
+          userScriptRunnerConfig,
+        })
+      : undefined;
 
     // Build websocket apis
     const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
