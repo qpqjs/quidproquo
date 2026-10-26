@@ -1,6 +1,7 @@
 import {
   askCatch,
   askFileExists,
+  askOpenApiGetDocument,
   AskResponse,
   createUserScriptCaller,
   FileActionType,
@@ -12,8 +13,9 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 
 // What both build paths prove once their script is built: plain exports return their
-// values, a story export runs with the sandbox's pure actions, and a story that reaches
-// for a resource fails inside the sandbox with nothing written.
+// values, a story export runs with the sandbox's pure actions, a story can call out over
+// HTTP (the service's own echo route, so the answer is provably this call's), and a story
+// that reaches for a resource fails inside the sandbox with nothing written.
 export function* askRunSmokeUserScriptCalls(
   builtPath: string,
   outputPath: string,
@@ -37,6 +39,17 @@ export function* askRunSmokeUserScriptCalls(
   yield* askSmokeAssert(
     stamped.startsWith(`hello ${label} @ 20`),
     `story export did not run with the sandbox's pure actions: [${stamped}]`
+  );
+
+  const document = yield* askOpenApiGetDocument();
+  const baseUrl = document.servers[0]?.url;
+  yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
+  const echoed = yield* script.postJson(`${baseUrl}/v1/echo/${label}`, {
+    bodyValue: label,
+  });
+  yield* askSmokeAssert(
+    echoed.status === 200 && echoed.data.bodyValue === label,
+    `network request from inside the sandbox did not round-trip: [${echoed.status}] ${JSON.stringify(echoed.data)}`
   );
 
   const refused = yield* askCatch(

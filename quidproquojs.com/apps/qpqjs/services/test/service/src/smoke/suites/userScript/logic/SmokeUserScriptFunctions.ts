@@ -1,4 +1,6 @@
-import { AskResponse } from 'quidproquo';
+import { AskResponse, HTTPNetworkResponse } from 'quidproquo';
+
+import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
 
 import { SmokeAwsProbeResult } from '../models/SmokeAwsProbeResult';
 
@@ -7,6 +9,10 @@ export type SmokeUserScriptFunctions = {
   add: (a: number, b: number) => number;
   greet: (name: string) => string;
   stampedGreeting: (name: string) => AskResponse<string>;
+  postJson: (
+    url: string,
+    body: EchoRequest
+  ) => AskResponse<HTTPNetworkResponse<EchoResponse>>;
   writeFile: (
     drive: string,
     filepath: string,
