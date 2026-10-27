@@ -1,6 +1,7 @@
 import { StoryResultMetadataWithChildren } from '@qpqjs/core';
 
 import { apiRequestGet, externalRequestGet } from '../../logic';
+import { encodeLogPathSegment } from './encodeLogPathSegment';
 
 export const getLogHierarchy = async function findRootLog(
   apiBaseUrl: string,
@@ -12,7 +13,11 @@ export const getLogHierarchy = async function findRootLog(
     return;
   }
 
-  const hierarchyUrl = await apiRequestGet<{ url: string }>(`/log/${correlation}/hierarchies?refresh=${!!refreshReport}`, apiBaseUrl, accessToken);
+  const hierarchyUrl = await apiRequestGet<{ url: string }>(
+    `/log/${encodeLogPathSegment(correlation)}/hierarchies?refresh=${!!refreshReport}`,
+    apiBaseUrl,
+    accessToken,
+  );
 
   if (hierarchyUrl.url) {
     const reportJson = await externalRequestGet<StoryResultMetadataWithChildren>(hierarchyUrl.url);
