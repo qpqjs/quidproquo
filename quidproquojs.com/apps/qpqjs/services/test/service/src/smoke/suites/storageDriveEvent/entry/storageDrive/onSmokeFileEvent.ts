@@ -1,3 +1,5 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askKeyValueStoreUpsert,
   AskResponse,
@@ -5,9 +7,6 @@ import {
   StorageDriveEvent,
   StorageDriveEventResponse,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { smokeFileEventMarkerId } from '../../logic/smokeFileEventMarkerId';
 

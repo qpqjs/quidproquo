@@ -1,3 +1,5 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askDelay,
   askKeyValueStoreDelete,
@@ -5,9 +7,6 @@ import {
   AskResponse,
   Nullable,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from './askSmokeAssert';
 

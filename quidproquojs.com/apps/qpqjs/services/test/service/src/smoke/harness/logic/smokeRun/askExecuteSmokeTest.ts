@@ -1,17 +1,16 @@
 import {
+  SmokeRun,
+  SmokeRunStatus,
+  SmokeTestResult,
+  SmokeTestStatus,
+} from '@qpqjs/test-models';
+import {
   askCatch,
   askDateNow,
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
 } from 'quidproquo';
-
-import {
-  SmokeRun,
-  SmokeRunStatus,
-  SmokeTestResult,
-  SmokeTestStatus,
-} from '@qpqjs/test-models';
 
 import { askGetSmokeRunById } from '../../data/askGetSmokeRunById';
 import { askRecordSmokeTestResult } from '../../data/askRecordSmokeTestResult';

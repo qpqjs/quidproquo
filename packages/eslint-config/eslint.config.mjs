@@ -29,7 +29,7 @@ export default [
         'error',
         {
           groups: [
-            ['^quidproquo'],
+            ['^@qpqjs/', '^quidproquo'],
             [
               '^\\u0000[^.]',
               // Packages. `react`/`react-dom` packages come first.

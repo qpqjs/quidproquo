@@ -3,7 +3,6 @@
 // 'qpq-account' stack. Exactly one repo/config owns this per account, and
 // actor deploys must not deploy it — account resources have nothing to do with
 // any app's lifecycle. Identity plumbing comes from the workspace CDK app.
-import { QPQConfig } from 'quidproquo';
 import {
   AwsDataStoreRemovalPolicy,
   defineAccountBudget,
@@ -12,6 +11,7 @@ import {
   defineAccountSecurityServices,
   defineAwsDataStoreRemovalPolicy,
 } from '@qpqjs/config-aws';
+import { QPQConfig } from 'quidproquo';
 
 export default (): QPQConfig => [
   // Dev account: data stores created by the account stack are torn down with it.

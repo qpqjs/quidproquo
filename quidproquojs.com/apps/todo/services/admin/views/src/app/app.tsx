@@ -1,8 +1,4 @@
-import {
-  getApiUrl,
-  getFederatedViewsUrl,
-  getWebSocketUrl,
-} from '@qpqjs/web';
+import { getApiUrl, getFederatedViewsUrl, getWebSocketUrl } from '@qpqjs/web';
 import { App as QpqAdminApp } from '@qpqjs/web-admin';
 import { BaseUrlResolvers } from '@qpqjs/web-react';
 

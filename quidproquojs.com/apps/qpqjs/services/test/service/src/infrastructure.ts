@@ -1,12 +1,11 @@
-import { defineUserScriptRunner } from 'quidproquo';
+import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineDevServerOptions } from '@qpqjs/dev-server/config';
+import { defineQpqjsService } from '@qpqjs/service-utils';
 import {
   defineUserScriptBuilder,
   getUserScriptBuilderApiLayer,
 } from '@qpqjs/user-script';
-
-import { QpqjsServiceEnum } from '@qpqjs/constants';
-import { defineQpqjsService } from '@qpqjs/service-utils';
+import { defineUserScriptRunner } from 'quidproquo';
 
 import { defineSmoke } from './smoke/config/defineSmoke';
 

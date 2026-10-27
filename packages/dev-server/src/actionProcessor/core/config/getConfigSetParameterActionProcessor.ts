@@ -1,11 +1,4 @@
-import {
-  actionResult,
-  actionResultErrorFromCaughtError,
-  askConfigSetParameter,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultErrorFromCaughtError, askConfigSetParameter, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { setParameterValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';

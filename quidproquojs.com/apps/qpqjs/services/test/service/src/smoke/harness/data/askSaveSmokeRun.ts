@@ -1,6 +1,5 @@
-import { askKeyValueStoreUpsert, AskResponse } from 'quidproquo';
-
 import { SmokeRun } from '@qpqjs/test-models';
+import { askKeyValueStoreUpsert, AskResponse } from 'quidproquo';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 

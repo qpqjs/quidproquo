@@ -1,10 +1,9 @@
+import { QpqjsServiceEnum } from '@qpqjs/constants';
 import {
   askNetworkRequest,
   askOpenApiGetDocument,
   AskResponse,
 } from 'quidproquo';
-
-import { QpqjsServiceEnum } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

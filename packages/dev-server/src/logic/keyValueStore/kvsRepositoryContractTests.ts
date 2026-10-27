@@ -1,11 +1,4 @@
-import {
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  KvsLogicalOperatorType,
-  KvsQueryOperationType,
-  KvsUpdateActionType,
-  QPQConfig,
-} from '@qpqjs/core';
+import { buildTestQpqConfig, defineKeyValueStore, KvsLogicalOperatorType, KvsQueryOperationType, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
 
 import * as fs from 'fs';
 import * as os from 'os';

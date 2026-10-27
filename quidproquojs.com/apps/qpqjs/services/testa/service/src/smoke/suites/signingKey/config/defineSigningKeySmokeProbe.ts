@@ -1,10 +1,9 @@
-import { defineServiceFunction, defineSigningKey, QPQConfig } from 'quidproquo';
-
 import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_SIGNING_KEY,
 } from '@qpqjs/constants';
+import { defineServiceFunction, defineSigningKey, QPQConfig } from 'quidproquo';
 
 /**
  * The test service's signing key declared FOREIGN (owned by test), plus the

@@ -1,6 +1,5 @@
-import { defineKeyValueStore, QPQConfig } from 'quidproquo';
-
 import { SmokeProbeRecord } from '@qpqjs/test-models';
+import { defineKeyValueStore, QPQConfig } from 'quidproquo';
 
 import { SMOKE_STREAM_PROBE_STORE } from '../constants/SMOKE_STREAM_PROBE_STORE';
 

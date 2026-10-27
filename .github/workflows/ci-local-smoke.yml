@@ -44,7 +44,7 @@ jobs:
             package-lock.json
             quidproquojs.com/package-lock.json
 
-      # Build the monorepo first: quidproquojs.com pulls the quidproquo-*
+      # Build the monorepo first: quidproquojs.com pulls the @qpqjs/*
       # packages via file: refs, which resolve to each package's built lib/.
       - run: npm ci
       - run: npm run build

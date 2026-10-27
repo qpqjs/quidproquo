@@ -5,7 +5,7 @@ export type StepContext = {
   targetDirectory: string;
   // Absolute path of the bundled template snapshot (a pruned quidproquojs.com).
   templateDirectory: string;
-  // create-qpq-app's own version. The generated app pins its quidproquo-*
+  // create-qpq-app's own version. The generated app pins its @qpqjs/*
   // dependencies to this (the packages are published in lockstep).
   ownVersion: string;
   answers: CreateQpqAppAnswers;

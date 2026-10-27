@@ -1,12 +1,4 @@
 import {
-  askFileDelete,
-  askFileReadTextContents,
-  askNewGuid,
-  AskResponse,
-  askServiceFunctionExecute,
-} from 'quidproquo';
-
-import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_DRIVE,
@@ -15,6 +7,13 @@ import {
   CrossServiceProbePayload,
   CrossServiceStorageDriveProbeResult,
 } from '@qpqjs/testa-models';
+import {
+  askFileDelete,
+  askFileReadTextContents,
+  askNewGuid,
+  AskResponse,
+  askServiceFunctionExecute,
+} from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

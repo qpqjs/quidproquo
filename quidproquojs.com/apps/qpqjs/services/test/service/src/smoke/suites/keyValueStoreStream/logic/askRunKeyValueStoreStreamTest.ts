@@ -1,3 +1,4 @@
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askKeyValueStoreDelete,
   askKeyValueStoreUpsert,
@@ -5,8 +6,6 @@ import {
   AskResponse,
   KvsStreamEventType,
 } from 'quidproquo';
-
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';

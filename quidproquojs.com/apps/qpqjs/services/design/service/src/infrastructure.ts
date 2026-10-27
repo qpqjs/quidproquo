@@ -1,6 +1,5 @@
-import { defineDevServerOptions } from '@qpqjs/dev-server/config';
-
 import { QpqjsServiceEnum } from '@qpqjs/constants';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 import { defineQpqjsService } from '@qpqjs/service-utils';
 
 export default [

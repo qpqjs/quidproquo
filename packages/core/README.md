@@ -27,7 +27,7 @@ function* askGreet(name: string): AskResponse<string> {
 }
 ```
 
-The **runtime** drives the story, takes each yielded action, looks up the **processor** registered for that action type, awaits the result, and resumes the generator with it. Processors live in the `quidproquo-actionprocessor-*` packages, one set per platform. Swap the set and the same story runs somewhere else.
+The **runtime** drives the story, takes each yielded action, looks up the **processor** registered for that action type, awaits the result, and resumes the generator with it. Processors live in the `@qpqjs/actionprocessor-*` packages, one set per platform. Swap the set and the same story runs somewhere else.
 
 Every action that passes through the runtime is recorded, which is where the execution logs, replay, and tracing come from.
 
@@ -79,7 +79,7 @@ A mock can be a literal value or a function, and a function mock is re-invoked p
 
 ## Status
 
-Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
+Pre-1.0. The whole `@qpqjs/*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 

@@ -1,11 +1,10 @@
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   defineCryptoKey,
   defineKeyValueStore,
   defineStorageDrive,
   QPQConfig,
 } from 'quidproquo';
-
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { SMOKE_CRYPTO_KEY } from '../constants/SMOKE_CRYPTO_KEY';
 import { SMOKE_ENCRYPTED_PROBE_DRIVE } from '../constants/SMOKE_ENCRYPTED_PROBE_DRIVE';

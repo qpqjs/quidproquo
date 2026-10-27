@@ -1,11 +1,10 @@
+import { SmokeRunStarted } from '@qpqjs/test-models';
 import {
   AskResponse,
   HTTPEvent,
   HTTPEventResponse,
   qpqWebServerUtils,
 } from 'quidproquo';
-
-import { SmokeRunStarted } from '@qpqjs/test-models';
 
 import { askStartSmokeRun } from '../logic/smokeRun/askStartSmokeRun';
 

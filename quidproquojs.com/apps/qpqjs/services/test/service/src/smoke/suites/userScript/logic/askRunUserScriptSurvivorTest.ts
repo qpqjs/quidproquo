@@ -1,3 +1,4 @@
+import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 import {
   askFileDelete,
   askFileWriteTextContents,
@@ -6,8 +7,6 @@ import {
   askUserScriptBuild,
   createUserScriptCaller,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_SURVIVOR_PORT } from '../constants/SMOKE_SURVIVOR_PORT';

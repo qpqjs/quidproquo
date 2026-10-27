@@ -1,12 +1,11 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askKeyValueStoreUpsert,
   AskResponse,
   KvsStreamEventResponse,
   KvsStreamRecord,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { smokeStreamMarkerId } from '../../logic/smokeStreamMarkerId';
 

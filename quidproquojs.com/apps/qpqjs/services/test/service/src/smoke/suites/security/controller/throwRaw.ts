@@ -1,5 +1,5 @@
-import { AskResponse, HTTPEventResponse } from 'quidproquo';
 import { dynamicRoute } from '@qpqjs/features';
+import { AskResponse, HTTPEventResponse } from 'quidproquo';
 
 import { SECURITY_PROBE_LEAK_MARKER } from '../constants/SECURITY_PROBE_LEAK_MARKER';
 

@@ -1,4 +1,10 @@
 import {
+  SmokeRun,
+  SmokeRunStatus,
+  SmokeTestResult,
+  SmokeTestStatus,
+} from '@qpqjs/test-models';
+import {
   askDateNow,
   askNewGuid,
   askPlatformGetName,
@@ -6,13 +12,6 @@ import {
   AskResponse,
   QueueMessage,
 } from 'quidproquo';
-
-import {
-  SmokeRun,
-  SmokeRunStatus,
-  SmokeTestResult,
-  SmokeTestStatus,
-} from '@qpqjs/test-models';
 
 import {
   SMOKE_RUN_QUEUE,

@@ -1,11 +1,10 @@
+import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
+import { CrossServiceStorageDriveProbeResult } from '@qpqjs/testa-models';
 import {
   askFileReadTextContents,
   askFileWriteTextContents,
   AskResponse,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import { CrossServiceStorageDriveProbeResult } from '@qpqjs/testa-models';
 
 // Writes a file into the test service's probe drive and reads it back, under
 // THIS service's role: PutObject and GetObject through the foreign

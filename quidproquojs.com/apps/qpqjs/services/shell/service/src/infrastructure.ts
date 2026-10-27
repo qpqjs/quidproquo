@@ -1,13 +1,12 @@
+import { QpqjsServiceEnum } from '@qpqjs/constants';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
+import { defineDynamicRoutes } from '@qpqjs/features';
+import { defineQpqjsService } from '@qpqjs/service-utils';
 import {
   defineStorageDrive,
   defineWebEntry,
   QPQConfigAdvancedWebEntrySettings,
 } from 'quidproquo';
-import { defineDevServerOptions } from '@qpqjs/dev-server/config';
-import { defineDynamicRoutes } from '@qpqjs/features';
-
-import { QpqjsServiceEnum } from '@qpqjs/constants';
-import { defineQpqjsService } from '@qpqjs/service-utils';
 
 import * as dynamicRoutes from './entry/controller';
 

@@ -63,7 +63,7 @@ Quidproquo is a functional, action-based web framework built on generators and p
 
 2. **Stories**: Generator functions that compose business logic by yielding actions and receiving results. Stories are pure functions that describe what should happen without knowing how.
 
-3. **Action Processors**: Platform-specific implementations that execute actions. Each runtime (AWS Lambda, Node.js, browser) has its own set of processors in `quidproquo-actionprocessor-*` packages.
+3. **Action Processors**: Platform-specific implementations that execute actions. Each runtime (AWS Lambda, Node.js, browser) has its own set of processors in `@qpqjs/actionprocessor-*` packages.
 
 4. **Runtime**: The orchestration layer that executes stories by processing yielded actions through the appropriate processors.
 
@@ -75,7 +75,7 @@ The monorepo uses npm workspaces with these key relationships:
 
 - **@qpqjs/webserver**: Builds on core to add web-specific concepts like routes, APIs, and services.
 
-- **quidproquo-actionprocessor-\***: Runtime implementations that execute actions. Each targets a specific platform (AWS Lambda, Node.js, browser).
+- **@qpqjs/actionprocessor-\***: Runtime implementations that execute actions. Each targets a specific platform (AWS Lambda, Node.js, browser).
 
 - **@qpqjs/config-aws** + **@qpqjs/deploy-awscdk**: Work together to define and deploy AWS infrastructure using CDK.
 
@@ -101,7 +101,7 @@ Actions are organized by domain in `packages/core/src/actions/`:
 
 1. **Define the action** in `packages/core/src/actions/<domain>/`
 2. **Create action requester** (generator function) in the same location
-3. **Implement processors** in each `quidproquo-actionprocessor-*` package
+3. **Implement processors** in each `@qpqjs/actionprocessor-*` package
 4. **Export from index files** at each level
 
 ### TypeScript Configuration

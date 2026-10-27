@@ -1,9 +1,8 @@
-import { AskResponse, ExecuteServiceFunctionEvent } from 'quidproquo';
-
 import {
   CrossServiceSigningKeyProbePayload,
   CrossServiceSigningKeyProbeResult,
 } from '@qpqjs/testa-models';
+import { AskResponse, ExecuteServiceFunctionEvent } from 'quidproquo';
 
 import { askProbeForeignSigningKey } from '../../logic/askProbeForeignSigningKey';
 

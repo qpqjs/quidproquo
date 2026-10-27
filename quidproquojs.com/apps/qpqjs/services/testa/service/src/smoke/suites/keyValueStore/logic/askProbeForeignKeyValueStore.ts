@@ -1,3 +1,6 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
+import { CrossServiceKeyValueStoreProbeResult } from '@qpqjs/testa-models';
 import {
   askKeyValueStoreGet,
   askKeyValueStoreUpsert,
@@ -5,10 +8,6 @@ import {
   askThrowError,
   ErrorTypeEnum,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
-import { CrossServiceKeyValueStoreProbeResult } from '@qpqjs/testa-models';
 
 // Writes a row into the test service's probe store and reads it back, under
 // THIS service's role: PutItem and GetItem through the foreign (exact-ARN)

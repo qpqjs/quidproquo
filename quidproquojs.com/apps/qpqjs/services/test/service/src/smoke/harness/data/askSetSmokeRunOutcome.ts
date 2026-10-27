@@ -1,11 +1,10 @@
+import { SmokeRun, SmokeRunStatus } from '@qpqjs/test-models';
 import {
   askKeyValueStoreUpdate,
   AskResponse,
   kvsSet,
   kvsUpdate,
 } from 'quidproquo';
-
-import { SmokeRun, SmokeRunStatus } from '@qpqjs/test-models';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 

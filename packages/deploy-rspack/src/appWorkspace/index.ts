@@ -10,6 +10,7 @@ export * from './getViewsDevtool';
 export * from './getViewsRspackConfig';
 export * from './getWorkspacePackageDirs';
 export * from './getWorkspaceSourceAliases';
+export * from './listInstalledQpqPackageNames';
 export * from './sanitizeMfName';
 export * from './scanFederatedExposes';
 export * from './serviceTsRules';

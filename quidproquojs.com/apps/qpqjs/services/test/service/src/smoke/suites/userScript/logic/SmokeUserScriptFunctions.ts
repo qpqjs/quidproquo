@@ -1,6 +1,5 @@
-import { AskResponse, HTTPNetworkResponse } from 'quidproquo';
-
 import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
+import { AskResponse, HTTPNetworkResponse } from 'quidproquo';
 
 import { SmokeAwsProbeResult } from '../models/SmokeAwsProbeResult';
 import { SmokeSurvivorProbeResult } from '../models/SmokeSurvivorProbeResult';

@@ -1,12 +1,4 @@
 import {
-  askCryptoGetPublicKey,
-  askCryptoSignJwt,
-  askGetCurrentEpoch,
-  AskResponse,
-  askServiceFunctionExecute,
-} from 'quidproquo';
-
-import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_SIGNING_KEY,
@@ -16,6 +8,13 @@ import {
   CrossServiceSigningKeyProbePayload,
   CrossServiceSigningKeyProbeResult,
 } from '@qpqjs/testa-models';
+import {
+  askCryptoGetPublicKey,
+  askCryptoSignJwt,
+  askGetCurrentEpoch,
+  AskResponse,
+  askServiceFunctionExecute,
+} from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

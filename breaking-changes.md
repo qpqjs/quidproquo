@@ -5,7 +5,8 @@ assembled quickly.
 
 ## vNext
 
-- `FEDERATED_SHARED_PACKAGE_NAMES` now lives in `quidproquo-core` and is no longer exported from `quidproquo-actionprocessor-awslambda`. Import it from core.
+- Every package except `quidproquo` and `create-qpq-app` is now published under the `@qpqjs` scope, named after its folder: `quidproquo-core` is `@qpqjs/core`, `quidproquo-webserver` is `@qpqjs/webserver`, and so on. The one rename beyond the prefix is `quidproquo-actionprocessor-awslambda`, now `@qpqjs/actionprocessor-aws`. Swap the names in package.json and in every import, deep imports included (`quidproquo-core/lib/...` becomes `@qpqjs/core/lib/...`), plus tsconfig `extends` (`@qpqjs/tsconfig/tsconfig.base.json`) and the eslint config import (`@qpqjs/eslint-config`). Action type strings keep their `@quidproquo-*` ids, so stored logs and older services still match. `FEDERATED_SHARED_PACKAGE_NAMES` is now `['@qpqjs/core', '@qpqjs/webserver']`, so a federation host and its remotes must move to the new names together.
+- `FEDERATED_SHARED_PACKAGE_NAMES` now lives in `@qpqjs/core` and is no longer exported from `@qpqjs/actionprocessor-aws`. Import it from core.
 - An event doc definition (and so the registered `EventDocFunctions`) gains a `getServerEventTypes()` member, which `EventDocInvokableFunctions` requires. A hand-rolled functions object or test mock that answers dynamic-function calls by name must now answer `getServerEventTypes` (returning `[]` is the old behaviour).
 
 ## 0.1.34

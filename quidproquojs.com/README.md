@@ -2,7 +2,7 @@
 
 The quidproquo framework's own website (app **qpqjs**), built with quidproquo itself: TypeScript npm workspaces, AWS Lambda service backends bundled with Rspack, React microfrontend views built with Rspack and Module Federation, deployed with AWS CDK.
 
-This folder lives inside the quidproquo monorepo but is **not** one of its workspaces. It is a self-contained consumer app. All `quidproquo-*` dependencies are `file:../<pkg>` refs to the sibling packages, so the site always runs against the in-repo HEAD. Build the framework first (`npm install && npm run build` at the repo root) before installing here.
+This folder lives inside the quidproquo monorepo but is **not** one of its workspaces. It is a self-contained consumer app. All `@qpqjs/*` dependencies are `file:../<pkg>` refs to the sibling packages, so the site always runs against the in-repo HEAD. Build the framework first (`npm install && npm run build` at the repo root) before installing here.
 
 It doubles as the `create-qpq-app` template: the scaffolder snapshots this workspace at publish time, so anything broken here is broken in every new app.
 
@@ -12,7 +12,7 @@ It doubles as the `create-qpq-app` template: the scaffolder snapshots this works
 
 ```bash
 nvm use              # always first: switches to the Node version in .nvmrc
-npm install          # deps, plus symlinks to the sibling quidproquo-* packages (file: refs)
+npm install          # deps, plus symlinks to the sibling @qpqjs/* packages (file: refs)
 npm run build        # build every workspace (libs: tsc -b to dist; services: type-check)
 npm run dev          # full local dev stack: api dev server (:8080) and all views dev servers
 ```

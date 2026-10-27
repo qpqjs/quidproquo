@@ -1,11 +1,4 @@
-import {
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  KeyValueStoreActionType,
-  kvsKey,
-  KvsStreamEventType,
-  noopDynamicModuleLoader,
-} from '@qpqjs/core';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, kvsKey, KvsStreamEventType, noopDynamicModuleLoader } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

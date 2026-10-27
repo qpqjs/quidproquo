@@ -40,7 +40,7 @@ The two docker flags are asked for when you run interactively and can be left bl
 
 The template is a snapshot of quidproquojs.com, a real and continuously built qpq workspace, captured into this package at publish time. Scaffolding runs a pipeline of self-contained steps: prune the docs site, prune the website app, apply your app's identity and domain, pin the quidproquo versions, git init, install.
 
-The generated app pins the `quidproquo-*` versions this package was published with. The whole family releases in lockstep, so those versions are always a set that was built and tested together.
+The generated app pins the `@qpqjs/*` versions this package was published with. The whole family releases in lockstep, so those versions are always a set that was built and tested together.
 
 ## Status
 

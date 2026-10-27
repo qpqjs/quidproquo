@@ -1,6 +1,5 @@
-import { defineSigningKey, QPQConfig } from 'quidproquo';
-
 import { SMOKE_PROBE_SIGNING_KEY } from '@qpqjs/constants';
+import { defineSigningKey, QPQConfig } from 'quidproquo';
 
 /**
  * An owned RSA signing key: kms:Sign and kms:GetPublicKey through the

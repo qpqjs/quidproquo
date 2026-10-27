@@ -1,6 +1,5 @@
-import { AskResponse, Nullable } from 'quidproquo';
-
 import { SmokeRun } from '@qpqjs/test-models';
+import { AskResponse, Nullable } from 'quidproquo';
 
 import { askGetSmokeRunById } from '../../data/askGetSmokeRunById';
 

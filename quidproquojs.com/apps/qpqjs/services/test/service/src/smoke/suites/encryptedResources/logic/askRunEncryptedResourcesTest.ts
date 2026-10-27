@@ -1,3 +1,4 @@
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askFileDelete,
   askFileReadTextContents,
@@ -8,8 +9,6 @@ import {
   askNewGuid,
   AskResponse,
 } from 'quidproquo';
-
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_ENCRYPTED_PROBE_DRIVE } from '../constants/SMOKE_ENCRYPTED_PROBE_DRIVE';

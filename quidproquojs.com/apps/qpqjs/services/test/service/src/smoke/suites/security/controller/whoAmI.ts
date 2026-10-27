@@ -1,3 +1,4 @@
+import { dynamicRoute } from '@qpqjs/features';
 import {
   askCatch,
   AskResponse,
@@ -5,7 +6,6 @@ import {
   HTTPEventResponse,
   qpqWebServerUtils,
 } from 'quidproquo';
-import { dynamicRoute } from '@qpqjs/features';
 
 // GET /security/who-am-i. Public, no token auth. Reports the identity the
 // platform hands a story on a route like this. The directory name is a

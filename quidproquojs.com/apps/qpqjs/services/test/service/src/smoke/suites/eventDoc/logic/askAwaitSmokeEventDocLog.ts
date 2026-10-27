@@ -1,5 +1,5 @@
-import { askDelay, AskResponse } from 'quidproquo';
 import { askEventDocEventListAll, EventDocEvent } from '@qpqjs/features';
+import { askDelay, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

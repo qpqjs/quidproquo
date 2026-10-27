@@ -1,5 +1,6 @@
-import { memo } from 'react';
 import { LandingPage } from '@qpqjs/design-service-views/LandingPage';
+
+import { memo } from 'react';
 
 const AppComponent = () => <LandingPage />;
 
