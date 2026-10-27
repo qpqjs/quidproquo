@@ -45,6 +45,20 @@ describe('getWebsocketSendMessageActionProcessor', () => {
     expect(sendMessageToWebSocketConnection).toHaveBeenCalledWith('API123', 'c1', 'eu-west-1', { hi: true });
   });
 
+  // Security regression: the payload goes out exactly as given (no session or token rides along), and a refusal from
+  // API Gateway for a connection this api does not own is a typed error, never a throw out of the processor.
+  it('sends only the given payload and maps a forbidden connection to a typed error', async () => {
+    const processor = await resolveProcessor();
+    await invoke(processor);
+    expect(vi.mocked(sendMessageToWebSocketConnection).mock.calls[0][3]).toEqual({ hi: true });
+
+    vi.mocked(sendMessageToWebSocketConnection).mockRejectedValue(Object.assign(new Error('forbidden'), { name: 'ForbiddenException' }));
+    const [, error] = await invoke(processor);
+
+    expect(error?.errorType).toBeDefined();
+    expect(error?.errorText).not.toContain('forbidden');
+  });
+
   it('maps a gone connection to a disconnected error', async () => {
     vi.mocked(sendMessageToWebSocketConnection).mockRejectedValue(Object.assign(new Error('gone'), { name: 'GoneException' }));
     const processor = await resolveProcessor();
