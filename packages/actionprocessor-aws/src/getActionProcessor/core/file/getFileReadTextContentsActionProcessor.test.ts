@@ -42,4 +42,23 @@ describe('getProcessFileReadTextContents', () => {
 
     expect(error?.errorType).toBe(askFileReadTextContents.errorType.FileNotFound);
   });
+
+  // Security regression: a scoped read is prefixed with the scope, and a traversal or NUL path is refused before S3.
+  it('reads under the scope prefix', async () => {
+    vi.mocked(readTextFile).mockResolvedValue('hello');
+
+    await invoke({ drive: 'assets', filepath: 'a.txt', scope: 'tenant-a' } as any);
+
+    expect(vi.mocked(readTextFile).mock.calls.at(-1)?.[1]).toBe('tenant-a/a.txt');
+  });
+
+  it('refuses traversal and NUL paths under a scope before touching S3', async () => {
+    vi.mocked(readTextFile).mockClear();
+
+    for (const filepath of ['../tenant-b/a.txt', 'sub/../../tenant-b/a.txt', 'a\u0000.txt']) {
+      const [, error] = await invoke({ drive: 'assets', filepath, scope: 'tenant-a' } as any);
+      expect(error?.errorType).toBe(askFileReadTextContents.errorType.InvalidScope);
+    }
+    expect(readTextFile).not.toHaveBeenCalled();
+  });
 });
