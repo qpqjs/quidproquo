@@ -15,4 +15,13 @@ describe('parseEventDocHeadMovedTopic', () => {
     expect(parseEventDocHeadMovedTopic('eventDoc##doc-1')).toBeNull();
     expect(parseEventDocHeadMovedTopic('')).toBeNull();
   });
+
+  // Security regression: the topic grammar is exact, so a trailing separator, a different case or a scope prefix never
+  // resolves to a document another subscriber could be told about.
+  it('rejects trailing separators, case variants and scope-prefixed lookalikes', () => {
+    expect(parseEventDocHeadMovedTopic('eventDoc#envelopes#doc-1#')).toBeNull();
+    expect(parseEventDocHeadMovedTopic('EventDoc#envelopes#doc-1')).toBeNull();
+    expect(parseEventDocHeadMovedTopic('TENANT#a#eventDoc#envelopes#doc-1')).toBeNull();
+    expect(parseEventDocHeadMovedTopic('eventDoc#envelopes#')).toBeNull();
+  });
 });
