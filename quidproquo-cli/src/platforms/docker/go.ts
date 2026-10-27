@@ -27,9 +27,11 @@ import { DeployPlan } from '../../lib/deployPrompts';
 import { writeDevServerEntry, writeUserScriptChildEntry } from '../../lib/devServerEntry';
 import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
-import { runAppHook } from '../../lib/hooks';
+import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
+import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 import { runCommand } from '../../lib/runCommand';
+import { assertNoFailures } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
 import { clearWebAddressingEnv, setWebAddressingEnv } from '../../lib/webAddressingEnv';
@@ -180,7 +182,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   // Workspace packages resolve through their built dist/ (package.json main),
   // so bundles would ship stale code unless every lib is tsc'd first.
   console.log('Building workspace packages');
-  await runCommand('npm', ['run', 'build', '--workspaces', '--if-present']);
+  assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // ---- Server bundle: the dev server + every service, one main.js ----
   console.log('Bundling server (dev server + all services)');

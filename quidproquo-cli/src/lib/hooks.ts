@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getAppDirectory, getAvailableApps, getRoot } from './discovery';
+import { getAppDirectory, getAppsDirectory, getAvailableApps, getRoot } from './discovery';
 import { nextPrefixColor, runCommand, runCommandPrefixed } from './runCommand';
 import { runDependencyTasks, TaskFailure } from './runTasks';
 
@@ -119,13 +119,51 @@ const resolveHookScript = (pkg: HookPackageJson, hook: string): string | undefin
   return undefined;
 };
 
-// Run the hook's script in every app/workspace package that defines it
-// (qpq:<hook> preferred over a plain <hook> script), in dependency order
-// (declared deps resolved by package name), with up to `jobs` running
-// concurrently. Packages whose dependencies aren't part of this run don't
-// wait on them. Returns the failures; callers decide fatality.
-export const runHookForAllPackages = async (hook: string, jobs: number): Promise<TaskFailure[]> => {
-  const hookPackages = getHookPackages()
+const getDeclaredDependencyNames = (pkg: HookPackageJson): string[] =>
+  Object.keys({ ...pkg.dependencies, ...pkg.devDependencies, ...pkg.peerDependencies });
+
+// True for a package inside apps/<some other app>/. Packages outside apps/
+// are shared, so they never count as another app's.
+const isOtherAppPackage = (dir: string, appName: string): boolean => {
+  const relative = path.relative(getAppsDirectory(), path.resolve(dir));
+  if (relative === '' || relative.startsWith('..') || path.isAbsolute(relative)) {
+    return false;
+  }
+  return relative.split(path.sep)[0] !== appName;
+};
+
+// The app's own packages and the shared ones, plus every package they depend
+// on wherever it lives, so a cross-app dependency still gets built.
+const getAppHookPackages = (appName: string): HookPackage[] => {
+  const allPackages = getHookPackages();
+  const byName = new Map<string, HookPackage>();
+  for (const hookPackage of allPackages) {
+    if (hookPackage.pkg.name) {
+      byName.set(hookPackage.pkg.name, hookPackage);
+    }
+  }
+
+  const selected = new Set(allPackages.filter((hookPackage) => !isOtherAppPackage(hookPackage.dir, appName)));
+  const pending = [...selected];
+  for (let current = pending.pop(); current; current = pending.pop()) {
+    for (const depName of getDeclaredDependencyNames(current.pkg)) {
+      const dep = byName.get(depName);
+      if (dep && !selected.has(dep)) {
+        selected.add(dep);
+        pending.push(dep);
+      }
+    }
+  }
+
+  return allPackages.filter((hookPackage) => selected.has(hookPackage));
+};
+
+// Run the hook's script in each of `candidates` that defines it (qpq:<hook>
+// preferred over a plain <hook> script), in dependency order (declared deps
+// resolved by package name), with up to `jobs` running concurrently. Packages
+// whose dependencies aren't part of this run don't wait on them.
+const runHookForPackages = async (candidates: HookPackage[], hook: string, jobs: number): Promise<TaskFailure[]> => {
+  const hookPackages = candidates
     .map((candidate) => ({ ...candidate, scriptName: resolveHookScript(candidate.pkg, hook) }))
     .filter((candidate): candidate is HookPackage & { scriptName: string } => candidate.scriptName !== undefined);
 
@@ -138,18 +176,23 @@ export const runHookForAllPackages = async (hook: string, jobs: number): Promise
   // a dep that doesn't define the hook has nothing to wait for.
   const runSetNames = new Set(hookPackages.map((hookPackage) => hookPackage.pkg.name).filter(Boolean));
 
-  const tasks = hookPackages.map((hookPackage) => {
-    const declared = { ...hookPackage.pkg.dependencies, ...hookPackage.pkg.devDependencies, ...hookPackage.pkg.peerDependencies };
-    const deps = Object.keys(declared).filter((name) => runSetNames.has(name) && name !== hookPackage.pkg.name);
-
-    return {
-      id: hookPackage.pkg.name ?? hookPackage.dir,
-      label: hookPackage.label,
-      deps,
-      run: () => runCommandPrefixed(hookPackage.label, 'npm', ['run', hookPackage.scriptName], { cwd: hookPackage.dir, color: nextPrefixColor() }),
-    };
-  });
+  const tasks = hookPackages.map((hookPackage) => ({
+    id: hookPackage.pkg.name ?? hookPackage.dir,
+    label: hookPackage.label,
+    deps: getDeclaredDependencyNames(hookPackage.pkg).filter((name) => runSetNames.has(name) && name !== hookPackage.pkg.name),
+    run: () => runCommandPrefixed(hookPackage.label, 'npm', ['run', hookPackage.scriptName], { cwd: hookPackage.dir, color: nextPrefixColor() }),
+  }));
 
   console.log(`Running ${hook} hooks in ${tasks.length} package(s) (${jobs} jobs, dependency ordered)`);
   return runDependencyTasks(tasks, jobs);
 };
+
+/** Runs a hook in every app and workspace package that defines it. Returns the failures; callers decide fatality. */
+export const runHookForAllPackages = (hook: string, jobs: number): Promise<TaskFailure[]> => runHookForPackages(getHookPackages(), hook, jobs);
+
+/**
+ * Runs a hook in one app's packages, the shared packages outside apps/, and anything those depend on.
+ * Other apps' packages are skipped. Returns the failures; callers decide fatality.
+ */
+export const runHookForAppPackages = (hook: string, appName: string, jobs: number): Promise<TaskFailure[]> =>
+  runHookForPackages(getAppHookPackages(appName), hook, jobs);

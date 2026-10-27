@@ -14,9 +14,10 @@ import path from 'path';
 import { synthCommand } from '../../commands/synth';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
-import { runAppHook } from '../../lib/hooks';
+import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
+import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
-import { runCommand } from '../../lib/runCommand';
+import { assertNoFailures } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews } from '../../lib/views';
 import { isAwsCredentialsValid } from './awsCredentials';
@@ -116,7 +117,7 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   // Workspace packages resolve through their built dist/ (package.json main),
   // so bundles would ship stale code unless every lib is tsc'd first.
   console.log('Building workspace packages');
-  await runCommand('npm', ['run', 'build', '--workspaces', '--if-present']);
+  assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // Views uploads resolve bucket names from the shell service's config.
   if (allStacks || stacks === 'views') {

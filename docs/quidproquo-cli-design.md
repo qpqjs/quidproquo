@@ -234,7 +234,9 @@ implementation:
   `qpq hooks postinstall || true` (non-fatal while quidproquo-cli is linked,
   not registry-installed); chakra:typegen lives in docgen's `qpq:postinstall`.
   `qpq go` also fires a `qpq:predeploy` hook before building (single-app,
-  sequential, unchanged).
+  sequential, unchanged). `qpq go`, `go:docker` and the docker image build then
+  compile the workspace with the same runner, limited to the selected app: its
+  own packages, the shared ones outside `apps/`, and anything those depend on.
 - **`qpq go:docker`** is the parallel dockerized deploy, ported intact: local
   builds first (synth in-process, api/views bundles programmatic + concurrent,
   one CDK cloud assembly per service via `cdk synth --app <workspace app>`),
