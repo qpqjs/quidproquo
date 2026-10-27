@@ -1,4 +1,5 @@
 export * from './createHierarchy';
+export * from './encodeLogPathSegment';
 export * from './findLogDirectChildren';
 export * from './findRootLog';
 export * from './getLogHierarchy';

@@ -1,6 +1,7 @@
 import { StoryResultMetadata } from '@qpqjs/core';
 
 import { apiRequestGet, cache } from '../../logic';
+import { encodeLogPathSegment } from './encodeLogPathSegment';
 
 export const findRootLog = cache(async function findRootLog(
   apiBaseUrl: string,
@@ -12,7 +13,7 @@ export const findRootLog = cache(async function findRootLog(
   }
 
   try {
-    const parentLog = await apiRequestGet<StoryResultMetadata>(`/log/${fromCorrelation}`, apiBaseUrl, accessToken);
+    const parentLog = await apiRequestGet<StoryResultMetadata>(`/log/${encodeLogPathSegment(fromCorrelation)}`, apiBaseUrl, accessToken);
 
     return (await findRootLog(apiBaseUrl, parentLog?.fromCorrelation, accessToken)) || parentLog;
   } catch (error) {
