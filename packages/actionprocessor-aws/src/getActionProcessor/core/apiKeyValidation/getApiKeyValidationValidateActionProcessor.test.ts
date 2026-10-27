@@ -84,4 +84,19 @@ describe('getApiKeyValidationValidateActionProcessor', () => {
     expect(await invoke(processor, 'secret')).toEqual([false]);
     expect(getApiKeyValue).not.toHaveBeenCalled();
   });
+
+  // Security regression: a prefix, a case variant or an empty value never matches, and an empty or missing real key
+  // never matches an empty presented value.
+  it('rejects prefixes, case variants and empty values', async () => {
+    vi.mocked(getExportedValue).mockResolvedValue('key-id');
+    vi.mocked(getApiKeyValue).mockResolvedValue('Secret-Key-Value-123');
+    const processor = await resolveProcessor();
+
+    for (const presented of ['Secret-Key-Value-12', 'secret-key-value-123', '', 'Secret-Key-Value-1234']) {
+      expect(await invoke(processor, presented)).toEqual([false]);
+    }
+
+    vi.mocked(getApiKeyValue).mockResolvedValue('');
+    expect(await invoke(processor, '')).toEqual([false]);
+  });
 });

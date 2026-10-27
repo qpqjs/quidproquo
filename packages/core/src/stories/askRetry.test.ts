@@ -104,4 +104,23 @@ describe('askRetry', () => {
     // A NaN jitter byte must not poison the wait
     expect(waits).toEqual([100]);
   });
+
+  // Security regression: retry amplification is bounded by the caller's constant: exactly maxRetries + 1 attempts and
+  // maxRetries waits, even when every attempt fails with a retryable error.
+  it('never exceeds maxRetries + 1 attempts or maxRetries waits when every attempt fails', () => {
+    let attempts = 0;
+    const delay = vi.fn();
+
+    const result = runStory(askRetry(loadConfig, 3, 250), {
+      [ConfigActionType.GetParameter]: () => {
+        attempts += 1;
+        return throwsError('Throttling', 'still slow');
+      },
+      [PlatformActionType.Delay]: delay,
+    });
+
+    expect(expectError(result).errorText).toBe('still slow');
+    expect(attempts).toBe(4);
+    expect(delay).toHaveBeenCalledTimes(3);
+  });
 });

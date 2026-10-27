@@ -17,4 +17,10 @@ describe('isString', () => {
     expect(isString(undefined)).toBe(false);
     expect(isString({})).toBe(false);
   });
+
+  // Security regression: only primitive strings pass; a boxed String or a string-like object never does.
+  it('returns false for boxed strings and string-like objects', () => {
+    expect(isString(new String('x'))).toBe(false);
+    expect(isString({ toString: () => 'x', length: 1 })).toBe(false);
+  });
 });
