@@ -2,7 +2,7 @@ import { StorageDriveTier } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { getS3BucketStorageClassFromStorageDriveTier, matchUrl, randomGuid } from './awsLambdaUtils';
+import { findApiRoute, getS3BucketStorageClassFromStorageDriveTier, matchUrl, randomGuid } from './awsLambdaUtils';
 
 describe('randomGuid', () => {
   it('returns a v4-shaped uuid', () => {
@@ -30,6 +30,30 @@ describe('matchUrl', () => {
 
   it('does not match when the path differs', () => {
     expect(matchUrl('/attempt/{id}', '/result/123').didMatch).toBe(false);
+  });
+
+  // Security regression: a parameter is one segment and the whole url must match, so a request can never reach a
+  // route through an extra segment, a prefix or an encoded slash.
+  it('never lets a parameter span a slash or a request match as a prefix', () => {
+    expect(matchUrl('/users/{id}', '/users/a/b').didMatch).toBe(false);
+    expect(matchUrl('/users/{id}', '/users/a%2Fb').params).toEqual({ id: 'a%2Fb' });
+    expect(matchUrl('/users', '/users/extra').didMatch).toBe(false);
+    expect(matchUrl('/users', '/usersextra').didMatch).toBe(false);
+    expect(matchUrl('/users/{id}', '/users/').didMatch).toBe(false);
+  });
+});
+
+describe('findApiRoute', () => {
+  const route = (method: string, path: string) => ({ method, path, runtime: { src: path, runtimeType: 'Function' }, options: {} }) as any;
+
+  // Security regression: a literal segment always beats a sibling parameter, so `/admin/me` can never be served by the
+  // `/admin/{id}` handler, and a method mismatch is no match at all.
+  it('prefers the literal route over a parameter sibling and respects the method', () => {
+    const routes = [route('GET', '/admin/{id}'), route('GET', '/admin/me'), route('POST', '/admin/{id}')];
+
+    expect(findApiRoute(routes, 'GET', '/admin/me')?.route.path).toBe('/admin/me');
+    expect(findApiRoute(routes, 'GET', '/admin/other')?.route.path).toBe('/admin/{id}');
+    expect(findApiRoute(routes, 'DELETE', '/admin/me')).toBeNull();
   });
 });
 

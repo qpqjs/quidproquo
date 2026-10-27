@@ -82,6 +82,24 @@ describe('buildOpenApiDocument', () => {
     expect(document.components.securitySchemes).toEqual({});
   });
 
+  // Security regression: a hidden route leaves no trace in the document, not even its security requirement or path
+  // parameters, so an internal route map cannot be reconstructed from the spec.
+  it('leaves no trace of a hidden route anywhere in the document', () => {
+    const config = buildTestQpqConfig([
+      defineRoute('POST', '/v1/internal/{tenantId}/rotate-keys', '/src/internal::rotate', {
+        schema: { hidden: true },
+        routeAuthSettings: { userDirectoryName: 'admins' },
+      }),
+      defineRoute('GET', '/v1/widgets', '/src/widgets::list'),
+    ]);
+
+    const json = JSON.stringify(buildOpenApiDocument(config));
+
+    expect(json).not.toContain('internal');
+    expect(json).not.toContain('rotate');
+    expect(json).not.toContain('tenantId');
+  });
+
   it('skips hidden routes', () => {
     const config = buildTestQpqConfig([
       defineRoute('GET', '/v1/docs', '/src/docs::page', { schema: { hidden: true } }),

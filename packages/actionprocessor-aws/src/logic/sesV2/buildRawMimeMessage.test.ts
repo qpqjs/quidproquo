@@ -65,6 +65,23 @@ describe('buildRawMimeMessage', () => {
     expect(mime).not.toContain('\r\nBcc:');
   });
 
+  // Security regression: every header that carries caller text (addresses, reply-to, attachment names) is sanitised,
+  // so a CR/LF in any of them never starts a new header line.
+  it('never lets CR/LF in addresses, reply-to or attachment names start a header line', () => {
+    const injected = '\r\nX-Injected: yes';
+    const mime = buildRawMimeMessage({
+      ...basePayload,
+      from: `noreply@example.com${injected}`,
+      to: [`someone@example.com${injected}`],
+      cc: [`cc@example.com${injected}`],
+      replyTo: `reply@example.com${injected}`,
+      attachments: [{ base64Data: 'aGVsbG8=', filename: `a.txt${injected}`, mimetype: 'text/plain' }],
+    });
+
+    expect(mime).not.toMatch(/^X-Injected:/m);
+    expect(mime).not.toContain('\r\nX-Injected');
+  });
+
   it('encodes non-ascii subjects as RFC 2047 encoded-words', () => {
     const mime = buildRawMimeMessage({ ...basePayload, subject: 'Héllo 👋' });
 
