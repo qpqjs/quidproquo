@@ -20,6 +20,24 @@ describe('keyFragmentParser', () => {
     expect(redactions.sort()).toEqual(['cb-1', 'cs-1', 'wh-1']);
   });
 
+  // Security regression: the TOTP seed Cognito returns from AssociateSoftwareToken lands in the action result
+  // as secretCode; the fragment rule must catch that spelling and sweep the seed from the whole log.
+  it('redacts the secretCode of a software token association and sweeps it from the log', () => {
+    const seed = 'JBSWY3DPEHPK3PXP';
+    const log = {
+      correlation: 'c1',
+      history: [
+        { act: { type: 'UserDirectory/AssociateSoftwareToken', payload: { session: 's' } }, res: [{ secretCode: seed, session: 's2' }, undefined] },
+        { act: { type: 'Log/Create', payload: { msg: `otpauth://totp/app?secret=${seed}` } }, res: [undefined, undefined] },
+      ],
+    } as any;
+
+    const redacted = redactStoryResult(log);
+
+    expect(redacted.history[0].res[0]).toEqual({ secretCode: REDACTED_STRING, session: 's2' });
+    expect(JSON.stringify(redacted)).not.toContain(seed);
+  });
+
   it('finds the key inside a form-encoded body, such as an OAuth token request', () => {
     const log = { correlation: 'c1', input: [{ body: 'grant_type=client_credentials&client_id=abc&client_secret=ca_super-secret-value' }] } as any;
 
