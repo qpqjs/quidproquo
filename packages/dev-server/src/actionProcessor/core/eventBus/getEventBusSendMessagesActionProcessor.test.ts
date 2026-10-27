@@ -1,5 +1,6 @@
 import {
   buildTestQpqConfig,
+  buildTestStorySession,
   defineEventBus,
   ErrorTypeEnum,
   EventBusActionType,
@@ -63,6 +64,28 @@ describe('getEventBusSendMessagesActionProcessor', () => {
         targetEnvironment: expect.any(String),
       }),
     );
+  });
+
+  // Security regression: the session that rides a bus message must be the cross-service form, never the raw
+  // bearer token, local context or function globals of the sending story.
+  it('publishes the cross-service session without the token, local context or function globals', async () => {
+    const process = await getProcessor();
+    const session = {
+      ...buildTestStorySession(),
+      accessToken: 'raw-bearer-token',
+      localContext: { secretThing: 'x' },
+      functionGlobals: { apiKey: 'k' },
+      context: { tenant: 't1' },
+    } as any;
+
+    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] }, session);
+
+    const published = (eventBus.publish as any).mock.calls[0][1];
+    expect(published.storySession.accessToken).toBeUndefined();
+    expect(published.storySession.localContext).toBeUndefined();
+    expect(published.storySession.functionGlobals).toBeUndefined();
+    expect(published.storySession.context).toEqual({ tenant: 't1' });
+    expect(JSON.stringify(published)).not.toContain('raw-bearer-token');
   });
 
   it('leaves groupId unset for non-FIFO buses', async () => {
