@@ -1,6 +1,6 @@
 import { KeyValueStoreActionType, runStory } from '@qpqjs/core';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { askTenantConnectionScopeResolver } from './askTenantConnectionScopeResolver';
 
@@ -41,5 +41,26 @@ describe('askTenantConnectionScopeResolver', () => {
     const runForeign = () => runStory(askTenantConnectionScopeResolver({ userId: 'u1', requestedScope: 'PERSONAL#u2' }), {});
 
     expect(runForeign).toThrowError(/personal scope/);
+  });
+
+  // Security regression: a disabled membership or a store row for another pair never grants the tenant scope, and a
+  // malformed claim is refused before the membership store is read.
+  it('throws Forbidden for a disabled membership or a row for another pair', () => {
+    const runWith = (row: Record<string, unknown>) => () =>
+      runStory(askTenantConnectionScopeResolver({ userId: 'u1', requestedScope: 'tenant-a' }), {
+        [KeyValueStoreActionType.Query]: { items: [row], nextPageKey: undefined },
+      });
+
+    expect(runWith({ userId: 'u1', tenantId: 'tenant-a', roles: [], grants: [], disabled: true })).toThrowError();
+    expect(runWith({ userId: 'u2', tenantId: 'tenant-a', roles: [], grants: [] })).toThrowError();
+  });
+
+  it.each(['tenant/../other', 'a\u0000b', 't'.repeat(200)])('refuses the malformed claim %j without reading the store', (requestedScope) => {
+    const query = vi.fn(() => ({ items: [], nextPageKey: undefined }));
+
+    expect(() =>
+      runStory(askTenantConnectionScopeResolver({ userId: 'u1', requestedScope }), { [KeyValueStoreActionType.Query]: query }),
+    ).toThrowError();
+    expect(query).not.toHaveBeenCalled();
   });
 });
