@@ -25,6 +25,20 @@ describe('buildKvsFilterConditions', () => {
     expect(condition).toBeNull();
   });
 
+  // Security regression: the operator comes from the server-side field definition, never the request, and prototype
+  // names are not fields.
+  it('ignores the operator the request claims and uses the definition', () => {
+    const condition = buildKvsFilterConditions([{ fieldName: 'method', operator: ActionSearchFilterOperator.Contains, value: 'GET' }], fields);
+
+    expect(condition).toEqual(kvsEqual('method', 'GET'));
+  });
+
+  it('drops prototype-named and empty field names', () => {
+    expect(buildKvsFilterConditions([{ fieldName: '__proto__', operator: ActionSearchFilterOperator.Equals, value: 'x' }], fields)).toBeNull();
+    expect(buildKvsFilterConditions([{ fieldName: 'constructor', operator: ActionSearchFilterOperator.Equals, value: 'x' }], fields)).toBeNull();
+    expect(buildKvsFilterConditions([{ fieldName: '', operator: ActionSearchFilterOperator.Equals, value: 'x' }], fields)).toBeNull();
+  });
+
   it('maps equals and contains to their kvs conditions', () => {
     expect(buildKvsFilterConditions([{ fieldName: 'method', operator: ActionSearchFilterOperator.Equals, value: 'GET' }], fields)).toEqual(
       kvsEqual('method', 'GET'),
