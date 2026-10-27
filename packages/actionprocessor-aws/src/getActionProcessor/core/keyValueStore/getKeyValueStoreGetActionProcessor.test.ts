@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { askKeyValueStoreGetBase, buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,5 +30,36 @@ describe('getKeyValueStoreGetActionProcessor', () => {
 
     expect(result).toEqual([{ id: '1' }]);
     expect(getItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', 'pk', '1');
+  });
+
+  // Security regression: the scope gate runs before Dynamo is asked: a scoped store refuses a call without a scope,
+  // an unscoped store refuses one with a scope, and a scoped read composes the scope into the key it fetches.
+  it('refuses a scoped store without a scope and an unscoped store with one, before touching Dynamo', async () => {
+    const config = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('111', 'eu-west-1'),
+      defineKeyValueStore('users', 'pk', ['sk']),
+      defineKeyValueStore('tenants', 'pk', ['sk'], { scoped: true }),
+    ]);
+    const processor = (await getKeyValueStoreGetActionProcessor(config, {} as any))[KeyValueStoreActionType.Get];
+
+    const [, scopedWithout] = await invokeProcessor(processor, { keyValueStoreName: 'tenants', key: '1' });
+    const [, unscopedWith] = await invokeProcessor(processor, { keyValueStoreName: 'users', key: '1', options: { scope: 'tenant-a' } });
+
+    expect(scopedWithout?.errorType).toBe(askKeyValueStoreGetBase.errorType.InvalidScope);
+    expect(unscopedWith?.errorType).toBe(askKeyValueStoreGetBase.errorType.InvalidScope);
+    expect(getItem).not.toHaveBeenCalled();
+  });
+
+  it('composes the scope into the key it fetches', async () => {
+    vi.mocked(getItem).mockResolvedValue(undefined as any);
+    const config = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('111', 'eu-west-1'),
+      defineKeyValueStore('tenants', 'pk', ['sk'], { scoped: true }),
+    ]);
+    const processor = (await getKeyValueStoreGetActionProcessor(config, {} as any))[KeyValueStoreActionType.Get];
+
+    await invokeProcessor(processor, { keyValueStoreName: 'tenants', key: '1', options: { scope: 'tenant-a' } });
+
+    expect(vi.mocked(getItem).mock.calls[0][3]).toBe('tenant-a@@QPQSCOPE@@1');
   });
 });
