@@ -69,7 +69,7 @@ Quidproquo is a functional, action-based web framework built on generators and p
 
 ### Package Architecture
 
-Every published package lives in `packages/<folder>` and is named `@qpqjs/<folder>` (`packages/core` is `@qpqjs/core`). Two keep unscoped names because people type them by hand: `quidproquo`, the umbrella that re-exports core and webserver, and `create-qpq-app`, the `npx create-qpq-app` scaffolder. A new package follows the rule; never add another exception. Action type strings keep their `@quidproquo-<package>/...` ids (`@quidproquo-core/Date/Now`): they are identifiers stored in logs and sent between services, not package names, so never rename them to match.
+Every published package lives in `packages/<folder>` and is named `@qpqjs/<folder>` (`packages/core` is `@qpqjs/core`). Two keep unscoped names because people type them by hand: `quidproquo`, the umbrella that re-exports core and webserver, and `create-qpq-app`, the `npx create-qpq-app` scaffolder. A new package follows the rule; never add another exception. Action type strings keep their `@quidproquo-<package>/...` ids (`@quidproquo-core/Date/Now`): they are identifiers stored in logs and sent between services, not package names, so never rename them to match. The site's `qpqjs` app (`quidproquojs.com/apps/qpqjs`) also uses the `@qpqjs` scope for its own packages (`config`, `constants`, `service-utils`, and `<service>-<kind>` such as `admin-models`), so a new framework folder must never take one of those names.
 
 The monorepo uses npm workspaces with these key relationships:
 
