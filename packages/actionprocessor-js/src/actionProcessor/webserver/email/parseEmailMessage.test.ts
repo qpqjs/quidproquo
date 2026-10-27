@@ -67,3 +67,20 @@ describe('parseEmailMessage', () => {
     expect(message.attachments).toEqual([{ filename: 'note.txt', mimeType: 'text/plain', base64Data: Buffer.from('hello').toString('base64') }]);
   });
 });
+
+describe('parseEmailMessage header decode cost', () => {
+  // A long run of joinable RFC 2047 base64 words is the cheapest way for a sender to burn CPU in the
+  // email lambda: the inbound message is attacker-controlled, so the decode has to stay linear.
+  // On a quadratic decoder this run takes seconds; a linear one finishes in tens of milliseconds.
+  it('decodes a subject of 99000 joinable encoded words in linear time', async () => {
+    const word = `=?utf-8?B?${Buffer.from('abc').toString('base64')}?=`;
+    const subject = Array.from({ length: 99000 }, () => word).join(' ');
+
+    const startedAt = performance.now();
+    const message = await parseEmailMessage(raw(['From: a@x.example', 'To: b@y.example', `Subject: ${subject}`, '', 'hi']));
+    const elapsedMs = performance.now() - startedAt;
+
+    expect(message.subject).toBe('abc'.repeat(99000));
+    expect(elapsedMs).toBeLessThan(500);
+  });
+});
