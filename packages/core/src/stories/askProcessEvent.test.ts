@@ -56,6 +56,25 @@ describe('askProcessEvent', () => {
     ]);
   });
 
+  // Security regression: when the session cannot be seeded (an auth override rejected, a decode failed), the story
+  // must not run anonymously; the record fails closed.
+  it('never executes the story when seeding the session fails', () => {
+    const execute = vi.fn(() => 'should-not-run');
+
+    expect(() =>
+      runStory(askProcessEvent('event-arg'), {
+        [ConfigActionType.GetGlobal]: 'v1',
+        [EventActionType.GetRecords]: ['record-1'],
+        [EventActionType.MatchStory]: { runtime: '/handlers/run::default', runtimeOptions: {} },
+        [EventActionType.AutoRespond]: null,
+        [EventActionType.GetStorySession]: () => throwsError('Unauthorized', 'session rejected'),
+        [SystemActionType.ExecuteStory]: execute,
+        [EventActionType.TransformResponseResult]: (action: any) => action.payload.qpqEventRecordResponses,
+      }),
+    ).toThrow(StoryError);
+    expect(execute).not.toHaveBeenCalled();
+  });
+
   it('returns a match failure for the record instead of crashing the batch', () => {
     const result = runStory(askProcessEvent('event-arg'), {
       [ConfigActionType.GetGlobal]: 'v1',
