@@ -10,7 +10,7 @@ Commit the changes that are currently staged in git. Do **not** stage anything y
 
 1. Run `git diff --cached --name-only` to get the list of staged files. If nothing is staged, stop and tell the user there is nothing to commit.
 2. Run `git diff --cached` to read the actual staged changes so the message reflects what was done, not just which files changed.
-3. **Check for breaking changes** (see "Breaking changes" section below). If the staged diff contains any, append a bullet for each to `breaking-changes.md` under the `## vNext` heading, then `git add breaking-changes.md` so it rides in this same commit.
+3. **Check for breaking changes against the last release** (see "Breaking changes" section below). Add, rewrite or remove bullets under the `## vNext` heading of `breaking-changes.md` so it matches what the staged diff means for someone upgrading from the last release, then `git add breaking-changes.md` if you changed it so it rides in this same commit.
 4. **Check for fundamental changes that affect documentation** (see "Documentation updates" section below). If the staged diff adds or changes a documented action, config helper, or feature, create or update the relevant page(s) under `quidproquojs.com/docusaurus/docs/`, then `git add` those files by name so they ride in this same commit. Together with step 3, this is the **only** case in which this command is allowed to stage files beyond what was already staged by the user.
 5. Determine the **prefix**:
    - For each staged file, take its top-level directory. If it starts with `quidproquo-`, that's the package.
@@ -26,7 +26,7 @@ Commit the changes that are currently staged in git. Do **not** stage anything y
    git commit -m "<prefix><summary>"
    ```
    Use `-m` with a single line. No body, no trailers.
-8. Run `git status` after to confirm the commit landed, then report the commit message you used. If you appended to `breaking-changes.md` or touched any docs pages, mention those too (list the paths).
+8. Run `git status` after to confirm the commit landed, then report the commit message you used. If you changed `breaking-changes.md` (say which bullets you added, rewrote or removed, and the tag you compared against) or touched any docs pages, mention those too (list the paths).
 
 ## Breaking changes
 
@@ -38,7 +38,20 @@ A breaking change is anything that forces downstream callers to update their cod
 - A `define*` config helper's shape changed in a way that existing config files won't compile against.
 - Runtime behavior of a public API changed in a way a caller depends on (e.g. default value flipped, silent failure became a throw).
 
-When you find one, append a bullet under the `## vNext` heading in `breaking-changes.md`. `vNext` is always the active bucket for unreleased breaking changes — at release time the user renames it to the release version and starts a fresh `## vNext` above it. Do not create or rename version headings yourself.
+"Exported" means a consumer can import it: reachable from the package's root `index.ts`, or from a subpath listed in its package.json `exports`. An `export` in an internal file that the package root never re-exports is not public.
+
+### Judge against the last release, not the last commit
+
+Consumers only ever install released versions, so the question is "does this break someone upgrading from the last release", never "does this break the previous commit". Something added and then reshaped between releases breaks nobody.
+
+1. Find the last release: `git describe --tags --abbrev=0`. Tags are bare versions (`0.1.34`). If there is no tag, compare against `HEAD` instead and say so in your report.
+2. For each change in the staged diff that matches the list above, check whether the affected export existed at that tag, e.g. `git grep -n '<symbol>' <tag> -- <package>/src` or `git show <tag>:<path>`.
+3. **Not at the tag** (added since the last release): not breaking. No bullet, however much it changes. The changelog picks it up as a feature from the commits.
+4. **At the tag**: compare the new shape with the shape at the tag, not at `HEAD`. If it still breaks a caller written against the tag, it needs a bullet that states the tag's shape and the new one.
+5. **Already has a vNext bullet** (an earlier unreleased commit changed the same thing): rewrite that bullet so it describes tag to now. Never add a second bullet for the same thing.
+6. **The staged change puts it back to its shape at the tag**: delete its bullet.
+
+`vNext` is always the active bucket for unreleased breaking changes. At release time `/changes` renames it to the release version and starts a fresh `## vNext` above it. Do not create or rename version headings yourself. The release workflow refuses a patch release while `vNext` has bullets, so a bullet that is not a real break blocks a release.
 
 The bullet should:
 
