@@ -33,6 +33,26 @@ describe('getConsoleLogRedactionActionProcessors', () => {
     expect(resolveActionResult(result)).toBeUndefined();
   });
 
+  // Security regression: credential keys of every common spelling and a bare JWT in the message never reach CloudWatch.
+  it('redacts password and api key fields and sweeps a JWT out of the message', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const processor = await resolve(LogActionType.Create);
+    const jwt = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.abc_DEF-123';
+
+    await processor({
+      logLevel: LogLevelEnum.Info,
+      msg: `login with ${jwt} using hunter2`,
+      data: { password: 'hunter2', apiKey: 'key-9', 'x-api-key': 'key-10', nested: { client_secret: 'cs-1' } },
+    });
+
+    const [, printedData] = log.mock.calls[0];
+    const printed = JSON.stringify(log.mock.calls[0]);
+    expect(printedData.password).toBe(REDACTED_STRING);
+    for (const secret of [jwt, 'key-9', 'key-10', 'cs-1']) {
+      expect(printed).not.toContain(secret);
+    }
+  });
+
   it('prints the message alone when there is no data, and keeps falsy data', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     const processor = await resolve(LogActionType.Create);

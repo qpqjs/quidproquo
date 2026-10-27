@@ -25,6 +25,23 @@ const sampleLog = () => {
 };
 
 describe('adminSessionFoldReducer', () => {
+  // Security regression: the session document is UI state only; no key anywhere in the folded state names a credential.
+  it('folds to a state with no credential-shaped key at any depth', () => {
+    const state = foldAdminSessionLog(sampleLog());
+    const keys: string[] = [];
+    const walk = (value: unknown) => {
+      if (value && typeof value === 'object') {
+        for (const [key, inner] of Object.entries(value as Record<string, unknown>)) {
+          keys.push(key.toLowerCase());
+          walk(inner);
+        }
+      }
+    };
+    walk(state);
+
+    expect(keys.some((key) => /token|password|secret|authorization|cookie|apikey/.test(key))).toBe(false);
+  });
+
   it('folds a full session log into the session state', () => {
     const state = foldAdminSessionLog(sampleLog());
 

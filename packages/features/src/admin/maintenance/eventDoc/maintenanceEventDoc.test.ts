@@ -156,6 +156,34 @@ describe('maintenanceEventDoc', () => {
     expect(isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(closed))).toBe(false);
   });
 
+  // Security regression: the public projection is an allow-list of fields; a field added to the document never leaks
+  // to the websocket broadcast unless it is added here too.
+  it('exposes exactly the public fields and nothing else', () => {
+    const state = maintenanceEventDoc.views.document.fold([
+      init,
+      buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up1', reason: 'Working on it', internalNotes: 'SECRET' }), T1, 1),
+    ]);
+
+    const publicState = toMaintenancePublicState(state);
+
+    expect(Object.keys(publicState).sort()).toEqual(
+      [
+        'affectedServices',
+        'bannerText',
+        'etaDurationMins',
+        'etaEndsAt',
+        'id',
+        'level',
+        'maintenanceType',
+        'reason',
+        'status',
+        'updatedAt',
+        'updates',
+      ].sort(),
+    );
+    expect(Object.keys(publicState.updates[0]).sort()).toEqual(['createdAt', 'displayText', 'id']);
+  });
+
   it('strips internal notes and authors from the public projection; the public update text is the reason', () => {
     const state = maintenanceEventDoc.views.document.fold([
       init,
