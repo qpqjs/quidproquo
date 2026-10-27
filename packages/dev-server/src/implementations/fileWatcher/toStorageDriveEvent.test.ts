@@ -21,7 +21,7 @@ describe('toStorageDriveEvent', () => {
 
   // Security regression: the dev watcher applies the same first-folder rule as S3, so a stray file at the
   // drive root or under a traversal-shaped folder fails instead of running a handler unscoped or under that folder.
-  it.each(['stray.pdf', '../docs/x.pdf', './docs/x.pdf', '@@QPQSCOPE@@/x.pdf'])('fails for the scoped-drive path %s', (filepath) => {
+  it.each(['stray.pdf', '../docs/x.pdf', './docs/x.pdf', '@@QPQSCOPE@@/x.pdf'])('fails for the scoped-drive path %s', (filepath: string) => {
     expect(() => toStorageDriveEvent(payload(filepath), defineStorageDrive('uploads', { scoped: true }))).toThrow(InvalidScopeError);
   });
 });
