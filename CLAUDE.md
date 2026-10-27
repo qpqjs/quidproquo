@@ -79,7 +79,7 @@ The monorepo uses npm workspaces with these key relationships:
 
 - **@qpqjs/actionprocessor-\***: Runtime implementations that execute actions. Each targets a specific platform (AWS Lambda, Node.js, browser).
 
-- **@qpqjs/config-aws** + **@qpqjs/deploy-awscdk**: Work together to define and deploy AWS infrastructure using CDK.
+- **@qpqjs/config-aws** + **@qpqjs/deploy-aws**: Work together to define and deploy AWS infrastructure using CDK.
 
 - **@qpqjs/web** + **@qpqjs/web-react**: Client-side utilities and React integration for building SPAs that interact with QPQ backends.
 

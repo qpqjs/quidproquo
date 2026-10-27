@@ -7,7 +7,7 @@ description: Point a key-value store at a pre-existing DynamoDB table instead of
 
 Overrides the physical **DynamoDB table** backing a [key-value store](../core/key-value-store.md). Normally quidproquo derives the table name from the store name and application/module/environment prefix and creates the table for you. This setting instead binds the store to an **existing** DynamoDB table by name, so the deploy imports that table rather than creating a new one. Use it to adopt a table that already exists (a migration, a manually-managed table, or a table shared across systems).
 
-- **On AWS:** resolved by `getDynamoTableNameOverrride` in `@qpqjs/config-aws` and consumed by `QpqCoreKeyValueStoreConstruct` in `@qpqjs/deploy-awscdk`. When an override matches the store, the construct calls `aws_dynamodb.Table.fromTableName(...)` to import the named table instead of provisioning one, and the store's action processors read and write that table. Because the table is imported (not owned), its schema, keys, indexes, and removal policy are managed outside this config.
+- **On AWS:** resolved by `getDynamoTableNameOverrride` in `@qpqjs/config-aws` and consumed by `QpqCoreKeyValueStoreConstruct` in `@qpqjs/deploy-aws`. When an override matches the store, the construct calls `aws_dynamodb.Table.fromTableName(...)` to import the named table instead of provisioning one, and the store's action processors read and write that table. Because the table is imported (not owned), its schema, keys, indexes, and removal policy are managed outside this config.
 
 :::note Spelling
 The exported name is spelled **`defineAwsDyanmoOverrideForKvs`** ("Dyanmo", not "Dynamo") in the source, and that is the name you import.

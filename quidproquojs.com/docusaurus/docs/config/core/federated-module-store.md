@@ -7,7 +7,7 @@ description: Define a federated module store — opt a service into loading its 
 
 Defines a **federated module store**: it opts a service into loading its story code as **federated modules** from a [storage drive](./storage-drive.md) at runtime, instead of running only the code statically bundled into its Lambda zips. This lets you publish new story code to the store and have running services pick it up without redeploying the infrastructure — the compute stays fixed while the behaviour is swapped underneath it. Many services can share one store bucket, each namespaced under its own prefix.
 
-- **On AWS:** no new resource of its own — it reuses the referenced storage drive's S3 bucket. At deploy time the service's Lambdas are pointed at `s3://<bucket>/<serviceName>` via environment variables (`federatedCodeStoreUrl`, and `federatedCodeStoreRecheckMs` when set), computed by `getFederatedCodeStoreEnv` in `@qpqjs/deploy-awscdk`. Read access comes from the storage drive's own IAM grants — nothing extra is created. If the referenced storage drive doesn't exist, the deploy fails fast. The Lambda's module loader polls the store and falls back to bundled modules when nothing is published (unless `bundleFallback` is `false`).
+- **On AWS:** no new resource of its own — it reuses the referenced storage drive's S3 bucket. At deploy time the service's Lambdas are pointed at `s3://<bucket>/<serviceName>` via environment variables (`federatedCodeStoreUrl`, and `federatedCodeStoreRecheckMs` when set), computed by `getFederatedCodeStoreEnv` in `@qpqjs/deploy-aws`. Read access comes from the storage drive's own IAM grants — nothing extra is created. If the referenced storage drive doesn't exist, the deploy fails fast. The Lambda's module loader polls the store and falls back to bundled modules when nothing is published (unless `bundleFallback` is `false`).
 
 ```typescript
 import { defineStorageDrive, defineFederatedModuleStore } from '@qpqjs/core';
@@ -58,4 +58,4 @@ export default [
 ## Related
 
 - [defineStorageDrive](./storage-drive.md) — declares the drive whose bucket backs the federated module store.
-- **AWS implementation:** `getFederatedCodeStoreEnv` (Lambda environment wiring) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `getFederatedCodeStoreEnv` (Lambda environment wiring) in `@qpqjs/deploy-aws`.

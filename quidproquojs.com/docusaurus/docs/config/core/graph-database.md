@@ -9,7 +9,7 @@ Defines a **graph database**: a named graph store that stories query using [open
 
 A graph database always lives inside a **virtual network** (VPC). You must declare that network separately and pass its name as the second argument — the database is deployed into it and is only reachable from workloads (lambdas) attached to the same network.
 
-- **On AWS:** deploys an Amazon Neptune Serverless cluster (`QpqCoreApiGraphDatabaseConstruct` in `@qpqjs/deploy-awscdk`). The cluster is placed in the private subnets of the named virtual network's VPC, scales serverlessly (1–2.5 NCUs), exports audit logs to CloudWatch (one-week retention), and is reachable only from lambdas carrying the network's workload security group. Data stores are retained via a final **snapshot** on stack teardown unless the service opts into destroy with `defineAwsDataStoreRemovalPolicy`.
+- **On AWS:** deploys an Amazon Neptune Serverless cluster (`QpqCoreApiGraphDatabaseConstruct` in `@qpqjs/deploy-aws`). The cluster is placed in the private subnets of the named virtual network's VPC, scales serverlessly (1–2.5 NCUs), exports audit logs to CloudWatch (one-week retention), and is reachable only from lambdas carrying the network's workload security group. Data stores are retained via a final **snapshot** on stack teardown unless the service opts into destroy with `defineAwsDataStoreRemovalPolicy`.
 
 ```typescript
 import { defineGraphDatabase } from '@qpqjs/core';
@@ -69,4 +69,4 @@ export default [
 - [defineVirtualNetwork](./virtual-network.md) — the private network an in-network graph database runs inside.
 - [defineGraphDatabaseNeo4j](../neo4j/graph-database-neo4j.md) — the same graph database action backed by Neo4j instead of Neptune.
 - **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) — retain (via a final snapshot) vs destroy the Neptune cluster on teardown.
-- **AWS implementation:** `QpqCoreApiGraphDatabaseConstruct` (Neptune Serverless cluster, VPC placement, IAM grants) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqCoreApiGraphDatabaseConstruct` (Neptune Serverless cluster, VPC placement, IAM grants) in `@qpqjs/deploy-aws`.

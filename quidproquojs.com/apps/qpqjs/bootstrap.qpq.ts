@@ -1,6 +1,6 @@
 // App-specific bootstrap extras: the root domains, WAF, the api domain, and the
 // domain certificates. The identity plumbing (defineApplication +
-// defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-awscdk's
+// defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-aws's
 // workspace CDK app; this fragment must not declare its own.
 import {
   defineAwsGithubDeployRole,
@@ -10,7 +10,7 @@ import {
   WafRuleOverrideAction,
 } from '@qpqjs/config-aws';
 import { QpqjsServiceEnum } from '@qpqjs/constants';
-import { QpqAppDeployContext } from '@qpqjs/deploy-awscdk';
+import { QpqAppDeployContext } from '@qpqjs/deploy-aws';
 import {
   defineApi,
   defineDns,

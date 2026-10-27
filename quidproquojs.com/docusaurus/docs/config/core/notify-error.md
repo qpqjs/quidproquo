@@ -7,7 +7,7 @@ description: Define an error notifier — watches a service's failures via Cloud
 
 Defines an **error notifier**: it watches the service's Lambda failures and, when they cross a threshold, publishes an alarm-state change to one or more [event buses](./event-bus.md). Subscribe a [queue](./queue.md) to those buses and its consumer story receives a `NotifyErrorQueueEvent` describing the alarm — the mechanism that turns runtime errors and throttles into a reactive notification (page a channel, open a ticket, etc.) processed through the standard [askProcessEvent](../../actions/core/event/ask-process-event.md) pipeline.
 
-- **On AWS:** deploys two **CloudWatch alarms** (`QpqCoreNotifyErrorConstruct` in `@qpqjs/deploy-awscdk`) on the `AWS/Lambda` namespace — one on the `Errors` metric and one on the `Throttles` metric, each with a 60-second period and a threshold of 1 (fires when at least one error/throttle occurs in the period). For every event bus named in `onAlarm.publishToEventBus`, an SNS alarm action is added that publishes the alarm-state change to that bus's SNS topic. A queue subscribed to the bus then delivers the message to your handler story.
+- **On AWS:** deploys two **CloudWatch alarms** (`QpqCoreNotifyErrorConstruct` in `@qpqjs/deploy-aws`) on the `AWS/Lambda` namespace — one on the `Errors` metric and one on the `Throttles` metric, each with a 60-second period and a threshold of 1 (fires when at least one error/throttle occurs in the period). For every event bus named in `onAlarm.publishToEventBus`, an SNS alarm action is added that publishes the alarm-state change to that bus's SNS topic. A queue subscribed to the bus then delivers the message to your handler story.
 
 ```typescript
 import { defineNotifyError, defineEventBus, defineQueue } from '@qpqjs/core';
@@ -94,4 +94,4 @@ export default [
 - [askProcessEvent](../../actions/core/event/ask-process-event.md) — the pipeline that runs the handler story for the delivered message.
 - [defineAwsAlarm](../config-aws/aws-alarm.md) — declare an additional custom CloudWatch alarm beyond the default per-resource ones.
 - [defineAwsServiceDashboard](../config-aws/aws-service-dashboard.md) — its latency anomaly alarms route via this notify-error configuration.
-- **AWS implementation:** `QpqCoreNotifyErrorConstruct` (CloudWatch alarms + SNS alarm actions) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqCoreNotifyErrorConstruct` (CloudWatch alarms + SNS alarm actions) in `@qpqjs/deploy-aws`.

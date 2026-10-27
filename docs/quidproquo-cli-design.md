@@ -61,9 +61,9 @@ Root package.json is entirely user-owned; qpq's only claims on it are a
   calls:
   - rspack service/views config builders, federated exports → `@qpqjs/deploy-rspack`
   - dev-server shell + dynamicModuleLoader glue → `@qpqjs/dev-server`
-  - CDK app entry + cdk.json → `@qpqjs/deploy-awscdk` (CDK is identical for all
+  - CDK app entry + cdk.json → `@qpqjs/deploy-aws` (CDK is identical for all
     products; nothing CDK-shaped lives in the consumer repo)
-- **Fat CLI**: hard-depends on deploy-rspack, deploy-awscdk, dev-server, etc. One
+- **Fat CLI**: hard-depends on deploy-rspack, deploy-aws, dev-server, etc. One
   install, no plugin discovery. It's dev tooling; weight is fine.
 - **Zero package-specific knowledge**: no liquidjs/adm-zip/ws special cases baked in.
   That cruft moves to the consumer's own config (see bundle options below). Hard
@@ -165,7 +165,7 @@ are day-two. Day one is making doccypoccy lean:
    `defineBackendBundleOptions` in the relevant doccypoccy services.
 4. Move `tools/dev-server` into `@qpqjs/dev-server`; port config comes from
    `defineDevServerOptions`, delete `"port"` from views package.jsons.
-5. Move the CDK entry + cdk.json into `@qpqjs/deploy-awscdk`.
+5. Move the CDK entry + cdk.json into `@qpqjs/deploy-aws`.
 6. Create `@qpqjs/cli`: port `tools/services-deployment-awscdk/scripts/*`
    as `qpq` commands, calling down into the packages above.
 7. Move account/bootstrap configs per-app; extend deploy.config.json with the

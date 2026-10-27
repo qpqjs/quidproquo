@@ -1,4 +1,4 @@
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import { SetupStep } from '../../../lib/setupStep';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack } from '../stacks';
@@ -16,7 +16,7 @@ const buildStackStep = (id: string, name: string, stackName: string, region: str
 });
 
 export const buildAccountStackStep = (ctx: AwsSetupContext): SetupStep =>
-  buildStackStep('account-stack', 'Account guardrails stack', qpqDeployAwsCdkUtils.getAccountStackName(), ctx.region, () =>
+  buildStackStep('account-stack', 'Account guardrails stack', qpqDeployAwsUtils.getAccountStackName(), ctx.region, () =>
     deployAccountStack(ctx.appName),
   );
 
@@ -25,7 +25,7 @@ export const buildDomainStackStep = (ctx: AwsSetupContext): SetupStep =>
   buildStackStep(
     'domain-stack',
     'Domain stack: certificates + api domains',
-    qpqDeployAwsCdkUtils.getDomainStackName(ctx.bootstrapQpqConfig),
+    qpqDeployAwsUtils.getDomainStackName(ctx.bootstrapQpqConfig),
     ctx.region,
     () => deployDomainStack(ctx.appName),
   );
@@ -34,7 +34,7 @@ export const buildBootstrapStackStep = (ctx: AwsSetupContext): SetupStep =>
   buildStackStep(
     'bootstrap-stack',
     'Bootstrap stack: WAF and app-wide resources',
-    qpqDeployAwsCdkUtils.getBootstrapStackName(ctx.bootstrapQpqConfig),
+    qpqDeployAwsUtils.getBootstrapStackName(ctx.bootstrapQpqConfig),
     ctx.region,
     () => deployBootstrapStack(ctx.appName),
   );

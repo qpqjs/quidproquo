@@ -1,5 +1,5 @@
 import { QPQConfig } from '@qpqjs/core';
-import { getQpqAppDeployContext, getWorkspaceAccountQpqConfig, getWorkspaceBootstrapQpqConfig } from '@qpqjs/deploy-awscdk';
+import { getQpqAppDeployContext, getWorkspaceAccountQpqConfig, getWorkspaceBootstrapQpqConfig } from '@qpqjs/deploy-aws';
 
 import { getRoot, getServiceNames } from '../../../lib/discovery';
 import { loadServiceQpqConfig } from '../../../lib/qpqConfigs';

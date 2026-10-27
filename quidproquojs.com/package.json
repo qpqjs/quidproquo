@@ -85,7 +85,7 @@
     "@qpqjs/actionprocessor-node": "file:../packages/actionprocessor-node",
     "@qpqjs/actionprocessor-web": "file:../packages/actionprocessor-web",
     "@qpqjs/config-aws": "file:../packages/config-aws",
-    "@qpqjs/deploy-awscdk": "file:../packages/deploy-awscdk",
+    "@qpqjs/deploy-aws": "file:../packages/deploy-aws",
     "@qpqjs/deploy-rspack": "file:../packages/deploy-rspack",
     "@qpqjs/dev-server": "file:../packages/dev-server",
     "@qpqjs/web": "file:../packages/web",

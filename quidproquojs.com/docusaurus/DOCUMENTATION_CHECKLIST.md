@@ -351,7 +351,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Service account management
 - [ ] Configuration utilities
 
-## AWS CDK Deployment (`@qpqjs/deploy-awscdk`)
+## AWS CDK Deployment (`@qpqjs/deploy-aws`)
 
 - [ ] QPQApp construct
 - [ ] Stack definitions

@@ -52,7 +52,7 @@
     "@qpqjs/actionprocessor-aws": "0.1.34",
     "@qpqjs/config-aws": "0.1.34",
     "@qpqjs/core": "0.1.34",
-    "@qpqjs/deploy-awscdk": "0.1.34",
+    "@qpqjs/deploy-aws": "0.1.34",
     "@qpqjs/deploy-rspack": "0.1.34",
     "@qpqjs/user-script": "0.1.34",
     "@qpqjs/dev-server": "0.1.34",

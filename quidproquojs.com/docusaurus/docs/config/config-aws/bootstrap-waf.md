@@ -139,4 +139,4 @@ export default [
 
 - [defineWafProtection](./waf-protection.md) — a per-service setting that opts a service's API Gateway stage and CloudFront distributions into these web ACLs.
 - [defineBootstrapAwsOrganization](./bootstrap-aws-organization.md) — another bootstrap-phase setting deployed by the same `BootstrapQpqServiceStack`.
-- **AWS implementation:** `QpqBootstrapConfigWafConstruct` (regional ACL) and `WafCloudFrontWebAclStack` (CloudFront ACL in us-east-1), with shared rule building in `wafRules.ts`, in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqBootstrapConfigWafConstruct` (regional ACL) and `WafCloudFrontWebAclStack` (CloudFront ACL in us-east-1), with shared rule building in `wafRules.ts`, in `@qpqjs/deploy-aws`.

@@ -69,4 +69,4 @@ export default [
 - [defineWebEntry](./web-entry.md) — the hosted app whose paths this SEO route augments.
 - [defineCache](./cache.md) — the cache policy an SEO route can reference by name.
 - [askWebEntryInvalidateCache](../../actions/webserver/web-entry/ask-web-entry-invalidate-cache.md) — invalidate SEO paths after changing what they render.
-- **AWS implementation:** the SEO Lambda@Edge functions and CloudFront behaviors are created by `WebQpqWebserverWebEntryConstruct` in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** the SEO Lambda@Edge functions and CloudFront behaviors are created by `WebQpqWebserverWebEntryConstruct` in `@qpqjs/deploy-aws`.

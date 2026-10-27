@@ -88,4 +88,4 @@ export default [
 
 - [defineAccountCloudTrail](./account-cloud-trail.md) — required (with `cloudWatchLogs`) for the Cognito auth-failure alarm's metric filter.
 - [defineAccountBudget](./account-budget.md) — cost budget & anomaly alerts, another `defineAccount*` bootstrap setting on the same account stack.
-- **AWS implementation:** `QpqAccountSecurityServicesConstruct` (GuardDuty detector, Security Hub hub, CloudWatch metric filter/alarm, SNS topic) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqAccountSecurityServicesConstruct` (GuardDuty detector, Security Hub hub, CloudWatch metric filter/alarm, SNS topic) in `@qpqjs/deploy-aws`.

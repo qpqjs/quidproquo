@@ -77,4 +77,4 @@ export default [
 
 - [defineBootstrapWaf](./bootstrap-waf.md) — another bootstrap-phase setting deployed by the same `BootstrapQpqServiceStack`.
 - [defineAccountBudget](./account-budget.md), [defineAccountCloudTrail](./account-cloud-trail.md), [defineAccountSecurityServices](./account-security-services.md) — account-level settings applied per member account (from that account's own account config).
-- **AWS implementation:** `QpqBootstrapConfigAwsOrganizationConstruct` (Organizations OU + member accounts) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqBootstrapConfigAwsOrganizationConstruct` (Organizations OU + member accounts) in `@qpqjs/deploy-aws`.

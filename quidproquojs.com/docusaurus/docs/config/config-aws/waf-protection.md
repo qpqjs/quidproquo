@@ -7,7 +7,7 @@ description: Opt a service's API Gateway stage and CloudFront distributions into
 
 Opts this service into the **WAF (web application firewall)** web ACLs created for the app. The web ACLs themselves are provisioned once, in the bootstrap phase, by [`defineBootstrapWaf`](./bootstrap-waf.md) (a regional ACL for API Gateway and a CloudFront ACL in `us-east-1`). This setting is what associates a service's API Gateway stage and CloudFront distributions with those ACLs. It's a separate setting because service configs and the bootstrap config are separate arrays — the ACL ARNs are resolved by convention from SSM at deploy time (so the bootstrap WAF must be deployed first).
 
-- **On AWS:** flagged by `isWafProtectionEnabled` and consumed in `@qpqjs/deploy-awscdk`. `ApiQpqWebserverApiConstruct` creates a `CfnWebACLAssociation` between the API Gateway stage and the regional web ACL ARN (read from SSM); `WebQpqWebserverWebEntryConstruct` sets the CloudFront distribution's `webAclId` to the CloudFront web ACL ARN (also from SSM). Without a bootstrap WAF deployed, there are no ACL ARNs to resolve.
+- **On AWS:** flagged by `isWafProtectionEnabled` and consumed in `@qpqjs/deploy-aws`. `ApiQpqWebserverApiConstruct` creates a `CfnWebACLAssociation` between the API Gateway stage and the regional web ACL ARN (read from SSM); `WebQpqWebserverWebEntryConstruct` sets the CloudFront distribution's `webAclId` to the CloudFront web ACL ARN (also from SSM). Without a bootstrap WAF deployed, there are no ACL ARNs to resolve.
 
 ```typescript
 import { defineWafProtection } from '@qpqjs/config-aws';

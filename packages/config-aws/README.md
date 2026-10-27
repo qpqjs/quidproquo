@@ -10,7 +10,7 @@ That split is deliberate: a service config stays portable, and the AWS detail si
 npm install @qpqjs/config-aws
 ```
 
-You usually pair it with [`@qpqjs/deploy-awscdk`](https://www.npmjs.com/package/@qpqjs/deploy-awscdk), which reads these settings and builds the stacks.
+You usually pair it with [`@qpqjs/deploy-aws`](https://www.npmjs.com/package/@qpqjs/deploy-aws), which reads these settings and builds the stacks.
 
 ## What you can configure
 

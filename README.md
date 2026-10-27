@@ -149,7 +149,7 @@ The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/packages/eslin
 | Package | Description |
 | --- | --- |
 | [@qpqjs/config-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/config-aws) | AWS-specific config settings |
-| [@qpqjs/deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-awscdk) | Turns a qpq config into CDK stacks |
+| [@qpqjs/deploy-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-aws) | Turns a qpq config into CDK stacks |
 | [@qpqjs/deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-rspack) | Rspack bundling for services and federated remotes |
 | [@qpqjs/deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-webpack) | The same, on webpack |
 

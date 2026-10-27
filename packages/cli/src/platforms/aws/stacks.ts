@@ -1,10 +1,10 @@
 // Host-side `cdk deploy` helpers. No cdk.json anywhere: the CDK app command is
-// passed via --app and runs @qpqjs/deploy-awscdk's generic workspace app
+// passed via --app and runs @qpqjs/deploy-aws's generic workspace app
 // (bin/qpq-cdk-app.js) under ts-node hooks. The child inherits the primed
 // deployment env (DEPLOY_APP_NAME / DEPLOY_NAME and everything resolveDeployment
 // set); only the per-invocation service is added here.
 import { QpqDeployEnvVar } from '@qpqjs/core';
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import path from 'path';
 
@@ -57,7 +57,7 @@ export const destroyServiceStack = (serviceName: string, stackName: string, appN
 
 export const deployDomainStack = async (appName: string): Promise<void> => {
   const qpqConfig = loadServiceQpqConfig(appName, getServiceNames(appName)[0]);
-  const stackName = qpqDeployAwsCdkUtils.getDomainStackName(qpqConfig);
+  const stackName = qpqDeployAwsUtils.getDomainStackName(qpqConfig);
   console.log('Deploy Domain: ', stackName);
   await deployStack(stackName, {
     DEPLOY_SERVICE_NAME: '',
@@ -70,7 +70,7 @@ export const deployDomainStack = async (appName: string): Promise<void> => {
 // whether an actor deploy should include it (bootstrap skips it; the explicit
 // 'account' menu option always deploys).
 export const deployAccountStack = async (appName: string): Promise<void> => {
-  const stackName = qpqDeployAwsCdkUtils.getAccountStackName();
+  const stackName = qpqDeployAwsUtils.getAccountStackName();
   console.log('Deploy Account: ', stackName);
   await deployStack(stackName, {
     DEPLOY_SERVICE_NAME: '',
