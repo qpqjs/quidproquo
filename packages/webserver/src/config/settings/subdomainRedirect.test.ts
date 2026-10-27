@@ -28,4 +28,25 @@ describe('defineSubdomainRedirect', () => {
     expect(setting.onRootDomain).toBe(false);
     expect(setting.cloudflareApiKeySecretName).toBe('cf-secret');
   });
+
+  // Security regression: the redirect target is config, stored verbatim, so what a request can add is only the path and
+  // query the handler appends under it; nothing in the setting is derived from a request.
+  it('keeps the target url exactly as written, path and query included', () => {
+    const setting = defineSubdomainRedirect('go', './build', 'https://example.com/landing?utm=x');
+
+    expect(setting.redirectUrl).toBe('https://example.com/landing?utm=x');
+    expect(Object.keys(setting).sort()).toEqual(
+      [
+        'addEnvironment',
+        'addFeatureEnvironment',
+        'apiBuildPath',
+        'cloudflareApiKeySecretName',
+        'configSettingType',
+        'onRootDomain',
+        'redirectUrl',
+        'subdomain',
+        'uniqueKey',
+      ].sort(),
+    );
+  });
 });
