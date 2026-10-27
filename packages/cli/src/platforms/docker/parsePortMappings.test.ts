@@ -11,6 +11,15 @@ describe('parsePortMappings', () => {
     ]);
   });
 
+  // Security regression: a mapping is the only CLI value that reaches a docker argument by text, so anything
+  // but two short digit runs is refused before a command line is built.
+  it.each(['80:8080; rm -rf /', '$(id):80', '80:8080 --privileged', '-p:80', '080:8080a', '123456:80'])(
+    'rejects the shell-shaped mapping %j',
+    (value) => {
+      expect(() => parsePortMappings(value)).toThrow('must be host:container');
+    },
+  );
+
   it('rejects a malformed pair', () => {
     expect(() => parsePortMappings('80->8080')).toThrow("Port mapping '80->8080' must be host:container");
   });
