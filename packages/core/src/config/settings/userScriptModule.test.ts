@@ -31,4 +31,10 @@ describe('defineUserScriptModule', () => {
   it.each(['', './local', '/abs', 'node:fs'])('refuses [%s] as an import name', (name) => {
     expect(() => defineUserScriptModule(name, '/x::y')).toThrow('package-style');
   });
+
+  // Security regression: a module name is an import specifier the sandbox allowlists; a path-shaped or node: name
+  // would let a script reach outside the module map.
+  it.each(['', './local', '../up', '/abs/path', 'node:fs', 'node:child_process'])('refuses the import name %j', (moduleName) => {
+    expect(() => defineUserScriptModule(moduleName, '/entry/mod::mod')).toThrow('not a package-style import name');
+  });
 });

@@ -28,4 +28,14 @@ describe('defineUserScriptRunner', () => {
   it.each([64, 10241, 512.5])('refuses memoryInMiB [%s]', (memoryInMiB) => {
     expect(() => defineUserScriptRunner({ memoryInMiB })).toThrow('memoryInMiB');
   });
+
+  // Security regression: the sandbox's time and memory ceilings are config, so a typo must fail at define time rather
+  // than deploy an unbounded runner.
+  it.each([0, 901, 1.5, Number.NaN])('refuses a timeout of %s seconds', (timeoutInSeconds) => {
+    expect(() => defineUserScriptRunner({ timeoutInSeconds })).toThrow('timeoutInSeconds');
+  });
+
+  it.each([127, 10241, 512.5])('refuses a memory of %s MiB', (memoryInMiB) => {
+    expect(() => defineUserScriptRunner({ memoryInMiB })).toThrow('memoryInMiB');
+  });
 });

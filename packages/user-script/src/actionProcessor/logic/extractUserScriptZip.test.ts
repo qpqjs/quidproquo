@@ -31,6 +31,23 @@ const understateSize = (zip: Buffer, name: string, claimed: number): Buffer => {
   return out;
 };
 
+// Sets the "encrypted" general purpose flag (bit 0) on one entry in both its local header and its central
+// directory record, the way a password-protected archive marks it.
+const markEncrypted = (zip: Buffer, name: string): Buffer => {
+  const out = Buffer.from(zip);
+  const nameBytes = Buffer.from(name);
+  let offset = 0;
+  while ((offset = out.indexOf(nameBytes, offset)) !== -1) {
+    const localHeader = offset - 30;
+    const centralHeader = offset - 46;
+    if (localHeader >= 0 && out.readUInt32LE(localHeader) === 0x04034b50) out.writeUInt16LE(out.readUInt16LE(localHeader + 6) | 1, localHeader + 6);
+    if (centralHeader >= 0 && out.readUInt32LE(centralHeader) === 0x02014b50)
+      out.writeUInt16LE(out.readUInt16LE(centralHeader + 8) | 1, centralHeader + 8);
+    offset += nameBytes.length;
+  }
+  return out;
+};
+
 const expectArchiveError = async (promise: Promise<unknown>, code: UserScriptArchiveErrorCode, messagePart: string) => {
   const error = await promise.then(
     () => undefined,
@@ -98,6 +115,13 @@ describe('extractUserScriptZip', () => {
     const zip = makeZip({ 'src/main.ts': text('main'), 'src/link.ts': [text('../../etc/passwd'), { attrs: SYMLINK_ATTRS }] });
 
     await expectArchiveError(extractUserScriptZip(zip, projectDir), UserScriptArchiveErrorCode.UnsafeArchiveEntry, 'is a symlink');
+  });
+
+  // Security regression: an encrypted entry cannot be inspected, so it is refused rather than written as garbage.
+  it('refuses an encrypted entry', async () => {
+    const zip = markEncrypted(makeZip({ 'src/main.ts': text('main'), 'src/secret.ts': text('x') }), 'src/secret.ts');
+
+    await expectArchiveError(extractUserScriptZip(zip, projectDir), UserScriptArchiveErrorCode.InvalidArchive, 'is encrypted');
   });
 
   it('refuses a node_modules folder anywhere in the archive', async () => {
