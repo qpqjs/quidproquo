@@ -131,6 +131,36 @@ describe('loadFederatedStory', () => {
     expect(await loadFederatedStory(qpqConfig, '/src/entry/hello::hello')).toBeUndefined();
   });
 
+  // Security regression: the manifest names the files to sync, so a manifest written by anyone with write
+  // access to the drive must not be able to place code outside the version directory, nor pick a version
+  // directory outside the cache root.
+  it('refuses a manifest whose files, entry or version escape the cache directory', async () => {
+    const escapeSrcDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-fed-escape-'));
+    const hash = 'escape123';
+    const versionDir = path.join(storeDir, hash);
+    fs.mkdirSync(versionDir, { recursive: true });
+    fs.writeFileSync(path.join(escapeSrcDir, 'escape.js'), buildContainerSource('qpq_escape'));
+    const escapingFile = path.relative(versionDir, path.join(escapeSrcDir, 'escape.js'));
+    const writeManifest = (manifest: Record<string, unknown>) =>
+      fs.writeFileSync(
+        path.join(storeDir, 'manifest.json'),
+        JSON.stringify({ service: 'svc', exposes: { '/src/entry/hello::hello': 'src/entry/hello' }, ...manifest }),
+      );
+
+    try {
+      writeManifest({ containerName: 'qpq_escape', hash, entry: escapingFile, files: [escapingFile] });
+      expect(await loadFederatedStory(qpqConfig, '/src/entry/hello::hello')).toBeUndefined();
+      expect(fs.existsSync(path.resolve(cacheDir, 'qpq_escape', hash, escapingFile))).toBe(false);
+
+      resetFederatedModuleStoreCache();
+      writeManifest({ containerName: '../../qpq_escape', hash, entry: 'remoteEntry.js', files: ['remoteEntry.js'] });
+      expect(await loadFederatedStory(qpqConfig, '/src/entry/hello::hello')).toBeUndefined();
+      expect(fs.existsSync(path.resolve(cacheDir, '..', '..', 'qpq_escape'))).toBe(false);
+    } finally {
+      fs.rmSync(escapeSrcDir, { recursive: true, force: true });
+    }
+  });
+
   it('matches an advanced runtime by its machine-independent key, ignoring basePath', async () => {
     const hash = 'advkey123';
     fs.mkdirSync(path.join(storeDir, hash), { recursive: true });
