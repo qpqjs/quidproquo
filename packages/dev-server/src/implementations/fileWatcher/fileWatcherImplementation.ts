@@ -6,12 +6,10 @@ import {
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
-  splitScopedFilePath,
   StorageDriveQPQConfigSetting,
   storageScopeContext,
   StorySession,
 } from '@qpqjs/core';
-import { StorageDriveEvent, StorageDriveEventType } from '@qpqjs/webserver';
 
 import * as chokidar from 'chokidar';
 import { randomUUID } from 'crypto';
@@ -23,28 +21,8 @@ import { trackInFlight } from '../../logic';
 import { DevServerPluginStop } from '../../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerLogger } from '../logger';
-
-interface FileEventPayload {
-  service: string;
-  drive: string;
-  filepath: string;
-  event: 'create' | 'delete';
-}
-
-// On a scoped drive the first folder under the drive is the scope, matching the
-// S3 key layout. A file outside any scope folder throws, as it does deployed.
-const toStorageDriveEvent = (eventPayload: FileEventPayload, storageDrive: StorageDriveQPQConfigSetting): StorageDriveEvent => {
-  const eventType = eventPayload.event === 'create' ? StorageDriveEventType.Create : StorageDriveEventType.Delete;
-  const storedPath = eventPayload.filepath.split(path.sep).join('/');
-
-  if (!storageDrive.scoped) {
-    return { eventType, driveName: eventPayload.drive, filePaths: [storedPath] };
-  }
-
-  const { scope, filepath } = splitScopedFilePath(storedPath);
-
-  return { eventType, driveName: eventPayload.drive, scope, filePaths: [filepath] };
-};
+import { FileEventPayload } from './FileEventPayload';
+import { toStorageDriveEvent } from './toStorageDriveEvent';
 
 const getDateNow = () => new Date().toISOString();
 
