@@ -8,6 +8,12 @@ const packagesToSkip = [
 
 export default defineConfig({
   test: {
+    // Most packages set `pool: 'threads'` in their own config: worker threads load test
+    // files much faster than forked processes. The ones left on forks need a real process:
+    // rspack's native binding crashes inside a worker (deploy-rspack, user-script, cli),
+    // actionprocessor-node spawns child processes, and actionprocessor-web needs the
+    // Web Storage flag below, which only forks can pass.
+    //
     // Node 25+ enables the experimental Web Storage API by default, injecting a
     // global `localStorage` that shadows jsdom's and is non-functional without a
     // `--localstorage-file`. Disable it in the test workers so jsdom owns storage.

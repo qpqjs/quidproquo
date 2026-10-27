@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    pool: 'threads',
     // aws-cdk-lib's default CloudFormation validator compiles an 8MB wasm module on each worker's
     // first synth (~1s alone, 5s+ with every synth file warming up in parallel), timing out the
     // first test per file. It only reports warnings, so tests lose nothing; real synths still run it.

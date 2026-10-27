@@ -3,20 +3,17 @@
 // that defines one, in dependency order with parallel execution.
 // Wire the root package.json's lifecycle to it, e.g.
 // "postinstall": "qpq hooks postinstall". Use --jobs=1 to force serial runs.
-import os from 'os';
-
 import { getArgValue } from '../lib/args';
+import { getDefaultHookJobs } from '../lib/getDefaultHookJobs';
 import { runHookForAllPackages } from '../lib/hooks';
 import { assertNoFailures } from '../lib/runTasks';
 
-// Leave a core for the rest of the machine, capped so a wide dependency level
-// doesn't stack up too many concurrent npm processes.
 const getJobs = (argv: string[]): number => {
   const parsed = Number(getArgValue(argv, '--jobs'));
   if (Number.isFinite(parsed) && parsed >= 1) {
     return Math.floor(parsed);
   }
-  return Math.max(1, Math.min(8, os.availableParallelism() - 1));
+  return getDefaultHookJobs();
 };
 
 export const hooksCommand = async (argv: string[]): Promise<void> => {

@@ -53,8 +53,9 @@ import path from 'path';
 import { synthCommand } from '../../commands/synth';
 import { DeployPlan, StackType } from '../../lib/deployPrompts';
 import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
+import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { GoDockerMode } from '../../lib/goDockerMode';
-import { runAppHook } from '../../lib/hooks';
+import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { nextPrefixColor, runCommand, runCommandBestEffort, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';
@@ -310,11 +311,11 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
   await runAppHook(appName, 'predeploy');
 
   // Workspace packages resolve through their built dist/ (package.json main),
-  // so bundles would ship stale code unless every lib is tsc'd first. npm runs
-  // the workspaces in topological order; tsc -b is incremental, so this is
-  // seconds when nothing changed.
+  // so bundles would ship stale code unless every lib is tsc'd first. Other
+  // apps' packages are skipped: nothing this app deploys can import them
+  // unless it declares them, and declared ones are built.
   console.log('Building workspace packages');
-  await runCommand('npm', ['run', 'build', '--workspaces', '--if-present']);
+  assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // Synth the selected services' QPQ configs (and shell's, which the views
   // destinations resolve from) so a config that fails to load fails here,

@@ -39,6 +39,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: quidproquojs.com/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            quidproquojs.com/package-lock.json
 
       # Build the monorepo first: quidproquojs.com pulls the quidproquo-*
       # packages via file: refs, which resolve to each package's built lib/.

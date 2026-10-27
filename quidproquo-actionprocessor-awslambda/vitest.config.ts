@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    pool: 'threads',
   },
   resolve: {
     // Test against core source, not the last-built lib - matches

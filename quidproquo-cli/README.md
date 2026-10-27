@@ -41,7 +41,7 @@ For `go`, `svc` is `all`, a comma-separated list, or one of `account`, `domain`,
 
 | Command | Does |
 | --- | --- |
-| `qpq go:docker <svc> <stack> --build-only` | Builds the workspace, bundles the api, views and federated remote, synthesises the CDK assembly and writes a manifest. No docker needed. AWS credentials are, since `cdk synth` looks up hosted zones and VPCs |
+| `qpq go:docker <svc> <stack> --build-only` | Builds the app's workspace packages (other apps' are skipped unless this app depends on them), bundles the api, views and federated remote, synthesises the CDK assembly and writes a manifest. No docker needed. AWS credentials are, since `cdk synth` looks up hosted zones and VPCs |
 | `qpq go:docker <svc> <stack> --from-build` | Deploys the chosen stack from that saved build without rebuilding. After `api` it also publishes the federated remote. Needs docker and the same `--deployment`; the workspace does not need to be built |
 
 The build prints the directories that make up each service's saved build: `dist/qpq/go-docker/<app>/<svc>` (the assembly and the manifest), plus `dist/apps/<app>/services/<svc>/views` and `dist/apps/<app>/services/<svc>/service-remote-published` when the service has them. Upload those as the job's artifact. A build made with `all` can deploy any stack. One made with a single stack can only deploy that stack, so a build for `inf` cannot deploy `api` and skip the publish.
