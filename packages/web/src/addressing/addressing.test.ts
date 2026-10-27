@@ -47,6 +47,20 @@ describe('subdomain mode', () => {
     expect(getApiUrl('shell', 'api', { protocol: 'https:', hostname: 'preview.somewhere.net' })).toBe('https://api.dev.example.com/shell');
   });
 
+  // Security regression: a page host that merely contains or ends in a root's letters is not that root, so
+  // a lookalike page gets the primary root's hosts, never one built from its own hostname.
+  it.each(['dev.example.org.evil.net', 'evilexample.org', 'example.org-cdn.net', 'EXAMPLE.ORG.evil.net'])(
+    'falls back to the primary root for the lookalike page host %s',
+    (hostname) => {
+      bake(subdomainAddressing);
+      const location = { protocol: 'https:', hostname };
+
+      expect(getApiUrl('shell', 'api', location)).toBe('https://api.dev.example.com/shell');
+      expect(getWebSocketUrl('admin', 'qpqadmin', location)).toBe('wss://qpqadmin.admin.dev.example.com');
+      expect(getWebEntryUrl('docs', undefined, location)).toBe('https://docs.dev.example.com');
+    },
+  );
+
   it('throws for an api it does not know', () => {
     bake(subdomainAddressing);
 

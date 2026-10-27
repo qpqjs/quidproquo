@@ -44,6 +44,18 @@ describe('useApiRequestActionProcessor', () => {
     expect(getHeaders()).toEqual({ Authorization: 'Bearer tok' });
   });
 
+  // Security regression: app-supplied extra headers (tenant id, tracing) merge under the auth header, so a
+  // stray or forged Authorization among them can never replace the signed-in user's bearer token.
+  it('keeps the real bearer token over an Authorization supplied through extra headers', () => {
+    const getExtraHeaders = () => ({ 'x-qpq-tenant-id': 'tenant-1', Authorization: 'Bearer forged' });
+    renderHook(() => useApiRequestActionProcessor({ getExtraHeaders }), {
+      wrapper: wrapperFor({ username: '', password: '', authenticationInfo: { accessToken: 'tok' } as any }),
+    });
+
+    const { getHeaders } = createApiRequestActionProcessor.mock.calls.at(-1)![0];
+    expect(getHeaders()).toEqual({ 'x-qpq-tenant-id': 'tenant-1', Authorization: 'Bearer tok' });
+  });
+
   it('defaults the service base url to the api url resolver', () => {
     renderHook(() => useApiRequestActionProcessor(), { wrapper: wrapperFor({ username: '', password: '' }) });
 
