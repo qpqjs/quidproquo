@@ -38,8 +38,8 @@ const readPackageJson = (dir: string): PackageJson =>
 
 // The `workspaces` array is only the launch-order tiebreak between tasks that become
 // ready at the same time. Real ordering constraints come from the dependency graph
-// wired up in buildTasks; the array itself is not reliably topological (deploy-webpack
-// and deploy-rspack sit before @qpqjs/deploy-aws, which both declare as a dep).
+// wired up in buildTasks; the array itself is not reliably topological (deploy-rspack
+// sits before @qpqjs/deploy-aws, which it declares as a dep).
 const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspaces || [];
 
 // Scripts whose aggregate form is driven as sub-scripts. `anytime` scripts have no

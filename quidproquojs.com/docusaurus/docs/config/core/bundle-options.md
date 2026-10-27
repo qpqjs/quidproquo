@@ -5,7 +5,7 @@ description: "Tune how the service's backend and frontend bundles are built: ext
 
 # defineBackendBundleOptions / defineFrontendBundleOptions
 
-Declares **bundler options** for the service. These settings deploy nothing themselves: they are read by the build layer (`@qpqjs/deploy-webpack` / `@qpqjs/deploy-rspack`) when it bundles the service's backend code and frontend views. You can declare either setting more than once; the build layer merges every declared block (later lists concatenate onto earlier ones).
+Declares **bundler options** for the service. These settings deploy nothing themselves: they are read by the build layer (`@qpqjs/deploy-rspack`) when it bundles the service's backend code and frontend views. You can declare either setting more than once; the build layer merges every declared block (later lists concatenate onto earlier ones).
 
 All regex-shaped fields are plain regex **source strings**, not `RegExp` objects, because a QPQ config must survive JSON serialization. The bundler compiles them with `new RegExp(...)`.
 
@@ -99,4 +99,4 @@ export default [
 
 - [defineFederatedModuleStore](./federated-module-store.md): load story code from a store at runtime instead of only the bundled zip.
 - [defineApiBuildPath](./api-build-path.md): where the bundled backend output lives.
-- **Build implementation:** `getWebpackConfigForQpq` / `getRspackConfigForQpq` and `getQpqBundleExternals` in `@qpqjs/deploy-webpack` / `@qpqjs/deploy-rspack`.
+- **Build implementation:** `getRspackConfigForQpq` and `getQpqBundleExternals` in `@qpqjs/deploy-rspack`.

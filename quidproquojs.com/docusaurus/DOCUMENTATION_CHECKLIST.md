@@ -421,8 +421,8 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Service function execution
 - [ ] Tinker interface
 
-### @qpqjs/deploy-webpack
-- [ ] Webpack configuration
+### @qpqjs/deploy-rspack
+- [ ] Rspack configuration
 - [ ] QPQ plugins
 - [ ] Module federation
 - [ ] Dynamic loading

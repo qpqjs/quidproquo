@@ -16,10 +16,6 @@ npm install @qpqjs/deploy-rspack
 - **Loaders and plugins** for the qpq build, including the virtual dynamic loader module
 - **Federation**, both host and remote sides, so a service can publish its logic and another can load it at runtime
 
-## webpack or rspack
-
-[`@qpqjs/deploy-webpack`](https://www.npmjs.com/package/@qpqjs/deploy-webpack) is the same API surface on webpack. Pick one. Rspack is faster and is what the scaffolded app and the CLI use by default; webpack is kept for projects that need it or that depend on a webpack-only plugin.
-
 ## Status
 
 Pre-1.0. The whole `@qpqjs/*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
