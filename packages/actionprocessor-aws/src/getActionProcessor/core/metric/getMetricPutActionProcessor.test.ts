@@ -58,4 +58,24 @@ describe('getMetricPutActionProcessor', () => {
     expect(emf._aws.CloudWatchMetrics[0].Namespace).toBe('qpq/test-app/development/jane');
     expect(emf._aws.CloudWatchMetrics[0].Dimensions).toEqual([['service']]);
   });
+
+  // Security regression: an EMF record is exactly one JSON log line whose namespace comes from the config; a story
+  // cannot forge a second record or move the metric to another namespace through a dimension value or name.
+  it('keeps a hostile dimension inside one JSON line under the configured namespace', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const processor = await resolveProcessor();
+
+    await invokeProcessor(processor, {
+      metricName: 'requests',
+      value: 1,
+      dimensions: { kind: 'a"}\n{"_aws":{"CloudWatchMetrics":[{"Namespace":"other-app"}]}}', Namespace: 'other-app' },
+    });
+
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    const line = logSpy.mock.calls[0][0] as string;
+    expect(line.split('\n')).toHaveLength(1);
+    const emf = JSON.parse(line);
+    expect(emf._aws.CloudWatchMetrics[0].Namespace).toBe('qpq/test-app/development');
+    expect(emf._aws.CloudWatchMetrics).toHaveLength(1);
+  });
 });
