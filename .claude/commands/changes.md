@@ -8,7 +8,7 @@ Build the changelog entry for the release that is about to be published, and do 
 
 ### 1. Work out the new version (V)
 
-Read `"version"` from the working-tree `quidproquo-core/package.json`. That is V, the version this entry is for.
+Read `"version"` from the working-tree `packages/core/package.json`. That is V, the version this entry is for.
 
 ### 2. Work out the previous release (P) and the commit range
 

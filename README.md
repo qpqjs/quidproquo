@@ -104,9 +104,9 @@ Three things fall out of that arrangement:
   const result = runStory(askGreet('world'), { [DateActionType.Now]: '2026-01-01T00:00:00.000Z' });
   ```
 - **Moving platforms is a config change.** The stories do not know or care which processor set answered them.
-- **Every run leaves a complete log.** Because all side effects pass through the runtime, you get execution logs, replay, and statement-level traces without instrumenting anything. That is what the [admin console](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-admin) reads.
+- **Every run leaves a complete log.** Because all side effects pass through the runtime, you get execution logs, replay, and statement-level traces without instrumenting anything. That is what the [admin console](https://github.com/qpqjs/quidproquo/tree/main/packages/web-admin) reads.
 
-The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-eslint-config) enforces both halves of the `ask` contract: always `yield*` an ask call, never name a plain function `ask*`.
+The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/packages/eslint-config) enforces both halves of the `ask` contract: always `yield*` an ask call, never name a plain function `ask*`.
 
 ## Packages
 
@@ -114,59 +114,59 @@ The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-esl
 
 | Package | Description |
 | --- | --- |
-| [create-qpq-app](https://github.com/qpqjs/quidproquo/tree/main/create-qpq-app) | Scaffolder. `npx create-qpq-app my-app` |
-| [quidproquo](https://github.com/qpqjs/quidproquo/tree/main/quidproquo) | The main entry point. Re-exports core and webserver |
-| [quidproquo-cli](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-cli) | The `qpq` CLI: dev, build, deploy and teardown |
+| [create-qpq-app](https://github.com/qpqjs/quidproquo/tree/main/packages/create-qpq-app) | Scaffolder. `npx create-qpq-app my-app` |
+| [quidproquo](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo) | The main entry point. Re-exports core and webserver |
+| [quidproquo-cli](https://github.com/qpqjs/quidproquo/tree/main/packages/cli) | The `qpq` CLI: dev, build, deploy and teardown |
 
 **Framework**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-core](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-core) | Actions, stories, the runtime, and the config system |
-| [quidproquo-webserver](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-webserver) | Routes, apis, websockets, dns, email, and the web-side config |
-| [quidproquo-features](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-features) | Ready-made features: admin, auth users, tenants, event documents |
+| [quidproquo-core](https://github.com/qpqjs/quidproquo/tree/main/packages/core) | Actions, stories, the runtime, and the config system |
+| [quidproquo-webserver](https://github.com/qpqjs/quidproquo/tree/main/packages/webserver) | Routes, apis, websockets, dns, email, and the web-side config |
+| [quidproquo-features](https://github.com/qpqjs/quidproquo/tree/main/packages/features) | Ready-made features: admin, auth users, tenants, event documents |
 
 **Runtimes**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-actionprocessor-js](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-js) | Processors that need no platform at all |
-| [quidproquo-actionprocessor-node](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-node) | Node processors |
-| [quidproquo-actionprocessor-awslambda](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-awslambda) | AWS processors and the Lambda entry handlers |
-| [quidproquo-actionprocessor-web](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-web) | Browser processors |
-| [quidproquo-dev-server](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-dev-server) | Runs your whole app locally on real code paths |
+| [quidproquo-actionprocessor-js](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-js) | Processors that need no platform at all |
+| [quidproquo-actionprocessor-node](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-node) | Node processors |
+| [quidproquo-actionprocessor-awslambda](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-aws) | AWS processors and the Lambda entry handlers |
+| [quidproquo-actionprocessor-web](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-web) | Browser processors |
+| [quidproquo-dev-server](https://github.com/qpqjs/quidproquo/tree/main/packages/dev-server) | Runs your whole app locally on real code paths |
 
 **Frontend**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-web](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web) | Browser utilities, no UI framework required |
-| [quidproquo-web-react](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-react) | React bindings: state store, hooks, auth, websockets |
-| [quidproquo-web-admin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-admin) | The admin console: logs, traces, config, maintenance |
+| [quidproquo-web](https://github.com/qpqjs/quidproquo/tree/main/packages/web) | Browser utilities, no UI framework required |
+| [quidproquo-web-react](https://github.com/qpqjs/quidproquo/tree/main/packages/web-react) | React bindings: state store, hooks, auth, websockets |
+| [quidproquo-web-admin](https://github.com/qpqjs/quidproquo/tree/main/packages/web-admin) | The admin console: logs, traces, config, maintenance |
 
 **Build and deploy**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-config-aws](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-config-aws) | AWS-specific config settings |
-| [quidproquo-deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-awscdk) | Turns a qpq config into CDK stacks |
-| [quidproquo-deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-rspack) | Rspack bundling for services and federated remotes |
-| [quidproquo-deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-webpack) | The same, on webpack |
+| [quidproquo-config-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/config-aws) | AWS-specific config settings |
+| [quidproquo-deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-awscdk) | Turns a qpq config into CDK stacks |
+| [quidproquo-deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-rspack) | Rspack bundling for services and federated remotes |
+| [quidproquo-deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-webpack) | The same, on webpack |
 
 **Tooling**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-tsconfig](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-tsconfig) | Shared TypeScript config |
-| [quidproquo-eslint-config](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-eslint-config) | Shared ESLint config and the qpq lint rules |
-| [quidproquo-testing](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-testing) | Generator assertions and vitest matchers |
+| [quidproquo-tsconfig](https://github.com/qpqjs/quidproquo/tree/main/packages/tsconfig) | Shared TypeScript config |
+| [quidproquo-eslint-config](https://github.com/qpqjs/quidproquo/tree/main/packages/eslint-config) | Shared ESLint config and the qpq lint rules |
+| [quidproquo-testing](https://github.com/qpqjs/quidproquo/tree/main/packages/testing) | Generator assertions and vitest matchers |
 
 **Integrations**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-neo4j](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-neo4j) | Neo4j behind the graph database actions |
-| [quidproquo-xstate](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-xstate) | XState machines as qpq actions |
+| [quidproquo-neo4j](https://github.com/qpqjs/quidproquo/tree/main/packages/neo4j) | Neo4j behind the graph database actions |
+| [quidproquo-xstate](https://github.com/qpqjs/quidproquo/tree/main/packages/xstate) | XState machines as qpq actions |
 
 ## Working on the framework
 

@@ -8,9 +8,9 @@ node_modules/
 .npm
 
 # Don't commit compiled package output (each package's build dir, e.g.
-# quidproquo-core/lib/). Anchored so it doesn't also catch source
-# directories named lib/ nested under src/ (e.g. quidproquo-cli/src/lib/).
-/*/lib/
+# packages/core/lib/). Anchored so it doesn't also catch source
+# directories named lib/ nested under src/ (e.g. packages/cli/src/lib/).
+/packages/*/lib/
 
 # Don't commit env powershell scripts
 .envrc.ps1

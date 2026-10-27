@@ -84,23 +84,23 @@ The `ask-prefix-generator-only` eslint rule only checks function literals, so `c
 
 ## Approach
 
-### Requesters (quidproquo-core/src/logic/stateEffects/)
+### Requesters (packages/core/src/logic/stateEffects/)
 
 1. `EffectRequesterDefinition.ts`: `{ effectType: TType; getPayload?: (...args: TArgs) => TPayload }`.
-2. `EffectRequesterFunction.ts`: callable `(...args: TArgs) => AskResponse<void>`, with `effectType: TType` and `getPayload` attached, like `ActionRequesterFunction` (`quidproquo-core/src/types/ActionRequesterFunction.ts`).
+2. `EffectRequesterFunction.ts`: callable `(...args: TArgs) => AskResponse<void>`, with `effectType: TType` and `getPayload` attached, like `ActionRequesterFunction` (`packages/core/src/types/ActionRequesterFunction.ts`).
 3. `EffectDispatcher.ts`: `<TEffect extends Effect<string, any>>(type: TEffect['type'], payload: TEffect['payload']) => AskResponse<void>`. `any` for the same variance reason as `AnyActionRequesterFunction`, with that comment. `askStateDispatchEffect` and `askApplyEventDocEvent` both already fit.
 4. `createEffectRequesterFor.ts`: `(dispatch: EffectDispatcher) => <TType extends string, TArgs extends unknown[] = [], TPayload = undefined>(definition) => EffectRequesterFunction<TType, TArgs, TPayload>`. A single call, not curried: there is no outer effect generic any more, the type is inferred as a literal from `effectType` and the payload from `getPayload`'s return. A missing `getPayload` becomes `() => undefined`, like `createActionRequester`.
 5. `createStateEffectRequester.ts`: `createEffectRequesterFor(askStateDispatchEffect)`.
 6. Type helpers, one per file: `EffectOf<TRequester>` (the `Effect<TType, TPayload>` it sends), `EffectPayloadOf<TRequester>`, and `AnyEffectRequesterFunction` for constraints.
 
-### Reducers (quidproquo-core/src/logic/stateEffects/)
+### Reducers (packages/core/src/logic/stateEffects/)
 
 7. `EffectHandlerPair.ts`: `{ requester; updater: (state: TState, payload: EffectPayloadOf<TRequester>) => TState }`.
 8. `onEffect.ts`: `(requester, updater) => EffectHandlerPair`, typed so the updater's payload must match the requester.
 9. `buildEffectReducerFrom.ts`: `<TState>() => (pairs) => QpqReducer<TState, union of EffectOf for each pair>`. Curried so the state type is pinned while the pairs are inferred. Builds a lookup by `requester.effectType` with own-property checks, the same as `buildEffectReducer` (effects are replayed from stored logs, so `'toString'` must stay unhandled). Throws at build time if two pairs share an effect type. Returning the union of handled effects means modules no longer hand-write a union for `QpqReducer` or `combineQpqReducers`.
 10. Keep `buildEffectReducer` as it is. Both builders live side by side while modules move over.
 
-### Event docs (quidproquo-features/src/eventDoc/)
+### Event docs (packages/features/src/eventDoc/)
 
 11. `actions/eventDocEvent/createEventDocEffectRequester.ts`: `createEffectRequesterFor(askApplyEventDocEvent)`.
 12. Event-doc updaters receive the payload wrapped in `EventDocEventPayload<T>` (see `fold/EventDocFoldEffects.ts`). Add `fold/onEventDocEffect.ts`, which types the updater as `(state, payload: EventDocEventPayload<EffectPayloadOf<TRequester>>) => TState`, and `fold/buildEventDocFoldReducerFrom.ts`, the pair-based twin of `fold/buildEventDocFoldReducer.ts` (combines `buildEventDocBaseReducer` with the domain pairs, returns `QpqReducer<TState, domain | ReservedEventDocEffects>`).
@@ -123,8 +123,8 @@ The `ask-prefix-generator-only` eslint rule only checks function literals, so `c
 ### Trial conversion (this repo)
 
 22. Two modules, one of each kind, with existing tests passing unchanged apart from switching string matches to `.effectType`:
-    - `quidproquo-features/src/tenant/membership/` (6 UI effects; `logic/askTenantMembershipUiLoad.test.ts` covers it).
-    - `quidproquo-features/src/eventDoc/workspace/chrome/` (4 event-doc effects, the canonical example in CLAUDE.md).
+    - `packages/features/src/tenant/membership/` (6 UI effects; `logic/askTenantMembershipUiLoad.test.ts` covers it).
+    - `packages/features/src/eventDoc/workspace/chrome/` (4 event-doc effects, the canonical example in CLAUDE.md).
     For each: type-string test first (step 15), convert creators, convert updaters to `EffectPayloadOf` or a domain type, swap the reducer to the pair builder, build the validator union if one exists, delete `effects/`, update barrels and any consumer that imported an effect or payload type.
 23. Stop and review with Joe before converting anything else.
 
@@ -134,7 +134,7 @@ The `ask-prefix-generator-only` eslint rule only checks function literals, so `c
 
 ### Rollout
 
-25. Convert the rest module by module as they are touched, not in one sweep. Creators that do more than send one effect (for example `quidproquo-web-admin/src/Auth/**/authActionCreator.ts`, `quidproquo-web-admin/src/platformLogic/effects/system/systemActionCreators.ts`) become plain stories that call requesters.
+25. Convert the rest module by module as they are touched, not in one sweep. Creators that do more than send one effect (for example `packages/web-admin/src/Auth/**/authActionCreator.ts`, `packages/web-admin/src/platformLogic/effects/system/systemActionCreators.ts`) become plain stories that call requesters.
 26. Additive, not breaking: `buildEffectReducer`, `buildEventDocFoldReducer`, `askStateDispatchEffect` and `askApplyEventDocEvent` stay public. Changelog entry through the `changes` skill at release.
 27. doccypoccy, after the release lands there: convert `eventEditor` first. Its updaters are generic over the experience type (`setConfig = <T>(state: EventEditorState<T>, ...)`), which is a good check that `onEffect` accepts generic updaters under a pinned state type. Its experience reducers go through `getEventEditorExperienceReducer`, which is generic over the effect type and should need no change.
 

@@ -37,7 +37,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
   - [x] Basic API example
   - [x] Deployment options
 
-## Core Actions (`quidproquo-core/src/actions`)
+## Core Actions (`packages/core/src/actions`)
 
 ### Config Actions
 - [x] ConfigGetApplicationInfo - Get application metadata
@@ -171,7 +171,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] UserDirectorySetUserAttributes - Set attributes
 - [ ] Auth challenge types and flows
 
-## Core Stories (`quidproquo-core/src/stories`)
+## Core Stories (`packages/core/src/stories`)
 
 ### Array Stories
 - [ ] askArraySome - Check array conditions
@@ -216,7 +216,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] askRetry - Retry operations
 - [ ] askProcessEvent - Process events
 
-## Core Configuration (`quidproquo-core/src/config`)
+## Core Configuration (`packages/core/src/config`)
 
 ### Settings
 - [ ] Action processors configuration
@@ -242,7 +242,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] User directory settings
 - [ ] Virtual network configuration
 
-## Core Types (`quidproquo-core/src/types`)
+## Core Types (`packages/core/src/types`)
 
 - [ ] Action - Base action type
 - [ ] BoundLogicStory - Bound story types
@@ -267,7 +267,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] StorySession - Story session management
 - [ ] UnboundLogicStory - Unbound story types
 
-## Core Runtime (`quidproquo-core/src/runtime`)
+## Core Runtime (`packages/core/src/runtime`)
 
 - [ ] createRuntime - Runtime creation
 - [ ] processAction - Action processing
@@ -275,7 +275,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] resolveStoryWithLogs - Story logging
 - [ ] consoleLogHook - Console logging
 
-## Core Logic (`quidproquo-core/src/logic`)
+## Core Logic (`packages/core/src/logic`)
 
 - [ ] actionLogic - Action logic patterns
 - [ ] Context creation and providers
@@ -285,7 +285,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Lookup resolution
 - [ ] State effects and reducers
 
-## Core Utils (`quidproquo-core/src/utils`)
+## Core Utils (`packages/core/src/utils`)
 
 - [ ] Function binding utilities
 - [ ] Hash generation

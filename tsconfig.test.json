@@ -1,5 +1,5 @@
 {
-  "extends": "./quidproquo-tsconfig/tsconfig.base.json",
+  "extends": "./packages/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
     "esModuleInterop": true,
@@ -12,14 +12,14 @@
     // Resolve quidproquo-web-react to its source for type-checking so the suite type-checks
     // without first building that package's lib (every other workspace dep is already built).
     "paths": {
-      "quidproquo-web-react": ["quidproquo-web-react/src/index.ts"]
+      "quidproquo-web-react": ["packages/web-react/src/index.ts"]
     }
   },
   "include": [
     "./vitest-env.d.ts",
     "**/src/**/*.test.ts",
     "**/src/**/*.spec.ts",
-    "quidproquo-testing/src/**/*.ts"
+    "packages/testing/src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

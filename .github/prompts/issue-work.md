@@ -98,7 +98,7 @@ not pushed, so never start anything that does not exit on its own:
 
 - Run tests with `npm test` or `npx vitest run`. Never bare `npx vitest`,
   which starts watch mode and waits forever.
-- Never start the dev server (`npm run start` in `quidproquo-dev-server`),
+- Never start the dev server (`npm run start` in `packages/dev-server`),
   `npm run watch`, or anything described as a server, watcher, or daemon.
 - Wrap the big steps so a stall fails fast instead of eating the budget:
   `timeout 600 npm ci`, `timeout 600 npm run build`, `timeout 900 npm test`.

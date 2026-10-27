@@ -49,7 +49,7 @@ npm run publish
 ### Development Server
 ```bash
 # Run the development server
-cd quidproquo-dev-server
+cd packages/dev-server
 npm run start
 ```
 
@@ -59,7 +59,7 @@ Quidproquo is a functional, action-based web framework built on generators and p
 
 ### Core Concepts
 
-1. **Actions**: Type-safe Redux-style actions with a type and optional payload. All actions are defined in `quidproquo-core/src/actions/`.
+1. **Actions**: Type-safe Redux-style actions with a type and optional payload. All actions are defined in `packages/core/src/actions/`.
 
 2. **Stories**: Generator functions that compose business logic by yielding actions and receiving results. Stories are pure functions that describe what should happen without knowing how.
 
@@ -83,7 +83,7 @@ The monorepo uses npm workspaces with these key relationships:
 
 ### Action Categories
 
-Actions are organized by domain in `quidproquo-core/src/actions/`:
+Actions are organized by domain in `packages/core/src/actions/`:
 
 - **Config**: Parameters, secrets, globals
 - **KeyValueStore**: DynamoDB-like operations  
@@ -99,18 +99,18 @@ Actions are organized by domain in `quidproquo-core/src/actions/`:
 
 ### Adding New Features
 
-1. **Define the action** in `quidproquo-core/src/actions/<domain>/`
+1. **Define the action** in `packages/core/src/actions/<domain>/`
 2. **Create action requester** (generator function) in the same location
 3. **Implement processors** in each `quidproquo-actionprocessor-*` package
 4. **Export from index files** at each level
 
 ### TypeScript Configuration
 
-All packages extend the base config at `quidproquo-tsconfig/tsconfig.base.json`. Packages build dual CommonJS/ESM outputs using separate tsconfig files.
+All packages extend the base config at `packages/tsconfig/tsconfig.base.json`. Packages build dual CommonJS/ESM outputs using separate tsconfig files.
 
 ### ESLint Configuration  
 
-Shared ESLint config at `quidproquo-eslint-config/eslint.config.mjs` enforces consistent code style. Import sorting groups quidproquo packages separately from external dependencies.
+Shared ESLint config at `packages/eslint-config/eslint.config.mjs` enforces consistent code style. Import sorting groups quidproquo packages separately from external dependencies.
 
 ## Writing style
 
@@ -190,7 +190,7 @@ Backend-only features (routes + logic) use the same idea with `actions/`, `route
 ## Important Notes
 
 - This is a monorepo using npm workspaces - always use `-w <package-name>` to target specific packages
-- Tests run with vitest (`npm run test -w <package-name>`); vitest configs alias sibling qpq packages to their `src`, so no build is needed to run tests. Unit-test stories with `runStory` from `quidproquo-core/src/testing` (mock actions by type), and state-driven logic with `askReduceState`.
+- Tests run with vitest (`npm run test -w <package-name>`); vitest configs alias sibling qpq packages to their `src`, so no build is needed to run tests. Unit-test stories with `runStory` from `packages/core/src/testing` (mock actions by type), and state-driven logic with `askReduceState`.
 - The project is under active development and not production-ready
 - When modifying actions, ensure changes are reflected across all action processor implementations
-- The dev server in `quidproquo-dev-server` is the primary way to test changes locally
+- The dev server in `packages/dev-server` is the primary way to test changes locally

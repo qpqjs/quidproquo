@@ -160,7 +160,7 @@ jobs:
       - name: pack the saved build
         run: |
           shopt -s nullglob
-          tar -I 'zstd -T0' -cf deploy-build.tar.zst -- */lib \
+          tar -I 'zstd -T0' -cf deploy-build.tar.zst -- packages/*/lib \
             quidproquojs.com/dist/qpq/go-docker/qpqjs \
             quidproquojs.com/dist/apps/qpqjs/services/*/views \
             quidproquojs.com/dist/apps/qpqjs/services/*/service-remote-published

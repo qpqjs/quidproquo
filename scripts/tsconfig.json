@@ -1,6 +1,6 @@
 // tsconfig.commonjs.json
 {
-  "extends": "../quidproquo-tsconfig/tsconfig.base",
+  "extends": "../packages/tsconfig/tsconfig.base",
   "compilerOptions": {
     "module": "CommonJS",
     "outDir": "./lib/commonjs"
