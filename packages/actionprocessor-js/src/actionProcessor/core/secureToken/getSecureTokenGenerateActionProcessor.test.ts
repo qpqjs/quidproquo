@@ -1,4 +1,12 @@
-import { askSecureTokenGenerate, buildTestQpqConfig, isErroredActionResult, resolveActionResult, resolveActionResultError, SecureTokenActionType } from '@qpqjs/core';
+import {
+  askSecureTokenGenerate,
+  buildTestQpqConfig,
+  isErroredActionResult,
+  resolveActionResult,
+  resolveActionResultError,
+  SECURE_TOKEN_MAX_BYTE_LENGTH,
+  SecureTokenActionType,
+} from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -48,5 +56,26 @@ describe('getSecureTokenGenerateActionProcessor', () => {
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askSecureTokenGenerate.errorType.InvalidByteLength);
+  });
+
+  // Security regression: a token must be a whole number of bytes inside the configured range, and it must never
+  // come from a weaker source than Web Crypto.
+  it.each([0, -1, 1.5, Number.NaN, SECURE_TOKEN_MAX_BYTE_LENGTH + 1])('refuses a byte length of %s', async (byteLength) => {
+    const processor = await getProcessor();
+
+    const result = await processor({ byteLength });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(askSecureTokenGenerate.errorType.InvalidByteLength);
+  });
+
+  it('refuses to generate without Web Crypto rather than falling back', async () => {
+    const processor = await getProcessor();
+    vi.spyOn(globalThis, 'crypto', 'get').mockReturnValue(undefined as any);
+
+    const result = await processor({ byteLength: 32 });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(askSecureTokenGenerate.errorType.RandomSourceUnavailable);
   });
 });

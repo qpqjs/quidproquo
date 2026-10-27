@@ -26,6 +26,17 @@ describe('rs256', () => {
     expect(rs256Verify(other.publicKeyPem, 'header.payload', signature)).toBe(false);
   });
 
+  // Security regression: a well-formed signature with any bit changed is simply false, never true and never a throw
+  // that could be mistaken for a transport problem.
+  it('rejects a signature with a single flipped bit without throwing', () => {
+    const signature = rs256Sign(privateKeyPem, 'header.payload');
+    const bytes = Buffer.from(base64UrlDecode(signature));
+    bytes[bytes.length - 1] ^= 0x01;
+    const flipped = bytes.toString('base64url');
+
+    expect(rs256Verify(publicKeyPem, 'header.payload', flipped)).toBe(false);
+  });
+
   it('throws MalformedSignature for a signature that is not base64url', () => {
     expect(() => rs256Verify(publicKeyPem, 'header.payload', 'not base64url!')).toThrow(SigningMalformedSignatureError);
     expect(() => base64UrlDecode('abc+/=')).toThrow(SigningMalformedSignatureError);
