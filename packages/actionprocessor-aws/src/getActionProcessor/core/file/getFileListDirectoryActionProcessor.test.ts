@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileListDirectory, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -31,5 +31,25 @@ describe('getProcessFileListDirectory', () => {
       fileInfos: [{ filepath: 'a.txt', isDir: false, drive: 'assets' }],
       pageToken: 'next',
     });
+  });
+
+  // Security regression: a scoped list is prefixed with the scope and stripped back, so one scope can never see
+  // another's keys; a traversal folder path is refused before S3 is asked.
+  it('lists under the scope prefix and strips it from the returned keys', async () => {
+    vi.mocked(listFiles).mockResolvedValue({ fileInfos: [{ filepath: 'tenant-a/sub/a.txt', isDir: false }], pageToken: undefined });
+
+    const [result] = await invoke({ drive: 'assets', folderPath: 'sub', scope: 'tenant-a' } as any);
+
+    expect(vi.mocked(listFiles).mock.calls.at(-1)?.[2]).toBe('tenant-a/sub');
+    expect(result?.fileInfos.map((file) => file.filepath)).toEqual(['sub/a.txt']);
+  });
+
+  it('refuses a traversal folder path under a scope before touching S3', async () => {
+    vi.mocked(listFiles).mockClear();
+
+    const [, error] = await invoke({ drive: 'assets', folderPath: '../tenant-b', scope: 'tenant-a' } as any);
+
+    expect(error?.errorType).toBe(askFileListDirectory.errorType.InvalidScope);
+    expect(listFiles).not.toHaveBeenCalled();
   });
 });

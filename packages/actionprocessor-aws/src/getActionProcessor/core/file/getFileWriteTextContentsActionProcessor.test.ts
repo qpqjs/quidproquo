@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileWriteTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -25,5 +25,21 @@ describe('getProcessFileWriteTextContents', () => {
 
     expect(result).toBeUndefined();
     expect(writeTextFile).toHaveBeenCalledWith('bucket-x', 'a.txt', 'hello', 'us-test-1', 'STANDARD');
+  });
+
+  // Security regression: a scoped write lands under the scope prefix, and a traversal path is refused before S3.
+  it('writes under the scope prefix', async () => {
+    await invoke({ drive: 'assets', filepath: 'a.txt', data: 'hello', scope: 'tenant-a' });
+
+    expect(vi.mocked(writeTextFile).mock.calls.at(-1)?.[1]).toBe('tenant-a/a.txt');
+  });
+
+  it('refuses a traversal path under a scope before touching S3', async () => {
+    vi.mocked(writeTextFile).mockClear();
+
+    const [, error] = await invoke({ drive: 'assets', filepath: '../tenant-b/a.txt', data: 'hello', scope: 'tenant-a' });
+
+    expect(error?.errorType).toBe(askFileWriteTextContents.errorType.InvalidScope);
+    expect(writeTextFile).not.toHaveBeenCalled();
   });
 });
