@@ -54,6 +54,20 @@ describe('getEventTransformResponseResultActionProcessor (express)', () => {
     expect(resolveActionResult(result).body).toBe('');
   });
 
+  // Security regression: the stack stays in the log; a caller only ever sees the error type and text.
+  it('never sends an error stack or stack frames to the caller', async () => {
+    const error = {
+      errorType: ErrorTypeEnum.GenericError,
+      errorText: 'An unexpected error occurred [TypeError].',
+      errorStack: 'TypeError: x\n    at handler (/app/index.js:1:1)',
+    };
+    const output = resolveActionResult(await invoke([{ success: false, error }]));
+
+    expect(output.statusCode).toBe(500);
+    expect(Object.keys(JSON.parse(output.body)).sort()).toEqual(['errorText', 'errorType']);
+    expect(output.body).not.toMatch(/\n\s+at /);
+  });
+
   it('maps a NotFound error record to a 404 response', async () => {
     const result = await invoke([{ success: false, error: { errorType: ErrorTypeEnum.NotFound, errorText: 'nope' } }]);
 

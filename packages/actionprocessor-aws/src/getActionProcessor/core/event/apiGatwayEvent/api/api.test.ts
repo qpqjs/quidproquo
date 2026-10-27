@@ -151,6 +151,23 @@ describe('apiGatwayEvent/api getEventTransformResponseResultActionProcessor', ()
     expect(JSON.parse((response as any).body)).toEqual({ errorType: ErrorTypeEnum.NotFound, errorText: 'nope' });
   });
 
+  // Security regression: the stack stays in the log; a caller only ever sees the error type and text.
+  it('never sends an error stack or stack frames to the caller', async () => {
+    const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult);
+    const error = {
+      errorType: ErrorTypeEnum.GenericError,
+      errorText: 'An unexpected error occurred [TypeError].',
+      errorStack: 'TypeError: x\n    at handler (/var/task/index.js:1:1)',
+    };
+
+    const [response] = await processor({ eventParams: [buildApiGatewayEvent(), context], qpqEventRecordResponses: [{ success: false, error }] });
+
+    const body = JSON.parse((response as any).body);
+    expect((response as any).statusCode).toBe(500);
+    expect(Object.keys(body).sort()).toEqual(['errorText', 'errorType']);
+    expect((response as any).body).not.toMatch(/\n\s+at /);
+  });
+
   it("answers with the matched route's own allowed origin, as its preflight does", async () => {
     const config = buildTestQpqConfig([
       {
