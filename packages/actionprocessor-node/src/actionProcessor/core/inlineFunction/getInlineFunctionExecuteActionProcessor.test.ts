@@ -53,6 +53,18 @@ describe('getInlineFunctionExecuteActionProcessor', () => {
     expect(error.errorText).toContain('missing');
   });
 
+  // Security regression: the name is a config key, not a path; path-shaped names never reach the module loader.
+  it.each(['../entry/fn::handler', '/entry/fn::handler', 'entry/../../etc::x', 'node:child_process'])(
+    'returns NotFound for the path-shaped name %s without loading anything',
+    async (functionName) => {
+      const loader = vi.fn(async () => ({ handler: () => actionResult('never') }));
+      const result = await invoke({ functionName, payload: {} }, {}, loader);
+
+      expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+      expect(loader).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns NotFound when the module cannot be loaded', async () => {
     const result = await invoke({ functionName: 'handler', payload: {} }, {}, async () => null);
 

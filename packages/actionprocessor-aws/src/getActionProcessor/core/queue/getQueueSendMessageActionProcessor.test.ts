@@ -40,6 +40,27 @@ describe('getQueueSendMessagesActionProcessor', () => {
     expect(JSON.parse(entries[0].body)).toEqual({ payload: { a: 1 }, storySession: buildTestStorySession() });
   });
 
+  // Security regression: the body that lands in SQS carries the cross-service session only, never the raw bearer
+  // token, local context or function globals of the sending story.
+  it('strips the token, local context and function globals from the session it sends', async () => {
+    const processor = await resolveProcessor();
+    const session = {
+      ...buildTestStorySession(),
+      accessToken: 'raw-bearer-token',
+      localContext: { secretThing: 'x' },
+      functionGlobals: { apiKey: 'k' },
+    } as any;
+
+    await invokeProcessor(processor, { queueName: 'jobs', queueMessages: [{ payload: {} }] }, { session });
+
+    const [, , entries] = vi.mocked(sendMessages).mock.calls[0];
+    const sent = JSON.parse(entries[0].body).storySession;
+    expect(sent.accessToken).toBeUndefined();
+    expect(sent.localContext).toBeUndefined();
+    expect(sent.functionGlobals).toBeUndefined();
+    expect(entries[0].body).not.toContain('raw-bearer-token');
+  });
+
   it('resolves a .fifo name and defaults groupId/deduplicationId for a FIFO queue', async () => {
     const processor = await resolveProcessor([defineQueue('jobs', {}, { isFifo: true })]);
 

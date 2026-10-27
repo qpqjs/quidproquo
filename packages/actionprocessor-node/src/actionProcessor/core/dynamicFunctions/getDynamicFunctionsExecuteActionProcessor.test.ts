@@ -174,6 +174,16 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     expect(resolveActionResultError(result).errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
   });
 
+  // Security regression: a caller names the member, so Object.prototype names must never resolve to callables.
+  it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty', 'valueOf'])(
+    'returns FunctionNotFound for the prototype name %s',
+    async (functionName) => {
+      const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName, args: [] }, {}, async () => ({ real() {} }));
+
+      expect(resolveActionResultError(result).errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
+    },
+  );
+
   it('returns FunctionNotFound for a member reachable only through the prototype', async () => {
     class WithProtoMember {
       inherited() {
