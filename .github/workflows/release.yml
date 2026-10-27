@@ -14,6 +14,11 @@ name: release
 #             installs nothing. Publishes the tarballs, then pushes the bump
 #             commit and tag and makes the GitHub release.
 #
+# The publish job runs in the `npm` environment, which waits for a maintainer to
+# approve the run ("Review deployments" on the run page) and only accepts main.
+# npm's trusted publisher for every package names that environment, so a changed
+# copy of this workflow on another branch cannot publish.
+#
 # If publish fails, use "Re-run failed jobs": it skips versions already on npm,
 # and pushing the same commit again is a no-op.
 on:
@@ -113,6 +118,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: npm
     permissions:
       # Push the bump commit and tag, and make the release.
       contents: write
