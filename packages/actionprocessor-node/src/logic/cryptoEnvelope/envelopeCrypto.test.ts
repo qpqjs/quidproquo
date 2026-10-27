@@ -38,6 +38,20 @@ describe('envelopeEncrypt / envelopeDecrypt', () => {
     expect(ciphertext).not.toContain('tenant-a');
   });
 
+  // Security regression: every encryption draws a fresh data key and IV, so the same plaintext under the same key and
+  // context never produces the same ciphertext (equal ciphertexts would leak equal plaintexts).
+  it('never produces the same ciphertext twice for the same plaintext, key and context', async () => {
+    const provider = buildProvider();
+    const context = { tenantId: 'tenant-a' };
+
+    const first = await envelopeEncrypt('super-secret-value', context, provider);
+    const second = await envelopeEncrypt('super-secret-value', context, provider);
+
+    expect(first).not.toBe(second);
+    expect(await envelopeDecrypt(first, context, provider)).toBe('super-secret-value');
+    expect(await envelopeDecrypt(second, context, provider)).toBe('super-secret-value');
+  });
+
   it('treats omitted context and {} as the same context', async () => {
     const provider = buildProvider();
 
