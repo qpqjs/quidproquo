@@ -34,8 +34,8 @@ permissions:
   contents: read
 
 jobs:
-  # Deploy gate: the unit tests on the node version the deploy runs on. Keep it
-  # in step with quidproquojs.com/.nvmrc.
+  # Deploy gate: the unit tests on the node version the deploy runs on. When
+  # quidproquojs.com/.nvmrc moves to a new major, move this list with it.
   test:
     uses: ./.github/workflows/ci-test.yml
     with:
