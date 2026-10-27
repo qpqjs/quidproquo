@@ -87,6 +87,22 @@ describe('askMcpHandleRequest', () => {
     expect(response).toMatchObject({ id: 3, error: { code: McpJsonRpcErrorCode.MethodNotFound } });
   });
 
+  // Security regression: a tool or method name is a lookup key, so prototype names resolve to nothing and run nothing.
+  it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty'])('answers the tool name %s with InvalidParams and runs nothing', (name) => {
+    const executed: ExecuteAction[] = [];
+
+    const response = runStory(askMcpHandleRequest(callTool(name, {}), event), buildMocks(executed));
+
+    expect(response).toMatchObject({ id: 7, error: { code: McpJsonRpcErrorCode.InvalidParams } });
+    expect(executed.filter((action) => action.payload!.functionName !== 'docsListFn')).toEqual([]);
+  });
+
+  it.each(['__proto__', 'constructor', 'tools/call/../ping'])('answers the method %s with MethodNotFound', (method) => {
+    const response = runStory(askMcpHandleRequest({ jsonrpc: '2.0', id: 3, method }, event), buildMocks());
+
+    expect(response).toMatchObject({ id: 3, error: { code: McpJsonRpcErrorCode.MethodNotFound } });
+  });
+
   it('answers an unknown tool with InvalidParams', () => {
     const response = runStory(askMcpHandleRequest(callTool('dropTables', {}), event), buildMocks());
 
