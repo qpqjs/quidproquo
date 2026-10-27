@@ -1,7 +1,17 @@
 // @vitest-environment jsdom
-import { buildTestQpqConfig, ConfigActionType, noopDynamicModuleLoader } from '@qpqjs/core';
+import {
+  buildTestQpqConfig,
+  ConfigActionType,
+  CryptoActionType,
+  EventBusActionType,
+  FileActionType,
+  KeyValueStoreActionType,
+  noopDynamicModuleLoader,
+  QueueActionType,
+  UserDirectoryActionType,
+} from '@qpqjs/core';
 import { QueryParamsActionType, WindowActionType } from '@qpqjs/web';
-import { ApiActionType } from '@qpqjs/webserver';
+import { ApiActionType, ServiceFunctionActionType, WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -22,5 +32,24 @@ describe('getWebActionProcessors', () => {
     ]) {
       expect(typeof processors[actionType]).toBe('function');
     }
+  });
+
+  // Security regression: the browser bundle runs as the user, so no processor that needs the service role
+  // (secrets, stores, files, directories, buses, queues, keys, cross-service invokes) may be registered.
+  it('registers no server-only processor', async () => {
+    const processors = await getWebActionProcessors(buildTestQpqConfig(), noopDynamicModuleLoader);
+    const serverOnly = [
+      ConfigActionType.GetSecret,
+      ...Object.values(KeyValueStoreActionType),
+      ...Object.values(FileActionType),
+      ...Object.values(UserDirectoryActionType),
+      ...Object.values(EventBusActionType),
+      ...Object.values(QueueActionType),
+      ...Object.values(CryptoActionType),
+      ...Object.values(ServiceFunctionActionType),
+      ...Object.values(WebsocketActionType),
+    ];
+
+    expect(serverOnly.filter((actionType) => actionType in processors)).toEqual([]);
   });
 });
