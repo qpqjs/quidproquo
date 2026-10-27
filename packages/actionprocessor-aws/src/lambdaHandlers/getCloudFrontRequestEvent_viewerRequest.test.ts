@@ -38,4 +38,14 @@ describe('getCloudFrontRequestEvent_viewerRequest', () => {
 
     expect(request.headers[qpqHeaderIsBot][0].value).toBe('false');
   });
+
+  // Security regression: the bot flag is computed at the edge and must overwrite any copy a client sends.
+  it('overwrites a client-supplied bot header with the computed value', async () => {
+    const event = buildEvent('Mozilla/5.0 (Macintosh) Chrome/130');
+    event.Records[0].cf.request.headers[qpqHeaderIsBot] = [{ key: qpqHeaderIsBot, value: 'true' }];
+
+    const request = await getCloudFrontRequestEvent_viewerRequest()(event, {} as Context);
+
+    expect(request.headers[qpqHeaderIsBot]).toEqual([{ key: qpqHeaderIsBot, value: 'false' }]);
+  });
 });
