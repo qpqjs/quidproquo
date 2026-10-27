@@ -40,7 +40,7 @@ describe('userScriptModuleTypesLoader', () => {
     expect(declarations).toContain('export declare const askNewGuid');
     expect(declarations).toContain('export type AskResponse<T>');
     // Self-contained: nothing left for a browser editor to resolve.
-    expect(declarations).not.toMatch(/from ['"]quidproquo/);
+    expect(declarations).not.toMatch(/from ['"](@qpqjs\/|quidproquo['"/])/);
     // The types the exports use are present but not exported.
     expect(declarations).toMatch(/\ninterface Action<T>/);
   }, 60_000);

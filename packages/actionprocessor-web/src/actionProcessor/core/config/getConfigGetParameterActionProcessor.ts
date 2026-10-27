@@ -1,12 +1,4 @@
-import {
-  actionResult,
-  actionResultError,
-  askConfigGetParameter,
-  createActionProcessor,
-  ErrorTypeEnum,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askConfigGetParameter, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetParameter> => {
   return async ({ parameterName }) => {

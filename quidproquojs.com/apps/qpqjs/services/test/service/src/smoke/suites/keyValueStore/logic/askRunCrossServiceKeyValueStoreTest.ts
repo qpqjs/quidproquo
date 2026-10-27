@@ -1,12 +1,4 @@
 import {
-  askKeyValueStoreDelete,
-  askKeyValueStoreGet,
-  askNewGuid,
-  AskResponse,
-  askServiceFunctionExecute,
-} from 'quidproquo';
-
-import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_STORE,
@@ -16,6 +8,13 @@ import {
   CrossServiceKeyValueStoreProbeResult,
   CrossServiceProbePayload,
 } from '@qpqjs/testa-models';
+import {
+  askKeyValueStoreDelete,
+  askKeyValueStoreGet,
+  askNewGuid,
+  AskResponse,
+  askServiceFunctionExecute,
+} from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

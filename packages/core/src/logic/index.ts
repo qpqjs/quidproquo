@@ -5,6 +5,7 @@ export * from './error';
 export * from './keyValueStore';
 export * from './logHistory';
 export * from './lookup';
+export * from './qpqPackage';
 export * from './scope';
 export * from './stateEffects';
 export * from './stream';

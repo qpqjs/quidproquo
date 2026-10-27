@@ -1,4 +1,11 @@
 import {
+  ApiLayer,
+  AwsDataStoreRemovalPolicy,
+  defineAwsDataStoreRemovalPolicy,
+  defineAwsServiceAccountInfo,
+} from '@qpqjs/config-aws';
+import { defineAdminSettings, defineAdminUserDirectory } from '@qpqjs/features';
+import {
   defineApi,
   defineApplicationModule,
   defineApplicationVersion,
@@ -10,16 +17,6 @@ import {
   getDeploySettingList,
   QPQConfig,
 } from 'quidproquo';
-import {
-  ApiLayer,
-  AwsDataStoreRemovalPolicy,
-  defineAwsDataStoreRemovalPolicy,
-  defineAwsServiceAccountInfo,
-} from '@qpqjs/config-aws';
-import {
-  defineAdminSettings,
-  defineAdminUserDirectory,
-} from '@qpqjs/features';
 
 import { execSync } from 'child_process';
 import {
@@ -95,7 +92,7 @@ export const defineTodoService = (
     }
   ),
 
-  // Module-federation singletons beyond the react/@qpqjs/web defaults.
+  // Module-federation singletons beyond the react and @qpqjs/web defaults.
   defineFrontendBundleOptions({
     sharedSingletons: ['chakra', 'zod'],
   }),

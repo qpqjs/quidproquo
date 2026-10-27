@@ -1,3 +1,6 @@
+import { SMOKE_PROBE_SIGNING_KEY } from '@qpqjs/constants';
+import { SmokeSigningKeyClaims } from '@qpqjs/test-models';
+import { CrossServiceSigningKeyProbeResult } from '@qpqjs/testa-models';
 import {
   askCatch,
   askCryptoGetPublicKey,
@@ -5,10 +8,6 @@ import {
   askCryptoVerifyJwt,
   AskResponse,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_SIGNING_KEY } from '@qpqjs/constants';
-import { SmokeSigningKeyClaims } from '@qpqjs/test-models';
-import { CrossServiceSigningKeyProbeResult } from '@qpqjs/testa-models';
 
 // Verifies a jwt the test service signed, under THIS service's role and
 // through its foreign (owner: test) declaration of the key: kms:GetPublicKey

@@ -1,10 +1,10 @@
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
+import { defineDynamicRoutes } from '@qpqjs/features';
 import {
   defineStorageDrive,
   defineWebEntry,
   QPQConfigAdvancedWebEntrySettings,
 } from 'quidproquo';
-import { defineDevServerOptions } from '@qpqjs/dev-server/config';
-import { defineDynamicRoutes } from '@qpqjs/features';
 
 import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';

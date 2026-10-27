@@ -1,3 +1,4 @@
+import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 import {
   askCatch,
   askFileExists,
@@ -6,8 +7,6 @@ import {
   createUserScriptCaller,
   FileActionType,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';

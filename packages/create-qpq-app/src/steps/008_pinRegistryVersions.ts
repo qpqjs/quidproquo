@@ -17,7 +17,8 @@ export const pinRegistryVersions: CreateQpqAppStep = {
 
     for (const dependencyBlock of [packageJson.dependencies, packageJson.devDependencies]) {
       for (const [name, version] of Object.entries(dependencyBlock ?? {})) {
-        if (name.startsWith('quidproquo') && String(version).startsWith('file:')) {
+        // Same rule as isQpqPackageName in @qpqjs/core, which this package does not depend on.
+        if ((name === 'quidproquo' || name.startsWith('@qpqjs/')) && String(version).startsWith('file:')) {
           dependencyBlock[name] = ownVersion;
         }
       }

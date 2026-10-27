@@ -1,14 +1,13 @@
 import {
-  defineServiceFunction,
-  defineStorageDrive,
-  QPQConfig,
-} from 'quidproquo';
-
-import {
   QpqjsServiceEnum,
   SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME,
   SMOKE_PROBE_DRIVE,
 } from '@qpqjs/constants';
+import {
+  defineServiceFunction,
+  defineStorageDrive,
+  QPQConfig,
+} from 'quidproquo';
 
 /**
  * The test service's probe drive declared FOREIGN (owned by test), which is

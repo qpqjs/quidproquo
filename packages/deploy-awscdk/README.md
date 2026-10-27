@@ -33,7 +33,7 @@ Resource names are derived from the account, region, and config name. The runtim
 
 ## Status
 
-Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
+Pre-1.0. The whole `@qpqjs/*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 

@@ -1,4 +1,3 @@
-import { AskResponse, Effect, QpqReducer } from 'quidproquo';
 import {
   askApplyEventDocEvent,
   buildEventDocFoldReducer,
@@ -8,6 +7,7 @@ import {
   EventDocEvent,
   EventDocEventPayload,
 } from '@qpqjs/features';
+import { AskResponse, Effect, QpqReducer } from 'quidproquo';
 
 import {
   SMOKE_EVENT_DOC_MARK_EVENT,

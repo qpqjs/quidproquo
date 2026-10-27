@@ -31,11 +31,11 @@ A service config is a plain array. The deploy packages read it to build infrastr
 
 ## Where the platform bits live
 
-This package stays platform-neutral. Anything that is specific to one cloud lives in the layer that owns it: `@qpqjs/config-aws` for AWS-only settings, and the `quidproquo-actionprocessor-*` packages for the implementations that run these actions.
+This package stays platform-neutral. Anything that is specific to one cloud lives in the layer that owns it: `@qpqjs/config-aws` for AWS-only settings, and the `@qpqjs/actionprocessor-*` packages for the implementations that run these actions.
 
 ## Status
 
-Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
+Pre-1.0. The whole `@qpqjs/*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 

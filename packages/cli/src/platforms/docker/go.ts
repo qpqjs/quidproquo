@@ -15,8 +15,8 @@
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from '@qpqjs/config-aws';
-import { QpqDeployEnvVar } from '@qpqjs/core';
-import { getAppServiceQpqConfigs, getDevServerRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
+import { isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
+import { getAppServiceQpqConfigs, getDevServerRspackConfig, listInstalledQpqPackageNames, runRspack } from '@qpqjs/deploy-rspack';
 import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from '@qpqjs/dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
 
@@ -107,7 +107,7 @@ const writeImagePackageJson = (root: string, contextDir: string): void => {
 
   const dependencies: Record<string, string> = { ...(rootPackageJson.dependencies ?? {}) };
   for (const [name, version] of Object.entries(dependencies)) {
-    if (name.startsWith('quidproquo') && version.startsWith('file:')) {
+    if (isQpqPackageName(name) && version.startsWith('file:')) {
       dependencies[name] = `file:./vendor/${name}`;
     }
   }
@@ -132,9 +132,7 @@ const vendorQuidproquoPackages = (root: string, contextDir: string): number => {
   const vendorDir = path.join(contextDir, 'vendor');
   let vendored = 0;
 
-  for (const name of fs.readdirSync(nodeModules)) {
-    if (!name.startsWith('quidproquo')) continue;
-
+  for (const name of listInstalledQpqPackageNames(nodeModules)) {
     const packageDir = fs.realpathSync(path.join(nodeModules, name));
     const targetDir = path.join(vendorDir, name);
     fs.mkdirSync(targetDir, { recursive: true });

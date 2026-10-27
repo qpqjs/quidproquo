@@ -187,7 +187,7 @@ Tests run on vitest and alias sibling packages to their `src`, so you do not nee
 
 ## Status
 
-Pre-1.0. The whole family releases in lockstep, so any set of `quidproquo-*` versions that share a number was built and tested together. Expect APIs to move between releases, and pin your versions.
+Pre-1.0. The whole family releases in lockstep, so any set of `@qpqjs/*` versions that share a number was built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 

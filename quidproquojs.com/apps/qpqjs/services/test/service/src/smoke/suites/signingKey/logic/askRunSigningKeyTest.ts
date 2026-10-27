@@ -1,3 +1,5 @@
+import { SMOKE_PROBE_SIGNING_KEY } from '@qpqjs/constants';
+import { SmokeSigningKeyClaims } from '@qpqjs/test-models';
 import {
   askCryptoGetPublicKey,
   askCryptoSign,
@@ -7,9 +9,6 @@ import {
   askGetCurrentEpoch,
   AskResponse,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_SIGNING_KEY } from '@qpqjs/constants';
-import { SmokeSigningKeyClaims } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

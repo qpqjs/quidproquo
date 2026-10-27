@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { getWorkspacePackageDirs } from './getWorkspacePackageDirs';
+import { listInstalledQpqPackageNames } from './listInstalledQpqPackageNames';
 
 export type WorkspaceSourceAliases = {
   /** rspack resolve.alias entries, exact-match ('<name>$' -> abs src/index.ts) */
@@ -25,13 +26,8 @@ export type WorkspaceSourceAliases = {
 // node_modules (npm link / file: deps point back into the framework repo).
 const getLinkedQuidproquoPackageDirs = (root: string): string[] => {
   const nodeModulesDir = path.join(root, 'node_modules');
-  if (!fs.existsSync(nodeModulesDir)) {
-    return [];
-  }
 
-  return fs
-    .readdirSync(nodeModulesDir)
-    .filter((name) => name.startsWith('quidproquo'))
+  return listInstalledQpqPackageNames(nodeModulesDir)
     .map((name) => path.join(nodeModulesDir, name))
     .filter((dir) => fs.lstatSync(dir).isSymbolicLink())
     .map((dir) => fs.realpathSync(dir));

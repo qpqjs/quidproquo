@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo';
 import { defineDynamicRoutes } from '@qpqjs/features';
+import { QPQConfig } from 'quidproquo';
 
 import * as controllers from '../controller';
 

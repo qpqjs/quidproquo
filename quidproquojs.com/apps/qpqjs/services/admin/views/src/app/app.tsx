@@ -1,12 +1,7 @@
-import {
-  getApiUrl,
-  getFederatedViewsUrl,
-  getWebSocketUrl,
-} from '@qpqjs/web';
+import { QpqjsServiceEnum } from '@qpqjs/constants';
+import { getApiUrl, getFederatedViewsUrl, getWebSocketUrl } from '@qpqjs/web';
 import { App as QpqAdminApp } from '@qpqjs/web-admin';
 import { BaseUrlResolvers } from '@qpqjs/web-react';
-
-import { QpqjsServiceEnum } from '@qpqjs/constants';
 
 export const getApiBaseUrl = () => getApiUrl(QpqjsServiceEnum.Admin);
 

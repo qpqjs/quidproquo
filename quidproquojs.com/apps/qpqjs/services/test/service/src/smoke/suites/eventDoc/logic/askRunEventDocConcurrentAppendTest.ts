@@ -1,9 +1,9 @@
-import { askQueueSendMessages, AskResponse } from 'quidproquo';
 import {
   askEventDocCreate,
   askEventDocProvideStore,
   askEventDocSoftDelete,
 } from '@qpqjs/features';
+import { askQueueSendMessages, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import {

@@ -1,10 +1,4 @@
-import {
-  askFileGenerateTemporaryUploadSecureUrl,
-  ErrorTypeEnum,
-  FileActionType,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { askFileGenerateTemporaryUploadSecureUrl, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

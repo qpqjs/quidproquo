@@ -3,22 +3,21 @@
 // defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-awscdk's
 // workspace CDK app; this fragment must not declare its own.
 import {
-  defineApi,
-  defineDns,
-  defineEmailReceivingDomain,
-  getDeploySettingList,
-  QPQConfig,
-} from 'quidproquo';
-import {
   defineAwsGithubDeployRole,
   defineBootstrapWaf,
   defineDomainCertificate,
   WafManagedRuleGroup,
   WafRuleOverrideAction,
 } from '@qpqjs/config-aws';
-import { QpqAppDeployContext } from '@qpqjs/deploy-awscdk';
-
 import { QpqjsServiceEnum } from '@qpqjs/constants';
+import { QpqAppDeployContext } from '@qpqjs/deploy-awscdk';
+import {
+  defineApi,
+  defineDns,
+  defineEmailReceivingDomain,
+  getDeploySettingList,
+  QPQConfig,
+} from 'quidproquo';
 
 export default ({ region }: QpqAppDeployContext): QPQConfig => [
   defineDns(getDeploySettingList('ROOT_DOMAINS')),

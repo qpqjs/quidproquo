@@ -1,4 +1,22 @@
 import {
+  ApiLayer,
+  AwsDataStoreRemovalPolicy,
+  defineAwsDataStoreRemovalPolicy,
+  defineAwsServiceAccountInfo,
+  defineWafProtection,
+  getAwsServiceAccountInfosForDeployments,
+} from '@qpqjs/config-aws';
+import {
+  QPQJS_USER_DIRECTORY,
+  QpqjsServiceEnum,
+  qpqjsServiceNames,
+} from '@qpqjs/constants';
+import {
+  defineAdminSettings,
+  defineAdminUserDirectory,
+  defineOpenApiRoutes,
+} from '@qpqjs/features';
+import {
   defineApi,
   defineApplicationModule,
   defineApplicationVersion,
@@ -11,26 +29,8 @@ import {
   getDeploySettingList,
   QPQConfig,
 } from 'quidproquo';
-import {
-  ApiLayer,
-  AwsDataStoreRemovalPolicy,
-  defineAwsDataStoreRemovalPolicy,
-  defineAwsServiceAccountInfo,
-  defineWafProtection,
-  getAwsServiceAccountInfosForDeployments,
-} from '@qpqjs/config-aws';
-import {
-  defineAdminSettings,
-  defineAdminUserDirectory,
-  defineOpenApiRoutes,
-} from '@qpqjs/features';
 
 import { execSync } from 'child_process';
-import {
-  QPQJS_USER_DIRECTORY,
-  QpqjsServiceEnum,
-  qpqjsServiceNames,
-} from '@qpqjs/constants';
 
 // Identity comes from the selected deployment in deploy.config.json, primed by the CLI.
 const modulePrefix = process.env.APPLICATION_NAME!;
@@ -79,7 +79,10 @@ export const defineQpqjsService = (
     process.env.AWS_DEFAULT_ACCOUNT!,
     process.env.AWS_DEFAULT_REGION!,
 
-    getAwsServiceAccountInfosForDeployments(crossDeploymentNames, qpqjsServiceNames),
+    getAwsServiceAccountInfosForDeployments(
+      crossDeploymentNames,
+      qpqjsServiceNames
+    ),
     {
       apiLayers,
       lambdaMaxMemoryInMiB: lambdaMemoryInMiB,
@@ -93,7 +96,7 @@ export const defineQpqjsService = (
 
   defineWafProtection(),
 
-  // Module-federation singletons beyond the react/@qpqjs/web defaults.
+  // Module-federation singletons beyond the react and @qpqjs/web defaults.
   defineFrontendBundleOptions({
     sharedSingletons: ['chakra', 'zod'],
   }),

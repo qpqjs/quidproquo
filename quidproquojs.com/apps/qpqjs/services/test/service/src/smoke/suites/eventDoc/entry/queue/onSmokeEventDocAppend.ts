@@ -1,10 +1,10 @@
-import { AskResponse, QueueEventResponse } from 'quidproquo';
 import {
   askEventDocAppendServerEvent,
   askEventDocAppendServerEvents,
   askEventDocProvideStore,
   EventDocServerEventInput,
 } from '@qpqjs/features';
+import { AskResponse, QueueEventResponse } from 'quidproquo';
 
 import {
   SMOKE_EVENT_DOC_ACTOR,

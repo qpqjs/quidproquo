@@ -1,11 +1,10 @@
+import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 import {
   askCatch,
   askNewGuid,
   AskResponse,
   askUserScriptBuild,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

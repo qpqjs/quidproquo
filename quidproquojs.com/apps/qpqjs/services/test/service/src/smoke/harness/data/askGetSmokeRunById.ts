@@ -1,6 +1,5 @@
-import { askKeyValueStoreGet, AskResponse, Nullable } from 'quidproquo';
-
 import { SmokeRun } from '@qpqjs/test-models';
+import { askKeyValueStoreGet, AskResponse, Nullable } from 'quidproquo';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 

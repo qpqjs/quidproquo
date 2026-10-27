@@ -1,3 +1,5 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askCatch,
   askDelay,
@@ -15,9 +17,6 @@ import {
   kvsSet,
   kvsUpdate,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_SCOPED_PROBE_STORE } from '../constants/SMOKE_SCOPED_PROBE_STORE';

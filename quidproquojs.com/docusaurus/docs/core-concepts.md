@@ -36,7 +36,7 @@ Notice it never calls `new Date()`. It yields a plain action object and suspends
 
 ### 1. It's a request, not an execution
 
-Calling `askDateNow()` does nothing on its own. It builds a generator that *describes* what it wants, and the runtime decides how to fulfil it. That's what keeps stories pure and platform-agnostic: the "what" lives in your story, the "how" lives in the `quidproquo-actionprocessor-*` packages. Your story doesn't know whether the clock is a Lambda, a Node process, or a test fixture.
+Calling `askDateNow()` does nothing on its own. It builds a generator that *describes* what it wants, and the runtime decides how to fulfil it. That's what keeps stories pure and platform-agnostic: the "what" lives in your story, the "how" lives in the `@qpqjs/actionprocessor-*` packages. Your story doesn't know whether the clock is a Lambda, a Node process, or a test fixture.
 
 ### 2. It's a question with an answer
 

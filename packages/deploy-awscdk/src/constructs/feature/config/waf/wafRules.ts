@@ -1,10 +1,4 @@
-import {
-  BootstrapWafQPQConfigSetting,
-  WafManagedRuleGroup,
-  WafManagedRuleOverride,
-  WafRateLimit,
-  WafRuleOverrideAction,
-} from '@qpqjs/config-aws';
+import { BootstrapWafQPQConfigSetting, WafManagedRuleGroup, WafManagedRuleOverride, WafRateLimit, WafRuleOverrideAction } from '@qpqjs/config-aws';
 
 import { aws_wafv2 } from 'aws-cdk-lib';
 

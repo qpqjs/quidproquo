@@ -1,9 +1,8 @@
-import { AskResponse, ExecuteServiceFunctionEvent } from 'quidproquo';
-
 import {
   CrossServiceProbePayload,
   CrossServiceStorageDriveProbeResult,
 } from '@qpqjs/testa-models';
+import { AskResponse, ExecuteServiceFunctionEvent } from 'quidproquo';
 
 import { askProbeForeignStorageDrive } from '../../logic/askProbeForeignStorageDrive';
 

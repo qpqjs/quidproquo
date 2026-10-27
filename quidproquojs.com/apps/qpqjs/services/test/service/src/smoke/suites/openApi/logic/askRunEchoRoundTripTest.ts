@@ -1,10 +1,9 @@
+import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
 import {
   askNetworkRequest,
   askOpenApiGetDocument,
   AskResponse,
 } from 'quidproquo';
-
-import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 

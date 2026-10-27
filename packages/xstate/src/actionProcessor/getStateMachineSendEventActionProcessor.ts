@@ -1,12 +1,4 @@
-import {
-  actionResult,
-  actionResultError,
-  askKeyValueStoreUpsert,
-  createActionProcessor,
-  ErrorTypeEnum,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askKeyValueStoreUpsert, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 

@@ -1,11 +1,10 @@
+import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
+import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askKeyValueStoreUpsert,
   AskResponse,
   QueueEventResponse,
 } from 'quidproquo';
-
-import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import { SmokeProbeRecord } from '@qpqjs/test-models';
 
 import { SmokeProbeEventQueueEvent } from '../../models/SmokeProbeEventQueueEvent';
 
