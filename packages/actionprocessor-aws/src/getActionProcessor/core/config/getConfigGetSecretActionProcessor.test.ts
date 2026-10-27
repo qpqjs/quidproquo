@@ -44,4 +44,13 @@ describe('getConfigGetSecretActionProcessor', () => {
 
     expect(error?.errorType).toBe(expectedType);
   });
+
+  // Security regression: a story can only read secrets its config declares; an undeclared name never reaches Secrets
+  // Manager, and an error never carries a secret value.
+  it('refuses an undeclared secret before touching Secrets Manager', async () => {
+    const processor = await resolveProcessor();
+
+    await expect(invokeProcessor(processor, { secretName: 'other-app/prod/db' })).rejects.toThrow('Can not find secret');
+    expect(getSecret).not.toHaveBeenCalled();
+  });
 });

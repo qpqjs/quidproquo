@@ -41,4 +41,12 @@ describe('getConfigGetParameterActionProcessor', () => {
 
     expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttling);
   });
+
+  // Security regression: a story can only read parameters its config declares; an undeclared name never reaches SSM.
+  it('refuses an undeclared parameter before touching SSM', async () => {
+    const processor = await resolveProcessor();
+
+    await expect(invokeProcessor(processor, { parameterName: '/aws/reference/secretsmanager/other-app-secret' })).rejects.toThrow('not found');
+    expect(getParameter).not.toHaveBeenCalled();
+  });
 });
