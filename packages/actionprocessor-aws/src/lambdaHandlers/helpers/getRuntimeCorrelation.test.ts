@@ -14,4 +14,15 @@ describe('getRuntimeCorrelation', () => {
 
     expect(getRuntimeCorrelation(config)).not.toBe(getRuntimeCorrelation(config));
   });
+
+  // Security regression: a correlation is the config module name plus a v4 guid and nothing else, so no request field
+  // can ever shape one and ids are unguessable.
+  it('is the module name, one separator and a v4 guid', () => {
+    const correlation = getRuntimeCorrelation(buildTestQpqConfig());
+    const [module, guid, ...rest] = correlation.split('::');
+
+    expect(module).toBe('test-module');
+    expect(rest).toEqual([]);
+    expect(guid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
 });
