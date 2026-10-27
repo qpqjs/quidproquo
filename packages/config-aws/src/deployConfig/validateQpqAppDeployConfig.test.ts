@@ -67,6 +67,12 @@ describe('validateQpqAppDeployConfig', () => {
     );
   });
 
+  // Security regression: a settings key becomes the suffix of an env var, so anything that could break
+  // out of one name (spaces, `=`, lower case, a leading digit, a traversal) is refused rather than exported.
+  it.each(['page title', 'PAGE=TITLE', 'pageTitle', '1PAGE', '../PAGE', 'PAGE\nTITLE', ''])('rejects the setting key %j', (key) => {
+    expect(() => validate({ deployments: { dev: { ...awsDeployment, settings: { [key]: 'x' } } } })).toThrow('must be UPPER_SNAKE_CASE');
+  });
+
   it('rejects an empty feature', () => {
     expect(() => validate({ deployments: { prod: { ...awsDeployment, feature: '' } } })).toThrow('"feature" must be a non-empty string when set');
   });
