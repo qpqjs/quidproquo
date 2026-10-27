@@ -62,6 +62,16 @@ describe('resolveHosts', () => {
     expect(() => resolveHosts(twoRoots(), {}, rogue)).toThrow('must be the root or end with .example.com');
   });
 
+  // Security regression: a resolver may only shape labels under the declared root; a lookalike that merely
+  // contains or starts with the root (a takeover-shaped host) is refused, as is an empty host.
+  it.each(['example.com.evil.com', 'evilexample.com', 'example.com-evil.com', 'example.comm', ''])(
+    'rejects the lookalike host %j from a resolver',
+    (host) => {
+      const rogue: DomainResolver = { resolveHost: () => host };
+      expect(() => resolveHosts(twoRoots(), {}, rogue)).toThrow('must be the root or end with .example.com');
+    },
+  );
+
   it('loads the pointer through the dynamic module loader, built-ins otherwise', async () => {
     const pointer = { basePath: '/app', relativePath: 'domainResolver', functionName: 'domainResolver' };
     const config = buildTestQpqConfig([defineDns('example.com', { resolver: pointer })]);
@@ -108,5 +118,13 @@ describe('findRootDomainForHost', () => {
   it('is null for a host under no declared root', () => {
     expect(findRootDomainForHost(config, 'notexample.com')).toBeNull();
     expect(findRootDomainForHost(config, 'evil.com')).toBeNull();
+  });
+
+  // Security regression: the Host header is attacker-controlled, so a host that embeds a declared root as a
+  // label of another domain must not key request behaviour off that root.
+  it('is null for a host that carries a declared root as a label of another domain', () => {
+    expect(findRootDomainForHost(config, 'example.com.evil.com')).toBeNull();
+    expect(findRootDomainForHost(config, 'app.example.com.evil.com')).toBeNull();
+    expect(resolveHostForRequestHost(config, 'example.com.evil.com')).toBe(resolveHostForRequestHost(config, undefined));
   });
 });

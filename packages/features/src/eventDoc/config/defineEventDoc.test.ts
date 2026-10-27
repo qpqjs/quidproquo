@@ -42,6 +42,21 @@ describe('defineEventDoc', () => {
     expect(snapshotFunctionsGlobalOf(config)).toEqual({ memo: eventDocFunctionsName('memos', 'memo') });
   });
 
+  // Security regression: a collection with a scope resolver must scope every store it declares, so a scoped
+  // read or write can never land in an unscoped sibling store or drive; without one, nothing is scoped.
+  it('scopes the summary, events, snapshot stores and blob drive together, keyed on the scope resolver', () => {
+    const scoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos', scopeResolver: '/entry/scope::askResolveScope' });
+    const unscoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos' });
+
+    const scopedStores = qpqCoreUtils.getAllKeyValueStores(scoped);
+    expect(scopedStores).toHaveLength(3);
+    expect(scopedStores.every((kvs) => kvs.scoped === true)).toBe(true);
+    expect(qpqCoreUtils.getStorageDrives(scoped).map((drive) => drive.scoped)).toEqual([true]);
+
+    expect(qpqCoreUtils.getAllKeyValueStores(unscoped).some((kvs) => kvs.scoped)).toBe(false);
+    expect(qpqCoreUtils.getStorageDrives(unscoped).some((drive) => drive.scoped)).toBe(false);
+  });
+
   it('throws when the functions object carries no identity', () => {
     const identityless = { ...memoFunctions, storeName: undefined, type: undefined };
 
