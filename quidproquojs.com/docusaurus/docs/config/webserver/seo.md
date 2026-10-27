@@ -10,7 +10,7 @@ Defines an **SEO route**: a URL path within a [web entry](./web-entry.md) whose 
 - **On AWS:** the web entry's CloudFront distribution gets two Lambda@Edge functions — a **viewer-request** and an **origin-request** function — built from the `runtime` story. For each non-deprecated SEO route, a CloudFront behavior is added whose path pattern is the SEO `path` with any `{param}` placeholders turned into `*` wildcards, wiring both edge functions to that behavior. The route can use its own [cache](./cache.md) policy via `cacheSettingsName` (otherwise caching is disabled for it). Deprecated routes are still built but are **not** attached as a behavior.
 
 ```typescript
-import { defineSeo } from 'quidproquo-webserver';
+import { defineSeo } from '@qpqjs/webserver';
 
 export default [
   defineSeo('/products/{productId}', '/entry/seo/product::renderProductSeo'),
@@ -48,7 +48,7 @@ A reference to the story that renders the response at the edge, usually written 
 ## Examples
 
 ```typescript
-import { defineSeo, defineWebEntry } from 'quidproquo-webserver';
+import { defineSeo, defineWebEntry } from '@qpqjs/webserver';
 
 export default [
   defineWebEntry('website', {
@@ -69,4 +69,4 @@ export default [
 - [defineWebEntry](./web-entry.md) — the hosted app whose paths this SEO route augments.
 - [defineCache](./cache.md) — the cache policy an SEO route can reference by name.
 - [askWebEntryInvalidateCache](../../actions/webserver/web-entry/ask-web-entry-invalidate-cache.md) — invalidate SEO paths after changing what they render.
-- **AWS implementation:** the SEO Lambda@Edge functions and CloudFront behaviors are created by `WebQpqWebserverWebEntryConstruct` in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** the SEO Lambda@Edge functions and CloudFront behaviors are created by `WebQpqWebserverWebEntryConstruct` in `@qpqjs/deploy-awscdk`.

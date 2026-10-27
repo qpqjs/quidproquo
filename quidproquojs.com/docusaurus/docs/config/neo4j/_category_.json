@@ -1,1 +1,1 @@
-{ "label": "quidproquo-neo4j", "position": 5, "link": { "type": "generated-index", "description": "Neo4j graph database config from quidproquo-neo4j." } }
+{ "label": "@qpqjs/neo4j", "position": 5, "link": { "type": "generated-index", "description": "Neo4j graph database config from @qpqjs/neo4j." } }

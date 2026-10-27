@@ -1,4 +1,4 @@
-import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
 import { MaintenanceLevel } from './v1/types/MaintenanceLevel';

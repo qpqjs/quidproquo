@@ -1,5 +1,5 @@
-import { QPQConfig, QpqPureFunction } from 'quidproquo-core';
-import { DomainResolver, qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig, QpqPureFunction } from '@qpqjs/core';
+import { DomainResolver, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import path from 'path';
 

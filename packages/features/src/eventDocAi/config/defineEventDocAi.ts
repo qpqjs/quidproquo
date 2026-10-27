@@ -9,8 +9,8 @@ import {
   QPQConfig,
   QpqFunctionRuntimeAdvanced,
   QpqQueueProcessors,
-} from 'quidproquo-core';
-import { defineServiceFunction } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc';
 import { buildEventDocStore, buildEventDocStoreGlobals } from '../../eventDoc';

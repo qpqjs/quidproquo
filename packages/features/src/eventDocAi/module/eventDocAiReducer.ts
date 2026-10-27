@@ -1,4 +1,4 @@
-import { buildEffectReducer } from 'quidproquo-core';
+import { buildEffectReducer } from '@qpqjs/core';
 
 import { EventDocAiEffect } from './effects/EventDocAiEffect';
 import type { EventDocAiEffects } from './effects/EventDocAiEffects';

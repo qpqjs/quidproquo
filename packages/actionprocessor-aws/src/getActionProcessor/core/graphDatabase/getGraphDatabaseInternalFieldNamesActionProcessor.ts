@@ -5,7 +5,7 @@ import {
   GraphDatabaseActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessInternalFieldNames = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseInternalFieldNames> => {
   return async () => {

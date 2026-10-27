@@ -1,4 +1,4 @@
-import { ActionProcessorListResolver } from 'quidproquo-core';
+import { ActionProcessorListResolver } from '@qpqjs/core';
 
 import { createElement, ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';

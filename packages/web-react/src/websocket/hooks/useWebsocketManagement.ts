@@ -1,4 +1,4 @@
-import { WebsocketService } from 'quidproquo-web';
+import { WebsocketService } from '@qpqjs/web';
 
 import { useEffect, useState } from 'react';
 

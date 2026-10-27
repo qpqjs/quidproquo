@@ -1,4 +1,4 @@
-import { askKeyValueStoreDelete, askKeyValueStoreQueryAll, askKeyValueStoreUpsertWithRetry, AskResponse, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreDelete, askKeyValueStoreQueryAll, askKeyValueStoreUpsertWithRetry, AskResponse, kvsEqual } from '@qpqjs/core';
 
 import { getWebSocketQueueSubscriptionsKeyValueStoreName } from '../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../context/websocketConnectionInfoContext';

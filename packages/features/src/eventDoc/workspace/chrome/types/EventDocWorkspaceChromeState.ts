@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 /** State of the default chrome slot. */
 export type EventDocWorkspaceChromeState = {

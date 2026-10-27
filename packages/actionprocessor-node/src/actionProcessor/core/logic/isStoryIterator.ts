@@ -1,4 +1,4 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, Nullable } from '@qpqjs/core';
 
 /**
  * The member execution contract shared by dynamic functions and user scripts: a value

@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from 'quidproquo-core';
-import { askApiRequest } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from '@qpqjs/core';
+import { askApiRequest } from '@qpqjs/webserver';
 
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { tenantMyTenantsEndpoint } from '../constants/tenantMyTenantsEndpoint';

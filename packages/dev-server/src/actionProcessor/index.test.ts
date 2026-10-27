@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, DynamicFunctionsActionType, FileActionType, noopDynamicModuleLoader, UserScriptActionType } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, DynamicFunctionsActionType, FileActionType, noopDynamicModuleLoader, UserScriptActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

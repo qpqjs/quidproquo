@@ -5,12 +5,12 @@ description: "Tune how the service's backend and frontend bundles are built: ext
 
 # defineBackendBundleOptions / defineFrontendBundleOptions
 
-Declares **bundler options** for the service. These settings deploy nothing themselves: they are read by the build layer (`quidproquo-deploy-webpack` / `quidproquo-deploy-rspack`) when it bundles the service's backend code and frontend views. You can declare either setting more than once; the build layer merges every declared block (later lists concatenate onto earlier ones).
+Declares **bundler options** for the service. These settings deploy nothing themselves: they are read by the build layer (`@qpqjs/deploy-webpack` / `@qpqjs/deploy-rspack`) when it bundles the service's backend code and frontend views. You can declare either setting more than once; the build layer merges every declared block (later lists concatenate onto earlier ones).
 
 All regex-shaped fields are plain regex **source strings**, not `RegExp` objects, because a QPQ config must survive JSON serialization. The bundler compiles them with `new RegExp(...)`.
 
 ```typescript
-import { defineBackendBundleOptions, defineFrontendBundleOptions } from 'quidproquo-core';
+import { defineBackendBundleOptions, defineFrontendBundleOptions } from '@qpqjs/core';
 
 export default [
   defineBackendBundleOptions({
@@ -69,7 +69,7 @@ function defineFrontendBundleOptions(
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| `sharedSingletons` | `string[]` | `[]` | Substring-matched against the hoisted root dependency names; matches are shared as module-federation **singletons** in the views build. `react`, `react-dom`, react-ish deps, and `quidproquo-web*` are always singletons; this adds app-stack packages (e.g. `'chakra'`, `'zod'`) without baking package names into the bundler. |
+| `sharedSingletons` | `string[]` | `[]` | Substring-matched against the hoisted root dependency names; matches are shared as module-federation **singletons** in the views build. `react`, `react-dom`, react-ish deps, and `@qpqjs/web*` are always singletons; this adds app-stack packages (e.g. `'chakra'`, `'zod'`) without baking package names into the bundler. |
 
 ## Notes
 
@@ -79,7 +79,7 @@ function defineFrontendBundleOptions(
 ## Examples
 
 ```typescript
-import { defineBackendBundleOptions } from 'quidproquo-core';
+import { defineBackendBundleOptions } from '@qpqjs/core';
 
 export default [
   defineBackendBundleOptions({
@@ -99,4 +99,4 @@ export default [
 
 - [defineFederatedModuleStore](./federated-module-store.md): load story code from a store at runtime instead of only the bundled zip.
 - [defineApiBuildPath](./api-build-path.md): where the bundled backend output lives.
-- **Build implementation:** `getWebpackConfigForQpq` / `getRspackConfigForQpq` and `getQpqBundleExternals` in `quidproquo-deploy-webpack` / `quidproquo-deploy-rspack`.
+- **Build implementation:** `getWebpackConfigForQpq` / `getRspackConfigForQpq` and `getQpqBundleExternals` in `@qpqjs/deploy-webpack` / `@qpqjs/deploy-rspack`.

@@ -12,7 +12,7 @@ It is normally set for you by [defineApplicationModule](./application-module.md)
 - **On AWS:** does not deploy a resource of its own. The deploy layer resolves the full path by joining the config root with this value (`qpqCoreUtils.getApiBuildPath` → `getApiBuildPathFullPath`), then uses that directory as the Lambda function code asset.
 
 ```typescript
-import { defineApiBuildPath } from 'quidproquo-core';
+import { defineApiBuildPath } from '@qpqjs/core';
 
 export default [
   defineApiBuildPath('./build/api'),

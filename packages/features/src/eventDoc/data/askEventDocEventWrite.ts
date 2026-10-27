@@ -1,4 +1,4 @@
-import { askKeyValueStoreUpsertWithRetry, AskResponse } from 'quidproquo-core';
+import { askKeyValueStoreUpsertWithRetry, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';

@@ -1,4 +1,4 @@
-import { KvsAttributePath, KvsUpdate, KvsUpdateAction, KvsUpdateActionType } from 'quidproquo-core';
+import { KvsAttributePath, KvsUpdate, KvsUpdateAction, KvsUpdateActionType } from '@qpqjs/core';
 
 import { getItemName } from './getItemName';
 import { getValueName } from './getValueName';

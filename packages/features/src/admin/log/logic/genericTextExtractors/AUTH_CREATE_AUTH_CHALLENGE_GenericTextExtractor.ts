@@ -1,4 +1,4 @@
-import { QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import { QpqRuntimeType, StoryResult } from '@qpqjs/core';
 
 // TODO: FIll this out using history
 export const AUTH_CREATE_AUTH_CHALLENGE_GenericTextExtractor = (storyResult: StoryResult<any>): string[] => {

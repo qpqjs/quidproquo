@@ -1,4 +1,4 @@
-import { DecomposedStringPrimitive, LogTemplateLiteralActionPayload } from 'quidproquo-core';
+import { DecomposedStringPrimitive, LogTemplateLiteralActionPayload } from '@qpqjs/core';
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';

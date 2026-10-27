@@ -1,4 +1,4 @@
-import { askKeyValueStoreDelete, AskResponse } from 'quidproquo-core';
+import { askKeyValueStoreDelete, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocResolveScope } from './askEventDocResolveScope';

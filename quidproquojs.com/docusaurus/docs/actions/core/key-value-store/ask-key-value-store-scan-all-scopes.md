@@ -12,7 +12,7 @@ Reach for this only from a migration or an equivalent whole-store operation that
 - **Action type:** `KeyValueStoreActionType.ScanAllScopes`
 
 ```typescript
-import { askKeyValueStoreScanAllScopes } from 'quidproquo-core';
+import { askKeyValueStoreScanAllScopes } from '@qpqjs/core';
 
 interface User {
   userId: string;

@@ -8,7 +8,7 @@ import {
   kvsEqual,
   kvsExists,
   QpqPagedData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getWebSocketQueueKeyValueStoreName } from '../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../context/websocketConnectionInfoContext';

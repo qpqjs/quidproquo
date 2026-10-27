@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import * as webserver from './index';
 
-describe('quidproquo-webserver barrel', () => {
+describe('@qpqjs/webserver barrel', () => {
   it('loads and exposes the qpqWebServerUtils namespace', () => {
     expect(webserver.qpqWebServerUtils).toBeDefined();
     expect(typeof webserver.qpqWebServerUtils.getHeaderValue).toBe('function');

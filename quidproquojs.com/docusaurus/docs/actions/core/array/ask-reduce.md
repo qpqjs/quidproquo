@@ -10,8 +10,8 @@ Iterates an array and folds it into a single accumulated value — the async/sto
 - **Built from:** a plain `for` loop that `yield*`s the callback for each item, threading the accumulator through.
 
 ```typescript
-import { askReduce } from 'quidproquo-core';
-import { askFileReadObjectJson } from 'quidproquo-core';
+import { askReduce } from '@qpqjs/core';
+import { askFileReadObjectJson } from '@qpqjs/core';
 
 export function* askSumInvoiceTotals(invoiceIds: string[]) {
   // Read each invoice and accumulate its total into a running sum.

@@ -2,8 +2,8 @@ import {
   getCoreActionProcessor as getJsCoreActionProcessor,
   getPlatformActionProcessor,
   getWebserverActionProcessor as getJsWebserverActionProcessor,
-} from 'quidproquo-actionprocessor-js';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+} from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import {
   getCoreActionProcessor as getWebCoreActionProcessor,

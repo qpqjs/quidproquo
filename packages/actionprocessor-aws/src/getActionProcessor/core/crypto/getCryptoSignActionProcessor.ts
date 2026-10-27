@@ -1,5 +1,5 @@
-import { base64UrlEncode } from 'quidproquo-actionprocessor-node';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { base64UrlEncode } from '@qpqjs/actionprocessor-node';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -8,7 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { signWithKey } from '../../../logic/kms/signWithKey';
 import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './kmsSigningErrorMap';

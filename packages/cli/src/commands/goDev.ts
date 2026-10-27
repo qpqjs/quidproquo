@@ -4,7 +4,7 @@
 // output fresh for the editor (--no-types to skip it). The app is resolved
 // once here and handed to both sub-commands via QPQ_DEV_APP, the deployment
 // likewise via DEPLOY_NAME, so neither asks again; their output shares the terminal.
-import { getAllViews } from 'quidproquo-deploy-rspack';
+import { getAllViews } from '@qpqjs/deploy-rspack';
 
 import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';

@@ -1,4 +1,4 @@
-import { type AiStreamError, type AiStreamFinish, AiStreamFinishReasonEnum, type AiStreamPart, AiStreamPartType } from 'quidproquo-core';
+import { type AiStreamError, type AiStreamFinish, AiStreamFinishReasonEnum, type AiStreamPart, AiStreamPartType } from '@qpqjs/core';
 
 import { EVENT_DOC_AI_DECLINED_NOTICE } from '../constants/eventDocAiDeclinedNotice';
 import { EVENT_DOC_AI_ERROR_NOTICE } from '../constants/eventDocAiErrorNotice';

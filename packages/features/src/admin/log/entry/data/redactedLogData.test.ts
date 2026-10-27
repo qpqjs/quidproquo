@@ -6,7 +6,7 @@ import {
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   runStory,
   StoryError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

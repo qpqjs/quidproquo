@@ -1,4 +1,4 @@
-import { assertStorageDriveScopeRequirementOrThrow, QPQConfig, qpqCoreUtils, validateScopeSegment } from 'quidproquo-core';
+import { assertStorageDriveScopeRequirementOrThrow, QPQConfig, qpqCoreUtils, validateScopeSegment } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';

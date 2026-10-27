@@ -1,4 +1,4 @@
-import { HTTPEvent } from 'quidproquo-webserver';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

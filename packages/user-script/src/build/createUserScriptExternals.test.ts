@@ -1,4 +1,4 @@
-import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-core';
+import { FEDERATED_SHARED_PACKAGE_NAMES } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -29,7 +29,7 @@ describe('createUserScriptExternals', () => {
   });
 
   it('refuses a subpath import of a shared package', async () => {
-    const { error } = await resolveAsync('quidproquo-core/lib/commonjs/index');
+    const { error } = await resolveAsync('@qpqjs/core/lib/commonjs/index');
 
     expect(error?.message).toContain('import the package root instead');
   });

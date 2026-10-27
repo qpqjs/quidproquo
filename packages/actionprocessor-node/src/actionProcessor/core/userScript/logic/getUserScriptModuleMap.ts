@@ -1,12 +1,12 @@
-import * as quidproquoCore from 'quidproquo-core';
-import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-core';
-import * as quidproquoWebserver from 'quidproquo-webserver';
+import * as quidproquoCore from '@qpqjs/core';
+import { FEDERATED_SHARED_PACKAGE_NAMES } from '@qpqjs/core';
+import * as quidproquoWebserver from '@qpqjs/webserver';
 
 import { UserScriptModuleMap } from './UserScriptModuleMap';
 
 const sharedPackages: Record<(typeof FEDERATED_SHARED_PACKAGE_NAMES)[number], unknown> = {
-  'quidproquo-core': quidproquoCore,
-  'quidproquo-webserver': quidproquoWebserver,
+  '@qpqjs/core': quidproquoCore,
+  '@qpqjs/webserver': quidproquoWebserver,
 };
 
 /**

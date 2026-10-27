@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { TenantMember } from '../../models/TenantMember';
 import { TenantMembershipUiEffect } from '../effects/TenantMembershipUiEffect';

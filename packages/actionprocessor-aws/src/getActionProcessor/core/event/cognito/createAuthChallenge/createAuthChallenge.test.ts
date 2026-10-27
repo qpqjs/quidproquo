@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from 'quidproquo-core';
+import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

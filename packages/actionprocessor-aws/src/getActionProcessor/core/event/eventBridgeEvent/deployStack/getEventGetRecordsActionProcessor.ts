@@ -7,7 +7,7 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
 import { EventInput, InternalEventRecord } from './types';

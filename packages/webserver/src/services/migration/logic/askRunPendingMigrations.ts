@@ -1,4 +1,4 @@
-import { askLogCreate, askQueueSendMessages, AskResponse, LogLevelEnum, QueueMessage } from 'quidproquo-core';
+import { askLogCreate, askQueueSendMessages, AskResponse, LogLevelEnum, QueueMessage } from '@qpqjs/core';
 
 import { askPendingMigrations, askRecordMigrationRan, getMigrationKey } from './pendingMigrations';
 

@@ -1,4 +1,4 @@
-import { buildEffectReducer, combineQpqReducers, QpqReducer } from 'quidproquo-core';
+import { buildEffectReducer, combineQpqReducers, QpqReducer } from '@qpqjs/core';
 
 import { EventDocDocument } from '../models';
 import { buildEventDocBaseReducer } from './buildEventDocBaseReducer';

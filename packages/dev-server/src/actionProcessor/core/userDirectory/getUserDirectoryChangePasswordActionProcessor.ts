@@ -5,7 +5,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessChangePassword = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryChangePassword> => {
   return async () => {

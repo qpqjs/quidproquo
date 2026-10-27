@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, Nullable, QPQError } from 'quidproquo-core';
+import { DynamicModuleLoader, Nullable, QPQError } from '@qpqjs/core';
 
 import { StateMachineQPQConfigSetting } from '../../config/settings/stateMachine';
 import { StateMachineStoryResolver } from './createStateMachineStoryResolver';

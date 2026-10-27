@@ -1,6 +1,6 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, defineQueue, defineUserDirectory, kvsKey, QPQConfig } from 'quidproquo-core';
-import { defineWebsocket } from 'quidproquo-webserver';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, defineKeyValueStore, defineQueue, defineUserDirectory, kvsKey, QPQConfig } from '@qpqjs/core';
+import { defineWebsocket } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

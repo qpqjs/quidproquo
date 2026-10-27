@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

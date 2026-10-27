@@ -1,4 +1,4 @@
-import { QPQConfig, ScheduleFields, ScheduleQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, ScheduleFields, ScheduleQPQConfigSetting } from '@qpqjs/core';
 
 // One armed schedule: the config that declared it, and its recurrence already
 // resolved. Resolving once at boot rather than per tick means an unschedulable

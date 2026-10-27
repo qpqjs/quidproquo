@@ -30,7 +30,7 @@ There are two ways to establish the context — one for custom routes, one for t
 Provides the store context for a collection identified by `storeName` + `type`, deriving the events-store and blob-drive names from `storeName`. Use it in a **custom** route (one outside `defineEventDocRoutes`, which has no per-route globals) so its sub-story can call the generic `askEventDocEvent*` / `askEventDocGetByIdOrThrow` data functions. It is the hand-written counterpart to [askEventDocProvideStoreFromGlobals](#askeventdocprovidestorefromglobals).
 
 ```typescript
-import { askEventDocProvideStore } from 'quidproquo-features';
+import { askEventDocProvideStore } from '@qpqjs/features';
 
 export function* customAppendRoute(docId: string, input: EventDocEventInput) {
   return yield* askEventDocProvideStore(
@@ -78,7 +78,7 @@ function* askEventDocProvideStore<T>(
 The built-in-routes counterpart: bridges the per-route **globals** that `defineEventDocRoutes` sets (store name, events-store name, type, storage drive, and the optional onPublish/onAppend/scopeResolver hooks) into the store context, then runs the controller sub-story. Reads each global with [askConfigGetGlobal](../../core/config/ask-config-get-global.md), which throws if a route forgot to set them.
 
 ```typescript
-import { askEventDocProvideStoreFromGlobals } from 'quidproquo-features';
+import { askEventDocProvideStoreFromGlobals } from '@qpqjs/features';
 
 export function* getEventsController(event: HTTPEvent) {
   return yield* askEventDocProvideStoreFromGlobals(
@@ -134,7 +134,7 @@ function* askEventDocStoreRead(): AskResponse<EventDocStore>;
 Reads the store context and **throws if it was not provided** — a plain read otherwise silently returns the empty default and the data stories would target a blank store. This is the safe accessor the event/asset data stories use to get the store; it validates that `storeName` and `type` are set.
 
 ```typescript
-import { askEventDocResolveStore } from 'quidproquo-features';
+import { askEventDocResolveStore } from '@qpqjs/features';
 
 export function* eventsStoreName() {
   const { eventsStoreName } = yield* askEventDocResolveStore();

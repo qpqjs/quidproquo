@@ -10,7 +10,7 @@ Invokes an [inline function](../../../config/core/inline-function.md) by name, p
 - **Action type:** `InlineFunctionActionType.Execute`
 
 ```typescript
-import { askInlineFunctionExecute } from 'quidproquo-core';
+import { askInlineFunctionExecute } from '@qpqjs/core';
 
 export function* quoteOrder(order: { subtotal: number; region: string }) {
   const tax = yield* askInlineFunctionExecute<number, { amount: number; region: string }>(

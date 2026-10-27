@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { DnsActionType, OpenApiActionType } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { DnsActionType, OpenApiActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

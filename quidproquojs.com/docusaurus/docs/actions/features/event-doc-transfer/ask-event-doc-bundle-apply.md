@@ -12,7 +12,7 @@ Docs are imported independently: a blocking row (`diverged`, `codeConflict`) is 
 - **Built from:** `askEventDocTransferProvideCollection` (runs each doc's import against its own collection's store) then `askEventDocBundleApplyDoc` (the per-doc write). Requires an `EventDocTransferRegistry` and a parsed `EventDocBundle` — the built-in `POST /transfer/import` route resolves both from `{ transferId }`, plus the importing user id, before calling this.
 
 ```typescript
-import { askEventDocBundleApply, askEventDocTransferReadBundle, askEventDocTransferReadRegistry } from 'quidproquo-features';
+import { askEventDocBundleApply, askEventDocTransferReadBundle, askEventDocTransferReadRegistry } from '@qpqjs/features';
 
 export function* applyImport(transferId: string, importerUserId: string, force = false) {
   const registry = yield* askEventDocTransferReadRegistry();

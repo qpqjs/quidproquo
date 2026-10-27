@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineWebsocket, QpqWebSocketEventProcessors } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineWebsocket, QpqWebSocketEventProcessors } from '@qpqjs/webserver';
 
 import { request } from 'http';
 import { Socket } from 'net';

@@ -1,5 +1,5 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
-import { LogLog } from 'quidproquo-features';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
+import { LogLog } from '@qpqjs/features';
 
 import { VolatileEffect } from '../../effects/volatile/VolatileEffect';
 import { VolatileLogLogSearchPartLoadedEffect } from '../../effects/volatile/VolatileLogLogSearchPartLoadedEffect';

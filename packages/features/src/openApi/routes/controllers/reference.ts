@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, OpenApiDocumentOptions, qpqWebServerUtils } from 'quidproquo-webserver';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, OpenApiDocumentOptions, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { OPEN_API_INFO_GLOBAL } from '../../constants/openApiGlobalNames';
 import { buildOpenApiReferenceHtml } from '../../logic/buildOpenApiReferenceHtml';

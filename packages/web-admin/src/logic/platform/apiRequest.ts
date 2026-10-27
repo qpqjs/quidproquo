@@ -1,5 +1,5 @@
-import { HTTPNetworkResponse } from 'quidproquo-core';
-import { preformNetworkRequest } from 'quidproquo-webserver';
+import { HTTPNetworkResponse } from '@qpqjs/core';
+import { preformNetworkRequest } from '@qpqjs/webserver';
 
 const getHeaders = (accessToken?: string) => ({
   'Content-Type': 'application/json',

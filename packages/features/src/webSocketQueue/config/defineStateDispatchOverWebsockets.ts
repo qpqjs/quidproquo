@@ -1,4 +1,4 @@
-import { defineActionProcessors, QPQConfig } from 'quidproquo-core';
+import { defineActionProcessors, QPQConfig } from '@qpqjs/core';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 

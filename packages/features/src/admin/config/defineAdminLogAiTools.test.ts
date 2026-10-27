@@ -1,4 +1,4 @@
-import { InlineFunctionQPQConfigSetting } from 'quidproquo-core';
+import { InlineFunctionQPQConfigSetting } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

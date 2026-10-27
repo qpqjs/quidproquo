@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineWebEntry } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineWebEntry } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

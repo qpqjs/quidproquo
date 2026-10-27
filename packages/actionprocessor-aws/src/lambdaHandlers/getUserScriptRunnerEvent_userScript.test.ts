@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from 'quidproquo-core';
+import { buildTestQpqConfig, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
 
 import { Context, SNSEvent } from 'aws-lambda';
 import path from 'path';

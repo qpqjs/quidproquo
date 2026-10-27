@@ -5,7 +5,7 @@ const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', 
 const BAR_WIDTH = 28;
 
 export type ActiveStep = {
-  label: string; // e.g. "quidproquo-features@0.1.7 › build:esm"
+  label: string; // e.g. "@qpqjs/features@0.1.7 › build:esm"
   startMs: number;
 };
 

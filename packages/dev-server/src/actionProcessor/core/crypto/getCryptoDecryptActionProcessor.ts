@@ -1,4 +1,4 @@
-import { createLocalMasterKeyDataKeyProvider, envelopeDecrypt } from 'quidproquo-actionprocessor-node';
+import { createLocalMasterKeyDataKeyProvider, envelopeDecrypt } from '@qpqjs/actionprocessor-node';
 import {
   actionResult,
   actionResultError,
@@ -8,7 +8,7 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getOrSeedCryptoMasterKey } from '../../../logic/cryptoKeys';
 import { ResolvedDevServerConfig } from '../../../types';

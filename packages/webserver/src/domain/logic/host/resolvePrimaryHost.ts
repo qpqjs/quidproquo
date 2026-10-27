@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { DomainTarget } from '../../../domain/types/DomainTarget';

@@ -1,4 +1,4 @@
-import { DeployEventType } from 'quidproquo-core';
+import { DeployEventType } from '@qpqjs/core';
 
 export type MigrationInfo = {
   srcPath: string;

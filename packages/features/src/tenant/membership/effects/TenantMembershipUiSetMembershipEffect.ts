@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { TenantCallerMembership } from '../../models/TenantCallerMembership';
 import { TenantId } from '../../models/TenantId';

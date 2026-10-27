@@ -1,1 +1,1 @@
-{ "label": "quidproquo-features", "position": 6, "link": { "type": "generated-index", "description": "Config settings from quidproquo-features — ready-made feature modules (event documents, AI chat, admin) you compose into a service." } }
+{ "label": "@qpqjs/features", "position": 6, "link": { "type": "generated-index", "description": "Config settings from @qpqjs/features — ready-made feature modules (event documents, AI chat, admin) you compose into a service." } }

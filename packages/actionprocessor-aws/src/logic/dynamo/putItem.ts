@@ -1,4 +1,4 @@
-import { KvsKey, KvsObjectDataType } from 'quidproquo-core';
+import { KvsKey, KvsObjectDataType } from '@qpqjs/core';
 
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 

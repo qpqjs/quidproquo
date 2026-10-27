@@ -1,4 +1,4 @@
-import { KvsAdvancedDataType, KvsCoreDataType, KvsLogicalOperator, KvsQueryCondition, KvsQueryOperation } from 'quidproquo-core';
+import { KvsAdvancedDataType, KvsCoreDataType, KvsLogicalOperator, KvsQueryCondition, KvsQueryOperation } from '@qpqjs/core';
 
 import { composeScopedKvsIndexValue, getScopedKvsIndexAttributeName } from './scopedKvsIndexAttribute';
 import { composeScopedKvsValue, stripScopedKvsValue } from './scopedKvsValue';

@@ -10,7 +10,7 @@ Runs a wrapped story and captures the outcome as an `EitherActionResult` object 
 - **Built from:** a generator that re-yields each of the wrapped story's actions with `returnErrors: true`, so action failures come back as failure objects rather than throwing. It also catches thrown JavaScript errors and reports them as `GenericError`.
 
 ```typescript
-import { askCatch } from 'quidproquo-core';
+import { askCatch } from '@qpqjs/core';
 
 export function* askTryReadConfig() {
   const outcome = yield* askCatch(askFileReadTextContents('config', 'app.json'));

@@ -12,7 +12,7 @@ This is an **account/organization bootstrap setting**: it configures the AWS acc
 - **On AWS:** deploys an `aws_cloudtrail.Trail` writing to a private, SSE-S3-encrypted, SSL-enforced S3 bucket (`qpq-cloudtrail-<accountId>-<region>-<name>`, retained on teardown, with a lifecycle expiration equal to `retentionDays`). When `cloudWatchLogs` is set, it also creates a CloudWatch Logs group (`/qpq/cloudtrail/<name>`, destroyed on teardown) and sends trail events to it. Deployed by `QpqAccountCloudTrailConstruct` in the account stack (`AccountQpqStack`).
 
 ```typescript
-import { defineAccountCloudTrail } from 'quidproquo-config-aws';
+import { defineAccountCloudTrail } from '@qpqjs/config-aws';
 
 export default [
   defineAccountCloudTrail('audit'),
@@ -53,7 +53,7 @@ The trail's name. Used as the setting's `uniqueKey` and baked into the physical 
 ## Examples
 
 ```typescript
-import { defineAccountCloudTrail } from 'quidproquo-config-aws';
+import { defineAccountCloudTrail } from '@qpqjs/config-aws';
 
 export default [
   // Audit trail with CloudWatch delivery, so the Cognito auth-failure alarm can attach
@@ -72,4 +72,4 @@ export default [
 
 - [defineAccountSecurityServices](./account-security-services.md) — consumes this trail's CloudWatch log group for its Cognito auth-failure alarm.
 - [defineAccountBudget](./account-budget.md) — cost budget & anomaly alerts, another `defineAccount*` bootstrap setting on the same account stack.
-- **AWS implementation:** `QpqAccountCloudTrailConstruct` (CloudTrail trail, S3 log bucket, optional CloudWatch Logs group) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqAccountCloudTrailConstruct` (CloudTrail trail, S3 log bucket, optional CloudWatch Logs group) in `@qpqjs/deploy-awscdk`.

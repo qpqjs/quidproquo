@@ -13,7 +13,7 @@ Returns a random floating-point number.
 Randomness is the classic source of non-determinism, so a story never calls `Math.random()` inline. It `yield*`s this action and the runtime supplies the value, recording it in the execution log. That keeps the story a pure generator that can be inspected, tested, and replayed — a replay reuses the exact number the original run drew rather than rolling a fresh one.
 
 ```typescript
-import { askRandomNumber } from 'quidproquo-core';
+import { askRandomNumber } from '@qpqjs/core';
 
 export function* askRollDice() {
   const r = yield* askRandomNumber();

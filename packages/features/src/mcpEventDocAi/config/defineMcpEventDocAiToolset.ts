@@ -1,4 +1,4 @@
-import { defineActionProcessors, defineInlineFunction, QPQConfig } from 'quidproquo-core';
+import { defineActionProcessors, defineInlineFunction, QPQConfig } from '@qpqjs/core';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';

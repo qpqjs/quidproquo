@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import * as cdk from 'aws-cdk-lib';
 import { Construct, IConstruct } from 'constructs';

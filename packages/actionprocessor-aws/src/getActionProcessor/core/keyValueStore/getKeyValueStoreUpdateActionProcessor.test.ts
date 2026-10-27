@@ -1,4 +1,4 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   askKeyValueStoreUpdateBase,
   buildTestQpqConfig,
@@ -8,7 +8,7 @@ import {
   kvsNotExists,
   kvsOr,
   KvsUpdateActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

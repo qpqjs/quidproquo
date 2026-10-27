@@ -6,8 +6,8 @@ import {
   actionResultErrorFromCaughtError,
   Nullable,
   ProcessorFor,
-} from 'quidproquo-core';
-import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, preformNetworkRequest } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, preformNetworkRequest } from '@qpqjs/webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name

@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect, Nullable } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect, Nullable } from '@qpqjs/core';
 
 import { EventDocImportUiEffect } from '../effects/EventDocImportUiEffect';
 import type { EventDocImportUiSetErrorEffect } from '../effects/EventDocImportUiSetErrorEffect';

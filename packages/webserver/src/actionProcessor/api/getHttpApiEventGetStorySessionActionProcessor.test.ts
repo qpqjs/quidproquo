@@ -9,7 +9,7 @@ import {
   ErrorTypeEnum,
   EventActionType,
   noopDynamicModuleLoader,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

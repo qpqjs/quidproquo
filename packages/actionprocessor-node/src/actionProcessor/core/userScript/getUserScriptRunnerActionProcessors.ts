@@ -5,8 +5,8 @@ import {
   getLogActionProcessor,
   getMathActionProcessor,
   getNetworkActionProcessor,
-} from 'quidproquo-actionprocessor-js';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+} from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 /**
  * The whole world of a sandboxed user script: the pure processors (date, error, guid, log,

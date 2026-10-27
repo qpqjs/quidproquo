@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { CloudflareDnsDeployEvent, CloudflareDnsDeployEventResponse } from '../../../../types';
 import { askProcessCloudflareDnsDeployEvent } from '../../logic/askProcessCloudflareDnsDeployEvent';

@@ -1,4 +1,4 @@
-import { QpqPagedData, UserAttributes } from 'quidproquo-core';
+import { QpqPagedData, UserAttributes } from '@qpqjs/core';
 
 import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client-cognito-identity-provider';
 

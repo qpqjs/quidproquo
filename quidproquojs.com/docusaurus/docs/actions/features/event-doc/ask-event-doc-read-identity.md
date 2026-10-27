@@ -8,11 +8,11 @@ description: Declaratively read where an event-doc's own document lives (service
 The address sibling of [askEventDocReadState](./ask-event-doc-read-state.md): the story yields no payload at all, and a registered processor answers with the doc's own identity — `serviceName`, `basePath`, and `id`. Verbs written in terms of it (for example, building an `EventDocLink` relative to their own doc) stay workspace-blind, resolving whichever doc the processor is bound to.
 
 - **Action type:** `EventDocActionType.ReadIdentity`
-- **quidproquo-features ships no default processor** for this action. Calling it with no processor registered fails loudly, the same as an unbound [askEventDocReadState](./ask-event-doc-read-state.md).
+- **@qpqjs/features ships no default processor** for this action. Calling it with no processor registered fails loudly, the same as an unbound [askEventDocReadState](./ask-event-doc-read-state.md).
 - Returns `null` until the doc has an identity to report: before the workspace initializes the slot, and always for an unsaved doc (it has no server-backed identity to resolve).
 
 ```typescript
-import { askEventDocReadIdentity } from 'quidproquo-features';
+import { askEventDocReadIdentity } from '@qpqjs/features';
 
 export function* askTemplateBuildSelfLink() {
   const identity = yield* askEventDocReadIdentity();

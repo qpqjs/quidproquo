@@ -11,7 +11,7 @@ Writes binary data to a file on a [storage drive](../../../config/core/storage-d
 - **On AWS:** performs an S3 `PutObject` on the drive's bucket, decoding the supplied base64 data. If a `storageDriveTier` is given, the object is written directly into that S3 storage class.
 
 ```typescript
-import { askFileWriteBinaryContents } from 'quidproquo-core';
+import { askFileWriteBinaryContents } from '@qpqjs/core';
 
 export function* askStoreAvatar(userId: string, base64Png: string) {
   yield* askFileWriteBinaryContents('user-uploads', `avatars/${userId}.png`, {
@@ -73,7 +73,7 @@ interface QPQBinaryData {
 | `FileWriteBinaryContentsErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
 | `FileWriteBinaryContentsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(

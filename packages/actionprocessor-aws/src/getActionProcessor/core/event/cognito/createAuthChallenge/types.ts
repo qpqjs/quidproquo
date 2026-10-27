@@ -1,4 +1,4 @@
-import { CreateAuthChallengeEvent, CreateAuthChallengeEventResponse, MatchStoryResult } from 'quidproquo-core';
+import { CreateAuthChallengeEvent, CreateAuthChallengeEventResponse, MatchStoryResult } from '@qpqjs/core';
 
 import { Context, CreateAuthChallengeTriggerEvent } from 'aws-lambda';
 

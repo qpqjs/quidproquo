@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, ErrorTypeEnum, EventActionType } from 'quidproquo-core';
-import { QPQWebServerConfigSettingType, WebSocketEventType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { QPQWebServerConfigSettingType, WebSocketEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

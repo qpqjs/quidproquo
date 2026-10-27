@@ -1,4 +1,4 @@
-import { createContextProvider } from 'quidproquo-core';
+import { createContextProvider } from '@qpqjs/core';
 
 import { EventDocStore } from '../types/EventDocStore';
 import { eventDocStoreContext } from './eventDocStoreContext';

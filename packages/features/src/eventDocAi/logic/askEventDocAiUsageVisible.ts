@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL } from '../constants/eventDocAiGlobalNames';
 

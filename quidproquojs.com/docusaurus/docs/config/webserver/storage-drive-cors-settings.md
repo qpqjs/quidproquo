@@ -10,8 +10,8 @@ Sets the browser **CORS allowed-origins** for a [storage drive](../core/storage-
 - **On AWS:** the drive's S3 bucket is created with a CORS rule whose `AllowedOrigins` come from this setting (`QpqCoreStorageDriveConstruct`, wired by the web-aware deploy). The bucket allows `GET`, `HEAD`, `PUT`, and `POST` from those origins, all request headers, and exposes the `ETag` response header. When no CORS setting is declared for a drive, its allowed origins default to this service's own domain (`https://<domain>` and `https://*.<domain>`), falling back to `['*']` only when the service declares no domain at all.
 
 ```typescript
-import { defineStorageDrive } from 'quidproquo-core';
-import { defineStorageDriveCorsSettings } from 'quidproquo-webserver';
+import { defineStorageDrive } from '@qpqjs/core';
+import { defineStorageDriveCorsSettings } from '@qpqjs/webserver';
 
 export default [
   defineStorageDrive('uploads'),
@@ -50,8 +50,8 @@ The browser origins allowed to read/write the drive's objects via cross-origin `
 ## Examples
 
 ```typescript
-import { defineStorageDrive } from 'quidproquo-core';
-import { defineStorageDriveCorsSettings } from 'quidproquo-webserver';
+import { defineStorageDrive } from '@qpqjs/core';
+import { defineStorageDriveCorsSettings } from '@qpqjs/webserver';
 
 export default [
   defineStorageDrive('uploads'),
@@ -69,5 +69,5 @@ export default [
 
 - [defineStorageDrive](../core/storage-drive.md) — declares the drive this CORS policy applies to.
 - [defineWebEntry](./web-entry.md) — has its own `corsAllowedOrigins` for a web entry's served assets (a distinct concern from a drive's object CORS).
-- **Browser-direct transfers:** the presigned-URL file actions (`askFileGenerateTemporaryUploadSecureUrl`, `askFileGenerateTemporarySecureUrl` in quidproquo-core) are what a browser uses to hit the drive directly — this CORS policy is what makes those cross-origin calls succeed.
-- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket CORS rule) in `quidproquo-deploy-awscdk`.
+- **Browser-direct transfers:** the presigned-URL file actions (`askFileGenerateTemporaryUploadSecureUrl`, `askFileGenerateTemporarySecureUrl` in @qpqjs/core) are what a browser uses to hit the drive directly — this CORS policy is what makes those cross-origin calls succeed.
+- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket CORS rule) in `@qpqjs/deploy-awscdk`.

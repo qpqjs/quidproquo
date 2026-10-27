@@ -1,4 +1,4 @@
-import { AssociateSoftwareTokenResult } from 'quidproquo-core';
+import { AssociateSoftwareTokenResult } from '@qpqjs/core';
 
 import { AssociateSoftwareTokenCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 

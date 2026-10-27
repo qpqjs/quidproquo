@@ -1,6 +1,6 @@
 // App-specific bootstrap extras: the root domains, WAF, the api domain, and the
 // domain certificates. The identity plumbing (defineApplication +
-// defineAwsServiceAccountInfo) is provided by quidproquo-deploy-awscdk's
+// defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-awscdk's
 // workspace CDK app; this fragment must not declare its own.
 import {
   defineApi,
@@ -15,8 +15,8 @@ import {
   defineDomainCertificate,
   WafManagedRuleGroup,
   WafRuleOverrideAction,
-} from 'quidproquo-config-aws';
-import { QpqAppDeployContext } from 'quidproquo-deploy-awscdk';
+} from '@qpqjs/config-aws';
+import { QpqAppDeployContext } from '@qpqjs/deploy-awscdk';
 
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 

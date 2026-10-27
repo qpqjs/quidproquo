@@ -4,7 +4,7 @@
 // carries sourcesContent (the federated remote build embeds it), the original source
 // text is embedded in the trace so viewers need no access to the repo.
 
-import { QpqExecutionTraceSource, QpqExecutionTraceStep, QpqExecutionTraceValue } from 'quidproquo-core';
+import { QpqExecutionTraceSource, QpqExecutionTraceStep, QpqExecutionTraceValue } from '@qpqjs/core';
 
 import * as fs from 'fs';
 import * as path from 'path';

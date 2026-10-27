@@ -9,7 +9,7 @@ import {
   KvsUpdate,
   KvsUpdateActionType,
   throwsError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 type Row = Record<string, unknown>;
 

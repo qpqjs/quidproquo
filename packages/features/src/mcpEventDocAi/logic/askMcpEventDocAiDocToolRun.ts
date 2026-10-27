@@ -1,5 +1,5 @@
-import { askInlineFunctionExecute, AskResponse, askThrowError, ErrorTypeEnum, Nullable } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askInlineFunctionExecute, AskResponse, askThrowError, ErrorTypeEnum, Nullable } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { eventDocRouteAction } from '../../eventDoc/constants/eventDocRouteAction';
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';

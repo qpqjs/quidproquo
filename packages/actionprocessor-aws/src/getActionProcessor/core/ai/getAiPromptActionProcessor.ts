@@ -7,7 +7,7 @@ import {
   ProcessorFor,
   QPQConfig,
   sumAiStreamUsage,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import type { LanguageModelUsage, ModelMessage } from 'ai';
 import { generateText, jsonSchema, NoObjectGeneratedError, Output } from 'ai';

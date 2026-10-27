@@ -1,4 +1,4 @@
-import { createActionRequester, DecodedAccessToken, Nullable, QpqContext } from 'quidproquo-core';
+import { createActionRequester, DecodedAccessToken, Nullable, QpqContext } from '@qpqjs/core';
 
 import { RouteAuthSettings } from '../../config/settings/route';
 import { HTTPEvent } from '../../types/HTTPEvent';

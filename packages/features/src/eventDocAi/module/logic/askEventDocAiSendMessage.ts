@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askStateRead } from 'quidproquo-core';
+import { askCatch, AskResponse, askStateRead } from '@qpqjs/core';
 
 import type { EventDocAiAttachment } from '../../models';
 import { askUIEventDocAiAppendChatMessage } from '../actionCreators/askUIEventDocAiAppendChatMessage';

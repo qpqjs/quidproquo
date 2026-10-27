@@ -1,4 +1,4 @@
-import type { Effect } from 'quidproquo-core';
+import type { Effect } from '@qpqjs/core';
 
 import { EventDocAiEffect } from './EventDocAiEffect';
 

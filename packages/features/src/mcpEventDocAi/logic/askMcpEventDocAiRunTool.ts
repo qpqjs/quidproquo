@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { readMcpStringArg } from '../../mcp/logic/readMcpStringArg';
 import { McpToolsetRunToolInput } from '../../mcp/models/McpToolsetRunToolInput';

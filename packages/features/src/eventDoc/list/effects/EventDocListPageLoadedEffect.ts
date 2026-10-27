@@ -1,4 +1,4 @@
-import { Effect, Nullable } from 'quidproquo-core';
+import { Effect, Nullable } from '@qpqjs/core';
 
 import { EventDocSummary } from '../../models';
 import { EventDocListEffect } from './EventDocListEffect';

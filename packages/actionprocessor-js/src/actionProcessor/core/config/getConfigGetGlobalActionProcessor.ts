@@ -1,4 +1,4 @@
-import { actionResult, askConfigGetGlobalBase, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, askConfigGetGlobalBase, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 const getProcessConfigGetGlobal = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetGlobalBase> => {
   return async ({ globalName }, session) => {

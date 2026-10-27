@@ -1,5 +1,5 @@
 import { AskResponse } from 'quidproquo';
-import { askEventDocDocumentStateLatest } from 'quidproquo-features';
+import { askEventDocDocumentStateLatest } from '@qpqjs/features';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SmokeProbeDocState } from '../definition/smokeProbeDocDefinition';

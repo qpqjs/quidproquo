@@ -1,4 +1,4 @@
-import { flattenKvsQueryConditions, KvsQueryOperation } from 'quidproquo-core';
+import { flattenKvsQueryConditions, KvsQueryOperation } from '@qpqjs/core';
 
 import { getItemName } from './getItemName';
 

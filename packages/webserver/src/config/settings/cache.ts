@@ -1,4 +1,4 @@
-import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 import { CacheSettings, QPQWebServerConfigSettingType } from '../QPQConfig';
 

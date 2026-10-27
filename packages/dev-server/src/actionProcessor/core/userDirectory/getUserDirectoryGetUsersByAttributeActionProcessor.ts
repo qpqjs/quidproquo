@@ -6,7 +6,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
 import { findDevUsersByAttribute } from '../../../logic/auth/jsonUserStore';

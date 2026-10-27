@@ -1,4 +1,4 @@
-import { UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
+import { UserScriptModuleMap } from '@qpqjs/actionprocessor-node';
 
 import fs from 'fs';
 import os from 'os';

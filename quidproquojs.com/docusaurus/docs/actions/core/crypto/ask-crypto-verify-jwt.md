@@ -10,7 +10,7 @@ Verifies a compact JWT against a [signing key](../../../config/core/signing-key.
 Checks, in order: three base64url segments; header is JSON with `alg: "RS256"` (anything else, including `none`, is rejected before any verification); signature verifies under the key via [askCryptoVerify](./ask-crypto-verify.md); payload is a JSON object; `nbf` is not in the future and `exp` is not in the past, against QPQ time. Audience, issuer and every application claim are yours to check on the returned claims.
 
 ```typescript
-import { askCryptoVerifyJwt, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askCryptoVerifyJwt, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 type AccessTokenClaims = { sub: string; grants: string[]; exp: number };
 

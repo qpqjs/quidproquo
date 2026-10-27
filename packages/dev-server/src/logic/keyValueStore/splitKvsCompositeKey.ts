@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, Nullable } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, Nullable } from '@qpqjs/core';
 
 export type KvsCompositeKeyParts = {
   pk: string;

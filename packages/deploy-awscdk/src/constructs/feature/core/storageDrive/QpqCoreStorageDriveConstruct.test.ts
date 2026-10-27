@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

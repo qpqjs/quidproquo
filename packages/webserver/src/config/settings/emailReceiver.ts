@@ -1,4 +1,4 @@
-import { defineInlineFunction, defineStorageDrive, QPQConfig, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
+import { defineInlineFunction, defineStorageDrive, QPQConfig, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { EMAIL_RECEIVER_ON_EMAIL_GLOBAL } from '../../services/emailReceiving/constants/emailReceivingGlobals';
 import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';

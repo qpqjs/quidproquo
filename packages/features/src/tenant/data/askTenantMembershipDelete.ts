@@ -1,4 +1,4 @@
-import { askKeyValueStoreDelete, AskResponse } from 'quidproquo-core';
+import { askKeyValueStoreDelete, AskResponse } from '@qpqjs/core';
 
 import { TENANT_MEMBERSHIPS_STORE } from '../constants/tenantStoreNames';
 import { TenantId } from '../models/TenantId';

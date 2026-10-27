@@ -1,4 +1,4 @@
-import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 export enum QPQDevServerConfigSettingType {
   devServerOptions = '@quidproquo-dev-server/config/DevServerOptions',

@@ -1,5 +1,5 @@
-import type { Effect } from 'quidproquo-core';
-import type { Nullable } from 'quidproquo-core';
+import type { Effect } from '@qpqjs/core';
+import type { Nullable } from '@qpqjs/core';
 
 import { EventDocAiEffect } from './EventDocAiEffect';
 

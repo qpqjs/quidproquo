@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { TenantId } from '../models/TenantId';

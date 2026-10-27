@@ -1,11 +1,11 @@
-# quidproquo-neo4j
+# @qpqjs/neo4j
 
 Neo4j behind the graph database actions in [quidproquo](https://github.com/qpqjs/quidproquo).
 
 Core defines `graphDatabase` actions in platform-neutral terms. This package supplies the processors that answer them with Neo4j, so a story written against `askGraphDatabase*` runs unchanged whether the graph is Neo4j here or Neptune on AWS.
 
 ```bash
-npm install quidproquo-neo4j
+npm install @qpqjs/neo4j
 ```
 
 ## What is in here

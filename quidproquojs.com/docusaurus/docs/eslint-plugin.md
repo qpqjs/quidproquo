@@ -19,12 +19,12 @@ const now = yield* askDateNow();
 
 ## Setup
 
-If you use the shared config, you already have it. `quidproquo-eslint-config` wires the plugin in, so every `create-qpq-app` project and every package extending that config gets both rules as errors with no extra setup.
+If you use the shared config, you already have it. `@qpqjs/eslint-config` wires the plugin in, so every `create-qpq-app` project and every package extending that config gets both rules as errors with no extra setup.
 
 To use the plugin on its own, without the rest of the shared config:
 
 ```js title="eslint.config.mjs"
-import { qpqPlugin } from 'quidproquo-eslint-config';
+import { qpqPlugin } from '@qpqjs/eslint-config';
 
 export default [
   qpqPlugin.configs.recommended,

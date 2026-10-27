@@ -1,4 +1,4 @@
-import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
+import { buildEffectReducer, QpqReducer } from '@qpqjs/core';
 
 import { ReservedEventDocEffects } from '../fold/ReservedEventDocEffects';
 import { EventDocEffect, EventDocEvent, EventDocSummaryView } from '../models';

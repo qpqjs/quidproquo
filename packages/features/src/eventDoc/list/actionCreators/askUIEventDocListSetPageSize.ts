@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { EventDocListEffect } from '../effects/EventDocListEffect';
 import type { EventDocListSetPageSizeEffect } from '../effects/EventDocListSetPageSizeEffect';

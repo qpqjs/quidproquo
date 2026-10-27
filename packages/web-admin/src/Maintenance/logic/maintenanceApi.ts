@@ -1,5 +1,5 @@
-import { generateUuid, QpqPagedData } from 'quidproquo-core';
-import { EventDocEvent, EventDocEventInput, EventDocSummary, MAINTENANCE_SCHEMA_VERSION, maintenanceBasePath } from 'quidproquo-features';
+import { generateUuid, QpqPagedData } from '@qpqjs/core';
+import { EventDocEvent, EventDocEventInput, EventDocSummary, MAINTENANCE_SCHEMA_VERSION, maintenanceBasePath } from '@qpqjs/features';
 
 import { apiRequestGet, apiRequestPost } from '../../logic';
 

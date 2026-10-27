@@ -1,4 +1,4 @@
-import { AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
+import { AskResponse, AuthenticateUserChallenge } from '@qpqjs/core';
 
 import { askSaveAuthToken } from '../../../platformLogic';
 import { askAuthUISetAuthInfo, askAuthUISetPassword } from '../authActionCreator';

@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocApplyTransientEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';

@@ -1,5 +1,5 @@
-import { askCatch, AskResponse, askTraceStory } from 'quidproquo-core';
-import { askServiceFunctionExecute, ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { askCatch, AskResponse, askTraceStory } from '@qpqjs/core';
+import { askServiceFunctionExecute, ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import {
   QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,

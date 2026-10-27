@@ -1,1 +1,1 @@
-{ "label": "quidproquo-config-aws", "position": 3, "link": { "type": "generated-index", "description": "AWS-specific config settings (define* functions) from quidproquo-config-aws — account, networking, security, and per-resource AWS overrides." } }
+{ "label": "@qpqjs/config-aws", "position": 3, "link": { "type": "generated-index", "description": "AWS-specific config settings (define* functions) from @qpqjs/config-aws — account, networking, security, and per-resource AWS overrides." } }

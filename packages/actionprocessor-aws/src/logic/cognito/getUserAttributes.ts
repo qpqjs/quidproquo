@@ -1,4 +1,4 @@
-import { UserAttributes } from 'quidproquo-core';
+import { UserAttributes } from '@qpqjs/core';
 
 import { AdminGetUserCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 

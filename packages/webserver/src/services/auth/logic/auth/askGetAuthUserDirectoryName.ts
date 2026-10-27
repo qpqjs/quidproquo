@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { AUTH_USER_DIRECTORY_GLOBAL_KEY } from '../../config';
 

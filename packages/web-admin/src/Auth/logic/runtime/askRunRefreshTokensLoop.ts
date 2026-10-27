@@ -1,4 +1,4 @@
-import { askDateNow, askDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from 'quidproquo-core';
+import { askDateNow, askDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
 import { askAuthUISetAuthInfo } from '../authActionCreator';

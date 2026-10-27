@@ -10,7 +10,7 @@ Defines a source of **action processors** for a service. Stories yield actions; 
 - **On AWS:** no infrastructure of its own. The referenced module is bundled as a build source and loaded inside the service's existing Lambdas at runtime; there is no separate construct or resource.
 
 ```typescript
-import { defineActionProcessors } from 'quidproquo-core';
+import { defineActionProcessors } from '@qpqjs/core';
 
 export default [
   defineActionProcessors('/entry/actionProcessors/getCustomProcessors::getCustomProcessors'),
@@ -33,7 +33,7 @@ A reference (usually a relative path string of the form `'/path/to/file::exporte
 
 ```typescript
 // getCustomProcessors.ts
-import { ActionProcessorListResolver, actionResult } from 'quidproquo-core';
+import { ActionProcessorListResolver, actionResult } from '@qpqjs/core';
 
 export const getCustomProcessors: ActionProcessorListResolver = async (qpqConfig, dynamicModuleLoader) => ({
   ['MyDomain.DoThing']: async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -47,14 +47,14 @@ Each key is an **action type**; each value is the processor that runs when a sto
 
 ## Returning results from a processor
 
-A processor never returns a bare value or throws to the story. It returns an `ActionProcessorResult`, built with helpers from `quidproquo-core`:
+A processor never returns a bare value or throws to the story. It returns an `ActionProcessorResult`, built with helpers from `@qpqjs/core`:
 
 - `actionResult(value)` wraps a successful result. The story receives `value` from its `yield`.
 - `actionResultError(errorType, errorText, errorStack?)` wraps a failure. `errorType` should come from the action's own error enum. By default the failure ends the story with that `QPQError`; a story that yields the action with `returnErrors` set receives it as an `EitherActionResult` instead.
 - `actionResultErrorFromCaughtError(caughtError, errorMap)` converts a caught exception inside a `try`/`catch`. The map is keyed by the error's runtime `code` (Node fs style: `ENOENT`, `EACCES`) first, then its `name` (AWS SDK style: `NoSuchBucket`, `AccessDenied`); the matching entry builds the `actionResultError`. An unmapped error becomes a `GenericError` whose text names only the unmapped key, never the raw error message, so map every error your processor can realistically hit.
 
 ```typescript
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, ErrorTypeEnum } from 'quidproquo-core';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, ErrorTypeEnum } from '@qpqjs/core';
 
 try {
   const item = await readTheThing(payload.id);
@@ -74,7 +74,7 @@ try {
 ## Examples
 
 ```typescript
-import { defineActionProcessors } from 'quidproquo-core';
+import { defineActionProcessors } from '@qpqjs/core';
 
 export default [
   // Register custom actions and/or override built-in processors

@@ -7,7 +7,7 @@ import {
   FileActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
 import { FileStorageConfig } from './types';
@@ -50,7 +50,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
       return actionResult(url);
     } catch (error: unknown) {
       // Name-keyed, not instanceof: under npm link / module federation the
-      // error can come from another copy of quidproquo-core.
+      // error can come from another copy of @qpqjs/core.
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope, error.message),
       });

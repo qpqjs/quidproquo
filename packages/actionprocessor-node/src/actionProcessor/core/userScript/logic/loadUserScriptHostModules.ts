@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { DynamicModuleLoader, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { UserScriptHostModuleLoadError } from './UserScriptHostModuleLoadError';
 import { UserScriptModuleMap } from './UserScriptModuleMap';

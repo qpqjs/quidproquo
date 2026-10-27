@@ -1,4 +1,4 @@
-import { CryptoContext } from 'quidproquo-core';
+import { CryptoContext } from '@qpqjs/core';
 
 import { createCipheriv, randomBytes } from 'crypto';
 

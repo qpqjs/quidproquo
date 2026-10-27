@@ -1,5 +1,5 @@
 {
-  "extends": "quidproquo-tsconfig/tsconfig.amd.json",
+  "extends": "@qpqjs/tsconfig/tsconfig.amd.json",
   "compilerOptions": {
     "outDir": "./lib/amd",
     "jsx": "react-jsx"

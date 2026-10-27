@@ -13,7 +13,7 @@ These run inside the `onChatHistory` and `onChatSend` handlers — the drive nam
 - `Save` built from [askConfigGetGlobal](../../core/config/ask-config-get-global.md) and [askFileWriteObjectJson](../../core/file/ask-file-write-object-json.md).
 
 ```typescript
-import { askEventDocAiChatHistoryLoad, askEventDocAiChatHistorySave } from 'quidproquo-features';
+import { askEventDocAiChatHistoryLoad, askEventDocAiChatHistorySave } from '@qpqjs/features';
 
 export function* askAppendSystemNote(docId: string, chatId: string) {
   const history = yield* askEventDocAiChatHistoryLoad(docId, chatId);

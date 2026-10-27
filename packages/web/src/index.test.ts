@@ -4,7 +4,7 @@ import * as quidproquoWeb from './index';
 
 // The barrel is the published API surface: catch an accidental unwiring of a
 // subtree before it ships.
-describe('quidproquo-web public api', () => {
+describe('@qpqjs/web public api', () => {
   it.each([
     ['askQueryParamsGet'],
     ['askQueryParamsGetAll'],

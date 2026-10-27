@@ -6,7 +6,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   StateActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessStateRead =
   <State>(getCurrentState: () => State): ProcessorFor<typeof askStateReadBase> =>

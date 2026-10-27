@@ -1,4 +1,4 @@
-import { useAuthenticatedNetworkRequest } from 'quidproquo-web-react';
+import { useAuthenticatedNetworkRequest } from '@qpqjs/web-react';
 
 import { getBaseUrlFromAdminWebHost } from './logic/getBaseUrlFromAdminWebHost';
 import { AdminNetworkRequestPayload } from './types/AdminNetworkRequestPayload';

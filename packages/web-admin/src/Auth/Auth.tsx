@@ -1,5 +1,5 @@
-import { AuthenticateUserChallenge } from 'quidproquo-core';
-import { authContext, QpqRuntimeEffectCatcher, useQpqRuntime } from 'quidproquo-web-react';
+import { AuthenticateUserChallenge } from '@qpqjs/core';
+import { authContext, QpqRuntimeEffectCatcher, useQpqRuntime } from '@qpqjs/web-react';
 
 import { ReactNode } from 'react';
 

@@ -8,13 +8,13 @@ receive their results back. There are two complementary ways to test them.
 
 ## 1. Story-level tests with `runStory` (the default)
 
-`runStory` (from `quidproquo-core`) runs a story to completion, answering every action it
+`runStory` (from `@qpqjs/core`) runs a story to completion, answering every action it
 asks for from a mock map. It is built on `askOverrideActions`, so batches (`askRunParallel`),
 nested stories, and `askCatch` all work transparently. This is the pattern to reach for when a
 story composes several actions.
 
 ```ts
-import { runStory, throwsError, expectError } from 'quidproquo-core';
+import { runStory, throwsError, expectError } from '@qpqjs/core';
 
 const result = runStory(askKeyValueStoreQueryAll('items', keyCondition), {
   // a literal value…
@@ -44,11 +44,11 @@ See `packages/core/src/testing/storyTesting.test.ts` for the full surface and
 
 ## 2. Action-requester tests with `expectGenerator`
 
-For a single action requester, `expectGenerator` (from `quidproquo-testing`) asserts the exact
+For a single action requester, `expectGenerator` (from `@qpqjs/testing`) asserts the exact
 action that is yielded and the value fed back — no runtime needed.
 
 ```ts
-import { expectGenerator } from 'quidproquo-testing';
+import { expectGenerator } from '@qpqjs/testing';
 
 expectGenerator(askConfigGetSecret('my-secret'))
   .toYield({ type: ConfigActionType.GetSecret, payload: { secretName: 'my-secret' } })

@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { QpqPermission } from '../../../permission/types/QpqPermission';
 import { TenantPermissionRequirement } from '../../models/TenantPermissionRequirement';

@@ -15,8 +15,8 @@ import {
   QPQConfig,
   QPQConfigAdvancedSettings,
   StorageDriveTier,
-} from 'quidproquo-core';
-import { defineServiceFunction } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';

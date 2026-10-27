@@ -17,7 +17,7 @@ These helpers cover three flows: presigned URLs for a browser to upload/download
 Mints a guid and a short-lived presigned `PUT` URL the client uploads the bytes to. Returns the guid (as `assetId`) so the caller can record it in a domain event. This is one complete storage operation — no bytes pass through your service. An optional `contentDisposition` is baked into the upload (the client must `PUT` the matching header) so the stored object serves with it, e.g. `inline` so a rendered PDF previews in an `<iframe>` instead of downloading.
 
 ```typescript
-import { askEventDocGenerateAssetUploadUrl } from 'quidproquo-features';
+import { askEventDocGenerateAssetUploadUrl } from '@qpqjs/features';
 
 export function* startImageUpload(docId: string) {
   const { uploadUrl, assetId } = yield* askEventDocGenerateAssetUploadUrl(docId, 'image/png');
@@ -53,7 +53,7 @@ function* askEventDocGenerateAssetUploadUrl(
 Returns a short-lived presigned `GET` URL the client loads an asset's bytes from — e.g. as an `<img src>` or to build a data URL. Read-only, no mutation.
 
 ```typescript
-import { askEventDocGenerateAssetDownloadUrl } from 'quidproquo-features';
+import { askEventDocGenerateAssetDownloadUrl } from '@qpqjs/features';
 
 export function* imageSrc(docId: string, assetId: string) {
   const { url } = yield* askEventDocGenerateAssetDownloadUrl(docId, assetId);
@@ -86,7 +86,7 @@ function* askEventDocGenerateAssetDownloadUrl(
 Writes a server-generated binary as an immutable asset directly on the collection's storage drive (under the same `<docId>/assets/<guid>` scheme) and returns a reference to it. This is the server-side twin of the presigned-upload flow — for when the backend itself holds the bytes (e.g. a rendered PDF) and no client round-trip is needed. The download route can serve it back via the same key.
 
 ```typescript
-import { askEventDocWriteAsset } from 'quidproquo-features';
+import { askEventDocWriteAsset } from '@qpqjs/features';
 
 export function* storeRenderedPdf(docId: string, pdf: QPQBinaryData) {
   const ref = yield* askEventDocWriteAsset(docId, pdf);
@@ -120,7 +120,7 @@ function* askEventDocWriteAsset(
 Records a **value** (data of unpredictable size — a node output, a variable, a trigger input) for an event: inline when it is small enough, or as an asset when it is not. This is the size-aware counterpart to `askEventDocWriteAsset` above, which stays the right choice for genuine files where a reference is always correct.
 
 ```typescript
-import { askEventDocWriteValue } from 'quidproquo-features';
+import { askEventDocWriteValue } from '@qpqjs/features';
 
 export function* recordNodeOutput(docId: string, nodeId: string, output: unknown) {
   const ref = yield* askEventDocWriteValue(docId, output, `${nodeId}.json`);
@@ -157,7 +157,7 @@ function* askEventDocWriteValue(
 
 - All four resolve the drive from the store context, so a missing context throws (see [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore)).
 - Assets are immutable: guid-named so a re-upload is always a fresh blob; the old one stays addressable for history/rollback. Assets live under `<docId>/assets/<guid>`; derived, disposable artifacts use a sibling `<docId>/runtime/<...>` prefix written elsewhere.
-- On the read side, `isInlineEventDocValueRef`, `readInlineEventDocValueRefs`, and `resolveEventDocValueRef` (all in `quidproquo-features`) are the shared helpers for branching on a ref's `kind` and resolving it against fetched asset snapshots — use them rather than checking `ref.kind` by hand, so every reader agrees on what "available" means.
+- On the read side, `isInlineEventDocValueRef`, `readInlineEventDocValueRefs`, and `resolveEventDocValueRef` (all in `@qpqjs/features`) are the shared helpers for branching on a ref's `kind` and resolving it against fetched asset snapshots — use them rather than checking `ref.kind` by hand, so every reader agrees on what "available" means.
 
 ## Related
 

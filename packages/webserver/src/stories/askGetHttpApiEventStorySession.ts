@@ -1,4 +1,4 @@
-import { AskResponse, DecodedAccessToken, Nullable, StorySession } from 'quidproquo-core';
+import { AskResponse, DecodedAccessToken, Nullable, StorySession } from '@qpqjs/core';
 
 import { askRouteAuthValidationDecode, askRouteAuthValidationResolveContext, RouteAuthDecodeOutcome } from '../actions/routeAuthValidation';
 import { RouteAuthSettings } from '../config/settings/route';

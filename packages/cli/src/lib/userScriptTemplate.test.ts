@@ -27,7 +27,7 @@ describe('createUserScriptProject', () => {
     expect(written).toEqual(['.gitignore', 'README.md', 'package.json', 'src/main.ts', 'tsconfig.json']);
     const packageJson = JSON.parse(fs.readFileSync(path.join(target, 'package.json'), 'utf8'));
     expect(packageJson.name).toBe('my-report');
-    expect(packageJson.dependencies['quidproquo-core']).toBe(ownVersion);
+    expect(packageJson.dependencies['@qpqjs/core']).toBe(ownVersion);
     expect(fs.readFileSync(path.join(target, 'README.md'), 'utf8')).toContain('# my-report');
     expect(fs.readFileSync(path.join(target, 'src/main.ts'), 'utf8')).toContain('export function* stampedGreeting');
   });

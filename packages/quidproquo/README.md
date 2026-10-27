@@ -71,7 +71,7 @@ Here is the health route the scaffolded app ships with:
 
 ```typescript
 import { askDateNow, AskResponse, HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo';
-import { dynamicRoute } from 'quidproquo-features';
+import { dynamicRoute } from '@qpqjs/features';
 
 export const health = dynamicRoute(
   ['GET', '/health'],
@@ -116,57 +116,57 @@ The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/packages/eslin
 | --- | --- |
 | [create-qpq-app](https://github.com/qpqjs/quidproquo/tree/main/packages/create-qpq-app) | Scaffolder. `npx create-qpq-app my-app` |
 | [quidproquo](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo) | The main entry point. Re-exports core and webserver |
-| [quidproquo-cli](https://github.com/qpqjs/quidproquo/tree/main/packages/cli) | The `qpq` CLI: dev, build, deploy and teardown |
+| [@qpqjs/cli](https://github.com/qpqjs/quidproquo/tree/main/packages/cli) | The `qpq` CLI: dev, build, deploy and teardown |
 
 **Framework**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-core](https://github.com/qpqjs/quidproquo/tree/main/packages/core) | Actions, stories, the runtime, and the config system |
-| [quidproquo-webserver](https://github.com/qpqjs/quidproquo/tree/main/packages/webserver) | Routes, apis, websockets, dns, email, and the web-side config |
-| [quidproquo-features](https://github.com/qpqjs/quidproquo/tree/main/packages/features) | Ready-made features: admin, auth users, tenants, event documents |
+| [@qpqjs/core](https://github.com/qpqjs/quidproquo/tree/main/packages/core) | Actions, stories, the runtime, and the config system |
+| [@qpqjs/webserver](https://github.com/qpqjs/quidproquo/tree/main/packages/webserver) | Routes, apis, websockets, dns, email, and the web-side config |
+| [@qpqjs/features](https://github.com/qpqjs/quidproquo/tree/main/packages/features) | Ready-made features: admin, auth users, tenants, event documents |
 
 **Runtimes**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-actionprocessor-js](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-js) | Processors that need no platform at all |
-| [quidproquo-actionprocessor-node](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-node) | Node processors |
-| [quidproquo-actionprocessor-awslambda](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-aws) | AWS processors and the Lambda entry handlers |
-| [quidproquo-actionprocessor-web](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-web) | Browser processors |
-| [quidproquo-dev-server](https://github.com/qpqjs/quidproquo/tree/main/packages/dev-server) | Runs your whole app locally on real code paths |
+| [@qpqjs/actionprocessor-js](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-js) | Processors that need no platform at all |
+| [@qpqjs/actionprocessor-node](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-node) | Node processors |
+| [@qpqjs/actionprocessor-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-aws) | AWS processors and the Lambda entry handlers |
+| [@qpqjs/actionprocessor-web](https://github.com/qpqjs/quidproquo/tree/main/packages/actionprocessor-web) | Browser processors |
+| [@qpqjs/dev-server](https://github.com/qpqjs/quidproquo/tree/main/packages/dev-server) | Runs your whole app locally on real code paths |
 
 **Frontend**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-web](https://github.com/qpqjs/quidproquo/tree/main/packages/web) | Browser utilities, no UI framework required |
-| [quidproquo-web-react](https://github.com/qpqjs/quidproquo/tree/main/packages/web-react) | React bindings: state store, hooks, auth, websockets |
-| [quidproquo-web-admin](https://github.com/qpqjs/quidproquo/tree/main/packages/web-admin) | The admin console: logs, traces, config, maintenance |
+| [@qpqjs/web](https://github.com/qpqjs/quidproquo/tree/main/packages/web) | Browser utilities, no UI framework required |
+| [@qpqjs/web-react](https://github.com/qpqjs/quidproquo/tree/main/packages/web-react) | React bindings: state store, hooks, auth, websockets |
+| [@qpqjs/web-admin](https://github.com/qpqjs/quidproquo/tree/main/packages/web-admin) | The admin console: logs, traces, config, maintenance |
 
 **Build and deploy**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-config-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/config-aws) | AWS-specific config settings |
-| [quidproquo-deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-awscdk) | Turns a qpq config into CDK stacks |
-| [quidproquo-deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-rspack) | Rspack bundling for services and federated remotes |
-| [quidproquo-deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-webpack) | The same, on webpack |
+| [@qpqjs/config-aws](https://github.com/qpqjs/quidproquo/tree/main/packages/config-aws) | AWS-specific config settings |
+| [@qpqjs/deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-awscdk) | Turns a qpq config into CDK stacks |
+| [@qpqjs/deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-rspack) | Rspack bundling for services and federated remotes |
+| [@qpqjs/deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/packages/deploy-webpack) | The same, on webpack |
 
 **Tooling**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-tsconfig](https://github.com/qpqjs/quidproquo/tree/main/packages/tsconfig) | Shared TypeScript config |
-| [quidproquo-eslint-config](https://github.com/qpqjs/quidproquo/tree/main/packages/eslint-config) | Shared ESLint config and the qpq lint rules |
-| [quidproquo-testing](https://github.com/qpqjs/quidproquo/tree/main/packages/testing) | Generator assertions and vitest matchers |
+| [@qpqjs/tsconfig](https://github.com/qpqjs/quidproquo/tree/main/packages/tsconfig) | Shared TypeScript config |
+| [@qpqjs/eslint-config](https://github.com/qpqjs/quidproquo/tree/main/packages/eslint-config) | Shared ESLint config and the qpq lint rules |
+| [@qpqjs/testing](https://github.com/qpqjs/quidproquo/tree/main/packages/testing) | Generator assertions and vitest matchers |
 
 **Integrations**
 
 | Package | Description |
 | --- | --- |
-| [quidproquo-neo4j](https://github.com/qpqjs/quidproquo/tree/main/packages/neo4j) | Neo4j behind the graph database actions |
-| [quidproquo-xstate](https://github.com/qpqjs/quidproquo/tree/main/packages/xstate) | XState machines as qpq actions |
+| [@qpqjs/neo4j](https://github.com/qpqjs/quidproquo/tree/main/packages/neo4j) | Neo4j behind the graph database actions |
+| [@qpqjs/xstate](https://github.com/qpqjs/quidproquo/tree/main/packages/xstate) | XState machines as qpq actions |
 
 ## Working on the framework
 
@@ -181,7 +181,7 @@ npm run lint           # eslint across the workspace
 npm run validate       # lint, build, test, and typecheck the test suite
 ```
 
-Target a single package with `-w`, for example `npm run watch -w quidproquo-core`.
+Target a single package with `-w`, for example `npm run watch -w @qpqjs/core`.
 
 Tests run on vitest and alias sibling packages to their `src`, so you do not need to build before running them.
 

@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

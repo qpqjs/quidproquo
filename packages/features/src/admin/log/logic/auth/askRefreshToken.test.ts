@@ -1,4 +1,4 @@
-import { Action, AuthenticateUserResponse, runStory, UserDirectoryActionType } from 'quidproquo-core';
+import { Action, AuthenticateUserResponse, runStory, UserDirectoryActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

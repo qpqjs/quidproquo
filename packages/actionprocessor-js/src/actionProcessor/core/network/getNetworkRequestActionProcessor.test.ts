@@ -1,5 +1,5 @@
-import { askNetworkRequestBase, buildTestQpqConfig, NetworkActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
-import { NetworkRequestError, NetworkRequestErrorCode } from 'quidproquo-webserver';
+import { askNetworkRequestBase, buildTestQpqConfig, NetworkActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { NetworkRequestError, NetworkRequestErrorCode } from '@qpqjs/webserver';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,8 +7,8 @@ import { getNetworkRequestActionProcessor } from './getNetworkRequestActionProce
 
 const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
 
-vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => ({
-  ...(await importOriginal<typeof import('quidproquo-webserver')>()),
+vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<typeof import('@qpqjs/webserver')>()),
   preformNetworkRequest,
 }));
 

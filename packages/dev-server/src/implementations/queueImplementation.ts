@@ -7,7 +7,7 @@ import {
   QpqFunctionRuntime,
   QpqRuntimeType,
   QueueActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';

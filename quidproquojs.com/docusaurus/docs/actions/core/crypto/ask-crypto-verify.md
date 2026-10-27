@@ -12,7 +12,7 @@ Checks that `signature` was produced over `message` by the private half of a [si
 - **On the dev server:** the same check against the locally seeded pair.
 
 ```typescript
-import { askCryptoVerify } from 'quidproquo-core';
+import { askCryptoVerify } from '@qpqjs/core';
 
 export function* askIsWebhookBodyAuthentic(body: string, signature: string) {
   return yield* askCryptoVerify('webhook-signing-key', body, signature);

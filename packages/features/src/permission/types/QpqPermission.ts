@@ -1,4 +1,4 @@
-import { Brand } from 'quidproquo-core';
+import { Brand } from '@qpqjs/core';
 
 /**
  * A permission key: colon-separated segments such as `case:approve` or

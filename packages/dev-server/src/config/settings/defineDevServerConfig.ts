@@ -1,5 +1,5 @@
-import { QPQConfig, QPQConfigAdvancedSettings } from 'quidproquo-core';
-import { defineServiceFunction } from 'quidproquo-webserver';
+import { QPQConfig, QPQConfigAdvancedSettings } from '@qpqjs/core';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 import path from 'path';
 

@@ -7,7 +7,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export const deployEventGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.DEPLOY_EVENT) {

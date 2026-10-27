@@ -11,7 +11,7 @@ Reads the access token attached to the **current story session** and returns its
 - **On AWS:** returns the session's already-decoded token when present; otherwise verifies the session's token against the pool's public JWKs over HTTPS (no Cognito API call).
 
 ```typescript
-import { askUserDirectoryReadAccessToken } from 'quidproquo-core';
+import { askUserDirectoryReadAccessToken } from '@qpqjs/core';
 
 export function* askCurrentUserId() {
   const token = yield* askUserDirectoryReadAccessToken('app-users', false);
@@ -42,7 +42,7 @@ function* askUserDirectoryReadAccessToken(
 ## Notes
 
 - This reads the token from the ambient session; there is no `accessToken` parameter. To decode a token you hold yourself, use [askUserDirectoryDecodeAccessToken](./ask-user-directory-decode-access-token.md).
-- If the session carries no token, or the token is invalid/expired (and `ignoreExpiration` is `false`), the action fails — catch it with `askCatch` from quidproquo-core.
+- If the session carries no token, or the token is invalid/expired (and `ignoreExpiration` is `false`), the action fails — catch it with `askCatch` from @qpqjs/core.
 
 ## Related
 

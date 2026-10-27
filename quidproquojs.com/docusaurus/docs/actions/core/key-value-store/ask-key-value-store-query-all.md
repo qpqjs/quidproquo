@@ -10,7 +10,7 @@ Runs [askKeyValueStoreQuery](./ask-key-value-store-query.md) repeatedly, followi
 - **Built from:** loops [askKeyValueStoreQuery](./ask-key-value-store-query.md) until there are no more pages. It is a helper story, not a distinct action.
 
 ```typescript
-import { askKeyValueStoreQueryAll, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQueryAll, kvsEqual } from '@qpqjs/core';
 
 interface Order {
   customerId: string;

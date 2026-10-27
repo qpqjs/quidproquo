@@ -1,4 +1,4 @@
-import { AiMessage } from 'quidproquo-core';
+import { AiMessage } from '@qpqjs/core';
 
 import type { ModelMessage } from 'ai';
 

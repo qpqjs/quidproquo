@@ -10,7 +10,7 @@ import {
   QPQConfig,
   validateScopedKvsKeyOrThrow,
   validateScopedKvsUpdatesOrThrow,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';

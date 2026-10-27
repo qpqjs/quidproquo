@@ -8,7 +8,7 @@ import {
   createContextIdentifier,
   createLocalContextIdentifier,
   getSuccessfulEitherActionResultIfRequired,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { boundary, echo, ECHO_ACTION, FAIL_ACTION, failLeaf } from './runtime';
 

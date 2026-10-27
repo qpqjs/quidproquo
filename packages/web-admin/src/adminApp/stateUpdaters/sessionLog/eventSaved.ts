@@ -1,4 +1,4 @@
-import { EventDocEvent } from 'quidproquo-features';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { SessionLogEventSavedPayload } from '../../effects/sessionLog/SessionLogEventSavedEffect';
 import { SessionLogState } from '../../SessionLogState';

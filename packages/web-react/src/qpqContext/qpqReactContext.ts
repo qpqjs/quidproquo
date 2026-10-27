@@ -1,4 +1,4 @@
-import { QpqContext } from 'quidproquo-core';
+import { QpqContext } from '@qpqjs/core';
 
 import { createContext } from 'react';
 

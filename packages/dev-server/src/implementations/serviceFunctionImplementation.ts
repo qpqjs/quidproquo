@@ -1,5 +1,5 @@
-import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, toCrossServiceSession } from 'quidproquo-core';
-import { ServiceFunctionActionType } from 'quidproquo-webserver';
+import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, toCrossServiceSession } from '@qpqjs/core';
+import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { getNodeServiceFunctionEventProcessor } from '../actionProcessor';
 import { AnyExecuteServiceFunctionEventWithSession } from '../actionProcessor/core/event/node/serviceFunction/types';

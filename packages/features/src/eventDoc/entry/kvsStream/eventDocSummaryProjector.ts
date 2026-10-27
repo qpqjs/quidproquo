@@ -5,7 +5,7 @@ import {
   KvsStreamEventResponse,
   KvsStreamEventType,
   KvsStreamRecord,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { askEventDocStoreProvide } from '../../context/askEventDocStoreProvide';

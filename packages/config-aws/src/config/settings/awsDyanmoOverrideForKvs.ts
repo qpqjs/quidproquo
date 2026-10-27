@@ -5,7 +5,7 @@ import {
   QPQConfigAdvancedSettings,
   QPQConfigSetting,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 

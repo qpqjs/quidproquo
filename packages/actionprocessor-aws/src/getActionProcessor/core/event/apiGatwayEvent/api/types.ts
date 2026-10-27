@@ -1,5 +1,5 @@
-import { MatchStoryResult } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
+import { MatchStoryResult } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, RouteOptions } from '@qpqjs/webserver';
 
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { ApiActionType, askApiRequestBase, NetworkRequestError, NetworkRequestErrorCode } from 'quidproquo-webserver';
+import { ApiActionType, askApiRequestBase, NetworkRequestError, NetworkRequestErrorCode } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,8 +7,8 @@ import { createApiRequestActionProcessor, getApiRequestActionProcessor } from '.
 
 const preformNetworkRequest = vi.hoisted(() => vi.fn());
 
-vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => ({
-  ...(await importOriginal<typeof import('quidproquo-webserver')>()),
+vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<typeof import('@qpqjs/webserver')>()),
   preformNetworkRequest,
 }));
 

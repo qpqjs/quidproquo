@@ -1,4 +1,4 @@
-import { ConfigActionType } from 'quidproquo-core';
+import { ConfigActionType } from '@qpqjs/core';
 
 const coreConfigActionComponentMap: Record<string, string[]> = {
   [ConfigActionType.GetApplicationInfo]: ['askConfigGetApplicationInfo'],

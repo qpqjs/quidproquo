@@ -1,5 +1,5 @@
 {
-  "extends": "quidproquo-tsconfig/tsconfig.base.json",
+  "extends": "@qpqjs/tsconfig/tsconfig.base.json",
   "compileOnSave": false,
   "compilerOptions": {
     "jsx": "react-jsx",

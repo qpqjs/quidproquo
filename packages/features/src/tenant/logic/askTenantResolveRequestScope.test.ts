@@ -1,5 +1,5 @@
-import { ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

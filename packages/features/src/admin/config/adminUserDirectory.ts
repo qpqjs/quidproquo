@@ -1,4 +1,4 @@
-import { defineUserDirectory, QPQConfig, QPQConfigAdvancedUserDirectorySettings } from 'quidproquo-core';
+import { defineUserDirectory, QPQConfig, QPQConfigAdvancedUserDirectorySettings } from '@qpqjs/core';
 
 export const adminUserDirectoryResourceName = 'qpq-admin';
 

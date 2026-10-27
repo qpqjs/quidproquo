@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import { join } from 'upath';
 

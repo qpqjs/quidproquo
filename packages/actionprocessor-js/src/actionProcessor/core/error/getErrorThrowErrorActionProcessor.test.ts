@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, ErrorActionType, ErrorTypeEnum, resolveActionResultError } from 'quidproquo-core';
+import { buildTestQpqConfig, ErrorActionType, ErrorTypeEnum, resolveActionResultError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

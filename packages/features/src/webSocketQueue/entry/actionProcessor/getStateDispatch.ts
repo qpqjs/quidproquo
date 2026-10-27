@@ -7,7 +7,7 @@ import {
   QPQConfig,
   StateActionType,
   StateDispatchActionPayload,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

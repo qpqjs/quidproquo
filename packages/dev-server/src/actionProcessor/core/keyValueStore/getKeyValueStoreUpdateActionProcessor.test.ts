@@ -15,7 +15,7 @@ import {
   ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

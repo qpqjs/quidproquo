@@ -1,4 +1,4 @@
-import { GuidActionType } from 'quidproquo-core';
+import { GuidActionType } from '@qpqjs/core';
 
 const coreGuidActionComponentMap: Record<string, string[]> = {
   [GuidActionType.New]: ['askNewGuid'],

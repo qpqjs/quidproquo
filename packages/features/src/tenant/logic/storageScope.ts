@@ -1,4 +1,4 @@
-import { Nullable, validateScopeSegment } from 'quidproquo-core';
+import { Nullable, validateScopeSegment } from '@qpqjs/core';
 
 import { TenantId } from '../models/TenantId';
 import { isTenantId } from './isTenantId';

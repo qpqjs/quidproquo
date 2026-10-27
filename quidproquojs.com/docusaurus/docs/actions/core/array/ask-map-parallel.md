@@ -10,8 +10,8 @@ Iterates an array and builds a new array from the result of a per-item callback,
 - **Built from:** `askRunParallel`, which drives every item's story in lockstep and batches their pending actions into a single dispatch per step.
 
 ```typescript
-import { askMapParallel } from 'quidproquo-core';
-import { askKeyValueStoreGet } from 'quidproquo-core';
+import { askMapParallel } from '@qpqjs/core';
+import { askKeyValueStoreGet } from '@qpqjs/core';
 
 export function* askLoadUsers(userIds: string[]) {
   // Fetch every user record at the same time.

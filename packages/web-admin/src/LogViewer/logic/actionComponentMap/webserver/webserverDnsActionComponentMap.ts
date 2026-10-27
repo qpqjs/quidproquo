@@ -1,4 +1,4 @@
-import { DnsActionType } from 'quidproquo-webserver';
+import { DnsActionType } from '@qpqjs/webserver';
 
 const webserverDnsActionComponentMap: Record<string, string[]> = {
   [DnsActionType.List]: ['askDnsList'],

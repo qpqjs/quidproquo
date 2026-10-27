@@ -6,7 +6,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StreamRegistry,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs';
 import { Readable } from 'stream';

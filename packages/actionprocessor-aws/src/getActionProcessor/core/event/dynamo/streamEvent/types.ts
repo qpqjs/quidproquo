@@ -1,4 +1,4 @@
-import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionRuntime } from 'quidproquo-core';
+import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { Context, DynamoDBStreamEvent } from 'aws-lambda';
 

@@ -1,4 +1,4 @@
-import { AskResponse, createDynamicFunctionCaller } from 'quidproquo-core';
+import { AskResponse, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
 import { askEventDocProvideStore } from '../context/askEventDocProvideStore';

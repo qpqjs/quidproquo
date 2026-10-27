@@ -1,4 +1,4 @@
-import { QpqAppDeployConfig, QpqAppDeployment } from 'quidproquo-core';
+import { QpqAppDeployConfig, QpqAppDeployment } from '@qpqjs/core';
 
 // A settings key is used verbatim as an env var suffix, so it must be one.
 const SETTING_KEY_PATTERN = /^[A-Z][A-Z0-9_]*$/;

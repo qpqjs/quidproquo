@@ -10,7 +10,7 @@ Reads the current wall-clock time and returns it as the number of **milliseconds
 - Built from [askDateNow](./ask-date-now.md): it reads the runtime clock and converts the ISO-8601 timestamp to a millisecond count with `new Date(...).getTime()`.
 
 ```typescript
-import { askGetCurrentEpochMs } from 'quidproquo-core';
+import { askGetCurrentEpochMs } from '@qpqjs/core';
 
 export function* askStampMillis() {
   const nowMs = yield* askGetCurrentEpochMs();

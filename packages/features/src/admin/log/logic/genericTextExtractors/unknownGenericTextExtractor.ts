@@ -1,4 +1,4 @@
-import { getFederatedKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
+import { getFederatedKeyFromQpqFunctionRuntime, StoryResult } from '@qpqjs/core';
 
 export const unknownGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.qpqFunctionRuntimeInfo) {

@@ -1,4 +1,4 @@
-import { QpqPagedData, StoryResultMetadata } from 'quidproquo-core';
+import { QpqPagedData, StoryResultMetadata } from '@qpqjs/core';
 
 import { apiRequestGet, cache } from '../../logic';
 

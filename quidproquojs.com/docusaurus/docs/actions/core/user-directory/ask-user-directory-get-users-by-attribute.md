@@ -11,7 +11,7 @@ Finds users in a [user directory](../../../config/core/user-directory.md) whose 
 - **On AWS:** issues Cognito `ListUsers` with a filter on the requested attribute.
 
 ```typescript
-import { askUserDirectoryGetUsersByAttribute } from 'quidproquo-core';
+import { askUserDirectoryGetUsersByAttribute } from '@qpqjs/core';
 
 export function* askFindByEmail(email: string) {
   const page = yield* askUserDirectoryGetUsersByAttribute('app-users', 'email', email);

@@ -1,4 +1,4 @@
-import { getServiceFunctionActionProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { getServiceFunctionActionProcessor } from '@qpqjs/actionprocessor-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -13,8 +13,8 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
 import { randomUUID } from 'crypto';
 

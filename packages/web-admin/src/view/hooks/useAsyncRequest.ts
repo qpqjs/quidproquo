@@ -1,5 +1,5 @@
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
-import { useFastCallback } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
+import { useFastCallback } from '@qpqjs/web-react';
 
 import { apiRequestGet, apiRequestPost, externalRequestGet } from '../../logic';
 import { useAsyncLoading } from '../Loading';

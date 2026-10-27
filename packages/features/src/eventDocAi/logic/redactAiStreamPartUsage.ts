@@ -1,4 +1,4 @@
-import { type AiStreamPart, AiStreamPartType } from 'quidproquo-core';
+import { type AiStreamPart, AiStreamPartType } from '@qpqjs/core';
 
 /** The part with its token usage emptied, for browsers that must not see usage. Other parts pass through. */
 export const redactAiStreamPartUsage = (part: AiStreamPart): AiStreamPart =>

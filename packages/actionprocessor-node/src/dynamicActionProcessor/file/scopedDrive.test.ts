@@ -5,7 +5,7 @@ import {
   askFileWriteTextContents,
   FileActionType,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-import { createContextIdentifier } from 'quidproquo-core';
+import { createContextIdentifier } from '@qpqjs/core';
 
 import { createElement, ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';

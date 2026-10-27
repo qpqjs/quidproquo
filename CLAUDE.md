@@ -71,15 +71,15 @@ Quidproquo is a functional, action-based web framework built on generators and p
 
 The monorepo uses npm workspaces with these key relationships:
 
-- **quidproquo-core**: Defines all action types and core abstractions. Every other package depends on this.
+- **@qpqjs/core**: Defines all action types and core abstractions. Every other package depends on this.
 
-- **quidproquo-webserver**: Builds on core to add web-specific concepts like routes, APIs, and services.
+- **@qpqjs/webserver**: Builds on core to add web-specific concepts like routes, APIs, and services.
 
 - **quidproquo-actionprocessor-\***: Runtime implementations that execute actions. Each targets a specific platform (AWS Lambda, Node.js, browser).
 
-- **quidproquo-config-aws** + **quidproquo-deploy-awscdk**: Work together to define and deploy AWS infrastructure using CDK.
+- **@qpqjs/config-aws** + **@qpqjs/deploy-awscdk**: Work together to define and deploy AWS infrastructure using CDK.
 
-- **quidproquo-web** + **quidproquo-web-react**: Client-side utilities and React integration for building SPAs that interact with QPQ backends.
+- **@qpqjs/web** + **@qpqjs/web-react**: Client-side utilities and React integration for building SPAs that interact with QPQ backends.
 
 ### Action Categories
 
@@ -134,7 +134,7 @@ Comments are for what the code cannot say. Fewer, better comments is the goal; a
 - **No non-trivial logic inline as a call argument.** If an arrow function passed as an argument needs a `try`/`catch`, an `if` beyond a single guard clause, or more than ~2 lines of body, pull it out into a named `const` (or top-level function) above the call site, with a comment explaining *why*, and pass the name instead. This applies especially inside object/array literals and spread expressions (e.g. `{ ...(await getX(y, inlineCallbackHere)) }`), where an inline multi-line callback breaks the scan-ability of the surrounding list and buries the actual logic. A named function you can read top-to-bottom, separate from the plumbing that wires it in, is worth the extra top-level declaration.
 - **Prefer `type` over `interface`.** Use `type` aliases for all type definitions (props, payloads, results, state). Only use `interface` when extending or declaration merging is explicitly needed.
 - **Prefer `unknown` over `any`.** Use `unknown` for values of uncertain type and narrow with type guards. `any` is acceptable only at variance boundaries (e.g. a slot-config union whose reducer state params are contravariant) or third-party APIs that require it, with a comment saying why.
-- **Prefer `Nullable<T>` over hand-written `| null` / `| undefined` unions** for a value or return that may be absent (`Nullable` is in `quidproquo-core`); return `null`. Optional object properties (`field?: T`) are still fine.
+- **Prefer `Nullable<T>` over hand-written `| null` / `| undefined` unions** for a value or return that may be absent (`Nullable` is in `@qpqjs/core`); return `null`. Optional object properties (`field?: T`) are still fine.
 
 ## Story conventions
 
@@ -149,12 +149,12 @@ Comments are for what the code cannot say. Fewer, better comments is the goal; a
 
 - **`define*` is reserved for config.** A `define*` helper returns `QPQConfigSetting`s (or a `QPQConfig` array) only. Helpers that instantiate live objects (reducers, apis, CDK constructs) are `create*` / `build*`.
 - **Never spread `define*` results.** QPQ flattens nested config arrays recursively, so a helper that returns an array goes into the config as a plain element; a `...spread` is redundant and breaks the convention.
-- **Platform-specific config lives in the owning layer.** Web concerns (CORS, domains) belong in quidproquo-webserver settings, AWS-only concerns in quidproquo-config-aws, each keyed by the core resource name and resolved at deploy. Never add platform fields to a core `define*`.
+- **Platform-specific config lives in the owning layer.** Web concerns (CORS, domains) belong in @qpqjs/webserver settings, AWS-only concerns in @qpqjs/config-aws, each keyed by the core resource name and resolved at deploy. Never add platform fields to a core `define*`.
 - **Derive resource names.** No `xName?: string` override fields on config settings; derive names from accountId/region/config.
 
 ## Module & file structure
 
-State-modules (a feature in `quidproquo-features` with frontend state, or any shared state module) follow this layout, one concern per folder:
+State-modules (a feature in `@qpqjs/features` with frontend state, or any shared state module) follow this layout, one concern per folder:
 
 | Folder | Purpose |
 |---|---|

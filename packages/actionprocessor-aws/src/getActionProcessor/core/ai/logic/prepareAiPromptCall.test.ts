@@ -1,4 +1,4 @@
-import { AiModel, buildTestQpqConfig, defineAi, ErrorTypeEnum } from 'quidproquo-core';
+import { AiModel, buildTestQpqConfig, defineAi, ErrorTypeEnum } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,7 +7,7 @@ import { prepareAiPromptCall } from './prepareAiPromptCall';
 const bedrockFactory = vi.fn((modelId: string) => ({ __model: modelId }));
 const createAmazonBedrock = vi.fn(() => bedrockFactory);
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 

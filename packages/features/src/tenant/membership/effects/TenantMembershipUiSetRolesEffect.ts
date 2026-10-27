@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { TenantRoleOption } from '../../models/TenantRoleOption';
 import { TenantMembershipUiEffect } from './TenantMembershipUiEffect';

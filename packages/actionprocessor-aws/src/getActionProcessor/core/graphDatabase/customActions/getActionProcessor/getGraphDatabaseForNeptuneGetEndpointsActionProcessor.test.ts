@@ -1,4 +1,4 @@
-import { ErrorTypeEnum } from 'quidproquo-core';
+import { ErrorTypeEnum } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -8,7 +8,7 @@ import { invokeProcessor } from '../../../../../testing/processorTestHelpers';
 import { GraphDatabaseForNeptuneActionType } from '../actions';
 import { getGraphDatabaseForNeptuneGetEndpointsActionProcessor } from './getGraphDatabaseForNeptuneGetEndpointsActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('../../../../../awsNamingUtils', () => ({

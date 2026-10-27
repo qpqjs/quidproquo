@@ -7,7 +7,7 @@ import {
   resolveActionResultError,
   StoryResult,
   SystemActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';

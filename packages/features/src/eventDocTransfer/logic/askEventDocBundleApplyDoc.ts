@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventListAll } from '../../eventDoc/data';
 import { EventDocEvent } from '../../eventDoc/models';

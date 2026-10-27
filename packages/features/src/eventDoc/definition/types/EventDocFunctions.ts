@@ -1,4 +1,4 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, Nullable } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult, EventDocSnapshotViews } from '../../models';
 import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';

@@ -1,4 +1,4 @@
-import { GuidActionType, LogActionType, SystemActionType } from 'quidproquo-core';
+import { GuidActionType, LogActionType, SystemActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

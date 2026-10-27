@@ -1,4 +1,4 @@
-import type { AiModel, AiStreamUsage } from 'quidproquo-core';
+import type { AiModel, AiStreamUsage } from '@qpqjs/core';
 
 import type { EventDocAiMessageSegment } from './EventDocAiMessageSegment';
 

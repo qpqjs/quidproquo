@@ -7,10 +7,10 @@ description: Define a queue — a durable message queue whose consumer stories r
 
 Defines a **queue**: a durable, asynchronous message channel. Stories enqueue messages with [askQueueSendMessages](../../actions/core/queue/ask-queue-send-messages.md), and the runtime delivers each message to a consumer **story** chosen by the message's `type`. A queue can also subscribe to one or more [event buses](./event-bus.md) so bus messages are delivered to it.
 
-- **On AWS:** deploys an **SQS queue** plus a dead-letter queue (`QpqCoreQueueConstruct`), and a consumer Lambda wired to the queue as an SQS event source (`QpqApiCoreQueueConstruct`, both in `quidproquo-deploy-awscdk`). Failed messages are retried up to `maxTries` times before going to the DLQ. Default CloudWatch alarms cover a growing backlog and any message landing in the DLQ. When `isFifo` is `true`, FIFO SQS queues (`.fifo` suffix) are created and the consumer processes messages in group order.
+- **On AWS:** deploys an **SQS queue** plus a dead-letter queue (`QpqCoreQueueConstruct`), and a consumer Lambda wired to the queue as an SQS event source (`QpqApiCoreQueueConstruct`, both in `@qpqjs/deploy-awscdk`). Failed messages are retried up to `maxTries` times before going to the DLQ. Default CloudWatch alarms cover a growing backlog and any message landing in the DLQ. When `isFifo` is `true`, FIFO SQS queues (`.fifo` suffix) are created and the consumer processes messages in group order.
 
 ```typescript
-import { defineQueue } from 'quidproquo-core';
+import { defineQueue } from '@qpqjs/core';
 
 export default [
   defineQueue('emails', {
@@ -74,7 +74,7 @@ The FIFO consumer processes records one group at a time using [askProcessEventWi
 ## Examples
 
 ```typescript
-import { defineQueue } from 'quidproquo-core';
+import { defineQueue } from '@qpqjs/core';
 
 export default [
   // Simple queue: one story per message type
@@ -109,4 +109,4 @@ export default [
 - [defineEventBus](./event-bus.md) — a bus a queue can subscribe to via `eventBusSubscriptions`.
 - [askProcessEvent](../../actions/core/event/ask-process-event.md) — the pipeline that matches each delivered message to a consumer story (and preserves FIFO group ordering).
 - [defineNotifyError](./notify-error.md) — subscribe a queue to its bus to handle error/throttle alarms as `NotifyErrorQueueEvent` messages.
-- **AWS implementation:** `QpqCoreQueueConstruct` (SQS queue + DLQ + alarms) and `QpqApiCoreQueueConstruct` (consumer Lambda + SQS event source + bus subscriptions) in `quidproquo-deploy-awscdk`; the send-message processor in `quidproquo-actionprocessor-awslambda`.
+- **AWS implementation:** `QpqCoreQueueConstruct` (SQS queue + DLQ + alarms) and `QpqApiCoreQueueConstruct` (consumer Lambda + SQS event source + bus subscriptions) in `@qpqjs/deploy-awscdk`; the send-message processor in `@qpqjs/actionprocessor-aws`.

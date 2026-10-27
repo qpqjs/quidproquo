@@ -1,5 +1,5 @@
-import { ConfigActionType, ContextActionType, runStory } from 'quidproquo-core';
-import { ServiceFunctionActionType } from 'quidproquo-webserver';
+import { ConfigActionType, ContextActionType, runStory } from '@qpqjs/core';
+import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,5 +1,5 @@
-import { AskResponse, QpqPagedData } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { AskResponse, QpqPagedData } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { eventDocRouteAction } from '../../eventDoc/constants/eventDocRouteAction';
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';

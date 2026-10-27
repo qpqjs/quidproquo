@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 /**
  * Construct id for a per-root resource. The primary root keeps the bare id, so existing

@@ -1,5 +1,5 @@
-import { askProcessEvent, QPQConfig, qpqCoreUtils, qpqExecuteLog, QpqFunctionRuntime, QpqRuntimeType, StoryResult } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { askProcessEvent, QPQConfig, qpqCoreUtils, qpqExecuteLog, QpqFunctionRuntime, QpqRuntimeType, StoryResult } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import bodyParser from 'body-parser';
 import express, { Express, Request, Response } from 'express';
@@ -84,7 +84,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   // Resolved through node resolution (not a __dirname walk) so it works both
   // from a workspace checkout and inside the docker platform image.
-  const adminFrontend = path.join(path.dirname(require.resolve('quidproquo-web-admin/package.json')), 'lib');
+  const adminFrontend = path.join(path.dirname(require.resolve('@qpqjs/web-admin/package.json')), 'lib');
 
   // Admin page
   app.use('/admin', express.static(adminFrontend));

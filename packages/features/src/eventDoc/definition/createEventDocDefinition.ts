@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { buildEventDocViewFoldConfig } from '../fold/buildEventDocViewFoldConfig';
 import { collectEventDocReferences } from '../fold/collectEventDocReferences';

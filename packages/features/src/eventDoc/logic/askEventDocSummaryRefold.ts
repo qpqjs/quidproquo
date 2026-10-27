@@ -1,4 +1,4 @@
-import { askCatch, askLogCreate, AskResponse, LogLevelEnum, Nullable } from 'quidproquo-core';
+import { askCatch, askLogCreate, AskResponse, LogLevelEnum, Nullable } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';

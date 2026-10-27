@@ -1,5 +1,5 @@
-import { envelopeEncrypt } from 'quidproquo-actionprocessor-node';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { envelopeEncrypt } from '@qpqjs/actionprocessor-node';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -8,7 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { createKmsDataKeyProvider, resolveCryptoKeyAlias } from './utils';
 

@@ -1,4 +1,4 @@
-import { UserDirectoryActionType } from 'quidproquo-core';
+import { UserDirectoryActionType } from '@qpqjs/core';
 
 const coreUserDirectoryActionComponentMap: Record<string, string[]> = {
   [UserDirectoryActionType.AuthenticateUser]: ['askUserDirectoryAuthenticateUser', 'userDirectoryName', 'authenticateUserRequest'],

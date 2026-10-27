@@ -11,7 +11,7 @@ Writes a log entry at a specified [log level](#loglevelenum), with a message and
 - **On AWS:** the line is written to the function's stdout (`console.log`), formatted as `` `${logLevel}: ${msg}` ``, with any `data` passed through as a second argument. It flows to CloudWatch Logs like any other Lambda output. This is separate from the story's replayable event history — see [askLogDisableEventHistory](./ask-log-disable-event-history.md).
 
 ```typescript
-import { askLogCreate, LogLevelEnum } from 'quidproquo-core';
+import { askLogCreate, LogLevelEnum } from '@qpqjs/core';
 
 export function* askProcessOrder(orderId: string) {
   yield* askLogCreate(LogLevelEnum.Info, 'Processing order', { orderId });

@@ -1,4 +1,4 @@
-import { isDefined, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
+import { isDefined, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,

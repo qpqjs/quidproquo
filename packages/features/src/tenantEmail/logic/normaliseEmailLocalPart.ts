@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 // What a tenant may register: the conservative RFC 5321 dot-atom subset, lower-cased so
 // routing is case-insensitive the way mail delivery is. Null when it is not registrable.

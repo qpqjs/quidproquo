@@ -9,7 +9,7 @@ import {
   ProcessorFor,
   QPQConfig,
   resolveScopedPkAttributeOrThrow,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';

@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 /** Parse an HTTP request body as JSON, throwing BadRequest on malformed input. */
 export function* askEventDocParseBody<T extends object>(event: HTTPEvent): AskResponse<T> {

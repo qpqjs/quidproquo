@@ -1,4 +1,4 @@
-import { askKeyValueStoreGet, AskResponse } from 'quidproquo-core';
+import { askKeyValueStoreGet, AskResponse } from '@qpqjs/core';
 
 import { TENANT_RECORD_STORE } from '../constants/tenantStoreNames';
 import { TenantId } from '../models/TenantId';

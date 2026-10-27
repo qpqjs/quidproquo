@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor } from 'quidproquo-core';
-import { askEmailSendEmail, EmailActionType } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { askEmailSendEmail, EmailActionType } from '@qpqjs/webserver';
 
 import { randomUUID } from 'crypto';
 

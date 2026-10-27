@@ -11,7 +11,7 @@ Changes a signed-in user's password. The caller proves ownership with the user's
 - **On AWS:** issues Cognito `ChangePassword` using the supplied access token.
 
 ```typescript
-import { askUserDirectoryChangePassword } from 'quidproquo-core';
+import { askUserDirectoryChangePassword } from '@qpqjs/core';
 
 export function* askUpdateMyPassword(oldPassword: string, newPassword: string, accessToken: string) {
   yield* askUserDirectoryChangePassword(oldPassword, newPassword, accessToken);

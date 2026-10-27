@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, noopDynamicModuleLoader, resolveActionResult } from 'quidproquo-core';
-import { ApiKeyValidationActionType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { ApiKeyValidationActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

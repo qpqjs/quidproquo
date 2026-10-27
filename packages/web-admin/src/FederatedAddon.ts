@@ -1,4 +1,4 @@
-import { BaseUrlResolvers } from 'quidproquo-web-react';
+import { BaseUrlResolvers } from '@qpqjs/web-react';
 
 export type FederatedTab = {
   name: string;
@@ -20,6 +20,6 @@ export type LoadFederatedAddonsContext = {
   accessToken?: string;
 };
 
-// Provided by the host application via <App loadAddons={...} />. quidproquo-web-admin
+// Provided by the host application via <App loadAddons={...} />. @qpqjs/web-admin
 // no longer owns the federation mechanism - it just asks for the addons.
 export type LoadFederatedAddons = (context: LoadFederatedAddonsContext) => Promise<FederatedAddon[]>;

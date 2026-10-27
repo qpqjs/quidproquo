@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { EVENT_DOC_COLLECTION_CONFIG_SETTING_TYPE } from '../../eventDoc/constants/eventDocCollectionConfigSettingType';
 import { buildEventDocStore } from '../../eventDoc/context/buildEventDocStore';

@@ -1,4 +1,4 @@
-import { LogActionType } from 'quidproquo-core';
+import { LogActionType } from '@qpqjs/core';
 
 import { CoreLogCreateCustomAction, CoreLogDisableEventHistoryCustomAction, CoreLogTemplateLiteralCustomAction } from '../../custom';
 import { ActionComponent } from '../../types';

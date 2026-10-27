@@ -7,7 +7,7 @@ import {
   NetworkRequestActionPayload,
   Nullable,
   resolveActionResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { ActionSearchDefinition } from '../../domain/ActionSearchDefinition';
 import { ActionSearchExtractedAction } from '../../domain/ActionSearchExtractedAction';

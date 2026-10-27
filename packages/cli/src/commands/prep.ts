@@ -1,7 +1,7 @@
 // `qpq prep` — regenerates apps/<app>/tsconfig.federated.json (the TypeScript
 // path aliases for cross-view federated imports). Run after adding/removing a
 // `// federated.export` marker.
-import { writeFederatedTsconfigForApp } from 'quidproquo-deploy-rspack';
+import { writeFederatedTsconfigForApp } from '@qpqjs/deploy-rspack';
 
 import { getAvailableApps, getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';

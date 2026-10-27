@@ -10,7 +10,7 @@ Registers a module export — an **object whose properties are functions** — u
 - **On AWS:** deploys **no dedicated infrastructure** of its own. The referenced module is loaded and its member is invoked inside whatever Lambda is already running the calling story, sharing its action processors and session context. Registration simply makes the surface resolvable by name.
 
 ```typescript
-import { defineDynamicFunctions } from 'quidproquo-core';
+import { defineDynamicFunctions } from '@qpqjs/core';
 
 export default [
   defineDynamicFunctions('templateEventDoc', '/entry/eventDocs::templateEventDoc'),
@@ -47,7 +47,7 @@ A reference to the module to register, usually a relative path string of the for
 ## Examples
 
 ```typescript
-import { defineDynamicFunctions } from 'quidproquo-core';
+import { defineDynamicFunctions } from '@qpqjs/core';
 
 export default [
   defineDynamicFunctions('templateEventDoc', '/entry/eventDocs::templateEventDoc'),

@@ -12,7 +12,7 @@ Each doc is compared against the target's own log for the same id (see `findEven
 - **Built from:** `askEventDocTransferProvideCollection` (runs each doc's comparison against its own collection's store) then `askEventDocBundlePlanDoc` (the per-doc comparison). Requires an `EventDocTransferRegistry` and a parsed `EventDocBundle` — the built-in `POST /transfer/plan` route resolves both from `{ transferId }` before calling this.
 
 ```typescript
-import { askEventDocBundlePlan, askEventDocTransferReadBundle, askEventDocTransferReadRegistry } from 'quidproquo-features';
+import { askEventDocBundlePlan, askEventDocTransferReadBundle, askEventDocTransferReadRegistry } from '@qpqjs/features';
 
 export function* reviewImport(transferId: string) {
   const registry = yield* askEventDocTransferReadRegistry();

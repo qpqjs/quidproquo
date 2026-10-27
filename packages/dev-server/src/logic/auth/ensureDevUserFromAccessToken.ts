@@ -1,4 +1,4 @@
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { DevUserDirectory } from './devAuth';
 import { getDevUserByUserId, upsertDevUser } from './jsonUserStore';

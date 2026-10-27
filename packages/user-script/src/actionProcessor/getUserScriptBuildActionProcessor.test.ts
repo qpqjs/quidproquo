@@ -1,5 +1,5 @@
-import { getErrorActionProcessor } from 'quidproquo-actionprocessor-js';
-import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
+import { getErrorActionProcessor } from '@qpqjs/actionprocessor-js';
+import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule } from '@qpqjs/actionprocessor-node';
 import {
   actionResult,
   actionResultError,
@@ -13,7 +13,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   UserScriptActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import fs from 'fs';
 import os from 'os';
@@ -82,7 +82,7 @@ const invoke = async (payload: Payload, actionProcessors: Record<string, any>) =
 
 const PROJECT = {
   'scripts:a/source/src/main.ts': `
-    import { askFileWriteTextContents, AskResponse } from 'quidproquo-core';
+    import { askFileWriteTextContents, AskResponse } from '@qpqjs/core';
     import { formatSum } from './helpers/formatSum';
     export function* add(drive: string, filepath: string, a: number, b: number): AskResponse<number> {
       const sum = a + b;
@@ -122,7 +122,7 @@ describe('getUserScriptBuildActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual({ exports: ['add', 'greet'] });
     const written = Object.keys(drive.files).filter((key) => !(key in PROJECT));
     expect(written).toEqual(['scripts:a/built.js']);
-    expect(drive.files['scripts:a/built.js']).toContain('require("quidproquo-core")');
+    expect(drive.files['scripts:a/built.js']).toContain('require("@qpqjs/core")');
     expect(drive.files['scripts:a/built.js']).not.toContain('sourceMappingURL');
 
     const scriptExports = loadUserScriptModule('built.js', drive.files['scripts:a/built.js'], getUserScriptModuleMap());

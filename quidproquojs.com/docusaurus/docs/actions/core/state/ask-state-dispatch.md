@@ -10,7 +10,7 @@ Dispatches an action — an **effect** — into the state reducer that surrounds
 - **Action type:** `StateActionType.Dispatch`
 
 ```typescript
-import { askStateDispatch } from 'quidproquo-core';
+import { askStateDispatch } from '@qpqjs/core';
 
 // CounterEffects is your effect union, e.g. Effect<'counter/Add', number>
 export function* askAddToCounter(amount: number) {
@@ -48,7 +48,7 @@ type Effect<TType extends string, TPayload = undefined> = {
 You typically model your effects as a union of `Effect<...>` types and give each a reducer case:
 
 ```typescript
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 type IncrementEffect = Effect<'counter/Increment'>;        // payload: undefined
 type AddEffect = Effect<'counter/Add', number>;            // payload: number
@@ -58,7 +58,7 @@ type CounterEffects = IncrementEffect | AddEffect;
 `askStateDispatchEffect` is a thin convenience wrapper over `askStateDispatch` that builds the `{ type, payload }` object for you from the type and payload arguments — handy for effects, especially payload-less ones:
 
 ```typescript
-import { askStateDispatchEffect } from 'quidproquo-core';
+import { askStateDispatchEffect } from '@qpqjs/core';
 
 export function* askBumpCounter() {
   yield* askStateDispatchEffect<IncrementEffect>('counter/Increment'); // payload defaults to undefined

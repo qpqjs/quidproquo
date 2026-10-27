@@ -1,4 +1,4 @@
-import { kvsLessThan, kvsNotExists, kvsOr, KvsUpdateActionType } from 'quidproquo-core';
+import { kvsLessThan, kvsNotExists, kvsOr, KvsUpdateActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

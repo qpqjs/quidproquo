@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, QpqPagedData } from 'quidproquo-core';
-import { askApiRequest } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum, QpqPagedData } from '@qpqjs/core';
+import { askApiRequest } from '@qpqjs/webserver';
 
 import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';

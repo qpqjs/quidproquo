@@ -1,11 +1,11 @@
-# quidproquo-xstate
+# @qpqjs/xstate
 
 [XState](https://stately.ai/docs/xstate) state machines as [quidproquo](https://github.com/qpqjs/quidproquo) actions.
 
 Declare a machine in your config, then drive it from a story the same way you would any other qpq resource. The machine's state is persisted by the runtime, so it survives across invocations instead of living in a single process.
 
 ```bash
-npm install quidproquo-xstate
+npm install @qpqjs/xstate
 ```
 
 ## The actions

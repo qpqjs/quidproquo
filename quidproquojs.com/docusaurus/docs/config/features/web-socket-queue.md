@@ -13,7 +13,7 @@ Defines a **WebSocket queue**: a batteries-included messaging layer on top of a 
   - three [globals](../core/global.md) recording the associated event-bus name, user-directory name, and connection-scope-resolver name.
 
 ```typescript
-import { defineWebSocketQueue } from 'quidproquo-features';
+import { defineWebSocketQueue } from '@qpqjs/features';
 
 export default [
   defineWebSocketQueue('my-event-bus', 'api', {

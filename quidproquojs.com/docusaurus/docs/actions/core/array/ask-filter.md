@@ -10,8 +10,8 @@ Iterates an array and returns a new array containing only the items for which th
 - **Built from:** a plain `for` loop that `yield*`s the predicate for each item and keeps the item when it returns `true`.
 
 ```typescript
-import { askFilter } from 'quidproquo-core';
-import { askFileExists } from 'quidproquo-core';
+import { askFilter } from '@qpqjs/core';
+import { askFileExists } from '@qpqjs/core';
 
 export function* askKeepExistingFiles(filepaths: string[]) {
   // Keep only the paths that actually exist on the drive.

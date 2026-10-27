@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, KeyValueStoreQueryOptions, KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, KeyValueStoreQueryOptions, KvsQueryOperation, QpqPagedData } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

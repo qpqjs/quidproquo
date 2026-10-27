@@ -1,5 +1,5 @@
-import { getQpqAppDeployConfig, getQpqAppDeployConfigPath, primeDeploymentEnv } from 'quidproquo-config-aws';
-import { QpqAppDeployment, QpqDeployEnvVar } from 'quidproquo-core';
+import { getQpqAppDeployConfig, getQpqAppDeployConfigPath, primeDeploymentEnv } from '@qpqjs/config-aws';
+import { QpqAppDeployment, QpqDeployEnvVar } from '@qpqjs/core';
 
 import { getPlatformDriver } from '../platforms';
 import { getArgValue } from './args';

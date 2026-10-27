@@ -1,4 +1,4 @@
-import { AiStreamPartType } from 'quidproquo-core';
+import { AiStreamPartType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

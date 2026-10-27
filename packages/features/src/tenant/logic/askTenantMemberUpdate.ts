@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';

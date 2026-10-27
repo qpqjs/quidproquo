@@ -1,4 +1,4 @@
-import { AuthenticationInfo, getQpqIsoDateTimeFromDate } from 'quidproquo-core';
+import { AuthenticationInfo, getQpqIsoDateTimeFromDate } from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';

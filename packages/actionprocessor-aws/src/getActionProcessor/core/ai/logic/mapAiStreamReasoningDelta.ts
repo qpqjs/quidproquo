@@ -1,4 +1,4 @@
-import { AiStreamPartType, AiStreamReasoningDelta } from 'quidproquo-core';
+import { AiStreamPartType, AiStreamReasoningDelta } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 

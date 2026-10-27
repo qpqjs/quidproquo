@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { askUIEventDocAiClearStream } from '../actionCreators/askUIEventDocAiClearStream';
 import { askUIEventDocAiSetActiveChat } from '../actionCreators/askUIEventDocAiSetActiveChat';

@@ -1,4 +1,4 @@
-import { HTTPNetworkResponse, NetworkRequestActionPayload } from 'quidproquo-core';
+import { HTTPNetworkResponse, NetworkRequestActionPayload } from '@qpqjs/core';
 
 import { NetworkRequestError, NetworkRequestErrorCode } from './NetworkRequestError';
 import { executeNetworkRequest } from './networkRequestUtils';

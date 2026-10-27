@@ -1,4 +1,4 @@
-import { EmailSendEmailActionPayload } from 'quidproquo-webserver';
+import { EmailSendEmailActionPayload } from '@qpqjs/webserver';
 
 import { EmailContent, SendEmailCommand, SESv2Client } from '@aws-sdk/client-sesv2';
 

@@ -1,4 +1,4 @@
-import { KvsLogicalOperatorType, KvsQueryOperationType } from 'quidproquo-core';
+import { KvsLogicalOperatorType, KvsQueryOperationType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

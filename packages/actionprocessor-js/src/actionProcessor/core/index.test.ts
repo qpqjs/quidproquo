@@ -11,7 +11,7 @@ import {
   NetworkActionType,
   PlatformActionType,
   SystemActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

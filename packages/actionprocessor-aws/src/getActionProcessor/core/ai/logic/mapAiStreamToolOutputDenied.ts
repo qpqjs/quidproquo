@@ -1,4 +1,4 @@
-import { AiStreamPartType, AiStreamToolOutputDenied } from 'quidproquo-core';
+import { AiStreamPartType, AiStreamToolOutputDenied } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 

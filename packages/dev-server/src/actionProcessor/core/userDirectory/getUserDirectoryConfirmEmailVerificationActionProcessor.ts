@@ -5,7 +5,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessConfirmEmailVerification = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
   return async () => {

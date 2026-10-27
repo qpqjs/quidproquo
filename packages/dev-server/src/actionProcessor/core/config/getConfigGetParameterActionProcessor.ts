@@ -5,7 +5,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getOrSeedParameterValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';

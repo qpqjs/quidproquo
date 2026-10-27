@@ -1,4 +1,4 @@
-import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

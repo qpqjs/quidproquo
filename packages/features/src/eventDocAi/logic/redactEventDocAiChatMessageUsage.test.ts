@@ -1,4 +1,4 @@
-import { AiModel } from 'quidproquo-core';
+import { AiModel } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

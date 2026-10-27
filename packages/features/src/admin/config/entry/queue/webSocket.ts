@@ -6,7 +6,7 @@ import {
   AskResponse,
   askRunParallel,
   QueueEventResponse,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askWebsocketReadConnectionInfo } from '../../../../webSocketQueue/context';
 import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';

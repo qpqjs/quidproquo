@@ -7,8 +7,8 @@ import { AuthState } from '../../auth/types';
 
 const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn().mockResolvedValue({ status: 200 }) }));
 
-vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => {
-  const original = await importOriginal<typeof import('quidproquo-webserver')>();
+vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => {
+  const original = await importOriginal<typeof import('@qpqjs/webserver')>();
   return { ...original, preformNetworkRequest };
 });
 

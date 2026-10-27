@@ -17,9 +17,9 @@
 //   deployRemoteManifest - upload manifest.json, atomically flipping lambdas over
 // Version files always land before the manifest that references them, so a reading
 // lambda never sees a manifest whose files aren't all present yet.
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from 'quidproquo-deploy-rspack';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from '@qpqjs/deploy-rspack';
 
 import fs from 'fs';
 import path from 'path';

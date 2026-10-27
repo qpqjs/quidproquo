@@ -1,4 +1,4 @@
-import { QPQConfig, resolveScopedKvsStoreOrThrow } from 'quidproquo-core';
+import { QPQConfig, resolveScopedKvsStoreOrThrow } from '@qpqjs/core';
 
 import { createScopedKvsTranslator, ScopedKvsTranslator } from './scopedKvsTranslator';
 

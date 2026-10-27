@@ -1,4 +1,4 @@
-import { createBrandGuard, validateScopeSegment } from 'quidproquo-core';
+import { createBrandGuard, validateScopeSegment } from '@qpqjs/core';
 
 import { TenantId } from '../models/TenantId';
 

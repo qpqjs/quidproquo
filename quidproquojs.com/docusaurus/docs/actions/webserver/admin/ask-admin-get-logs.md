@@ -12,8 +12,8 @@ Every story that runs in a quidproquo service — an API request, a queue messag
 - **Action type:** `AdminActionType.GetLogs`
 
 ```typescript
-import { askAdminGetLogs } from 'quidproquo-webserver';
-import { QpqRuntimeType } from 'quidproquo-core';
+import { askAdminGetLogs } from '@qpqjs/webserver';
+import { QpqRuntimeType } from '@qpqjs/core';
 
 export function* listRecentApiCalls() {
   const page = yield* askAdminGetLogs(

@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askFileDelete, askFileReadBinaryContents, askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, askFileDelete, askFileReadBinaryContents, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
 
 import { askEmailParse } from '../../../../actions/email/askEmailParse';
 import { EmailReceivedEvent, EmailReceivedEventResponse } from '../../../../types/EmailReceivedEvent';

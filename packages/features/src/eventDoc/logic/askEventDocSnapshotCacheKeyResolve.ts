@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller } from 'quidproquo-core';
+import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';

@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

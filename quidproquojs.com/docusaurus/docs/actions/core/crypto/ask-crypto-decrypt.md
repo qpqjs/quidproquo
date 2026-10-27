@@ -12,7 +12,7 @@ Decrypts a blob produced by [askCryptoEncrypt](./ask-crypto-encrypt.md) and retu
 - **On the dev server:** identical code path against the local master key, including identical context enforcement. A context scoping bug fails the same way locally as in prod.
 
 ```typescript
-import { askCryptoDecrypt, askKeyValueStoreGet } from 'quidproquo-core';
+import { askCryptoDecrypt, askKeyValueStoreGet } from '@qpqjs/core';
 
 export function* askReadCustomerApiKey(customerId: string) {
   const record = yield* askKeyValueStoreGet('customer-credentials', customerId);

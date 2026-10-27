@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
 import { DomainResolver } from '../../../domain/types/DomainResolver';

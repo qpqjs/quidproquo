@@ -1,4 +1,4 @@
-import { actionResult, askNewGuid, createActionProcessor, generateUuid, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askNewGuid, createActionProcessor, generateUuid, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessGuidNew = (qpqConfig: QPQConfig): ProcessorFor<typeof askNewGuid> => {
   return async () => {

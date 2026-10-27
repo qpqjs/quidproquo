@@ -10,7 +10,7 @@ Invokes one member of a [dynamic functions](../../../config/core/dynamic-functio
 - **Action type:** `DynamicFunctionsActionType.Execute`
 
 ```typescript
-import { askDynamicFunctionExecute } from 'quidproquo-core';
+import { askDynamicFunctionExecute } from '@qpqjs/core';
 
 import { templateEventDoc } from '../eventDocs/templateEventDoc';
 
@@ -81,7 +81,7 @@ if (outcome.success) {
 ## Notes
 
 - The invoked member runs **in the same process** as the caller — a generator member runs nested one level deeper, not as a separate deployed service — dynamic functions add no infrastructure of their own.
-- `createDynamicFunctionCaller` (also exported from `quidproquo-core`) wraps this action in a typed proxy so call sites read like a normal method call instead of a string-keyed action: `const caller = createDynamicFunctionCaller<typeof templateEventDoc>('templateEventDoc'); yield* caller.foldSnapshotViews(events);` yields the exact same action as calling `askDynamicFunctionExecute` directly.
+- `createDynamicFunctionCaller` (also exported from `@qpqjs/core`) wraps this action in a typed proxy so call sites read like a normal method call instead of a string-keyed action: `const caller = createDynamicFunctionCaller<typeof templateEventDoc>('templateEventDoc'); yield* caller.foldSnapshotViews(events);` yields the exact same action as calling `askDynamicFunctionExecute` directly.
 
 ## Related
 

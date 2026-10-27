@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
 

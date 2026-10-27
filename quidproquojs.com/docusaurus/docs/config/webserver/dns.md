@@ -10,7 +10,7 @@ Declares the **root domains** for a service, primary first. Everything else that
 - **On AWS:** `defineDns` does **not** create a Route53 hosted zone. Deploy constructs look zones up with `HostedZone.fromLookup` and add records into them. A host's zone is its root's site root when it sits under it (`api.development.example.com` in `development.example.com`), otherwise the root itself (`development-api.example.com` in `example.com`); see [Domains](../../domains.md).
 
 ```typescript
-import { defineDns } from 'quidproquo-webserver';
+import { defineDns } from '@qpqjs/webserver';
 
 export default [
   defineDns(['example.com', 'example.org'], {
@@ -43,7 +43,7 @@ A pointer (`{ basePath, relativePath, functionName }`) to the app's `DomainResol
 ## Examples
 
 ```typescript
-import { defineDns } from 'quidproquo-webserver';
+import { defineDns } from '@qpqjs/webserver';
 
 export default [
   // One root

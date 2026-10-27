@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { ServiceAllowedOrigin } from '../../../config/settings/route';
 import { DomainResolver } from '../../../domain/types/DomainResolver';

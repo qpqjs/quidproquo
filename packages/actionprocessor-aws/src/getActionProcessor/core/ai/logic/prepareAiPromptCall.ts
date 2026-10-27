@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   ActionProcessorList,
   AiModel,
@@ -11,7 +11,7 @@ import {
   QpqLogger,
   StorySession,
   StreamRegistry,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import type { ToolSet } from 'ai';
 import { jsonSchema } from 'ai';

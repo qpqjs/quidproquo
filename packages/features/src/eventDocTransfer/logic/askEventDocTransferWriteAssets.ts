@@ -1,4 +1,4 @@
-import { askFileWriteBinaryContents, AskResponse } from 'quidproquo-core';
+import { askFileWriteBinaryContents, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../../eventDoc/context';
 import { askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc/data';

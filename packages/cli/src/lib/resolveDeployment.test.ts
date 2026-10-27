@@ -31,7 +31,7 @@ writeConfig('broken', { prod: { platform: 'aws', name: 'x', environment: 'produc
 vi.mock('./discovery', () => ({ getRoot: () => root }));
 vi.mock('./prompts', () => ({ promptSelect: vi.fn(async () => 'other-prod') }));
 vi.mock('../platforms', async () => {
-  const { primeAwsDeploymentEnv, validateAwsDeployment } = await import('quidproquo-config-aws');
+  const { primeAwsDeploymentEnv, validateAwsDeployment } = await import('@qpqjs/config-aws');
   const drivers: Record<string, { prepareDeployment: (name: string, deployment: unknown) => void }> = {
     aws: { prepareDeployment: (name, deployment) => primeAwsDeploymentEnv(validateAwsDeployment(name, deployment as never)) },
     docker: { prepareDeployment: () => {} },

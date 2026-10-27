@@ -11,8 +11,8 @@ import {
   QpqIsoDateTime,
   runStory,
   throwsError,
-} from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { WebSocketQueueClientMessageEventType } from 'quidproquo-features';
+import { WebSocketQueueClientMessageEventType } from '@qpqjs/features';
 
 import { createElement, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

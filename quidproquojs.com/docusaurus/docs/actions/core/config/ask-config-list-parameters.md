@@ -11,7 +11,7 @@ Returns the names of every [parameter](../../../config/core/parameter.md) availa
 - **On AWS:** enumerates AWS Systems Manager Parameter Store (`ssm:DescribeParameters`).
 
 ```typescript
-import { askConfigListParameters, askConfigGetParameter } from 'quidproquo-core';
+import { askConfigListParameters, askConfigGetParameter } from '@qpqjs/core';
 
 export function* askDumpAllParameters() {
   const names = yield* askConfigListParameters();

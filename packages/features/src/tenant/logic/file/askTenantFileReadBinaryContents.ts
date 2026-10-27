@@ -1,4 +1,4 @@
-import { askFileReadBinaryContents, AskResponse, QPQBinaryData } from 'quidproquo-core';
+import { askFileReadBinaryContents, AskResponse, QPQBinaryData } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

@@ -1,4 +1,4 @@
-import { replayEffects } from 'quidproquo-core';
+import { replayEffects } from '@qpqjs/core';
 
 import { foldEventDocLogStep } from '../../fold/foldEventDocLogStep';
 import { migrateEventDocDocumentTo } from '../../fold/migrateEventDocDocumentTo';

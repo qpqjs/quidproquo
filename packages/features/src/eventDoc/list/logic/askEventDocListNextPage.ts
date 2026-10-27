@@ -1,4 +1,4 @@
-import { AskResponse, askStateRead } from 'quidproquo-core';
+import { AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askUIEventDocListSetPageIndex } from '../actionCreators/askUIEventDocListSetPageIndex';
 import type { EventDocListState } from '../types/EventDocListState';

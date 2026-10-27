@@ -1,4 +1,4 @@
-import { ActionProcessorsQPQConfigSetting, defineActionProcessors } from 'quidproquo-core';
+import { ActionProcessorsQPQConfigSetting, defineActionProcessors } from '@qpqjs/core';
 
 /**
  * Registers the askUserScriptBuild processor on a service. Only services that call this

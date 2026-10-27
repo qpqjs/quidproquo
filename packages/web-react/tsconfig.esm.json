@@ -1,5 +1,5 @@
 {
-  "extends": "quidproquo-tsconfig/tsconfig.esm.json",
+  "extends": "@qpqjs/tsconfig/tsconfig.esm.json",
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./lib/esm",

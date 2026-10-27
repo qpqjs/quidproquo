@@ -1,4 +1,4 @@
-import { CryptoContext } from 'quidproquo-core';
+import { CryptoContext } from '@qpqjs/core';
 
 // KMS treats a missing EncryptionContext and an empty one as equivalent, but
 // we normalise to undefined so requests are byte-identical either way.

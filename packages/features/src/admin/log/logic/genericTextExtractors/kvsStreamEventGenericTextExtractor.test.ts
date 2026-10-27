@@ -1,4 +1,4 @@
-import { actionResult, actionResultError, ErrorTypeEnum, KvsStreamEventType, KvsStreamRecord, QpqRuntimeType } from 'quidproquo-core';
+import { actionResult, actionResultError, ErrorTypeEnum, KvsStreamEventType, KvsStreamRecord, QpqRuntimeType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

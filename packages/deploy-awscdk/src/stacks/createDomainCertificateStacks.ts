@@ -1,6 +1,6 @@
-import { DomainCertificateQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { DomainCertificateQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { Construct } from 'constructs';
 

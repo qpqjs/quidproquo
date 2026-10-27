@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { MCP_REMOTE_TOOL_NAME_SEPARATOR } from '../constants/mcpRemoteToolNameSeparator';
 

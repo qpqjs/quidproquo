@@ -1,4 +1,4 @@
-import { askStorageScopeProvide, FileActionType, GuidActionType, runStory } from 'quidproquo-core';
+import { askStorageScopeProvide, FileActionType, GuidActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

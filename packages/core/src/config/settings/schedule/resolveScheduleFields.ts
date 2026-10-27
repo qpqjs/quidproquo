@@ -50,8 +50,8 @@ const EVERY_VALUE: ScheduleFields = {
  * Turn a declared recurrence into the concrete field values both renderers
  * consume, validating it on the way through.
  *
- * The single interpreter of ScheduleRecurrence. quidproquo-deploy-awscdk and
- * quidproquo-dev-server both start from what this returns, which is what makes
+ * The single interpreter of ScheduleRecurrence. @qpqjs/deploy-awscdk and
+ * @qpqjs/dev-server both start from what this returns, which is what makes
  * "it fires locally exactly when it would fire deployed" a property of one
  * function rather than of two implementations agreeing.
  */

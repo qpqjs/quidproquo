@@ -1,4 +1,4 @@
-import { UserAttributes } from 'quidproquo-core';
+import { UserAttributes } from '@qpqjs/core';
 
 import { cognitoAttributeMap } from './cognitoAttributeMap';
 

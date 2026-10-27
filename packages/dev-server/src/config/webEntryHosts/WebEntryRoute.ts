@@ -1,4 +1,4 @@
-import { WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 /** One web entry served same-origin on the api port, at `/` (the root-domain entry) or `/<subdomain>`. */
 export type WebEntryRoute = {

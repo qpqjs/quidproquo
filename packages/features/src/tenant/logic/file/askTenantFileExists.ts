@@ -1,4 +1,4 @@
-import { askFileExists, AskResponse } from 'quidproquo-core';
+import { askFileExists, AskResponse } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

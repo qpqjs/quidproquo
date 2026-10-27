@@ -8,7 +8,7 @@ description: Tell every connected frontend that a service's deployed artifacts c
 Broadcasts a `ServiceUpdated` message to every live connection on a [WebSocket queue](../../../config/features/web-socket-queue.md) API, naming the service whose deployed artifacts changed (for example, a new views bundle going live). A typed wrapper around [askWebSocketQueueBroadcastMessage](./ask-web-socket-queue-broadcast-message.md) for this one built-in message type.
 
 ```typescript
-import { askWebSocketQueueBroadcastServiceUpdated } from 'quidproquo-features';
+import { askWebSocketQueueBroadcastServiceUpdated } from '@qpqjs/features';
 
 export function* askNotifyDeploy(serviceName: string) {
   yield* askWebSocketQueueBroadcastServiceUpdated('api', serviceName);

@@ -1,4 +1,4 @@
-import { actionResult, askEventAutoRespondBase, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventAutoRespondBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 // Nothing is waiting on a schedule's return value, deployed or locally.
 const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {

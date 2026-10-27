@@ -10,7 +10,7 @@ Computes the number of seconds elapsed from a `startTime` to an `endTime`. If `e
 - Built from [askDateNow](./ask-date-now.md): when `endTime` is not supplied it reads the runtime clock; otherwise it does no I/O and simply subtracts the two timestamps.
 
 ```typescript
-import { askSecondsElapsedFrom } from 'quidproquo-core';
+import { askSecondsElapsedFrom } from '@qpqjs/core';
 
 export function* askIsTokenExpired(issuedAt: string) {
   const age = yield* askSecondsElapsedFrom(issuedAt);
@@ -34,7 +34,7 @@ function* askSecondsElapsedFrom(
 | `startTime` | `QpqIsoDateTime` | — | The earlier ISO-8601 timestamp to measure from, e.g. a value produced by [askDateNow](./ask-date-now.md). |
 | `endTime` | `QpqIsoDateTime` | current time | The later ISO-8601 timestamp to measure to. When omitted, the current time is read via [askDateNow](./ask-date-now.md). |
 
-`QpqIsoDateTime` is a template-literal string type exported from quidproquo-core (a plain `string` at runtime; see [askDateNow](./ask-date-now.md)).
+`QpqIsoDateTime` is a template-literal string type exported from @qpqjs/core (a plain `string` at runtime; see [askDateNow](./ask-date-now.md)).
 
 ## Returns
 

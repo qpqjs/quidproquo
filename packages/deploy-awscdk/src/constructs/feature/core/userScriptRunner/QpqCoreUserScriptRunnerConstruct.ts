@@ -1,4 +1,4 @@
-import { USER_SCRIPT_RUNNER_FUNCTION_NAME, UserScriptRunnerQPQConfigSetting } from 'quidproquo-core';
+import { USER_SCRIPT_RUNNER_FUNCTION_NAME, UserScriptRunnerQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_ec2, aws_iam, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

@@ -10,7 +10,7 @@ Releases an open stream, freeing the underlying source (a file body, a model res
 - **Action type:** `StreamActionType.Close`
 
 ```typescript
-import { askFileStreamOpen, askStreamRead, askStreamClose } from 'quidproquo-core';
+import { askFileStreamOpen, askStreamRead, askStreamClose } from '@qpqjs/core';
 
 export function* askReadFirstChunk(filepath: string) {
   const handle = yield* askFileStreamOpen('logs', filepath, 'text');

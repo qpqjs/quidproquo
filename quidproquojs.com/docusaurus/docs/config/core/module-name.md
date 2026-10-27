@@ -12,7 +12,7 @@ Most services do not call `defineModule` directly — [defineApplicationModule](
 - **On AWS:** does not deploy a resource of its own. The name is read by the deploy layer (`qpqCoreUtils.getApplicationModuleName`, via `getFullyQualifiedResourceName`) as the `module` segment of every physical resource name.
 
 ```typescript
-import { defineModule } from 'quidproquo-core';
+import { defineModule } from '@qpqjs/core';
 
 export default [
   defineModule('web'),

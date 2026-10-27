@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askUserDirectoryDecodeAccessToken } from 'quidproquo-core';
+import { askCatch, AskResponse, askUserDirectoryDecodeAccessToken } from '@qpqjs/core';
 
 import { RouteAuthDecodeOutcome, RouteAuthDecodeResult, RouteAuthValidationDecodeActionPayload } from '../actions/routeAuthValidation';
 import { getHeaderValue } from '../utils/headerUtils';

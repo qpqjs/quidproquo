@@ -13,7 +13,7 @@ Id assignment (advancing past a lost race), dedup, and domain validation all liv
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) / [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals).
 
 ```typescript
-import { askEventDocEventWrite } from 'quidproquo-features';
+import { askEventDocEventWrite } from '@qpqjs/features';
 
 export function* persistPrebuiltEvent(docId: string, event: EventDocEvent) {
   yield* askEventDocEventWrite(docId, event);

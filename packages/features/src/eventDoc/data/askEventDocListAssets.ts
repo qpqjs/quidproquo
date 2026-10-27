@@ -1,4 +1,4 @@
-import { askCatch, askFileListAllDirectory, askFileListDirectory, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askCatch, askFileListAllDirectory, askFileListDirectory, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocResolveScope } from './askEventDocResolveScope';

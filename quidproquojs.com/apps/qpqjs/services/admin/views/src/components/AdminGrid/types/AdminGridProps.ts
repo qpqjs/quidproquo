@@ -1,4 +1,4 @@
-import { DataGridProps } from 'quidproquo-web-admin';
+import { DataGridProps } from '@qpqjs/web-admin';
 
 export type AdminGridProps<T extends object> = DataGridProps<T> & {
   title?: string;

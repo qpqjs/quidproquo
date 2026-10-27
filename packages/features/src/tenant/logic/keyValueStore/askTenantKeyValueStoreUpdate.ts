@@ -1,4 +1,4 @@
-import { askKeyValueStoreUpdate, AskResponse, KvsCoreDataType, KvsUpdate } from 'quidproquo-core';
+import { askKeyValueStoreUpdate, AskResponse, KvsCoreDataType, KvsUpdate } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

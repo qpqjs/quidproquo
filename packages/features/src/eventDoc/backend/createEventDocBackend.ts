@@ -1,4 +1,4 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, Nullable } from '@qpqjs/core';
 
 import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
 import { askEventDocCopyAsset } from '../data/askEventDocCopyAsset';

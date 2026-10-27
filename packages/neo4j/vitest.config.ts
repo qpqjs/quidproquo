@@ -11,7 +11,7 @@ export default defineConfig({
     // Test against core source, not the last-built lib, so tests never
     // depend on a stale build (matches the sibling packages' configs).
     alias: {
-      'quidproquo-core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
+      '@qpqjs/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
     },
   },
 });

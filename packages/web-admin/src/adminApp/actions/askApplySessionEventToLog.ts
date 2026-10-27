@@ -1,5 +1,5 @@
-import { askDateNow, askNewGuid, AskResponse } from 'quidproquo-core';
-import { EventDocEvent } from 'quidproquo-features';
+import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { askUISessionLogEventAppended } from '../actionCreators/sessionLog/askUISessionLogEventAppended';
 import { adminSessionSchemaVersion } from '../constants/adminSessionSchemaVersion';

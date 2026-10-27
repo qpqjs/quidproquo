@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../constants/tenantGlobalNames';
 import { TenantId } from '../models/TenantId';

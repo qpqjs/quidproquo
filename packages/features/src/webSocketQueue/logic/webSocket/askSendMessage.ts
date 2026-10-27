@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { askWebsocketSendMessage } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { askWebsocketSendMessage } from '@qpqjs/webserver';
 
 import { askWebsocketReadApiNameOrThrow } from '../../context';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';

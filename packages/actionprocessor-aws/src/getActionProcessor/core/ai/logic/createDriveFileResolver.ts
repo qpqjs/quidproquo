@@ -7,7 +7,7 @@ import {
   QpqLogger,
   StorySession,
   StreamRegistry,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomGuid } from '../../../../awsLambdaUtils';
 import { AiDriveFileResolver } from './toSdkMessages';

@@ -13,7 +13,7 @@ Generates a new random token to use as a secret (a signing link, an API secret) 
 The admin log redaction treats the result as a secret. It is blanked in this action's own log entry and swept from every other string in the story's log.
 
 ```typescript
-import { askSecureTokenGenerate } from 'quidproquo-core';
+import { askSecureTokenGenerate } from '@qpqjs/core';
 
 export function* askCreateInviteLink(baseUrl: string) {
   const token = yield* askSecureTokenGenerate();

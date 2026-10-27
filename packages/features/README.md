@@ -1,12 +1,12 @@
-# quidproquo-features
+# @qpqjs/features
 
 Ready-made features for [quidproquo](https://github.com/qpqjs/quidproquo) apps. Each one is a config helper plus the stories, routes, and frontend state that go with it, so you add a feature by putting a `define*` in your service config rather than by writing it.
 
 ```bash
-npm install quidproquo-features
+npm install @qpqjs/features
 ```
 
-Requires `quidproquo-core` and `quidproquo-webserver` (or `quidproquo`).
+Requires `@qpqjs/core` and `@qpqjs/webserver` (or `quidproquo`).
 
 ## What is in here
 

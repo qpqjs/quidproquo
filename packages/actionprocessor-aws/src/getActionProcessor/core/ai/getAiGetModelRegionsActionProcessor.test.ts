@@ -1,4 +1,4 @@
-import { AiActionType, AiDataRegion, AiModel } from 'quidproquo-core';
+import { AiActionType, AiDataRegion, AiModel } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

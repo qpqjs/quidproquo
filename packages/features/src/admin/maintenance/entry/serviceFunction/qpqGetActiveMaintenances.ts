@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { askEventDocProvideStore } from '../../../../eventDoc/context/askEventDocProvideStore';
 import { maintenanceStoreOptions } from '../../config/maintenanceStoreOptions';

@@ -1,4 +1,4 @@
-import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse, Nullable } from 'quidproquo-core';
+import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse, Nullable } from '@qpqjs/core';
 
 import { getWebSocketQueueGlobalConfigKeyForTopicAuthoriser } from '../../../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../../../context';

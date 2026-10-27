@@ -1,11 +1,11 @@
-# quidproquo-web-react
+# @qpqjs/web-react
 
 React bindings for [quidproquo](https://github.com/qpqjs/quidproquo).
 
 This is what a qpq frontend is built on. It runs the qpq runtime in the browser, so the same kind of stories that run on the server can drive your UI, and it provides the state, auth, and connection plumbing around them.
 
 ```bash
-npm install quidproquo-web-react
+npm install @qpqjs/web-react
 ```
 
 React 18 or newer is a peer dependency.
@@ -16,7 +16,7 @@ React 18 or newer is a peer dependency.
 | --- | --- |
 | `runtime` | The browser runtime, wired to the web action processors |
 | `store` | The qpq state store: reference-counted, `set_state` only, with an `onInit` hook on the definition and immediate teardown when the last consumer unmounts |
-| `state` | Effect and reducer wiring for state modules, matching the layout `quidproquo-features` uses |
+| `state` | Effect and reducer wiring for state modules, matching the layout `@qpqjs/features` uses |
 | `api` | Typed clients for your service apis |
 | `auth` | Sign in, sign out, tokens, and the auth context |
 | `websocket`, `webSocketQueue` | Live connections, including the ordered, reliable queue |

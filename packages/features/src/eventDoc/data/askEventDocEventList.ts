@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsBetween, kvsEqual, kvsGreaterThan, kvsLessThanOrEqual, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsBetween, kvsEqual, kvsGreaterThan, kvsLessThanOrEqual, QpqPagedData } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';

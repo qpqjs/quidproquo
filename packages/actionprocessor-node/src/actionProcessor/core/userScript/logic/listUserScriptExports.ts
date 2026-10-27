@@ -1,4 +1,4 @@
-import { UserScriptModuleExports } from 'quidproquo-core';
+import { UserScriptModuleExports } from '@qpqjs/core';
 
 import { loadUserScriptModule } from './loadUserScriptModule';
 import { UserScriptModuleMap } from './UserScriptModuleMap';

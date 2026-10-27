@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
 
 import { askUIVolatileLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogSearchCompleted';
 import { askUIVolatileLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogSearchStarted';

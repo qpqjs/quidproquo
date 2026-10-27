@@ -1,4 +1,4 @@
-import { runUserScriptInChild } from 'quidproquo-actionprocessor-node';
+import { runUserScriptInChild } from '@qpqjs/actionprocessor-node';
 import {
   ActionProcessorList,
   ActionProcessorResult,
@@ -18,7 +18,7 @@ import {
   USER_SCRIPT_RUNNER_SOURCE_URL_EXPIRY_MS,
   UserScriptRunnerEvent,
   UserScriptRunnerRequest,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

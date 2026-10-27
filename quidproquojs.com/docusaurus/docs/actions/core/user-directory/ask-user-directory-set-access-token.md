@@ -11,7 +11,7 @@ Decodes an access token issued by a [user directory](../../../config/core/user-d
 - **On AWS:** verifies/decodes the token against the pool's public JWKs over HTTPS, then updates the session.
 
 ```typescript
-import { askUserDirectorySetAccessToken } from 'quidproquo-core';
+import { askUserDirectorySetAccessToken } from '@qpqjs/core';
 
 export function* askActAs(accessToken: string) {
   const decoded = yield* askUserDirectorySetAccessToken('app-users', accessToken);
@@ -43,7 +43,7 @@ function* askUserDirectorySetAccessToken(
 ## Notes
 
 - The token is stored on the session only; sessions are not transferred across service boundaries (queues, event buses, service functions), so the identity does not leak beyond the current in-process runtime.
-- A token that cannot be verified (missing, malformed, wrong pool, bad signature, or expired) fails the action with a generic `Unauthorized` error and leaves the session untouched. Catch it with `askCatch` from quidproquo-core when a failed load should not abort the story.
+- A token that cannot be verified (missing, malformed, wrong pool, bad signature, or expired) fails the action with a generic `Unauthorized` error and leaves the session untouched. Catch it with `askCatch` from @qpqjs/core when a failed load should not abort the story.
 
 ## Related
 

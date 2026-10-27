@@ -12,7 +12,7 @@ Most services do not call `defineApplication` directly — [defineApplicationMod
 - **On AWS:** does not deploy a resource of its own. Its values are read by the deploy layer (`qpqCoreUtils.getFullyQualifiedResourceName`) to derive the physical name of every construct — buckets, tables, queues, functions, etc. — as `application / module / environment / feature / resourceName`.
 
 ```typescript
-import { defineApplication } from 'quidproquo-core';
+import { defineApplication } from '@qpqjs/core';
 
 export default [
   defineApplication('my-app', 'production', __dirname),
@@ -47,7 +47,7 @@ function defineApplication(
 ## Examples
 
 ```typescript
-import { defineApplication } from 'quidproquo-core';
+import { defineApplication } from '@qpqjs/core';
 
 export default [
   // Standard production identity

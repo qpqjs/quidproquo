@@ -10,7 +10,7 @@ Drives an open stream to completion: it reads chunk after chunk, invokes your ca
 `askStreamProcess` is not a distinct action; it is a story composed of [askStreamRead](./ask-stream-read.md) and [askStreamClose](./ask-stream-close.md). It reads in the default blocking mode, skips any chunk whose `data` is `undefined` or that is marked `skipped`, stops on `done`, and always closes the handle before returning.
 
 ```typescript
-import { askAiPromptStream, askStreamProcess, AiModel, AiStreamPartType } from 'quidproquo-core';
+import { askAiPromptStream, askStreamProcess, AiModel, AiStreamPartType } from '@qpqjs/core';
 
 export function* askAnswerStreamed(prompt: string) {
   const stream = yield* askAiPromptStream(AiModel.ClaudeSonnet46, prompt);

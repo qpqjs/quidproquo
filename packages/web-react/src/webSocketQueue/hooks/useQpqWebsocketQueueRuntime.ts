@@ -1,4 +1,4 @@
-import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-features';
+import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from '@qpqjs/features';
 
 import { useRef } from 'react';
 

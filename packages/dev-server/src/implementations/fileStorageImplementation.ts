@@ -1,5 +1,5 @@
-import { resolveFilePath, verifySecureUrlToken } from 'quidproquo-actionprocessor-node';
-import { FileActionType } from 'quidproquo-core';
+import { resolveFilePath, verifySecureUrlToken } from '@qpqjs/actionprocessor-node';
+import { FileActionType } from '@qpqjs/core';
 
 import express, { Express, Request, Response } from 'express';
 import * as fs from 'fs/promises';

@@ -1,5 +1,5 @@
-import { AskResponse, askStateRead } from 'quidproquo-core';
-import { askQueryParamsGetAll, askQueryParamsSet } from 'quidproquo-web';
+import { AskResponse, askStateRead } from '@qpqjs/core';
+import { askQueryParamsGetAll, askQueryParamsSet } from '@qpqjs/web';
 
 import { AdminAppState } from '../../AdminAppState';
 import { selectUrlProjection } from '../selectors/selectUrlProjection';

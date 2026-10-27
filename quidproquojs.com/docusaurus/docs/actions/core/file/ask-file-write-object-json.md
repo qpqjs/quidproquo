@@ -11,7 +11,7 @@ Serializes an object with `JSON.stringify` and writes it to a file on a [storage
 - **On AWS:** runs `JSON.stringify` on the object and performs an S3 `PutObject` on the drive's bucket. If a `storageDriveTier` is given, the object is written directly into that S3 storage class.
 
 ```typescript
-import { askFileWriteObjectJson } from 'quidproquo-core';
+import { askFileWriteObjectJson } from '@qpqjs/core';
 
 interface AppSettings {
   theme: string;
@@ -63,7 +63,7 @@ function* askFileWriteObjectJson<T extends object>(
 | `FileWriteObjectJsonErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
 | `FileWriteObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileWriteObjectJson('config', 'settings.json', settings));

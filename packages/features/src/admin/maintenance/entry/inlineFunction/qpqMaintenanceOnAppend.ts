@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { EventDocOnAppendInput } from '../../../../eventDoc/models/EventDocOnAppendInput';
 import { isMaintenancePubliclyVisible } from '../../eventDoc/isMaintenancePubliclyVisible';

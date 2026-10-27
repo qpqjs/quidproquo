@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -9,7 +9,7 @@ import {
   FileActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { generatePresignedUploadUrl } from '../../../logic/s3/generatePresignedUploadUrl';
 import { resolveStorageDriveBucketName } from './utils';
@@ -41,7 +41,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): P
       return actionResult(url);
     } catch (error: unknown) {
       // Name-keyed, not instanceof: under npm link / module federation the
-      // error can come from another copy of quidproquo-core.
+      // error can come from another copy of @qpqjs/core.
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope, error.message),
       });

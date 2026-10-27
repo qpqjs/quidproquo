@@ -1,5 +1,5 @@
-import { askCatch, AskResponse, EitherActionResult, HTTPNetworkResponse, StoryResultMetadata } from 'quidproquo-core';
-import { QpqLogList } from 'quidproquo-webserver';
+import { askCatch, AskResponse, EitherActionResult, HTTPNetworkResponse, StoryResultMetadata } from '@qpqjs/core';
+import { QpqLogList } from '@qpqjs/webserver';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
 import { askUIVolatileLogSearchPartLoaded } from '../../actionCreators/volatile/askUIVolatileLogSearchPartLoaded';

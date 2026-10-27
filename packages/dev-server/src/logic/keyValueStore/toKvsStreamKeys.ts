@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 // The store's key attributes, lifted off a stored item. A stream record carries only the keys
 // (plus the images), and locally we have the whole item, so this picks out the same subset a

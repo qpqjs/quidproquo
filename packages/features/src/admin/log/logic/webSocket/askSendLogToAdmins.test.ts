@@ -1,5 +1,5 @@
-import { Action, KeyValueStoreActionType, runStory, StoryResultMetadata } from 'quidproquo-core';
-import { WebsocketActionType } from 'quidproquo-webserver';
+import { Action, KeyValueStoreActionType, runStory, StoryResultMetadata } from '@qpqjs/core';
+import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

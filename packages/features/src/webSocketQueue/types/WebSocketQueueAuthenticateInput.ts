@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 /** What a queue's `connectionAuthenticator` inline function receives; it throws to reject the token. */
 export type WebSocketQueueAuthenticateInput = {

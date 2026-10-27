@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../../eventDoc/constants/eventDocGlobalNames';
 import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocResolveUserId';

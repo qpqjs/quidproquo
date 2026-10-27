@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import * as publicApi from './index';
 
-describe('quidproquo-actionprocessor-web public surface', () => {
+describe('@qpqjs/actionprocessor-web public surface', () => {
   it('exports the processor resolvers consumers depend on', () => {
     expect(typeof publicApi.getWebActionProcessors).toBe('function');
     expect(typeof publicApi.createApiRequestActionProcessor).toBe('function');

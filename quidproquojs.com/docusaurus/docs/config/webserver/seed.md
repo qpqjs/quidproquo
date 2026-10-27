@@ -12,7 +12,7 @@ Registers a set of **seed** stories that run **once, on the first (Create) deplo
 - **What it declares:** a [global](../core/global.md) (`qpqSeeds`) holding the seed list, a [deploy event](../core/deploy-event.md) (`qpqSeeds`) that reacts to stack changes, and a [queue](../core/queue.md) (`qpqSeeds`) that executes each seed story. The queue runs **one seed at a time** (`maxConcurrentExecutions: 1`, `batchSize: 1`, `concurrency: 1`). Note there is **no** tracking key-value store — that is the key difference from `defineMigration`.
 
 ```typescript
-import { defineSeed } from 'quidproquo-webserver';
+import { defineSeed } from '@qpqjs/webserver';
 
 export default [
   defineSeed([

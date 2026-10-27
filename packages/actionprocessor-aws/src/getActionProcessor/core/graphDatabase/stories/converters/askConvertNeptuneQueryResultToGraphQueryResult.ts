@@ -1,4 +1,4 @@
-import { askReduce, AskResponse, GraphQueryResult } from 'quidproquo-core';
+import { askReduce, AskResponse, GraphQueryResult } from '@qpqjs/core';
 
 import { NeptuneQueryResult } from '../types';
 import { askConvertAnyNeptuneResultToAnyGraphResult } from './askConvertAnyNeptuneResultToAnyGraphResult';

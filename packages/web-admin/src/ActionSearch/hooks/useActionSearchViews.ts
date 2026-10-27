@@ -1,4 +1,4 @@
-import { actionSearchRegistry } from 'quidproquo-features';
+import { actionSearchRegistry } from '@qpqjs/features';
 
 import { useMemo } from 'react';
 

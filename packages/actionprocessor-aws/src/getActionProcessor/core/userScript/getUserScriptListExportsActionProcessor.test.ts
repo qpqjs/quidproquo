@@ -1,4 +1,4 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   actionResult,
   askUserScriptListExports,
@@ -9,7 +9,7 @@ import {
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

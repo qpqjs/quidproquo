@@ -8,7 +8,7 @@ import {
   QPQConfig,
   QPQConfigAdvancedSettings,
   QpqFunctionRuntime,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 

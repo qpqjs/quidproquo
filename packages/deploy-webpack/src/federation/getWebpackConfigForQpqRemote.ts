@@ -11,7 +11,7 @@
 // lambda can require() it from /tmp, and `shared` keeps the framework packages OUT of
 // the bundle (the host provides them), so a remote carries only user code.
 // ─────────────────────────────────────────────────────────────────────────────
-import { FEDERATED_SHARED_PACKAGE_NAMES, QPQConfig } from 'quidproquo-core';
+import { FEDERATED_SHARED_PACKAGE_NAMES, QPQConfig } from '@qpqjs/core';
 
 import { Configuration } from 'webpack';
 import { ModuleFederationPlugin } from '@module-federation/enhanced';

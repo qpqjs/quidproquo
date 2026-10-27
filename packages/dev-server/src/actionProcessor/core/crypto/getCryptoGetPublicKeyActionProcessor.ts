@@ -7,7 +7,7 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getOrSeedSigningKeyPair } from '../../../logic/signingKeys';
 import { ResolvedDevServerConfig } from '../../../types';

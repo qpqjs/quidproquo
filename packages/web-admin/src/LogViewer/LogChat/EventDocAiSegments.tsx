@@ -1,4 +1,4 @@
-import { EventDocAiMessageSegment } from 'quidproquo-features';
+import { EventDocAiMessageSegment } from '@qpqjs/features';
 
 import React from 'react';
 import Markdown from 'react-markdown';

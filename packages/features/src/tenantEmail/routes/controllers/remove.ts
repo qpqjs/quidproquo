@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { askTenantEmailInboxRelease } from '../../logic/askTenantEmailInboxRelease';
 import { askTenantEmailRequest } from '../askTenantEmailRequest';

@@ -1,4 +1,4 @@
-import { KvsCoreDataType, Nullable } from 'quidproquo-core';
+import { KvsCoreDataType, Nullable } from '@qpqjs/core';
 
 import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
 

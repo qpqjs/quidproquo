@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askDateNow, askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual } from 'quidproquo-core';
+import { askConfigGetGlobal, askDateNow, askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc';
 import { EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL } from '../constants/eventDocAiGlobalNames';

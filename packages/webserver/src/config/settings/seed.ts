@@ -1,4 +1,4 @@
-import { defineDeployEvent, defineGlobal, defineQueue, getUniqueKeyFromQpqFunctionRuntime, QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
+import { defineDeployEvent, defineGlobal, defineQueue, getUniqueKeyFromQpqFunctionRuntime, QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 

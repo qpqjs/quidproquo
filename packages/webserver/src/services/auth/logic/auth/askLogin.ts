@@ -1,4 +1,4 @@
-import { AskResponse, askUserDirectoryAuthenticateUser, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, askUserDirectoryAuthenticateUser, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askGetAuthUserDirectoryName } from './askGetAuthUserDirectoryName';
 

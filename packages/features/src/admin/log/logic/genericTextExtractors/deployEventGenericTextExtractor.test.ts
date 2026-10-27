@@ -1,4 +1,4 @@
-import { actionResult, actionResultError, DeployEventStatusType, DeployEventType, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
+import { actionResult, actionResultError, DeployEventStatusType, DeployEventType, ErrorTypeEnum, QpqRuntimeType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

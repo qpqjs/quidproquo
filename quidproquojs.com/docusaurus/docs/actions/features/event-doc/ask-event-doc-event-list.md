@@ -15,7 +15,7 @@ Three read helpers over a document's event stream. All three resolve the collect
 Returns one page of events for a document, oldest first. Supports paging and, via `afterEventId`, fetching only the tail since a known event — an incremental refresh.
 
 ```typescript
-import { askEventDocEventList } from 'quidproquo-features';
+import { askEventDocEventList } from '@qpqjs/features';
 
 export function* refreshSince(docId: string, lastSeenEventId: number) {
   const page = yield* askEventDocEventList(docId, { afterEventId: lastSeenEventId });
@@ -59,7 +59,7 @@ function* askEventDocEventList(
 Pages through the **whole** log (ascending) and returns it as a flat array — the complete history a from-scratch fold needs. The append-time validator uses this; until state snapshots exist it re-reads the full log per validated append, so treat it as O(log length).
 
 ```typescript
-import { askEventDocEventListAll } from 'quidproquo-features';
+import { askEventDocEventListAll } from '@qpqjs/features';
 
 export function* fullHistory(docId: string) {
   return yield* askEventDocEventListAll(docId); // EventDocEvent[]
@@ -92,7 +92,7 @@ function* askEventDocEventListAll(
 Returns the newest event in the log, or `null` if the document has no events. Relies on string sort-key ordering (a sortable event id's string form sorts lexicographically in creation order, and the dev server sorts string sort keys the same way DynamoDB does), so it returns the true latest.
 
 ```typescript
-import { askEventDocEventLast } from 'quidproquo-features';
+import { askEventDocEventLast } from '@qpqjs/features';
 
 export function* currentVersion(docId: string) {
   const last = yield* askEventDocEventLast(docId);

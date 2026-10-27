@@ -15,7 +15,7 @@ Dynamic inboxes need no configuration: an address is just a local part, so `<inb
 A throwing handler loses that message after the platform's retries. Catch inside the handler to do otherwise.
 
 ```typescript
-import { defineEmailReceiver } from 'quidproquo-webserver';
+import { defineEmailReceiver } from '@qpqjs/webserver';
 
 export default [
   defineEmailReceiver('support', {
@@ -27,8 +27,8 @@ export default [
 The handler:
 
 ```typescript
-import { AskResponse } from 'quidproquo-core';
-import { EmailReceivedEvent, EmailReceivedEventResponse } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { EmailReceivedEvent, EmailReceivedEventResponse } from '@qpqjs/webserver';
 
 export function* onSupportEmail({ message }: EmailReceivedEvent): AskResponse<EmailReceivedEventResponse> {
   if (message.authentication.dkim !== 'pass') {

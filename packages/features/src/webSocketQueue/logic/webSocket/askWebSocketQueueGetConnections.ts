@@ -1,4 +1,4 @@
-import { AskResponse, QpqPagedData } from 'quidproquo-core';
+import { AskResponse, QpqPagedData } from '@qpqjs/core';
 
 import { askGetAllPagedConnections } from '../../data';
 import { Connection } from '../../types';

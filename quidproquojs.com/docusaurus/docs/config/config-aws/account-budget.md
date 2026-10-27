@@ -12,7 +12,7 @@ This is an **account/organization bootstrap setting**: it does not configure a d
 - **On AWS:** deploys an AWS Budgets `CfnBudget` (a `COST`, `MONTHLY` budget) with one email notification per threshold, and — unless anomaly detection is disabled — an `aws_ce` `CfnAnomalyMonitor` (`DIMENSIONAL` / `SERVICE`) plus a `CfnAnomalySubscription` that emails subscribers daily. Deployed by `QpqAccountBudgetConstruct` in the account stack (`AccountQpqStack`). AWS allows only **one** service-dimension anomaly monitor per account, so if several environments share one account, enable anomaly detection in only one of them (or set `anomalyDetection.disabled` on the extras).
 
 ```typescript
-import { defineAccountBudget } from 'quidproquo-config-aws';
+import { defineAccountBudget } from '@qpqjs/config-aws';
 
 export default [
   defineAccountBudget('primary', 500, ['billing@example.com']),
@@ -90,7 +90,7 @@ export interface AccountBudgetAnomalyDetection {
 ## Examples
 
 ```typescript
-import { defineAccountBudget, BudgetThresholdType } from 'quidproquo-config-aws';
+import { defineAccountBudget, BudgetThresholdType } from '@qpqjs/config-aws';
 
 export default [
   // Custom thresholds, anomaly detection kept on with a higher impact floor
@@ -114,4 +114,4 @@ export default [
 
 - [defineAccountCloudTrail](./account-cloud-trail.md) — account audit logging, another `defineAccount*` bootstrap setting deployed by the same account stack.
 - [defineAccountSecurityServices](./account-security-services.md) — account threat-detection services deployed by the same account stack.
-- **AWS implementation:** `QpqAccountBudgetConstruct` (AWS Budgets + Cost Explorer anomaly detection) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqAccountBudgetConstruct` (AWS Budgets + Cost Explorer anomaly detection) in `@qpqjs/deploy-awscdk`.

@@ -1,4 +1,4 @@
-import { type AiStreamError, type AiStreamFinish, AiStreamFinishReasonEnum, AiStreamPartType } from 'quidproquo-core';
+import { type AiStreamError, type AiStreamFinish, AiStreamFinishReasonEnum, AiStreamPartType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

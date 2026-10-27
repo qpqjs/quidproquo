@@ -1,5 +1,5 @@
-import { QPQAwsConfigSettingType } from 'quidproquo-config-aws';
-import { QPQ_LOGS_STORAGE_DRIVE_NAME } from 'quidproquo-core';
+import { QPQAwsConfigSettingType } from '@qpqjs/config-aws';
+import { QPQ_LOGS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, DecodedAccessToken, ErrorTypeEnum, UserDirectoryActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, DecodedAccessToken, ErrorTypeEnum, UserDirectoryActionType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

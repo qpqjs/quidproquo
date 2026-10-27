@@ -1,4 +1,4 @@
-import { buildEffectReducer } from 'quidproquo-core';
+import { buildEffectReducer } from '@qpqjs/core';
 
 import { VolatileEffect } from './effects/volatile/VolatileEffect';
 import { VolatileEffects } from './effects/volatile/VolatileEffects';

@@ -1,4 +1,4 @@
-import { Effect, StoryResultMetadata } from 'quidproquo-core';
+import { Effect, StoryResultMetadata } from '@qpqjs/core';
 
 import { VolatileEffect } from './VolatileEffect';
 

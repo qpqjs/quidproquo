@@ -1,6 +1,6 @@
-import { AskResponse, LogLevelEnum } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
-import { askFromJsonEventRequest, toJsonEventResponse } from 'quidproquo-webserver';
+import { AskResponse, LogLevelEnum } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
+import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
 import { logLogLogic } from '../../logic/logLog';
 

@@ -8,11 +8,11 @@ description: Parse a raw MIME message into addresses, subject, body, attachments
 Parses a raw MIME message into an `EmailMessage`, the `message` a [defineEmailReceiver](../../../config/webserver/email-receiver.md) hands its `onEmail` inside an `EmailReceivedEvent`. A receiver parses for you; this is for a raw message an app obtained some other way.
 
 - **Action type:** `EmailActionType.Parse`
-- **At runtime:** pure on every platform (postal-mime in `quidproquo-actionprocessor-js`); throws `Invalid` when the bytes are not a MIME message.
+- **At runtime:** pure on every platform (postal-mime in `@qpqjs/actionprocessor-js`); throws `Invalid` when the bytes are not a MIME message.
 
 ```typescript
-import { askFileReadBinaryContents } from 'quidproquo-core';
-import { askEmailParse } from 'quidproquo-webserver';
+import { askFileReadBinaryContents } from '@qpqjs/core';
+import { askEmailParse } from '@qpqjs/webserver';
 
 export function* askHandleMail(drive: string, filepath: string) {
   const raw = yield* askFileReadBinaryContents(drive, filepath);

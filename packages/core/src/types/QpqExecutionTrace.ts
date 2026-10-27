@@ -2,7 +2,7 @@ import { QpqIsoDateTime } from './QpqIsoDateTime';
 
 // A line-by-line execution trace of a story REPLAY (see qpqExecuteLog): every statement
 // the story executed, with the values of its local variables at that moment. Produced by
-// quidproquo-actionprocessor-node's traceStoryExecution (worker-thread V8 inspector) and
+// @qpqjs/actionprocessor-node's traceStoryExecution (worker-thread V8 inspector) and
 // rendered by qpq-admin as annotated original source. See trace-replay-plan.md.
 
 // One original source file the trace maps into. When the traced bundle shipped source

@@ -1,4 +1,4 @@
-import { AskResponse, QpqPagedData } from 'quidproquo-core';
+import { AskResponse, QpqPagedData } from '@qpqjs/core';
 
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';

@@ -5,7 +5,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessAssociateSoftwareToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
   return async ({ session }) => {

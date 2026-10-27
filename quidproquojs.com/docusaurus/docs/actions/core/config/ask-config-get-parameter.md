@@ -11,7 +11,7 @@ Reads the current value of a [parameter](../../../config/core/parameter.md) by n
 - **On AWS:** reads from AWS Systems Manager Parameter Store (`ssm:GetParameter`). The parameter is provisioned by [defineParameter](../../../config/core/parameter.md).
 
 ```typescript
-import { askConfigGetParameter } from 'quidproquo-core';
+import { askConfigGetParameter } from '@qpqjs/core';
 
 export function* askGetFeatureFlag() {
   const flag = yield* askConfigGetParameter('new-checkout-enabled');

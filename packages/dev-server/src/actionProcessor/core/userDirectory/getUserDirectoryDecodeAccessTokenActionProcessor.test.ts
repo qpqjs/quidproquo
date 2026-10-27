@@ -6,7 +6,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

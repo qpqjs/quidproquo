@@ -1,4 +1,4 @@
-import { createInitialTenantMembershipUiState, sharedTenantMembershipUiApi, tenantMembershipUiReducer } from 'quidproquo-features';
+import { createInitialTenantMembershipUiState, sharedTenantMembershipUiApi, tenantMembershipUiReducer } from '@qpqjs/features';
 
 import { describe, expect, it } from 'vitest';
 

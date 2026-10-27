@@ -1,6 +1,6 @@
-import { DomainCertificateQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { DomainCertificateQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_certificatemanager, aws_iam, aws_ssm, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';

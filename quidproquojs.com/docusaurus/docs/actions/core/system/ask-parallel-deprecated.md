@@ -14,7 +14,7 @@ Runs any number of stories in parallel by driving each generator forward and bat
 - **Built from:** [askBatch](./ask-batch.md) — on every step it collects the not-yet-done stories' current actions and processes them as a single batch, then feeds each result back into the corresponding story.
 
 ```typescript
-import { askParallelDEPRECATED } from 'quidproquo-core';
+import { askParallelDEPRECATED } from '@qpqjs/core';
 
 export function* askLoadTwo(aId: string, bId: string) {
   // Prefer askRunParallel for new code — this is here for reference only.

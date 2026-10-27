@@ -10,7 +10,7 @@ Fetches the **full execution log** for a single story, identified by its correla
 - **Action type:** `AdminActionType.GetLog`
 
 ```typescript
-import { askAdminGetLog } from 'quidproquo-webserver';
+import { askAdminGetLog } from '@qpqjs/webserver';
 
 export function* inspectStory(correlationId: string) {
   const log = yield* askAdminGetLog(correlationId);

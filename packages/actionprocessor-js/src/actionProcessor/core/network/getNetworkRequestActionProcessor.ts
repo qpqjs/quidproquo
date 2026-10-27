@@ -6,8 +6,8 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
-import { NetworkRequestErrorCode, preformNetworkRequest } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { NetworkRequestErrorCode, preformNetworkRequest } from '@qpqjs/webserver';
 
 const getProcessNetworkRequest = (qpqConfig: QPQConfig): ProcessorFor<typeof askNetworkRequestBase> => {
   return async (payload) => {

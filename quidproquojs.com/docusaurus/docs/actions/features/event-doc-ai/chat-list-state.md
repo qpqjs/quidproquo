@@ -7,7 +7,7 @@ description: UI state setters for the Event Doc AI chat list and active-chat sel
 
 These `ask`-generators are **client-side UI state setters** for the Event Doc AI chat feature. They don't touch the network or any backend service — they run inside the browser SPA and mutate the in-memory `EventDocAiState` so the chat UI re-renders. This page covers the four setters that manage the **chat list** (the collection of a user's chats for an eventDoc) and which chat is currently selected.
 
-Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `quidproquo-core`), so a `yield*` here is a synchronous, local state update — not a round-trip. Every setter returns `AskResponse<void>`.
+Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `@qpqjs/core`), so a `yield*` here is a synchronous, local state update — not a round-trip. Every setter returns `AskResponse<void>`.
 
 ## State shape
 
@@ -52,8 +52,8 @@ Replaces the entire chat list — typically called after loading the list from t
 - **State change:** sets `chats` to the provided array (wholesale replace).
 
 ```typescript
-import { askUIEventDocAiSetChats } from 'quidproquo-features';
-import type { EventDocAiChatSummary } from 'quidproquo-features';
+import { askUIEventDocAiSetChats } from '@qpqjs/features';
+import type { EventDocAiChatSummary } from '@qpqjs/features';
 
 export function* onChatsLoaded(chats: EventDocAiChatSummary[]) {
   yield* askUIEventDocAiSetChats(chats);
@@ -82,8 +82,8 @@ Inserts or updates a single chat in the list without replacing the rest — used
 - **State change:** removes any existing chat with the same `chatId`, then prepends the provided chat — so `chats` stays de-duplicated and the upserted chat moves to the front of the list.
 
 ```typescript
-import { askUIEventDocAiUpsertChat } from 'quidproquo-features';
-import type { EventDocAiChatSummary } from 'quidproquo-features';
+import { askUIEventDocAiUpsertChat } from '@qpqjs/features';
+import type { EventDocAiChatSummary } from '@qpqjs/features';
 
 export function* onChatCreated(chat: EventDocAiChatSummary) {
   yield* askUIEventDocAiUpsertChat(chat);
@@ -112,7 +112,7 @@ Selects (or clears) the currently open chat. This is the value the message pane 
 - **State change:** sets `activeChatId` to the given id, or `null` to deselect.
 
 ```typescript
-import { askUIEventDocAiSetActiveChat } from 'quidproquo-features';
+import { askUIEventDocAiSetActiveChat } from '@qpqjs/features';
 
 export function* openChat(chatId: string) {
   yield* askUIEventDocAiSetActiveChat(chatId);
@@ -145,7 +145,7 @@ Toggles the "loading the chat list" flag so the UI can show a spinner while the 
 - **State change:** sets `isLoadingChats`.
 
 ```typescript
-import { askUIEventDocAiSetLoadingChats, askUIEventDocAiSetChats } from 'quidproquo-features';
+import { askUIEventDocAiSetLoadingChats, askUIEventDocAiSetChats } from '@qpqjs/features';
 
 export function* loadChats() {
   yield* askUIEventDocAiSetLoadingChats(true);

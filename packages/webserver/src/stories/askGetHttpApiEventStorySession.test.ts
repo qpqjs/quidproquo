@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, runStory, StorySession, throwsError } from 'quidproquo-core';
+import { ErrorTypeEnum, runStory, StorySession, throwsError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

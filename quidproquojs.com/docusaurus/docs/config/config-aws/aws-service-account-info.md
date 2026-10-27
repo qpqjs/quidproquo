@@ -7,10 +7,10 @@ description: Bind a service to the AWS account and region it deploys to, and tun
 
 Binds this service to the **AWS account and region** it deploys into, and carries service-wide Lambda and logging defaults. It is the one required AWS setting — the deploy reads the target account/region from here, and cross-module resolution uses the `serviceInfoMap` to locate sibling services in other accounts/regions/environments. Exactly one `defineAwsServiceAccountInfo` is allowed per config.
 
-- **On AWS:** consumed throughout `quidproquo-deploy-awscdk` and `quidproquo-actionprocessor-awslambda` via `getAwsServiceAccountInfoConfig` and friends. `deployAccountId`/`deployRegion` set the CloudFormation stack env; `apiLayers` become Lambda layer references; `lambdaMaxMemoryInMiB` sets the default function memory; the `disable*` flags toggle X-Ray tracing, reserved concurrency, and the Lambda-warming schedule; `logServiceName`, `disableLogs`, and `instantLogs` drive the logging pipeline. Resources across the `serviceInfoMap` are matched by module/environment/feature/application to resolve cross-service references.
+- **On AWS:** consumed throughout `@qpqjs/deploy-awscdk` and `@qpqjs/actionprocessor-aws` via `getAwsServiceAccountInfoConfig` and friends. `deployAccountId`/`deployRegion` set the CloudFormation stack env; `apiLayers` become Lambda layer references; `lambdaMaxMemoryInMiB` sets the default function memory; the `disable*` flags toggle X-Ray tracing, reserved concurrency, and the Lambda-warming schedule; `logServiceName`, `disableLogs`, and `instantLogs` drive the logging pipeline. Resources across the `serviceInfoMap` are matched by module/environment/feature/application to resolve cross-service references.
 
 ```typescript
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 
 export default [
   defineAwsServiceAccountInfo('123456789012', 'us-east-1'),
@@ -88,7 +88,7 @@ interface ApiLayer {
 ## Examples
 
 ```typescript
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 
 export default [
   // Minimal: just the deploy target

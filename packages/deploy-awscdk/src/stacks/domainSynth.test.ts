@@ -1,6 +1,6 @@
-import { defineAwsServiceAccountInfo, defineDomainCertificate } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, QPQConfig } from 'quidproquo-core';
-import { defineApi, defineDns, defineWebEntry, qpqWebServerUtils } from 'quidproquo-webserver';
+import { defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, QPQConfig } from '@qpqjs/core';
+import { defineApi, defineDns, defineWebEntry, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

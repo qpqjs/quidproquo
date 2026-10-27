@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';

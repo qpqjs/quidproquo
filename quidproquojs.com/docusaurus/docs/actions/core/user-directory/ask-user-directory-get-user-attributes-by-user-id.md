@@ -11,7 +11,7 @@ Reads a user's profile attributes from a [user directory](../../../config/core/u
 - **On AWS:** issues Cognito `ListUsers` filtered on the `sub` attribute.
 
 ```typescript
-import { askUserDirectoryGetUserAttributesByUserId } from 'quidproquo-core';
+import { askUserDirectoryGetUserAttributesByUserId } from '@qpqjs/core';
 
 export function* askLoadProfileById(userId: string) {
   const attributes = yield* askUserDirectoryGetUserAttributesByUserId('app-users', userId);

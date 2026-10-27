@@ -56,10 +56,10 @@ const workspace = createEventDocWorkspace({
 
 `workspace.storeNames` then lists the slots that opted in. A slot built from `createEventDocDefinition` with `storeName` and `type` set already carries it, so nothing extra is needed there. The identity a slot is bound to only carries the wire address (`serviceName`, `basePath`, `id`), and the push topic needs the store name, which is why the slot config declares it.
 
-Mount the hook from `quidproquo-web-react` once per editor, below `WebsocketProvider` and `WebSocketAuthSync`:
+Mount the hook from `@qpqjs/web-react` once per editor, below `WebsocketProvider` and `WebSocketAuthSync`:
 
 ```typescript
-import { useEventDocWorkspaceSync } from 'quidproquo-web-react';
+import { useEventDocWorkspaceSync } from '@qpqjs/web-react';
 
 const [api, state] = useQpqRuntime(runtime, runtimeName);
 
@@ -79,7 +79,7 @@ useEventDocWorkspaceSync(workspace.storeNames, state, api);
 A page that reads a document through its own api (a public signing page that GETs a view, say) can still follow pushes with `useEventDocHeadMovedSubscription`:
 
 ```typescript
-import { useEventDocHeadMovedSubscription } from 'quidproquo-web-react';
+import { useEventDocHeadMovedSubscription } from '@qpqjs/web-react';
 
 useEventDocHeadMovedSubscription('envelopes', envelopeId, api.refresh);
 ```

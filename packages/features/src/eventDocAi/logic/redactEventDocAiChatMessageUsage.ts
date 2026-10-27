@@ -1,4 +1,4 @@
-import { omitKey } from 'quidproquo-core';
+import { omitKey } from '@qpqjs/core';
 
 import type { EventDocAiChatMessage } from '../models';
 

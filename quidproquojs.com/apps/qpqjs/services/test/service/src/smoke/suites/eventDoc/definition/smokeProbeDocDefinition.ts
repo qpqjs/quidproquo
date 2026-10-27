@@ -7,7 +7,7 @@ import {
   EventDocDocument,
   EventDocEvent,
   EventDocEventPayload,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import {
   SMOKE_EVENT_DOC_MARK_EVENT,

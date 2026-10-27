@@ -7,10 +7,10 @@ description: Declare an API key — a shared secret (an AWS API Gateway API key)
 
 Declares an **API key**: a named shared secret that callers present in the `x-api-key` request header to authenticate against a route. Unlike user-directory auth (which identifies a *user* via an access token), an API key identifies a *caller* — typically a machine, service, or third party. You declare the key here, reference it from a route's `routeAuthSettings.apiKeys`, and the runtime validates the presented header against the real key value.
 
-- **On AWS:** deploys an **API Gateway API key** (`aws_apigateway.ApiKey` via `QpqWebserverApiKeyConstruct` in `quidproquo-deploy-awscdk`). The key is created with `enabled: true`, its physical name is derived from the config (prefixed with application/module/environment), and its CloudFormation-exported id is what the runtime resolves to fetch the real key value during validation. If `value` is omitted, AWS generates the key value automatically.
+- **On AWS:** deploys an **API Gateway API key** (`aws_apigateway.ApiKey` via `QpqWebserverApiKeyConstruct` in `@qpqjs/deploy-awscdk`). The key is created with `enabled: true`, its physical name is derived from the config (prefixed with application/module/environment), and its CloudFormation-exported id is what the runtime resolves to fetch the real key value during validation. If `value` is omitted, AWS generates the key value automatically.
 
 ```typescript
-import { defineApiKey } from 'quidproquo-webserver';
+import { defineApiKey } from '@qpqjs/webserver';
 
 export default [
   // AWS generates the key value
@@ -64,7 +64,7 @@ When a route lists `apiKeys`, the runtime reads the `x-api-key` header from the 
 ## Examples
 
 ```typescript
-import { defineApiKey } from 'quidproquo-webserver';
+import { defineApiKey } from '@qpqjs/webserver';
 
 export default [
   // Let AWS generate the secret
@@ -83,5 +83,5 @@ export default [
 ## Related
 
 - [askApiKeyValidationValidate](../../actions/webserver/api-key-validation/ask-api-key-validation-validate.md) — the action that validates a presented key value against declared keys at runtime.
-- **Routes and APIs** reference a key through `routeAuthSettings.apiKeys` (see the `defineRoute` / `defineApi` config settings in quidproquo-webserver).
+- **Routes and APIs** reference a key through `routeAuthSettings.apiKeys` (see the `defineRoute` / `defineApi` config settings in @qpqjs/webserver).
 - [defineAuthSystem](./auth-system.md) — the other half of route auth: user-directory / access-token authentication.

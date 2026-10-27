@@ -11,7 +11,7 @@ Reads several [parameters](../../../config/core/parameter.md) at once, returning
 - **On AWS:** reads from AWS Systems Manager Parameter Store (`ssm:GetParameters`).
 
 ```typescript
-import { askConfigGetParameters } from 'quidproquo-core';
+import { askConfigGetParameters } from '@qpqjs/core';
 
 export function* askLoadEndpoints() {
   const [billingUrl, searchUrl] = yield* askConfigGetParameters(['billing-endpoint', 'search-endpoint']);

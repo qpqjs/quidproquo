@@ -18,7 +18,7 @@ Wires up **everything for org/tenant support**, declared identically in every se
 - **On AWS:** on the owner's deploy, this deploys everything [defineTenantStores](./tenant-stores.md) deploys (two DynamoDB tables and an S3 bucket) plus the `tenantMemberships` table and the API Gateway routes and Lambda handlers from [defineEventDocRoutes](./event-doc-routes.md) and the tenant routes below. On every other service's deploy, only the `tenantMemberships` reference resolves (no new table); the inline functions deploy no infrastructure of their own anywhere.
 
 ```typescript
-import { defineTenant } from 'quidproquo-features';
+import { defineTenant } from '@qpqjs/features';
 
 // Declare identically in every service — the owner service and any other
 // service that needs to tenant-scope its own collections.
@@ -57,7 +57,7 @@ On top of these, the stock event-doc route set (get, append, list events, assets
 `createTenantedRouteDefinition` stamps out a route family whose handlers run inside the request's typed scope after the membership gate. Its config takes a `permission` on top of the usual `knownErrors` and `schema`:
 
 ```typescript
-import { createTenantedRouteDefinition } from 'quidproquo-features';
+import { createTenantedRouteDefinition } from '@qpqjs/features';
 
 const caseRoute = createTenantedRouteDefinition('users', {}, { [ErrorTypeEnum.Forbidden]: 403 });
 

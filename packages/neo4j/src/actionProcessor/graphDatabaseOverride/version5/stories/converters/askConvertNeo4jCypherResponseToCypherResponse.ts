@@ -1,4 +1,4 @@
-import { AskResponse, GraphCypherResponse, GraphQueryResult } from 'quidproquo-core';
+import { AskResponse, GraphCypherResponse, GraphQueryResult } from '@qpqjs/core';
 
 import { Neo4jCypherResponse } from '../types';
 import { askConvertAnyNeo4jResultToAnyGraphResult } from './askConvertAnyNeo4jResultToAnyGraphResult';

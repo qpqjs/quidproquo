@@ -1,5 +1,5 @@
-import { askCatch, askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
+import { askCatch, askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../constants/tenantGlobalNames';
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';

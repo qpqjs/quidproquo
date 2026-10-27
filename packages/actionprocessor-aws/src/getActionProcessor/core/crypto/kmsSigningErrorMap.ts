@@ -1,4 +1,4 @@
-import { actionResultError } from 'quidproquo-core';
+import { actionResultError } from '@qpqjs/core';
 
 type SigningErrorTypes = {
   KeyUnavailable: string;

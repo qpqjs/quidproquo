@@ -1,7 +1,7 @@
-import { AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
+import { AskResponse, AuthenticateUserChallenge } from '@qpqjs/core';
 // TODO: Fix this import (name it up the chain)
-import { qpqWebServerUtils } from 'quidproquo-webserver';
-import { HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
+import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 
 import { authLogic } from '../../logic';
 

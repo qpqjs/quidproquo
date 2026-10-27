@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig } from 'quidproquo-core';
+import { Nullable, QPQConfig } from '@qpqjs/core';
 
 import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
 

@@ -1,6 +1,6 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
-// Shared webserver processors (dns, ...) are owned by quidproquo-actionprocessor-js and
+// Shared webserver processors (dns, ...) are owned by @qpqjs/actionprocessor-js and
 // spread in by getWebActionProcessors. This aggregator holds only web-specific webserver
 // processors (none yet).
 export const getWebserverActionProcessor: ActionProcessorListResolver = async (

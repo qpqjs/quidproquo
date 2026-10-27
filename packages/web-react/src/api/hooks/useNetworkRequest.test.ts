@@ -3,8 +3,8 @@ import { renderHook } from '@testing-library/react';
 
 const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
 
-vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => {
-  const original = await importOriginal<typeof import('quidproquo-webserver')>();
+vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => {
+  const original = await importOriginal<typeof import('@qpqjs/webserver')>();
   return { ...original, preformNetworkRequest };
 });
 

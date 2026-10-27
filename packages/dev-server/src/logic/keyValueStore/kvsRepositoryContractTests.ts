@@ -5,7 +5,7 @@ import {
   KvsQueryOperationType,
   KvsUpdateActionType,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs';
 import * as os from 'os';

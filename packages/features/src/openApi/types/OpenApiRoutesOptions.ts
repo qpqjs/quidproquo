@@ -1,4 +1,4 @@
-import { OpenApiDocumentOptions, RouteAuthSettings } from 'quidproquo-webserver';
+import { OpenApiDocumentOptions, RouteAuthSettings } from '@qpqjs/webserver';
 
 export type OpenApiRoutesOptions = {
   // Where the docs live, under the version prefix. Defaults to `/docs`; the raw

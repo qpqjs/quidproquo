@@ -1,4 +1,4 @@
-import { QpqAppDeployment } from 'quidproquo-core';
+import { QpqAppDeployment } from '@qpqjs/core';
 
 import { ClearResourcesPlan } from '../lib/clearResourcesPlan';
 import { DeployPlan, TeardownPlan } from '../lib/deployPrompts';

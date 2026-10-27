@@ -10,7 +10,7 @@ Reads a page of records from a [key-value store](../../../config/core/key-value-
 - **Action type:** `KeyValueStoreActionType.Scan`
 
 ```typescript
-import { askKeyValueStoreScan, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreScan, kvsEqual } from '@qpqjs/core';
 
 interface User {
   userId: string;

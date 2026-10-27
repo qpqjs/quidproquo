@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import {
   getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,

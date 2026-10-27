@@ -1,4 +1,4 @@
-import { getQpqAppDeployment, validateAwsDeployment } from 'quidproquo-config-aws';
+import { getQpqAppDeployment, validateAwsDeployment } from '@qpqjs/config-aws';
 
 import path from 'path';
 

@@ -7,7 +7,7 @@ description: UI state setters for the messages of the currently open Event Doc A
 
 These `ask`-generators are **client-side UI state setters** for the Event Doc AI chat feature. They run inside the browser SPA and mutate the in-memory `EventDocAiState` so the message pane re-renders. This page covers the setters for the **finalized messages** of the active chat (`chatMessages`) and the flag that gates loading a chat's history.
 
-Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `quidproquo-core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
+Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `@qpqjs/core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
 
 `chatMessages` holds only **finalized** turns. The live, in-flight assistant reply lives separately in `streamSegments` (see [Event Doc AI streaming & status state](./streaming-and-status-state.md)) and is folded into a finalized message once the reply completes.
 
@@ -54,8 +54,8 @@ Replaces the active chat's message list wholesale — typically called after loa
 - **State change:** sets `chatMessages` to the provided array.
 
 ```typescript
-import { askUIEventDocAiSetMessages } from 'quidproquo-features';
-import type { EventDocAiChatMessage } from 'quidproquo-features';
+import { askUIEventDocAiSetMessages } from '@qpqjs/features';
+import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* onHistoryLoaded(messages: EventDocAiChatMessage[]) {
   yield* askUIEventDocAiSetMessages(messages);
@@ -84,8 +84,8 @@ Appends a single finalized message to the end of the current thread — used to 
 - **State change:** pushes `message` onto the end of `chatMessages`.
 
 ```typescript
-import { askUIEventDocAiAppendChatMessage } from 'quidproquo-features';
-import type { EventDocAiChatMessage } from 'quidproquo-features';
+import { askUIEventDocAiAppendChatMessage } from '@qpqjs/features';
+import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* addUserTurn(text: string) {
   const message: EventDocAiChatMessage = {
@@ -119,7 +119,7 @@ Toggles the "loading this chat's history" flag so the message pane can show a sp
 - **State change:** sets `isLoadingHistory`.
 
 ```typescript
-import { askUIEventDocAiSetLoadingHistory, askUIEventDocAiSetMessages } from 'quidproquo-features';
+import { askUIEventDocAiSetLoadingHistory, askUIEventDocAiSetMessages } from '@qpqjs/features';
 
 export function* openChatHistory() {
   yield* askUIEventDocAiSetLoadingHistory(true);

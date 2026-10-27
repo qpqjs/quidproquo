@@ -1,4 +1,4 @@
-import { DynamicFunctionsActionType, ErrorTypeEnum, runStory, throwsError } from 'quidproquo-core';
+import { DynamicFunctionsActionType, ErrorTypeEnum, runStory, throwsError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

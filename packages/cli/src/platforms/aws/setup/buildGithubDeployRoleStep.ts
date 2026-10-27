@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import { GetRoleCommand, IAMClient } from '@aws-sdk/client-iam';
 

@@ -1,4 +1,4 @@
-import { replayEffects } from 'quidproquo-core';
+import { replayEffects } from '@qpqjs/core';
 
 import { foldEventDocLiveView } from '../../fold/foldEventDocLiveView';
 import { EventDocDocument, EventDocEvent } from '../../models';

@@ -1,1 +1,1 @@
-{ "label": "quidproquo-xstate", "position": 3, "link": { "type": "generated-index", "description": "Action requesters for driving XState state machines from a story." } }
+{ "label": "@qpqjs/xstate", "position": 3, "link": { "type": "generated-index", "description": "Action requesters for driving XState state machines from a story." } }

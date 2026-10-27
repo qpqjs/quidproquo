@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineKeyValueStore, KvsUpdateActionType, QPQConfig } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';

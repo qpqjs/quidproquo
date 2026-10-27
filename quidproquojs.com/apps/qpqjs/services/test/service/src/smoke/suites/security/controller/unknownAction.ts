@@ -1,5 +1,5 @@
 import { AskResponse, HTTPEventResponse } from 'quidproquo';
-import { dynamicRoute } from 'quidproquo-features';
+import { dynamicRoute } from '@qpqjs/features';
 
 // GET /security/unknown-action. Public. Yields an action type no processor
 // implements, so the probe can read what the platform sends a caller when the

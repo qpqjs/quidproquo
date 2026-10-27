@@ -3,13 +3,13 @@
 // react-flavoured swc options in getViewsRspackConfig. Dependency-specific
 // build quirks (ignored modules/warnings) are config-driven via
 // `defineBackendBundleOptions`: nothing package-specific lives here.
-import { USER_SCRIPT_MODULE_TYPES_QUERY } from 'quidproquo-core';
+import { USER_SCRIPT_MODULE_TYPES_QUERY } from '@qpqjs/core';
 
 import path from 'path';
 import { RuleSetRule } from '@rspack/core';
 
 // TypeScript via rspack's builtin swc loader. Decorators on to match
-// quidproquo-tsconfig; services are plain node code so no react transform.
+// @qpqjs/tsconfig; services are plain node code so no react transform.
 const swcNodeOptions = (tsx: boolean) => ({
   jsc: {
     parser: { syntax: 'typescript', tsx, decorators: true },

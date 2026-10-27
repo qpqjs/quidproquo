@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { askConfigGetParameter, buildTestQpqConfig, ConfigActionType, defineParameter } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askConfigGetParameter, buildTestQpqConfig, ConfigActionType, defineParameter } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

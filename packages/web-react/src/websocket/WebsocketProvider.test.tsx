@@ -4,8 +4,8 @@ import { render } from '@testing-library/react';
 
 const { destroy } = vi.hoisted(() => ({ destroy: vi.fn() }));
 
-vi.mock('quidproquo-web', async (importOriginal) => {
-  const original = await importOriginal<typeof import('quidproquo-web')>();
+vi.mock('@qpqjs/web', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@qpqjs/web')>();
   return {
     ...original,
     WebsocketService: class {

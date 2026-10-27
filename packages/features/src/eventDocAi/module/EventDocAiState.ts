@@ -1,4 +1,4 @@
-import type { Nullable } from 'quidproquo-core';
+import type { Nullable } from '@qpqjs/core';
 
 import type { EventDocAiChatMessage, EventDocAiChatSummary, EventDocAiMessageSegment } from '../models';
 

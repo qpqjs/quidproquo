@@ -10,7 +10,7 @@ Updates a record in a [key-value store](../../../config/core/key-value-store.md)
 - **Built from:** derives a `KvsUpdate` (via `kvsSet` / `kvsRemove`) from the object and calls [askKeyValueStoreUpdate](./ask-key-value-store-update.md). It is a helper story, not a distinct action.
 
 ```typescript
-import { askKeyValueStoreUpdatePartialProperties } from 'quidproquo-core';
+import { askKeyValueStoreUpdatePartialProperties } from '@qpqjs/core';
 
 interface User {
   userId: string;

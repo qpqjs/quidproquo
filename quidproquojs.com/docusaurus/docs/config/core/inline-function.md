@@ -10,7 +10,7 @@ Registers a story runtime as a named **inline function**. Once registered, any s
 - **On AWS:** deploys **no dedicated infrastructure** of its own. The referenced story is loaded and executed inside whatever Lambda is already running the calling story, sharing its action processors and session context. Registration simply makes the runtime resolvable by name.
 
 ```typescript
-import { defineInlineFunction } from 'quidproquo-core';
+import { defineInlineFunction } from '@qpqjs/core';
 
 export default [
   defineInlineFunction('/entry/functions/calculateTax::calculateTax'),
@@ -43,7 +43,7 @@ A reference to the story to register, usually a relative path string of the form
 ## Examples
 
 ```typescript
-import { defineInlineFunction } from 'quidproquo-core';
+import { defineInlineFunction } from '@qpqjs/core';
 
 export default [
   // Name derived from the story export ('calculateTax')

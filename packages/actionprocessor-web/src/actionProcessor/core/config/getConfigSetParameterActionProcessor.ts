@@ -6,7 +6,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigSetParameter> => {
   return async ({ parameterName, parameterValue }) => {

@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { MCP_SERVER_CONFIG_SETTING_TYPE } from '../constants/mcpServerConfigSettingType';
 import { McpConfig } from '../models/McpConfig';

@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { EventDocEffects } from '../../effects/EventDocEffects';
 import { EventDocDocument } from '../../models';

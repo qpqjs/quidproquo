@@ -1,4 +1,4 @@
-import { QpqAppDeployment } from 'quidproquo-core';
+import { QpqAppDeployment } from '@qpqjs/core';
 
 import { Mount, parseMounts } from './parseMounts';
 import { parsePortMappings, PortMapping } from './parsePortMappings';

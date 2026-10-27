@@ -1,4 +1,4 @@
-import { awsLambdaUtils } from 'quidproquo-actionprocessor-awslambda';
+import { awsLambdaUtils } from '@qpqjs/actionprocessor-aws';
 import {
   actionResult,
   actionResultError,
@@ -9,7 +9,7 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 

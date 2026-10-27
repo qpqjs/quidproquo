@@ -15,7 +15,7 @@ The **tenant memberships store** (`tenantMemberships`, partition key `userId`, s
 - **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (two DynamoDB tables plus an S3 bucket), plus one more DynamoDB table (via [defineKeyValueStore](../core/key-value-store.md)) for the record store.
 
 ```typescript
-import { defineTenantStores } from 'quidproquo-features';
+import { defineTenantStores } from '@qpqjs/features';
 
 export default [
   ...defineTenantStores(),
@@ -32,7 +32,7 @@ function defineTenantStores(): QPQConfig;
 
 ## Parameters
 
-None. All store names are fixed constants exported from `quidproquo-features`:
+None. All store names are fixed constants exported from `@qpqjs/features`:
 
 | Constant | Value | Store |
 | --- | --- | --- |

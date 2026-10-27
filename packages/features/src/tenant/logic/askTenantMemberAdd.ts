@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, askUserDirectoryGetUsersByAttribute, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, askUserDirectoryGetUsersByAttribute, ErrorTypeEnum } from '@qpqjs/core';
 
 import { TenantId } from '../models/TenantId';
 import { TenantMember } from '../models/TenantMember';

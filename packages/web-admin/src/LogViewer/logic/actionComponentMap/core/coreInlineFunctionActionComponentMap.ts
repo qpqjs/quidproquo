@@ -1,4 +1,4 @@
-import { InlineFunctionActionType } from 'quidproquo-core';
+import { InlineFunctionActionType } from '@qpqjs/core';
 
 const coreInlineFunctionActionComponentMap: Record<string, string[]> = {
   [InlineFunctionActionType.Execute]: ['askInlineFunctionExecute', 'functionName', 'payload'],

@@ -11,7 +11,7 @@ Sends a prompt to a large language model and resolves with the model's complete 
 - **On AWS:** runs through the [Vercel AI SDK](https://ai-sdk.dev) (`generateText`) against Amazon Bedrock. Any tools declared on the matching [defineAi](../../../config/core/ai.md) config are made available to the model, and the processor runs up to 20 tool-calling steps before returning.
 
 ```typescript
-import { askAiPrompt, AiModel } from 'quidproquo-core';
+import { askAiPrompt, AiModel } from '@qpqjs/core';
 
 export function* askSummarize(document: string) {
   const { text } = yield* askAiPrompt(
@@ -133,7 +133,7 @@ One knob for every model; what it means per model is under `reasoning` above.
 Catch failures with `askCatch`, which returns an `EitherActionResult` — `{ success: true, result }` or `{ success: false, error }`:
 
 ```typescript
-import { askCatch, askAiPrompt, AiModel } from 'quidproquo-core';
+import { askCatch, askAiPrompt, AiModel } from '@qpqjs/core';
 
 const outcome = yield* askCatch(askAiPrompt(AiModel.ClaudeHaiku45, prompt));
 if (!outcome.success) {

@@ -1,5 +1,5 @@
-import { AiToolDefinition, askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { AiToolDefinition, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { McpTool } from '../models/McpTool';
 import { McpToolBinding } from '../models/McpToolBinding';

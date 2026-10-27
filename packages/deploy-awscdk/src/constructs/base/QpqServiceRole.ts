@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, Resource, Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

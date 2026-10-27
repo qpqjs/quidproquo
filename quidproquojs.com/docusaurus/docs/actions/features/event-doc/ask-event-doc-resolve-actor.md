@@ -14,7 +14,7 @@ Resolves the acting user as an `EventDocEventActor` — `{ userId, userDisplayNa
 - **Built from:** [askConfigGetGlobal](../../core/config/ask-config-get-global.md) (the user-directory global) + [askUserDirectoryReadAccessToken](../../core/user-directory/ask-user-directory-read-access-token.md). Not a single action.
 
 ```typescript
-import { askEventDocResolveActor } from 'quidproquo-features';
+import { askEventDocResolveActor } from '@qpqjs/features';
 
 export function* appendController(docId: string, input: EventDocEventInput) {
   const actor = yield* askEventDocResolveActor();
@@ -44,7 +44,7 @@ Resolves just the acting user's id — a `string` — from the same validated ac
 - **Built from:** [askConfigGetGlobal](../../core/config/ask-config-get-global.md) + [askUserDirectoryReadAccessToken](../../core/user-directory/ask-user-directory-read-access-token.md). Not a single action.
 
 ```typescript
-import { askEventDocResolveUserId } from 'quidproquo-features';
+import { askEventDocResolveUserId } from '@qpqjs/features';
 
 export function* whoAmI() {
   return yield* askEventDocResolveUserId(); // string userId
@@ -70,8 +70,8 @@ function* askEventDocResolveUserId(): AskResponse<string>;
 Parses an HTTP request body as JSON, transparently base64-decoding it first when the event is base64-encoded, and throwing on malformed input. A typed convenience for controllers reading a JSON POST body (e.g. an `EventDocEventInput`).
 
 ```typescript
-import { askEventDocParseBody } from 'quidproquo-features';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askEventDocParseBody } from '@qpqjs/features';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 export function* appendRoute(event: HTTPEvent) {
   const input = yield* askEventDocParseBody<EventDocEventInput>(event);
@@ -89,7 +89,7 @@ function* askEventDocParseBody<T extends object>(event: HTTPEvent): AskResponse<
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `event` | `HTTPEvent` | The incoming HTTP event (from `quidproquo-webserver`); its `body` / `isBase64Encoded` fields are read. |
+| `event` | `HTTPEvent` | The incoming HTTP event (from `@qpqjs/webserver`); its `body` / `isBase64Encoded` fields are read. |
 
 ### Returns
 

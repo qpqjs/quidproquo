@@ -1,4 +1,4 @@
-import { ConfigActionType, CryptoActionType, FileActionType, SecureTokenActionType } from 'quidproquo-core';
+import { ConfigActionType, CryptoActionType, FileActionType, SecureTokenActionType } from '@qpqjs/core';
 
 /**
  * Action types whose successful result is a secret: the value is redacted and swept from the whole

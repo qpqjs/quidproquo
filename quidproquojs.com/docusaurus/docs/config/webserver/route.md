@@ -10,7 +10,7 @@ Defines an **HTTP route**: a mapping from an HTTP method and URL path to a **sto
 - **On AWS:** routes are not individual infrastructure. API Gateway proxies every request to the single API Lambda, which matches the request against all declared routes at runtime and dispatches to the matching story. See [defineApi](./api.md) for the deployed resources.
 
 ```typescript
-import { defineRoute } from 'quidproquo-webserver';
+import { defineRoute } from '@qpqjs/webserver';
 
 export default [
   defineRoute('GET', '/users/{userId}', '/src/routes/users/getUser::getUser'),
@@ -75,7 +75,7 @@ A reference to the story that handles the request. Usually written as a relative
 ## Examples
 
 ```typescript
-import { defineRoute } from 'quidproquo-webserver';
+import { defineRoute } from '@qpqjs/webserver';
 
 export default [
   // Public read endpoint

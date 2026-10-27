@@ -1,4 +1,4 @@
-import { AiToolDefinition } from 'quidproquo-core';
+import { AiToolDefinition } from '@qpqjs/core';
 
 import { McpToolBinding } from '../models/McpToolBinding';
 import { McpToolKind } from '../models/McpToolKind';

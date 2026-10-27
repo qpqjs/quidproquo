@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig } from '@qpqjs/core';
 
 import { aws_certificatemanager, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

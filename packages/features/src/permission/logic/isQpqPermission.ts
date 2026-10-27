@@ -1,4 +1,4 @@
-import { createBrandGuard } from 'quidproquo-core';
+import { createBrandGuard } from '@qpqjs/core';
 
 import { QpqPermission } from '../types/QpqPermission';
 

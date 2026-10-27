@@ -1,4 +1,4 @@
-import { QpqAppDeploySettings } from 'quidproquo-core';
+import { QpqAppDeploySettings } from '@qpqjs/core';
 
 /**
  * Deploy-time context handed to the app's account.qpq.ts / bootstrap.qpq.ts config

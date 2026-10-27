@@ -5,8 +5,8 @@ import {
   QPQConfig,
   QPQConfigAdvancedSettings,
   qpqCoreUtils,
-} from 'quidproquo-core';
-import { defineWebsocket } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineWebsocket } from '@qpqjs/webserver';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 

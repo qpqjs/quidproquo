@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { ContentSecurityPolicyEntry } from '../../../config/types/ResponseSecurityHeaders';
 import { DomainResolver } from '../../../domain/types/DomainResolver';

@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsEqual } from '@qpqjs/core';
 
 import { TenantId } from '../../tenant/models/TenantId';
 import { TENANT_EMAIL_INBOX_STORE } from '../constants/tenantEmailStoreNames';

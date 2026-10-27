@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 /**
  * The (unquoted) table a store lives in: qpq_kvs_<ownerModule>_<storeName>.

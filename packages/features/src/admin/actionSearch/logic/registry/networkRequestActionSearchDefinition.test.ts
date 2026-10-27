@@ -1,4 +1,4 @@
-import { ActionHistory, NetworkActionType, StoryResult } from 'quidproquo-core';
+import { ActionHistory, NetworkActionType, StoryResult } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

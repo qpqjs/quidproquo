@@ -1,4 +1,4 @@
-import { ActionProcessorResult, FileActionType, runStory } from 'quidproquo-core';
+import { ActionProcessorResult, FileActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

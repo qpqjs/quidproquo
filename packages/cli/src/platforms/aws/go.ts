@@ -5,9 +5,9 @@
 // service that opts into module federation has its federated remote published
 // (built + uploaded + manifest flipped), so a deploy that ships new backend
 // code also republishes the code the lambdas federate.
-import { QpqDeployEnvVar } from 'quidproquo-core';
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
-import { getServiceRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
+import { QpqDeployEnvVar } from '@qpqjs/core';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { getServiceRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
 
 import path from 'path';
 

@@ -1,2 +1,2 @@
-export * from 'quidproquo-core';
-export * from 'quidproquo-webserver';
+export * from '@qpqjs/core';
+export * from '@qpqjs/webserver';

@@ -4,7 +4,7 @@
 // Covers: no store, empty store, happy path + cache, missing/unexposed runtime, missing
 // exposes map, machine-independent (basePath-agnostic) advanced-runtime keys, and hot
 // swap to a newly published version on a warm container.
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import fs from 'fs';
 import os from 'os';

@@ -1,4 +1,4 @@
-import { DevServerConfigOverrides } from 'quidproquo-dev-server';
+import { DevServerConfigOverrides } from '@qpqjs/dev-server';
 
 // App-level dev server settings. The ports are the same locally and inside the docker image,
 // so a url that works against `npm run dev` works against the deployed container too.

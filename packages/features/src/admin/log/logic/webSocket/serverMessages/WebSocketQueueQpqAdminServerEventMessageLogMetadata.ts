@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from '@qpqjs/core';
 
 import { WebSocketQueueEventMessage } from '../../../../../webSocketQueue';
 import { WebSocketQueueQpqAdminServerMessageEventType } from './WebSocketQueueQpqAdminServerMessageEventType';

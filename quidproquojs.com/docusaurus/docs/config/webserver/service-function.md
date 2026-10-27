@@ -7,10 +7,10 @@ description: Define a callable service function — an RPC-style story deployed 
 
 Defines a **service function**: a story that can be invoked directly, RPC-style, rather than being exposed as an HTTP route. Service functions are the unit of cross-service (and in-service) direct invocation — a story calls one with a typed payload and receives a typed result using [askServiceFunctionExecute](../../actions/webserver/service-function/ask-service-function-execute.md).
 
-- **On AWS:** deploys a **dedicated Lambda** (`QpqWebserverServiceFunctionConstruct` in `quidproquo-deploy-awscdk`, named `<functionName>-sfunc`) with a ~14.5-minute timeout. `askServiceFunctionExecute` invokes it directly by name — synchronously by default, or as a fire-and-forget async invocation when requested.
+- **On AWS:** deploys a **dedicated Lambda** (`QpqWebserverServiceFunctionConstruct` in `@qpqjs/deploy-awscdk`, named `<functionName>-sfunc`) with a ~14.5-minute timeout. `askServiceFunctionExecute` invokes it directly by name — synchronously by default, or as a fire-and-forget async invocation when requested.
 
 ```typescript
-import { defineServiceFunction } from 'quidproquo-webserver';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 export default [
   defineServiceFunction('/src/functions/resizeImage::resizeImage'),
@@ -48,7 +48,7 @@ A reference to the story the service function runs. Usually a relative path stri
 ## Examples
 
 ```typescript
-import { defineServiceFunction } from 'quidproquo-webserver';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 export default [
   // Named by its story

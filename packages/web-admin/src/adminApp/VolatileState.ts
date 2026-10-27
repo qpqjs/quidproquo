@@ -1,5 +1,5 @@
-import { StoryResultMetadata } from 'quidproquo-core';
-import { LogLog } from 'quidproquo-features';
+import { StoryResultMetadata } from '@qpqjs/core';
+import { LogLog } from '@qpqjs/features';
 
 // Server-derived / transient data that is NOT part of the audited session fold.
 // Search results are a cache keyed by the raw search params that produced them

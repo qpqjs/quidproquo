@@ -7,8 +7,8 @@ import {
   QPQConfig,
   StoryResult,
   toCrossServiceSession,
-} from 'quidproquo-core';
-import { askServiceFunctionExecuteBase, ServiceFunctionActionType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { askServiceFunctionExecuteBase, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { eventBus } from '../../../logic/eventBus';
 import { AnyExecuteServiceFunctionEventWithSession } from '../../core/event/node/serviceFunction/types';

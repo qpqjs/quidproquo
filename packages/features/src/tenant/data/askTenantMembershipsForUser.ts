@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsEqual } from '@qpqjs/core';
 
 import { TENANT_MEMBERSHIPS_STORE } from '../constants/tenantStoreNames';
 import { TenantMembership } from '../models/TenantMembership';

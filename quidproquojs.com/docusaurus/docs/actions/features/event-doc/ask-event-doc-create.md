@@ -10,7 +10,7 @@ Creates a new event document. It seeds the document's log with an `INIT_STATE` e
 - **Built from:** [askEventDocSeedInitState](#askeventdocseedinitstate) (writes the `INIT_STATE` event) then the summary reducer + [askEventDocUpsert](#askeventdocupsert) (persists the derived record). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
 ```typescript
-import { askEventDocCreate } from 'quidproquo-features';
+import { askEventDocCreate } from '@qpqjs/features';
 
 export function* createArticle(name: string, code: string) {
   const summary = yield* askEventDocCreate(name, code, {
@@ -57,7 +57,7 @@ A point-in-time snapshot of who produced an event, captured server-side at appen
 
 ## Notes
 
-- The record is validated against `eventDocSummaryViewSchema` before it is written; a schema violation throws (`ErrorTypeEnum` from quidproquo-core).
+- The record is validated against `eventDocSummaryViewSchema` before it is written; a schema violation throws (`ErrorTypeEnum` from @qpqjs/core).
 - Not concurrency-safe against duplicate codes on its own. If two callers may create the same `code` at once, prefer [askEventDocGetByCodeOrCreate](./ask-event-doc-get-by-code.md#askeventdocgetbycodeorcreate) and serialise, or add a conditional create.
 
 ---
@@ -107,6 +107,6 @@ Prefer the higher-level lifecycle actions over calling `askEventDocUpsert` direc
 - [askEventDocGetByCodeOrCreate](./ask-event-doc-get-by-code.md#askeventdocgetbycodeorcreate) — create-on-first-use built on top of this.
 - [askEventDocGetById / askEventDocGetByIdOrThrow](./ask-event-doc-get-by-id.md) — read the record back.
 - [askEventDocSoftDelete](./ask-event-doc-soft-delete.md) — retire a document.
-- **Appending events after create:** `askEventDocEventAppend` (quidproquo-features) applies each later event through the same reducer.
+- **Appending events after create:** `askEventDocEventAppend` (@qpqjs/features) applies each later event through the same reducer.
 - [defineEventDocSummary](../../../config/features/event-doc-summary.md) — declares the store this writes to.
 - [askNewGuid](../../core/guid/ask-new-guid.md) / [askDateNow](../../core/date/ask-date-now.md) — the core actions the create path uses for id and timestamps.

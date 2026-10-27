@@ -10,7 +10,7 @@ import {
   kvsOr,
   kvsRemove,
   kvsSet,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocSummary, EventDocSummaryView } from '../models';

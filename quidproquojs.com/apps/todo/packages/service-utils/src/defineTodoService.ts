@@ -15,11 +15,11 @@ import {
   AwsDataStoreRemovalPolicy,
   defineAwsDataStoreRemovalPolicy,
   defineAwsServiceAccountInfo,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 import {
   defineAdminSettings,
   defineAdminUserDirectory,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import { execSync } from 'child_process';
 import {
@@ -95,7 +95,7 @@ export const defineTodoService = (
     }
   ),
 
-  // Module-federation singletons beyond the react/quidproquo-web defaults.
+  // Module-federation singletons beyond the react/@qpqjs/web defaults.
   defineFrontendBundleOptions({
     sharedSingletons: ['chakra', 'zod'],
   }),

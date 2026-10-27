@@ -4,8 +4,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
-      'quidproquo-core': path.resolve(__dirname, '../core/src'),
-      'quidproquo-webserver': path.resolve(__dirname, '../webserver/src'),
+      '@qpqjs/core': path.resolve(__dirname, '../core/src'),
+      '@qpqjs/webserver': path.resolve(__dirname, '../webserver/src'),
     },
   },
   test: {

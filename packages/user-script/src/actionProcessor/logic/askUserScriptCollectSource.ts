@@ -1,4 +1,4 @@
-import { askFileListAllDirectory, askFileReadTextContents, AskResponse, askThrowError, askUserScriptBuild } from 'quidproquo-core';
+import { askFileListAllDirectory, askFileReadTextContents, AskResponse, askThrowError, askUserScriptBuild } from '@qpqjs/core';
 
 import { USER_SCRIPT_SOURCE_LIMITS } from './USER_SCRIPT_SOURCE_LIMITS';
 import { UserScriptSourceFile } from './UserScriptSourceFile';

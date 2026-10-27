@@ -1,4 +1,4 @@
-import { useAuthAccessToken } from 'quidproquo-web-react';
+import { useAuthAccessToken } from '@qpqjs/web-react';
 
 import { ComponentType, memo } from 'react';
 

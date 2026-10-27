@@ -10,7 +10,7 @@ Adds an **MCP server** to a service: a single HTTP endpoint (streamable HTTP, st
 Callers send a Bearer access token. By default it is checked against `userDirectoryName`, and every tool call runs as that user. The server offers the tools in `options.tools` plus the tools of every [defineMcpToolset](#defineMcpToolset) in the same service. Tools are listed on each request, so a tool added to a toolset's source shows up after the next deploy.
 
 ```typescript
-import { defineMcpServer } from 'quidproquo-features';
+import { defineMcpServer } from '@qpqjs/features';
 
 export default [
   defineMcpServer({
@@ -68,7 +68,7 @@ One service's MCP server can offer the toolsets of other services, so a client c
 In the service that owns the tools, `defineMcpToolsetExport()` offers its toolsets (its `defineMcpToolset` registrations) as two backend-only service functions, one to list the tools and one to run one:
 
 ```typescript
-import { defineMcpEventDocAiToolset, defineMcpToolsetExport } from 'quidproquo-features';
+import { defineMcpEventDocAiToolset, defineMcpToolsetExport } from '@qpqjs/features';
 
 // in the template service
 export default [
@@ -80,7 +80,7 @@ export default [
 In the service with the MCP server, `defineMcpRemoteToolset` adds them under a prefix:
 
 ```typescript
-import { defineMcpRemoteToolset, defineMcpServer } from 'quidproquo-features';
+import { defineMcpRemoteToolset, defineMcpServer } from '@qpqjs/features';
 
 export default [
   defineMcpServer({ userDirectoryName: 'users' }),

@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 /**
  * The key a subscription is filed under: the connection's validated storage scope in front of the client's topic, so

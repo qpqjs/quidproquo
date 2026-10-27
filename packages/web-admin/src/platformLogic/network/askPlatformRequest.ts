@@ -1,4 +1,4 @@
-import { askContextRead, askNetworkRequest, HTTPMethod, HTTPRequestOptions } from 'quidproquo-core';
+import { askContextRead, askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
 
 import { askLoadAuthToken } from '../config';
 import { baseUrlsContext } from '../contexts';

@@ -1,10 +1,10 @@
-# quidproquo-actionprocessor-web
+# @qpqjs/actionprocessor-web
 
 The browser runtime for [quidproquo](https://github.com/qpqjs/quidproquo).
 
 A qpq story yields actions, and a **processor** is the function that actually carries one out. This package supplies the processors a story needs when it runs in the browser, so the same story code can run on the client and the server.
 
-You do not usually install this yourself. It arrives as a dependency of `quidproquo-web-react`.
+You do not usually install this yourself. It arrives as a dependency of `@qpqjs/web-react`.
 
 ## What it implements
 
@@ -12,7 +12,7 @@ You do not usually install this yourself. It arrives as a dependency of `quidpro
 - **Api actions**: calling your qpq service apis from the client, with the same typed requesters the backend uses
 - **Config**: reading client-side config values
 
-Everything platform-neutral (dates, guids, http, logging) comes from `quidproquo-actionprocessor-js`.
+Everything platform-neutral (dates, guids, http, logging) comes from `@qpqjs/actionprocessor-js`.
 
 ## The point of it
 

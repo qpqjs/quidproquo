@@ -1,4 +1,4 @@
-import { KeyValueStoreActionType, kvsExists, runStory } from 'quidproquo-core';
+import { KeyValueStoreActionType, kvsExists, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

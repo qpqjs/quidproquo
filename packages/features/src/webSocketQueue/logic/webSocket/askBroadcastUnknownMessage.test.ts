@@ -1,4 +1,4 @@
-import { ConfigActionType, ContextActionType, EventBusActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, ContextActionType, EventBusActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -11,7 +11,7 @@ Signs a user in against a [user directory](../../../config/core/user-directory.m
 - **On AWS:** issues Cognito `AdminInitiateAuth` — `ADMIN_USER_PASSWORD_AUTH` for a normal sign-in, or `CUSTOM_AUTH` when `isCustom` is `true` (requires a [customAuthRuntime](../../../config/core/user-directory.md#custom-auth-runtime)).
 
 ```typescript
-import { askUserDirectoryAuthenticateUser, AuthenticateUserChallenge } from 'quidproquo-core';
+import { askUserDirectoryAuthenticateUser, AuthenticateUserChallenge } from '@qpqjs/core';
 
 export function* askSignIn(email: string, password: string) {
   const result = yield* askUserDirectoryAuthenticateUser('app-users', false, email, password);
@@ -101,7 +101,7 @@ interface AuthenticationInfo {
 | `UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound` | The email or password is incorrect. Unknown users and wrong passwords are deliberately reported the same way so callers cannot probe which accounts exist. |
 | `UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword` | A standard (`isCustom: false`) sign-in was attempted without a password. Thrown before the request reaches the identity provider. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askUserDirectoryAuthenticateUser('app-users', false, email, password));

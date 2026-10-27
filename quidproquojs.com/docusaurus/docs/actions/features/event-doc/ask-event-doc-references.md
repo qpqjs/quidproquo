@@ -12,7 +12,7 @@ This is the **transfer export's** read — it exports the whole history and must
 - **Built from:** [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore) (to read the collection's `storeName`/`type`, which address its functions registration) and `askEventDocEventListAll` (the full log `collectReferences` folds). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
 ```typescript
-import { askEventDocReferences } from 'quidproquo-features';
+import { askEventDocReferences } from '@qpqjs/features';
 
 export function* readTemplateDependencies(templateId: string) {
   const links = yield* askEventDocReferences(templateId);

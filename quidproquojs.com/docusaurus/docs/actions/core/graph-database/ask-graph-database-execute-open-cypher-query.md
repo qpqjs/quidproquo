@@ -11,7 +11,7 @@ Runs an [openCypher](https://opencypher.org/) query against a [graph database](.
 - **On AWS:** the processor resolves the database's Neptune endpoints, picks the reader or writer based on `instance`, POSTs the query to Neptune's `/openCypher` HTTP endpoint, and converts the Neptune response into the [`GraphCypherResponse`](#returns) shape.
 
 ```typescript
-import { askGraphDatabaseExecuteOpenCypherQuery, GraphDatabaseInstanceType } from 'quidproquo-core';
+import { askGraphDatabaseExecuteOpenCypherQuery, GraphDatabaseInstanceType } from '@qpqjs/core';
 
 export function* askFindFriends(userId: string) {
   const response = yield* askGraphDatabaseExecuteOpenCypherQuery(
@@ -125,7 +125,7 @@ type GraphScalarResult = number | string | boolean | null;
 Because nodes and relationships share `$id` and `$properties` and are tagged by `$entityType`, you can narrow a value safely:
 
 ```typescript
-import { GraphEntityType } from 'quidproquo-core';
+import { GraphEntityType } from '@qpqjs/core';
 
 function describe(value: AnyGraphResult): string {
   if (value === null || typeof value !== 'object') {

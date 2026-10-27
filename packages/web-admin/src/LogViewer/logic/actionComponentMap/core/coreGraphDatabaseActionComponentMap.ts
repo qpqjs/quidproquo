@@ -1,4 +1,4 @@
-import { GraphDatabaseActionType } from 'quidproquo-core';
+import { GraphDatabaseActionType } from '@qpqjs/core';
 
 const coreGraphDatabaseActionComponentMap: Record<string, string[]> = {
   [GraphDatabaseActionType.ExecuteOpenCypherQuery]: [

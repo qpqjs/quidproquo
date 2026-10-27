@@ -10,7 +10,7 @@ Returns the number of **milliseconds** left before the platform terminates the c
 - **Action type:** `SystemActionType.GetRuntimeRemainingTime`
 
 ```typescript
-import { askGetRuntimeRemainingTime } from 'quidproquo-core';
+import { askGetRuntimeRemainingTime } from '@qpqjs/core';
 
 const HANDOFF_HEADROOM_MS = 60_000;
 

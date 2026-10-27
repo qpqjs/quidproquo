@@ -1,5 +1,5 @@
-import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
-import { resolveScheduleFields, ScheduleQPQConfigSetting } from 'quidproquo-core';
+import { LambdaRuntimeConfig } from '@qpqjs/actionprocessor-aws';
+import { resolveScheduleFields, ScheduleQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

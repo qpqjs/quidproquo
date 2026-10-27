@@ -1,5 +1,5 @@
-import { ContextActionType, runStory, StateActionType } from 'quidproquo-core';
-import { eventDocAiContext, ServiceActionType } from 'quidproquo-features';
+import { ContextActionType, runStory, StateActionType } from '@qpqjs/core';
+import { eventDocAiContext, ServiceActionType } from '@qpqjs/features';
 
 import { describe, expect, it } from 'vitest';
 

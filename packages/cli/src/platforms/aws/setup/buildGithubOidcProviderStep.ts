@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import { GetOpenIDConnectProviderCommand, IAMClient } from '@aws-sdk/client-iam';
 

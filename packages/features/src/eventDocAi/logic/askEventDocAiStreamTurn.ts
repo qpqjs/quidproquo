@@ -13,7 +13,7 @@ import {
   AskResponse,
   askStreamMap,
   type Nullable,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askEventDocResolveScope, EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';

@@ -1,6 +1,6 @@
-import { createRuntime, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from 'quidproquo-core';
-import * as qpqCore from 'quidproquo-core';
-import * as qpqWebserver from 'quidproquo-webserver';
+import { createRuntime, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from '@qpqjs/core';
+import * as qpqCore from '@qpqjs/core';
+import * as qpqWebserver from '@qpqjs/webserver';
 
 import { randomUUID } from 'crypto';
 import path from 'path';
@@ -305,7 +305,7 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         replServer.setPrompt(`qpq:${serviceName}> `);
       };
 
-      // Import all the ask functions from quidproquo-core for convenience
+      // Import all the ask functions from @qpqjs/core for convenience
       const qpqConxtext = { ...qpqCore, ...qpqWebserver };
       // replServer.context.qpq = qpqConxtext;
 

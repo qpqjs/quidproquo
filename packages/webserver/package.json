@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-webserver",
+  "name": "@qpqjs/webserver",
   "version": "0.1.34",
   "description": "",
   "main": "./lib/commonjs/index.js",
@@ -35,10 +35,10 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "0.1.34"
+    "@qpqjs/core": "0.1.34"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.1.34",
+    "@qpqjs/tsconfig": "0.1.34",
     "typescript": "^5.8.2"
   }
 }

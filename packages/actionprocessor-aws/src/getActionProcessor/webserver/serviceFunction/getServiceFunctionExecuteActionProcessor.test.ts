@@ -1,6 +1,6 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, buildTestStorySession } from 'quidproquo-core';
-import { ServiceFunctionActionType } from 'quidproquo-webserver';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/core';
+import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

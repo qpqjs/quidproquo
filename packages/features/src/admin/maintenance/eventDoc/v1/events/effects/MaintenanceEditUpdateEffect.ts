@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { MaintenanceEffect } from './MaintenanceEffect';
 import { MaintenanceUpdateData } from './MaintenanceUpdateData';

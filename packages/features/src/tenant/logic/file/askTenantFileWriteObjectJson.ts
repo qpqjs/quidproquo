@@ -1,4 +1,4 @@
-import { askFileWriteObjectJson, AskResponse, StorageDriveAdvancedWriteOptions } from 'quidproquo-core';
+import { askFileWriteObjectJson, AskResponse, StorageDriveAdvancedWriteOptions } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

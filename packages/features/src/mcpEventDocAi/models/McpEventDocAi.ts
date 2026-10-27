@@ -1,4 +1,4 @@
-import { AiToolDefinition } from 'quidproquo-core';
+import { AiToolDefinition } from '@qpqjs/core';
 
 import { EventDocStore } from '../../eventDoc/types/EventDocStore';
 

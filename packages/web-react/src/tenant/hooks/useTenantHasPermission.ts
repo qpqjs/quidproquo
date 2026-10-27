@@ -1,5 +1,5 @@
-import { Nullable } from 'quidproquo-core';
-import { createTenantHasPermissionSelector, QpqPermission } from 'quidproquo-features';
+import { Nullable } from '@qpqjs/core';
+import { createTenantHasPermissionSelector, QpqPermission } from '@qpqjs/features';
 
 import { useMemo } from 'react';
 

@@ -5,7 +5,7 @@
 // isn't enough friction. Owned-only so a cross-module ref (e.g. a membership
 // table every service declares against one owner) appears exactly once, on
 // the service that owns it.
-import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 import { getServiceNames } from './discovery';
 import { promptCheckbox, promptSelect, promptText } from './prompts';

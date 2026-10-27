@@ -11,8 +11,8 @@ import {
   LogLevelEnumLookup,
   QpqPagedData,
   resolveLookupValues,
-} from 'quidproquo-core';
-import { LogLog } from 'quidproquo-features';
+} from '@qpqjs/core';
+import { LogLog } from '@qpqjs/features';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
 import { askUIVolatileLogLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogLogSearchCompleted';

@@ -8,7 +8,7 @@
     "validate-ts": "tsc --noEmit"
   },
   "dependencies": {
-    "quidproquo-core": "0.1.34"
+    "@qpqjs/core": "0.1.34"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

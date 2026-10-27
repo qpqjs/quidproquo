@@ -6,8 +6,8 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
-import { WebsocketEvent, WebSocketEventType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { WebsocketEvent, WebSocketEventType } from '@qpqjs/webserver';
 
 export const webSocketEventGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.WEBSOCKET_EVENT) {

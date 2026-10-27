@@ -1,4 +1,4 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, Nullable } from '@qpqjs/core';
 
 import { getTenantIdFromScope } from '../logic/storageScope';
 import { TenantId } from '../models/TenantId';

@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askWebsocketProvideConnectionInfo } from '../../context/websocketConnectionInfoContext';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';

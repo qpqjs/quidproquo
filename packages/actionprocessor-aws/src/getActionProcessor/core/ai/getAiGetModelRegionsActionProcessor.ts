@@ -8,7 +8,7 @@ import {
   AiModelRegionMap,
   askAiGetModelRegions,
   ProcessorFor,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { bedrockModelMap } from './aiModelMap';
 

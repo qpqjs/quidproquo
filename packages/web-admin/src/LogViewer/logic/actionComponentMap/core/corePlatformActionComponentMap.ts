@@ -1,4 +1,4 @@
-import { PlatformActionType } from 'quidproquo-core';
+import { PlatformActionType } from '@qpqjs/core';
 
 const corePlatformActionComponentMap: Record<string, string[]> = {
   [PlatformActionType.Delay]: ['askDelay', 'timeMs'],

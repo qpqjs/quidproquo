@@ -20,8 +20,8 @@ import {
   QpqIsoDateTime,
   runStory,
   throwsError,
-} from 'quidproquo-core';
-import { WebsocketActionType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

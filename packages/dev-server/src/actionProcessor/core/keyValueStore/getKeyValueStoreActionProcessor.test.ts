@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, KeyValueStoreActionType, noopDynamicModuleLoader } from 'quidproquo-core';
+import { buildTestQpqConfig, KeyValueStoreActionType, noopDynamicModuleLoader } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineEventBus, defineQueue, EventBusActionType, QueueActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, defineEventBus, defineQueue, EventBusActionType, QueueActionType } from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

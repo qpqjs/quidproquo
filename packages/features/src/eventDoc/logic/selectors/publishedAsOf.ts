@@ -1,4 +1,4 @@
-import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocSummary, EventDocVersion } from '../../models';
 import { maxByVersion } from './maxByVersion';

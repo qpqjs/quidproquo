@@ -6,7 +6,7 @@ import {
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
   GraphDatabaseInstanceType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askGraphDatabaseForNeptuneGetEndpoints } from '../customActions';
 import { askConvertNeptuneCypherResponseToCypherResponse } from './converters/askConvertNeptuneCypherResponseToCypherResponse';

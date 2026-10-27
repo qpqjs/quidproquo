@@ -1,5 +1,5 @@
-import { defineAccountEmailReceiving, defineAccountGithubOidcProvider, defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { defineAccountEmailReceiving, defineAccountGithubOidcProvider, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/core';
 
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

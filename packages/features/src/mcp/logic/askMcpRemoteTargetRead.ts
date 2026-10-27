@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { MCP_REMOTE_PREFIX_GLOBAL } from '../constants/mcpRemotePrefixGlobal';
 import { MCP_REMOTE_SERVICE_GLOBAL } from '../constants/mcpRemoteServiceGlobal';

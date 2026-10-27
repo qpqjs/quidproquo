@@ -1,4 +1,4 @@
-import { actionResult, askDateNow, createActionProcessor, getQpqIsoDateTimeFromDate, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askDateNow, createActionProcessor, getQpqIsoDateTimeFromDate, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessDateNow = (qpqConfig: QPQConfig): ProcessorFor<typeof askDateNow> => {
   return async () => {

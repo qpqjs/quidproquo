@@ -1,5 +1,5 @@
-import { askFileWriteTextContents, AskResponse, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { askFileWriteTextContents, AskResponse, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { QpqStoreTraceResultPayload } from '../../config/traceLogServiceFunction';
 import { askSendTraceDoneToAdmins } from '../../logic/webSocket/askSendTraceDoneToAdmins';

@@ -12,7 +12,7 @@ The wrapped story's return value is passed straight back out, so you can wrap an
 - **Action type:** implemented on top of [askOverrideActions](../system/ask-override-actions.md) — it intercepts `Context/Read` (and the internal `Context/List`) for the matching identifier while the sub-story runs, and injects the value onto every relayed action so it survives into nested runtimes.
 
 ```typescript
-import { askContextProvideValue, askContextRead, createContextIdentifier } from 'quidproquo-core';
+import { askContextProvideValue, askContextRead, createContextIdentifier } from '@qpqjs/core';
 
 export const CurrentTenantContext = createContextIdentifier<string>('current-tenant', 'public');
 
@@ -54,7 +54,7 @@ The value returned by `storyIterator` — its type is inferred, so wrapping a st
 When you provide the same context in many places, `createContextProvider` builds a typed wrapper so you don't repeat the identifier at every call site. You give it the identifier and a mapper from your own arguments to the context value; it returns a generator you call with those arguments plus the sub-story:
 
 ```typescript
-import { createContextProvider, createContextIdentifier } from 'quidproquo-core';
+import { createContextProvider, createContextIdentifier } from '@qpqjs/core';
 
 const CurrentUserContext = createContextIdentifier<{ id: string } | null>('current-user', null);
 

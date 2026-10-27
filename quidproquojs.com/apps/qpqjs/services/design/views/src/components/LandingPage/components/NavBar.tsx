@@ -1,4 +1,4 @@
-import { getWebEntryUrl } from 'quidproquo-web';
+import { getWebEntryUrl } from '@qpqjs/web';
 
 const getDocsUrl = (): string => getWebEntryUrl('docs');
 

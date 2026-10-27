@@ -1,4 +1,4 @@
-import { actionResult, askRandomNumber, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askRandomNumber, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessMathRandomNumber = (qpqConfig: QPQConfig): ProcessorFor<typeof askRandomNumber> => {
   return async () => {

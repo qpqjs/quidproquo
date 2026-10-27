@@ -6,8 +6,8 @@ import {
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
-import { ServiceFunctionActionType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

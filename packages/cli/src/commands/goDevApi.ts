@@ -10,7 +10,7 @@
 // infrastructure.ts is evaluated once at launch and baked into the
 // `quidproquo-dynamic-loader` virtual module — config changes need a full
 // `go:dev:api` restart.
-import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
+import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
 import fs from 'fs';
@@ -27,7 +27,7 @@ import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from 
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 
-// 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
+// 8080/8888 are set in the generated entry; 3001 is the @qpqjs/dev-server
 // file-storage (secure URL) default port.
 const getDevServerPortList = (appName: string): number[] => Object.values(readDevServerPorts(appName));
 const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');

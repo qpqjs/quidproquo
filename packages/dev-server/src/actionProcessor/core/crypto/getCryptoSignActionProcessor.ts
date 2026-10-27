@@ -1,4 +1,4 @@
-import { rs256Sign } from 'quidproquo-actionprocessor-node';
+import { rs256Sign } from '@qpqjs/actionprocessor-node';
 import {
   actionResult,
   actionResultError,
@@ -8,7 +8,7 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getOrSeedSigningKeyPair } from '../../../logic/signingKeys';
 import { ResolvedDevServerConfig } from '../../../types';

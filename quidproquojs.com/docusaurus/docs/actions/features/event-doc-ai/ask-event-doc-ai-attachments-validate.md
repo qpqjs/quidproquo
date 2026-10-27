@@ -12,7 +12,7 @@ It runs inside [askEventDocAiProcessSend](./ask-event-doc-ai-process-send.md) be
 - Built from [askFileExists](../../core/file/ask-file-exists.md) and `askThrowError`.
 
 ```typescript
-import { askEventDocAiAttachmentsValidate } from 'quidproquo-features';
+import { askEventDocAiAttachmentsValidate } from '@qpqjs/features';
 
 export function* askGuardAttachments(drive: string, docId: string, attachments) {
   // throws if any attachment is malformed or missing

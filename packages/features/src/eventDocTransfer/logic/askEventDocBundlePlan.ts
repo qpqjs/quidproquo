@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EventDocBundle, EventDocTransferPlanRow, EventDocTransferRegistry } from '../models';
 import { askEventDocBundlePlanDoc } from './askEventDocBundlePlanDoc';

@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticationInfo } from '@qpqjs/core';
 
 import { useEffect } from 'react';
 

@@ -1,10 +1,10 @@
-import { generateUuid } from 'quidproquo-core';
+import { generateUuid } from '@qpqjs/core';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
   WebSocketQueueServerEventMessageServiceRequestResponse,
   WebSocketQueueServerMessageEventType,
-} from 'quidproquo-features';
-import { WebsocketService, WebsocketServiceEvent } from 'quidproquo-web';
+} from '@qpqjs/features';
+import { WebsocketService, WebsocketServiceEvent } from '@qpqjs/web';
 
 import { useRef } from 'react';
 

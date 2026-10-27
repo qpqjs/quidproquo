@@ -11,7 +11,7 @@ Updates a user's profile attributes in a [user directory](../../../config/core/u
 - **On AWS:** issues Cognito `AdminUpdateUserAttributes`.
 
 ```typescript
-import { askUserDirectorySetUserAttributes } from 'quidproquo-core';
+import { askUserDirectorySetUserAttributes } from '@qpqjs/core';
 
 export function* askUpdateProfile(username: string) {
   yield* askUserDirectorySetUserAttributes('app-users', username, {

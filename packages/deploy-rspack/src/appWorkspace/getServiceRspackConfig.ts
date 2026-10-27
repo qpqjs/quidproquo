@@ -5,8 +5,8 @@
 // (commonjs2) and QpqPlugin. On top we add a TypeScript loader and force
 // single-file lambda bundles. `@scope/*` resolves via workspace node_modules
 // symlinks to built dist, so no tsconfig-paths plugin is needed.
-import { getLambdaEntries } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig } from 'quidproquo-core';
+import { getLambdaEntries } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration } from '@rspack/core';

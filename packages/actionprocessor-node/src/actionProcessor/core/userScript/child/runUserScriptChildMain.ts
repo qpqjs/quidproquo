@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig, UserScriptRunnerEvent } from 'quidproquo-core';
+import { DynamicModuleLoader, QPQConfig, UserScriptRunnerEvent } from '@qpqjs/core';
 
 import { handleUserScriptRunnerEvent } from './handleUserScriptRunnerEvent';
 

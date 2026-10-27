@@ -1,4 +1,4 @@
-import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from 'quidproquo-core';
+import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

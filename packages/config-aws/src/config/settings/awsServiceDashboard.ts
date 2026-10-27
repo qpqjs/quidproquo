@@ -1,4 +1,4 @@
-import { QPQConfigSetting } from 'quidproquo-core';
+import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 

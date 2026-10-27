@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, AskResponse } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, AskResponse } from '@qpqjs/core';
 
 import { eventDocStorageDriveName } from '../../eventDoc/constants/eventDocStorageDriveName';
 import { eventDocAssetPath } from '../../eventDoc/data/eventDocAssetPath';

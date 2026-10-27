@@ -11,7 +11,7 @@ import {
   defineAccountGithubOidcProvider,
   defineAccountSecurityServices,
   defineAwsDataStoreRemovalPolicy,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 
 export default (): QPQConfig => [
   // Dev account: data stores created by the account stack are torn down with it.

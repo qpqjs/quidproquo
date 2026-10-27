@@ -1,4 +1,4 @@
-import { askDateNow, AskResponse, LogLevelEnum, NotifyErrorQueueTimeoutEventPayload } from 'quidproquo-core';
+import { askDateNow, AskResponse, LogLevelEnum, NotifyErrorQueueTimeoutEventPayload } from '@qpqjs/core';
 
 import { LogLog } from '../../entry';
 import { askUpsert } from '../../entry/data/logLogData';

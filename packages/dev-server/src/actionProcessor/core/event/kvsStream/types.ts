@@ -1,4 +1,4 @@
-import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionRuntime, StorySession } from 'quidproquo-core';
+import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionRuntime, StorySession } from '@qpqjs/core';
 
 // What the local KVS backend hands the runtime after a mutating write. One record per write:
 // deployed, a stream batches changes and the processor coalesces them, but locally a write is

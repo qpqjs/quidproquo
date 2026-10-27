@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';

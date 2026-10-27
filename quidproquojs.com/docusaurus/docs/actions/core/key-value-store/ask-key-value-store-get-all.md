@@ -10,7 +10,7 @@ Returns **all** records in a [key-value store](../../../config/core/key-value-st
 - **Action type:** `KeyValueStoreActionType.GetAll`
 
 ```typescript
-import { askKeyValueStoreGetAll } from 'quidproquo-core';
+import { askKeyValueStoreGetAll } from '@qpqjs/core';
 
 interface FeatureFlag {
   name: string;

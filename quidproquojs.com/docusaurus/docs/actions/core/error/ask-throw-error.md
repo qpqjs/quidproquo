@@ -10,7 +10,7 @@ Throws a structured error out of a story. Execution of the current story stops a
 - **Action type:** `ErrorActionType.ThrowError`
 
 ```typescript
-import { askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 export function* askGetUser(userId: string) {
   const user = yield* askKvsGet('users', userId);
@@ -82,7 +82,7 @@ Never returns normally — the action always throws. In types it resolves to `T`
 A thrown error does not have to crash the story. When the throwing story is wrapped in [askCatch](../system/ask-catch.md), the error is captured and returned as an `EitherActionResult` value instead of propagating:
 
 ```typescript
-import { askCatch, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askCatch, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 export function* askTryGetUser(userId: string) {
   const outcome = yield* askCatch(askGetUser(userId));

@@ -11,7 +11,7 @@ Reads a file on a [storage drive](../../../config/core/storage-drive.md) and par
 - **On AWS:** performs an S3 `GetObject` on the drive's bucket and runs `JSON.parse` on the text body.
 
 ```typescript
-import { askFileReadObjectJson } from 'quidproquo-core';
+import { askFileReadObjectJson } from '@qpqjs/core';
 
 interface AppSettings {
   theme: string;
@@ -57,7 +57,7 @@ The type parameter `T` is the shape you expect the parsed JSON to have. It is a 
 | `FileReadObjectJsonErrorTypeEnum.InvalidJson` | The file exists but its contents are not parseable JSON. |
 | `FileReadObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileReadObjectJson<AppSettings>('config', 'settings.json'));

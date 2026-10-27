@@ -12,7 +12,7 @@ Resolves the current **draft** version pointer for a document by `id`, or `null`
 First, a quick recap of the model (full detail on the [read-by-id page](./ask-event-doc-get-by-id.md#the-event-document-model)): an event document is derived by folding its event log. Each **version** pointer in the summary's `versions` array records the `eventId` of its last event (its head) and, once published, its `publishedAt` and `effectiveFrom` times. The tail version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes a version and opens the next draft.
 
 ```typescript
-import { askEventDocGetDraft } from 'quidproquo-features';
+import { askEventDocGetDraft } from '@qpqjs/features';
 
 export function* currentDraft(id: string) {
   const draft = yield* askEventDocGetDraft(id);
@@ -105,5 +105,5 @@ function* askEventDocPublishedVersionAsOf(
 
 - [askEventDocGetById / askEventDocGetByIdOrThrow](./ask-event-doc-get-by-id.md) — read the full summary record (and the model reference).
 - [askEventDocList](./ask-event-doc-list.md) — enumerate a collection's documents.
-- **Publishing / appending events:** `askEventDocEventAppend` (quidproquo-features) advances the log that these reads project.
+- **Publishing / appending events:** `askEventDocEventAppend` (@qpqjs/features) advances the log that these reads project.
 - [defineEventDocSummary](../../../config/features/event-doc-summary.md) — declares the store these read from.

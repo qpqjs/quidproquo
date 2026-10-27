@@ -1,5 +1,5 @@
-import { QPQBinaryData } from 'quidproquo-core';
-import { EmailSendEmailActionPayload } from 'quidproquo-webserver';
+import { QPQBinaryData } from '@qpqjs/core';
+import { EmailSendEmailActionPayload } from '@qpqjs/webserver';
 
 const CRLF = '\r\n';
 

@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineBackendBundleOptions } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, defineBackendBundleOptions } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 import { IgnorePlugin } from 'webpack';

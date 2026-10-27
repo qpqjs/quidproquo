@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askDnsList, qpqWebServerUtils } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askDnsList, qpqWebServerUtils } from '@qpqjs/webserver';
 
 const getProcessDnsList = (qpqConfig: QPQConfig): ProcessorFor<typeof askDnsList> => {
   return async () => actionResult(qpqWebServerUtils.getRootDomains(qpqConfig));

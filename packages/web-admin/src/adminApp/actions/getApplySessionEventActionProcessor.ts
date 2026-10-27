@@ -1,5 +1,5 @@
-import { generateUuid, getProcessCustomImplementation, ProcessorFor } from 'quidproquo-core';
-import { ActionProcessorListResolverFactory } from 'quidproquo-web-react';
+import { generateUuid, getProcessCustomImplementation, ProcessorFor } from '@qpqjs/core';
+import { ActionProcessorListResolverFactory } from '@qpqjs/web-react';
 
 import { AdminAppState } from '../AdminAppState';
 import { AdminSessionActionType } from './AdminSessionActionType';

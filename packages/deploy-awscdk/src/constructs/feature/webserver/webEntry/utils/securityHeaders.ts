@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import {
   ContentSecurityPolicyEntry,
   HeadersFrameOption,
@@ -13,7 +13,7 @@ import {
   ResponseHeadersStrictTransportSecurity,
   ResponseHeadersXSSProtection,
   ResponseSecurityHeaders,
-} from 'quidproquo-webserver';
+} from '@qpqjs/webserver';
 
 import { aws_cloudfront } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

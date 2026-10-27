@@ -1,4 +1,4 @@
-import { NetworkActionType } from 'quidproquo-core';
+import { NetworkActionType } from '@qpqjs/core';
 
 import { CoreNetworkRequestCustomAction } from '../../custom';
 import { ActionComponent } from '../../types';

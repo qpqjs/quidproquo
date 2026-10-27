@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { Nullable } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { Nullable } from '@qpqjs/core';
 
 import { askEventDocList } from '../data/askEventDocList';
 import { EventDocSummary } from '../models';

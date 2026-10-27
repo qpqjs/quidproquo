@@ -4,7 +4,7 @@ import {
   askNetworkRequest,
   AskResponse,
   HTTPNetworkResponse,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { probeAws, probeSurvivor, spawnSurvivor } from 'smoke-probe';
 

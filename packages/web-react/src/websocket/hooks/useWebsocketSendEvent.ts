@@ -1,4 +1,4 @@
-import { AnyEventMessage } from 'quidproquo-core';
+import { AnyEventMessage } from '@qpqjs/core';
 
 import { useFastCallback } from '../../hooks';
 import { useWebsocketApi } from './useWebsocketApi';

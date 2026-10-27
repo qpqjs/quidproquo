@@ -1,4 +1,4 @@
-import { AskResponse, Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { AskResponse, Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 import { askEventDocEventIdAsOf } from '../data/askEventDocEventIdAsOf';
 import { EventDocDocumentStateAtEvent } from '../models';

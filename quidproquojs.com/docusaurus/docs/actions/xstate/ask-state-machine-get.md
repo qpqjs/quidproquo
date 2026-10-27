@@ -11,7 +11,7 @@ Fetches a [state-machine](../../config/xstate/state-machine.md) instance by its 
 - **On the runtime:** the processor reads the row keyed by `id` from the machine's backing key-value store and returns it verbatim. It does not rehydrate the XState actor, so the machine's `stateField` still holds the raw persisted snapshot.
 
 ```typescript
-import { askStateMachineGet } from 'quidproquo-xstate';
+import { askStateMachineGet } from '@qpqjs/xstate';
 
 interface Order {
   id: string;

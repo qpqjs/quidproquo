@@ -1,4 +1,4 @@
-import { actionResult, buildTestQpqConfig, defineActionProcessors, DynamicModuleLoader } from 'quidproquo-core';
+import { actionResult, buildTestQpqConfig, defineActionProcessors, DynamicModuleLoader } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

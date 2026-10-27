@@ -8,7 +8,7 @@ import {
   AiUserMessage,
   AiUserMessagePart,
   QPQBinaryData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import type { AssistantModelMessage, ModelMessage, ToolModelMessage, UserModelMessage } from 'ai';
 

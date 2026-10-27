@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, MetricActionType, MetricUnit } from 'quidproquo-core';
+import { buildTestQpqConfig, MetricActionType, MetricUnit } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

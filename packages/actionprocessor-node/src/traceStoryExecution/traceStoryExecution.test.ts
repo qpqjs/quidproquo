@@ -1,4 +1,4 @@
-import { actionResult, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import { actionResult, QpqRuntimeType, StoryResult } from '@qpqjs/core';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';

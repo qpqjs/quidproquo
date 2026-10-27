@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineRecurringSchedule, InvalidScheduleRecurrenceError } from 'quidproquo-core';
+import { buildTestQpqConfig, defineRecurringSchedule, InvalidScheduleRecurrenceError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { HTTPEvent } from 'quidproquo-webserver';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { EventDocPermissionAction } from './EventDocPermissionAction';
 

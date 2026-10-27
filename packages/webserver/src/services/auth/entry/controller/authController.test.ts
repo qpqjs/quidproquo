@@ -1,4 +1,4 @@
-import { Action, AuthenticateUserChallenge, ConfigActionType, ErrorTypeEnum, runStory, StoryError, UserDirectoryActionType } from 'quidproquo-core';
+import { Action, AuthenticateUserChallenge, ConfigActionType, ErrorTypeEnum, runStory, StoryError, UserDirectoryActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

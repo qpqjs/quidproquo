@@ -1,4 +1,4 @@
-import { AskResponse, askUserDirectoryRespondToAuthChallenge, AuthenticateUserChallenge, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, askUserDirectoryRespondToAuthChallenge, AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
 
 export function* askRespondToAuthChallenge(
   username: string,

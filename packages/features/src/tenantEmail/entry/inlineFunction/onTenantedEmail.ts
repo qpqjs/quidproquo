@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { EmailReceivedEvent, EmailReceivedEventResponse } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { EmailReceivedEvent, EmailReceivedEventResponse } from '@qpqjs/webserver';
 
 import { askTenantEmailRoute } from '../../logic/askTenantEmailRoute';
 

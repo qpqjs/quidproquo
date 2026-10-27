@@ -10,7 +10,7 @@ Returns the deployed application version — the value stored in the well-known 
 - **Built from:** [askConfigGetGlobal](./ask-config-get-global.md), wrapped in [askCatch](../system/ask-catch.md) so a missing/unreadable global resolves to `null` instead of throwing.
 
 ```typescript
-import { askGetApplicationVersion } from 'quidproquo-core';
+import { askGetApplicationVersion } from '@qpqjs/core';
 
 export function* askTagWithVersion(payload: Record<string, unknown>) {
   const version = yield* askGetApplicationVersion();

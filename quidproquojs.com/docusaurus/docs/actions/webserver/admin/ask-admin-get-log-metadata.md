@@ -10,7 +10,7 @@ Fetches the **metadata summary** for a single story, identified by its correlati
 - **Action type:** `AdminActionType.GetLogMetadata`
 
 ```typescript
-import { askAdminGetLogMetadata } from 'quidproquo-webserver';
+import { askAdminGetLogMetadata } from '@qpqjs/webserver';
 
 export function* summariseStory(correlationId: string) {
   const meta = yield* askAdminGetLogMetadata(correlationId);

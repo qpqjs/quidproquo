@@ -1,5 +1,5 @@
-import { FileStorageConfig } from 'quidproquo-actionprocessor-node';
-import { QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
+import { FileStorageConfig } from '@qpqjs/actionprocessor-node';
+import { QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { DevServerPorts } from './DevServerPorts';
 

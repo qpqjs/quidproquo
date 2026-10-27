@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsQueryOperationType } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsQueryOperationType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

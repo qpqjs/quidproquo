@@ -1,8 +1,8 @@
 {
-  "label": "quidproquo-webserver",
+  "label": "@qpqjs/webserver",
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Action requesters (ask* generator functions) exported from quidproquo-webserver."
+    "description": "Action requesters (ask* generator functions) exported from @qpqjs/webserver."
   }
 }

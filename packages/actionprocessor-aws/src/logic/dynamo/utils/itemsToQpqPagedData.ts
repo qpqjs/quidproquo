@@ -1,4 +1,4 @@
-import { QpqPagedData } from 'quidproquo-core';
+import { QpqPagedData } from '@qpqjs/core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 

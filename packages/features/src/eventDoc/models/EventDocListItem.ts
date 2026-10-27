@@ -1,5 +1,5 @@
-import { QpqIsoDateTime } from 'quidproquo-core';
-import { Nullable } from 'quidproquo-core';
+import { QpqIsoDateTime } from '@qpqjs/core';
+import { Nullable } from '@qpqjs/core';
 
 /** A flattened, display-ready view of an EventDocSummary for a list row. */
 export type EventDocListItem = {

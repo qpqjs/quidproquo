@@ -10,7 +10,7 @@ A [defineWebSocketQueue](./web-socket-queue.md) with tenant scope resolution pre
 The deploying service must still register the resolver implementation by calling [defineTenant](./tenant.md) (with the same `owner` used everywhere else).
 
 ```typescript
-import { defineTenantedWebSocketQueue, defineTenant } from 'quidproquo-features';
+import { defineTenantedWebSocketQueue, defineTenant } from '@qpqjs/features';
 
 export default [
   ...defineTenant({

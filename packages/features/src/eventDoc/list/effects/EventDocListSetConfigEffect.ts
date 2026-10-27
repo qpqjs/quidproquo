@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { EventDocListConfig } from '../types/EventDocListConfig';
 import { EventDocListEffect } from './EventDocListEffect';

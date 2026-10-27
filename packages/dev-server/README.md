@@ -1,11 +1,11 @@
-# quidproquo-dev-server
+# @qpqjs/dev-server
 
 Runs a whole [quidproquo](https://github.com/qpqjs/quidproquo) app on your machine.
 
 It reads the same service configs the deploy packages read, stands up every route, websocket, queue, scheduled event and data store the app declares, and executes your stories through the real qpq runtime. Nothing is stubbed out or simplified.
 
 ```bash
-npm install quidproquo-dev-server
+npm install @qpqjs/dev-server
 ```
 
 You normally reach it through the `qpq` CLI or, in a scaffolded app, `npm run dev`.

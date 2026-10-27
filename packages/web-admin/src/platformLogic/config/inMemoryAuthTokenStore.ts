@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
 
 // Tokens deliberately live in memory only — never localStorage — so a page
 // refresh forces a fresh login and with it a fresh admin session doc.

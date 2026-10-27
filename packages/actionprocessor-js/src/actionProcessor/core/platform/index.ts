@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { getPlatformDelayActionProcessor } from './getPlatformDelayActionProcessor';
 import { getPlatformGetNameActionProcessor } from './getPlatformGetNameActionProcessor';

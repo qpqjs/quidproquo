@@ -10,7 +10,7 @@ Writes a string to a file on a [storage drive](../../../config/core/storage-driv
 - **Action type:** `FileActionType.WriteTextContents`
 
 ```typescript
-import { askFileWriteTextContents } from 'quidproquo-core';
+import { askFileWriteTextContents } from '@qpqjs/core';
 
 export function* askSaveReport(reportCsv: string) {
   yield* askFileWriteTextContents('reports', 'exports/monthly.csv', reportCsv);

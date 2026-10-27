@@ -10,7 +10,7 @@ Builds a user script project that is already stored on a drive into one file at 
 - **Action type:** `UserScriptActionType.Build`
 
 ```typescript
-import { askUserScriptBuild, askUserScriptExecute } from 'quidproquo-core';
+import { askUserScriptBuild, askUserScriptExecute } from '@qpqjs/core';
 
 export function* askBuildAndRunReport(drive: string) {
   const { exports } = yield* askUserScriptBuild(drive, 'scripts/report/source', 'scripts/report/main.js');
@@ -64,9 +64,9 @@ The last two, and `BuildFailed` for a built file that does not load, come from c
 
 ## Notes
 
-- Only services that opt in can process this action. Call `defineUserScriptBuilder()` from `quidproquo-user-script` in the service config; services that do not call it never load rspack.
+- Only services that opt in can process this action. Call `defineUserScriptBuilder()` from `@qpqjs/user-script` in the service config; services that do not call it never load rspack.
 - On lambda the service also needs rspack from a layer. Pass `getUserScriptBuilderApiLayer()` in its api layers and produce the layer with `qpq script:builder-layer` (`--arch x86_64` for x86 lambdas; the default is arm64), normally from the app's `qpq:predeploy` hook.
-- A script project may import `quidproquo-core` and its own files. Other npm packages and Node builtins are refused.
+- A script project may import `@qpqjs/core` and its own files. Other npm packages and Node builtins are refused.
 
 ## Related
 

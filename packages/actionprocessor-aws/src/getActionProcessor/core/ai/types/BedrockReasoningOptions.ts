@@ -1,4 +1,4 @@
-import { AiReasoningEffort } from 'quidproquo-core';
+import { AiReasoningEffort } from '@qpqjs/core';
 
 /** The `providerOptions` that turn extended thinking on for a Bedrock call. */
 export type BedrockReasoningOptions = {

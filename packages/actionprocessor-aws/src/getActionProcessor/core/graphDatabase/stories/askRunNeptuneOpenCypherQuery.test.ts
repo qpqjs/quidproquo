@@ -1,4 +1,4 @@
-import { ActionOf, askNetworkRequestBase, ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType, runStory, StoryError } from 'quidproquo-core';
+import { ActionOf, askNetworkRequestBase, ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType, runStory, StoryError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { createSecureUrlToken } from 'quidproquo-actionprocessor-node';
+import { createSecureUrlToken } from '@qpqjs/actionprocessor-node';
 
 import * as fs from 'fs/promises';
 import * as net from 'net';

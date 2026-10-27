@@ -10,8 +10,8 @@ Iterates an array with **bounded concurrency**, maps each item to an array via t
 - **Built from:** [askMapParallelBatch](./ask-map-parallel-batch.md) followed by a single-level `Array.prototype.flat()`.
 
 ```typescript
-import { askFlatMapParallelBatch } from 'quidproquo-core';
-import { askAiPrompt } from 'quidproquo-core';
+import { askFlatMapParallelBatch } from '@qpqjs/core';
+import { askAiPrompt } from '@qpqjs/core';
 
 const EXPAND_BATCH = 4;
 

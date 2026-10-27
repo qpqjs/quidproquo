@@ -12,7 +12,7 @@ This is one of the four client stories also exposed as `sharedEventDocAiApi`. It
 - Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatListRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiSetChats` / `askUIEventDocAiSetLoadingChats` / `askUIEventDocAiSetError` UI actions.
 
 ```typescript
-import { askEventDocAiLoadChats } from 'quidproquo-features';
+import { askEventDocAiLoadChats } from '@qpqjs/features';
 
 export function* askOnChatPanelOpen() {
   yield* askEventDocAiLoadChats();

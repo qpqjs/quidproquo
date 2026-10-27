@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting } from '@qpqjs/core';
 
 /** The item's sort key value, or null when the store has no sort key. */
 export const getKvsItemSk = (item: any, storeConfig: KeyValueStoreQPQConfigSetting): any =>

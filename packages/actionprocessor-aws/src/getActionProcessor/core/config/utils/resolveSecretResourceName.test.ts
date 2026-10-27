@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineSecret } from 'quidproquo-core';
+import { buildTestQpqConfig, defineSecret } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

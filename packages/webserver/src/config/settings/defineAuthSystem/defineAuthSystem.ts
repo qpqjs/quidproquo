@@ -1,4 +1,4 @@
-import { defineGlobal, defineServiceSettings, defineUserDirectory, EmailTemplates, QPQConfig, UserDirectoryMfaSettings } from 'quidproquo-core';
+import { defineGlobal, defineServiceSettings, defineUserDirectory, EmailTemplates, QPQConfig, UserDirectoryMfaSettings } from '@qpqjs/core';
 
 import { AUTH_USER_DIRECTORY_GLOBAL_KEY } from '../../../services/auth/config';
 import { defineAuthServiceRoute } from '../../../services/auth/config/defineAuthServiceRoute';
@@ -26,7 +26,7 @@ export interface AuthSystemOptions {
 // Bundles a complete username/password login flow: a user directory plus the
 // endpoints needed to log in, refresh tokens, respond to challenges, recover a
 // forgotten password, and change a password. The handler stories ship inside
-// quidproquo-webserver (services/auth) and resolve `directoryName` at runtime
+// @qpqjs/webserver (services/auth) and resolve `directoryName` at runtime
 // from the global emitted below.
 export const defineAuthSystem = (service: string, directoryName: string, options?: AuthSystemOptions): QPQConfig => {
   const basePath = options?.basePath ?? '';

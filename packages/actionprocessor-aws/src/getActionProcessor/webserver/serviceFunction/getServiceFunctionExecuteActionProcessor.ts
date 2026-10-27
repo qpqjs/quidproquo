@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -9,8 +9,8 @@ import {
   qpqCoreUtils,
   StorySession,
   toCrossServiceSession,
-} from 'quidproquo-core';
-import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent, ServiceFunctionActionType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';

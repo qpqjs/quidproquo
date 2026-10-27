@@ -1,4 +1,4 @@
-import { EmailActionType, EmailDeliveryStatus } from 'quidproquo-webserver';
+import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

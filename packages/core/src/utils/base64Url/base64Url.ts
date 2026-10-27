@@ -1,6 +1,6 @@
 // Base64url (RFC 4648 §5, unpadded) over UTF-8 text, on web globals
 // (TextEncoder/TextDecoder/btoa/atob) rather than Node's Buffer so it works in
-// browser bundles of quidproquo-core too. This is the JOSE encoding: JWT
+// browser bundles of @qpqjs/core too. This is the JOSE encoding: JWT
 // headers and payloads are base64url, never plain base64.
 
 export const base64UrlEncodeUtf8 = (text: string): string => {

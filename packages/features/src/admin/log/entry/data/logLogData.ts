@@ -14,7 +14,7 @@ import {
   LogLevelEnum,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { LogLog } from '../domain';
 

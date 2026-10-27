@@ -1,4 +1,4 @@
-import { DynamicFunctionsExecuteErrorTypeEnum } from 'quidproquo-core';
+import { DynamicFunctionsExecuteErrorTypeEnum } from '@qpqjs/core';
 
 /**
  * True when a dynamic-functions call failed because nothing is registered for the collection or the member is absent.

@@ -1,6 +1,6 @@
-import { defineAwsGithubDeployRole, defineAwsServiceAccountInfo, defineDomainCertificate } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineDns, defineEmailReceivingDomain } from 'quidproquo-webserver';
+import { defineAwsGithubDeployRole, defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineDns, defineEmailReceivingDomain } from '@qpqjs/webserver';
 
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

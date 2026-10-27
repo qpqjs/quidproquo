@@ -11,7 +11,7 @@ Confirms a signed-in user's email address using the code sent by [askUserDirecto
 - **On AWS:** issues Cognito `VerifyUserAttribute` for the `email` attribute using the supplied access token.
 
 ```typescript
-import { askUserDirectoryConfirmEmailVerification } from 'quidproquo-core';
+import { askUserDirectoryConfirmEmailVerification } from '@qpqjs/core';
 
 export function* askFinishEmailVerification(code: string, accessToken: string) {
   yield* askUserDirectoryConfirmEmailVerification(code, accessToken);

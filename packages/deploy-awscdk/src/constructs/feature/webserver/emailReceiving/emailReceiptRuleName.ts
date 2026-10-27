@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
-import { qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 /**
  * The app's rule in the account's shared receipt rule set. Carries app, environment and module

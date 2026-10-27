@@ -1,4 +1,4 @@
-import { AskResponse, isErroredActionResult, resolveActionResultError } from 'quidproquo-core';
+import { AskResponse, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
 

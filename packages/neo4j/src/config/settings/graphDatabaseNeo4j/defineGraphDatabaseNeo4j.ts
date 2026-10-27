@@ -7,7 +7,7 @@ import {
   QPQConfig,
   QPQConfigAdvancedSettings,
   QpqFunctionRuntimeAdvanced,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { Neo4jVersion } from './Neo4jVersion';
 

@@ -18,12 +18,12 @@ import {
   defineAwsServiceAccountInfo,
   defineWafProtection,
   getAwsServiceAccountInfosForDeployments,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 import {
   defineAdminSettings,
   defineAdminUserDirectory,
   defineOpenApiRoutes,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import { execSync } from 'child_process';
 import {
@@ -93,7 +93,7 @@ export const defineQpqjsService = (
 
   defineWafProtection(),
 
-  // Module-federation singletons beyond the react/quidproquo-web defaults.
+  // Module-federation singletons beyond the react/@qpqjs/web defaults.
   defineFrontendBundleOptions({
     sharedSingletons: ['chakra', 'zod'],
   }),

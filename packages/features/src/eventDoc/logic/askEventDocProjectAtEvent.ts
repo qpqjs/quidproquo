@@ -1,4 +1,4 @@
-import { AskResponse, createDynamicFunctionCaller, Nullable } from 'quidproquo-core';
+import { AskResponse, createDynamicFunctionCaller, Nullable } from '@qpqjs/core';
 
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotSeedLatest } from '../data/askEventDocSnapshotSeedLatest';

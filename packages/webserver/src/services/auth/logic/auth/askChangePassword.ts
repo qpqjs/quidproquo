@@ -1,4 +1,4 @@
-import { AskResponse, askUserDirectoryChangePassword } from 'quidproquo-core';
+import { AskResponse, askUserDirectoryChangePassword } from '@qpqjs/core';
 
 // The underlying action authenticates the caller via their access token, so no
 // user directory name is required here.

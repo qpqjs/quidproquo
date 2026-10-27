@@ -1,4 +1,4 @@
-import { KVS_RESERVED_MARKER, KvsCoreDataType } from 'quidproquo-core';
+import { KVS_RESERVED_MARKER, KvsCoreDataType } from '@qpqjs/core';
 
 import { KVS_SCOPE_DELIMITER } from './scopedKvsValue';
 

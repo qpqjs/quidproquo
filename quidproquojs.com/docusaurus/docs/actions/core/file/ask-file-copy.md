@@ -12,7 +12,7 @@ Copies an object to another path, possibly on another storage drive, without the
 - **Locally:** copies the file, then best-effort copies its `.qpqmeta.json` sidecar (missing sidecar is not an error).
 
 ```typescript
-import { askFileCopy } from 'quidproquo-core';
+import { askFileCopy } from '@qpqjs/core';
 
 export function* askDuplicateReport() {
   yield* askFileCopy('reports', 'drafts/q1.csv', 'reports', 'published/q1.csv');
@@ -54,7 +54,7 @@ function* askFileCopy(
 | `FileCopyErrorTypeEnum.FileNotFound` | No object exists at `sourceFilepath`. |
 | `FileCopyErrorTypeEnum.InvalidScope` | `scope` is not a valid single path segment. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileCopy('reports', 'drafts/q1.csv', 'reports', 'published/q1.csv'));

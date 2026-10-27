@@ -4,7 +4,7 @@ import {
   WafManagedRuleOverride,
   WafRateLimit,
   WafRuleOverrideAction,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 
 import { aws_wafv2 } from 'aws-cdk-lib';
 

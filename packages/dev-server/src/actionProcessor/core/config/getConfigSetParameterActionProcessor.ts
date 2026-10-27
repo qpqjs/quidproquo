@@ -5,7 +5,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { setParameterValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';

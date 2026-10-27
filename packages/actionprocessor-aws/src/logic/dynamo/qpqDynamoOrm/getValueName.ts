@@ -1,4 +1,4 @@
-import { KvsAdvancedDataType } from 'quidproquo-core';
+import { KvsAdvancedDataType } from '@qpqjs/core';
 
 import { getHash } from './getHash';
 

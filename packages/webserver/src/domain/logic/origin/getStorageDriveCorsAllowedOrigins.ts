@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { getStorageDriveCorsSettingsByName } from '../../../configUtils/storageDrive/getStorageDriveCorsSettingsByName';
 import { DomainResolver } from '../../../domain/types/DomainResolver';

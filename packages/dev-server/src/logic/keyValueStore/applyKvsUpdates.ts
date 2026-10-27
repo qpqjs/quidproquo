@@ -1,4 +1,4 @@
-import { KvsAttributePath, KvsUpdate, KvsUpdateActionType } from 'quidproquo-core';
+import { KvsAttributePath, KvsUpdate, KvsUpdateActionType } from '@qpqjs/core';
 
 export const getPathArray = (path: KvsAttributePath): string[] => {
   if (typeof path === 'string') {

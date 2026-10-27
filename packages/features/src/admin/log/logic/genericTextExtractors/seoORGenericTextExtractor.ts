@@ -6,8 +6,8 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
-import { SeoEvent } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { SeoEvent } from '@qpqjs/webserver';
 
 export const seoORGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.EVENT_SEO_OR) {

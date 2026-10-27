@@ -1,4 +1,4 @@
-import { DevServerConfigOverrides, DevServerPorts } from 'quidproquo-dev-server';
+import { DevServerConfigOverrides, DevServerPorts } from '@qpqjs/dev-server';
 
 import fs from 'fs';
 import path from 'path';

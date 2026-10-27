@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -10,7 +10,7 @@ import {
   QPQConfig,
   resolveKvsQueryIndex,
   resolveKvsStoreConfigOrThrow,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';

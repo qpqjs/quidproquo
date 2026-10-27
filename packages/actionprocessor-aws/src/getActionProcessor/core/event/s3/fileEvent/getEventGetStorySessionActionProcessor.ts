@@ -6,7 +6,7 @@ import {
   ProcessorFor,
   QPQConfig,
   storageScopeContext,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 

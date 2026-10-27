@@ -10,7 +10,7 @@ Adds a toolset to the service's [MCP server](./mcp-server.md) that exposes the t
 Each AI tool takes a `docId` argument and runs in that document's AI context, the same as it would inside the chat. The collection's own hooks (for example a tenant authoriser) still decide whether the caller may touch the document.
 
 ```typescript
-import { defineMcpEventDocAiToolset, defineMcpServer } from 'quidproquo-features';
+import { defineMcpEventDocAiToolset, defineMcpServer } from '@qpqjs/features';
 
 export default [
   defineMcpServer({ userDirectoryName: 'users' }),

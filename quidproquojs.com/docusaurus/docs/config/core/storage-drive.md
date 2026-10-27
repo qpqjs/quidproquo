@@ -7,10 +7,10 @@ description: Define a storage drive — a logical file container (an S3 bucket o
 
 Defines a **storage drive**: a named, logical container for files. Stories never talk to S3 or a filesystem directly — they read and write files on a drive by name using the [File action requesters](../../actions/core/file/ask-file-read-text-contents.md), and the runtime maps the drive to real storage.
 
-- **On AWS:** deploys an S3 bucket (`QpqCoreStorageDriveConstruct` in `quidproquo-deploy-awscdk`). The bucket is versioned, blocks all public access, and is retained on stack teardown unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`.
+- **On AWS:** deploys an S3 bucket (`QpqCoreStorageDriveConstruct` in `@qpqjs/deploy-awscdk`). The bucket is versioned, blocks all public access, and is retained on stack teardown unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`.
 
 ```typescript
-import { defineStorageDrive } from 'quidproquo-core';
+import { defineStorageDrive } from '@qpqjs/core';
 
 export default [
   defineStorageDrive('user-uploads'),
@@ -65,7 +65,7 @@ defineStorageDrive('images', {
 });
 ```
 
-The handler story receives a `StorageDriveEvent` (exported from quidproquo-webserver) describing the drive and filepath that changed. On a `scoped` drive, the event also carries a `scope` field (the object's scope, with `filePaths` made scope-relative); the handler runs with it as the ambient storage scope, so file and KVS calls inside it inherit the partition.
+The handler story receives a `StorageDriveEvent` (exported from @qpqjs/webserver) describing the drive and filepath that changed. On a `scoped` drive, the event also carries a `scope` field (the object's scope, with `filePaths` made scope-relative); the handler runs with it as the ambient storage scope, so file and KVS calls inside it inherit the partition.
 
 ## Lifecycle rules
 
@@ -102,7 +102,7 @@ A transition specifies **either** `transitionAfterDays` **or** `transitionDate`,
 ## Examples
 
 ```typescript
-import { defineStorageDrive, StorageDriveTier } from 'quidproquo-core';
+import { defineStorageDrive, StorageDriveTier } from '@qpqjs/core';
 
 export default [
   // Simple private drive
@@ -137,8 +137,8 @@ export default [
 ## Related
 
 - **Action requesters that use this drive:** [askFileReadTextContents](../../actions/core/file/ask-file-read-text-contents.md), [askFileWriteTextContents](../../actions/core/file/ask-file-write-text-contents.md), and the rest of the File actions (binary/JSON read & write, list, exists, delete, temporary secure URLs, streams).
-- **CORS for browser access:** [defineStorageDriveCorsSettings](../webserver/storage-drive-cors-settings.md) (quidproquo-webserver) controls the allowed browser origins for direct-to-drive uploads/downloads.
+- **CORS for browser access:** [defineStorageDriveCorsSettings](../webserver/storage-drive-cors-settings.md) (@qpqjs/webserver) controls the allowed browser origins for direct-to-drive uploads/downloads.
 - [defineFederatedModuleStore](./federated-module-store.md) — loads a service's story code from a drive declared here.
 - [defineEventDocSummary](../features/event-doc-summary.md) — declares an event-document collection's asset bucket as a drive of this kind.
 - **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the bucket on teardown).
-- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket, lifecycle, KMS, IAM grants) in `quidproquo-deploy-awscdk`; file action processors in `quidproquo-actionprocessor-awslambda`.
+- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket, lifecycle, KMS, IAM grants) in `@qpqjs/deploy-awscdk`; file action processors in `@qpqjs/actionprocessor-aws`.

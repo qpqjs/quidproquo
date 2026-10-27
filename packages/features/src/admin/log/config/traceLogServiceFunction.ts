@@ -1,4 +1,4 @@
-import { QpqExecutionTrace, StoryResult } from 'quidproquo-core';
+import { QpqExecutionTrace, StoryResult } from '@qpqjs/core';
 
 // The async trace-replay handshake (see trace-replay-plan.md):
 //

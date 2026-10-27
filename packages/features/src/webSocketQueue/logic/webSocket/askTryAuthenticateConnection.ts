@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askUserDirectorySetAccessToken, Nullable } from 'quidproquo-core';
+import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askUserDirectorySetAccessToken, Nullable } from '@qpqjs/core';
 
 import {
   getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,

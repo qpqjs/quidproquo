@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 import { EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW } from '../constants/eventDocRecentClientMessageIdWindow';
 import { EventDocDocument, EventDocEvent } from '../models';

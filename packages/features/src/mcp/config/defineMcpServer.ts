@@ -1,5 +1,5 @@
-import { defineActionProcessors, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
-import { defineRoute } from 'quidproquo-webserver';
+import { defineActionProcessors, QPQConfig, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
+import { defineRoute } from '@qpqjs/webserver';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { McpServerOptions } from '../types/McpServerOptions';

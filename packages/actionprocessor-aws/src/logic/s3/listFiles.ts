@@ -1,4 +1,4 @@
-import { filePathDelimiter } from 'quidproquo-core';
+import { filePathDelimiter } from '@qpqjs/core';
 
 import { ListObjectsV2Command, ListObjectsV2CommandInput, S3Client } from '@aws-sdk/client-s3';
 

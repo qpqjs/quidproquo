@@ -1,4 +1,4 @@
-import { actionResult, askLogCreate, createActionProcessor, LogLevelEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogCreate, createActionProcessor, LogLevelEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import chalk from 'chalk';
 

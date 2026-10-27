@@ -1,4 +1,4 @@
-import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -8,7 +8,7 @@ description: Push a server-initiated message to every live connection on a WebSo
 Sends a message to **every live connection** on a named [WebSocket queue](../../../config/features/web-socket-queue.md) API. Unlike a connection-scoped send, this does not need a websocket-triggered context — the caller names the `apiName` explicitly, so any story (a storage event, a queue handler, a cron job) can push to every connected frontend. Connections whose socket died without their `onDisconnect` firing are skipped and their stale record is cleaned up automatically; a single dead connection never aborts the broadcast.
 
 ```typescript
-import { askWebSocketQueueBroadcastMessage } from 'quidproquo-features';
+import { askWebSocketQueueBroadcastMessage } from '@qpqjs/features';
 
 interface Announcement {
   type: 'Announcement';

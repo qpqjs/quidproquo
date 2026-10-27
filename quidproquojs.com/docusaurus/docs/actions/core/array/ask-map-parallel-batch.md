@@ -10,8 +10,8 @@ Iterates an array and builds a new array from the result of a per-item callback,
 - **Built from:** repeated calls to [askMapParallel](./ask-map-parallel.md) over successive slices of the array, with an optional [askDelay](../platform/ask-delay.md) between batches.
 
 ```typescript
-import { askMapParallelBatch } from 'quidproquo-core';
-import { askAiPrompt } from 'quidproquo-core';
+import { askMapParallelBatch } from '@qpqjs/core';
+import { askAiPrompt } from '@qpqjs/core';
 
 const RENDER_BATCH = 5;
 

@@ -10,7 +10,7 @@ Finds the single non-deleted document in the current collection whose `code` mat
 - **Built from:** [askEventDocList](./ask-event-doc-list.md) filtered in memory by `code` (there is no secondary index on `code`, and the dev key-value store can't query one anyway). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`.
 
 ```typescript
-import { askEventDocGetByCode } from 'quidproquo-features';
+import { askEventDocGetByCode } from '@qpqjs/features';
 
 export function* findByCode(code: string) {
   const summary = yield* askEventDocGetByCode(code);
@@ -42,7 +42,7 @@ The generic `T` narrows to a collection-specific extension of [`EventDocSummary`
 
 ## Notes
 
-- Because `code` is expected unique in scope, **more than one match is treated as a data-integrity error** and throws `ErrorTypeEnum.Conflict` (from quidproquo-core) — it does not pick one arbitrarily.
+- Because `code` is expected unique in scope, **more than one match is treated as a data-integrity error** and throws `ErrorTypeEnum.Conflict` (from @qpqjs/core) — it does not pick one arbitrarily.
 - Soft-deleted documents are excluded (this filters via [askEventDocList](./ask-event-doc-list.md)'s default).
 
 ---

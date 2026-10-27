@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, AskResponse } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocAssetDownloadUrl } from '../models';

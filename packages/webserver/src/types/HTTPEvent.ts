@@ -1,4 +1,4 @@
-import { HTTPMethod, QPQBinaryData } from 'quidproquo-core';
+import { HTTPMethod, QPQBinaryData } from '@qpqjs/core';
 
 export interface HttpEventHeaders {
   [key: string]: undefined | string;

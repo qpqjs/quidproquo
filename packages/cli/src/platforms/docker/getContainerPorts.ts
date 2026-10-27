@@ -1,4 +1,4 @@
-import { WebEntryHost } from 'quidproquo-dev-server';
+import { WebEntryHost } from '@qpqjs/dev-server';
 
 import { ResolvedDevServerPorts } from '../../lib/devServerPorts';
 

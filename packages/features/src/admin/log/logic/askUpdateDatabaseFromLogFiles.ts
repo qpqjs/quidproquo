@@ -20,7 +20,7 @@ import {
   StorySession,
   UserDirectoryActionType,
   UserDirectorySetAccessTokenActionPayload,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askUpdateActionSearchFromStoryResult } from '../../actionSearch/logic/askUpdateActionSearchFromStoryResult';
 import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';

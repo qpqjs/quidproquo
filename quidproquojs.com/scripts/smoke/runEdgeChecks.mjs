@@ -16,7 +16,7 @@ const fetchWithTimeout = (url, init = {}) =>
 
 // Hosts for one root under the app's default shape (`<sub>.<env>.<root>`, no
 // environment label in production). If the app ever adds a domain resolver
-// pointer, derive these with quidproquo-webserver's resolveHosts instead.
+// pointer, derive these with @qpqjs/webserver's resolveHosts instead.
 export const getRootHosts = (root, environment) => {
   const site = environment === 'production' ? root : `${environment}.${root}`;
 

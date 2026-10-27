@@ -1,4 +1,4 @@
-import { askFileGenerateTemporaryUploadSecureUrl, askNewGuid, AskResponse } from 'quidproquo-core';
+import { askFileGenerateTemporaryUploadSecureUrl, askNewGuid, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferImportPath } from '../constants';

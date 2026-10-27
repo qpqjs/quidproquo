@@ -1,5 +1,5 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { WebSocketEventType } from 'quidproquo-webserver';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { WebSocketEventType } from '@qpqjs/webserver';
 
 import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord } from './types';
 

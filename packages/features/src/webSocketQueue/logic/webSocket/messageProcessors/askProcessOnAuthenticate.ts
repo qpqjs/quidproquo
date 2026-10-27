@@ -6,7 +6,7 @@ import {
   askUserDirectorySetAccessToken,
   DecodedAccessToken,
   Nullable,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import {
   getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,

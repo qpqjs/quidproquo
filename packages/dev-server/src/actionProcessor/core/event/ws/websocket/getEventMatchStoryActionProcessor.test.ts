@@ -6,8 +6,8 @@ import {
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
-import { defineWebsocket, WebSocketEventType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineWebsocket, WebSocketEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

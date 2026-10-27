@@ -1,4 +1,4 @@
-import { askFileWriteBinaryContents, AskResponse, QPQBinaryData, StorageDriveAdvancedWriteOptions } from 'quidproquo-core';
+import { askFileWriteBinaryContents, AskResponse, QPQBinaryData, StorageDriveAdvancedWriteOptions } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

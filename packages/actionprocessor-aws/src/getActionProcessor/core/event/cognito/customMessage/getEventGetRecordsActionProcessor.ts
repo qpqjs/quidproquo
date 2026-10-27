@@ -1,5 +1,5 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { EmailSendEventType } from 'quidproquo-webserver';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { EmailSendEventType } from '@qpqjs/webserver';
 
 import { EventInput, InternalEventRecord } from './types';
 

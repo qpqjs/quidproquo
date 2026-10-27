@@ -1,5 +1,5 @@
-import { Nullable } from 'quidproquo-core';
-import { getDevServerOptions } from 'quidproquo-dev-server';
+import { Nullable } from '@qpqjs/core';
+import { getDevServerOptions } from '@qpqjs/dev-server';
 
 import fs from 'fs';
 import path from 'path';

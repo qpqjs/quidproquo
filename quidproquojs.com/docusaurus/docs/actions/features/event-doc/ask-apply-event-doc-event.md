@@ -8,11 +8,11 @@ description: Declaratively apply an event-doc event, leaving HOW it is applied (
 A **purely declarative** way to apply an event-doc event: the story yields an `eventType` and its `data`, and a registered processor decides how that turns into an actual write — for example an optimistic local append followed by a POST in a browser editor, or a direct [askEventDocEventAppend](./ask-event-doc-event-append.md) on the backend. Because it has no side effect of its own, verbs written in terms of it (like a domain's `askXSetY` action creators) run unchanged wherever a processor for it is registered — backend, tests, or transforms.
 
 - **Action type:** `EventDocActionType.ApplyEvent`
-- **quidproquo-features ships no default processor** for this action. Each consumer registers the implementation that fits its runtime via `defineActionProcessors`. Calling it with no processor registered fails the same way any unhandled action type does.
+- **@qpqjs/features ships no default processor** for this action. Each consumer registers the implementation that fits its runtime via `defineActionProcessors`. Calling it with no processor registered fails the same way any unhandled action type does.
 - The version stamped on the resulting event is not passed by the caller — the registered processor (the "editor") stamps its own configured schema version and provenance when it applies the event.
 
 ```typescript
-import { askApplyEventDocEvent } from 'quidproquo-features';
+import { askApplyEventDocEvent } from '@qpqjs/features';
 
 export function* askTenantSetBrand(data: TenantSetBrandData) {
   yield* askApplyEventDocEvent<SetBrandEffect>(TenantEffect.setBrand, data);

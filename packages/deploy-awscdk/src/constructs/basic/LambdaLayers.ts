@@ -1,6 +1,6 @@
-import { awsNamingUtils, getLogExtensionLayerPath } from 'quidproquo-actionprocessor-awslambda';
-import { ApiLayer, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils, getLogExtensionLayerPath } from '@qpqjs/actionprocessor-aws';
+import { ApiLayer, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

@@ -7,8 +7,8 @@
 // route/queue/schedule/etc.) and produces TWO maps keyed off one derived `exposePath`
 // per source file. See FederatedRemoteInfo below for what each map is for.
 // ─────────────────────────────────────────────────────────────────────────────
-import { getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import crypto from 'crypto';
 import path from 'path';

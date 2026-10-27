@@ -14,7 +14,7 @@ Versioning here is purely **path-based** — there is no content negotiation or 
 - **On AWS:** identical to [defineRoute](../webserver/route.md) — routes are not individual infrastructure; API Gateway proxies every request to the API Lambda, which matches the full (version-prefixed) path at runtime.
 
 ```typescript
-import { defineVersionedRoute } from 'quidproquo-features';
+import { defineVersionedRoute } from '@qpqjs/features';
 
 export default [
   // Served at GET /v1/users/{userId}
@@ -59,7 +59,7 @@ The version number used to build the path prefix. `1` produces `/v1…`, `2` pro
 ## Examples
 
 ```typescript
-import { defineVersionedRoute } from 'quidproquo-features';
+import { defineVersionedRoute } from '@qpqjs/features';
 
 export default [
   // v1 — the original handler

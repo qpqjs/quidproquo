@@ -39,7 +39,7 @@ const readPackageJson = (dir: string): PackageJson =>
 // The `workspaces` array is only the launch-order tiebreak between tasks that become
 // ready at the same time. Real ordering constraints come from the dependency graph
 // wired up in buildTasks; the array itself is not reliably topological (deploy-webpack
-// and deploy-rspack sit before quidproquo-deploy-awscdk, which both declare as a dep).
+// and deploy-rspack sit before @qpqjs/deploy-awscdk, which both declare as a dep).
 const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspaces || [];
 
 // Scripts whose aggregate form is driven as sub-scripts. `anytime` scripts have no
@@ -47,9 +47,9 @@ const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspace
 // reads until its own compile, so it can soak up idle slots while unrelated packages
 // build. `stages` run in order, scripts inside one stage concurrently. esm and cjs
 // compile the same src into separate outDirs (no shared tsbuildinfo), so they overlap
-// safely; build:extension (only quidproquo-actionprocessor-awslambda) esbuild-bundles
+// safely; build:extension (only @qpqjs/actionprocessor-aws) esbuild-bundles
 // the log-extension layer straight from src into lib/extension-layer, independent of
-// tsc; build:bin-perms (quidproquo-cli, create-qpq-app) chmods a bin file tsc just
+// tsc; build:bin-perms (@qpqjs/cli, create-qpq-app) chmods a bin file tsc just
 // emitted, so it must wait for the compiles. Packages missing a sub-script skip it.
 const STEP_PLANS: Record<string, StepPlan> = {
   build: { anytime: ['clean'], stages: [['build:esm', 'build:cjs', 'build:extension'], ['build:bin-perms']] },
@@ -60,7 +60,7 @@ const STEP_PLANS: Record<string, StepPlan> = {
 // src in isolation and can run fully parallel.
 const DEPENDENCY_ORDERED_SCRIPTS = new Set(['build']);
 
-// Note: empty-string scripts (e.g. quidproquo-tsconfig's `"build": ""`) are falsy,
+// Note: empty-string scripts (e.g. @qpqjs/tsconfig's `"build": ""`) are falsy,
 // so they're excluded here and such workspaces contribute zero steps.
 // useStages=false (--no-stages) skips the sub-script expansion and runs the package's
 // own aggregate script as a single step, for comparing against staged execution.

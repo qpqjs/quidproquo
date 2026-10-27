@@ -1,4 +1,4 @@
-import { QPQError } from 'quidproquo-core';
+import { QPQError } from '@qpqjs/core';
 
 import { EventDocWorkspaceSlotOperation } from './EventDocWorkspaceSlotOperation';
 

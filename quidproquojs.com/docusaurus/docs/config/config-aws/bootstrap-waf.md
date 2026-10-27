@@ -12,7 +12,7 @@ This is a **bootstrap setting**: it is created once during the bootstrap phase f
 - **On AWS:** deploys two `aws_wafv2.CfnWebACL`s with `defaultAction: allow` and shared rules. The REGIONAL ACL (`qpq-waf-regional-<app>-<env>`) is created by `QpqBootstrapConfigWafConstruct` in the bootstrap stack and publishes its ARN to SSM; each service's API stack attaches via a `WebACLAssociation`. The CLOUDFRONT ACL (`qpq-waf-cloudfront-<app>-<env>`) must live in `us-east-1`, so it is a sibling stack (`WafCloudFrontWebAclStack`) that hands its ARN back to the deploy region via SSM (directly if deploying to `us-east-1`, otherwise via a cross-region `AwsCustomResource`). CloudWatch metrics and sampled requests are enabled on every rule.
 
 ```typescript
-import { defineBootstrapWaf } from 'quidproquo-config-aws';
+import { defineBootstrapWaf } from '@qpqjs/config-aws';
 
 export default [
   defineBootstrapWaf(),
@@ -102,7 +102,7 @@ export enum WafRuleOverrideAction {
 ## Examples
 
 ```typescript
-import { defineBootstrapWaf, WafManagedRuleGroup } from 'quidproquo-config-aws';
+import { defineBootstrapWaf, WafManagedRuleGroup } from '@qpqjs/config-aws';
 
 export default [
   defineBootstrapWaf({
@@ -123,7 +123,7 @@ export default [
 To let large request bodies through instead of being blocked by the `common` group's default 8kb body-size limit:
 
 ```typescript
-import { defineBootstrapWaf, WafManagedRuleGroup, WafRuleOverrideAction } from 'quidproquo-config-aws';
+import { defineBootstrapWaf, WafManagedRuleGroup, WafRuleOverrideAction } from '@qpqjs/config-aws';
 
 export default [
   defineBootstrapWaf({
@@ -139,4 +139,4 @@ export default [
 
 - [defineWafProtection](./waf-protection.md) — a per-service setting that opts a service's API Gateway stage and CloudFront distributions into these web ACLs.
 - [defineBootstrapAwsOrganization](./bootstrap-aws-organization.md) — another bootstrap-phase setting deployed by the same `BootstrapQpqServiceStack`.
-- **AWS implementation:** `QpqBootstrapConfigWafConstruct` (regional ACL) and `WafCloudFrontWebAclStack` (CloudFront ACL in us-east-1), with shared rule building in `wafRules.ts`, in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqBootstrapConfigWafConstruct` (regional ACL) and `WafCloudFrontWebAclStack` (CloudFront ACL in us-east-1), with shared rule building in `wafRules.ts`, in `@qpqjs/deploy-awscdk`.

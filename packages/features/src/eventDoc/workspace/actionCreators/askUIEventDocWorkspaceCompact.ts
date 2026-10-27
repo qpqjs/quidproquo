@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { EventDocWorkspaceCompactEffect } from '../effects/EventDocWorkspaceCompactEffect';
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';

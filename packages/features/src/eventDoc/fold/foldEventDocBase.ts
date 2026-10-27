@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 import { EventDocDocument, EventDocEvent } from '../models';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';

@@ -1,5 +1,5 @@
-import { Action, InlineFunctionActionType, runStory, StoryError } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { Action, InlineFunctionActionType, runStory, StoryError } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

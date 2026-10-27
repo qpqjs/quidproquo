@@ -11,7 +11,7 @@ Completes an authentication **challenge** raised by [askUserDirectoryAuthenticat
 - **On AWS:** issues Cognito `RespondToAuthChallenge`. For the `MFA_SETUP` challenge the processor first calls `VerifySoftwareToken` with the TOTP code, then completes the challenge with the refreshed session.
 
 ```typescript
-import { askUserDirectoryRespondToAuthChallenge, AuthenticateUserChallenge } from 'quidproquo-core';
+import { askUserDirectoryRespondToAuthChallenge, AuthenticateUserChallenge } from '@qpqjs/core';
 
 export function* askCompleteMfa(username: string, session: string, mfaCode: string) {
   const result = yield* askUserDirectoryRespondToAuthChallenge('app-users', {

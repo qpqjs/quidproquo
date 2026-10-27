@@ -1,5 +1,5 @@
-import { Nullable, QpqPagedData } from 'quidproquo-core';
-import { ActionSearchFilter } from 'quidproquo-features';
+import { Nullable, QpqPagedData } from '@qpqjs/core';
+import { ActionSearchFilter } from '@qpqjs/features';
 
 import { useState } from 'react';
 

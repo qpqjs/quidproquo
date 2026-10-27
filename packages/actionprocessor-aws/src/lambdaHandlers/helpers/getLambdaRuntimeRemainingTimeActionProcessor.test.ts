@@ -1,4 +1,4 @@
-import { buildTestStorySession, resolveActionResult, SystemActionType } from 'quidproquo-core';
+import { buildTestStorySession, resolveActionResult, SystemActionType } from '@qpqjs/core';
 
 import { Context } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';

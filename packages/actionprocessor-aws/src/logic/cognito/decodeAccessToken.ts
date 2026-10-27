@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { DecodedAccessToken, QPQConfig } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { DecodedAccessToken, QPQConfig } from '@qpqjs/core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../awsNamingUtils';
 import { getExportedValue } from '../cloudformation/getExportedValue';

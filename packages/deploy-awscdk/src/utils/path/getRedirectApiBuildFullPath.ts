@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { join } from 'upath';
 

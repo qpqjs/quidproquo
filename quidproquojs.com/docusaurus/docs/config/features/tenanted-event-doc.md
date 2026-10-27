@@ -12,7 +12,7 @@ The deploying service must still register both implementations by calling [defin
 Bundle a collection's keys into roles with `eventDocPermissions`, which builds them from the store name so the catalog and the check cannot drift:
 
 ```typescript
-import { eventDocPermissions } from 'quidproquo-features';
+import { eventDocPermissions } from '@qpqjs/features';
 
 const articles = eventDocPermissions('articles');
 
@@ -23,7 +23,7 @@ export const APP_ROLE_CATALOG = {
 ```
 
 ```typescript
-import { defineTenantedEventDoc, defineTenant } from 'quidproquo-features';
+import { defineTenantedEventDoc, defineTenant } from '@qpqjs/features';
 import { articleDefinition } from './articleDefinition';
 
 export default [

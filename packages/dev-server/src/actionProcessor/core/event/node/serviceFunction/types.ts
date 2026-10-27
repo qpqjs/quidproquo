@@ -1,5 +1,5 @@
-import { EitherActionResult, MatchStoryResult, StorySession } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { EitherActionResult, MatchStoryResult, StorySession } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 // Customs
 export type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {

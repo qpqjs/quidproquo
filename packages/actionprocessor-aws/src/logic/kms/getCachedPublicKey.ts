@@ -1,4 +1,4 @@
-import { spkiDerToPem } from 'quidproquo-actionprocessor-node';
+import { spkiDerToPem } from '@qpqjs/actionprocessor-node';
 
 import { GetPublicKeyCommand, KMSClient } from '@aws-sdk/client-kms';
 

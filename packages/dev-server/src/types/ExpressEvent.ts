@@ -1,4 +1,4 @@
-import { QPQBinaryData } from 'quidproquo-core';
+import { QPQBinaryData } from '@qpqjs/core';
 
 export interface ExpressEvent {
   protocol: string;

@@ -1,5 +1,5 @@
-import { getLayerProvidedModules } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { getLayerProvidedModules } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { ExternalItem, ExternalItemFunctionData } from 'webpack';
 

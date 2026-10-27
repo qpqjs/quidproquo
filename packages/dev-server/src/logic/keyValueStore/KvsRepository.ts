@@ -1,4 +1,4 @@
-import { KvsQueryOperation, KvsUpdate, Nullable, QpqPagedData } from 'quidproquo-core';
+import { KvsQueryOperation, KvsUpdate, Nullable, QpqPagedData } from '@qpqjs/core';
 
 /**
  * One entry of an upsertMany result: the item as written, and the row it

@@ -1,5 +1,5 @@
-import { LogLevelEnumLookup } from 'quidproquo-core';
-import { useFastCallback } from 'quidproquo-web-react';
+import { LogLevelEnumLookup } from '@qpqjs/core';
+import { useFastCallback } from '@qpqjs/web-react';
 
 import { useMemo } from 'react';
 

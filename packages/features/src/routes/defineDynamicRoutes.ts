@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { defineVersionedRoute } from './defineVersionedRoute';
 import { DynamicRouteMeta } from './dynamicRoute';

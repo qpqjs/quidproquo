@@ -10,7 +10,7 @@ Writes a complete record into a [key-value store](../../../config/core/key-value
 - **Action type:** `KeyValueStoreActionType.Upsert`
 
 ```typescript
-import { askKeyValueStoreUpsert } from 'quidproquo-core';
+import { askKeyValueStoreUpsert } from '@qpqjs/core';
 
 interface User {
   userId: string;

@@ -7,8 +7,8 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 

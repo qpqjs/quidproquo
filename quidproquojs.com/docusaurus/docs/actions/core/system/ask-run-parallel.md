@@ -10,7 +10,7 @@ Runs a tuple of stories in parallel and returns their results as a matching tupl
 - **Built from:** [askBatch](./ask-batch.md) — it drives each story's generator and batches their outstanding actions on every step, feeding each result back into the right story.
 
 ```typescript
-import { askRunParallel } from 'quidproquo-core';
+import { askRunParallel } from '@qpqjs/core';
 
 export function* askLoadDashboard(userId: string) {
   const [profile, orders, settings] = yield* askRunParallel([

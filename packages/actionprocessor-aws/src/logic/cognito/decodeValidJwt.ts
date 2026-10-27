@@ -1,4 +1,4 @@
-import { DecodedAccessToken, Nullable } from 'quidproquo-core';
+import { DecodedAccessToken, Nullable } from '@qpqjs/core';
 
 import { decode, verify } from 'jsonwebtoken';
 

@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect, Nullable } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect, Nullable } from '@qpqjs/core';
 
 import { EventDocSummary } from '../../models';
 import { EventDocListEffect } from '../effects/EventDocListEffect';

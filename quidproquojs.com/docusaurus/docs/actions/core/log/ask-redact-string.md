@@ -11,7 +11,7 @@ Marks a string value as sensitive in this story's log. The admin log redaction r
 - **At runtime:** does nothing. The marking is read later by the admin log redaction when the log is viewed.
 
 ```typescript
-import { askRedactString } from 'quidproquo-core';
+import { askRedactString } from '@qpqjs/core';
 
 export function* askHandleWebhook(signingSecret: string) {
   yield* askRedactString(signingSecret);

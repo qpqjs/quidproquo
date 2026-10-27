@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocInitData } from '../models';

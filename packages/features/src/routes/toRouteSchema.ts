@@ -1,4 +1,4 @@
-import { JsonSchema, RouteSchema } from 'quidproquo-webserver';
+import { JsonSchema, RouteSchema } from '@qpqjs/webserver';
 
 import { z } from 'zod/v4';
 

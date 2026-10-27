@@ -1,4 +1,4 @@
-import { isQpqFunctionRuntimeAdvanced, QPQCoreConfigSettingType } from 'quidproquo-core';
+import { isQpqFunctionRuntimeAdvanced, QPQCoreConfigSettingType } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

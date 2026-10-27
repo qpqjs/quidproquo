@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-dev-server-config",
-  "description": "Subpath entry: import { defineDevServerOptions } from 'quidproquo-dev-server/config' — config-only, safe to use in service infrastructure.ts (no server runtime deps pulled into lambda bundles).",
+  "description": "Subpath entry: import { defineDevServerOptions } from '@qpqjs/dev-server/config' — config-only, safe to use in service infrastructure.ts (no server runtime deps pulled into lambda bundles).",
   "main": "../lib/commonjs/config/index.js",
   "module": "../lib/esm/config/index.js",
   "types": "../lib/commonjs/config/index.d.ts",

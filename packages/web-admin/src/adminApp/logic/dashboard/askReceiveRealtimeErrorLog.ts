@@ -1,4 +1,4 @@
-import { AskResponse, StoryResultMetadata } from 'quidproquo-core';
+import { AskResponse, StoryResultMetadata } from '@qpqjs/core';
 
 import { askUIVolatileRealtimeErrorLogReceived } from '../../actionCreators/volatile/askUIVolatileRealtimeErrorLogReceived';
 

@@ -1,4 +1,4 @@
-import { askCatch, askMapParallel, AskResponse, askUserDirectoryGetUserAttributesByUserId, QpqPagedData } from 'quidproquo-core';
+import { askCatch, askMapParallel, AskResponse, askUserDirectoryGetUserAttributesByUserId, QpqPagedData } from '@qpqjs/core';
 
 import { askTenantMembershipsForTenant } from '../data/askTenantMembershipsForTenant';
 import { TenantId } from '../models/TenantId';

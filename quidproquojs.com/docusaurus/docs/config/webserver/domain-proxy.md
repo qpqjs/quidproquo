@@ -7,10 +7,10 @@ description: Front a domain with a CloudFront distribution that proxies all requ
 
 Puts a **CloudFront distribution** in front of a domain (rooted at the service's [DNS base](./dns.md)) and proxies every request through to another HTTP origin. Use it to serve an external or internal backend under your own domain with HTTPS, optional caching, and optional WAF protection.
 
-- **On AWS:** deploys an `aws_cloudfront.Distribution` (`WebQpqWebserverDomainProxyConstruct` in `quidproquo-deploy-awscdk`) whose default behaviour points at an `HttpOrigin` for `httpProxyDomain`, forwards all viewer headers/methods, and applies the chosen viewer-protocol policy. It attaches the requested custom domain names, a looked-up ACM certificate (from the central certificate stack), a cache policy (named cache config or caching-disabled), and — when WAF is enabled for the service — the shared CloudFront web ACL. It then creates a Route53 **`A` alias record** per domain name pointing at the distribution, and adds a caching-disabled behaviour for each `ignoreCache` path pattern.
+- **On AWS:** deploys an `aws_cloudfront.Distribution` (`WebQpqWebserverDomainProxyConstruct` in `@qpqjs/deploy-awscdk`) whose default behaviour points at an `HttpOrigin` for `httpProxyDomain`, forwards all viewer headers/methods, and applies the chosen viewer-protocol policy. It attaches the requested custom domain names, a looked-up ACM certificate (from the central certificate stack), a cache policy (named cache config or caching-disabled), and — when WAF is enabled for the service — the shared CloudFront web ACL. It then creates a Route53 **`A` alias record** per domain name pointing at the distribution, and adds a caching-disabled behaviour for each `ignoreCache` path pattern.
 
 ```typescript
-import { defineDomainProxy, DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
+import { defineDomainProxy, DomainProxyViewerProtocolPolicy } from '@qpqjs/webserver';
 
 export default [
   defineDomainProxy('marketing-proxy', {
@@ -81,7 +81,7 @@ export enum DomainProxyViewerProtocolPolicy {
 ## Examples
 
 ```typescript
-import { defineDomainProxy, DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
+import { defineDomainProxy, DomainProxyViewerProtocolPolicy } from '@qpqjs/webserver';
 
 export default [
   // Proxy specific subdomains, HTTPS only, with a named cache config and a bypass path

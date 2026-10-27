@@ -1,4 +1,4 @@
-import { AccountSecurityServicesQPQConfigSetting } from 'quidproquo-config-aws';
+import { AccountSecurityServicesQPQConfigSetting } from '@qpqjs/config-aws';
 
 import {
   aws_cloudwatch,

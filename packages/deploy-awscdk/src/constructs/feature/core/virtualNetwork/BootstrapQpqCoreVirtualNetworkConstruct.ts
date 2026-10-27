@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { VirtualNetworkQPQConfigSetting } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { VirtualNetworkQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_ec2, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

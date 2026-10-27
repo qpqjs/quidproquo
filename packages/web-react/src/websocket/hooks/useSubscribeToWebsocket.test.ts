@@ -1,4 +1,4 @@
-import { WebsocketServiceEvent } from 'quidproquo-web';
+import { WebsocketServiceEvent } from '@qpqjs/web';
 
 import { createElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';

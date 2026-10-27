@@ -3,10 +3,10 @@
 // markers at config-eval time; remotes are discovered from sibling views
 // packages. Dev-only remotes: everything points at
 // http://localhost:<port>/mf-manifest.json.
-import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { requireDomainResolver } from 'quidproquo-deploy-awscdk';
-import { getWebAddressing } from 'quidproquo-dev-server';
-import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from 'quidproquo-webserver';
+import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { requireDomainResolver } from '@qpqjs/deploy-awscdk';
+import { getWebAddressing } from '@qpqjs/dev-server';
+import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import fs from 'fs';
 import path from 'path';
@@ -36,7 +36,7 @@ const loadQpqConfig = (viewsDir: string): Nullable<QPQConfig> => {
   }
 };
 
-// Module-federation `shared` rules: react/react-dom singleton, quidproquo-web*
+// Module-federation `shared` rules: react/react-dom singleton, @qpqjs/web*
 // singleton, any react-ish dep singleton, plus whatever the service's
 // `defineFrontendBundleOptions({ sharedSingletons })` adds (substring-matched
 // against the hoisted root dependency names, e.g. 'chakra', 'zod').
@@ -54,7 +54,7 @@ const buildShared = (root: string, qpqConfig: Nullable<QPQConfig>): SharedConfig
   for (const [name, version] of Object.entries(deps)) {
     if (name === 'react' || name === 'react-dom') {
       shared[name] = { singleton: true, requiredVersion: version };
-    } else if (name.startsWith('quidproquo-web')) {
+    } else if (name.startsWith('@qpqjs/web')) {
       shared[name] = { singleton: true };
     } else if (sharedSingletons.some((singleton) => name.includes(singleton))) {
       shared[name] = { singleton: true };

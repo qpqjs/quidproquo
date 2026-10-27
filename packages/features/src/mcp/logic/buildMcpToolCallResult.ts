@@ -1,4 +1,4 @@
-import { EitherActionResult } from 'quidproquo-core';
+import { EitherActionResult } from '@qpqjs/core';
 
 import { McpToolCallResult } from '../models/McpToolCallResult';
 

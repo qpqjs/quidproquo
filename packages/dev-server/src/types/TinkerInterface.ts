@@ -1,4 +1,4 @@
-import { QPQConfig, Story, StoryResult } from 'quidproquo-core';
+import { QPQConfig, Story, StoryResult } from '@qpqjs/core';
 
 export interface TinkerOptions {
   initialService?: string;

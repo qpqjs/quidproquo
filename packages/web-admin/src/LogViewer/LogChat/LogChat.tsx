@@ -1,6 +1,6 @@
-import { eventDocAiContext } from 'quidproquo-features';
-import { useEffectCallback } from 'quidproquo-web-react';
-import { QpqContextProvider, useQpqWebsocketQueueRuntime } from 'quidproquo-web-react';
+import { eventDocAiContext } from '@qpqjs/features';
+import { useEffectCallback } from '@qpqjs/web-react';
+import { QpqContextProvider, useQpqWebsocketQueueRuntime } from '@qpqjs/web-react';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Android as AndroidIcon, Person as PersonIcon } from '@mui/icons-material';

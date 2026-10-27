@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge } from 'quidproquo-core';
+import { AuthenticateUserChallenge } from '@qpqjs/core';
 
 export type LoginPayload = {
   username: string;

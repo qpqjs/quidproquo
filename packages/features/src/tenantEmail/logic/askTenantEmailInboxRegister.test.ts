@@ -1,4 +1,4 @@
-import { Action, DateActionType, KeyValueStoreActionType, runStory, throwsError } from 'quidproquo-core';
+import { Action, DateActionType, KeyValueStoreActionType, runStory, throwsError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

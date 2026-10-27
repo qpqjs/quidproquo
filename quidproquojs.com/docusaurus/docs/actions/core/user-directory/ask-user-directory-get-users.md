@@ -11,7 +11,7 @@ Lists the users in a [user directory](../../../config/core/user-directory.md), r
 - **On AWS:** issues Cognito `ListUsers`, paging through the pool.
 
 ```typescript
-import { askUserDirectoryGetUsers } from 'quidproquo-core';
+import { askUserDirectoryGetUsers } from '@qpqjs/core';
 
 export function* askListAllUsers() {
   const users = [];

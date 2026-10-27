@@ -7,7 +7,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UuidNamespace,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 /**
  * Dev server auth helpers.
@@ -49,7 +49,7 @@ export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QP
 };
 
 // Fixed namespace so userIds stay stable across dev server restarts.
-const devUserIdNamespace = generateUuidV5('quidproquo-dev-server/user-id', UuidNamespace.url);
+const devUserIdNamespace = generateUuidV5('@qpqjs/dev-server/user-id', UuidNamespace.url);
 
 // Derives a deterministic userId from the directory identity and the login, so the
 // same email is always the same user in dev ~ and, like Cognito user pools, the same

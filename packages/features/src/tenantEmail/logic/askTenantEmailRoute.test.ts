@@ -6,8 +6,8 @@ import {
   LogActionType,
   runStory,
   storageScopeContext,
-} from 'quidproquo-core';
-import { EmailMessage } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { EmailMessage } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

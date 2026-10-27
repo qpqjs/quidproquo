@@ -1,6 +1,6 @@
-import { CRYPTO_BLOB_PREFIX_V1 } from 'quidproquo-actionprocessor-node';
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { askCryptoEncrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from 'quidproquo-core';
+import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askCryptoEncrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule, UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
+import { getUserScriptModuleMap, listUserScriptExports, loadUserScriptModule, UserScriptModuleMap } from '@qpqjs/actionprocessor-node';
 import {
   actionResult,
   actionResultError,
@@ -14,7 +14,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   UserScriptActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { zipSync } from 'fflate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -83,7 +83,7 @@ const SDK_ZIP = makeZip({
 
 const PROJECT_ZIP = makeZip({
   'my-script/src/main.ts': text(`
-    import { askFileWriteTextContents, AskResponse } from 'quidproquo-core';
+    import { askFileWriteTextContents, AskResponse } from '@qpqjs/core';
     import { formatSum } from './helpers/formatSum';
     export function* add(drive: string, filepath: string, a: number, b: number): AskResponse<number> {
       const sum = a + b;
@@ -142,7 +142,7 @@ describe('getUserScriptBuildFromZipActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual({ exports: ['add', 'greet'] });
     expect(Object.keys(drive.files)).toEqual(['scripts:doc-1/assets/built']);
     const built = drive.files['scripts:doc-1/assets/built'];
-    expect(built).toContain('require("quidproquo-core")');
+    expect(built).toContain('require("@qpqjs/core")');
     expect(built).not.toContain('sourceMappingURL');
     const scriptExports = loadUserScriptModule('built', built, getUserScriptModuleMap());
     expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');

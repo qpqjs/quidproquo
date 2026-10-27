@@ -1,4 +1,4 @@
-import { createQpqRuntimeDefinition } from 'quidproquo-web-react';
+import { createQpqRuntimeDefinition } from '@qpqjs/web-react';
 
 import { askAuthMain } from './runtime/askAuthMain';
 import { authLogic } from './runtime/authLogic';

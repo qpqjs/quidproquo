@@ -1,4 +1,4 @@
-import { EventDocEvent } from 'quidproquo-features';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { coalesceEventTypes } from '../../constants/coalesceEventTypes';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';

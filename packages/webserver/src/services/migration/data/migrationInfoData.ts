@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsEqual } from '@qpqjs/core';
 
 import { MigrationInfo } from '../domain/Migration';
 

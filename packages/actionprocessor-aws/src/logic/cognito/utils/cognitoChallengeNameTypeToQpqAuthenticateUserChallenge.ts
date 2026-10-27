@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge } from 'quidproquo-core';
+import { AuthenticateUserChallenge } from '@qpqjs/core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 

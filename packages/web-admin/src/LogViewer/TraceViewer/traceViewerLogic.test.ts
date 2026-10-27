@@ -1,4 +1,4 @@
-import { QpqExecutionTrace, QpqExecutionTraceValue } from 'quidproquo-core';
+import { QpqExecutionTrace, QpqExecutionTraceValue } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -192,7 +192,7 @@ describe('searchStepValues', () => {
 
 describe('isExternalSourcePath', () => {
   it('marks node_modules paths as external', () => {
-    expect(isExternalSourcePath('webpack://svc/node_modules/quidproquo-core/lib/story.js')).toBe(true);
+    expect(isExternalSourcePath('webpack://svc/node_modules/@qpqjs/core/lib/story.js')).toBe(true);
   });
 
   it('keeps own source paths', () => {

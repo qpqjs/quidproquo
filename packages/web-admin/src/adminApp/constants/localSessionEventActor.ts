@@ -1,4 +1,4 @@
-import { EventDocEventActor } from 'quidproquo-features';
+import { EventDocEventActor } from '@qpqjs/features';
 
 // Placeholder until the server ack replaces the event with the real actor
 // resolved from the access token.

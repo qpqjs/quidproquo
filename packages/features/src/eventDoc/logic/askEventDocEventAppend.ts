@@ -7,7 +7,7 @@ import {
   askRetry,
   askThrowError,
   ErrorTypeEnum,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import {
   EVENT_DOC_APPEND_MAX_RETRIES,

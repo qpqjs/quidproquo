@@ -1,5 +1,5 @@
-import { createApiRequestActionProcessor } from 'quidproquo-actionprocessor-web';
-import { ActionProcessorListResolver } from 'quidproquo-core';
+import { createApiRequestActionProcessor } from '@qpqjs/actionprocessor-web';
+import { ActionProcessorListResolver } from '@qpqjs/core';
 
 import { useMemo, useRef } from 'react';
 

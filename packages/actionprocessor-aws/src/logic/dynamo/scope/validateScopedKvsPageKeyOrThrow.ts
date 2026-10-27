@@ -1,4 +1,4 @@
-import { InvalidScopeError, InvalidScopeErrorCode, KVS_RESERVED_MARKER } from 'quidproquo-core';
+import { InvalidScopeError, InvalidScopeErrorCode, KVS_RESERVED_MARKER } from '@qpqjs/core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 

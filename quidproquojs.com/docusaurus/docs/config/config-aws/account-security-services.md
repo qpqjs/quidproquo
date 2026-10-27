@@ -12,7 +12,7 @@ This is an **account/organization bootstrap setting**: it configures the AWS acc
 - **On AWS:** deployed by `QpqAccountSecurityServicesConstruct` in the account stack (`AccountQpqStack`). When enabled it creates a GuardDuty `CfnDetector` and/or a Security Hub `CfnHub`. When `cognitoAuthFailureAlert` is set it creates a CloudWatch Logs `MetricFilter` (on the account CloudTrail's log group, matching `cognito-idp` `NotAuthorizedException` events), a `qpq/security` metric, an SNS topic (`qpq-account-security-alerts`) with an email subscription per address, and a CloudWatch `Alarm` that notifies the topic.
 
 ```typescript
-import { defineAccountSecurityServices } from 'quidproquo-config-aws';
+import { defineAccountSecurityServices } from '@qpqjs/config-aws';
 
 export default [
   defineAccountSecurityServices({
@@ -65,7 +65,7 @@ export interface AccountAuthFailureAlert {
 ## Examples
 
 ```typescript
-import { defineAccountSecurityServices, defineAccountCloudTrail } from 'quidproquo-config-aws';
+import { defineAccountSecurityServices, defineAccountCloudTrail } from '@qpqjs/config-aws';
 
 export default [
   // CloudTrail with CloudWatch delivery is required for the auth-failure alarm
@@ -88,4 +88,4 @@ export default [
 
 - [defineAccountCloudTrail](./account-cloud-trail.md) — required (with `cloudWatchLogs`) for the Cognito auth-failure alarm's metric filter.
 - [defineAccountBudget](./account-budget.md) — cost budget & anomaly alerts, another `defineAccount*` bootstrap setting on the same account stack.
-- **AWS implementation:** `QpqAccountSecurityServicesConstruct` (GuardDuty detector, Security Hub hub, CloudWatch metric filter/alarm, SNS topic) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqAccountSecurityServicesConstruct` (GuardDuty detector, Security Hub hub, CloudWatch metric filter/alarm, SNS topic) in `@qpqjs/deploy-awscdk`.

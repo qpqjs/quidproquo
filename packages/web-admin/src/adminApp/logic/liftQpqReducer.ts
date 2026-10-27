@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 // Lifts a slice reducer onto the root state: effects the slice handles update
 // that key immutably; unhandled effects bubble so the next reducer can try.

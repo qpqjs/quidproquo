@@ -12,7 +12,7 @@ The manifest comes back in discovery order (the starting docs first); the bundle
 - **Built from:** [askEventDocManifest](./ask-event-doc-manifest.md) (the reference walk) then `askEventDocBundleBuild` (reads each doc's full log + assets into the bundle). Requires an `EventDocTransferRegistry` — read one with `askEventDocTransferReadRegistry`, or call from the built-in `POST /transfer/export` route where it's already resolved.
 
 ```typescript
-import { askEventDocTransferExport, askEventDocTransferReadRegistry } from 'quidproquo-features';
+import { askEventDocTransferExport, askEventDocTransferReadRegistry } from '@qpqjs/features';
 
 export function* exportSelection(docs: EventDocDocRef[]) {
   const registry = yield* askEventDocTransferReadRegistry();

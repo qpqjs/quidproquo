@@ -1,4 +1,4 @@
-import { AiStreamPartType, AiStreamToolError } from 'quidproquo-core';
+import { AiStreamPartType, AiStreamToolError } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 import { toErrorMessage } from './toErrorMessage';

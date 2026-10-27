@@ -10,8 +10,8 @@ Iterates an array, maps each item to an array via the per-item callback, and con
 - **Built from:** [askMap](./ask-map.md) followed by a single-level `Array.prototype.flat()`.
 
 ```typescript
-import { askFlatMap } from 'quidproquo-core';
-import { askFileListDirectory } from 'quidproquo-core';
+import { askFlatMap } from '@qpqjs/core';
+import { askFileListDirectory } from '@qpqjs/core';
 
 export function* askListAllFiles(directories: string[]) {
   // Map each directory to its file list, then flatten into one array.

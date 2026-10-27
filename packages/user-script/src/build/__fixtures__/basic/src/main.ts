@@ -1,4 +1,4 @@
-import { askFileWriteTextContents, AskResponse } from 'quidproquo-core';
+import { askFileWriteTextContents, AskResponse } from '@qpqjs/core';
 
 import { uuidv7 } from 'uuidv7';
 

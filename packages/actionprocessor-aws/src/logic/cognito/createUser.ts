@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, CreateUserRequest } from 'quidproquo-core';
+import { AuthenticateUserResponse, CreateUserRequest } from '@qpqjs/core';
 
 import {
   AdminCreateUserCommand,

@@ -9,7 +9,7 @@ import {
   QPQConfig,
   QpqPagedData,
   resolveKvsStoreConfigOrThrow,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { DatabaseSync } from 'node:sqlite';
 

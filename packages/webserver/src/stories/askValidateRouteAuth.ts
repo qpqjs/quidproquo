@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askApiKeyValidationValidate } from '../actions/apiKeyValidation';
 import { askRouteAuthValidationDecode, askRouteAuthValidationResolveContext, RouteAuthDecodeOutcome } from '../actions/routeAuthValidation';

@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/core';
 
 import { App, aws_iam, aws_lambda, aws_lambda_event_sources, aws_sqs, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';

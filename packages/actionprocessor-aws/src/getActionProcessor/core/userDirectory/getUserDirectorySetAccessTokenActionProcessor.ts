@@ -8,7 +8,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { decodeAccessToken } from '../../../logic/cognito';
 

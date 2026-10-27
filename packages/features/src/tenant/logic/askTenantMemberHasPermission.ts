@@ -1,4 +1,4 @@
-import { askLogCreate, AskResponse, LogLevelEnum } from 'quidproquo-core';
+import { askLogCreate, AskResponse, LogLevelEnum } from '@qpqjs/core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { TenantId } from '../models/TenantId';

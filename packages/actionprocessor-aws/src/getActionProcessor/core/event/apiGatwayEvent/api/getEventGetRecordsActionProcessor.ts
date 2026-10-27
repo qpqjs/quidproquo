@@ -7,8 +7,8 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
-import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { getApiRecordPath } from './getApiRecordPath';

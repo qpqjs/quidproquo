@@ -1,4 +1,4 @@
-import { askSecureTokenGenerate, buildTestQpqConfig, isErroredActionResult, resolveActionResult, resolveActionResultError, SecureTokenActionType } from 'quidproquo-core';
+import { askSecureTokenGenerate, buildTestQpqConfig, isErroredActionResult, resolveActionResult, resolveActionResultError, SecureTokenActionType } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

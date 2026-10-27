@@ -10,8 +10,8 @@ import {
   QPQConfig,
   qpqCoreUtils,
   QPQError,
-} from 'quidproquo-core';
-import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { findApiRoute } from '../../../../../awsLambdaUtils';
 import { getApiRecordPath } from './getApiRecordPath';

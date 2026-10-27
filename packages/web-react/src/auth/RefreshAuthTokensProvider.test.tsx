@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticationInfo } from '@qpqjs/core';
 
 import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

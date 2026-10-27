@@ -12,7 +12,7 @@ It returns a `QPQConfig` (an array of settings), which you spread into your conf
 - **On AWS:** does not deploy a resource of its own. It contributes the identity and build-path values that the deploy layer uses to name and package every other resource.
 
 ```typescript
-import { defineApplicationModule } from 'quidproquo-core';
+import { defineApplicationModule } from '@qpqjs/core';
 
 export default [
   ...defineApplicationModule('my-app', 'web', 'production', __dirname, './build/api'),

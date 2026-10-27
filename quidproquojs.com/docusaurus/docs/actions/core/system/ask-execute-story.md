@@ -10,7 +10,7 @@ Runs a **separate story**, referenced by its function runtime (the `'/path/to/fi
 - **Action type:** `SystemActionType.ExecuteStory`
 
 ```typescript
-import { askExecuteStory } from 'quidproquo-core';
+import { askExecuteStory } from '@qpqjs/core';
 
 export function* askProcessUpload(fileId: string) {
   // Run the resize story, whose entry point lives in another module.

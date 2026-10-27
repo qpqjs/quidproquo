@@ -1,4 +1,4 @@
-import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

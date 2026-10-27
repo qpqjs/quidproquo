@@ -10,7 +10,7 @@ Runs [askKeyValueStoreScan](./ask-key-value-store-scan.md) repeatedly, following
 - **Built from:** loops [askKeyValueStoreScan](./ask-key-value-store-scan.md) until there are no more pages. It is a helper story, not a distinct action.
 
 ```typescript
-import { askKeyValueStoreScanAll, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreScanAll, kvsEqual } from '@qpqjs/core';
 
 interface User {
   userId: string;

@@ -9,7 +9,7 @@ import {
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
   QpqRuntimeType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askListLogs } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';

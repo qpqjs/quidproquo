@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
 import { MCP_EXPORT_RUN_TOOL_FN } from '../constants/mcpExportRunToolFn';
 import { McpToolsetRunToolInput } from '../models/McpToolsetRunToolInput';

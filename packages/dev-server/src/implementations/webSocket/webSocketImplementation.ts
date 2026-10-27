@@ -1,5 +1,5 @@
-import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
-import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
+import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { createServer } from 'http';
 import { RawData, WebSocket, WebSocketServer } from 'ws';

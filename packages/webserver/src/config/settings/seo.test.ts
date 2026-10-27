@@ -1,4 +1,4 @@
-import { generateSimpleHash } from 'quidproquo-core';
+import { generateSimpleHash } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -10,7 +10,7 @@ Starts one conversational turn on the backend. It validates the attachments, app
 - Built from [askEventDocAiAttachmentsValidate](./ask-event-doc-ai-attachments-validate.md), the history load/save helpers, and [askEventDocAiStreamTurn](./ask-event-doc-ai-stream-turn.md).
 
 ```typescript
-import { askEventDocAiProcessSend } from 'quidproquo-features';
+import { askEventDocAiProcessSend } from '@qpqjs/features';
 
 // From the ChatSend handler — docId is read from the trusted session context.
 export function* askOnSend(docId: string, chatId: string, message: string) {

@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QPQCoreConfigSettingType } from 'quidproquo-core';
+import { QPQConfigSetting, QPQCoreConfigSettingType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

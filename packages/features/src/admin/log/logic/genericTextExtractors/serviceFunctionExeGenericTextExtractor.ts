@@ -1,4 +1,4 @@
-import { QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import { QpqRuntimeType, StoryResult } from '@qpqjs/core';
 
 export const serviceFunctionExeGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.SERVICE_FUNCTION_EXE) {

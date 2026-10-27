@@ -42,9 +42,9 @@
 // half. Knobs: GO_DOCKER_BUILD_CONCURRENCY (default: the machine's core count —
 // local builds are CPU-bound) and GO_DOCKER_DEPLOY_CONCURRENCY (default
 // unlimited — deploys just wait on CloudFormation).
-import { QpqDeployEnvVar } from 'quidproquo-core';
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
-import { getServiceRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
+import { QpqDeployEnvVar } from '@qpqjs/core';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { getServiceRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
 
 import fs from 'fs';
 import os from 'os';

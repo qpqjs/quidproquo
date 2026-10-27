@@ -1,4 +1,4 @@
-import { logLevelEnumLookups } from 'quidproquo-core';
+import { logLevelEnumLookups } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

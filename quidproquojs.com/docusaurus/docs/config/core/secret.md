@@ -10,7 +10,7 @@ Declares a **secret**: a named container for a sensitive value like an API key, 
 - **On AWS:** provisions an AWS Secrets Manager secret, and grants the service's role `secretsmanager:GetSecretValue` on it. The physical secret name is derived from application/module/environment so the same config deploys cleanly to multiple environments.
 
 ```typescript
-import { defineSecret } from 'quidproquo-core';
+import { defineSecret } from '@qpqjs/core';
 
 export default [
   defineSecret('anthropic-api-key'),

@@ -11,7 +11,7 @@ Checks whether a file exists on a [storage drive](../../../config/core/storage-d
 - **On AWS:** performs an S3 `HeadObject` on the drive's bucket — a metadata lookup, so no file body is transferred.
 
 ```typescript
-import { askFileExists, askFileWriteTextContents } from 'quidproquo-core';
+import { askFileExists, askFileWriteTextContents } from '@qpqjs/core';
 
 export function* askEnsureSeedFile() {
   const exists = yield* askFileExists('config', 'seed/defaults.json');
@@ -51,7 +51,7 @@ function* askFileExists(
 | `FileExistsErrorTypeEnum.AccessDenied` | The caller lacks permission to check existence on this drive. |
 | `FileExistsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileExists('config', 'seed/defaults.json'));

@@ -10,10 +10,10 @@ Opens a file on a [storage drive](../../../config/core/storage-drive.md) as a **
 - **Action type:** `FileActionType.StreamOpen`
 - **On AWS:** performs an S3 `GetObject` and registers the response body as a chunked async iterator in the runtime's stream registry. Each chunk is `chunkSize` bytes (default `65536`).
 
-The action does not return the file's bytes — it returns a **stream handle**. You then pull chunks with `askStreamRead` and release the stream with `askStreamClose` (both from quidproquo-core).
+The action does not return the file's bytes — it returns a **stream handle**. You then pull chunks with `askStreamRead` and release the stream with `askStreamClose` (both from @qpqjs/core).
 
 ```typescript
-import { askFileStreamOpen, askStreamRead, askStreamClose } from 'quidproquo-core';
+import { askFileStreamOpen, askStreamRead, askStreamClose } from '@qpqjs/core';
 
 export function* askCountLines(filepath: string) {
   const handle = yield* askFileStreamOpen('logs', filepath, 'text');
@@ -79,7 +79,7 @@ The handle's `encoding` type parameter flows through to `askStreamRead`, so a `'
 | `FileStreamOpenErrorTypeEnum.FileNotFound` | No file exists at the given path. |
 | `FileStreamOpenErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileStreamOpen('logs', 'app/2026-07-07.log', 'text'));

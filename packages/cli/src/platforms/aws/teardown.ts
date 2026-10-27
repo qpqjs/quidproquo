@@ -4,7 +4,7 @@
 // (values flow through SSM), so this order is prudence, not a hard dependency.
 // Bootstrap, domain and account stacks are deliberately out of scope — they
 // outlive any one service and are torn down by hand if ever.
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
 
 import { synthCommand } from '../../commands/synth';
 import { TeardownPlan } from '../../lib/deployPrompts';

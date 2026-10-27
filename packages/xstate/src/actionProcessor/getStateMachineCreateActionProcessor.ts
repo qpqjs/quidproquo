@@ -6,7 +6,7 @@ import {
   ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { createActor, createMachine } from 'xstate';
 

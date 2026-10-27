@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, GraphEntityType, runStory, StoryError } from 'quidproquo-core';
+import { ErrorTypeEnum, GraphEntityType, runStory, StoryError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

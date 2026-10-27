@@ -9,12 +9,12 @@ Mounts the export/import **routes** for a service's event-doc collections: a sta
 
 An export walks a doc's registered functions object `collectReferences` (see [defineEventDoc](./event-doc.md)) to pull in every doc it depends on — a template's layout, styles, and content — so a bundle is self-contained. An import replays that bundle's event log against the target's own collections, either as a fresh doc or appended onto one that already exists there, and reports what it would do (or did) per document.
 
-The route controllers ship inside `quidproquo-features` and read the collection registry from per-route globals, so a service needs no controller wiring of its own.
+The route controllers ship inside `@qpqjs/features` and read the collection registry from per-route globals, so a service needs no controller wiring of its own.
 
 - **On AWS:** deploys a storage drive for staged bundle files and the routes below, each backed by a Lambda running the corresponding built-in controller. It creates no data infrastructure for the collections themselves — those come from each collection's own `defineEventDoc`/`defineEventDocSummary`.
 
 ```typescript
-import { defineEventDoc, defineEventDocTransfer } from 'quidproquo-features';
+import { defineEventDoc, defineEventDocTransfer } from '@qpqjs/features';
 import { articleDefinition } from './articleDefinition';
 import { templateDefinition } from './templateDefinition';
 
@@ -63,7 +63,7 @@ The single `options` argument is an `EventDocTransferOptions`:
 | `service` | `string` | – (required) | The service name `EventDocLink`s use to address this service's collections (`link.eventDocService`). Transfers never leave it: the stores live here, so a reference into another service throws rather than being silently dropped from a manifest. |
 | `collections` | `EventDocTransferCollectionSource[]` | – (required) | The collections a transfer may read and write. Feed this the same array the service maps into its `defineEventDoc` calls (each entry's functions object carries the identity), so the two cannot drift — see `EventDocTransferCollectionSource` below. |
 | `scopeResolver` | `string` | – | Name of a registered inline function. Establishes the ambient storage scope for the whole request, exactly like a collection's own `scopeResolver`. Needed separately because a transfer spans collections, so there is no single store to read the resolver name from. Omit only if none of the collections partition. |
-| `routeAuthSettings` | `RouteAuthSettings` | – | Auth settings applied to every mounted route (from quidproquo-webserver — see [route](../webserver/route.md)). Import writes unvalidated history and export reads across every registered collection, so gate these harder than the collections' own routes. |
+| `routeAuthSettings` | `RouteAuthSettings` | – | Auth settings applied to every mounted route (from @qpqjs/webserver — see [route](../webserver/route.md)). Import writes unvalidated history and export reads across every registered collection, so gate these harder than the collections' own routes. |
 | `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. |
 
 ### `EventDocTransferCollectionSource`

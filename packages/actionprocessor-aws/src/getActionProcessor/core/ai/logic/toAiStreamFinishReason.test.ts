@@ -1,4 +1,4 @@
-import { AiStreamFinishReasonEnum } from 'quidproquo-core';
+import { AiStreamFinishReasonEnum } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { askCatch, askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askCatch, askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import {
   EVENT_DOC_AUTHORISER_GLOBAL,

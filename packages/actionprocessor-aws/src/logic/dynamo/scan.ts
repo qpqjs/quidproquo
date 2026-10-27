@@ -1,4 +1,4 @@
-import { KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
+import { KvsQueryOperation, QpqPagedData } from '@qpqjs/core';
 
 import { DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 

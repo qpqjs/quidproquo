@@ -1,5 +1,5 @@
-import type { Nullable } from 'quidproquo-core';
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import type { Nullable } from '@qpqjs/core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { EventDocAiEffect } from '../effects/EventDocAiEffect';
 import type { EventDocAiSetActiveChatEffect } from '../effects/EventDocAiSetActiveChatEffect';

@@ -1,4 +1,4 @@
-import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from 'quidproquo-config-aws';
+import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '@qpqjs/config-aws';
 import {
   filterLogHistoryByActionTypes,
   LogActionType,
@@ -8,7 +8,7 @@ import {
   QpqLogger,
   StoryResult,
   StorySession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';

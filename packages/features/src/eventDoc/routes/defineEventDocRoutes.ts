@@ -1,5 +1,5 @@
-import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
-import { RouteOptions } from 'quidproquo-webserver';
+import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
+import { RouteOptions } from '@qpqjs/webserver';
 
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
 import { defineEventDocCollectionRegistration } from '../config/defineEventDocCollectionRegistration';

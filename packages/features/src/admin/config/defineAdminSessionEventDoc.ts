@@ -1,4 +1,4 @@
-import { defineServiceSettings, QPQConfig } from 'quidproquo-core';
+import { defineServiceSettings, QPQConfig } from '@qpqjs/core';
 
 import { defineEventDocRoutes, defineEventDocSummary } from '../../eventDoc';
 import { adminSessionBasePath, adminSessionDocType, adminSessionStoreName } from '../constants/adminSessionConstants';

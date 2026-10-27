@@ -1,5 +1,5 @@
-import { qpqCoreUtils } from 'quidproquo-core';
-import { RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

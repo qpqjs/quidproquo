@@ -1,5 +1,5 @@
-import { getUserScriptModuleMap, loadUserScriptModule } from 'quidproquo-actionprocessor-node';
-import { FileActionType, runStory } from 'quidproquo-core';
+import { getUserScriptModuleMap, loadUserScriptModule } from '@qpqjs/actionprocessor-node';
+import { FileActionType, runStory } from '@qpqjs/core';
 
 import fs from 'fs';
 import os from 'os';
@@ -50,7 +50,7 @@ describe('buildUserScript', () => {
 
     const built = fs.readFileSync(result.entryPath, 'utf8');
     expect(built).not.toContain('sourceMappingURL');
-    expect(built).toContain('require("quidproquo-core")');
+    expect(built).toContain('require("@qpqjs/core")');
     expect(built).not.toContain('require("uuidv7")');
 
     const scriptExports = loadUserScriptModule(result.entryPath, built, getUserScriptModuleMap());

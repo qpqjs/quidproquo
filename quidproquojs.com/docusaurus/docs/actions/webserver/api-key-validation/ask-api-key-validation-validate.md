@@ -11,7 +11,7 @@ Validates a provided API key value against a list of [declared API keys](../../.
 - **On AWS:** for each referenced key the processor resolves the API Gateway key id (from a CloudFormation export), fetches the real key value, and compares it to the presented value using a **constant-time** equality check. Keys are looked up individually (not by listing all keys) so the IAM grant stays per-key.
 
 ```typescript
-import { askApiKeyValidationValidate } from 'quidproquo-webserver';
+import { askApiKeyValidationValidate } from '@qpqjs/webserver';
 
 export function* askGuardWebhook(presentedKey: string) {
   const isValid = yield* askApiKeyValidationValidate(presentedKey, [

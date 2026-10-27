@@ -1,5 +1,5 @@
-import { type QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { getWorkspaceServiceQpqConfig } from 'quidproquo-deploy-awscdk';
+import { type QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { getWorkspaceServiceQpqConfig } from '@qpqjs/deploy-awscdk';
 
 import { getRoot, getServiceNames } from './discovery';
 

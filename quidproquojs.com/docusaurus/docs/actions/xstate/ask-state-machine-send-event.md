@@ -11,7 +11,7 @@ Sends an event to a [state-machine](../../config/xstate/state-machine.md) instan
 - **On the runtime:** the processor loads the instance from the backing key-value store, runs **every** configured guard story with `(entity, event)` to resolve each guard to a boolean, and rehydrates the XState actor from the persisted snapshot. It then asks XState whether the current state can take the event (with the resolved guard outcomes); if not, it fails with `BadRequest`. Otherwise it sends the event, persists the new snapshot, and runs the stories mapped to any actions that fired during the transition, passing `(entity, event)`.
 
 ```typescript
-import { askStateMachineSendEvent } from 'quidproquo-xstate';
+import { askStateMachineSendEvent } from '@qpqjs/xstate';
 
 export function* payOrder(orderId: string, paymentRef: string) {
   const order = yield* askStateMachineSendEvent('order', orderId, {

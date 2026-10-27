@@ -1,5 +1,5 @@
-import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
+import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

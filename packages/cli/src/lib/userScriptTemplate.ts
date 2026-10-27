@@ -23,7 +23,7 @@ const substitute = (text: string, packageName: string, qpqVersion: string): stri
 
 /**
  * Writes the user-script template project into `targetDir`, naming the package after
- * the directory and pinning quidproquo-core to this CLI's own version. Refuses a
+ * the directory and pinning @qpqjs/core to this CLI's own version. Refuses a
  * directory that already has files in it. Returns the relative paths written.
  */
 export const createUserScriptProject = (targetDir: string): string[] => {

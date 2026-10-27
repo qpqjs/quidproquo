@@ -1,4 +1,4 @@
-import { createLocalContextIdentifier } from 'quidproquo-core';
+import { createLocalContextIdentifier } from '@qpqjs/core';
 
 import { EventDocStore } from '../types/EventDocStore';
 

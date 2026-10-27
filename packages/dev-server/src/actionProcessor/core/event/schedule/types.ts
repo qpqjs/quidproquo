@@ -1,4 +1,4 @@
-import { MatchStoryResult, QpqFunctionRuntime, ScheduledEventParams, StorySession } from 'quidproquo-core';
+import { MatchStoryResult, QpqFunctionRuntime, ScheduledEventParams, StorySession } from '@qpqjs/core';
 
 // What the local ticker hands the runtime when a schedule's minute comes up.
 // One record per firing: EventBridge delivers a schedule one event at a time

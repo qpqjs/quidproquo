@@ -10,7 +10,7 @@ Validates a model against a [Zod](https://zod.dev) schema. If the model matches,
 - **Built from:** a `schema.safeParse` check followed by [askThrowError](../../core/error/ask-throw-error.md) with `ErrorTypeEnum.Invalid` when parsing fails. It is a composed story, not a single action.
 
 ```typescript
-import { askValidateModelOrThrowError } from 'quidproquo-features';
+import { askValidateModelOrThrowError } from '@qpqjs/features';
 import { z } from 'zod';
 
 const CreateUserSchema = z.object({

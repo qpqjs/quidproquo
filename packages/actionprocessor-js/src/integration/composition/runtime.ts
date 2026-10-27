@@ -12,7 +12,7 @@ import {
   StoryResult,
   StorySession,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getCoreActionProcessor } from '../../actionProcessor/core';
 

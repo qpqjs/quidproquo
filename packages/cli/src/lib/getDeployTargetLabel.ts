@@ -1,4 +1,4 @@
-import { QpqDeployEnvVar } from 'quidproquo-core';
+import { QpqDeployEnvVar } from '@qpqjs/core';
 
 /** The resolved deployment as a human label for confirmations, e.g. `production (example-production)`. */
 export const getDeployTargetLabel = (): string => {

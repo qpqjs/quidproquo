@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, runStory, StateActionType } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, runStory, StateActionType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QpqPureFunction } from 'quidproquo-core';
+import { QPQConfigSetting, QpqPureFunction } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 

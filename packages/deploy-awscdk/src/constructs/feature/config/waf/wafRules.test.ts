@@ -1,4 +1,4 @@
-import { QPQAwsConfigSettingType, WafManagedRuleGroup, WafRuleOverrideAction } from 'quidproquo-config-aws';
+import { QPQAwsConfigSettingType, WafManagedRuleGroup, WafRuleOverrideAction } from '@qpqjs/config-aws';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askApplyEventDocEvent } from '../../../../../../eventDoc/actions/eventDocEvent/askApplyEventDocEvent';
 import { MaintenanceEditUpdateEffect } from '../effects/MaintenanceEditUpdateEffect';

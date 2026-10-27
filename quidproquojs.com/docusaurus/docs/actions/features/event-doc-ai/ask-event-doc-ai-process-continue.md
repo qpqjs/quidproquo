@@ -10,7 +10,7 @@ Resumes a turn that an earlier execution handed off. It loads the saved chat his
 The service function entry (`eventDocAiChatContinue`) is invoked async with the requesting session, so the websocket connection, correlation, storage scope, and actor all carry over. It rebuilds the eventDocAi context around this story, then either sends the result to the original correlation with `askServiceRequestRespond`, or returns silently if the turn was handed off again.
 
 ```typescript
-import { askEventDocAiProcessContinue } from 'quidproquo-features';
+import { askEventDocAiProcessContinue } from '@qpqjs/features';
 
 export function* askResumeTurn(docId: string, chatId: string) {
   return yield* askEventDocAiProcessContinue(docId, chatId);

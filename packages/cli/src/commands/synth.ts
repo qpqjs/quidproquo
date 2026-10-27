@@ -4,7 +4,7 @@
 // Runs with ts-node hooks registered (see runCli), which transpiles each
 // service's infrastructure.ts on require. Cross-package `@scope/*` imports
 // resolve through the workspace node_modules symlinks to already-built dist.
-import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

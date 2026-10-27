@@ -7,7 +7,7 @@ A quidproquo user script. It builds to one JavaScript file that a quidproquo ser
 - The entry is `src/main.ts`. Split the code across other files and folders as you like; the build folds them in.
 - Every export of `src/main.ts` must be a function. A generator export runs as a story: it yields quidproquo actions and its return value is what the caller gets. A plain function export returns its value.
 - Scripts run in a sandbox. The actions available are the pure ones (`askDateNow`, `askNewGuid`, logging, random numbers) and `askNetworkRequest` for calling out over HTTP; a story that yields a file, store or other resource action fails at that point. The service that hosts scripts may offer its own module to import instead (see `defineUserScriptModule`).
-- Import from `quidproquo-core`. npm packages you add to `package.json` are bundled into the output. Node builtins such as `fs` are refused at build time.
+- Import from `@qpqjs/core`. npm packages you add to `package.json` are bundled into the output. Node builtins such as `fs` are refused at build time.
 
 ## Build
 
@@ -15,7 +15,7 @@ A quidproquo user script. It builds to one JavaScript file that a quidproquo ser
 npm run build
 ```
 
-Writes `dist/main.js`, and nothing else. Add `--source-map` to the build to embed a source map in it (no separate `.map` file is written). The build needs no `npm install`: `quidproquo-core` is provided by the service that runs the script, and the build does not type check. Run `npm install` for editor types and `npm run validate-ts` to type check.
+Writes `dist/main.js`, and nothing else. Add `--source-map` to the build to embed a source map in it (no separate `.map` file is written). The build needs no `npm install`: `@qpqjs/core` is provided by the service that runs the script, and the build does not type check. Run `npm install` for editor types and `npm run validate-ts` to type check.
 
 ## Run
 

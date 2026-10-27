@@ -1,5 +1,5 @@
-import { generateRs256KeyPair, Rs256KeyPair } from 'quidproquo-actionprocessor-node';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { generateRs256KeyPair, Rs256KeyPair } from '@qpqjs/actionprocessor-node';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import * as path from 'path';
 

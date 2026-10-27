@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { buildTestQpqConfig } from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

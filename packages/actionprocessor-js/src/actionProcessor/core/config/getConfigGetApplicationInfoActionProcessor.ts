@@ -6,7 +6,7 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetApplicationInfo> => {
   return async () => {

@@ -1,4 +1,4 @@
-import { StateActionType } from 'quidproquo-core';
+import { StateActionType } from '@qpqjs/core';
 
 const coreStateActionComponentMap: Record<string, string[]> = {
   [StateActionType.Dispatch]: ['askStateDispatch', 'action'],

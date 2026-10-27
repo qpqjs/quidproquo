@@ -1,4 +1,4 @@
-import { AnyGraphResult, AskResponse, askThrowError, ErrorTypeEnum, GraphScalarResult } from 'quidproquo-core';
+import { AnyGraphResult, AskResponse, askThrowError, ErrorTypeEnum, GraphScalarResult } from '@qpqjs/core';
 
 import { AnyNeptuneResult } from '../types';
 import { askConvertNeptuneNodeResultToGraphNodeResult } from './askConvertNeptuneNodeResultToGraphNodeResult';

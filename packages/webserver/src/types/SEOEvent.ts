@@ -1,4 +1,4 @@
-import { HTTPMethod } from 'quidproquo-core';
+import { HTTPMethod } from '@qpqjs/core';
 
 export interface SeoEventHeaders {
   [key: string]: undefined | string;

@@ -8,7 +8,7 @@ import {
   KvsScopedItem,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { decodeScanAllScopesPageKey, encodeScanAllScopesPageKey } from '../../../logic/keyValueStore/scanAllScopesPageKey';

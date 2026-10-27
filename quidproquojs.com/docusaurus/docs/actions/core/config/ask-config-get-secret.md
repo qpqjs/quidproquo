@@ -11,7 +11,7 @@ Reads the current value of a [secret](../../../config/core/secret.md) by name an
 - **On AWS:** fetches the value from AWS Secrets Manager (`secretsmanager:GetSecretValue`). The secret itself is provisioned by [defineSecret](../../../config/core/secret.md).
 
 ```typescript
-import { askConfigGetSecret, askNetworkRequest } from 'quidproquo-core';
+import { askConfigGetSecret, askNetworkRequest } from '@qpqjs/core';
 
 interface Charge {
   id: string;

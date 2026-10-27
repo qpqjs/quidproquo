@@ -1,14 +1,14 @@
-# quidproquo-deploy-awscdk
+# @qpqjs/deploy-awscdk
 
 Turns a [quidproquo](https://github.com/qpqjs/quidproquo) config into AWS CDK stacks.
 
-You declare resources in your service config (`defineKeyValueStore`, `defineQueue`, `defineRoute`, and so on). This package reads that config and synthesises the infrastructure to back it, wired to the Lambda handlers in `quidproquo-actionprocessor-awslambda`.
+You declare resources in your service config (`defineKeyValueStore`, `defineQueue`, `defineRoute`, and so on). This package reads that config and synthesises the infrastructure to back it, wired to the Lambda handlers in `@qpqjs/actionprocessor-aws`.
 
 ```bash
-npm install quidproquo-deploy-awscdk
+npm install @qpqjs/deploy-awscdk
 ```
 
-In practice you drive it through the [`qpq` CLI](https://www.npmjs.com/package/quidproquo-cli) rather than calling it directly.
+In practice you drive it through the [`qpq` CLI](https://www.npmjs.com/package/@qpqjs/cli) rather than calling it directly.
 
 ## The stacks
 

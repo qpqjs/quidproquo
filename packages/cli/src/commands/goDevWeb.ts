@@ -8,7 +8,7 @@
 //   qpq go:dev:web
 //   qpq go:dev:web --only shell,design
 //   qpq go:dev:web --app <name>
-import { getAllViews, getAppServiceQpqConfigs, getViewsRspackConfig } from 'quidproquo-deploy-rspack';
+import { getAllViews, getAppServiceQpqConfigs, getViewsRspackConfig } from '@qpqjs/deploy-rspack';
 
 import http from 'http';
 import { rspack } from '@rspack/core';

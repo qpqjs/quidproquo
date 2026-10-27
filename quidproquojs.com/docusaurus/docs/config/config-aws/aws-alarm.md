@@ -7,7 +7,7 @@ description: Declare a CloudWatch metric alarm on a Lambda, API Gateway, DynamoD
 
 Declares a **CloudWatch metric alarm** for this service. You pick a namespace + metric (Lambda, API Gateway, DynamoDB, or SQS), a statistic and period, and the threshold/comparison that trips the alarm, and optionally route the alarm state to one or more [event buses](../core/event-bus.md) so it reaches a human. Use it to watch a specific resource metric that the default per-resource alarms and the service dashboard don't already cover.
 
-- **On AWS:** each declared alarm becomes an `aws_cloudwatch.Alarm` (`QpqConfigAwsAlarmConstruct` in `quidproquo-deploy-awscdk`), built entirely from the shared alarm fields, so it is namespace-agnostic. The metric is a plain `aws_cloudwatch.Metric` (namespace, metric name, statistic, period); the comparison operator maps to the matching CloudWatch `ComparisonOperator`. Each event-bus name in `onAlarm.publishToEventBus` resolves to that bus's SNS topic, and the alarm gets an `SnsAction` publishing state changes to it.
+- **On AWS:** each declared alarm becomes an `aws_cloudwatch.Alarm` (`QpqConfigAwsAlarmConstruct` in `@qpqjs/deploy-awscdk`), built entirely from the shared alarm fields, so it is namespace-agnostic. The metric is a plain `aws_cloudwatch.Metric` (namespace, metric name, statistic, period); the comparison operator maps to the matching CloudWatch `ComparisonOperator`. Each event-bus name in `onAlarm.publishToEventBus` resolves to that bus's SNS topic, and the alarm gets an `SnsAction` publishing state changes to it.
 
 ```typescript
 import {
@@ -17,7 +17,7 @@ import {
   AwsAlarmStatistic,
   AwsAlarmPeriod,
   AwsAlarmOperator,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 
 export default [
   // Alert when a queue's oldest message gets too old (a stuck consumer)
@@ -114,7 +114,7 @@ import {
   AwsAlarmStatistic,
   AwsAlarmPeriod,
   AwsAlarmOperator,
-} from 'quidproquo-config-aws';
+} from '@qpqjs/config-aws';
 
 export default [
   // Alert when Lambda errors exceed 5 over two of three 1-minute periods

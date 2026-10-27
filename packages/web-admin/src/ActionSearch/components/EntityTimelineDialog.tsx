@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';

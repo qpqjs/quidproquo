@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { DomainTarget, qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_apigateway, aws_certificatemanager, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

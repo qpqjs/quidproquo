@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, askUserDirectoryReadAccessToken, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, askUserDirectoryReadAccessToken, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveUserId } from '../../eventDoc/globals/askEventDocResolveUserId';
 

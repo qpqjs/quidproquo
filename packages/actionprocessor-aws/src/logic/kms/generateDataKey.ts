@@ -1,5 +1,5 @@
-import { GeneratedDataKey } from 'quidproquo-actionprocessor-node';
-import { CryptoContext } from 'quidproquo-core';
+import { GeneratedDataKey } from '@qpqjs/actionprocessor-node';
+import { CryptoContext } from '@qpqjs/core';
 
 import { GenerateDataKeyCommand, KMSClient } from '@aws-sdk/client-kms';
 

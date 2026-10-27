@@ -7,7 +7,7 @@ import {
   QPQConfig,
   QpqContext,
   QpqContextIdentifier,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 // any: one processor serves context identifiers of every value type; the per-call
 // generic is only meaningful at the requester, so the variance boundary needs any.

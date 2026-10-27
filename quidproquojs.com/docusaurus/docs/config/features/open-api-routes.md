@@ -10,7 +10,7 @@ Mounts two routes: an interactive API reference page and the OpenAPI 3.1 documen
 - **On AWS:** two ordinary routes on the API Lambda. The document is built on request from the config already bundled with the service, so there is no extra infrastructure and nothing to keep in sync.
 
 ```typescript
-import { defineOpenApiRoutes } from 'quidproquo-features';
+import { defineOpenApiRoutes } from '@qpqjs/features';
 
 export default [
   // GET /v1/docs (reference page) and GET /v1/docs/openapi.json (document)
@@ -45,7 +45,7 @@ Routes written with `dynamicRoute` (or a `createRouteDefinition` family) take zo
 
 ```typescript
 import { z } from 'zod/v4';
-import { dynamicRoute } from 'quidproquo-features';
+import { dynamicRoute } from '@qpqjs/features';
 
 export const create = dynamicRoute(
   ['POST', '/widgets'],

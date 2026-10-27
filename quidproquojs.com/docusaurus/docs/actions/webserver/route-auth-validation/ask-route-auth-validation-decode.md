@@ -10,7 +10,7 @@ Decodes and validates the **auth token on an incoming HTTP request** against a r
 - **Action type:** `RouteAuthValidationActionType.Decode`
 
 ```typescript
-import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from 'quidproquo-webserver';
+import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from '@qpqjs/webserver';
 
 export function* askAuthenticateRequest(event, routeAuthSettings) {
   const decodeResult = yield* askRouteAuthValidationDecode(event, routeAuthSettings, false);

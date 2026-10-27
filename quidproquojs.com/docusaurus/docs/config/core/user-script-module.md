@@ -17,7 +17,7 @@ import { askNewGuid } from 'my-app-sdk/v1';
 - **Run:** [askUserScriptExecute](../../actions/core/user-script/ask-user-script-execute.md) hands the script the service's own instance when it requires the name.
 
 ```typescript
-import { defineUserScriptModule } from 'quidproquo-core';
+import { defineUserScriptModule } from '@qpqjs/core';
 
 export default [
   defineUserScriptModule('my-app-sdk/v1', '/entry/scriptModules::mySdkV1'),
@@ -38,7 +38,7 @@ function defineUserScriptModule(
 
 ### `moduleName` — `string` (required)
 
-The exact import name scripts use. Putting a version in it (`my-app-sdk/v1`) lets a later `v2` change the surface while scripts built against `v1` keep working. It may not be a shared framework package (`quidproquo-core`, `quidproquo-webserver`), a relative or absolute path, or a `node:` specifier.
+The exact import name scripts use. Putting a version in it (`my-app-sdk/v1`) lets a later `v2` change the surface while scripts built against `v1` keep working. It may not be a shared framework package (`@qpqjs/core`, `@qpqjs/webserver`), a relative or absolute path, or a `node:` specifier.
 
 ### `runtime` — `QpqFunctionRuntime` (required)
 
@@ -46,7 +46,7 @@ A reference to the exported object, usually `'/path/to/file::exportedObjectName'
 
 ### `options.types` — `` `/${string}` `` (optional)
 
-The module's TypeScript entry, as a path from the config root (the same base a runtime's path uses), e.g. `'/../../sdk/src/v1/index.ts'`. The bundler turns it into one self-contained declaration file: the entry's exports, with the types they use from `quidproquo`, `quidproquo-core` and `quidproquo-webserver` inlined, and nothing else exported. [askUserScriptModuleTypes](../../actions/core/user-script/ask-user-script-module-types.md) returns it, so a browser script editor can autocomplete and type check the import with no build step of its own.
+The module's TypeScript entry, as a path from the config root (the same base a runtime's path uses), e.g. `'/../../sdk/src/v1/index.ts'`. The bundler turns it into one self-contained declaration file: the entry's exports, with the types they use from `quidproquo`, `@qpqjs/core` and `@qpqjs/webserver` inlined, and nothing else exported. [askUserScriptModuleTypes](../../actions/core/user-script/ask-user-script-module-types.md) returns it, so a browser script editor can autocomplete and type check the import with no build step of its own.
 
 - It is generated wherever the backend is bundled: the deployed lambda ships it, and the dev server's watch build regenerates it when a file in the entry's folder changes.
 - The entry is checked with the nearest `tsconfig.json`. If it does not type check, the build fails naming the entry.

@@ -15,7 +15,7 @@ One application-level key is usually enough. Separation between callers comes fr
 The same key also encrypts data at rest: name it as `cryptoKeyName` on a [storage drive](./storage-drive.md) or [key-value store](./key-value-store.md) and that resource is encrypted with it instead of the provider's managed keys.
 
 ```typescript
-import { defineCryptoKey } from 'quidproquo-core';
+import { defineCryptoKey } from '@qpqjs/core';
 
 export default [
   defineCryptoKey('app-crypto-key'),

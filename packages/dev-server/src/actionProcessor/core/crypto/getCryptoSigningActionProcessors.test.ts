@@ -8,7 +8,7 @@ import {
   buildTestQpqConfig,
   CryptoActionType,
   defineSigningKey,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { createPublicKey, verify } from 'crypto';
 import { existsSync } from 'fs';

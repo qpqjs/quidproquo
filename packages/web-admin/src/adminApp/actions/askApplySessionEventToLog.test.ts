@@ -1,5 +1,5 @@
-import { DateActionType, GuidActionType, runStory, StateActionType } from 'quidproquo-core';
-import { EventDocEvent } from 'quidproquo-features';
+import { DateActionType, GuidActionType, runStory, StateActionType } from '@qpqjs/core';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { describe, expect, it } from 'vitest';
 

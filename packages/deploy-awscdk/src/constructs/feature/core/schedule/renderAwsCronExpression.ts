@@ -1,4 +1,4 @@
-import { Nullable, ScheduleFields } from 'quidproquo-core';
+import { Nullable, ScheduleFields } from '@qpqjs/core';
 
 /**
  * The one place in the codebase that knows the AWS EventBridge cron dialect.

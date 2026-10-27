@@ -7,10 +7,10 @@ description: Control whether a service's AWS data stores are retained or destroy
 
 Sets the **removal policy** for every persistent data store this service deploys — storage-drive S3 buckets, key-value-store DynamoDB tables, user-directory Cognito user pools, and graph-database Neptune clusters. It decides what happens to that data when the resource is deleted or replaced (a `cdk destroy`, a full teardown, or a change that forces resource replacement). It defaults to **retain**, so production data survives teardown; declare it as **destroy** in dev/ephemeral configs where you want a clean tear-down.
 
-- **On AWS:** a single service-wide setting read by each data-store construct in `quidproquo-deploy-awscdk` (`QpqCoreStorageDriveConstruct`, `QpqCoreKeyValueStoreConstruct`, `QpqInfCoreUserDirectoryConstruct`, `QpqCoreApiGraphDatabaseConstruct`). `destroy` maps to CDK `RemovalPolicy.DESTROY`; `retain` maps to `RemovalPolicy.RETAIN` for buckets, tables, and user pools, and to `RemovalPolicy.SNAPSHOT` for the Neptune cluster — a final snapshot preserves the graph data without leaving an orphaned live cluster running. When the setting is absent, the resolver falls back to `retain`.
+- **On AWS:** a single service-wide setting read by each data-store construct in `@qpqjs/deploy-awscdk` (`QpqCoreStorageDriveConstruct`, `QpqCoreKeyValueStoreConstruct`, `QpqInfCoreUserDirectoryConstruct`, `QpqCoreApiGraphDatabaseConstruct`). `destroy` maps to CDK `RemovalPolicy.DESTROY`; `retain` maps to `RemovalPolicy.RETAIN` for buckets, tables, and user pools, and to `RemovalPolicy.SNAPSHOT` for the Neptune cluster — a final snapshot preserves the graph data without leaving an orphaned live cluster running. When the setting is absent, the resolver falls back to `retain`.
 
 ```typescript
-import { defineAwsDataStoreRemovalPolicy, AwsDataStoreRemovalPolicy } from 'quidproquo-config-aws';
+import { defineAwsDataStoreRemovalPolicy, AwsDataStoreRemovalPolicy } from '@qpqjs/config-aws';
 
 export default [
   // Dev config: let a teardown remove the data stores
@@ -46,7 +46,7 @@ This is a single, service-wide setting (its `uniqueKey` is fixed) — declaring 
 ## Examples
 
 ```typescript
-import { defineAwsDataStoreRemovalPolicy, AwsDataStoreRemovalPolicy } from 'quidproquo-config-aws';
+import { defineAwsDataStoreRemovalPolicy, AwsDataStoreRemovalPolicy } from '@qpqjs/config-aws';
 
 // A shared dev config module: everything is disposable
 export const devDataPolicy = [

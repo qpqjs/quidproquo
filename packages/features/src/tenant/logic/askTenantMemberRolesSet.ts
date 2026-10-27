@@ -1,4 +1,4 @@
-import { askDateNow, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askDateNow, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { TenantPermission } from '../constants/TenantPermission';
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';

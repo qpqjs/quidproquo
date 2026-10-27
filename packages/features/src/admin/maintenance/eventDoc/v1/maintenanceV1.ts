@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 import { EventDocBaseVersion } from '../../../../eventDoc/definition/types/EventDocVersion';
 import { EventDocEvent } from '../../../../eventDoc/models/EventDocEvent';

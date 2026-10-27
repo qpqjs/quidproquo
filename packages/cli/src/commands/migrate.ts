@@ -7,7 +7,7 @@
 //
 // Migrations are recorded as they run, in the same store the deploy path uses, so running
 // this twice is a no-op the second time.
-import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
+import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
 import { spawn } from 'child_process';
 import path from 'path';

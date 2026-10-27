@@ -1,4 +1,4 @@
-import { ActionSearchFieldDefinition, ActionSearchFieldType, ActionSearchFilter, ActionSearchFilterOperator } from 'quidproquo-features';
+import { ActionSearchFieldDefinition, ActionSearchFieldType, ActionSearchFilter, ActionSearchFilterOperator } from '@qpqjs/features';
 
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';

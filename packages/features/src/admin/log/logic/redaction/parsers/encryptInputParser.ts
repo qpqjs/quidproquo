@@ -1,4 +1,4 @@
-import { CryptoActionType } from 'quidproquo-core';
+import { CryptoActionType } from '@qpqjs/core';
 
 import { collectStrings } from '../collectStrings';
 import { redactAllStrings } from '../redactAllStrings';

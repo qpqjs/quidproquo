@@ -1,5 +1,5 @@
-import { defineInlineFunction, defineKeyValueStore, QPQConfig } from 'quidproquo-core';
-import { defineEmailReceiver } from 'quidproquo-webserver';
+import { defineInlineFunction, defineKeyValueStore, QPQConfig } from '@qpqjs/core';
+import { defineEmailReceiver } from '@qpqjs/webserver';
 
 import { TENANT_EMAIL_ON_EMAIL_GLOBAL } from '../constants/tenantEmailGlobalNames';
 import { tenantEmailOnEmailFunctionName } from '../constants/tenantEmailOnEmailFunctionName';

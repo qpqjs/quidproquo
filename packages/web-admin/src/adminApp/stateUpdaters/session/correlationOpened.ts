@@ -1,4 +1,4 @@
-import { EventDocEventPayload } from 'quidproquo-features';
+import { EventDocEventPayload } from '@qpqjs/features';
 
 import { AdminSessionState } from '../../AdminSessionState';
 import { CorrelationOpenedData } from '../../effects/session/CorrelationOpenedEvent';

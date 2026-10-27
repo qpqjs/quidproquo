@@ -12,7 +12,7 @@ The primary entry point a chat composer calls. One of the four client stories ex
 - Built from [askCatch](../../core/system/ask-catch.md), [askStateRead](../../core/state/ask-state-read.md), [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md), [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiAppendChatMessage` / `askUIEventDocAiClearStream` / `askUIEventDocAiSetSending` / `askUIEventDocAiSetError` UI actions.
 
 ```typescript
-import { askEventDocAiSendMessage } from 'quidproquo-features';
+import { askEventDocAiSendMessage } from '@qpqjs/features';
 
 export function* askOnComposerSubmit(text: string) {
   yield* askEventDocAiSendMessage(text);

@@ -16,7 +16,7 @@ The append is **expected-version optimistic concurrency**: it resolves the log's
 - **Requires the store context** — wrap the call in [askEventDocProvideStore](./ask-event-doc-provide-store.md) (custom routes) or [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals) (built-in routes).
 
 ```typescript
-import { askEventDocEventAppend } from 'quidproquo-features';
+import { askEventDocEventAppend } from '@qpqjs/features';
 
 export function* appendTitleChange(docId: string) {
   const actor = yield* askEventDocResolveActor();

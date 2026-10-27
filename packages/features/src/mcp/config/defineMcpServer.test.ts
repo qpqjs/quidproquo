@@ -1,5 +1,5 @@
-import { QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
-import { RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
+import { RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { QpqAppDeployConfig } from 'quidproquo-core';
+import { QpqAppDeployConfig } from '@qpqjs/core';
 
 import fs from 'fs';
 

@@ -11,7 +11,7 @@ Administratively sets a user's password in a [user directory](../../../config/co
 - **On AWS:** issues Cognito `AdminSetUserPassword` (setting the password as permanent).
 
 ```typescript
-import { askUserDirectorySetPassword } from 'quidproquo-core';
+import { askUserDirectorySetPassword } from '@qpqjs/core';
 
 export function* askResetUserPassword(username: string, newPassword: string) {
   yield* askUserDirectorySetPassword('app-users', username, newPassword);

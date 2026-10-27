@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-tsconfig",
+  "name": "@qpqjs/tsconfig",
   "version": "0.1.34",
   "description": "",
   "main": "tsconfig.base.json",

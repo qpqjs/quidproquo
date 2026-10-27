@@ -1,4 +1,4 @@
-import { QpqRuntimeType } from 'quidproquo-core';
+import { QpqRuntimeType } from '@qpqjs/core';
 
 import { Fragment, memo, useEffect, useRef, useState } from 'react';
 import { Tree, TreeNodeDatum } from 'react-d3-tree';

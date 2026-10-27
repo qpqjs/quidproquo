@@ -1,4 +1,4 @@
-import { actionResult, createActionProcessor, generateUuid, getProcessCustomImplementation, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, createActionProcessor, generateUuid, getProcessCustomImplementation, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
 import { askRouteAuthValidationDecodeDefault } from '../../stories/askRouteAuthValidationDecodeDefault';

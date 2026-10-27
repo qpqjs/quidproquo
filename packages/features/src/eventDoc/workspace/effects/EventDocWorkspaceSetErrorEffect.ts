@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { EventDocWorkspaceSlotError } from '../types/EventDocWorkspaceSlotError';
 import { EventDocWorkspaceEffect } from './EventDocWorkspaceEffect';

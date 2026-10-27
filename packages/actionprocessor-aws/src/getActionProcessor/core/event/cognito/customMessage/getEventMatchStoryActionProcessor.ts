@@ -8,8 +8,8 @@ import {
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-} from 'quidproquo-core';
-import { EmailSendEventType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { EmailSendEventType } from '@qpqjs/webserver';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 

@@ -1,5 +1,5 @@
-import { QpqIsoDateTime } from 'quidproquo-core';
-import { EventDocEffect, EventDocEvent } from 'quidproquo-features';
+import { QpqIsoDateTime } from '@qpqjs/core';
+import { EventDocEffect, EventDocEvent } from '@qpqjs/features';
 
 import { adminSessionSchemaVersion } from '../constants/adminSessionSchemaVersion';
 

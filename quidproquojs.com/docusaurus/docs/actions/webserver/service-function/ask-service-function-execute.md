@@ -11,7 +11,7 @@ Invokes a [service function](../../../config/webserver/service-function.md) — 
 - **On AWS:** invokes the target function's dedicated Lambda (`<functionName>-sfunc`) directly by name. When `isAsync` is `false` (the default) the call is synchronous and returns the function's result; when `true` it is a fire-and-forget async invocation that resolves without a result.
 
 ```typescript
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
 interface ResizeRequest {
   drive: string;

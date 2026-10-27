@@ -1,5 +1,5 @@
-import { GlobalQPQConfigSetting, KeyValueStoreQPQConfigSetting, QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from 'quidproquo-core';
-import { QPQWebServerConfigSettingType, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { GlobalQPQConfigSetting, KeyValueStoreQPQConfigSetting, QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { QPQWebServerConfigSettingType, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

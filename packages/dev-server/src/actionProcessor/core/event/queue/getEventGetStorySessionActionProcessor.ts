@@ -7,7 +7,7 @@ import {
   QPQConfig,
   StorySession,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 

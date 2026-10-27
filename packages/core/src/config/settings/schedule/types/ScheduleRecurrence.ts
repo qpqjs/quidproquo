@@ -5,7 +5,7 @@ import { DayOfWeek } from './DayOfWeek';
  * cron string.
  *
  * Deliberately platform-neutral: an AWS EventBridge cron expression is one
- * RENDERING of this, produced in quidproquo-deploy-awscdk, and the dev server
+ * RENDERING of this, produced in @qpqjs/deploy-awscdk, and the dev server
  * matches the same declaration against the clock. Nothing here knows what a
  * `?` is.
  *

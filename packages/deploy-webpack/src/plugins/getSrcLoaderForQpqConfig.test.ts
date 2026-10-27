@@ -1,7 +1,7 @@
 // Verifies the generated bundled-loader source string: src-path resolution, the guarded
 // require() emitted per runtime, and the bundleFallback:false "thin shell" branch that
 // emits a fail-fast throw with NO require() (so webpack bundles no user code).
-import { buildTestQpqConfig, defineFederatedModuleStore, defineInlineFunction } from 'quidproquo-core';
+import { buildTestQpqConfig, defineFederatedModuleStore, defineInlineFunction } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

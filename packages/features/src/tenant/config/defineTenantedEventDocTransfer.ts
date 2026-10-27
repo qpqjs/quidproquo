@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { defineEventDocTransfer, EventDocTransferOptions } from '../../eventDocTransfer';
 import { TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';

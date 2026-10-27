@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { GraphDatabaseQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

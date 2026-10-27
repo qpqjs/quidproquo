@@ -10,7 +10,7 @@ Builds a compact JWT (`header.payload.signature`) over `claims`, signed RS256 wi
 Every time-based claim (`exp`, `nbf`, `iat`) must already be on `claims`, sourced from QPQ time, so the story stays deterministic. Nothing is added or rewritten.
 
 ```typescript
-import { askCryptoSignJwt, askGetCurrentEpoch } from 'quidproquo-core';
+import { askCryptoSignJwt, askGetCurrentEpoch } from '@qpqjs/core';
 
 export function* askIssueAccessToken(clientId: string, grants: string[]) {
   const now = yield* askGetCurrentEpoch();

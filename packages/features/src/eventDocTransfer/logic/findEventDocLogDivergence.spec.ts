@@ -1,4 +1,4 @@
-import { QpqIsoDateTime } from 'quidproquo-core';
+import { QpqIsoDateTime } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

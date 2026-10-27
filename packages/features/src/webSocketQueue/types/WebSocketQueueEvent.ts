@@ -1,4 +1,4 @@
-import { QueueEvent, QueueMessage } from 'quidproquo-core';
+import { QueueEvent, QueueMessage } from '@qpqjs/core';
 
 export type WebSocketQueueEvent<EventType, Payload> = QueueEvent<
   {

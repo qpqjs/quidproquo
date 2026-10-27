@@ -1,7 +1,7 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_ec2, aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

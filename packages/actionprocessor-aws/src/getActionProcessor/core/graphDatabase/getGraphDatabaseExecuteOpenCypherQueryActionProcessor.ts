@@ -6,7 +6,7 @@ import {
   GraphDatabaseActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import { getGraphDatabaseForNeptuneActionProcessor } from './customActions';

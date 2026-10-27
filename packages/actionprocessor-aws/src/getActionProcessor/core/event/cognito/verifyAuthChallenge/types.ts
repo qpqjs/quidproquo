@@ -1,4 +1,4 @@
-import { MatchStoryResult, VerifyAuthChallengeEvent, VerifyAuthChallengeEventResponse } from 'quidproquo-core';
+import { MatchStoryResult, VerifyAuthChallengeEvent, VerifyAuthChallengeEventResponse } from '@qpqjs/core';
 
 import { Context, VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 

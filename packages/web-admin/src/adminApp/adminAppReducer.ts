@@ -1,4 +1,4 @@
-import { combineQpqReducers } from 'quidproquo-core';
+import { combineQpqReducers } from '@qpqjs/core';
 
 import { liftQpqReducer } from './logic/liftQpqReducer';
 import { AdminAppState } from './AdminAppState';

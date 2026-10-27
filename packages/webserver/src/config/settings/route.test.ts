@@ -1,4 +1,4 @@
-import { getUniqueKeyFromQpqFunctionRuntime } from 'quidproquo-core';
+import { getUniqueKeyFromQpqFunctionRuntime } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

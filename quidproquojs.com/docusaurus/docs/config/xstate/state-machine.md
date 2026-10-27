@@ -12,7 +12,7 @@ Each instance is a row in a key-value store. Its current XState snapshot is seri
 - **On AWS:** `defineStateMachine` expands into **two** config settings — a key-value store named `qpq-sm-<machineName>` (keyed by `id`) and the state-machine setting itself. The key-value store deploys a DynamoDB table (see [defineKeyValueStore](../core/key-value-store.md)) partitioned by `id`; that table is where every instance and its persisted snapshot live. The machine definition itself is not deployed as any dedicated infrastructure — it is evaluated in-process by the action processors whenever an instance is created, read, or advanced.
 
 ```typescript
-import { defineStateMachine } from 'quidproquo-xstate';
+import { defineStateMachine } from '@qpqjs/xstate';
 
 export default [
   defineStateMachine('order', {
@@ -79,7 +79,7 @@ XState `actions` and `guards` are named in your `config` but implemented as quid
 - **Guards** decide whether a guarded transition may occur. Before an event is applied, the runtime runs **every** mapped guard story, passing `(entity, event)`, and uses each story's boolean result to answer the corresponding guard in the machine. Guards must be side-effect-light — they are evaluated up front to a plain boolean.
 
 ```typescript
-import { defineStateMachine } from 'quidproquo-xstate';
+import { defineStateMachine } from '@qpqjs/xstate';
 
 export default [
   defineStateMachine('order', {
@@ -124,7 +124,7 @@ Because the snapshot is persisted with XState's own serialization, machine insta
 ## Examples
 
 ```typescript
-import { defineStateMachine } from 'quidproquo-xstate';
+import { defineStateMachine } from '@qpqjs/xstate';
 
 export default [
   // Minimal machine — no side effects, default state field
@@ -170,12 +170,12 @@ export default [
 A single config plus the four actions is enough to create a durable instance and move it through its lifecycle across separate invocations:
 
 ```typescript
-import { askNewGuid } from 'quidproquo-core';
+import { askNewGuid } from '@qpqjs/core';
 import {
   askStateMachineCreate,
   askStateMachineSendEvent,
   askStateMachineGetState,
-} from 'quidproquo-xstate';
+} from '@qpqjs/xstate';
 
 export function* processOrder(customerId: string) {
   const orderId = yield* askNewGuid();

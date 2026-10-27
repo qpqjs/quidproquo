@@ -6,7 +6,7 @@
 // One `tsc -b --watch` over every workspace package that ships types; routine
 // watch chatter is dropped so only real compile errors reach the shared
 // terminal. Opt out with `--no-types`.
-import { getWorkspacePackageDirs } from 'quidproquo-deploy-rspack';
+import { getWorkspacePackageDirs } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
 import fs from 'fs';

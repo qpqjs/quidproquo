@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo, defineEmailSenderAllowList } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo, defineEmailSenderAllowList } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/core';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';

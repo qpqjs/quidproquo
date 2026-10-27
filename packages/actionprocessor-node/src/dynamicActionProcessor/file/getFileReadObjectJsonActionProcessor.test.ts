@@ -1,4 +1,4 @@
-import { askFileReadObjectJsonBase, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileReadObjectJsonBase, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';

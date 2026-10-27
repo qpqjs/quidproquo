@@ -1,4 +1,4 @@
-import { UserAttributes } from 'quidproquo-core';
+import { UserAttributes } from '@qpqjs/core';
 
 /** Maps qpq UserAttributes keys to their Cognito standard attribute names. */
 export const cognitoAttributeMap: Record<keyof UserAttributes, string> = {

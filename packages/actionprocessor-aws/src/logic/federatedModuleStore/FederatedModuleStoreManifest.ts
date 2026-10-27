@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // The JSON contract that ties the two halves of federation together:
 //   WRITTEN BY   packages/deploy-webpack/src/federation/publishFederatedRemote.ts
-//   READ BY      quidproquo-actionprocessor-awslambda .../loadFederatedStory.ts
+//   READ BY      @qpqjs/actionprocessor-aws .../loadFederatedStory.ts
 //
 // Store layout (under s3://<bucket>/<service>/ once uploaded):
 //   manifest.json          <- THIS document, uploaded LAST (the atomic "current" pointer)

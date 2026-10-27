@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineDns } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineDns } from '@qpqjs/webserver';
 
 import fs from 'fs';
 import os from 'os';

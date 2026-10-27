@@ -1,4 +1,4 @@
-import { ActionOf, askOverrideActions, AskResponse, AskResponseReturnType, getSuccessfulEitherActionResultIfRequired } from 'quidproquo-core';
+import { ActionOf, askOverrideActions, AskResponse, AskResponseReturnType, getSuccessfulEitherActionResultIfRequired } from '@qpqjs/core';
 
 import {
   askApplyEventDocEventBase,

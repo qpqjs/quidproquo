@@ -1,7 +1,7 @@
 /**
  * The env vars a selected deployment is delivered through. Service configs and deploy
  * tooling read these at load time, so they are primed before any infrastructure.ts is
- * required. Platform identity vars are declared by the platform (see quidproquo-config-aws).
+ * required. Platform identity vars are declared by the platform (see @qpqjs/config-aws).
  */
 export enum QpqDeployEnvVar {
   // The app folder under apps/ and the deployment name within its deploy.config.json.

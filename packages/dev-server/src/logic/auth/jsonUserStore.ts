@@ -1,4 +1,4 @@
-import { UserAttributes } from 'quidproquo-core';
+import { UserAttributes } from '@qpqjs/core';
 
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 import { createDevUserId, DevUserDirectory, resolveDevUsername } from './devAuth';

@@ -10,7 +10,7 @@ import {
   LogLevelEnum,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomGuid } from '../../../../../awsLambdaUtils';
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';

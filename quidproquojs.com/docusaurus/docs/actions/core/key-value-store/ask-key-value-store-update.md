@@ -10,7 +10,7 @@ Applies a list of **update operations** (set, remove, increment, …) to a singl
 - **Action type:** `KeyValueStoreActionType.Update`
 
 ```typescript
-import { askKeyValueStoreUpdate, kvsUpdate, kvsSet, kvsIncrement } from 'quidproquo-core';
+import { askKeyValueStoreUpdate, kvsUpdate, kvsSet, kvsIncrement } from '@qpqjs/core';
 
 interface Account {
   accountId: string;
@@ -70,7 +70,7 @@ import {
   kvsUpdate,
   kvsSet, kvsRemove, kvsAdd, kvsDelete,
   kvsSetIfNotExists, kvsIncrement, kvsDecrement,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const updates = kvsUpdate([
   kvsSet('name', 'Ada'),

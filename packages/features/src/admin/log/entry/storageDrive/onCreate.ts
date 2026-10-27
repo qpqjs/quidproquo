@@ -1,4 +1,4 @@
-import { StorageDriveEvent } from 'quidproquo-webserver';
+import { StorageDriveEvent } from '@qpqjs/webserver';
 
 import { askUpdateDatabaseFromLogFiles } from '../../logic/askUpdateDatabaseFromLogFiles';
 

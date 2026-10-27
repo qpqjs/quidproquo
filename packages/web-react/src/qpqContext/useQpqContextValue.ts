@@ -1,4 +1,4 @@
-import { QpqContextIdentifier } from 'quidproquo-core';
+import { QpqContextIdentifier } from '@qpqjs/core';
 
 import { useQpqContextValues } from './useQpqContextValues';
 

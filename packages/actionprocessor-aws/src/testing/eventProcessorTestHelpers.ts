@@ -1,4 +1,4 @@
-import { ActionProcessorListResolver, buildTestQpqConfig, EventActionType, QPQConfig, QPQError } from 'quidproquo-core';
+import { ActionProcessorListResolver, buildTestQpqConfig, EventActionType, QPQConfig, QPQError } from '@qpqjs/core';
 
 // Resolves a single event action processor from its resolver. Every event resolver in this
 // package returns `{ [EventActionType.X]: processor }`, so tests only ever want the one

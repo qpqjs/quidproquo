@@ -1,5 +1,5 @@
-import { Nullable } from 'quidproquo-core';
-import { WebAddressing, WebAddressingMode } from 'quidproquo-webserver';
+import { Nullable } from '@qpqjs/core';
+import { WebAddressing, WebAddressingMode } from '@qpqjs/webserver';
 
 // Subdomain mode with no known entries: the shape of a bundle nothing was baked into.
 const UNADDRESSED: WebAddressing = { mode: WebAddressingMode.subdomain, rootDomains: [], entries: [], apis: [], webSockets: [] };

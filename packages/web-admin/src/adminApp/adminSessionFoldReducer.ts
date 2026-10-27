@@ -1,5 +1,5 @@
-import { QpqReducer } from 'quidproquo-core';
-import { buildEventDocFoldReducer, EventDocEvent, foldEventDocLog, ReservedEventDocEffects } from 'quidproquo-features';
+import { QpqReducer } from '@qpqjs/core';
+import { buildEventDocFoldReducer, EventDocEvent, foldEventDocLog, ReservedEventDocEffects } from '@qpqjs/features';
 
 import { adminSessionSchemaVersion } from './constants/adminSessionSchemaVersion';
 import { AdminSessionEvents } from './effects/session/AdminSessionEvents';
@@ -19,7 +19,7 @@ import { AdminSessionState, createInitialAdminSessionState } from './AdminSessio
 
 // Domain handlers + the reserved event-doc base effects (INIT_STATE etc.).
 // Explicitly annotated so declaration emit stays portable (the inferred type
-// would otherwise reference quidproquo-core through quidproquo-features).
+// would otherwise reference @qpqjs/core through @qpqjs/features).
 export const adminSessionFoldReducer: QpqReducer<AdminSessionState, AdminSessionEvents | ReservedEventDocEffects> = buildEventDocFoldReducer<
   AdminSessionState,
   AdminSessionEvents

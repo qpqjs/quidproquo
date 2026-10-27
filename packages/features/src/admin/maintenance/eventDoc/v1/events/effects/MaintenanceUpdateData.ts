@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { MaintenanceLevel } from '../../types/MaintenanceLevel';
 import { MaintenanceType } from '../../types/MaintenanceType';

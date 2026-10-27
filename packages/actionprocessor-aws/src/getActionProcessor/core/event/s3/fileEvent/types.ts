@@ -1,5 +1,5 @@
-import { MatchStoryResult, QpqFunctionRuntime } from 'quidproquo-core';
-import { StorageDriveEvent, StorageDriveEventResponse } from 'quidproquo-webserver';
+import { MatchStoryResult, QpqFunctionRuntime } from '@qpqjs/core';
+import { StorageDriveEvent, StorageDriveEventResponse } from '@qpqjs/webserver';
 
 import { Context, S3Event } from 'aws-lambda';
 

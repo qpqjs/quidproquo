@@ -10,7 +10,7 @@ A small set of **pure** helper functions for shifting an ISO-8601 date-time stri
 Each helper takes an ISO-8601 timestamp string (such as the value returned by [askDateNow](./ask-date-now.md)), parses it with `new Date(...)`, applies the shift, and returns the result as a UTC ISO-8601 string via `Date.prototype.toISOString()`. Because they are deterministic pure functions, they can be used freely inside a story (compute the shift on a timestamp you obtained from [askDateNow](./ask-date-now.md)) or anywhere in plain code.
 
 ```typescript
-import { askDateNow, addDaysToTDateIso } from 'quidproquo-core';
+import { askDateNow, addDaysToTDateIso } from '@qpqjs/core';
 
 export function* askSevenDaysFromNow() {
   const now = yield* askDateNow();

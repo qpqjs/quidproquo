@@ -1,4 +1,4 @@
-import { defineInlineFunction, QPQConfig } from 'quidproquo-core';
+import { defineInlineFunction, QPQConfig } from '@qpqjs/core';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { MCP_REMOTE_PREFIX_GLOBAL } from '../constants/mcpRemotePrefixGlobal';

@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { EventDocManifestItem } from '../../models';
 import { EventDocExportUiEffect } from '../effects/EventDocExportUiEffect';

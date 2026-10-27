@@ -1,4 +1,4 @@
-import { GenericDataResourceActionTypeEnum } from 'quidproquo-webserver';
+import { GenericDataResourceActionTypeEnum } from '@qpqjs/webserver';
 
 const webserverGenericDataResourceActionComponentMap: Record<string, string[]> = {
   [GenericDataResourceActionTypeEnum.Put]: ['askPutGenericDataResource', 'tableName', 'item'],

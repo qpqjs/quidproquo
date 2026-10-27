@@ -12,7 +12,7 @@ A collection with no registered functions object is a leaf: this returns `[]`. S
 - **Built from:** [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore) (to read the collection's `storeName`/`type`, which address its functions registration) and `askEventDocDocumentStateLatest` (the folded state `collectReferencesFromState` walks). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
 ```typescript
-import { askEventDocReferencesFromState } from 'quidproquo-features';
+import { askEventDocReferencesFromState } from '@qpqjs/features';
 
 export function* readTemplateDependencies(templateId: string) {
   const links = yield* askEventDocReferencesFromState(templateId);

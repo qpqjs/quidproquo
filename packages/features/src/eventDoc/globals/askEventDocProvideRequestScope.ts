@@ -1,5 +1,5 @@
-import { askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { EventDocAuthoriseInput } from '../types/EventDocAuthoriseInput';

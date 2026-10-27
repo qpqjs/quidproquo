@@ -48,7 +48,7 @@ export const defineBackendBundleOptions = (options: BackendBundleOptions): Backe
 export interface FrontendBundleOptions {
   // Substring-matched against the hoisted root dependency names; matches are
   // shared as module-federation singletons. react/react-dom/react-ish deps and
-  // quidproquo-web* are always singletons — this adds app-stack ones (e.g.
+  // @qpqjs/web* are always singletons — this adds app-stack ones (e.g.
   // 'chakra', 'zod') without baking package names into the bundler.
   sharedSingletons?: string[];
 }

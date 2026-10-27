@@ -1,4 +1,4 @@
-import { askFileIsColdStorage, AskResponse } from 'quidproquo-core';
+import { askFileIsColdStorage, AskResponse } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

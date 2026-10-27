@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { HTTPEventResponse } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { HTTPEventResponse } from '@qpqjs/webserver';
 
 /** GET and DELETE {path}: this server keeps no sessions and pushes nothing, which MCP clients accept as 405. */
 export function* mcpMethodNotAllowed(): AskResponse<HTTPEventResponse> {

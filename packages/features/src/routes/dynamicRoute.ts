@@ -1,5 +1,5 @@
-import { askCatch, AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils, RouteOptions } from 'quidproquo-webserver';
+import { askCatch, AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils, RouteOptions } from '@qpqjs/webserver';
 
 import { askDynamicRouteParseInput } from './askDynamicRouteParseInput';
 import { DynamicRouteConfig } from './DynamicRouteConfig';

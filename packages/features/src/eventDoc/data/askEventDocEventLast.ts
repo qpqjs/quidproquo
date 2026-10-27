@@ -1,5 +1,5 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual } from 'quidproquo-core';
-import { Nullable } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsEqual } from '@qpqjs/core';
+import { Nullable } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';

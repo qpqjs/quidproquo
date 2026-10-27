@@ -1,4 +1,4 @@
-import { QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import { QpqRuntimeType, StoryResult } from '@qpqjs/core';
 
 import { redactStoryResult } from '../../admin/log/logic/redaction/redactStoryResult';
 import { UNREDACTABLE_LOG_VALUE } from '../constants/UNREDACTABLE_LOG_VALUE';

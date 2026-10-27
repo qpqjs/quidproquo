@@ -3,7 +3,7 @@ import {
   askEventDocCreate,
   askEventDocProvideStore,
   askEventDocSoftDelete,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import {

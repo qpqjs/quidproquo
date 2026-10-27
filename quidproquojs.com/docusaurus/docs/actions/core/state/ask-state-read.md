@@ -10,7 +10,7 @@ Reads the current state that surrounds the story — the value accumulated from 
 - **Action type:** `StateActionType.Read`
 
 ```typescript
-import { askStateRead } from 'quidproquo-core';
+import { askStateRead } from '@qpqjs/core';
 
 export function* askGetCount() {
   const state = yield* askStateRead<CounterState>();

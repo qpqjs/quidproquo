@@ -10,7 +10,7 @@ Returns the hostname for a `{ subdomain?, service? }` target on every root the s
 - **Action type:** `DnsActionType.ResolveHosts`
 
 ```typescript
-import { askDnsResolveHosts } from 'quidproquo-webserver';
+import { askDnsResolveHosts } from '@qpqjs/webserver';
 
 export function* askPrimarySiteUrl() {
   const [siteHost] = yield* askDnsResolveHosts();

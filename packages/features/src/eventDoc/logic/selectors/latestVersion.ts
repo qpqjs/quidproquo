@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocSummary, EventDocVersion } from '../../models';
 import { maxByVersion } from './maxByVersion';

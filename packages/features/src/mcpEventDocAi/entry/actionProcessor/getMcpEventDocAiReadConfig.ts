@@ -1,4 +1,4 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { askMcpEventDocAiReadConfig } from '../../actions/askMcpEventDocAiReadConfig';
 import { buildMcpEventDocAis } from '../../logic/buildMcpEventDocAis';

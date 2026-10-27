@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineStorageDrive } from 'quidproquo-core';
+import { buildTestQpqConfig, defineStorageDrive } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

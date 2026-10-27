@@ -1,4 +1,4 @@
-import { MaintenanceLevel, MaintenancePublicState } from 'quidproquo-features';
+import { MaintenanceLevel, MaintenancePublicState } from '@qpqjs/features';
 
 import { Box, Chip, Paper, Typography } from '@mui/material';
 

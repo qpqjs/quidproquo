@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, LogActionType, NetworkActionType, runStory } from 'quidproquo-core';
+import { ErrorTypeEnum, LogActionType, NetworkActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

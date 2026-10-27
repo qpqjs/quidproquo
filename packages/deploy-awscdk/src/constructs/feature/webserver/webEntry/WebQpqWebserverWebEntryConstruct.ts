@@ -1,7 +1,7 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { DomainTarget, qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { DomainTarget, qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import {
   aws_cloudfront,

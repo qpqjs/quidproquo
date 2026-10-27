@@ -1,4 +1,4 @@
-import { useQpqRuntime } from 'quidproquo-web-react';
+import { useQpqRuntime } from '@qpqjs/web-react';
 
 import LogoutIcon from '@mui/icons-material/Logout';
 import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui/material';

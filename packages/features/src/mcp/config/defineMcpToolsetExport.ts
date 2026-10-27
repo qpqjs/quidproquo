@@ -1,5 +1,5 @@
-import { defineActionProcessors, QPQConfig } from 'quidproquo-core';
-import { defineServiceFunction } from 'quidproquo-webserver';
+import { defineActionProcessors, QPQConfig } from '@qpqjs/core';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { MCP_EXPORT_LIST_TOOLS_FN } from '../constants/mcpExportListToolsFn';

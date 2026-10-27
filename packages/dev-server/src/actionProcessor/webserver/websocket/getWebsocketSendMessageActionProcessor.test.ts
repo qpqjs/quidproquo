@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, isErroredActionResult, resolveActionResult } from 'quidproquo-core';
-import { defineWebsocket, WebsocketActionType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, isErroredActionResult, resolveActionResult } from '@qpqjs/core';
+import { defineWebsocket, WebsocketActionType } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

@@ -1,7 +1,7 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_apigateway, aws_cloudwatch, aws_ec2, aws_lambda, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

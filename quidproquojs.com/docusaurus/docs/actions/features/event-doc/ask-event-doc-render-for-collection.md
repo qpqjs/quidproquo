@@ -12,7 +12,7 @@ Unlike the render route, nothing here is soft: the caller names a specific colle
 - **Built from:** `askEventDocProvideStore` (to bind the target collection's store context) and `createDynamicFunctionCaller<EventDocInvokableFunctions>` (to invoke `render` on `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](../../../config/features/event-doc.md)). The caller resolves WHICH state to render first — this only renders the input it's handed.
 
 ```typescript
-import { askEventDocRenderForCollection } from 'quidproquo-features';
+import { askEventDocRenderForCollection } from '@qpqjs/features';
 
 export function* renderTemplateLayout(state: unknown, docId: string) {
   const result = yield* askEventDocRenderForCollection('layouts', 'layout', { state, docId });

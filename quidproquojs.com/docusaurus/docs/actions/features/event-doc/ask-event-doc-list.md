@@ -14,7 +14,7 @@ Reads the **whole** collection into memory, filters and sorts it, and returns it
 - **Built from:** a key-value store query over the collection's `type`, filtered and sorted in memory.
 
 ```typescript
-import { askEventDocList } from 'quidproquo-features';
+import { askEventDocList } from '@qpqjs/features';
 
 export function* listArticles() {
   const items = yield* askEventDocList(); // newest-updated first, deleted hidden
@@ -56,7 +56,7 @@ Reads **one page** of the collection straight off the store, newest first, witho
 - **Built from:** [askKeyValueStoreQuery](../../core/key-value-store/ask-key-value-store-query.md) against the summary store, ordered by its `(type, updatedAt)` index (descending), with soft-deleted rows excluded by a query filter.
 
 ```typescript
-import { askEventDocListPage } from 'quidproquo-features';
+import { askEventDocListPage } from '@qpqjs/features';
 
 export function* listArticlesPage(nextPageKey?: string) {
   return yield* askEventDocListPage({ nextPageKey }); // QpqPagedData<EventDocSummary>

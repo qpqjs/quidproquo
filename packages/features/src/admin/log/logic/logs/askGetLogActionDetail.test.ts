@@ -1,4 +1,4 @@
-import { ActionProcessorResult, FileActionType, runStory, StoryError } from 'quidproquo-core';
+import { ActionProcessorResult, FileActionType, runStory, StoryError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

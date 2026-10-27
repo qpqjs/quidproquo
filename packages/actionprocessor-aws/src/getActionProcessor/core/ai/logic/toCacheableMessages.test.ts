@@ -1,4 +1,4 @@
-import { AiCacheTtl, AiModel } from 'quidproquo-core';
+import { AiCacheTtl, AiModel } from '@qpqjs/core';
 
 import type { ModelMessage } from 'ai';
 import { describe, expect, it } from 'vitest';

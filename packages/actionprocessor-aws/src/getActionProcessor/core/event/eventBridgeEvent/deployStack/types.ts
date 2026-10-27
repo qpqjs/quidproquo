@@ -1,4 +1,4 @@
-import { DeployEvent, DeployEventResponse, MatchStoryResult } from 'quidproquo-core';
+import { DeployEvent, DeployEventResponse, MatchStoryResult } from '@qpqjs/core';
 
 import { Context, EventBridgeEvent } from 'aws-lambda';
 

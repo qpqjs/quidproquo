@@ -27,10 +27,10 @@ Harry's workaround lives in doccypoccy at `apps/docgen/packages/service-utils/sr
 
 ## Affected packages
 
-- `quidproquo-core`: the key-value Update action gains a write condition and a `ConditionFailed` error type.
-- `quidproquo-actionprocessor-awslambda`: `updateItem` sends the condition as a DynamoDB ConditionExpression and maps the failure.
-- `quidproquo-dev-server`: the sqlite repository evaluates the condition inside its update transaction; contract tests cover both engines.
-- `quidproquo-features`: the summary row gets a `headEventId` watermark, every summary write is conditional, reserved appends project synchronously, the published-version resolver folds with a consistent read, and the tests.
+- `@qpqjs/core`: the key-value Update action gains a write condition and a `ConditionFailed` error type.
+- `@qpqjs/actionprocessor-aws`: `updateItem` sends the condition as a DynamoDB ConditionExpression and maps the failure.
+- `@qpqjs/dev-server`: the sqlite repository evaluates the condition inside its update transaction; contract tests cover both engines.
+- `@qpqjs/features`: the summary row gets a `headEventId` watermark, every summary write is conditional, reserved appends project synchronously, the published-version resolver folds with a consistent read, and the tests.
 - doccypoccy (follow-up, other repo): remove the at-head workaround once this ships.
 
 ## Approach
@@ -45,7 +45,7 @@ Steps 1 to 5 ship on their own with no behaviour change beyond the ordering guar
 2. `packages/actionprocessor-aws/src/logic/dynamo/updateItem.ts`: accept the condition and set `ConditionExpression` with `buildDynamoQueryExpression` (`logic/dynamo/qpqDynamoOrm/buildDynamoQueryExpression.ts`, the builder `scan.ts` uses for its filter), merging its attribute names and values with the update's. Check the placeholder names the two builders generate cannot collide; prefix one side if they can. `getActionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.ts`: pass `options?.condition` through the scoped translator for parity with `scoped.update(updates)`, and map `ConditionalCheckFailedException` to `askKeyValueStoreUpdateBase.errorType.ConditionFailed`. Extend `getKeyValueStoreUpdateActionProcessor.test.ts`.
 3. `packages/dev-server/src/logic/keyValueStore/KvsRepository.ts`: `update` takes `options?: { condition?: KvsQueryOperation }`. `SqliteKvsRepository.ts` `update`: validate with `validateKvsQueryOperation` up front, and inside `runInImmediateTransaction`, after `selectRowData`, evaluate `evaluateKvsQueryOperation(currentItem, condition, storeConfig)` and throw `ConditionalCheckFailedException` when false. A missing row evaluates against the key-only base item, which matches DynamoDB, where attribute-not-exists is true for an absent item. `actionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.ts`: pass the condition, map the exception to `ConditionFailed`, and skip the stream emission on failure because nothing was written. `kvsRepositoryContractTests.ts`: a condition that holds applies the update; one that fails throws and leaves the row as it was.
 
-### The view's eventId and guarded summary writes (quidproquo-features)
+### The view's eventId and guarded summary writes (@qpqjs/features)
 
 4. `packages/features/src/eventDoc/models/EventDocSummary.ts`: `eventDocSummaryViewSchema` gains a required `eventId: z.number()`, the event the view is folded through (a version's own `eventId` is that version's head). `summary/applyEventDocSummaryEvent.ts` sets it on every event it applies, next to the tail version's `eventId`, and `summary/createEventDocSummarySeed.ts` seeds it at -1. The stored row adds nothing: `type` stays the only persistence-time field. A row written before the field existed has no `eventId`, which the writers treat as older than anything. A breaking type change for code that builds a summary by hand; logged in `breaking-changes.md`.
 5. `packages/features/src/eventDoc/data/askEventDocSummaryViewWrite.ts`: add `kvsSet('eventId', view.eventId)`, pass `condition: kvsOr([kvsNotExists('eventId'), kvsLessThan('eventId', view.eventId)])`, wrap the update in `askCatch`, and return `false` on `ConditionFailed` (a newer row is stored) and `true` otherwise; rethrow anything else. `logic/askEventDocProjectAtEvent.ts` returns the summary view it wrote (null when the log was empty) and parses the summary view it is about to write with `eventDocSummaryViewSchema`, falling back to the rederive path when it does not parse (a snapshot from before the field existed, or a fold that assembles something else), so no cast trusts stored or folded data. `logic/askEventDocSummaryRederive.ts` returns the view it wrote. `askEventDocCreate` and the transfer import's `askEventDocWriteForeignEvents` keep their unconditional puts: the row cannot exist before its InitState, and an import may have rewritten the log, which is the one case the row must be allowed to move backwards. Snapshots are still written when the summary write is refused: a snapshot is a per-event row and readers take the newest at or before their target, so an older one cannot regress anything.
@@ -63,7 +63,7 @@ Steps 1 to 5 ship on their own with no behaviour change beyond the ordering guar
 11. `packages/features/src/eventDoc/logic/askEventDocProjectAtEvent.test.ts` (new): the summary write carries the view's `eventId`; a `ConditionFailed` on it is swallowed and the snapshots are still written; the seed-at-event branch writes the seed's view without folding, and rederives from the log for a seed view that does not parse, as one from before the field existed.
 12. `packages/features/src/eventDoc/logic/askEventDocPublishedVersionAsOf.test.ts`: assert the gap read is consistent. Add Harry's window fixture (events store holds the Publish, summary row does not) as the case that documents why the fix is on the write side: with the row behind, the resolver alone still answers the old version.
 13. `packages/features/src/eventDoc/logic/isEventDocReservedEffect.test.ts`, the Lambda processor test from step 2, the dev-server contract cases from step 3.
-14. Run the four packages' suites and `npm run lint`. Confirm the dev server still projects on the bus by publishing a doc on `quidproquo-dev-server` and reading `GET /{id}` immediately.
+14. Run the four packages' suites and `npm run lint`. Confirm the dev server still projects on the bus by publishing a doc on `@qpqjs/dev-server` and reading `GET /{id}` immediately.
 
 ### Release and follow-up
 

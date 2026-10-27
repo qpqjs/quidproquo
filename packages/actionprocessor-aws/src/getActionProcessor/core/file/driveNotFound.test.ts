@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

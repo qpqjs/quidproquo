@@ -12,7 +12,7 @@ These are the low-level requests. For the client stories that call them and upda
 - Each built from [askEventDocAiServiceRequest](./ask-event-doc-ai-service-request.md) (method key `eventDocAi/<type>/<Verb>`).
 
 ```typescript
-import { askEventDocAiChatCreateRequest, askEventDocAiChatSendRequest } from 'quidproquo-features';
+import { askEventDocAiChatCreateRequest, askEventDocAiChatSendRequest } from '@qpqjs/features';
 
 export function* askStartAndAsk(question: string) {
   const chat = yield* askEventDocAiChatCreateRequest({ name: 'Untitled' });

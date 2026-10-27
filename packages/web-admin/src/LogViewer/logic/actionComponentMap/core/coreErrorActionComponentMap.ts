@@ -1,4 +1,4 @@
-import { ErrorActionType } from 'quidproquo-core';
+import { ErrorActionType } from '@qpqjs/core';
 
 const coreErrorActionComponentMap: Record<string, string[]> = {
   [ErrorActionType.ThrowError]: ['askThrowError', 'errorType', 'errorText', 'errorStack'],

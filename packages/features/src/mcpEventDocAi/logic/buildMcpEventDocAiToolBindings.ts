@@ -1,4 +1,4 @@
-import { AiToolDefinition } from 'quidproquo-core';
+import { AiToolDefinition } from '@qpqjs/core';
 
 import { buildMcpToolInputSchema } from '../../mcp/logic/buildMcpToolInputSchema';
 import { MCP_DOC_ID_ARG } from '../constants/mcpDocIdArg';

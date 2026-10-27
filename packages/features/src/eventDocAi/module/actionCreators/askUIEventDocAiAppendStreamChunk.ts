@@ -1,4 +1,4 @@
-import { type AiStreamPart, AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { type AiStreamPart, AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import type { EventDocAiAppendStreamChunkEffect } from '../effects/EventDocAiAppendStreamChunkEffect';
 import { EventDocAiEffect } from '../effects/EventDocAiEffect';

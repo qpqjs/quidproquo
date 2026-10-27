@@ -1,4 +1,4 @@
-import { AiCacheTtl } from 'quidproquo-core';
+import { AiCacheTtl } from '@qpqjs/core';
 
 import { bedrockOneHourCacheModels } from '../bedrockOneHourCacheModels';
 import { BedrockCachePointRole, BedrockCacheSettings } from '../types';

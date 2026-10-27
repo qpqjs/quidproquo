@@ -1,5 +1,5 @@
-import { Action, ConfigActionType, ErrorTypeEnum, LogActionType, runStory, StoryError, throwsError } from 'quidproquo-core';
-import { HTTPEvent, ServiceFunctionActionType } from 'quidproquo-webserver';
+import { Action, ConfigActionType, ErrorTypeEnum, LogActionType, runStory, StoryError, throwsError } from '@qpqjs/core';
+import { HTTPEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

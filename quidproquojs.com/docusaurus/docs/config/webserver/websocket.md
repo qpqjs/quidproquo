@@ -7,10 +7,10 @@ description: Define a WebSocket API with connect, disconnect, and message route 
 
 Defines a **WebSocket API**: a persistent, bidirectional connection endpoint served on its own subdomain. You supply story entry points that run when a client connects, disconnects, or sends a message, and the runtime wires them to the platform's WebSocket transport. Stories push messages back to connected clients with [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md).
 
-- **On AWS:** deploys an **API Gateway v2 WebSocket API** (`QpqApiWebserverWebsocketConstruct` in `quidproquo-deploy-awscdk`) fronted by a single Lambda proxy integration. Three routes — `$connect`, `$disconnect`, and `$default` — all target that Lambda, which dispatches to the matching handler in `eventProcessors`. The API is mapped to a custom domain on every root from [defineDns](./dns.md) (the `{ subdomain: apiSubdomain, service }` target, or `{ subdomain: apiSubdomain }` when `onRootDomain` is set) and served from the `prod` stage. Routes use `authorizationType: NONE`; do your own auth inside the `onConnect`/`onMessage` handlers. When `deprecated` is set, nothing is deployed.
+- **On AWS:** deploys an **API Gateway v2 WebSocket API** (`QpqApiWebserverWebsocketConstruct` in `@qpqjs/deploy-awscdk`) fronted by a single Lambda proxy integration. Three routes — `$connect`, `$disconnect`, and `$default` — all target that Lambda, which dispatches to the matching handler in `eventProcessors`. The API is mapped to a custom domain on every root from [defineDns](./dns.md) (the `{ subdomain: apiSubdomain, service }` target, or `{ subdomain: apiSubdomain }` when `onRootDomain` is set) and served from the `prod` stage. Routes use `authorizationType: NONE`; do your own auth inside the `onConnect`/`onMessage` handlers. When `deprecated` is set, nothing is deployed.
 
 ```typescript
-import { defineWebsocket } from 'quidproquo-webserver';
+import { defineWebsocket } from '@qpqjs/webserver';
 
 export default [
   defineWebsocket('ws', {
@@ -31,7 +31,7 @@ API Gateway's WebSocket API has three built-in route keys, and `defineWebsocket`
 | `$disconnect` | A client's connection closes (client- or server-initiated). | `eventProcessors.onDisconnect` |
 | `$default` | The client sends any message frame (there are no per-message custom routes — every inbound frame goes here). | `eventProcessors.onMessage` |
 
-Each handler is a story (generator) that receives a `WebsocketEvent` (exported from `quidproquo-webserver`) and returns `void`:
+Each handler is a story (generator) that receives a `WebsocketEvent` (exported from `@qpqjs/webserver`) and returns `void`:
 
 ```typescript
 export type WebsocketEvent<T extends string | Blob | ArrayBuffer = string> = {

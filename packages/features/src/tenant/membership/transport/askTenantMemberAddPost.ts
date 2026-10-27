@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';

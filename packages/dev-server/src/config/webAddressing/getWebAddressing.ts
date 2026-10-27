@@ -1,5 +1,5 @@
-import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { ApiAddress, DomainTarget, qpqWebServerUtils, WebAddressing, WebAddressingMode, WebEntryAddress } from 'quidproquo-webserver';
+import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { ApiAddress, DomainTarget, qpqWebServerUtils, WebAddressing, WebAddressingMode, WebEntryAddress } from '@qpqjs/webserver';
 
 import { getWebEntryPlacements } from '../webEntryHosts/getWebEntryPlacements';
 import { WebAddressingPorts } from './WebAddressingPorts';

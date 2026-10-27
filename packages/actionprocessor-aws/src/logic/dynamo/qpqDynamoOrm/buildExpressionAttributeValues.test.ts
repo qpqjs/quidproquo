@@ -1,4 +1,4 @@
-import { KvsQueryCondition, KvsQueryOperationType } from 'quidproquo-core';
+import { KvsQueryCondition, KvsQueryOperationType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { actionResult, askLogTemplateLiteral, createActionProcessor, DecomposedStringPrimitive, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogTemplateLiteral, createActionProcessor, DecomposedStringPrimitive, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import chalk from 'chalk';
 
