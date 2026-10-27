@@ -1,5 +1,5 @@
-import { QpqFunctionRuntime } from 'quidproquo-core';
-import { RouteAuthSettings } from 'quidproquo-webserver';
+import { QpqFunctionRuntime } from '@qpqjs/core';
+import { RouteAuthSettings } from '@qpqjs/webserver';
 
 export type TenantedEmailReceiverOptions = {
   // Runs once per (message, registered recipient) with a TenantedEmailReceivedEvent, inside the tenant's scope.

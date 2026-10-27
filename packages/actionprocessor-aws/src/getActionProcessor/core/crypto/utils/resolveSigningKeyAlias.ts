@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
 

@@ -1,4 +1,4 @@
-import { getValidQpqIsoDateTime, QpqIsoDateTime } from 'quidproquo-core';
+import { getValidQpqIsoDateTime, QpqIsoDateTime } from '@qpqjs/core';
 
 import { z } from 'zod';
 

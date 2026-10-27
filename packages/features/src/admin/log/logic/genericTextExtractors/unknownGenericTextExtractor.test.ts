@@ -1,4 +1,4 @@
-import { QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
+import { QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

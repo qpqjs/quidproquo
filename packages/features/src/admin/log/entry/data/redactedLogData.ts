@@ -10,7 +10,7 @@ import {
   QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   StoryResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getRedactedLogFilePath } from '../../logic/redaction/getRedactedLogFilePath';
 import { redactStoryResult } from '../../logic/redaction/redactStoryResult';

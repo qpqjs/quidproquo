@@ -10,7 +10,7 @@ Replaces the default `askLog` console processors with ones that run the admin lo
 Add it to any service whose console output reaches a shared log store. On AWS that is every Lambda, since the console is CloudWatch and anyone with CloudWatch read in the account can see it.
 
 ```typescript
-import { defineConsoleLogRedaction } from 'quidproquo-features';
+import { defineConsoleLogRedaction } from '@qpqjs/features';
 
 export default [defineConsoleLogRedaction()];
 ```

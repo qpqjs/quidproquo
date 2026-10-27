@@ -6,8 +6,8 @@ import {
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
-import { defineRoute } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineRoute } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

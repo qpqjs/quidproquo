@@ -1,4 +1,4 @@
-import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
+import { buildEffectReducer, QpqReducer } from '@qpqjs/core';
 
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';

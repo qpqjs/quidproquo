@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineParameter, defineSecret } from 'quidproquo-core';
+import { buildTestQpqConfig, defineParameter, defineSecret } from '@qpqjs/core';
 
 import { promises as fs } from 'fs';
 import * as os from 'os';

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { createQpqRuntimeDefinition, useQpqRuntime } from 'quidproquo-web-react';
+import { createQpqRuntimeDefinition, useQpqRuntime } from '@qpqjs/web-react';
 
 import LockIcon from '@mui/icons-material/Lock';
 import Box from '@mui/material/Box';

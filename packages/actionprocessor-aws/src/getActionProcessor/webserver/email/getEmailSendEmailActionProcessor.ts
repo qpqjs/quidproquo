@@ -1,6 +1,6 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askEmailSendEmail, EmailActionType } from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askEmailSendEmail, EmailActionType } from '@qpqjs/webserver';
 
 import { sendEmail } from '../../../logic/sesV2/sendEmail';
 

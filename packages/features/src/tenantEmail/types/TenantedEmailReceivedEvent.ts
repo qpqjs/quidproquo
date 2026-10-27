@@ -1,4 +1,4 @@
-import { EmailMessage } from 'quidproquo-webserver';
+import { EmailMessage } from '@qpqjs/webserver';
 
 import { TenantEmailInbox } from '../models/TenantEmailInbox';
 

@@ -10,7 +10,7 @@ Builds a user script project that is stored on a drive as a single zip file into
 - **Action type:** `UserScriptActionType.BuildFromZip`
 
 ```typescript
-import { askUserScriptBuildFromZip, askUserScriptExecuteBase } from 'quidproquo-core';
+import { askUserScriptBuildFromZip, askUserScriptExecuteBase } from '@qpqjs/core';
 
 export function* askBuildAndRunUploadedScript(drive: string, docId: string, zipAssetId: string, builtAssetId: string, scope: string) {
   const builtFilepath = `${docId}/assets/${builtAssetId}`;
@@ -77,7 +77,7 @@ A root `src/` always wins, so a zip holding only `src/...` is never stripped. Di
 
 - The zip is treated as untrusted. Unpacked bytes are counted as they are written and the build stops the moment a limit is crossed; the sizes in the zip's own headers are never trusted.
 - Registered by the same `defineUserScriptBuilder()` as `askUserScriptBuild`: a service that registers the builder gets both actions, and needs the same rspack layer on lambda.
-- A script project may import `quidproquo-core` and its own files. Other npm packages and Node builtins are refused.
+- A script project may import `@qpqjs/core` and its own files. Other npm packages and Node builtins are refused.
 
 ## Related
 

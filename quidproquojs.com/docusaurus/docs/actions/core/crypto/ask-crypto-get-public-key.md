@@ -12,7 +12,7 @@ Returns the public half of a [signing key](../../../config/core/signing-key.md) 
 - **On the dev server:** the public half of the locally seeded pair.
 
 ```typescript
-import { askCryptoGetPublicKey } from 'quidproquo-core';
+import { askCryptoGetPublicKey } from '@qpqjs/core';
 
 export function* askGetTokenVerificationKey() {
   return yield* askCryptoGetPublicKey('access-token-key');

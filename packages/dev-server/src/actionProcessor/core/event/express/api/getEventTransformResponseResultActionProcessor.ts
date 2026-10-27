@@ -1,4 +1,4 @@
-import { awsLambdaUtils } from 'quidproquo-actionprocessor-awslambda';
+import { awsLambdaUtils } from '@qpqjs/actionprocessor-aws';
 import {
   actionResult,
   askEventTransformResponseResultBase,
@@ -11,8 +11,8 @@ import {
   ProcessorFor,
   QPQConfig,
   QPQError,
-} from 'quidproquo-core';
-import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 

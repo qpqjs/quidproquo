@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from '@qpqjs/core';
 
 import { VolatileLogSearchPartLoadedPayload } from '../../effects/volatile/VolatileLogSearchPartLoadedEffect';
 import { VolatileState } from '../../VolatileState';

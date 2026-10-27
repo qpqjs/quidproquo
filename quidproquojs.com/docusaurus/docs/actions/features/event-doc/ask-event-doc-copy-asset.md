@@ -12,7 +12,7 @@ Copies an asset from a document in another collection (`sourceStoreName`) onto `
 - Also reachable as `EventDocBackend.askCopyAssetFrom` on a backend created by `createEventDocBackend`, which runs it under that backend's own store.
 
 ```typescript
-import { askEventDocCopyAsset } from 'quidproquo-features';
+import { askEventDocCopyAsset } from '@qpqjs/features';
 
 export function* duplicateCoverImage(sourceDocId: string, cover: EventDocAssetRef, targetDocId: string) {
   const ref = yield* askEventDocCopyAsset('renderGroups', sourceDocId, cover, targetDocId, 'cover.png');

@@ -1,4 +1,4 @@
-import { defineDevServerOptions } from 'quidproquo-dev-server/config';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 
 import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';

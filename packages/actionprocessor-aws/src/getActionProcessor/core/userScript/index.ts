@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { getUserScriptExecuteActionProcessor } from './getUserScriptExecuteActionProcessor';
 import { getUserScriptListExportsActionProcessor } from './getUserScriptListExportsActionProcessor';

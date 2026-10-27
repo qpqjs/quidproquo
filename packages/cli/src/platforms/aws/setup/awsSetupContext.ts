@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
-import { getQpqAppDeployContext, getWorkspaceAccountQpqConfig, getWorkspaceBootstrapQpqConfig } from 'quidproquo-deploy-awscdk';
+import { QPQConfig } from '@qpqjs/core';
+import { getQpqAppDeployContext, getWorkspaceAccountQpqConfig, getWorkspaceBootstrapQpqConfig } from '@qpqjs/deploy-awscdk';
 
 import { getRoot, getServiceNames } from '../../../lib/discovery';
 import { loadServiceQpqConfig } from '../../../lib/qpqConfigs';

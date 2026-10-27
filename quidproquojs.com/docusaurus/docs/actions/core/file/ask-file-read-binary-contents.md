@@ -11,7 +11,7 @@ Reads a file on a [storage drive](../../../config/core/storage-drive.md) and ret
 - **On AWS:** performs an S3 `GetObject` on the drive's bucket and returns the body base64-encoded.
 
 ```typescript
-import { askFileReadBinaryContents } from 'quidproquo-core';
+import { askFileReadBinaryContents } from '@qpqjs/core';
 
 export function* askGetLogo() {
   const logo = yield* askFileReadBinaryContents('assets', 'branding/logo.png');
@@ -59,7 +59,7 @@ interface QPQBinaryData {
 | `FileReadBinaryContentsErrorTypeEnum.FileNotFound` | No file exists at the given path. |
 | `FileReadBinaryContentsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileReadBinaryContents('assets', 'branding/logo.png'));

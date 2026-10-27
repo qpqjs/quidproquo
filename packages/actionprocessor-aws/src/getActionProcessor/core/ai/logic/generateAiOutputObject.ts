@@ -1,4 +1,4 @@
-import { AiJsonSchema, AiStreamUsage } from 'quidproquo-core';
+import { AiJsonSchema, AiStreamUsage } from '@qpqjs/core';
 
 import type { ModelMessage } from 'ai';
 

@@ -1,4 +1,4 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/getQpqAttributesFromCognitoStringMap';
 import { getChallengeSessionFromCognitoTriggerEventSession } from '../utils';

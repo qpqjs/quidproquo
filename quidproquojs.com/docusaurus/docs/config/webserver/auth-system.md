@@ -5,7 +5,7 @@ description: Bundle a complete username/password login flow — a user directory
 
 # defineAuthSystem
 
-Bundles a complete username/password **authentication system** into a single config entry: it declares a [user directory](../../config/core/user-directory.md) and wires up all the HTTP endpoints needed to log in, refresh access tokens, respond to auth challenges (including MFA / software-token association), recover a forgotten password, and change a password. The handler stories ship inside quidproquo-webserver — you don't write them — so a single `defineAuthSystem(...)` call gives a service a working auth API.
+Bundles a complete username/password **authentication system** into a single config entry: it declares a [user directory](../../config/core/user-directory.md) and wires up all the HTTP endpoints needed to log in, refresh access tokens, respond to auth challenges (including MFA / software-token association), recover a forgotten password, and change a password. The handler stories ship inside @qpqjs/webserver — you don't write them — so a single `defineAuthSystem(...)` call gives a service a working auth API.
 
 `defineAuthSystem` is a convenience that expands into several lower-level config settings; understanding those makes its behaviour clear. It emits:
 
@@ -15,7 +15,7 @@ Bundles a complete username/password **authentication system** into a single con
 - **On AWS:** deploys whatever the emitted settings deploy — a Cognito user pool + app client for the user directory (see [defineUserDirectory](../../config/core/user-directory.md)) and API Gateway routes/Lambdas for each endpoint. `defineAuthSystem` itself provisions no infrastructure beyond what those settings do.
 
 ```typescript
-import { defineAuthSystem } from 'quidproquo-webserver';
+import { defineAuthSystem } from '@qpqjs/webserver';
 
 export default [
   defineAuthSystem('auth', 'app-users', {
@@ -91,7 +91,7 @@ To protect your own routes with this directory, set `routeAuthSettings: { userDi
 ## Examples
 
 ```typescript
-import { defineAuthSystem, UserDirectoryMfaMode } from 'quidproquo-webserver';
+import { defineAuthSystem, UserDirectoryMfaMode } from '@qpqjs/webserver';
 
 export default [
   // Minimal: creates the 'app-users' directory + /login, /refreshToken, etc.
@@ -115,4 +115,4 @@ export default [
 - [defineUserDirectory](../../config/core/user-directory.md) — the user directory `defineAuthSystem` creates; documents the directory options that `phoneRequired`, `selfSignUpEnabled`, `emailTemplates`, and `mfa` forward to, plus the AWS Cognito infrastructure.
 - [defineApiKey](./api-key.md) — the complementary auth mechanism (shared-secret / machine callers) for routes.
 - **User Directory actions** — the auth operations the generated handlers wrap: [askUserDirectoryAuthenticateUser](../../actions/core/user-directory/ask-user-directory-authenticate-user.md), [askUserDirectoryRefreshToken](../../actions/core/user-directory/ask-user-directory-refresh-token.md), [askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md), [askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md), [askUserDirectoryRespondToAuthChallenge](../../actions/core/user-directory/ask-user-directory-respond-to-auth-challenge.md), [askUserDirectoryChangePassword](../../actions/core/user-directory/ask-user-directory-change-password.md), [askUserDirectoryForgotPassword](../../actions/core/user-directory/ask-user-directory-forgot-password.md), [askUserDirectoryConfirmForgotPassword](../../actions/core/user-directory/ask-user-directory-confirm-forgot-password.md), [askUserDirectoryAssociateSoftwareToken](../../actions/core/user-directory/ask-user-directory-associate-software-token.md).
-- **Routes and APIs** — the generated endpoints are `defineRoute` settings; see the route / `defineApi` config settings in quidproquo-webserver to add and protect your own routes with this directory.
+- **Routes and APIs** — the generated endpoints are `defineRoute` settings; see the route / `defineApi` config settings in @qpqjs/webserver to add and protect your own routes with this directory.

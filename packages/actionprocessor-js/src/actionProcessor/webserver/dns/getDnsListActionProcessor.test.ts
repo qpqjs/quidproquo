@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, resolveActionResult } from 'quidproquo-core';
-import { defineDns, DnsActionType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, resolveActionResult } from '@qpqjs/core';
+import { defineDns, DnsActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

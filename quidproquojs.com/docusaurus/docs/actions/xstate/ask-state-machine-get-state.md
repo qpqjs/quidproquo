@@ -11,7 +11,7 @@ Reads the current state of a [state-machine](../../config/xstate/state-machine.m
 - **On the runtime:** the processor loads the instance from the machine's backing key-value store, rehydrates an XState actor from the persisted snapshot (under the machine's `stateField`), reads the actor's current snapshot, and returns its state value and status. String state values are returned as-is; nested/parallel state values are JSON-stringified.
 
 ```typescript
-import { askStateMachineGetState } from 'quidproquo-xstate';
+import { askStateMachineGetState } from '@qpqjs/xstate';
 
 export function* isOrderShipped(orderId: string) {
   const state = yield* askStateMachineGetState('order', orderId);

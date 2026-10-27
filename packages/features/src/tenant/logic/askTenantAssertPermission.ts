@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, Nullable } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum, Nullable } from '@qpqjs/core';
 
 import { askTenantReadActiveTenantId } from '../context/askTenantReadActiveTenantId';
 import { TenantPermissionRequirement } from '../models/TenantPermissionRequirement';

@@ -1,4 +1,4 @@
-import { EventDocEventActor, EventDocStoreOptions } from 'quidproquo-features';
+import { EventDocEventActor, EventDocStoreOptions } from '@qpqjs/features';
 
 // The throwaway event-doc collection the smoke tests write to, registered in full via
 // defineEventDoc (see ../definition/smokeProbeDocDefinition): stores, stream projector,

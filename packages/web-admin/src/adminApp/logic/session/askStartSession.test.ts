@@ -1,5 +1,5 @@
-import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
-import { QueryParamsActionType } from 'quidproquo-web';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from '@qpqjs/core';
+import { QueryParamsActionType } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 

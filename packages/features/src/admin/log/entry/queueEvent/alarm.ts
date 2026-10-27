@@ -4,7 +4,7 @@ import {
   NotifyErrorQueueThrottleQueueEvent,
   NotifyErrorQueueTimeoutQueueEvent,
   QueueEventResponse,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { notifyErrorLogic } from '../../logic/notifyError';
 

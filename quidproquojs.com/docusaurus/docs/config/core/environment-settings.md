@@ -12,7 +12,7 @@ Use it to vary a value between `development` and `production` — a different pa
 - **On AWS:** does not deploy a resource of its own. It is resolved during config flattening (`qpqCoreUtils`): the matching environment's settings are spliced into the config and then deploy as normal, so whatever you put inside deploys only in that environment.
 
 ```typescript
-import { defineEnvironmentSettings, defineParameter } from 'quidproquo-core';
+import { defineEnvironmentSettings, defineParameter } from '@qpqjs/core';
 
 export default [
   defineEnvironmentSettings({
@@ -45,7 +45,7 @@ function defineEnvironmentSettings(
 ## Examples
 
 ```typescript
-import { defineEnvironmentSettings, defineStorageDrive, defineParameter } from 'quidproquo-core';
+import { defineEnvironmentSettings, defineStorageDrive, defineParameter } from '@qpqjs/core';
 
 export default [
   defineEnvironmentSettings({

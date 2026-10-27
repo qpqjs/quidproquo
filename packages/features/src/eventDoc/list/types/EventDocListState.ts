@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocSummary } from '../../models';
 import { EVENT_DOC_LIST_PAGE_SIZE } from '../constants/eventDocListPageSize';

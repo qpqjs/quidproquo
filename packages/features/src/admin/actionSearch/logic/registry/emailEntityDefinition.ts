@@ -1,4 +1,4 @@
-import { EmailDeliveryStatus } from 'quidproquo-webserver';
+import { EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { ActionSearchActionRow } from '../../domain/ActionSearchActionRow';
 import { ActionSearchEntityDefinition } from '../../domain/ActionSearchEntityDefinition';

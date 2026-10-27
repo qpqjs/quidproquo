@@ -10,7 +10,7 @@
 // The CALLER must run on the process MAIN THREAD (lambda handlers and the dev server
 // do) — inspector.Session.connectToMainThread only targets the main thread.
 
-import { ActionProcessorList, getQpqIsoDateTimeFromDate, qpqExecuteLog, QpqExecutionTrace, StoryResult } from 'quidproquo-core';
+import { ActionProcessorList, getQpqIsoDateTimeFromDate, qpqExecuteLog, QpqExecutionTrace, StoryResult } from '@qpqjs/core';
 
 import { Worker } from 'worker_threads';
 

@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { defineApplication, QPQConfig } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { defineApplication, QPQConfig } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

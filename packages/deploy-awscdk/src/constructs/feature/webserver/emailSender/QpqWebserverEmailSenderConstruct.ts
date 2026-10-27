@@ -1,6 +1,6 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig } from 'quidproquo-core';
-import { EmailSenderQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig } from '@qpqjs/core';
+import { EmailSenderQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_iam, aws_route53, aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

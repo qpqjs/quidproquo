@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { askEmailReceivingHosts } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { askEmailReceivingHosts } from '@qpqjs/webserver';
 
 import { TenantEmailInbox } from '../models/TenantEmailInbox';
 import { TenantEmailInboxView } from '../models/TenantEmailInboxView';

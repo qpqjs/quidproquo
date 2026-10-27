@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsAnd, kvsBetween, kvsEqual, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsAnd, kvsBetween, kvsEqual, QpqPagedData } from '@qpqjs/core';
 
 import { QPQ_LOG_ENTITY_LOOKUP_KVS_NAME } from '../../constants/qpqLogEntityLookupKvsName';
 import { ActionSearchLookupRow } from '../../domain/ActionSearchLookupRow';

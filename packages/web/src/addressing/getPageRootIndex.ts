@@ -1,4 +1,4 @@
-import { WebAddressing } from 'quidproquo-webserver';
+import { WebAddressing } from '@qpqjs/webserver';
 
 /**
  * Which of the app's root domains the page is on (longest match), as an index into every

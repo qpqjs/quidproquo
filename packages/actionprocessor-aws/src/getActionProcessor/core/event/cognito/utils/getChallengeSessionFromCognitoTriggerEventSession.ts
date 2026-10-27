@@ -1,4 +1,4 @@
-import { ChallengeResult, ChallengeSession } from 'quidproquo-core';
+import { ChallengeResult, ChallengeSession } from '@qpqjs/core';
 
 import { DefineAuthChallengeTriggerEvent } from 'aws-lambda';
 

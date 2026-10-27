@@ -1,4 +1,4 @@
-import { AskResponse, GraphEntityType, GraphNodeResult } from 'quidproquo-core';
+import { AskResponse, GraphEntityType, GraphNodeResult } from '@qpqjs/core';
 
 import { Neo4jNodeResult } from '../types';
 

@@ -1,4 +1,4 @@
-import { CryptoContext } from 'quidproquo-core';
+import { CryptoContext } from '@qpqjs/core';
 
 // Netstring-style encoding (byteLength:value) so { ab: 'c' } and { a: 'bc' }
 // cannot canonicalize to the same bytes.

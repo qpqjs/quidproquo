@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting } from '@qpqjs/core';
 
 import { DatabaseSync } from 'node:sqlite';
 

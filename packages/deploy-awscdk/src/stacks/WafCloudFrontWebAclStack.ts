@@ -1,5 +1,5 @@
-import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm, aws_wafv2, Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';

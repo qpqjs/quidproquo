@@ -9,7 +9,7 @@ import {
   KvsQueryOperation,
   Nullable,
   QpqPagedData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { QPQ_LOG_ENTITIES_KVS_NAME } from '../../constants/qpqLogEntitiesKvsName';
 import { ActionSearchEntityRow } from '../../domain/ActionSearchEntityRow';

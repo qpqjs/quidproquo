@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { getConfigRuntimeResourceNameFromConfig } from '../../../../../awsNamingUtils';
 import { getNeptuneEndpoints } from '../../../../../logic/neptune';

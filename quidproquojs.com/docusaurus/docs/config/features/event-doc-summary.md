@@ -18,7 +18,7 @@ Point-in-time recovery is enabled on all tables.
 - **On AWS:** deploys four DynamoDB tables (via [defineKeyValueStore](../core/key-value-store.md)) and one S3 bucket (via [defineStorageDrive](../core/storage-drive.md)). All physical names are derived from `keyValueStoreName`, so a collection needs only that one name.
 
 ```typescript
-import { defineEventDocSummary } from 'quidproquo-features';
+import { defineEventDocSummary } from '@qpqjs/features';
 
 export default [
   ...defineEventDocSummary('content'),
@@ -48,8 +48,8 @@ The collection's base store name. It is used directly as the summary store name 
 ## Examples
 
 ```typescript
-import { defineEventDocSummary } from 'quidproquo-features';
-import { defineEventDocRoutes } from 'quidproquo-features';
+import { defineEventDocSummary } from '@qpqjs/features';
+import { defineEventDocRoutes } from '@qpqjs/features';
 
 // One shared store, two document types served on different paths.
 export default [
@@ -60,8 +60,8 @@ export default [
 ```
 
 ```typescript
-import { defineDynamicFunctions } from 'quidproquo-core';
-import { defineEventDocRoutes, defineEventDocSummary, eventDocFunctionsName } from 'quidproquo-features';
+import { defineDynamicFunctions } from '@qpqjs/core';
+import { defineEventDocRoutes, defineEventDocSummary, eventDocFunctionsName } from '@qpqjs/features';
 
 // A shared store where "article" documents are snapshotted and "page" documents are not.
 export default [
@@ -77,4 +77,4 @@ export default [
 - [defineEventDocRoutes](./event-doc-routes.md) — mounts the HTTP routes against a store declared here (one per type).
 - [defineEventDoc](./event-doc.md) — declares this store *and* its routes together for the single-type case.
 - [defineKeyValueStore](../core/key-value-store.md) / [defineStorageDrive](../core/storage-drive.md) — the core config settings this helper composes.
-- **Reading the store from a custom story:** wrap data calls in `askEventDocProvideStore({ storeName, type }, ...)` (from quidproquo-features) so getters like [askEventDocGetById](../../actions/features/event-doc/ask-event-doc-get-by-id.md) resolve the right collection.
+- **Reading the store from a custom story:** wrap data calls in `askEventDocProvideStore({ storeName, type }, ...)` (from @qpqjs/features) so getters like [askEventDocGetById](../../actions/features/event-doc/ask-event-doc-get-by-id.md) resolve the right collection.

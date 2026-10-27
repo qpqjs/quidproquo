@@ -1,4 +1,4 @@
-import { AiStreamFinishStep, AiStreamPartType } from 'quidproquo-core';
+import { AiStreamFinishStep, AiStreamPartType } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 import { toAiStreamFinishReason } from './toAiStreamFinishReason';

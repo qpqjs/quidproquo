@@ -1,4 +1,4 @@
-import { DataKeyProvider } from 'quidproquo-actionprocessor-node';
+import { DataKeyProvider } from '@qpqjs/actionprocessor-node';
 
 import { getCachedGeneratedDataKey } from '../../../../logic/kms/getCachedGeneratedDataKey';
 import { getCachedUnwrappedDataKey } from '../../../../logic/kms/getCachedUnwrappedDataKey';

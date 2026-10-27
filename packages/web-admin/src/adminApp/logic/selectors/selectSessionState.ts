@@ -1,4 +1,4 @@
-import { EventDocEvent } from 'quidproquo-features';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { AdminAppState } from '../../AdminAppState';
 import { foldAdminSessionLog } from '../../adminSessionFoldReducer';

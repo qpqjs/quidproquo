@@ -1,4 +1,4 @@
-import { askMap, AskResponse, GraphCypherResponse } from 'quidproquo-core';
+import { askMap, AskResponse, GraphCypherResponse } from '@qpqjs/core';
 
 import { NeptuneCypherResponse } from '../types';
 import { askConvertNeptuneQueryResultToGraphQueryResult } from './askConvertNeptuneQueryResultToGraphQueryResult';

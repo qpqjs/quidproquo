@@ -1,5 +1,5 @@
-import { WebsocketAdminClientMessageEventType, WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest } from 'quidproquo-features';
-import { useWebsocketSendEvent } from 'quidproquo-web-react';
+import { WebsocketAdminClientMessageEventType, WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest } from '@qpqjs/features';
+import { useWebsocketSendEvent } from '@qpqjs/web-react';
 
 import React, { useState } from 'react';
 import { Box, CssBaseline, Drawer, List, ListItem, ListItemButton, ListItemText, Tab, Tabs, TextField, Toolbar, Typography } from '@mui/material';

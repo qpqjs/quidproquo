@@ -13,7 +13,7 @@ Logs a message written as a [tagged template literal](https://developer.mozilla.
 Because it is a tag function, you call it by placing the template literal directly after it — no parentheses:
 
 ```typescript
-import { askLogTemplateLiteral } from 'quidproquo-core';
+import { askLogTemplateLiteral } from '@qpqjs/core';
 
 export function* askGreetUser(userId: string, age: number) {
   yield* askLogTemplateLiteral`User ${userId} is ${age} years old`;
@@ -46,7 +46,7 @@ Internally these are stored as a `DecomposedString` — a `[strings, variables]`
 
 ## Notes
 
-- `askLog` is exported from quidproquo-core as an alias for `askLogTemplateLiteral`; the two are identical.
+- `askLog` is exported from @qpqjs/core as an alias for `askLogTemplateLiteral`; the two are identical.
 - Unlike [askLogCreate](./ask-log-create.md), this requester takes no log level.
 
 ## Related

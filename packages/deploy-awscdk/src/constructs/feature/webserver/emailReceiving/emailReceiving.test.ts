@@ -1,12 +1,12 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, defineStorageDrive, QPQConfig } from '@qpqjs/core';
 import {
   defineDns,
   defineEmailReceiver,
   defineEmailReceivingDomain,
   EmailReceiverQPQWebServerConfigSetting,
   qpqWebServerUtils,
-} from 'quidproquo-webserver';
+} from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

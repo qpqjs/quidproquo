@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { ActionSearchDefinition } from '../../domain/ActionSearchDefinition';
 import { actionSearchRegistry } from './actionSearchRegistry';

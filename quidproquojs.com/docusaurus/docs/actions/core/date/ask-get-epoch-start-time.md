@@ -10,7 +10,7 @@ Returns the start of the Unix epoch — `1970-01-01T00:00:00.000Z` — as an ISO
 - A small composed story that returns the epoch constant as a `QpqIsoDateTime`. It performs no clock read, so it always resolves to the same value.
 
 ```typescript
-import { askGetEpochStartTime, askSecondsElapsedFrom } from 'quidproquo-core';
+import { askGetEpochStartTime, askSecondsElapsedFrom } from '@qpqjs/core';
 
 export function* askAgeInSeconds(createdAt: string) {
   const epoch = yield* askGetEpochStartTime();
@@ -31,7 +31,7 @@ None.
 
 ## Returns
 
-`QpqIsoDateTime` — the fixed string `'1970-01-01T00:00:00.000Z'`. `QpqIsoDateTime` is a template-literal string type exported from quidproquo-core, so it is a plain `string` at runtime with extra compile-time shape checking (see [askDateNow](./ask-date-now.md)).
+`QpqIsoDateTime` — the fixed string `'1970-01-01T00:00:00.000Z'`. `QpqIsoDateTime` is a template-literal string type exported from @qpqjs/core, so it is a plain `string` at runtime with extra compile-time shape checking (see [askDateNow](./ask-date-now.md)).
 
 ## Related
 

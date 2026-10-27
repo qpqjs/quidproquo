@@ -1,4 +1,4 @@
-import { ActionProcessorList } from 'quidproquo-core';
+import { ActionProcessorList } from '@qpqjs/core';
 
 import { DevServerDelayConfig } from '../types';
 

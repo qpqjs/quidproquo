@@ -13,9 +13,9 @@ export * from './system';
 export * from './userDirectory';
 export * from './userScript';
 
-import { getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
-import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
+import { getPlatformActionProcessor } from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+import { getRouteAuthValidationActionProcessor } from '@qpqjs/webserver';
 
 import { getAiActionProcessor } from './ai';
 import { getApiKeyValidationActionProcessor } from './apiKeyValidation';

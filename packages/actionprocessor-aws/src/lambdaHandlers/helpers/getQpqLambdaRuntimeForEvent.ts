@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
+import { getCustomActionActionProcessor } from '@qpqjs/actionprocessor-js';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -8,7 +8,7 @@ import {
   QPQConfig,
   QpqRuntimeType,
   StorySession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { Context, SNSEvent } from 'aws-lambda';
 

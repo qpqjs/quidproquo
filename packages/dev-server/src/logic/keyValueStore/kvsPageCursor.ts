@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, KvsIndex, Nullable } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, KvsIndex, Nullable } from '@qpqjs/core';
 
 import { getKvsItemPk } from './getKvsItemPk';
 import { getKvsItemSk } from './getKvsItemSk';

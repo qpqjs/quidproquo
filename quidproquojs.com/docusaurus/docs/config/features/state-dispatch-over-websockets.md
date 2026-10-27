@@ -10,7 +10,7 @@ Registers an action processor override that redirects the core **State** domain'
 - **Built from:** `defineActionProcessors(...)` — it overrides the `StateActionType.Dispatch` processor with the WebSocket queue's `getStateDispatch` implementation. That implementation reads the current connection info and sends a typed `StateDispatch` server message to the client over the [WebSocket queue](./web-socket-queue.md). It takes no arguments.
 
 ```typescript
-import { defineStateDispatchOverWebsockets } from 'quidproquo-features';
+import { defineStateDispatchOverWebsockets } from '@qpqjs/features';
 
 export default [
   defineStateDispatchOverWebsockets(),

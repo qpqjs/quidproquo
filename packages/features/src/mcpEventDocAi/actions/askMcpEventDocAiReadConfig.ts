@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { McpEventDocAi } from '../models/McpEventDocAi';
 import { McpEventDocAiActionType } from './McpEventDocAiActionType';

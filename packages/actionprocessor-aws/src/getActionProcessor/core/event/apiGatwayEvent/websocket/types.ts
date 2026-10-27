@@ -1,5 +1,5 @@
-import { MatchStoryResult } from 'quidproquo-core';
-import { WebsocketEvent, WebsocketEventResponse } from 'quidproquo-webserver';
+import { MatchStoryResult } from '@qpqjs/core';
+import { WebsocketEvent, WebsocketEventResponse } from '@qpqjs/webserver';
 
 import {
   APIGatewayEventWebsocketRequestContextV2,

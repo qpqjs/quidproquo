@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from '@qpqjs/core';
 
 import { logRedactionParsers } from './parsers/logRedactionParsers';
 import { LogRedactionResult } from './types/LogRedactionResult';

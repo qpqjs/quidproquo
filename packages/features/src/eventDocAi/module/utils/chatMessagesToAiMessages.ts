@@ -1,4 +1,4 @@
-import type { AiMessage, AiUserMessagePart } from 'quidproquo-core';
+import type { AiMessage, AiUserMessagePart } from '@qpqjs/core';
 
 import { eventDocAssetPath } from '../../../eventDoc';
 import type { EventDocAiChatMessage, EventDocAiMessageSegment } from '../../models';

@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from '@qpqjs/core';
 
 import { CloudFrontRequestEvent } from 'aws-lambda';
 

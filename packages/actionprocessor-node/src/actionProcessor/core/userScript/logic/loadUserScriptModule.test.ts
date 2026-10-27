@@ -4,13 +4,13 @@ import { loadUserScriptModule } from './loadUserScriptModule';
 import { UserScriptLoadError } from './UserScriptLoadError';
 import { UserScriptModuleNotFoundError } from './UserScriptModuleNotFoundError';
 
-const modules = { 'quidproquo-core': { marker: 'core' } };
+const modules = { '@qpqjs/core': { marker: 'core' } };
 
 describe('loadUserScriptModule', () => {
   it('serves an allowlisted require from the module map', () => {
-    const exports = loadUserScriptModule('scripts/a/main.js', `exports.core = require('quidproquo-core');`, modules);
+    const exports = loadUserScriptModule('scripts/a/main.js', `exports.core = require('@qpqjs/core');`, modules);
 
-    expect(exports.core).toBe(modules['quidproquo-core']);
+    expect(exports.core).toBe(modules['@qpqjs/core']);
   });
 
   it('exposes generator and plain exports alike', () => {

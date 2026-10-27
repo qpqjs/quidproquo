@@ -1,4 +1,4 @@
-import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { EventInput, MatchResult } from './types';
 

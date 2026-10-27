@@ -1,5 +1,5 @@
-import { StoryResultMetadataWithChildren } from 'quidproquo-core';
-import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
+import { StoryResultMetadataWithChildren } from '@qpqjs/core';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from '@qpqjs/web-react';
 
 import { useEffect, useState } from 'react';
 import { TreeNodeDatum } from 'react-d3-tree';

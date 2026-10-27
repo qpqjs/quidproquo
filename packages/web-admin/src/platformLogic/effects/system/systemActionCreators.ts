@@ -1,6 +1,6 @@
 // --- UI Action Generators ---
 
-import { askDateNow, askNewGuid, AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { ShowErrorEffect, StartLoadingEffect, StopLoadingEffect, SystemEffect } from './types';
 

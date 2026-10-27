@@ -1,4 +1,4 @@
-import { WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 /** One web entry the dev server hosts on its own port when serving pre-built web. */
 export type WebEntryHost = {

@@ -1,4 +1,4 @@
-import { getFederatedKeyFromQpqFunctionRuntime, isQpqFunctionRuntimeAdvanced, StoryResult } from 'quidproquo-core';
+import { getFederatedKeyFromQpqFunctionRuntime, isQpqFunctionRuntimeAdvanced, StoryResult } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

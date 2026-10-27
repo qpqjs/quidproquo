@@ -7,7 +7,7 @@ import {
   ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { askConvertNeo4jCypherResponseToCypherResponse } from './converters';
 import { Neo4jCypherRequest, Neo4jCypherResponse } from './types';

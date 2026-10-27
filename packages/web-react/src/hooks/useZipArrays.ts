@@ -1,4 +1,4 @@
-import { zipArrays } from 'quidproquo-core';
+import { zipArrays } from '@qpqjs/core';
 
 import { useMemo } from 'react';
 

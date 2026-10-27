@@ -1,4 +1,4 @@
-import { QpqDeployEnvVar } from 'quidproquo-core';
+import { QpqDeployEnvVar } from '@qpqjs/core';
 
 import { ServiceAccountInfo } from '../types';
 import { getQpqAppDeployment } from './getQpqAppDeployment';

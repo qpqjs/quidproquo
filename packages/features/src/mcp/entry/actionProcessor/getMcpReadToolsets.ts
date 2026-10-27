@@ -1,4 +1,4 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { askMcpReadToolsets } from '../../actions/askMcpReadToolsets';
 import { buildMcpToolsets } from '../../logic/buildMcpToolsets';

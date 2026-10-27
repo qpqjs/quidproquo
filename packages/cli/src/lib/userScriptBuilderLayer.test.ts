@@ -1,4 +1,4 @@
-import { JavascriptRuntimeArchitecture } from 'quidproquo-core';
+import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 
 import fs from 'fs';
 import os from 'os';

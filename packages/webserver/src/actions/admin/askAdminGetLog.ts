@@ -1,4 +1,4 @@
-import { createActionRequester, StoryResult } from 'quidproquo-core';
+import { createActionRequester, StoryResult } from '@qpqjs/core';
 
 import { AdminActionType } from './AdminActionType';
 

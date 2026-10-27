@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader } from 'quidproquo-core';
+import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

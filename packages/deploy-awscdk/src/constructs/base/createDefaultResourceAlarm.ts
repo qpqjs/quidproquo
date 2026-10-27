@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_cloudwatch, aws_cloudwatch_actions } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

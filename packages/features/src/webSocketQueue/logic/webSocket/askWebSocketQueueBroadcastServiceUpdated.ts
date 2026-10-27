@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { WebSocketQueueServerEventMessageServiceUpdated } from '../../types/serverMessages/WebSocketQueueServerEventMessageServiceUpdated';
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages/WebSocketQueueServerMessageEventType';

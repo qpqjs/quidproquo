@@ -10,7 +10,7 @@ import {
   mergeRuntimeActionProcessors,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { RouteOptions } from '../../config/settings/route';
 import { loadDomainResolver } from '../../domain/logic/resolver/loadDomainResolver';

@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
+import { getCustomActionActionProcessor } from '@qpqjs/actionprocessor-js';
 import {
   ActionProcessorListResolver,
   askProcessEvent,
@@ -9,7 +9,7 @@ import {
   QpqRuntimeType,
   StoryResult,
   StorySession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

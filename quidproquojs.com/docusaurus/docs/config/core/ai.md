@@ -8,7 +8,7 @@ description: Define a named AI configuration — a set of tools a large language
 Declares a named **AI config**: a bundle of tool definitions that a large language model is allowed to call while it answers. Bind it to a prompt by passing its name as the `aiName` option to [askAiPrompt](../../actions/core/ai/ask-ai-prompt.md) or [askAiPromptStream](../../actions/core/ai/ask-ai-prompt-stream.md). Without an `aiName`, prompts run tool-less; with one, the model can invoke the declared tools and the runtime executes them and feeds the results back.
 
 ```typescript
-import { defineAi } from 'quidproquo-core';
+import { defineAi } from '@qpqjs/core';
 
 export default [
   defineAi('support-agent', {

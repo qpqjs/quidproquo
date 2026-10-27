@@ -1,4 +1,4 @@
-import { Action, runStory, UserDirectoryActionType } from 'quidproquo-core';
+import { Action, runStory, UserDirectoryActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

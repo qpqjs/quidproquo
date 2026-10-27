@@ -1,4 +1,4 @@
-import { ContextActionType, ErrorTypeEnum, runStory, StoryError } from 'quidproquo-core';
+import { ContextActionType, ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { actionResult, createActionProcessor, ProcessorFor } from 'quidproquo-core';
+import { actionResult, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
 import { askRouteAuthValidationResolveContext } from '../../actions/routeAuthValidation';
 

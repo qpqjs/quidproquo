@@ -1,4 +1,4 @@
-import { generateUuid, Nullable } from 'quidproquo-core';
+import { generateUuid, Nullable } from '@qpqjs/core';
 import {
   EventDocEffect,
   EventDocEvent,
@@ -10,8 +10,8 @@ import {
   MaintenanceType,
   MaintenanceUpdateEntry,
   toMaintenancePublicState,
-} from 'quidproquo-features';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+} from '@qpqjs/features';
+import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
 
 import { useEffect, useMemo, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';

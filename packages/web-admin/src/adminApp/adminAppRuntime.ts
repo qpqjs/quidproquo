@@ -1,4 +1,4 @@
-import { createQpqRuntimeDefinition } from 'quidproquo-web-react';
+import { createQpqRuntimeDefinition } from '@qpqjs/web-react';
 
 import { getApplySessionEventActionProcessor } from './actions/getApplySessionEventActionProcessor';
 import { askAdminAppMain } from './logic/askAdminAppMain';

@@ -1,5 +1,5 @@
-import { CrossModuleOwner } from 'quidproquo-core';
-import { RouteAuthSettings } from 'quidproquo-webserver';
+import { CrossModuleOwner } from '@qpqjs/core';
+import { RouteAuthSettings } from '@qpqjs/webserver';
 
 import { TenantRolesOptions } from './TenantRolesOptions';
 

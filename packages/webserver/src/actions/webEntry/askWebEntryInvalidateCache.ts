@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { WebEntryActionType } from './WebEntryActionType';
 

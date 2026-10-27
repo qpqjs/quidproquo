@@ -11,7 +11,7 @@ Resolves with the data regions every [`AiModel`](./ask-ai-prompt.md#aimodel) is 
 - **On AWS:** reads the regions off the Bedrock model map in the lambda action processor, which holds an inference profile id per model per region. Most entries are `au.` profiles and list only `AiDataRegion.Australia`; Sonnet 5.5, Fable 5 and Fable 5.1 have only a `global.` profile and list only `AiDataRegion.Global`. A prompt takes the Australian profile when the model has one, then Global, then the first region listed, so those three run through their Global profile.
 
 ```typescript
-import { askAiGetModelRegions, AiDataRegion, AiModel } from 'quidproquo-core';
+import { askAiGetModelRegions, AiDataRegion, AiModel } from '@qpqjs/core';
 
 export function* askListAustralianModels(): AskResponse<AiModel[]> {
   const regions = yield* askAiGetModelRegions();

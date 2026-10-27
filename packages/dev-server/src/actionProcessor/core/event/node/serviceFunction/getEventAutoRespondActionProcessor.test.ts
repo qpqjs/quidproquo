@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, buildTestStorySession, EventActionType, noopDynamicModuleLoader, resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, buildTestStorySession, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

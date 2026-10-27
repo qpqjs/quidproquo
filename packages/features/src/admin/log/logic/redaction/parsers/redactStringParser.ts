@@ -1,4 +1,4 @@
-import { filterLogHistoryByActionTypes, LogActionType } from 'quidproquo-core';
+import { filterLogHistoryByActionTypes, LogActionType } from '@qpqjs/core';
 
 import { LogRedactionParser } from '../types/LogRedactionParser';
 

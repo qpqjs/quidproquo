@@ -1,4 +1,4 @@
-import { AskResponse, askStorageScopeRead } from 'quidproquo-core';
+import { AskResponse, askStorageScopeRead } from '@qpqjs/core';
 
 import {
   askWebSocketQueueSendToTopic,

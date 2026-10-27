@@ -1,11 +1,11 @@
-# quidproquo-core
+# @qpqjs/core
 
 The heart of the [quidproquo](https://github.com/qpqjs/quidproquo) framework: the action catalogue, the story runtime, and the config system that everything else builds on.
 
-Most applications should install [`quidproquo`](https://www.npmjs.com/package/quidproquo) instead, which re-exports this package along with `quidproquo-webserver`. Install this one directly only if you want core without the web server.
+Most applications should install [`quidproquo`](https://www.npmjs.com/package/quidproquo) instead, which re-exports this package along with `@qpqjs/webserver`. Install this one directly only if you want core without the web server.
 
 ```bash
-npm install quidproquo-core
+npm install @qpqjs/core
 ```
 
 ## How it works
@@ -60,7 +60,7 @@ Every action that passes through the runtime is recorded, which is where the exe
 **Testing** in `src/testing/`: `runStory` runs a story with actions mocked by type, so you can assert on behaviour without a runtime or any infrastructure.
 
 ```typescript
-import { DateActionType, runStory } from 'quidproquo-core';
+import { DateActionType, runStory } from '@qpqjs/core';
 
 const result = runStory(askGreet('world'), {
   [DateActionType.Now]: '2026-01-01T00:00:00.000Z',

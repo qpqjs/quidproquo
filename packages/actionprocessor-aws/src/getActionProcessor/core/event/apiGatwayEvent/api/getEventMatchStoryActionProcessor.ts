@@ -7,8 +7,8 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
-import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { findApiRoute } from '../../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';

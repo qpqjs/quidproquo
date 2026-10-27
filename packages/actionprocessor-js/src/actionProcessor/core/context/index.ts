@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { getContextListActionProcessor } from './getContextListActionProcessor';
 import { getContextReadActionProcessor } from './getContextReadActionProcessor';

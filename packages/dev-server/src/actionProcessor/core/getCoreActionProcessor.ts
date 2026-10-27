@@ -1,7 +1,7 @@
-import { getMetricActionProcessor, getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
-import { getFileActionProcessor, getOwnCodeMarkersFromRoot, getSystemTraceStoryActionProcessor } from 'quidproquo-actionprocessor-node';
-import { ActionProcessorList, DynamicModuleLoader, isQpqFunctionRuntimeAdvanced, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
-import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
+import { getMetricActionProcessor, getPlatformActionProcessor } from '@qpqjs/actionprocessor-js';
+import { getFileActionProcessor, getOwnCodeMarkersFromRoot, getSystemTraceStoryActionProcessor } from '@qpqjs/actionprocessor-node';
+import { ActionProcessorList, DynamicModuleLoader, isQpqFunctionRuntimeAdvanced, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/core';
+import { getRouteAuthValidationActionProcessor } from '@qpqjs/webserver';
 
 import { ResolvedDevServerConfig } from '../../types';
 import { getApiKeyValidationActionProcessor } from './apiKeyValidation';

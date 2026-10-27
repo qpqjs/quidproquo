@@ -10,7 +10,7 @@ Loads a built script inside the service's sandbox ([defineUserScriptRunner](../.
 - **Action type:** `UserScriptActionType.ListExports`
 
 ```typescript
-import { askUserScriptListExports } from 'quidproquo-core';
+import { askUserScriptListExports } from '@qpqjs/core';
 
 export function* askScriptExportNames(drive: string, filepath: string) {
   const { functions } = yield* askUserScriptListExports(drive, filepath);

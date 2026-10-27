@@ -1,4 +1,4 @@
-import { KVS_RESERVED_MARKER, KvsCoreDataType, KvsQueryCondition, KvsQueryOperationType } from 'quidproquo-core';
+import { KVS_RESERVED_MARKER, KvsCoreDataType, KvsQueryCondition, KvsQueryOperationType } from '@qpqjs/core';
 
 // Separates the scope from the raw key in a stored partition key value
 // ('@@QPQSCOPE@@'). Built on core's KVS_RESERVED_MARKER, which caller pk values

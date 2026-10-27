@@ -11,7 +11,7 @@ Completes the password-reset flow started by [askUserDirectoryForgotPassword](./
 - **On AWS:** issues Cognito `ConfirmForgotPassword`.
 
 ```typescript
-import { askUserDirectoryConfirmForgotPassword } from 'quidproquo-core';
+import { askUserDirectoryConfirmForgotPassword } from '@qpqjs/core';
 
 export function* askFinishPasswordReset(code: string, username: string, newPassword: string) {
   yield* askUserDirectoryConfirmForgotPassword('app-users', code, username, newPassword);

@@ -1,5 +1,5 @@
-import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { askWebsocketSendMessageBase, qpqWebServerUtils, WebsocketActionType } from 'quidproquo-webserver';
+import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { askWebsocketSendMessageBase, qpqWebServerUtils, WebsocketActionType } from '@qpqjs/webserver';
 
 // The connection REGISTRY, not the implementation: webSocketImplementation imports
 // the event-processing pipeline (which includes these processors), so importing it

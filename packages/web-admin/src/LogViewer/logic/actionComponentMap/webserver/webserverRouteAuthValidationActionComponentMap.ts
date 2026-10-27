@@ -1,4 +1,4 @@
-import { RouteAuthValidationActionType } from 'quidproquo-webserver';
+import { RouteAuthValidationActionType } from '@qpqjs/webserver';
 
 const webserverRouteAuthValidationActionComponentMap: Record<string, string[]> = {
   [RouteAuthValidationActionType.Decode]: ['askRouteAuthValidationDecode', 'event', 'routeAuthSettings', 'ignoreExpiration'],

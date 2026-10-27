@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { EventDocEvent, EventDocEventInput } from 'quidproquo-features';
+import { AskResponse } from '@qpqjs/core';
+import { EventDocEvent, EventDocEventInput } from '@qpqjs/features';
 
 import { adminSessionApiBasePath } from '../../constants/adminSessionApiBasePath';
 import { askSessionApiRequestOrThrow } from './askSessionApiRequestOrThrow';

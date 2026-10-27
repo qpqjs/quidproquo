@@ -1,4 +1,4 @@
-import { buildEffectReducer } from 'quidproquo-core';
+import { buildEffectReducer } from '@qpqjs/core';
 
 import { TenantMembershipUiEffect } from './effects/TenantMembershipUiEffect';
 import type { TenantMembershipUiEffects } from './effects/TenantMembershipUiEffects';

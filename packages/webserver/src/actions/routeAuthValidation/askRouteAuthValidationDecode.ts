@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { RouteAuthSettings } from '../../config/settings/route';
 import { HTTPEvent } from '../../types/HTTPEvent';

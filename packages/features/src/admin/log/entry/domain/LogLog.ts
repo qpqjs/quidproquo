@@ -1,4 +1,4 @@
-import { LogLevelEnum } from 'quidproquo-core';
+import { LogLevelEnum } from '@qpqjs/core';
 
 export type LogLog = {
   type: LogLevelEnum;

@@ -7,8 +7,8 @@ import {
   QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
   runStory,
   StoryError,
-} from 'quidproquo-core';
-import { HTTPEvent, ServiceFunctionActionType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HTTPEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,5 +1,5 @@
-import { runUserScriptInChild } from 'quidproquo-actionprocessor-node';
-import { DynamicModuleLoader, QPQConfig, UserScriptRunnerEvent, UserScriptRunnerResult } from 'quidproquo-core';
+import { runUserScriptInChild } from '@qpqjs/actionprocessor-node';
+import { DynamicModuleLoader, QPQConfig, UserScriptRunnerEvent, UserScriptRunnerResult } from '@qpqjs/core';
 
 import { Context, SNSEvent } from 'aws-lambda';
 import path from 'path';

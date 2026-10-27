@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, resolveActionResult, StreamActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, resolveActionResult, StreamActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

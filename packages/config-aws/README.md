@@ -1,4 +1,4 @@
-# quidproquo-config-aws
+# @qpqjs/config-aws
 
 AWS-specific configuration for [quidproquo](https://github.com/qpqjs/quidproquo).
 
@@ -7,10 +7,10 @@ A qpq config is a plain array of settings. Core and webserver settings describe 
 That split is deliberate: a service config stays portable, and the AWS detail sits in one place you can point at.
 
 ```bash
-npm install quidproquo-config-aws
+npm install @qpqjs/config-aws
 ```
 
-You usually pair it with [`quidproquo-deploy-awscdk`](https://www.npmjs.com/package/quidproquo-deploy-awscdk), which reads these settings and builds the stacks.
+You usually pair it with [`@qpqjs/deploy-awscdk`](https://www.npmjs.com/package/@qpqjs/deploy-awscdk), which reads these settings and builds the stacks.
 
 ## What you can configure
 

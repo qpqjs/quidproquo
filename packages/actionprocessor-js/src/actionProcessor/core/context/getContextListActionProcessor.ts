@@ -1,4 +1,4 @@
-import { actionResult, askContextList, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askContextList, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessContextList = (qpqConfig: QPQConfig): ProcessorFor<typeof askContextList> => {
   return async (payload, session) => {

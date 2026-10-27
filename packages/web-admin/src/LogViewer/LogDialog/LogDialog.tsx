@@ -1,4 +1,4 @@
-import { useBaseUrlResolvers, useStateUpdater } from 'quidproquo-web-react';
+import { useBaseUrlResolvers, useStateUpdater } from '@qpqjs/web-react';
 
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Tab, Tabs } from '@mui/material';
 

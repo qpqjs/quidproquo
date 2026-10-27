@@ -11,7 +11,7 @@ Exchanges a previously issued refresh token for a fresh set of tokens against a 
 - **On AWS:** issues Cognito `AdminInitiateAuth` with the `REFRESH_TOKEN_AUTH` flow.
 
 ```typescript
-import { askUserDirectoryRefreshToken } from 'quidproquo-core';
+import { askUserDirectoryRefreshToken } from '@qpqjs/core';
 
 export function* askRenewSession(refreshToken: string) {
   const result = yield* askUserDirectoryRefreshToken('app-users', refreshToken);

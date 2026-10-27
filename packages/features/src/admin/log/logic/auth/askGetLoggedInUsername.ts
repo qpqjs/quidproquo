@@ -1,4 +1,4 @@
-import { AskResponse, askUserDirectoryReadAccessToken } from 'quidproquo-core';
+import { AskResponse, askUserDirectoryReadAccessToken } from '@qpqjs/core';
 
 export function* askGetLoggedInUsername(): AskResponse<string> {
   const decodedAccessToken = yield* askUserDirectoryReadAccessToken('qpq-admin', false);

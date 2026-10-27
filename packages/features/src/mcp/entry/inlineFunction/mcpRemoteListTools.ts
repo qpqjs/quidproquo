@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askMcpRemoteListTools } from '../../logic/askMcpRemoteListTools';
 import { McpTool } from '../../models/McpTool';

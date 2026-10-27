@@ -1,4 +1,4 @@
-import { WebAddressingMode } from 'quidproquo-webserver';
+import { WebAddressingMode } from '@qpqjs/webserver';
 
 import { formatOrigin } from './formatOrigin';
 import { getPageRootIndex } from './getPageRootIndex';

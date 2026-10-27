@@ -1,5 +1,5 @@
-import { Effect } from 'quidproquo-core';
-import { EventDocEvent } from 'quidproquo-features';
+import { Effect } from '@qpqjs/core';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { SessionLogEffect } from './SessionLogEffect';
 

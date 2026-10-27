@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor } from 'quidproquo-core';
-import { askEmailSetDeliveryStatus } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { askEmailSetDeliveryStatus } from '@qpqjs/webserver';
 
 // Deliberately a no-op: the action's meaning is its log entry, which the admin
 // action search folds into the email's entity via the messageId link key.

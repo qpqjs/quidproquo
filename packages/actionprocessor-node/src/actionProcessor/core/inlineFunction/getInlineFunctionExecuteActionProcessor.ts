@@ -9,7 +9,7 @@ import {
   qpqCoreUtils,
   QpqRuntimeType,
   storyResultToActionResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

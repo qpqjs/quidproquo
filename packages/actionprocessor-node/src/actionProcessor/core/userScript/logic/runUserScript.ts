@@ -5,7 +5,7 @@ import {
   askUserScriptExecuteBase,
   createRuntime,
   storyResultToActionResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { isStoryIterator } from '../../logic/isStoryIterator';
 import { loadUserScriptModule } from './loadUserScriptModule';

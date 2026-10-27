@@ -1,4 +1,4 @@
-import { ConfigActionType, runStory, throwsError } from 'quidproquo-core';
+import { ConfigActionType, runStory, throwsError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

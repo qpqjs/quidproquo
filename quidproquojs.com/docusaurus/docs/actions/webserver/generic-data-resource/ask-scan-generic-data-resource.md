@@ -14,7 +14,7 @@ No action processor currently implements this action on any platform (AWS, dev s
 :::
 
 ```typescript
-import { askScanGenericDataResource } from 'quidproquo-webserver';
+import { askScanGenericDataResource } from '@qpqjs/webserver';
 
 export function* readRecords(tableName: string) {
   const items = yield* askScanGenericDataResource(tableName, 100);

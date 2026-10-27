@@ -1,4 +1,4 @@
-import { Action, ActionProcessorResult, actionResult, resolveActionResult, SystemActionType, SystemBatchActionPayload } from 'quidproquo-core';
+import { Action, ActionProcessorResult, actionResult, resolveActionResult, SystemActionType, SystemBatchActionPayload } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

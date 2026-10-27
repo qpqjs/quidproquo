@@ -1,4 +1,4 @@
-import { CertificateQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { CertificateQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { Construct } from 'constructs';
 

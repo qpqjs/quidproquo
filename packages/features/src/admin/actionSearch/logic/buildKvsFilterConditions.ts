@@ -1,4 +1,4 @@
-import { kvsAnd, kvsBetween, kvsContains, kvsEqual, kvsGreaterThanOrEqual, kvsLessThanOrEqual, KvsQueryOperation, Nullable } from 'quidproquo-core';
+import { kvsAnd, kvsBetween, kvsContains, kvsEqual, kvsGreaterThanOrEqual, kvsLessThanOrEqual, KvsQueryOperation, Nullable } from '@qpqjs/core';
 
 import { ActionSearchFieldDefinition } from '../domain/ActionSearchFieldDefinition';
 import { ActionSearchFieldType } from '../domain/ActionSearchFieldType';

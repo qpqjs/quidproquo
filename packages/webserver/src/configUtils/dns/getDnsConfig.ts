@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../../config/QPQConfig';
 import { DnsQPQWebServerConfigSetting } from '../../config/settings/dns';

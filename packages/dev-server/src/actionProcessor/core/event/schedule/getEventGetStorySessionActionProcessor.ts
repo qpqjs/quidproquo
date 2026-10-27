@@ -1,4 +1,4 @@
-import { actionResult, askEventGetStorySessionBase, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventGetStorySessionBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   return async () => {

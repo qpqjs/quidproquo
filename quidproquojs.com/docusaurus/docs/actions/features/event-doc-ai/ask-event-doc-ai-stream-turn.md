@@ -10,7 +10,7 @@ The shared core of a chat turn. Given a history that is already saved, it stream
 Its other job is staying inside the execution's time limit. It reads [askGetRuntimeRemainingTime](../../core/system/ask-get-runtime-remaining-time.md), keeps back a fixed headroom, and gives the model the rest as `maxDurationMs`. When there is no budget to start, or the budget cut the model off mid-work, it hands the turn to the collection's continuation service function (async) and returns `SERVICE_REQUEST_DEFERRED` so no reply goes out from this execution.
 
 ```typescript
-import { askEventDocAiStreamTurn } from 'quidproquo-features';
+import { askEventDocAiStreamTurn } from '@qpqjs/features';
 
 // A resumed turn: the saved history already ends on the partial assistant reply.
 export function* askResume(docId: string, chatId: string, history: EventDocAiChatMessage[]) {

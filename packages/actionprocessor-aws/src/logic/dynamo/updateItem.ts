@@ -1,4 +1,4 @@
-import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from 'quidproquo-core';
+import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from '@qpqjs/core';
 
 import { DynamoDBClient, ReturnValue, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 

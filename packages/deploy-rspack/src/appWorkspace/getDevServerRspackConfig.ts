@@ -4,7 +4,7 @@
 // getWorkspaceSourceAliases) so rspack bundles them from source and watch mode
 // picks up lib edits. QpqPlugin bundles every service's handlers and injects
 // the `quidproquo-dynamic-loader` virtual module the entry imports.
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration, ExternalItemFunctionData, IgnorePlugin } from '@rspack/core';
@@ -55,7 +55,7 @@ export const getDevServerRspackConfig = ({
   // Externals are resolved to absolute paths from the *requiring* module's
   // directory. Source-bundled linked packages live outside the consumer repo,
   // so a bare runtime require from the bundle would miss deps that only exist
-  // in the framework repo's node_modules (e.g. quidproquo-dev-server's
+  // in the framework repo's node_modules (e.g. @qpqjs/dev-server's
   // body-parser); build-time resolution reproduces what node would have done
   // had the package not been bundled. Requests that don't resolve (optional
   // deps behind try/catch) fall back to a plain bare require. A portable

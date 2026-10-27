@@ -1,4 +1,4 @@
-import { useEffectCallback } from 'quidproquo-web-react';
+import { useEffectCallback } from '@qpqjs/web-react';
 
 import { useEffect, useMemo } from 'react';
 

@@ -1,4 +1,4 @@
-import { KvsObjectDataType } from 'quidproquo-core';
+import { KvsObjectDataType } from '@qpqjs/core';
 
 import { BatchWriteItemCommand, DynamoDBClient, WriteRequest } from '@aws-sdk/client-dynamodb';
 

@@ -1,4 +1,4 @@
-import { isQpqFunctionRuntimeAdvanced, qpqCoreUtils } from 'quidproquo-core';
+import { isQpqFunctionRuntimeAdvanced, qpqCoreUtils } from '@qpqjs/core';
 
 import path from 'path';
 
@@ -6,8 +6,8 @@ import path from 'path';
  * Absolute source path for a QpqFunctionRuntime: basePath + relativePath for an
  * advanced runtime, config root + the src half of a `path::story` string otherwise.
  *
- * @param {import('quidproquo-core').QpqFunctionRuntime} qpqFunctionRuntime
- * @param {import('quidproquo-core').QPQConfig} qpqConfig
+ * @param {import('@qpqjs/core').QpqFunctionRuntime} qpqFunctionRuntime
+ * @param {import('@qpqjs/core').QPQConfig} qpqConfig
  * @returns {string}
  */
 export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConfig) => {

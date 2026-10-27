@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { EventDocTransferPlanRow } from '../../models';
 import { EventDocImportUiEffect } from './EventDocImportUiEffect';

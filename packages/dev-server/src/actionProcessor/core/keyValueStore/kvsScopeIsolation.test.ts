@@ -8,7 +8,7 @@ import {
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';

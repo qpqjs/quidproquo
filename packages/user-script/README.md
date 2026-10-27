@@ -1,4 +1,4 @@
-# quidproquo-user-script
+# @qpqjs/user-script
 
 Builds a user-written script project (`src/main.ts` exporting functions) into one CommonJS `main.js` that `askUserScriptExecute` loads from a storage drive, and runs that build on the platform through `askUserScriptBuild`.
 

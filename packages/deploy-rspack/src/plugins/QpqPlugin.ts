@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 import type { Compiler, RspackPluginInstance } from '@rspack/core';

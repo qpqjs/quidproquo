@@ -1,4 +1,4 @@
-import { askFileExists, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
+import { askFileExists, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,7 +7,7 @@ import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));

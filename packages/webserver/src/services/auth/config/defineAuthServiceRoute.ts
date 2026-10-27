@@ -1,4 +1,4 @@
-import { HTTPMethod, QpqFunctionRuntime } from 'quidproquo-core';
+import { HTTPMethod, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { ApiKeyReference } from '../../../config/settings/apiKey';
 import { defineRoute, GenericRouteOptions } from '../../../config/settings/route';

@@ -1,4 +1,4 @@
-import { actionResult, askLogCreate, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogCreate, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { redactLogValue } from '../../logic/redactLogValue';
 

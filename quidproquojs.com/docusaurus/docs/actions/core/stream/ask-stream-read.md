@@ -12,7 +12,7 @@ Reads the next chunk from an open **stream** and returns it. A stream is never o
 Each read returns a [`StreamChunk`](#streamchunk) — an envelope that tells you whether the stream is finished (`done`), whether this poll had nothing ready yet (`skipped`), and, when there is one, the decoded chunk (`data`). The `data` is decoded according to the handle's [encoding](#streamencoding): `'text'` yields a `string`, `'binary'` yields a `Uint8Array`, and `'json'` yields the parsed object.
 
 ```typescript
-import { askFileStreamOpen, askStreamRead, askStreamClose } from 'quidproquo-core';
+import { askFileStreamOpen, askStreamRead, askStreamClose } from '@qpqjs/core';
 
 export function* askReadWholeFile(filepath: string) {
   const handle = yield* askFileStreamOpen('logs', filepath, 'text');
@@ -61,7 +61,7 @@ function* askStreamRead<E extends StreamEncoding, T = unknown>(
 
 ## Stream value types
 
-These types (all importable from quidproquo-core) describe a stream and the chunks it produces. They are the shared vocabulary of the whole Stream domain.
+These types (all importable from @qpqjs/core) describe a stream and the chunks it produces. They are the shared vocabulary of the whole Stream domain.
 
 ### `StreamHandle`
 

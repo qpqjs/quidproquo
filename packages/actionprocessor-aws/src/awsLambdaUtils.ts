@@ -1,5 +1,5 @@
-import { HTTPMethod, Nullable, StorageDriveTier } from 'quidproquo-core';
-import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { HTTPMethod, Nullable, StorageDriveTier } from '@qpqjs/core';
+import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';

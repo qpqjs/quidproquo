@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, isErroredActionResult, resolveActionResultError } from 'quidproquo-core';
+import { ErrorTypeEnum, FileActionType, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';

@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { askEventDocParseBody } from '../../../eventDoc/routes/askEventDocParseBody';
 import { askTenantEmailInboxRegister } from '../../logic/askTenantEmailInboxRegister';

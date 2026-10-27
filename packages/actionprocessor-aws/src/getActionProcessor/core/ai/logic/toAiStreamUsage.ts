@@ -1,4 +1,4 @@
-import { AiStreamUsage } from 'quidproquo-core';
+import { AiStreamUsage } from '@qpqjs/core';
 
 type SdkUsage = {
   inputTokens?: number;

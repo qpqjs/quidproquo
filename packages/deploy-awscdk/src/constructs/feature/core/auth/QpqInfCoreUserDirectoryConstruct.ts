@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   CrossModuleOwner,
   QPQConfig,
@@ -7,8 +7,8 @@ import {
   UserDirectoryMfaMode,
   UserDirectoryMfaSecondFactor,
   UserDirectoryQPQConfigSetting,
-} from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

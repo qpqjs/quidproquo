@@ -1,4 +1,4 @@
-import { MatchStoryResult, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from 'quidproquo-core';
+import { MatchStoryResult, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from '@qpqjs/core';
 
 import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 

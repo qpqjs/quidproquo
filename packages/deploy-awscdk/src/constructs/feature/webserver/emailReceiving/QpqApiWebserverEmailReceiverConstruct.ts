@@ -1,5 +1,5 @@
-import { qpqCoreUtils } from 'quidproquo-core';
-import { EmailReceiverQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { EmailReceiverQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

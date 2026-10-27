@@ -1,5 +1,5 @@
-import { askContextRead, askDateNow, askNewGuid, AskResponse } from 'quidproquo-core';
-import { askQueryParamsGetAll } from 'quidproquo-web';
+import { askContextRead, askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askQueryParamsGetAll } from '@qpqjs/web';
 
 import { askUISessionLogDocCreated } from '../../actionCreators/sessionLog/askUISessionLogDocCreated';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';

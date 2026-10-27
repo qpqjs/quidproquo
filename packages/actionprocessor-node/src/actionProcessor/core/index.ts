@@ -1,5 +1,5 @@
-import { getCoreActionProcessor as getJsCoreActionProcessor, getPlatformActionProcessor } from 'quidproquo-actionprocessor-js';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { getCoreActionProcessor as getJsCoreActionProcessor, getPlatformActionProcessor } from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { getDynamicFunctionsActionProcessor } from './dynamicFunctions';
 import { getInlineFunctionActionProcessor } from './inlineFunction';
@@ -8,7 +8,7 @@ import { getUserScriptActionProcessor } from './userScript';
 
 // The shared core processors (config, context, date, error, guid, log,
 // math, network, platform, system, customActions) are owned by
-// quidproquo-actionprocessor-js. Node builds on top of js and only adds the
+// @qpqjs/actionprocessor-js. Node builds on top of js and only adds the
 // processors that need a Node runtime (stream, inlineFunction, dynamicFunctions,
 // userScript).
 export * from './dynamicFunctions';

@@ -1,4 +1,4 @@
-import { askFileDelete, AskResponse } from 'quidproquo-core';
+import { askFileDelete, AskResponse } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

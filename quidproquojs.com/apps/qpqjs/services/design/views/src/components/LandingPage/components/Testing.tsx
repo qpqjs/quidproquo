@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /**
- * The story / test pair, taken from quidproquo-features' tenant scope gate.
+ * The story / test pair, taken from @qpqjs/features' tenant scope gate.
  * Kept close to the real source: the point only lands if the test is genuinely
  * this short.
  */

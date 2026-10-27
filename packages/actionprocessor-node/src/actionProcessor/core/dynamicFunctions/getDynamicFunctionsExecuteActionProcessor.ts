@@ -18,7 +18,7 @@ import {
   StorySession,
   StorySessionUpdater,
   StreamRegistry,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

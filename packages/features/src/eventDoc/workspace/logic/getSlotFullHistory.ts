@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocWorkspaceHistoryPage } from '../types/EventDocWorkspaceHistoryPage';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';

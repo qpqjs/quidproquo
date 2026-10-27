@@ -1,5 +1,5 @@
-import { Nullable } from 'quidproquo-core';
-import { ActionSearchActionRow, ActionSearchFilter } from 'quidproquo-features';
+import { Nullable } from '@qpqjs/core';
+import { ActionSearchActionRow, ActionSearchFilter } from '@qpqjs/features';
 
 import { useState } from 'react';
 import FormControl from '@mui/material/FormControl';

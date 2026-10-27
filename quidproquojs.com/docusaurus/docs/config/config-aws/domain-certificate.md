@@ -7,10 +7,10 @@ description: Issue one DNS-validated ACM certificate per region covering the app
 
 Issues a real **ACM (AWS Certificate Manager) certificate** for a region, covering a set of host targets on **every** root declared with [defineDns](../webserver/dns.md). This is the certificate API Gateway and CloudFront use for HTTPS.
 
-- **On AWS:** each region becomes one `DomainCertificateStack` (via `createDomainCertificateStacks` in `quidproquo-deploy-awscdk`). Every target is resolved on every root through the app's [domain resolver](../../domains.md), each name is DNS-validated in its own hosted zone (`CertificateValidation.fromDnsMultiZone`), and the ARN is published to SSM under an app-keyed parameter (`/qpq/domain/certificate-arn/<region>/<app>-<environment>[-<feature>]`), cross-region via a custom resource when the cert region differs from the deploy region. The certificate is **retained** on replacement: changing the name set issues a new cert while distributions still referencing the old ARN keep working until they redeploy. Entries for the same region are merged. ACM allows 10 names per certificate by default; synth fails with the name list when a config exceeds it.
+- **On AWS:** each region becomes one `DomainCertificateStack` (via `createDomainCertificateStacks` in `@qpqjs/deploy-awscdk`). Every target is resolved on every root through the app's [domain resolver](../../domains.md), each name is DNS-validated in its own hosted zone (`CertificateValidation.fromDnsMultiZone`), and the ARN is published to SSM under an app-keyed parameter (`/qpq/domain/certificate-arn/<region>/<app>-<environment>[-<feature>]`), cross-region via a custom resource when the cert region differs from the deploy region. The certificate is **retained** on replacement: changing the name set issues a new cert while distributions still referencing the old ARN keep working until they redeploy. Entries for the same region are merged. ACM allows 10 names per certificate by default; synth fails with the name list when a config exceeds it.
 
 ```typescript
-import { defineDomainCertificate } from 'quidproquo-config-aws';
+import { defineDomainCertificate } from '@qpqjs/config-aws';
 
 export default ({ region }) => [
   // CloudFront: the site root plus www on every root

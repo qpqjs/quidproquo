@@ -10,7 +10,7 @@ Soft-deletes an event document by appending a reserved `DELETE` event to its log
 - **Built from:** [askEventDocAppendServerEvent](./ask-event-doc-append-server-event.md) (appends the `DELETE` event) then [askEventDocGetByIdOrThrow](./ask-event-doc-get-by-id.md#askeventdocgetbyidorthrow) (re-reads the re-derived record). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`.
 
 ```typescript
-import { askEventDocSoftDelete } from 'quidproquo-features';
+import { askEventDocSoftDelete } from '@qpqjs/features';
 
 export function* archiveArticle(id: string, userId: string, schemaVersion: number) {
   const summary = yield* askEventDocSoftDelete(id, userId, schemaVersion);
@@ -52,7 +52,7 @@ function* askEventDocSoftDelete(
 Undoes a soft delete by appending a reserved `RESTORE` event. The `DELETE` event stays in the log — history is append-only, so the deletion remains auditable — but the fold stops treating the document as deleted from this point on: `deletedAt` is cleared on the re-derived summary record, and the document goes back into default (non-`includeDeleted`) listings. Everything else (versions, blob claims) is untouched, so the document comes back exactly as it was. Returns the updated `EventDocSummary`.
 
 ```typescript
-import { askEventDocRestore } from 'quidproquo-features';
+import { askEventDocRestore } from '@qpqjs/features';
 
 export function* unarchiveArticle(id: string, userId: string, schemaVersion: number) {
   const summary = yield* askEventDocRestore(id, userId, schemaVersion);

@@ -1,4 +1,4 @@
-import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   CrossModuleOwner,
   getScopedKvsIndexPartitionKeys,
@@ -8,8 +8,8 @@ import {
   QPQConfig,
   qpqCoreUtils,
   ResourceName,
-} from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { getScopedKvsIndexAttributeName } from './logic/dynamo/scope/scopedKvsIndexAttribute';
 

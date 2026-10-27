@@ -10,7 +10,7 @@ Calls one exported function of a user script stored on a storage drive. A script
 - **Action type:** `UserScriptActionType.Execute`
 
 ```typescript
-import { askUserScriptExecute } from 'quidproquo-core';
+import { askUserScriptExecute } from '@qpqjs/core';
 
 import { ScriptFunctions } from '../types/ScriptFunctions';
 

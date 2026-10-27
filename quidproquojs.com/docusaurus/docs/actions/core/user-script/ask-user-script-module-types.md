@@ -10,7 +10,7 @@ Returns the type declarations of every module this service lets user scripts imp
 - **Action type:** `UserScriptActionType.ModuleTypes`
 
 ```typescript
-import { askUserScriptModuleTypes } from 'quidproquo-core';
+import { askUserScriptModuleTypes } from '@qpqjs/core';
 
 export function* askScriptEditorTypes() {
   // [{ moduleName: 'my-app-sdk/v1', declarations: 'export declare const ...' }]

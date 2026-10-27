@@ -1,9 +1,9 @@
 import { defineUserScriptRunner } from 'quidproquo';
-import { defineDevServerOptions } from 'quidproquo-dev-server/config';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 import {
   defineUserScriptBuilder,
   getUserScriptBuilderApiLayer,
-} from 'quidproquo-user-script';
+} from '@qpqjs/user-script';
 
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineQpqjsService } from '@qpqjs/service-utils';

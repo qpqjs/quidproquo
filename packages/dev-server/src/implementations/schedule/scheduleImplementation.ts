@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { scheduleMatchesUtcMinute, trackInFlight } from '../../logic';
 import { DevServerPluginStop } from '../../plugins/types/DevServerPluginStop';

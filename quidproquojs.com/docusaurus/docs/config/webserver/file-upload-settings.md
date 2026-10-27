@@ -10,7 +10,7 @@ Declares **service-wide limits for multipart/form-data file uploads** — maximu
 - **On AWS:** no infrastructure of its own. The limits are enforced by the API Lambda's multipart parser when handling upload requests (see [defineApi](./api.md)). API Gateway independently caps request payloads at 10MB.
 
 ```typescript
-import { defineFileUploadSettings } from 'quidproquo-webserver';
+import { defineFileUploadSettings } from '@qpqjs/webserver';
 
 export default [
   defineFileUploadSettings({
@@ -45,7 +45,7 @@ Any subset of the limits below; unspecified fields keep their default.
 ## Examples
 
 ```typescript
-import { defineFileUploadSettings } from 'quidproquo-webserver';
+import { defineFileUploadSettings } from '@qpqjs/webserver';
 
 export default [
   // Images only, up to 5MB each, at most 3 per request

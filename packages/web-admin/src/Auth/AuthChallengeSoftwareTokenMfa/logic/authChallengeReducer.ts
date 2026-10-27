@@ -1,4 +1,4 @@
-import { buildMutableEffectReducer } from 'quidproquo-core';
+import { buildMutableEffectReducer } from '@qpqjs/core';
 
 import { AuthChallengeMfaEffect, AuthChallengeMfaEffects, AuthChallengeMfaState } from './authChallengeTypes';
 

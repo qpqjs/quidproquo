@@ -1,4 +1,4 @@
-import { AskResponse, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { getInMemoryAuthToken } from './inMemoryAuthTokenStore';
 

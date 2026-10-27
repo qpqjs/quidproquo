@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { ApiKeyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { ApiKeyQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

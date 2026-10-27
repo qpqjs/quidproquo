@@ -1,4 +1,4 @@
-import { DateActionType, KeyValueStoreActionType, LogLevelEnum, runStory } from 'quidproquo-core';
+import { DateActionType, KeyValueStoreActionType, LogLevelEnum, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

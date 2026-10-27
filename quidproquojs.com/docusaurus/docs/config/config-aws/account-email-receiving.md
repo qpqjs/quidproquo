@@ -12,7 +12,7 @@ SES allows exactly one active rule set per account per region, which is why it c
 - **On AWS:** creates a `ReceiptRuleSet` named `qpq-email-receiving` (fixed by the deploy package) and calls `SetActiveReceiptRuleSet` on it through a custom resource (CloudFormation can create a set but not activate one). Deleting the stack deactivates it first, since SES refuses to delete an active set. Nothing receives until this is deployed.
 
 ```typescript
-import { defineAccountEmailReceiving } from 'quidproquo-config-aws';
+import { defineAccountEmailReceiving } from '@qpqjs/config-aws';
 
 export default [
   defineAccountEmailReceiving(),

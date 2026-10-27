@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticationInfo } from '@qpqjs/core';
 
 import { WebSocketQueueEvent } from '../WebSocketQueueEvent';
 import { WebSocketQueueEventMessage } from '../WebSocketQueueEventMessage';

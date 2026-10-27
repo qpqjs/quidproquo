@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType } from 'quidproquo-core';
+import { ErrorTypeEnum, EventActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

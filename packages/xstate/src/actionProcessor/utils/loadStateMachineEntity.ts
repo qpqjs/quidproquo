@@ -4,7 +4,7 @@ import {
   ErrorTypeEnum,
   getSuccessfulEitherActionResult,
   getUnsuccessfulEitherActionResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { StateMachineQPQConfigSetting } from '../../config/settings/stateMachine';
 import { StateMachineEntity } from '../../models/StateMachineEntity';

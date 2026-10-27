@@ -1,4 +1,4 @@
-import { askFileListDirectory, askFileWriteTextContents, buildTestQpqConfig, defineStorageDrive, FileActionType } from 'quidproquo-core';
+import { askFileListDirectory, askFileWriteTextContents, buildTestQpqConfig, defineStorageDrive, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,7 +7,7 @@ import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));

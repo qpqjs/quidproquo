@@ -8,8 +8,8 @@ import {
   ProcessorFor,
   QPQConfig,
   QPQError,
-} from 'quidproquo-core';
-import { HttpEventHeaders } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HttpEventHeaders } from '@qpqjs/webserver';
 
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 

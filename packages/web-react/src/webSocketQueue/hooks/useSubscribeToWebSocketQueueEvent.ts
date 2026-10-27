@@ -1,5 +1,5 @@
-import { AnyWebSocketQueueEventMessageWithCorrelation } from 'quidproquo-features';
-import { WebSocketServiceEventSubscriptionFunction } from 'quidproquo-web';
+import { AnyWebSocketQueueEventMessageWithCorrelation } from '@qpqjs/features';
+import { WebSocketServiceEventSubscriptionFunction } from '@qpqjs/web';
 
 import { useSubscribeToWebSocketEvent } from '../../websocket';
 

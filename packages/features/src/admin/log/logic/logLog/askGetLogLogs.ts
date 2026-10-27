@@ -1,4 +1,4 @@
-import { askDateNow, AskResponse, askSecondsElapsedFrom, LogLevelEnum, LogLevelEnumLookup, QpqPagedData } from 'quidproquo-core';
+import { askDateNow, AskResponse, askSecondsElapsedFrom, LogLevelEnum, LogLevelEnumLookup, QpqPagedData } from '@qpqjs/core';
 
 import { askListLogLogs } from '../../entry/data/logLogData';
 import { LogLog } from '../../entry/domain';

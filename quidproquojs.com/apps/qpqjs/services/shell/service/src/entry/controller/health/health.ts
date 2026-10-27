@@ -5,7 +5,7 @@ import {
   HTTPEventResponse,
   qpqWebServerUtils,
 } from 'quidproquo';
-import { dynamicRoute } from 'quidproquo-features';
+import { dynamicRoute } from '@qpqjs/features';
 
 export const health = dynamicRoute(
   ['GET', '/health'],

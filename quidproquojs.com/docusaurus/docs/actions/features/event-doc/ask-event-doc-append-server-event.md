@@ -11,7 +11,7 @@ Appends a **server-authored** event to a document's log. It is the backend analo
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) or [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals).
 
 ```typescript
-import { askEventDocAppendServerEvent } from 'quidproquo-features';
+import { askEventDocAppendServerEvent } from '@qpqjs/features';
 
 export function* recordGeneratedSecret(docId: string, secretRef: string) {
   const actor = yield* askEventDocResolveActor();

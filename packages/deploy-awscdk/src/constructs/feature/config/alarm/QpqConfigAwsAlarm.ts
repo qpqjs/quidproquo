@@ -1,4 +1,4 @@
-import { AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
+import { AwsAlarmOperator, AwsAlarmQPQConfigSetting } from '@qpqjs/config-aws';
 
 import { aws_cloudwatch, aws_cloudwatch_actions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EventDocOnPublishInput } from '../../eventDoc/models';
 import { askTenantRecordUpsert } from '../data/askTenantRecordUpsert';

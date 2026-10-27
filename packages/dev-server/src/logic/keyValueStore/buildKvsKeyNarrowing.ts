@@ -6,7 +6,7 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
   Nullable,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export type KvsKeyNarrowing = {
   sql: string;

@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askEventBusSendMessages, AskResponse, EventBusMessage } from 'quidproquo-core';
+import { askConfigGetGlobal, askEventBusSendMessages, AskResponse, EventBusMessage } from '@qpqjs/core';
 
 import { getWebSocketQueueGlobalConfigKeyForEventBusName } from '../../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../../context';

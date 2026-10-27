@@ -12,7 +12,7 @@ Use it to stamp a build number, git SHA, or semver into a deployment and surface
 - **On AWS:** does not deploy a resource of its own — the version is baked into the resolved config as a [global](./global.md), so reading it at runtime involves no network call.
 
 ```typescript
-import { defineApplicationVersion } from 'quidproquo-core';
+import { defineApplicationVersion } from '@qpqjs/core';
 
 export default [
   ...defineApplicationVersion('1.4.2'),
@@ -38,7 +38,7 @@ function defineApplicationVersion(
 The value is stored as a global, so a story can read it with [askConfigGetGlobal](../../actions/core/config/ask-config-get-global.md) using the same reserved key, or via the `askGetApplicationVersion` story, which wraps that read and returns `null` when no version has been defined:
 
 ```typescript
-import { askGetApplicationVersion } from 'quidproquo-core';
+import { askGetApplicationVersion } from '@qpqjs/core';
 
 export function* reportVersion() {
   const version = yield* askGetApplicationVersion(); // string | null

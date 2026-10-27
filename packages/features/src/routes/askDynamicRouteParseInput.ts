@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { z } from 'zod/v4';
 

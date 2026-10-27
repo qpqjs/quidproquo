@@ -6,8 +6,8 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 export const apiGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.API) {

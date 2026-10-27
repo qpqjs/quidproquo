@@ -1,4 +1,4 @@
-import { defineKeyValueStore, QPQConfig } from 'quidproquo-core';
+import { defineKeyValueStore, QPQConfig } from '@qpqjs/core';
 
 import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';

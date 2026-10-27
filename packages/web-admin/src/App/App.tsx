@@ -1,4 +1,4 @@
-import { BaseUrlProvider, BaseUrlResolvers, createQpqStore, QpqContextProvider, QpqStoreProvider, WebsocketProvider } from 'quidproquo-web-react';
+import { BaseUrlProvider, BaseUrlResolvers, createQpqStore, QpqContextProvider, QpqStoreProvider, WebsocketProvider } from '@qpqjs/web-react';
 
 import React, { useMemo } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';

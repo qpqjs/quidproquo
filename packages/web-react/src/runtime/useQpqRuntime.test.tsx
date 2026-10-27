@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatch, askStateRead, Story } from 'quidproquo-core';
+import { AskResponse, askStateDispatch, askStateRead, Story } from '@qpqjs/core';
 
 import { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';

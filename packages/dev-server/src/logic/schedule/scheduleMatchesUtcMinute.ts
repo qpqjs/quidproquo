@@ -1,4 +1,4 @@
-import { Nullable, ScheduleFields } from 'quidproquo-core';
+import { Nullable, ScheduleFields } from '@qpqjs/core';
 
 // null means "every", so an absent field always matches. That is the whole
 // reason ScheduleFields uses null rather than listing every value: it keeps

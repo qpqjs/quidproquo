@@ -1,4 +1,4 @@
-import { WebsocketActionType } from 'quidproquo-webserver';
+import { WebsocketActionType } from '@qpqjs/webserver';
 
 const webserverWebsocketActionComponentMap: Record<string, string[]> = {
   [WebsocketActionType.SendMessage]: ['askWebsocketSendMessage', 'websocketApiName', 'connectionId', 'payload'],

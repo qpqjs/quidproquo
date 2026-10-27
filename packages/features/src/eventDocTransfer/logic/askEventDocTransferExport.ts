@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, askFileWriteObjectJson, askNewGuid, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, askFileWriteObjectJson, askNewGuid, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferBundleFilename, eventDocTransferExportPath } from '../constants';

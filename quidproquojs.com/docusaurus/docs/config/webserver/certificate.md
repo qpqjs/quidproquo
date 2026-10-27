@@ -14,7 +14,7 @@ Declares a TLS certificate for a domain rooted at a service's [DNS base](./dns.m
 - **On AWS:** nothing. The central `DomainCertificateStack` creates an **ACM certificate** with **DNS validation** against the existing Route53 hosted zone, then publishes its ARN to SSM so API Gateway custom domains and [CloudFront domain proxies](./domain-proxy.md) can look it up. `defineCertificate` itself no longer participates in that.
 
 ```typescript
-import { defineCertificate } from 'quidproquo-webserver';
+import { defineCertificate } from '@qpqjs/webserver';
 
 export default [
   // Legacy: certificate covering a subdomain of the service's DNS base
@@ -45,7 +45,7 @@ function defineCertificate(
 ## Examples
 
 ```typescript
-import { defineCertificate } from 'quidproquo-webserver';
+import { defineCertificate } from '@qpqjs/webserver';
 
 export default [
   // Certificate on the root domain

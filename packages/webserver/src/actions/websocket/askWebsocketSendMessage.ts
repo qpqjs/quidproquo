@@ -1,4 +1,4 @@
-import { AskResponse, createActionRequester } from 'quidproquo-core';
+import { AskResponse, createActionRequester } from '@qpqjs/core';
 
 import { WebsocketActionType } from './WebsocketActionType';
 

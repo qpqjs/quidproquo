@@ -11,7 +11,7 @@ Creates a new instance of a [state machine](../../config/xstate/state-machine.md
 - **On the runtime:** the processor builds the XState machine from your [defineStateMachine](../../config/xstate/state-machine.md) config, starts an actor, captures its **initial persisted snapshot**, merges `id` and that snapshot (under the machine's `stateField`, default `__machineState`) into your `item`, and upserts the whole record into the machine's backing key-value store. Any entry actions that fire on start run their mapped stories.
 
 ```typescript
-import { askStateMachineCreate } from 'quidproquo-xstate';
+import { askStateMachineCreate } from '@qpqjs/xstate';
 
 export function* startOrder(orderId: string, customerId: string) {
   const order = yield* askStateMachineCreate('order', orderId, {

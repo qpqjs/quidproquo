@@ -12,7 +12,7 @@ Backend helpers over the chat-list key-value store — the table [defineEventDoc
 - `Touch` built from [askKeyValueStoreQuery](../../core/key-value-store/ask-key-value-store-query.md), [askDateNow](../../core/date/ask-date-now.md), and `askEventDocAiChatUpsert`.
 
 ```typescript
-import { askEventDocAiChatList, askEventDocAiChatTouch } from 'quidproquo-features';
+import { askEventDocAiChatList, askEventDocAiChatTouch } from '@qpqjs/features';
 
 export function* askMostRecentChat(docId: string) {
   const chats = yield* askEventDocAiChatList(docId);

@@ -1,4 +1,4 @@
-import { ActionProcessor, DynamicModuleLoader } from 'quidproquo-core';
+import { ActionProcessor, DynamicModuleLoader } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

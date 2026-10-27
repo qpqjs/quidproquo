@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { EventDocDocRef } from '../../models';
 import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExportSetError';

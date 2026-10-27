@@ -1,5 +1,5 @@
-import { Action, runStory } from 'quidproquo-core';
-import { ApiActionType, ApiRequestActionPayload } from 'quidproquo-webserver';
+import { Action, runStory } from '@qpqjs/core';
+import { ApiActionType, ApiRequestActionPayload } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

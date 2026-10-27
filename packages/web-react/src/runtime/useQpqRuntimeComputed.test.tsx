@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';

@@ -9,10 +9,10 @@
 //
 // getRspackConfigForQpqRemote supplies target 'async-node', the
 // ModuleFederationPlugin (exposes auto-derived from every QpqFunctionRuntime,
-// quidproquo-core/webserver shared), and chunked output. On top we add the same
+// @qpqjs/core/webserver shared), and chunked output. On top we add the same
 // swc-loader getServiceRspackConfig uses. We deliberately do NOT copy its
 // splitChunks:false / eager-import settings: federation NEEDS async chunks.
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration } from '@rspack/core';

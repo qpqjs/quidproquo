@@ -1,4 +1,4 @@
-import { QpqFunctionRuntime } from 'quidproquo-core';
+import { QpqFunctionRuntime } from '@qpqjs/core';
 
 /**
  * Shape of the `lambdaRuntimeConfig` env var the CDK recurring-schedule

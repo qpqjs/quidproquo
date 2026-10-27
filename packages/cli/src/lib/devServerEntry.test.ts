@@ -11,7 +11,7 @@ describe('writeDevServerEntry', () => {
   it('serves only by default', () => {
     const entry = fs.readFileSync(writeDevServerEntry(makeRoot(), 'app'), 'utf8');
 
-    expect(entry).toContain("import { startDevServer } from 'quidproquo-dev-server';");
+    expect(entry).toContain("import { startDevServer } from '@qpqjs/dev-server';");
     expect(entry).toContain('startDevServer(devServerConfig, devServerConfigOverrides);');
     expect(entry).not.toContain('runMigrations(');
   });
@@ -30,7 +30,7 @@ describe('writeDevServerEntry', () => {
   it('migrates then serves for the image', () => {
     const entry = fs.readFileSync(writeDevServerEntry(makeRoot(), 'app', 'migrate-then-serve'), 'utf8');
 
-    expect(entry).toContain("import { runMigrations, startDevServer } from 'quidproquo-dev-server';");
+    expect(entry).toContain("import { runMigrations, startDevServer } from '@qpqjs/dev-server';");
     expect(entry).toContain('runMigrations(devServerConfig, devServerConfigOverrides)');
     expect(entry).toContain('return startDevServer(devServerConfig, devServerConfigOverrides);');
     expect(entry).not.toContain('process.exit(0)');

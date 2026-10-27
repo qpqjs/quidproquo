@@ -9,10 +9,10 @@ Defines a **Neo4j-backed graph database**. It registers everything a service nee
 
 Stories still query the database by name with [askGraphDatabaseExecuteOpenCypherQuery](../../actions/core/graph-database/ask-graph-database-execute-open-cypher-query.md), and they receive the exact same [`GraphCypherResponse`](../../actions/core/graph-database/ask-graph-database-execute-open-cypher-query.md#returns) result shape — nodes, relationships, and scalars. The only difference from the core [defineGraphDatabase](../core/graph-database.md) is the backing engine: `defineGraphDatabase` deploys an Amazon Neptune cluster, whereas `defineGraphDatabaseNeo4j` points the same action at a hosted Neo4j instance. You choose one or the other per database name; the story code that queries it is identical either way.
 
-It ships as a separate package. Import it from `quidproquo-neo4j`:
+It ships as a separate package. Import it from `@qpqjs/neo4j`:
 
 ```typescript
-import { defineGraphDatabaseNeo4j } from 'quidproquo-neo4j';
+import { defineGraphDatabaseNeo4j } from '@qpqjs/neo4j';
 
 export default [
   defineGraphDatabaseNeo4j('social-graph'),
@@ -78,7 +78,7 @@ Selects the Neo4j processor version to wire up.
 ## Examples
 
 ```typescript
-import { defineGraphDatabaseNeo4j, Neo4jVersion } from 'quidproquo-neo4j';
+import { defineGraphDatabaseNeo4j, Neo4jVersion } from '@qpqjs/neo4j';
 
 export default [
   // A Neo4j-backed graph database for this service
@@ -99,7 +99,7 @@ export default [
 Query it exactly as you would a core graph database — the story code doesn't know or care that Neo4j backs it:
 
 ```typescript
-import { askGraphDatabaseExecuteOpenCypherQuery, GraphDatabaseInstanceType } from 'quidproquo-core';
+import { askGraphDatabaseExecuteOpenCypherQuery, GraphDatabaseInstanceType } from '@qpqjs/core';
 
 export function* askFindFriends(userId: string) {
   const response = yield* askGraphDatabaseExecuteOpenCypherQuery(

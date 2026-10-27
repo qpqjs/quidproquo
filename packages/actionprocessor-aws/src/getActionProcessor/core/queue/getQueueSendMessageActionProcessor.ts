@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -13,7 +13,7 @@ import {
   QueueMessage,
   StorySession,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getQueueRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 import { sendMessages, SqsQueueMessageEntry } from '../../../logic/sqs/sendMessages';

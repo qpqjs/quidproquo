@@ -1,4 +1,4 @@
-import { createActionRequester, Nullable } from 'quidproquo-core';
+import { createActionRequester, Nullable } from '@qpqjs/core';
 
 import { EventDocWorkspaceDocumentIdentity } from '../../workspace/types/EventDocWorkspaceDocumentIdentity';
 import { EventDocActionType } from './EventDocActionType';

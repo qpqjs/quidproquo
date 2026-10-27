@@ -1,4 +1,4 @@
-import { AiJsonSchema } from 'quidproquo-core';
+import { AiJsonSchema } from '@qpqjs/core';
 
 import Ajv, { ErrorObject } from 'ajv';
 

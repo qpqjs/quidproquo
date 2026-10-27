@@ -1,5 +1,5 @@
-import { actionResult, actionResultError, ErrorTypeEnum, EventActionType, QpqRuntimeType } from 'quidproquo-core';
-import { WebsocketEvent, WebSocketEventType } from 'quidproquo-webserver';
+import { actionResult, actionResultError, ErrorTypeEnum, EventActionType, QpqRuntimeType } from '@qpqjs/core';
+import { WebsocketEvent, WebSocketEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

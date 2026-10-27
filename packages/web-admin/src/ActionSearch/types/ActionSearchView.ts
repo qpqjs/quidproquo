@@ -1,4 +1,4 @@
-import { ActionSearchFieldDefinition } from 'quidproquo-features';
+import { ActionSearchFieldDefinition } from '@qpqjs/features';
 
 export type ActionSearchView = {
   kind: 'action' | 'entity';

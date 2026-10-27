@@ -10,7 +10,7 @@ Removes one record from a [key-value store](../../../config/core/key-value-store
 - **Action type:** `KeyValueStoreActionType.Delete`
 
 ```typescript
-import { askKeyValueStoreDelete } from 'quidproquo-core';
+import { askKeyValueStoreDelete } from '@qpqjs/core';
 
 export function* askRemoveUser(userId: string) {
   yield* askKeyValueStoreDelete('users', userId);

@@ -10,7 +10,7 @@ Declares that the service sends email with [askEmailSendEmail](../../actions/web
 - **On AWS:** creates an SES `EmailIdentity` per root in its Route53 hosted zone (DKIM records land there automatically), and scopes the service role's `ses:SendEmail` / `ses:SendRawEmail` grant to those identities' exact ARNs. `ses:SendRawEmail` is needed for emails with attachments, which are sent as raw MIME. No grant or identity is created for services that declare no `defineEmailSender`.
 
 ```typescript
-import { defineDns, defineEmailSender } from 'quidproquo-webserver';
+import { defineDns, defineEmailSender } from '@qpqjs/webserver';
 
 export default [
   defineDns('example.com'),

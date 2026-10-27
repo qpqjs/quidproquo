@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
-import { DomainTarget, qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig } from '@qpqjs/core';
+import { DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { requireDomainResolver } from '../../appWorkspace/requireDomainResolver';
 

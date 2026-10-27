@@ -1,4 +1,4 @@
-import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, KeyValueStoreActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, KeyValueStoreActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { AskResponse, AssociateSoftwareTokenResult } from 'quidproquo-core';
+import { AskResponse, AssociateSoftwareTokenResult } from '@qpqjs/core';
 
 import { askPlatformRequest } from '../../../../platformLogic';
 import { askAuthChallengeSetMfaSetupAssociation } from '../authActionCreator';

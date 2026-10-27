@@ -1,4 +1,4 @@
-import { isErroredActionResult } from 'quidproquo-core';
+import { isErroredActionResult } from '@qpqjs/core';
 
 import { collectStrings } from '../collectStrings';
 import { REDACTION_SECRET_RESULT_ACTION_TYPES } from '../constants/REDACTION_SECRET_RESULT_ACTION_TYPES';

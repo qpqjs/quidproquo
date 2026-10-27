@@ -7,7 +7,7 @@ import {
   FileActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 
@@ -34,7 +34,7 @@ const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): 
       }
     } catch (error: unknown) {
       // Name-keyed, not instanceof: under npm link / module federation the
-      // error can come from another copy of quidproquo-core.
+      // error can come from another copy of @qpqjs/core.
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askFileExists.errorType.InvalidScope, error.message),
       });

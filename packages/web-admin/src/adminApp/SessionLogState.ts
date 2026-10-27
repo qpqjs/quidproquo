@@ -1,4 +1,4 @@
-import { EventDocEvent } from 'quidproquo-features';
+import { EventDocEvent } from '@qpqjs/features';
 
 // The session event log — the SOURCE OF TRUTH for session state. `events` are
 // server-acked (immutable, server-stamped metadata); `pendingEvents` is the

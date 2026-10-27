@@ -1,4 +1,4 @@
-import { AiToolDefinition, defineInlineFunction, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
+import { AiToolDefinition, defineInlineFunction, QPQConfig, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
 
 const adminLogAiToolGetActionsName = 'askAdminLogAiToolGetActions';
 const adminLogAiToolGetActionDetailName = 'askAdminLogAiToolGetActionDetail';

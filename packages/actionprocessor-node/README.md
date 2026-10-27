@@ -1,10 +1,10 @@
-# quidproquo-actionprocessor-node
+# @qpqjs/actionprocessor-node
 
 The Node.js runtime for [quidproquo](https://github.com/qpqjs/quidproquo).
 
-A qpq story yields actions, and a **processor** is the function that actually carries one out. This package supplies the processors that need Node: streams, dynamic function loading, and inline function execution. It builds on `quidproquo-actionprocessor-js`, which covers everything that works on any JavaScript engine.
+A qpq story yields actions, and a **processor** is the function that actually carries one out. This package supplies the processors that need Node: streams, dynamic function loading, and inline function execution. It builds on `@qpqjs/actionprocessor-js`, which covers everything that works on any JavaScript engine.
 
-You do not usually install this yourself. It arrives as a dependency of `quidproquo-dev-server`, `quidproquo-actionprocessor-awslambda`, and the CLI.
+You do not usually install this yourself. It arrives as a dependency of `@qpqjs/dev-server`, `@qpqjs/actionprocessor-aws`, and the CLI.
 
 ## What is in here
 

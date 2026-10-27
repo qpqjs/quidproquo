@@ -1,4 +1,4 @@
-import { AiActionType } from 'quidproquo-core';
+import { AiActionType } from '@qpqjs/core';
 
 const coreAiActionComponentMap: Record<string, string[]> = {
   [AiActionType.Prompt]: ['askAiPrompt', 'model', 'prompt', 'messages', 'turnContext', 'system', 'aiName'],

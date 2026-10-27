@@ -1,4 +1,4 @@
-import { createActionRequester, QPQBinaryData } from 'quidproquo-core';
+import { createActionRequester, QPQBinaryData } from '@qpqjs/core';
 
 import { EmailActionType } from './EmailActionType';
 

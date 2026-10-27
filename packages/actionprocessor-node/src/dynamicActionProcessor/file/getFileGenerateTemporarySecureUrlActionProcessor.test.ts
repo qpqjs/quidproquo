@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

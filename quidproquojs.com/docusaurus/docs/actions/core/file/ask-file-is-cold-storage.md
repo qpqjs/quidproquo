@@ -11,7 +11,7 @@ Reports whether a file on a [storage drive](../../../config/core/storage-drive.m
 - **On AWS:** reads the object's S3 storage class (via `HeadObject`) and returns `true` when it is an archival class such as Glacier or Glacier Deep Archive.
 
 ```typescript
-import { askFileIsColdStorage, askFileReadTextContents } from 'quidproquo-core';
+import { askFileIsColdStorage, askFileReadTextContents } from '@qpqjs/core';
 
 export function* askReadArchivableReport(filepath: string) {
   const isCold = yield* askFileIsColdStorage('reports', filepath);
@@ -56,7 +56,7 @@ function* askFileIsColdStorage(
 | `FileIsColdStorageErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
 | `FileIsColdStorageErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileIsColdStorage('reports', 'exports/2020.csv'));

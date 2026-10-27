@@ -1,4 +1,4 @@
-import { createContextReader } from 'quidproquo-core';
+import { createContextReader } from '@qpqjs/core';
 
 import { eventDocStoreContext } from './eventDocStoreContext';
 

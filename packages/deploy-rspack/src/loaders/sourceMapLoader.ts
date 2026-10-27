@@ -10,7 +10,7 @@
 // Anything else (http(s) URLs, missing/unreadable/unparseable maps) passes the
 // source through untouched - the module simply stays as-is in traces, exactly the
 // behaviour source-map-loader + our ignoreWarnings config produced.
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

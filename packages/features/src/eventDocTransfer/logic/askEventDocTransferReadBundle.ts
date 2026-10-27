@@ -1,4 +1,4 @@
-import { askFileReadObjectJson, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askFileReadObjectJson, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
 import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION, EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferImportPath } from '../constants';

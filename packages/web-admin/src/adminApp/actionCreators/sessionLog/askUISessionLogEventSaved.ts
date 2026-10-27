@@ -1,5 +1,5 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
-import { EventDocEvent } from 'quidproquo-features';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
+import { EventDocEvent } from '@qpqjs/features';
 
 import { SessionLogEffect } from '../../effects/sessionLog/SessionLogEffect';
 import { SessionLogEventSavedEffect } from '../../effects/sessionLog/SessionLogEventSavedEffect';

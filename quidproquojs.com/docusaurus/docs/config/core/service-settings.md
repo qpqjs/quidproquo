@@ -12,7 +12,7 @@ Use it when several modules share one config file but each needs its own extra s
 - **On AWS:** does not deploy a resource of its own. It is resolved during config flattening (`qpqCoreUtils`): the matching module's settings are spliced into the config and then deploy as normal.
 
 ```typescript
-import { defineServiceSettings, defineParameter } from 'quidproquo-core';
+import { defineServiceSettings, defineParameter } from '@qpqjs/core';
 
 export default [
   defineServiceSettings({

@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 /**
  * `require`s a service's infrastructure module and unwraps its QPQ config

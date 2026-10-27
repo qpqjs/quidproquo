@@ -76,9 +76,9 @@ The `ask-prefix-generator-only` eslint rule only checks function literals, so `c
 
 ## Affected packages
 
-- `quidproquo-core`: requester helper, reducer builder, `onEffect`, type helpers, tests.
-- `quidproquo-features`: event-doc versions of the requester and fold builder, validator typing, trial conversions.
-- `quidproquo-web-admin`: conversions only, when those modules are next touched.
+- `@qpqjs/core`: requester helper, reducer builder, `onEffect`, type helpers, tests.
+- `@qpqjs/features`: event-doc versions of the requester and fold builder, validator typing, trial conversions.
+- `@qpqjs/web-admin`: conversions only, when those modules are next touched.
 - `CLAUDE.md`: module structure table and the event-doc paragraph.
 - doccypoccy (follow-up, other repo): convert modules after a release, starting with `eventEditor`.
 
@@ -118,7 +118,7 @@ The `ask-prefix-generator-only` eslint rule only checks function literals, so `c
 18. Core reducer builder: routes each effect to its updater; returns `[state, false]` for unknown types and for `'toString'`; throws on a duplicate effect type; two reducers pairing the same requester with different updaters both handle it (the multiple-updater case, combined with `combineQpqReducers`).
 19. Type-level cases with `// @ts-expect-error`: updater payload not matching its requester, requester called with wrong arguments, a non-literal `effectType` (a plain `string`) losing the type link. Then confirm these are actually checked: run `tsc --noEmit` against a tsconfig that includes test files and temporarily remove one `@ts-expect-error` to watch it fail. If no typecheck covers the test files, say so and add one rather than trusting a green run.
 20. Features: the event-doc requester yields the same `ApplyEvent` action as `askApplyEventDocEvent` for the same input; `buildEventDocFoldReducerFrom` folds the reserved events and domain pairs.
-21. `npm run test` for core and features, `npm run build -w quidproquo-core -w quidproquo-features`, `npm run lint`.
+21. `npm run test` for core and features, `npm run build -w @qpqjs/core -w @qpqjs/features`, `npm run lint`.
 
 ### Trial conversion (this repo)
 

@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askMcpReadToolsets } from '../actions/askMcpReadToolsets';
 import { McpToolsetRunToolInput } from '../models/McpToolsetRunToolInput';

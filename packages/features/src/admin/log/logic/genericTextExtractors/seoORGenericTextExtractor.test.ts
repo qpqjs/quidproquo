@@ -1,5 +1,5 @@
-import { actionResult, actionResultError, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
-import { SeoEvent } from 'quidproquo-webserver';
+import { actionResult, actionResultError, ErrorTypeEnum, QpqRuntimeType } from '@qpqjs/core';
+import { SeoEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from 'quidproquo-core';
+import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from '@qpqjs/core';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';

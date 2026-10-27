@@ -11,7 +11,7 @@ Invalidates the CDN cache for a [web entry](../../../config/webserver/web-entry.
 - **On AWS:** looks up the CloudFront distribution deployed for the named web entry (via its CloudFormation export) and issues a CloudFront `CreateInvalidation` for the supplied paths. The caller reference is derived from a hash of the paths plus the current timestamp, so repeated invalidations of the same paths are always accepted as distinct requests.
 
 ```typescript
-import { askWebEntryInvalidateCache } from 'quidproquo-webserver';
+import { askWebEntryInvalidateCache } from '@qpqjs/webserver';
 
 export function* askPublishSite() {
   // Drop the SPA shell and manifest so a new deploy is served immediately

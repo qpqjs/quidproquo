@@ -10,7 +10,7 @@ Makes an outbound HTTP request and returns the response. Doing this as an action
 - **Action type:** `NetworkActionType.Request`
 
 ```typescript
-import { askNetworkRequest } from 'quidproquo-core';
+import { askNetworkRequest } from '@qpqjs/core';
 
 interface Todo {
   id: number;
@@ -76,7 +76,7 @@ The response is returned for any completed HTTP exchange, including non-2xx stat
 | `UnsupportedMethod` | The HTTP method is one the runtime refuses to send. |
 | `NetworkError` | No response came back: no connection, DNS failure, CORS block, unparseable body. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askNetworkRequest('GET', 'https://example.com/slow'));

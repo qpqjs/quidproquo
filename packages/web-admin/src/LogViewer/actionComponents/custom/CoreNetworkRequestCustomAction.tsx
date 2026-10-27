@@ -1,4 +1,4 @@
-import { NetworkRequestActionPayload } from 'quidproquo-core';
+import { NetworkRequestActionPayload } from '@qpqjs/core';
 
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from '../genericActionRenderer';
 import ActionResultDisplay from '../genericActionRenderer/ActionResultDisplay';

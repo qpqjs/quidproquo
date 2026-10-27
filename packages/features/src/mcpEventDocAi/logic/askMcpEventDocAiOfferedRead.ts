@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { askMcpEventDocAiReadConfig } from '../actions/askMcpEventDocAiReadConfig';
 import { MCP_EVENT_DOC_AI_EXCLUDED_TOOLS_GLOBAL } from '../constants/mcpEventDocAiExcludedToolsGlobal';

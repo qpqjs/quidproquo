@@ -1,4 +1,4 @@
-import { useFastCallback } from 'quidproquo-web-react';
+import { useFastCallback } from '@qpqjs/web-react';
 
 import { AnyAsyncFunction } from '../../types';
 import { useLoadingApi } from './useLoadingApi';

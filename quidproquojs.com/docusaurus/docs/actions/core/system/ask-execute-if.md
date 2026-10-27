@@ -10,7 +10,7 @@ Conditionally runs a story. When the condition is `true`, the wrapped story runs
 - **Built from:** a thin generator wrapper — it either `yield*`s the wrapped story or returns `undefined`.
 
 ```typescript
-import { askExecuteIf } from 'quidproquo-core';
+import { askExecuteIf } from '@qpqjs/core';
 
 export function* askMaybeNotify(user: User, shouldNotify: boolean) {
   // askSendWelcomeEmail only runs when shouldNotify is true.

@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import path from 'path';
 

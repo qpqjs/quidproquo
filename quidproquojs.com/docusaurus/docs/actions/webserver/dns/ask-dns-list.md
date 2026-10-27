@@ -10,7 +10,7 @@ Returns the root domains the service declared with [defineDns](../../../config/w
 - **Action type:** `DnsActionType.List`
 
 ```typescript
-import { askDnsList } from 'quidproquo-webserver';
+import { askDnsList } from '@qpqjs/webserver';
 
 export function* askPrimaryRootDomain() {
   const roots = yield* askDnsList();

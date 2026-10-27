@@ -1,4 +1,4 @@
-import { askCatch, askMapParallel, AskResponse } from 'quidproquo-core';
+import { askCatch, askMapParallel, AskResponse } from '@qpqjs/core';
 
 import { askUIEventDocWorkspaceAppendFullHistory } from '../actionCreators/askUIEventDocWorkspaceAppendFullHistory';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';

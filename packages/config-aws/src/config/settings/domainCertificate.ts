@@ -1,5 +1,5 @@
-import { QPQConfigSetting } from 'quidproquo-core';
-import { DomainTarget } from 'quidproquo-webserver';
+import { QPQConfigSetting } from '@qpqjs/core';
+import { DomainTarget } from '@qpqjs/webserver';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 

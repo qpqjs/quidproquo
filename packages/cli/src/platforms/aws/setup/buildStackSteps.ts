@@ -1,4 +1,4 @@
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
 
 import { SetupStep } from '../../../lib/setupStep';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack } from '../stacks';

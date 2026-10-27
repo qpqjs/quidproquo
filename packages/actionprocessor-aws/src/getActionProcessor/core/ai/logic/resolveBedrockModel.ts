@@ -1,4 +1,4 @@
-import { AiDataRegion, AiModel, Nullable } from 'quidproquo-core';
+import { AiDataRegion, AiModel, Nullable } from '@qpqjs/core';
 
 import { bedrockModelMap } from '../aiModelMap';
 import { bedrockDataRegionPreference } from '../bedrockDataRegionPreference';

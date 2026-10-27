@@ -11,7 +11,7 @@ Sends a prompt to a large language model and resolves immediately with a **strea
 - **On AWS:** runs through the [Vercel AI SDK](https://ai-sdk.dev) (`streamText`) against Amazon Bedrock, registering the SDK's event stream in the runtime's stream registry and handing back a handle to it.
 
 ```typescript
-import { askAiPromptStream, askStreamProcess, AiModel, AiStreamPartType } from 'quidproquo-core';
+import { askAiPromptStream, askStreamProcess, AiModel, AiStreamPartType } from '@qpqjs/core';
 
 export function* askAnswerStreamed(prompt: string) {
   const stream = yield* askAiPromptStream(AiModel.ClaudeSonnet46, prompt);

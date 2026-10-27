@@ -11,7 +11,7 @@ Sends an email. The `from` address must be under a domain declared with [defineE
 - **On AWS:** sent through **SES v2** (`SendEmailCommand`). `bcc` addresses are only ever placed in the SES `Destination`, never written into a message header, so other recipients can't see them. When `attachments` are provided the message is built as a raw MIME email (multipart/mixed wrapping a multipart/alternative body); otherwise it's sent as SES "Simple" content. While the SES account is in sandbox mode, recipients also need to be listed with [defineEmailSenderAllowList](../../../config/config-aws/email-sender-allow-list.md) and verified in the SES console.
 
 ```typescript
-import { askEmailSendEmail } from 'quidproquo-webserver';
+import { askEmailSendEmail } from '@qpqjs/webserver';
 
 export function* askSendWelcomeEmail(to: string) {
   const messageId = yield* askEmailSendEmail({
@@ -67,8 +67,8 @@ function* askEmailSendEmail(payload: EmailSendEmailActionPayload): AskResponse<s
 Wrap the call in [askCatch](../../../actions/core/system/ask-catch.md) to handle these without unwinding the story:
 
 ```typescript
-import { askCatch } from 'quidproquo-core';
-import { askEmailSendEmail, EmailSendEmailErrorTypeEnum } from 'quidproquo-webserver';
+import { askCatch } from '@qpqjs/core';
+import { askEmailSendEmail, EmailSendEmailErrorTypeEnum } from '@qpqjs/webserver';
 
 export function* askTrySendEmail(payload) {
   const outcome = yield* askCatch(askEmailSendEmail(payload));

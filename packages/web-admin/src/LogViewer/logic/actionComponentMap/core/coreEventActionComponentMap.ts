@@ -1,4 +1,4 @@
-import { EventActionType } from 'quidproquo-core';
+import { EventActionType } from '@qpqjs/core';
 
 const coreEventActionComponentMap: Record<string, string[]> = {
   [EventActionType.TransformEventParams]: ['askEventTransformEventParams', 'eventParams'],

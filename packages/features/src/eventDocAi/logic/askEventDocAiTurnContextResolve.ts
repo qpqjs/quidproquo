@@ -1,4 +1,4 @@
-import { type AiMessage, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
+import { type AiMessage, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiSystemPromptInput } from '../models';

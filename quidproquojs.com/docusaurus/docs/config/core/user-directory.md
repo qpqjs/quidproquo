@@ -7,10 +7,10 @@ description: Define a user directory — a named authentication & user store (an
 
 Defines a **user directory**: a named store of user accounts with authentication, passwords, MFA, and profile attributes. Stories never talk to Cognito (or any identity provider) directly — they create users, sign them in, respond to auth challenges, and read/write attributes by drive name using the [User Directory action requesters](../../actions/core/user-directory/ask-user-directory-authenticate-user.md), and the runtime maps the directory to real identity infrastructure.
 
-- **On AWS:** deploys an AWS Cognito **user pool** and an app **client** (`QpqInfCoreUserDirectoryConstruct` in `quidproquo-deploy-awscdk`). The pool enforces a fixed password policy (min 12 chars; requires lower- and upper-case, digits, and symbols), makes `email` a required, mutable, auto-verified standard attribute, and configures MFA from the `mfa` option. The app client is generated with a secret and enables the `ADMIN_USER_PASSWORD_AUTH` flow (and `CUSTOM_AUTH` when `customAuthRuntime` is set). The pool is **retained** on stack teardown by default (user accounts are unrecoverable) unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`. See [On AWS](#on-aws) for the full breakdown.
+- **On AWS:** deploys an AWS Cognito **user pool** and an app **client** (`QpqInfCoreUserDirectoryConstruct` in `@qpqjs/deploy-awscdk`). The pool enforces a fixed password policy (min 12 chars; requires lower- and upper-case, digits, and symbols), makes `email` a required, mutable, auto-verified standard attribute, and configures MFA from the `mfa` option. The app client is generated with a secret and enables the `ADMIN_USER_PASSWORD_AUTH` flow (and `CUSTOM_AUTH` when `customAuthRuntime` is set). The pool is **retained** on stack teardown by default (user accounts are unrecoverable) unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`. See [On AWS](#on-aws) for the full breakdown.
 
 ```typescript
-import { defineUserDirectory } from 'quidproquo-core';
+import { defineUserDirectory } from '@qpqjs/core';
 
 export default [
   defineUserDirectory('app-users'),
@@ -144,7 +144,7 @@ import {
   defineUserDirectory,
   UserDirectoryMfaMode,
   UserDirectoryMfaSecondFactor,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export default [
   // Simple admin-managed directory
@@ -185,6 +185,6 @@ export default [
 - **Tokens:** [askUserDirectoryReadAccessToken](../../actions/core/user-directory/ask-user-directory-read-access-token.md), [askUserDirectoryDecodeAccessToken](../../actions/core/user-directory/ask-user-directory-decode-access-token.md).
 - **Signing out:** [askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md) (single session), [askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md) (every session).
 - **All User Directory actions:** see the [User Directory actions](../../actions/core/user-directory/ask-user-directory-authenticate-user.md) group.
-- **Turn-key auth:** [defineAuthSystem](../webserver/auth-system.md) (quidproquo-webserver) creates a user directory and the login / refresh / password-recovery HTTP routes in one call.
+- **Turn-key auth:** [defineAuthSystem](../webserver/auth-system.md) (@qpqjs/webserver) creates a user directory and the login / refresh / password-recovery HTTP routes in one call.
 - **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) — retain vs destroy the Cognito user pool on teardown.
-- **Admin dashboard:** [defineAdminUserDirectory](../features/admin-user-directory.md) (quidproquo-features) wraps this to declare the `qpq-admin` directory the admin dashboard authenticates against.
+- **Admin dashboard:** [defineAdminUserDirectory](../features/admin-user-directory.md) (@qpqjs/features) wraps this to declare the `qpq-admin` directory the admin dashboard authenticates against.

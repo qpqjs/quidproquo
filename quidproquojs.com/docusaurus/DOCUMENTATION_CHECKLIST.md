@@ -293,7 +293,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Path utilities
 - [ ] Runtime path resolution
 
-## Web Server Package (`quidproquo-webserver`)
+## Web Server Package (`@qpqjs/webserver`)
 
 ### Actions
 - [ ] Web server specific actions
@@ -332,7 +332,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] URL utilities
 - [ ] WebSocket utilities
 
-## AWS Lambda Processor (`quidproquo-actionprocessor-awslambda`)
+## AWS Lambda Processor (`@qpqjs/actionprocessor-aws`)
 
 - [ ] Lambda handlers
 - [ ] API Gateway integration
@@ -344,14 +344,14 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Runtime configuration
 - [ ] AWS resource mapping
 
-## AWS Configuration (`quidproquo-config-aws`)
+## AWS Configuration (`@qpqjs/config-aws`)
 
 - [ ] AWS-specific configuration
 - [ ] API layers
 - [ ] Service account management
 - [ ] Configuration utilities
 
-## AWS CDK Deployment (`quidproquo-deploy-awscdk`)
+## AWS CDK Deployment (`@qpqjs/deploy-awscdk`)
 
 - [ ] QPQApp construct
 - [ ] Stack definitions
@@ -364,13 +364,13 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 
 ## Web Client Packages
 
-### quidproquo-web
+### @qpqjs/web
 - [ ] OAuth2 token exchange
 - [ ] Network requests
 - [ ] WebSocket service
 - [ ] Client utilities
 
-### quidproquo-web-react
+### @qpqjs/web-react
 - [ ] Auth context and providers
 - [ ] Base URL management
 - [ ] React hooks
@@ -384,7 +384,7 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Query parameters
 - [ ] WebSocket provider
 
-### quidproquo-web-admin
+### @qpqjs/web-admin
 - [ ] Admin UI components
 - [ ] Log viewer
 - [ ] Auth components
@@ -393,26 +393,26 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 
 ## Other Processors
 
-### quidproquo-actionprocessor-node
+### @qpqjs/actionprocessor-node
 - [ ] Node.js action processors
 - [ ] Dynamic processors
 
-### quidproquo-actionprocessor-js
+### @qpqjs/actionprocessor-js
 - [ ] JavaScript action processors
 - [ ] Browser compatibility
 
-### quidproquo-actionprocessor-web
+### @qpqjs/actionprocessor-web
 - [ ] Web-specific processors
 - [ ] Browser runtime
 
-## Neo4j Package (`quidproquo-neo4j`)
+## Neo4j Package (`@qpqjs/neo4j`)
 - [ ] Neo4j integration
 - [ ] Graph database processors
 - [ ] Cypher query support
 
 ## Development Tools
 
-### quidproquo-dev-server
+### @qpqjs/dev-server
 - [ ] Local development server
 - [ ] Action processor implementations
 - [ ] Event bus simulation
@@ -421,13 +421,13 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Service function execution
 - [ ] Tinker interface
 
-### quidproquo-deploy-webpack
+### @qpqjs/deploy-webpack
 - [ ] Webpack configuration
 - [ ] QPQ plugins
 - [ ] Module federation
 - [ ] Dynamic loading
 
-### quidproquo-testing
+### @qpqjs/testing
 - [ ] Generator testing utilities
 - [ ] Vitest matchers
 - [ ] Test helpers

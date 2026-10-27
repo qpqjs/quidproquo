@@ -1,4 +1,4 @@
-import { ActionMockMap, askReduceState, AskResponse, DateActionType, Effect, GuidActionType, QpqReducer, runStory } from 'quidproquo-core';
+import { ActionMockMap, askReduceState, AskResponse, DateActionType, Effect, GuidActionType, QpqReducer, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

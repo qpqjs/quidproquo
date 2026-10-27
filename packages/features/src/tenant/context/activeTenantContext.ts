@@ -1,4 +1,4 @@
-import { storageScopeContext } from 'quidproquo-core';
+import { storageScopeContext } from '@qpqjs/core';
 
 // The active tenant IS the ambient storage scope: scope-aware data layers (the
 // eventDoc feature, the askTenant* wrappers) forward it as the File/KVS scope.

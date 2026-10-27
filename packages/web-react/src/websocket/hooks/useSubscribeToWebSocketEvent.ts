@@ -1,5 +1,5 @@
-import { AnyEventMessage } from 'quidproquo-core';
-import { WebSocketServiceEventSubscriptionFunction } from 'quidproquo-web';
+import { AnyEventMessage } from '@qpqjs/core';
+import { WebSocketServiceEventSubscriptionFunction } from '@qpqjs/web';
 
 import { useEffect } from 'react';
 

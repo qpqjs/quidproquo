@@ -5,7 +5,7 @@ import {
   HTTPNetworkResponse,
   NetworkRequestActionPayload,
   QPQBinaryData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { NetworkRequestError, NetworkRequestErrorCode } from './NetworkRequestError';
 

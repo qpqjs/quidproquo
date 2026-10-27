@@ -13,20 +13,20 @@ export default defineConfig({
   },
   resolve: {
     // Test against core source, not the last-built lib - matches
-    // quidproquo-dev-server's and quidproquo-actionprocessor-node's configs.
+    // @qpqjs/dev-server's and @qpqjs/actionprocessor-node's configs.
     // Without this the suite silently tests whatever was built last, so a
     // change to a core type that this package renders (schedules, say) passes
     // or fails depending on whether someone remembered to build.
     alias: {
-      'quidproquo-core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
-      'quidproquo-webserver': fileURLToPath(new URL('../webserver/src/index.ts', import.meta.url)),
-      'quidproquo-config-aws': fileURLToPath(new URL('../config-aws/src/index.ts', import.meta.url)),
-      'quidproquo-actionprocessor-awslambda': fileURLToPath(new URL('../actionprocessor-aws/src/index.ts', import.meta.url)),
+      '@qpqjs/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
+      '@qpqjs/webserver': fileURLToPath(new URL('../webserver/src/index.ts', import.meta.url)),
+      '@qpqjs/config-aws': fileURLToPath(new URL('../config-aws/src/index.ts', import.meta.url)),
+      '@qpqjs/actionprocessor-aws': fileURLToPath(new URL('../actionprocessor-aws/src/index.ts', import.meta.url)),
       // The tracer is deep-imported as lib/commonjs/traceStoryExecution; map it to source too.
-      'quidproquo-actionprocessor-node/lib/commonjs/traceStoryExecution': fileURLToPath(
+      '@qpqjs/actionprocessor-node/lib/commonjs/traceStoryExecution': fileURLToPath(
         new URL('../actionprocessor-node/src/traceStoryExecution/index.ts', import.meta.url),
       ),
-      'quidproquo-actionprocessor-node': fileURLToPath(new URL('../actionprocessor-node/src/index.ts', import.meta.url)),
+      '@qpqjs/actionprocessor-node': fileURLToPath(new URL('../actionprocessor-node/src/index.ts', import.meta.url)),
     },
   },
 });

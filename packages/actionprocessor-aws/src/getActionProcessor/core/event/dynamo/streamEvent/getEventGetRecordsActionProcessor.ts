@@ -6,7 +6,7 @@ import {
   KvsStreamEventType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { DynamoDBRecord } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';

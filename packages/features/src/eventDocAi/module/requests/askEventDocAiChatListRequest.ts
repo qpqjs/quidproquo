@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import type { EventDocAiChatListPayload, EventDocAiChatSummary } from '../../models';
 import { EVENT_DOC_AI_METHOD_CHAT_LIST } from '../constants/eventDocAiMethodNames';

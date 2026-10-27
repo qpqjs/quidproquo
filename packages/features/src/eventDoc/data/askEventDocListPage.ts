@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual, kvsNotExists, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsEqual, kvsNotExists, QpqPagedData } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EVENT_DOC_LIST_PAGE_SIZE } from '../list/constants/eventDocListPageSize';

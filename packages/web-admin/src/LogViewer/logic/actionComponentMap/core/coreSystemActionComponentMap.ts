@@ -1,4 +1,4 @@
-import { SystemActionType } from 'quidproquo-core';
+import { SystemActionType } from '@qpqjs/core';
 
 const coreSystemActionComponentMap: Record<string, string[]> = {
   [SystemActionType.Batch]: ['askBatch', 'actions'],

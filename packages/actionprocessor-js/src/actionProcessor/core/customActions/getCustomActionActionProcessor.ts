@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/core';
 
 function getActionProcessorListLoader(dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) {
   return async function loadModule(qpqFunctionRuntime: QpqFunctionRuntime): Promise<ActionProcessorList> {

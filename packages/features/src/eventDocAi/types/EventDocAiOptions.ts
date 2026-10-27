@@ -1,4 +1,4 @@
-import type { AiCacheTtl, AiModel, AiReasoningEffort, AiToolDefinition, Nullable } from 'quidproquo-core';
+import type { AiCacheTtl, AiModel, AiReasoningEffort, AiToolDefinition, Nullable } from '@qpqjs/core';
 
 export type EventDocAiOptions = {
   // The eventDoc collection this AI works with (chats are scoped per document).

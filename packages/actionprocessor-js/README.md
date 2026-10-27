@@ -1,10 +1,10 @@
-# quidproquo-actionprocessor-js
+# @qpqjs/actionprocessor-js
 
 The platform-free half of the [quidproquo](https://github.com/qpqjs/quidproquo) runtime.
 
 A qpq story yields actions, and a **processor** is the function that actually carries one out. The processors in this package need nothing but a JavaScript engine, so they are shared by every other runtime: Node, the browser, and AWS Lambda all start from this set and add their own on top.
 
-You do not usually install this yourself. It arrives as a dependency of `quidproquo-actionprocessor-node`, `-web`, or `-awslambda`.
+You do not usually install this yourself. It arrives as a dependency of `@qpqjs/actionprocessor-node`, `-web`, or `-awslambda`.
 
 ## What it implements
 

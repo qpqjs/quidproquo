@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { defaultEventDocEventValidator } from '../../validation/defaultEventDocEventValidator';
 import { EventDocEditorValidator } from '../../validation/types/EventDocEditorValidator';

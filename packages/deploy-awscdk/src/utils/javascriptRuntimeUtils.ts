@@ -1,4 +1,4 @@
-import { JavascriptRuntimeArchitecture, JavascriptRuntimeVersion, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { JavascriptRuntimeArchitecture, JavascriptRuntimeVersion, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_lambda } from 'aws-cdk-lib';
 

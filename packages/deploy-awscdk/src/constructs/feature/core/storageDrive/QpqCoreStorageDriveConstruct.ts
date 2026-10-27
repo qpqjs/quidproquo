@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from '@qpqjs/core';
 
 import { aws_iam, aws_kms, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

@@ -6,7 +6,7 @@ import {
   ProcessorFor,
   QPQConfig,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';
 

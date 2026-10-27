@@ -10,8 +10,8 @@ Iterates an array and builds a new array from the result of a per-item callback 
 - **Built from:** a plain `for` loop that `yield*`s the callback for each item and collects the results.
 
 ```typescript
-import { askMap } from 'quidproquo-core';
-import { askFileReadTextContents } from 'quidproquo-core';
+import { askMap } from '@qpqjs/core';
+import { askFileReadTextContents } from '@qpqjs/core';
 
 export function* askLoadTemplates(filepaths: string[]) {
   // Read each template in turn and return the array of contents.

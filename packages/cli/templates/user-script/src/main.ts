@@ -1,4 +1,4 @@
-import { askDateNow, AskResponse } from 'quidproquo-core';
+import { askDateNow, AskResponse } from '@qpqjs/core';
 
 // Every export of this file is callable by name through askUserScriptExecute. A
 // generator export is a story: it yields quidproquo actions and its return value is

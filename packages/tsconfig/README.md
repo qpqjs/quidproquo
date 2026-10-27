@@ -1,16 +1,16 @@
-# quidproquo-tsconfig
+# @qpqjs/tsconfig
 
 The shared TypeScript configuration used by every package in the [quidproquo](https://github.com/qpqjs/quidproquo) monorepo.
 
 It exists so the framework packages compile the same way, and so an app can start from settings that are known to work with qpq's generator-heavy code and dual CommonJS and ESM builds.
 
 ```bash
-npm install --save-dev quidproquo-tsconfig
+npm install --save-dev @qpqjs/tsconfig
 ```
 
 ```json
 {
-  "extends": "quidproquo-tsconfig/tsconfig.base.json",
+  "extends": "@qpqjs/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./lib"
   },

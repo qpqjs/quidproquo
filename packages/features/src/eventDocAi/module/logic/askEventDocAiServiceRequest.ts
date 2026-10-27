@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askServiceRequest } from '../../../webSocketQueue/logic/service';
 import type { EventDocAiDocRef } from '../../models';

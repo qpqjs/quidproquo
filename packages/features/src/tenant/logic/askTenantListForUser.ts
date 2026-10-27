@@ -1,4 +1,4 @@
-import { askMapParallel, AskResponse, askStorageScopeProvide, Nullable } from 'quidproquo-core';
+import { askMapParallel, AskResponse, askStorageScopeProvide, Nullable } from '@qpqjs/core';
 
 import { askEventDocGetById } from '../../eventDoc/data/askEventDocGetById';
 import { EventDocSummary } from '../../eventDoc/models';

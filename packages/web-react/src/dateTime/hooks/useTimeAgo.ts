@@ -1,4 +1,4 @@
-import { formatTimeAgo, getTimeAgoUpdateIntervalMs } from 'quidproquo-web';
+import { formatTimeAgo, getTimeAgoUpdateIntervalMs } from '@qpqjs/web';
 
 import { useEffect, useMemo, useState } from 'react';
 

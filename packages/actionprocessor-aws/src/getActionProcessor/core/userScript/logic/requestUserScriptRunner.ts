@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   ActionProcessorList,
   ActionProcessorResult,
@@ -20,7 +20,7 @@ import {
   UserScriptRunnerEvent,
   UserScriptRunnerRequest,
   UserScriptRunnerResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

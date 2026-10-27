@@ -11,7 +11,7 @@ Globally signs a user out: revokes **every** refresh token issued to the owner o
 - **On AWS:** issues Cognito `GlobalSignOut`. Authorized by the access token itself — no user directory name or IAM is needed to identify the user, Cognito resolves it from the token.
 
 ```typescript
-import { askUserDirectorySignOutUser } from 'quidproquo-core';
+import { askUserDirectorySignOutUser } from '@qpqjs/core';
 
 export function* askLogOutEverywhere(accessToken: string) {
   yield* askUserDirectorySignOutUser(accessToken);

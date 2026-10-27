@@ -19,7 +19,7 @@ export type UserScriptBuildActionPayload = {
  * Build a user script project that is already on a drive into one file at `outputFilepath`,
  * on whichever runtime is calling. Source maps are off unless `options.sourceMap` is set, and
  * then they are embedded in that file. Only services that registered defineUserScriptBuilder
- * can process it. The project may import quidproquo-core and its own files; npm packages
+ * can process it. The project may import @qpqjs/core and its own files; npm packages
  * and Node builtins are refused.
  */
 export const askUserScriptBuild = createActionRequester<UserScriptBuildOutcome>()({

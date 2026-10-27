@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 // The ETA time blocks offered in the create dialog and editor. null = unknown
 // (no ETA shown to users). The chosen duration anchors to the SET_ETA event's

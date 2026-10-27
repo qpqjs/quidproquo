@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { OpenApiDocument } from '../../types/OpenApiDocument';
 import { OpenApiDocumentOptions } from '../../utils/openApi/OpenApiDocumentOptions';

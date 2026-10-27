@@ -13,7 +13,7 @@ Like [`defineDns`](./dns.md), it is declared in two places: in the bootstrap con
 
 ```typescript
 // bootstrap.qpq.ts, and the shared service define
-import { defineDns, defineEmailReceivingDomain } from 'quidproquo-webserver';
+import { defineDns, defineEmailReceivingDomain } from '@qpqjs/webserver';
 
 export default [
   defineDns('example.com'),

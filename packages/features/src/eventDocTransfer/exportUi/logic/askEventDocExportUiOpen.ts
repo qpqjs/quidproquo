@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { askEventDocListFetchAll } from '../../../eventDoc/list/transport/askEventDocListFetchAll';
 import { askUIEventDocExportOpen } from '../actionCreators/askUIEventDocExportOpen';

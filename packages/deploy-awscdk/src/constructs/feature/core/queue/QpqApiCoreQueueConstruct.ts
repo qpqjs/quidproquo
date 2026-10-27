@@ -1,4 +1,4 @@
-import { qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
+import { qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

@@ -11,7 +11,7 @@ Revokes a single refresh token (and every access token minted from it) against a
 - **On AWS:** issues Cognito `RevokeToken`. Requires token revocation to be enabled on the app client (the CDK default); a disabled client surfaces as an unmapped error.
 
 ```typescript
-import { askUserDirectoryRevokeRefreshToken } from 'quidproquo-core';
+import { askUserDirectoryRevokeRefreshToken } from '@qpqjs/core';
 
 export function* askLogOutThisDevice(refreshToken: string) {
   yield* askUserDirectoryRevokeRefreshToken('app-users', refreshToken);

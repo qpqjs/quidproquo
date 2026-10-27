@@ -1,4 +1,4 @@
-import { defineAi, QPQConfig } from 'quidproquo-core';
+import { defineAi, QPQConfig } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

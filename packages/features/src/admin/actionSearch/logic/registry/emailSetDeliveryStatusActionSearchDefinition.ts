@@ -1,5 +1,5 @@
-import { ActionHistory, Nullable } from 'quidproquo-core';
-import { EmailActionType, EmailDeliveryStatus, EmailSetDeliveryStatusActionPayload } from 'quidproquo-webserver';
+import { ActionHistory, Nullable } from '@qpqjs/core';
+import { EmailActionType, EmailDeliveryStatus, EmailSetDeliveryStatusActionPayload } from '@qpqjs/webserver';
 
 import { ActionSearchDefinition } from '../../domain/ActionSearchDefinition';
 import { ActionSearchExtractedAction } from '../../domain/ActionSearchExtractedAction';

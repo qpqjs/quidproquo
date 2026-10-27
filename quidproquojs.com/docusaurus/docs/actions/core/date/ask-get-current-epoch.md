@@ -10,7 +10,7 @@ Reads the current wall-clock time and returns it as the number of whole **second
 - Built from [askGetCurrentEpochMs](./ask-get-current-epoch-ms.md): it takes the millisecond epoch and floors it to whole seconds (`Math.floor(ms / 1000)`).
 
 ```typescript
-import { askGetCurrentEpoch } from 'quidproquo-core';
+import { askGetCurrentEpoch } from '@qpqjs/core';
 
 export function* askBuildJwtClaims() {
   const iat = yield* askGetCurrentEpoch();

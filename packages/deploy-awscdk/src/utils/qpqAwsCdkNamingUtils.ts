@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig } from '@qpqjs/core';
 
 export const getAccountStackName = awsNamingUtils.getAccountStackName;
 export const getBaseStackName = awsNamingUtils.getBaseStackName;

@@ -10,7 +10,7 @@ Reads a page of records from a [key-value store](../../../config/core/key-value-
 - **Action type:** `KeyValueStoreActionType.Query`
 
 ```typescript
-import { askKeyValueStoreQuery, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQuery, kvsEqual } from '@qpqjs/core';
 
 interface Order {
   customerId: string;
@@ -71,7 +71,7 @@ import {
   kvsBetween, kvsIn, kvsExists, kvsNotExists,
   kvsBeginsWith, kvsContains, kvsNotContains,
   kvsAnd, kvsOr,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 // key: customerId = X AND createdAt BETWEEN a and b
 const keyCondition = kvsAnd([

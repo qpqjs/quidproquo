@@ -1,4 +1,4 @@
-import { ActionProcessorsQPQConfigSetting, QPQCoreConfigSettingType, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
+import { ActionProcessorsQPQConfigSetting, QPQCoreConfigSettingType, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

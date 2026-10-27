@@ -1,4 +1,4 @@
-import { StorageDriveTier } from 'quidproquo-core';
+import { StorageDriveTier } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

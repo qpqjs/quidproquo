@@ -1,4 +1,4 @@
-import { Nullable, QpqPagedData } from 'quidproquo-core';
+import { Nullable, QpqPagedData } from '@qpqjs/core';
 
 import { EventDocEvent } from './EventDocEvent';
 import { EventDocSnapshotBase } from './EventDocSnapshotBase';

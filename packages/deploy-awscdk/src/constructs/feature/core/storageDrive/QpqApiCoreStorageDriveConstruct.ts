@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

@@ -7,7 +7,7 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 

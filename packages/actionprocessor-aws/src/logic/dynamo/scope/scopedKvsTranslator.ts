@@ -13,7 +13,7 @@ import {
   validateKvsKeyConditionForScopeOrThrow,
   validateKvsPkValueForScopeOrThrow,
   validateKvsUpdatesForScopeOrThrow,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { composeScopedKvsIndexValue, getScopedKvsIndexAttributeName, stripScopedKvsIndexAttributes } from './scopedKvsIndexAttribute';
 import { composeScopedKvsIndexKeyCondition, composeScopedKvsQueryOperation, stripScopedKvsItem } from './scopedKvsQueryOperation';

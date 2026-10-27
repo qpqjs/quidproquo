@@ -7,13 +7,13 @@ description: Attach direct SNS email or webhook subscribers to an event bus, wit
 
 Attaches **direct SNS subscribers** — an email address or an incident-tool webhook URL — to a core [event bus](../core/event-bus.md), with no queue or Lambda in between. It's for a bus used as an alert channel: messages published to the bus (for example alarm-state changes routed via `onAlarm.publishToEventBus`) reach a human out-of-band, without depending on the service's own compute being healthy. For rich, in-band handling, use the normal bus → queue → function pattern instead.
 
-This is an AWS-specific convenience — direct email/webhook delivery is an SNS feature, not a portable event-bus concept — which is why it lives in `quidproquo-config-aws` rather than on core's [`defineEventBus`](../core/event-bus.md).
+This is an AWS-specific convenience — direct email/webhook delivery is an SNS feature, not a portable event-bus concept — which is why it lives in `@qpqjs/config-aws` rather than on core's [`defineEventBus`](../core/event-bus.md).
 
-- **On AWS:** resolved by `getEventBusQuickSubscriptions` and applied in `QpqCoreEventBusConstruct` (`quidproquo-deploy-awscdk`) to the bus's SNS topic. An `email` subscription adds an `EmailSubscription`; a `url` subscription adds a `UrlSubscription` (http vs https auto-detected from the URL). Multiple calls for the same bus are additive. Quick subscriptions are **not** supported on FIFO event buses (SNS FIFO topics only allow SQS subscriptions) — declaring one there fails the deploy.
+- **On AWS:** resolved by `getEventBusQuickSubscriptions` and applied in `QpqCoreEventBusConstruct` (`@qpqjs/deploy-awscdk`) to the bus's SNS topic. An `email` subscription adds an `EmailSubscription`; a `url` subscription adds a `UrlSubscription` (http vs https auto-detected from the URL). Multiple calls for the same bus are additive. Quick subscriptions are **not** supported on FIFO event buses (SNS FIFO topics only allow SQS subscriptions) — declaring one there fails the deploy.
 
 ```typescript
-import { defineEventBus } from 'quidproquo-core';
-import { defineEventBusQuickSubscription, EventBusQuickSubscriptionType } from 'quidproquo-config-aws';
+import { defineEventBus } from '@qpqjs/core';
+import { defineEventBusQuickSubscription, EventBusQuickSubscriptionType } from '@qpqjs/config-aws';
 
 export default [
   defineEventBus('ops-alerts'),
@@ -64,8 +64,8 @@ type EventBusQuickSubscription =
 ## Examples
 
 ```typescript
-import { defineEventBus } from 'quidproquo-core';
-import { defineEventBusQuickSubscription, EventBusQuickSubscriptionType } from 'quidproquo-config-aws';
+import { defineEventBus } from '@qpqjs/core';
+import { defineEventBusQuickSubscription, EventBusQuickSubscriptionType } from '@qpqjs/config-aws';
 
 export default [
   defineEventBus('ops-alerts'),

@@ -1,4 +1,4 @@
-import { askUserScriptBuild, FileActionType, runStory, StoryError } from 'quidproquo-core';
+import { askUserScriptBuild, FileActionType, runStory, StoryError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

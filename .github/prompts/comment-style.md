@@ -25,7 +25,7 @@ should be able to read the whole comment in the time it takes to scroll past it.
   with a hover card, and the reader can jump between related issues. Never
   write "issue 34" or "issue-34" in prose when you mean the issue itself.
 - Branches, file paths, commands, package names, and labels go in backticks:
-  `issue-34`, `issues/plans/34.md`, `npm audit`, `quidproquo-core`, `planned`.
+  `issue-34`, `issues/plans/34.md`, `npm audit`, `@qpqjs/core`, `planned`.
 - Link to files on a branch with the full URL so the link survives the branch
   moving on: `https://github.com/{owner}/{repo}/blob/issue-{n}/issues/plans/{n}.md`.
 - Commands and error output go in fenced code blocks, never inline in a

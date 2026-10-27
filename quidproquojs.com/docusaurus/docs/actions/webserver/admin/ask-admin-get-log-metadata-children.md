@@ -10,7 +10,7 @@ Returns a paginated list of the **direct child stories** that a given story trig
 - **Action type:** `AdminActionType.GetLogMetadataChildren`
 
 ```typescript
-import { askAdminGetLogMetadataChildren } from 'quidproquo-webserver';
+import { askAdminGetLogMetadataChildren } from '@qpqjs/webserver';
 
 export function* walkChildren(correlationId: string) {
   const allChildren = [];

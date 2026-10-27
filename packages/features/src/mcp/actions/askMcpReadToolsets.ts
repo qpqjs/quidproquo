@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { McpToolset } from '../models/McpToolset';
 import { McpActionType } from './McpActionType';

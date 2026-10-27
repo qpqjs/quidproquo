@@ -1,4 +1,4 @@
-import { ActionHistory, Nullable, StoryResult } from 'quidproquo-core';
+import { ActionHistory, Nullable, StoryResult } from '@qpqjs/core';
 
 import { ActionSearchExtractedAction } from './ActionSearchExtractedAction';
 import { ActionSearchFieldDefinition } from './ActionSearchFieldDefinition';

@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 /** Where one web entry is reachable from the browser, in either addressing mode. */
 export type WebEntryAddress = {

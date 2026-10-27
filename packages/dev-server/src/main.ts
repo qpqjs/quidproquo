@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { askRunPendingMigrations } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { askRunPendingMigrations } from '@qpqjs/webserver';
 
 import * as crypto from 'crypto';
 import path from 'path';

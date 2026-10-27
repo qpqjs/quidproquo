@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineApi, defineDefaultRouteOptions, defineDns, defineRoute, qpqWebServerUtils } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineApi, defineDefaultRouteOptions, defineDns, defineRoute, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

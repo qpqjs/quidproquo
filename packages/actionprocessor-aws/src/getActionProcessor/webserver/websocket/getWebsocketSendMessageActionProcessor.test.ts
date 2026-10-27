@@ -1,6 +1,6 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, createActionProcessor, ProcessorFor } from 'quidproquo-core';
-import { askWebsocketSendMessageBase, defineWebsocket, WebsocketActionType } from 'quidproquo-webserver';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { askWebsocketSendMessageBase, defineWebsocket, WebsocketActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

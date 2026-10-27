@@ -1,4 +1,4 @@
-import { useQpqRuntime } from 'quidproquo-web-react';
+import { useQpqRuntime } from '@qpqjs/web-react';
 
 import { adminAppRuntime } from '../adminAppRuntime';
 

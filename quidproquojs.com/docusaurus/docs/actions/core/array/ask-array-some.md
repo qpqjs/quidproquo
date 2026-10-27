@@ -10,8 +10,8 @@ Iterates an array and returns `true` as soon as any item's callback returns `tru
 - **Built from:** a plain `for` loop that `yield*`s the predicate for each item and returns early on the first `true`.
 
 ```typescript
-import { askArraySome } from 'quidproquo-core';
-import { askFileExists } from 'quidproquo-core';
+import { askArraySome } from '@qpqjs/core';
+import { askFileExists } from '@qpqjs/core';
 
 export function* askAnyFileMissing(filepaths: string[]) {
   // Returns true as soon as one path is missing; stops checking the rest.

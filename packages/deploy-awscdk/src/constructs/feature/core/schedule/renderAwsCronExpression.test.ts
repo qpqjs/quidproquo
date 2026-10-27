@@ -1,4 +1,4 @@
-import { DayOfWeek, resolveScheduleFields, ScheduleRecurrence } from 'quidproquo-core';
+import { DayOfWeek, resolveScheduleFields, ScheduleRecurrence } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

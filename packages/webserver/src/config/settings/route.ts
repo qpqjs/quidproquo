@@ -1,4 +1,4 @@
-import { getUniqueKeyFromQpqFunctionRuntime, HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
+import { getUniqueKeyFromQpqFunctionRuntime, HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { RouteSchema } from '../types/RouteSchema';

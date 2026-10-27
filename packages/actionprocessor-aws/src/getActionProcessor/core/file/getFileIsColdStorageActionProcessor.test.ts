@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,7 +6,7 @@ import { getObjectStorageClass } from '../../../logic/s3/getObjectStorageClass';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));

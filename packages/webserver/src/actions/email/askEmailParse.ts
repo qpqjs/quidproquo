@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { EmailActionType } from './EmailActionType';
 import { EmailMessage } from './EmailMessage';

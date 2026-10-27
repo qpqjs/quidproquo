@@ -1,4 +1,4 @@
-import { ConfigActionType, ContextActionType, InlineFunctionActionType, KeyValueStoreActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, ContextActionType, InlineFunctionActionType, KeyValueStoreActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

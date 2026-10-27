@@ -1,5 +1,5 @@
-import { ActionHistory, StoryResult } from 'quidproquo-core';
-import { EmailActionType, EmailDeliveryStatus } from 'quidproquo-webserver';
+import { ActionHistory, StoryResult } from '@qpqjs/core';
+import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

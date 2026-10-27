@@ -1,4 +1,4 @@
-import { GraphDatabaseActionType, GraphDatabaseExecuteOpenCypherQueryAction, GraphDatabaseInstanceType, runStory } from 'quidproquo-core';
+import { GraphDatabaseActionType, GraphDatabaseExecuteOpenCypherQueryAction, GraphDatabaseInstanceType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { askFileStreamOpen, AskResponse, StreamEncoding, StreamHandle } from 'quidproquo-core';
+import { askFileStreamOpen, AskResponse, StreamEncoding, StreamHandle } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 

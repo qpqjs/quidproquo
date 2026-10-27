@@ -11,7 +11,7 @@ Deletes one or more files from a [storage drive](../../../config/core/storage-dr
 - **On AWS:** issues a single S3 `DeleteObjects` batch request against the drive's bucket for all of the given paths.
 
 ```typescript
-import { askFileDelete } from 'quidproquo-core';
+import { askFileDelete } from '@qpqjs/core';
 
 export function* askRemoveOldExports() {
   yield* askFileDelete('reports', ['exports/january.csv', 'exports/february.csv']);
@@ -48,7 +48,7 @@ function* askFileDelete(
 | `FileDeleteErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
 | `FileDeleteErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or one of the scoped `filepaths` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileDelete('reports', ['exports/old.csv']));

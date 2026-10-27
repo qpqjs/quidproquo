@@ -1,11 +1,11 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   askUserDirectoryRequestEmailVerification,
   buildTestQpqConfig,
   createActionProcessor,
   ProcessorFor,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

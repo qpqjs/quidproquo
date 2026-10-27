@@ -1,4 +1,4 @@
-import { createEventDocInitialDocumentState, EventDocDocument } from 'quidproquo-features';
+import { createEventDocInitialDocumentState, EventDocDocument } from '@qpqjs/features';
 
 import { adminSessionSchemaVersion } from './constants/adminSessionSchemaVersion';
 import { SearchRequestedData } from './effects/session/SearchRequestedEvent';

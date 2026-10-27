@@ -1,5 +1,5 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { AskResponse, Nullable } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { askMcpReadConfig } from '../actions/askMcpReadConfig';
 import { McpJsonRpcErrorCode } from '../constants/McpJsonRpcErrorCode';

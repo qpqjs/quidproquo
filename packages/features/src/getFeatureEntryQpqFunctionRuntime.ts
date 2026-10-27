@@ -1,4 +1,4 @@
-import { QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
+import { QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
 
 // Builds a runtime pointer to an entry file inside this package, so feature
 // configs can wire handlers that resolve from the compiled features output.

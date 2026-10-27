@@ -1,4 +1,4 @@
-import { getWebActionProcessors } from 'quidproquo-actionprocessor-web';
+import { getWebActionProcessors } from '@qpqjs/actionprocessor-web';
 import {
   ActionProcessorListResolver,
   AskResponse,
@@ -9,7 +9,7 @@ import {
   QpqRuntimeType,
   Story,
   StoryResolver,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 

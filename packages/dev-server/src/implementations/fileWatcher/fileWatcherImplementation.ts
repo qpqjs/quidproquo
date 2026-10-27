@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
+import { getCustomActionActionProcessor } from '@qpqjs/actionprocessor-js';
 import {
   askExecuteStory,
   createRuntime,
@@ -10,8 +10,8 @@ import {
   StorageDriveQPQConfigSetting,
   storageScopeContext,
   StorySession,
-} from 'quidproquo-core';
-import { StorageDriveEvent, StorageDriveEventType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { StorageDriveEvent, StorageDriveEventType } from '@qpqjs/webserver';
 
 import * as chokidar from 'chokidar';
 import { randomUUID } from 'crypto';

@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, defineGlobal } from 'quidproquo-core';
-import { defineDns, qpqWebServerUtils } from 'quidproquo-webserver';
+import { buildTestQpqConfig, defineGlobal } from '@qpqjs/core';
+import { defineDns, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -10,7 +10,7 @@ Declares **default route options** — CORS origins and auth settings that are m
 - **On AWS:** no infrastructure of its own. The defaults are merged into each route's options at runtime by the API Lambda; see [defineApi](./api.md).
 
 ```typescript
-import { defineDefaultRouteOptions } from 'quidproquo-webserver';
+import { defineDefaultRouteOptions } from '@qpqjs/webserver';
 
 export default [
   defineDefaultRouteOptions('web', {
@@ -55,7 +55,7 @@ The shapes of `RouteOptions`, `RouteAuthSettings`, and `ServiceAllowedOrigin` ar
 ## Examples
 
 ```typescript
-import { defineDefaultRouteOptions, defineRoute } from 'quidproquo-webserver';
+import { defineDefaultRouteOptions, defineRoute } from '@qpqjs/webserver';
 
 export default [
   // Apply a user directory and CORS origin to all routes

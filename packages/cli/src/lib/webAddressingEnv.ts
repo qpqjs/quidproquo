@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
-import { getWebAddressing, WebAddressingPorts } from 'quidproquo-dev-server';
+import { QPQConfig } from '@qpqjs/core';
+import { getWebAddressing, WebAddressingPorts } from '@qpqjs/dev-server';
 
 /** Env var the views build reads to bake `WebAddressing` into every bundle. */
 export const QPQ_WEB_ADDRESSING_ENV = 'QPQ_WEB_ADDRESSING';

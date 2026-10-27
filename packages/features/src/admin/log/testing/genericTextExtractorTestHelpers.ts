@@ -1,4 +1,4 @@
-import { ActionHistory, EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import { ActionHistory, EventActionType, QpqRuntimeType, StoryResult } from '@qpqjs/core';
 
 // Every generic text extractor takes a StoryResult and branches on its runtimeType, so each
 // test file only ever builds results for one runtime. This returns a builder pre-seeded with

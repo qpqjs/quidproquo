@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -14,7 +14,7 @@ import {
   qpqCoreUtils,
   StorySession,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';

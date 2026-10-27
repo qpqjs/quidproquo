@@ -1,4 +1,4 @@
-import { AnyAuthChallenge, askCatch, AskResponse, askThrowError, AuthenticateUserChallenge, ErrorTypeEnum } from 'quidproquo-core';
+import { AnyAuthChallenge, askCatch, AskResponse, askThrowError, AuthenticateUserChallenge, ErrorTypeEnum } from '@qpqjs/core';
 
 // TODO: Fix this import (name it up the chain)
 import { qpqWebServerUtils } from '../../../../index';

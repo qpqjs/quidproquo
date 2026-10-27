@@ -6,7 +6,7 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/LambdaRuntimeConfig';
 import { EventInput, InternalEventRecord, MatchResult } from './types';

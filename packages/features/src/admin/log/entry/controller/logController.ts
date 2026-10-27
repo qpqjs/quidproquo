@@ -8,10 +8,10 @@ import {
   ErrorTypeEnum,
   QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
-} from 'quidproquo-core';
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
-import { HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
-import { askFromJsonEventRequest, toJsonEventResponse } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
+import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
+import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
 import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
 import { logsLogic } from '../../logic';

@@ -1,4 +1,4 @@
-import { defineDynamicFunctions, QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
+import { defineDynamicFunctions, QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
 import { getEventDocFunctionsIdentity } from '../definition/getEventDocFunctionsIdentity';

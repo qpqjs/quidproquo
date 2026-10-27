@@ -13,7 +13,7 @@ Controls whether the **event history** — the recorded, replayable log of every
 Every action a story runs — config reads, key-value lookups, network calls, and their inputs/outputs — is normally captured in this history so a run can be inspected or replayed. Disable it when a story handles **sensitive data** you do not want persisted (secrets, PII, payment details) or when the history would be **prohibitively large**. Your explicit log lines are still kept.
 
 ```typescript
-import { askLogDisableEventHistory } from 'quidproquo-core';
+import { askLogDisableEventHistory } from '@qpqjs/core';
 
 export function* askHandlePayment(cardNumber: string) {
   // Don't persist the full action history for this run — it touches card data.

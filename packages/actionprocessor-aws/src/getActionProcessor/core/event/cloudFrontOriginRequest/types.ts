@@ -1,5 +1,5 @@
-import { MatchStoryResult } from 'quidproquo-core';
-import { SeoEvent, SeoEventResponse, SeoEventRouteParams, SeoQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { MatchStoryResult } from '@qpqjs/core';
+import { SeoEvent, SeoEventResponse, SeoEventRouteParams, SeoQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 

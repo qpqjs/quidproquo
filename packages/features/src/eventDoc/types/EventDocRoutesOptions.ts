@@ -1,4 +1,4 @@
-import { RouteAuthSettings } from 'quidproquo-webserver';
+import { RouteAuthSettings } from '@qpqjs/webserver';
 
 import { EventDocRouteName } from './EventDocRouteName';
 import { EventDocSyncOptions } from './EventDocSyncOptions';

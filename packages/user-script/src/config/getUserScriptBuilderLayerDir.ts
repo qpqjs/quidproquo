@@ -3,7 +3,7 @@ import path from 'path';
 
 import { USER_SCRIPT_BUILDER_LAYER_NAME } from './USER_SCRIPT_BUILDER_LAYER_NAME';
 
-const PACKAGE_NAME = 'quidproquo-user-script';
+const PACKAGE_NAME = '@qpqjs/user-script';
 
 // This package's root, from src under ts-node or from lib/commonjs, by walking up to its
 // own package.json.

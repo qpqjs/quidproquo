@@ -1,4 +1,4 @@
-import { AskResponse, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';

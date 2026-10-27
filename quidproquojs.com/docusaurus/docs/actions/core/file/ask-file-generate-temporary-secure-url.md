@@ -11,7 +11,7 @@ Generates a temporary, signed URL that lets a client **download** a single file 
 - **On AWS:** returns a SigV4 presigned S3 `GetObject` URL for the object. The expiry cannot exceed **7 days** — the maximum lifetime of a SigV4 presigned URL.
 
 ```typescript
-import { askFileGenerateTemporarySecureUrl } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl } from '@qpqjs/core';
 
 export function* askGetAvatarDownloadUrl(userId: string) {
   // Valid for 5 minutes
@@ -51,7 +51,7 @@ function* askFileGenerateTemporarySecureUrl(
 | `FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong` | The requested `expirationMs` exceeds the 7 day maximum for signed URLs. |
 | `FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(
@@ -68,7 +68,7 @@ if (outcome.success) {
 ## Notes
 
 - The URL is generated from a signature only — it does not verify that the file exists. Requesting a URL for a missing file succeeds, but the `GET` against it will 404.
-- For browser downloads, allow the client origin with `defineStorageDriveCorsSettings` (quidproquo-webserver).
+- For browser downloads, allow the client origin with `defineStorageDriveCorsSettings` (@qpqjs/webserver).
 
 ## Related
 

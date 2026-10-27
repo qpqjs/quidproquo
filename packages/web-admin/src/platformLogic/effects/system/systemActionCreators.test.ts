@@ -1,4 +1,4 @@
-import { captureRequester, DateActionType, GuidActionType, runStory, StateActionType, StateDispatchAction } from 'quidproquo-core';
+import { captureRequester, DateActionType, GuidActionType, runStory, StateActionType, StateDispatchAction } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

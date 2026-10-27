@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_PRIMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSnapshotViews } from '../models';

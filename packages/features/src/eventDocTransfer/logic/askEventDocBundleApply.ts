@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants';
 import { EventDocBundle, EventDocBundleApplyOptions, EventDocTransferPlanRow, EventDocTransferRegistry } from '../models';

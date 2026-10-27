@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocLink, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
 import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';

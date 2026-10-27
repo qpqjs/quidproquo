@@ -1,4 +1,4 @@
-import { askConfigGetSecret, AskResponse } from 'quidproquo-core';
+import { askConfigGetSecret, AskResponse } from '@qpqjs/core';
 
 import { CloudflareDnsDeployEvent, CloudflareDnsDeployEventEnum, CloudflareDnsDeployEventResponse } from '../../../types';
 import { askCloudflareAddDNSRecord } from './askCloudflareAddDNSRecord';

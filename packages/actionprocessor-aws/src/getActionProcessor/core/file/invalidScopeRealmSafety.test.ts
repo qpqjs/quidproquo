@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,11 +6,11 @@ import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 
-// Under npm link or module federation two copies of quidproquo-core can load,
+// Under npm link or module federation two copies of @qpqjs/core can load,
 // and an InvalidScopeError thrown by the OTHER copy fails instanceof while
 // keeping its explicit `.name`. These processors must map it by name (the
 // actionResultErrorFromCaughtError chokepoint), never by prototype, or a scope

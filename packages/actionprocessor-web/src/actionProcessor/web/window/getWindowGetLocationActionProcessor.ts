@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askWindowGetLocation, WindowActionType } from 'quidproquo-web';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askWindowGetLocation, WindowActionType } from '@qpqjs/web';
 
 const getProcessWindowGetLocation = (qpqConfig: QPQConfig): ProcessorFor<typeof askWindowGetLocation> => {
   return async () => {

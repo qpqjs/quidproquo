@@ -1,4 +1,4 @@
-import { AiToolDefinition, QpqFunctionRuntime } from 'quidproquo-core';
+import { AiToolDefinition, QpqFunctionRuntime } from '@qpqjs/core';
 
 /** Options for defineMcpServer. */
 export type McpServerOptions = {

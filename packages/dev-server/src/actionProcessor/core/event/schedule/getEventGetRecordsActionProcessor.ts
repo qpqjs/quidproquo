@@ -1,4 +1,4 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { EventInput } from './types';
 

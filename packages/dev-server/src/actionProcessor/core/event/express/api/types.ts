@@ -1,5 +1,5 @@
-import { MatchStoryResult } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, HttpEventRouteParams, RouteOptions } from 'quidproquo-webserver';
+import { MatchStoryResult } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, HttpEventRouteParams, RouteOptions } from '@qpqjs/webserver';
 
 import { ExpressEvent, ExpressEventResponse } from '../../../../../types/ExpressEvent';
 

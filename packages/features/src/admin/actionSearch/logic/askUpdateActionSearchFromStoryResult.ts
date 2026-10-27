@@ -7,7 +7,7 @@ import {
   isErroredActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { ActionSearchActionRow } from '../domain/ActionSearchActionRow';
 import { ActionSearchEntityDefinition } from '../domain/ActionSearchEntityDefinition';

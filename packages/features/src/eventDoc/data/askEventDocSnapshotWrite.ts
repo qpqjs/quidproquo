@@ -1,4 +1,4 @@
-import { askFileWriteTextContents, askKeyValueStoreUpsert, AskResponse } from 'quidproquo-core';
+import { askFileWriteTextContents, askKeyValueStoreUpsert, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_SNAPSHOT_INLINE_MAX_BYTES } from '../constants/eventDocSnapshotInlineLimits';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';

@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from '@qpqjs/core';
 
 import { VolatileState } from '../../VolatileState';
 

@@ -1,5 +1,5 @@
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { ListHostedZonesByNameCommand, Route53Client } from '@aws-sdk/client-route-53';
 

@@ -1,4 +1,4 @@
-import { ActionProcessorList, actionResult, askGetRuntimeRemainingTime, ProcessorFor, SystemActionType } from 'quidproquo-core';
+import { ActionProcessorList, actionResult, askGetRuntimeRemainingTime, ProcessorFor, SystemActionType } from '@qpqjs/core';
 
 import { Context } from 'aws-lambda';
 

@@ -6,8 +6,8 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
-import { EmailActionType, EmailDeliveryStatus, EmailSendEmailActionPayload } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { EmailActionType, EmailDeliveryStatus, EmailSendEmailActionPayload } from '@qpqjs/webserver';
 
 import { ActionSearchDefinition } from '../../domain/ActionSearchDefinition';
 import { ActionSearchExtractedAction } from '../../domain/ActionSearchExtractedAction';

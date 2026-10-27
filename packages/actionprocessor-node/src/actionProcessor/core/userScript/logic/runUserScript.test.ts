@@ -1,4 +1,4 @@
-import { askUserScriptExecute, ErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askUserScriptExecute, ErrorTypeEnum, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

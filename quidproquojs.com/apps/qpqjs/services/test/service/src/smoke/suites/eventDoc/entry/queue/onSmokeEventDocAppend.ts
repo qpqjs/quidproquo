@@ -4,7 +4,7 @@ import {
   askEventDocAppendServerEvents,
   askEventDocProvideStore,
   EventDocServerEventInput,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import {
   SMOKE_EVENT_DOC_ACTOR,

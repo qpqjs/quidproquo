@@ -1,4 +1,4 @@
-import { AuthenticationInfo, getQpqIsoDateTimeFromDate } from 'quidproquo-core';
+import { AuthenticationInfo, getQpqIsoDateTimeFromDate } from '@qpqjs/core';
 
 import { AuthenticationResultType } from '@aws-sdk/client-cognito-identity-provider';
 

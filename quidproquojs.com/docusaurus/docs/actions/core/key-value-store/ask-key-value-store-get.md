@@ -10,7 +10,7 @@ Fetches one record from a [key-value store](../../../config/core/key-value-store
 - **Action type:** `KeyValueStoreActionType.Get`
 
 ```typescript
-import { askKeyValueStoreGet } from 'quidproquo-core';
+import { askKeyValueStoreGet } from '@qpqjs/core';
 
 interface User {
   userId: string;
@@ -60,7 +60,7 @@ function* askKeyValueStoreGet<Value>(
 | `KeyValueStoreGetErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or the partition-key value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped calls reject it too). |
 | `KeyValueStoreGetErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an object — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an object — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askKeyValueStoreGet<User>('users', userId));

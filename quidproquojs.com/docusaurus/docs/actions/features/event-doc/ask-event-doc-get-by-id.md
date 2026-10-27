@@ -10,7 +10,7 @@ Reads one event document's **summary record** by `id` and returns it, or `null` 
 - **Built from:** a single-item key-value store query scoped to the collection's `type` + `id`. Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
 ```typescript
-import { askEventDocGetById } from 'quidproquo-features';
+import { askEventDocGetById } from '@qpqjs/features';
 
 export function* loadArticle(id: string) {
   const summary = yield* askEventDocGetById(id);
@@ -79,7 +79,7 @@ The generic `T` lets callers narrow to a collection-specific extension of `Event
 
 ## askEventDocGetByIdOrThrow
 
-Loads the summary record for `id`, throwing `ErrorTypeEnum.NotFound` (from quidproquo-core) instead of returning `null` when it does not exist. Use this in write flows where a missing document is an error.
+Loads the summary record for `id`, throwing `ErrorTypeEnum.NotFound` (from @qpqjs/core) instead of returning `null` when it does not exist. Use this in write flows where a missing document is an error.
 
 ```typescript
 function* askEventDocGetByIdOrThrow(id: string): AskResponse<EventDocSummary>;
@@ -92,7 +92,7 @@ function* askEventDocGetByIdOrThrow(id: string): AskResponse<EventDocSummary>;
 **Returns** `EventDocSummary` — always a record; throws `NotFound` otherwise. Requires the store context.
 
 ```typescript
-import { askEventDocGetByIdOrThrow } from 'quidproquo-features';
+import { askEventDocGetByIdOrThrow } from '@qpqjs/features';
 
 export function* renameArticle(id: string) {
   const summary = yield* askEventDocGetByIdOrThrow(id); // throws NotFound if absent

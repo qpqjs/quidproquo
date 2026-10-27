@@ -12,7 +12,7 @@ The never-saved sibling of [askApplyEventDocEvent](./ask-apply-event-doc-event.m
 - The version stamped on the resulting event is not passed by the caller — the binding that applies it stamps its own configured schema version, the same as `askApplyEventDocEvent`.
 
 ```typescript
-import { askApplyTransientEventDocEvent } from 'quidproquo-features';
+import { askApplyTransientEventDocEvent } from '@qpqjs/features';
 
 export function* askZipReportProgress(connectionId: string, data: ZipProgressData) {
   yield* askApplyTransientEventDocEvent<ZipProgressEffect>(connectionId, ZipEffect.Progress, data);

@@ -1,5 +1,5 @@
 // EventBus.ts
-import { generateUuid } from 'quidproquo-core';
+import { generateUuid } from '@qpqjs/core';
 
 import { EventEmitter } from 'events';
 

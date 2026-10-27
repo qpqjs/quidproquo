@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askConfigGetGlobal, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { askTenantMemberHasPermission } from '../../tenant/logic/askTenantMemberHasPermission';
 import { askTenantResolveRequest } from '../../tenant/logic/askTenantResolveRequest';

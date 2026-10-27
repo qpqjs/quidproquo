@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, Effect } from 'quidproquo-core';
+import { AuthenticateUserResponse, Effect } from '@qpqjs/core';
 
 export type AuthState = {
   username: string;

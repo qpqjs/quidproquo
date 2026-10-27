@@ -1,4 +1,4 @@
-import { QpqIsoDateTime } from 'quidproquo-core';
+import { QpqIsoDateTime } from '@qpqjs/core';
 
 import { MaintenanceLevel } from '../v1/types/MaintenanceLevel';
 import { MaintenanceType } from '../v1/types/MaintenanceType';

@@ -1,4 +1,4 @@
-import { Story } from 'quidproquo-core';
+import { Story } from '@qpqjs/core';
 
 import { ActionProcessorListResolverFactory } from './ActionProcessorListResolverFactory';
 import { QpqBubbleReducer } from './QpqBubbleReducer';

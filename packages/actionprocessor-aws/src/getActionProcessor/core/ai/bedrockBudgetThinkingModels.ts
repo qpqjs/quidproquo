@@ -1,4 +1,4 @@
-import { AiModel } from 'quidproquo-core';
+import { AiModel } from '@qpqjs/core';
 
 // Models that take extended thinking as `thinking: { type: 'enabled', budget_tokens }`. Opus 4.7
 // and newer and Sonnet 5 reject `budget_tokens` and run adaptive thinking instead, so any model

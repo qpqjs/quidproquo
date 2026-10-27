@@ -10,7 +10,7 @@ Returns the name of the platform the story is running on, an opaque string each 
 It exists for the rare story that must skip or degrade work a platform cannot do (a smoke test with no local equivalent, say). It is not for ordinary logic: a story that branches on the platform is doing what action processors are for.
 
 ```typescript
-import { askPlatformGetName } from 'quidproquo-core';
+import { askPlatformGetName } from '@qpqjs/core';
 
 export function* askRunDeployedOnlyCheck() {
   const platform = yield* askPlatformGetName();

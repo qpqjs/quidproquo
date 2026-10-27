@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, DecomposedString, DynamicModuleLoader, LogActionType, LogLevelEnum, resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, DecomposedString, DynamicModuleLoader, LogActionType, LogLevelEnum, resolveActionResult } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

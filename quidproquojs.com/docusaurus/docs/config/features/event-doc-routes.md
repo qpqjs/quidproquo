@@ -5,14 +5,14 @@ description: Mount the built-in HTTP routes for an event-sourced document collec
 
 # defineEventDocRoutes
 
-Mounts the built-in REST **routes** for one document `type` in an event-document collection. It returns a `QPQConfig` (an array of route settings). The route controllers ship inside `quidproquo-features` and resolve the store, type, and user directory from per-route globals, invoking the collection's registered `EventDocFunctions` object (looked up by convention as `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](./event-doc.md)) for render/references/snapshot behaviour — so a service needs no controller wiring of its own: declare the store, register the functions object, add these routes, and the collection is fully served.
+Mounts the built-in REST **routes** for one document `type` in an event-document collection. It returns a `QPQConfig` (an array of route settings). The route controllers ship inside `@qpqjs/features` and resolve the store, type, and user directory from per-route globals, invoking the collection's registered `EventDocFunctions` object (looked up by convention as `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](./event-doc.md)) for render/references/snapshot behaviour — so a service needs no controller wiring of its own: declare the store, register the functions object, add these routes, and the collection is fully served.
 
 `defineEventDocRoutes` defines **only** the routes; it assumes the store already exists (declared with [defineEventDocSummary](./event-doc-summary.md)). Use it directly when **several document types share one store** — call `defineEventDocSummary` once, then `defineEventDocRoutes` per type. For the single-type case, [defineEventDoc](./event-doc.md) does both in one call.
 
 - **On AWS:** deploys the routes below to API Gateway, each backed by a Lambda running the corresponding built-in controller. It creates no data infrastructure — that is [defineEventDocSummary](./event-doc-summary.md)'s job.
 
 ```typescript
-import { defineEventDocSummary, defineEventDocRoutes } from 'quidproquo-features';
+import { defineEventDocSummary, defineEventDocRoutes } from '@qpqjs/features';
 
 export default [
   ...defineEventDocSummary('content'),
@@ -58,7 +58,7 @@ The single `options` argument is an `EventDocRoutesOptions`:
 | `storeName` | `string` | – (required) | The store to serve. **Must match a [defineEventDocSummary](./event-doc-summary.md)** in the same service. |
 | `type` | `string` | – (required) | The document type this route set serves. Pins the collection within a store that can hold several types — use a distinct `type` (and `basePath`) per `defineEventDocRoutes` call over a shared store. |
 | `basePath` | `` `/${string}` `` | – (required) | URL prefix the routes mount under. Must start with `/`, e.g. `/articles`. |
-| `routeAuthSettings` | `RouteAuthSettings` | – | Auth settings applied to every mounted route (from quidproquo-webserver — see [route](../webserver/route.md)). When it carries a `userDirectoryName`, that directory is exposed to the controllers so mutations can attribute the acting user. **Omit to leave the routes open** — mutations then have no user to attribute. |
+| `routeAuthSettings` | `RouteAuthSettings` | – | Auth settings applied to every mounted route (from @qpqjs/webserver — see [route](../webserver/route.md)). When it carries a `userDirectoryName`, that directory is exposed to the controllers so mutations can attribute the acting user. **Omit to leave the routes open** — mutations then have no user to attribute. |
 | `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. |
 | `onPublish` | `string` | – | Name of a registered inline function. When set, every successful append of a Publish event invokes it with `{ docId, event, summary, state, previousState }` — the FOLDED document as of the publish event and as of the event before it (latest-shaped, snapshot-seeded, so hook cost tracks the burst since the last snapshot, never the log) — after the event is durably written. This is the seam for syncing a folded document into a materialized read model: use `state`, never re-fold. Errors propagate to the caller: the event has landed but the side effect did not, so the caller learns the read model may be stale. |
 | `onAppend` | `string` | – | Name of a registered inline function. When set, EVERY successful append (domain events and lifecycle events alike) invokes it with `{ docId, event, summary, state, previousState }` — the FOLDED document as of the event and as of its predecessor (latest-shaped, snapshot-seeded) — after the event is durably written. This is the seam for reacting to any mutation (e.g. broadcasting the doc's fresh fold, or diffing `previousState` vs `state` to detect a transition). Runs after `onPublish` when both fire on the same Publish event. Errors propagate to the caller: the event has landed but the side effect did not. |
@@ -71,13 +71,13 @@ Append-time validation, rendering, references, and snapshotting are no longer pe
 
 ### `RouteAuthSettings`
 
-`routeAuthSettings` is the standard quidproquo-webserver route auth object (the same one [defineRoute](../webserver/route.md) accepts). Its `userDirectoryName` names the [user directory](../core/key-value-store.md) callers authenticate against; the controllers read it to resolve the acting user for event attribution.
+`routeAuthSettings` is the standard @qpqjs/webserver route auth object (the same one [defineRoute](../webserver/route.md) accepts). Its `userDirectoryName` names the [user directory](../core/key-value-store.md) callers authenticate against; the controllers read it to resolve the acting user for event attribution.
 
 ## Examples
 
 ```typescript
-import { defineDynamicFunctions } from 'quidproquo-core';
-import { defineEventDocSummary, defineEventDocRoutes, eventDocFunctionsName } from 'quidproquo-features';
+import { defineDynamicFunctions } from '@qpqjs/core';
+import { defineEventDocSummary, defineEventDocRoutes, eventDocFunctionsName } from '@qpqjs/features';
 
 export default [
   // One store, two types, each on its own path and route version.
@@ -109,4 +109,4 @@ export default [
 - [Event doc workspace sync](./event-doc-workspace-sync.md): what the `sync` option drives end to end, from the push to the editor hook.
 - [defineEventDocTransfer](./event-doc-transfer.md) — mounts the export/import routes that read every registered collection's functions object (`collectReferences`) to build a transfer manifest.
 - [defineRoute](../webserver/route.md) — the underlying webserver route config (source of `RouteAuthSettings`).
-- **Custom routes over the same store:** wrap your controllers in `askEventDocProvideStore({ storeName, type }, ...)` (from quidproquo-features) so the generic [reads](../../actions/features/event-doc/ask-event-doc-get-by-id.md) resolve the collection, then compose actions like [askEventDocCreate](../../actions/features/event-doc/ask-event-doc-create.md).
+- **Custom routes over the same store:** wrap your controllers in `askEventDocProvideStore({ storeName, type }, ...)` (from @qpqjs/features) so the generic [reads](../../actions/features/event-doc/ask-event-doc-get-by-id.md) resolve the collection, then compose actions like [askEventDocCreate](../../actions/features/event-doc/ask-event-doc-create.md).

@@ -1,4 +1,4 @@
-import { AiModel, AiReasoningConfig } from 'quidproquo-core';
+import { AiModel, AiReasoningConfig } from '@qpqjs/core';
 
 import { bedrockBudgetThinkingModels } from '../bedrockBudgetThinkingModels';
 import { bedrockThinkingBudgetByEffort } from '../bedrockThinkingBudgetByEffort';

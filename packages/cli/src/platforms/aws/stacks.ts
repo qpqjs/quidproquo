@@ -1,10 +1,10 @@
 // Host-side `cdk deploy` helpers. No cdk.json anywhere: the CDK app command is
-// passed via --app and runs quidproquo-deploy-awscdk's generic workspace app
+// passed via --app and runs @qpqjs/deploy-awscdk's generic workspace app
 // (bin/qpq-cdk-app.js) under ts-node hooks. The child inherits the primed
 // deployment env (DEPLOY_APP_NAME / DEPLOY_NAME and everything resolveDeployment
 // set); only the per-invocation service is added here.
-import { QpqDeployEnvVar } from 'quidproquo-core';
-import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
+import { QpqDeployEnvVar } from '@qpqjs/core';
+import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
 
 import path from 'path';
 

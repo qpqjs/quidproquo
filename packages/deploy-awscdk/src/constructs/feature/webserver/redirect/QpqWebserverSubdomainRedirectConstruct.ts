@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

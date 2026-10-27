@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askMcpReadToolsets } from '../actions/askMcpReadToolsets';
 import { McpExportListToolsRequest } from '../models/McpExportListToolsRequest';

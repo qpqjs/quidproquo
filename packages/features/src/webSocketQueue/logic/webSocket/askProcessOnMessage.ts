@@ -1,4 +1,4 @@
-import { AskResponse, askStorageScopeProvide } from 'quidproquo-core';
+import { AskResponse, askStorageScopeProvide } from '@qpqjs/core';
 
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,

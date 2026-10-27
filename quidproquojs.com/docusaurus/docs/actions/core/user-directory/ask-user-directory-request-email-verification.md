@@ -11,7 +11,7 @@ Sends a signed-in user a verification code for their email address in a [user di
 - **On AWS:** issues Cognito `GetUserAttributeVerificationCode` for the `email` attribute using the supplied access token. The message can be customised via the [emailTemplates.verifyEmail](../../../config/core/user-directory.md#email-templates) handler.
 
 ```typescript
-import { askUserDirectoryRequestEmailVerification } from 'quidproquo-core';
+import { askUserDirectoryRequestEmailVerification } from '@qpqjs/core';
 
 export function* askStartEmailVerification(accessToken: string) {
   const delivery = yield* askUserDirectoryRequestEmailVerification('app-users', accessToken);

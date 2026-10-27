@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, LogActionType, LogLevelEnum, resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, LogActionType, LogLevelEnum, resolveActionResult } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

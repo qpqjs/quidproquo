@@ -8,7 +8,7 @@ import {
   WebSocketQueueServerEventMessageAuthenticated,
   WebSocketQueueServerEventMessageEventDocHeadMoved,
   WebSocketQueueServerMessageEventType,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 

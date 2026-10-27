@@ -1,4 +1,4 @@
-import { QPQConfigSetting } from 'quidproquo-core';
+import { QPQConfigSetting } from '@qpqjs/core';
 
 /** Which AI chats over which collection, and the doc context (`serviceName`, `type`) its tools expect. */
 export type EventDocAiQPQConfigSetting = QPQConfigSetting & {

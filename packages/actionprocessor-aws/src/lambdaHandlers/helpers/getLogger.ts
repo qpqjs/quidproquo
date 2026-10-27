@@ -1,4 +1,4 @@
-import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import {
   filterLogHistoryByActionTypes,
   LogActionType,
@@ -7,7 +7,7 @@ import {
   qpqCoreUtils,
   QpqLogger,
   StoryResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

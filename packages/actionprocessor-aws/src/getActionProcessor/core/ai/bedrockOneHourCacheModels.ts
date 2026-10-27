@@ -1,4 +1,4 @@
-import { AiModel } from 'quidproquo-core';
+import { AiModel } from '@qpqjs/core';
 
 // Models whose Bedrock cache checkpoints accept `ttl: '1h'`, per the Bedrock prompt caching
 // model table. The rest reject the field, so an hour request falls back to the default lifetime.

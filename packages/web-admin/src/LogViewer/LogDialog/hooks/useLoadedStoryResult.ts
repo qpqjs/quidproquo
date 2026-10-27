@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from '@qpqjs/core';
 
 import { useExternalData, usePlatformDataFromPath } from '../../../components/LoadingBox/hooks';
 import { useIsLoading } from '../../../view';

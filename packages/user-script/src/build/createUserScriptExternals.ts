@@ -1,4 +1,4 @@
-import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-core';
+import { FEDERATED_SHARED_PACKAGE_NAMES } from '@qpqjs/core';
 
 import { builtinModules } from 'module';
 import type { ExternalItemFunctionData } from '@rspack/core';

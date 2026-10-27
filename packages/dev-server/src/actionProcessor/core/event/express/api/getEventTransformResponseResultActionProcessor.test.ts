@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, noopDynamicModuleLoader, resolveActionResult } from 'quidproquo-core';
-import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

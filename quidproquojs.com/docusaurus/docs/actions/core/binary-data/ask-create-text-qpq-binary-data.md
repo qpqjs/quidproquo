@@ -10,7 +10,7 @@ Builds a [`QPQBinaryData`](#qpqbinarydata) value from a plain text string — ba
 - A small composed story that base64-encodes the text and fills in the `QPQBinaryData` fields. It performs no I/O.
 
 ```typescript
-import { askCreateTextQpqBinaryData, TextFileType, askFileWriteBinaryContents } from 'quidproquo-core';
+import { askCreateTextQpqBinaryData, TextFileType, askFileWriteBinaryContents } from '@qpqjs/core';
 
 export function* askExportReport(rows: object[]) {
   const csv = toCsv(rows); // your own serialiser

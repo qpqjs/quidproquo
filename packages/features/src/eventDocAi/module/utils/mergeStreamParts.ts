@@ -1,4 +1,4 @@
-import type { AiStreamPart } from 'quidproquo-core';
+import type { AiStreamPart } from '@qpqjs/core';
 
 import type { EventDocAiMessageSegment } from '../../models';
 import { foldStreamPart } from './foldStreamPart';

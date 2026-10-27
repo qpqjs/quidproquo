@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, captureRequester, StateActionType } from 'quidproquo-core';
+import { AuthenticateUserResponse, captureRequester, StateActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

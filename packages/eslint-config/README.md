@@ -1,14 +1,14 @@
-# quidproquo-eslint-config
+# @qpqjs/eslint-config
 
 The shared ESLint configuration for [quidproquo](https://github.com/qpqjs/quidproquo) projects, bundled with a small plugin that enforces the framework's `ask` naming contract.
 
 ```bash
-npm install --save-dev quidproquo-eslint-config
+npm install --save-dev @qpqjs/eslint-config
 ```
 
 ```js
 // eslint.config.mjs
-import qpqConfig from 'quidproquo-eslint-config';
+import qpqConfig from '@qpqjs/eslint-config';
 
 export default [...qpqConfig];
 ```
@@ -25,7 +25,7 @@ without the rest of the config:
 
 ```js
 // eslint.config.mjs
-import { qpqPlugin } from 'quidproquo-eslint-config';
+import { qpqPlugin } from '@qpqjs/eslint-config';
 
 export default [
   qpqPlugin.configs.recommended,
@@ -65,7 +65,7 @@ must be a generator. Aliases and factory results like
 literals. Not auto-fixable, rename the function or make it a generator.
 
 Tests live next to the rules (`plugin/rules/*.test.mjs`) and run with the repo's
-vitest suite: `npx vitest run --project quidproquo-eslint-config`.
+vitest suite: `npx vitest run --project @qpqjs/eslint-config`.
 
 ## Status
 

@@ -1,5 +1,5 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
-import { getHttpApiEventGetStorySessionActionProcessor } from 'quidproquo-webserver';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+import { getHttpApiEventGetStorySessionActionProcessor } from '@qpqjs/webserver';
 
 export const getEventGetStorySessionActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

@@ -10,7 +10,7 @@ Declares the account's **GitHub Actions OpenID Connect provider**, `token.action
 - **On AWS:** creates an `aws_iam.OpenIdConnectProvider` for `https://token.actions.githubusercontent.com` with the `sts.amazonaws.com` audience. The provider's ARN is fixed by its URL, which is what the deploy roles trust. An account can hold only one provider for that URL, so a provider created by hand must be deleted before the account stack can own it.
 
 ```typescript
-import { defineAccountGithubOidcProvider } from 'quidproquo-config-aws';
+import { defineAccountGithubOidcProvider } from '@qpqjs/config-aws';
 
 export default [
   defineAccountGithubOidcProvider(),

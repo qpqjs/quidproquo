@@ -1,4 +1,4 @@
-import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
+import { AskResponse, createActionRequester, Effect } from '@qpqjs/core';
 
 import { EventDocActionType } from './EventDocActionType';
 

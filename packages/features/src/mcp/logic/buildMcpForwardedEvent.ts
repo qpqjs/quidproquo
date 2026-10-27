@@ -1,4 +1,4 @@
-import { HTTPEvent } from 'quidproquo-webserver';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { MCP_FORWARD_STRIPPED_HEADERS } from '../constants/mcpForwardStrippedHeaders';
 

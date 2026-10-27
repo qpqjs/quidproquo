@@ -1,4 +1,4 @@
-import { askUserScriptExecuteBase, UserScriptRunnerEvent, UserScriptRunnerResult } from 'quidproquo-core';
+import { askUserScriptExecuteBase, UserScriptRunnerEvent, UserScriptRunnerResult } from '@qpqjs/core';
 
 import { ChildProcess, fork } from 'child_process';
 

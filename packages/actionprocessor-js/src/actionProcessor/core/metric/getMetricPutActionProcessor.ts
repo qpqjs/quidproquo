@@ -1,4 +1,4 @@
-import { actionResult, askMetricPut, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askMetricPut, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 // Dev-visible stand-in for the AWS EMF processor - keeps stories portable across runtimes
 const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetricPut> => {

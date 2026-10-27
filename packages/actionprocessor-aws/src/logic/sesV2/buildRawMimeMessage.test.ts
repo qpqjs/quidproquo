@@ -1,4 +1,4 @@
-import { EmailSendEmailActionPayload } from 'quidproquo-webserver';
+import { EmailSendEmailActionPayload } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

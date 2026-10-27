@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, USER_SCRIPT_MODULE_TYPES_QUERY } from 'quidproquo-core';
+import { buildTestQpqConfig, USER_SCRIPT_MODULE_TYPES_QUERY } from '@qpqjs/core';
 
 import fs from 'fs';
 import os from 'os';

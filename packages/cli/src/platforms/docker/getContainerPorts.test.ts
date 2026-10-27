@@ -1,4 +1,4 @@
-import { WebEntryHost } from 'quidproquo-dev-server';
+import { WebEntryHost } from '@qpqjs/dev-server';
 
 import { describe, expect, it } from 'vitest';
 

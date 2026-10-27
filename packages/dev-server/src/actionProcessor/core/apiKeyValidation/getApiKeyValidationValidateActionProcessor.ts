@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { ApiKeyValidationActionType, askApiKeyValidationValidate } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { ApiKeyValidationActionType, askApiKeyValidationValidate } from '@qpqjs/webserver';
 
 const getProcessApiKeyValidationValidate = (_qpqConfig: QPQConfig): ProcessorFor<typeof askApiKeyValidationValidate> => {
   return async () => {

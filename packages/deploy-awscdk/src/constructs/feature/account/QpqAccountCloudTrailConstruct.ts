@@ -1,4 +1,4 @@
-import { AccountCloudTrailQPQConfigSetting, AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AccountCloudTrailQPQConfigSetting, AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import * as cdk from 'aws-cdk-lib';
 import { aws_cloudtrail, aws_logs, aws_s3 } from 'aws-cdk-lib';

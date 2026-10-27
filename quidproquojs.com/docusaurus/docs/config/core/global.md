@@ -10,7 +10,7 @@ Declares a **global**: a named, typed, constant value stored directly in the app
 Use a global for a fixed value that belongs in config rather than hard-coded in a story and never changes at runtime.
 
 ```typescript
-import { defineGlobal } from 'quidproquo-core';
+import { defineGlobal } from '@qpqjs/core';
 
 export default [
   defineGlobal('feature-limits', { maxUploadsPerDay: 100 }),

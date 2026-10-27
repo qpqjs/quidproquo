@@ -1,7 +1,7 @@
 // Views build — programmatic (getViewsRspackConfig), platform-neutral. Where
 // the built views get hosted is a platform driver concern (see
 // platforms/<platform>/viewsSync).
-import { getViewsRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
+import { getViewsRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
 
 import path from 'path';
 

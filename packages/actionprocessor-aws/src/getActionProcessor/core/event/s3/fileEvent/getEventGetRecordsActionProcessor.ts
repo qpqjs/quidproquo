@@ -7,8 +7,8 @@ import {
   QPQConfig,
   qpqCoreUtils,
   splitScopedFilePath,
-} from 'quidproquo-core';
-import { StorageDriveEventType } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { EventInput, GLOBAL_STORAGE_DRIVE_NAME, InternalEventRecord } from './types';
 

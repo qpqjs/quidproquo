@@ -1,4 +1,4 @@
-import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
+import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from '@qpqjs/core';
 
 import { RouteOptions } from '../config/settings/route';
 import { resolveHosts } from '../domain/logic/host/resolveHosts';

@@ -1,4 +1,4 @@
-import { AiStreamUsage } from 'quidproquo-core';
+import { AiStreamUsage } from '@qpqjs/core';
 
 /**
  * Warns when nothing was read from or written to the cache: the prefix was under the model's

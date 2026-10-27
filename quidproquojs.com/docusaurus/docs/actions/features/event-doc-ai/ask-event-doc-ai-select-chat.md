@@ -12,7 +12,7 @@ One of the four client stories exposed as `sharedEventDocAiApi`.
 - Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatHistoryRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiSetActiveChat` / `askUIEventDocAiSetMessages` / `askUIEventDocAiClearStream` / `askUIEventDocAiSetLoadingHistory` / `askUIEventDocAiSetError` UI actions.
 
 ```typescript
-import { askEventDocAiSelectChat } from 'quidproquo-features';
+import { askEventDocAiSelectChat } from '@qpqjs/features';
 
 export function* askOnChatPicked(chatId: string) {
   yield* askEventDocAiSelectChat(chatId);

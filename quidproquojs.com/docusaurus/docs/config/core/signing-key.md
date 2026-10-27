@@ -13,7 +13,7 @@ Declares a **signing key**: a named RSA-2048 key pair stories use through [askCr
 Signing keys are separate from [crypto keys](./crypto-key.md): a provider key is either encrypt/decrypt or sign/verify, never both. Use a crypto key to protect data you store, and a signing key to mint tokens other parties verify.
 
 ```typescript
-import { defineSigningKey } from 'quidproquo-core';
+import { defineSigningKey } from '@qpqjs/core';
 
 export default [
   defineSigningKey('access-token-key'),

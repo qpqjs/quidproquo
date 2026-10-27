@@ -12,8 +12,8 @@ Registers a set of **migrations** — stories that run at deploy time to evolve 
 - **What it declares:** a [global](../core/global.md) (`qpqMigrations`) holding the migration list, a [key-value store](../core/key-value-store.md) (`qpqMigrations`) that records which migrations have run, a [deploy event](../core/deploy-event.md) (`qpqMigrations`) that reacts to stack changes, and a [queue](../core/queue.md) (`qpqMigrations`) that actually executes each migration story. The queue is configured to run **one migration at a time** (`maxConcurrentExecutions: 1`, `batchSize: 1`, `concurrency: 1`) so migrations never run concurrently.
 
 ```typescript
-import { defineMigration } from 'quidproquo-webserver';
-import { DeployEventType } from 'quidproquo-core';
+import { defineMigration } from '@qpqjs/webserver';
+import { DeployEventType } from '@qpqjs/core';
 
 export default [
   defineMigration([

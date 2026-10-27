@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, StoryResolver } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, StoryResolver } from '@qpqjs/core';
 
 import { useCallback, useContext, useEffect } from 'react';
 

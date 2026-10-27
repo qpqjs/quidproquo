@@ -1,4 +1,4 @@
-import { askContextProvideValue, askContextRead, createContextIdentifier, createLocalContextIdentifier } from 'quidproquo-core';
+import { askContextProvideValue, askContextRead, createContextIdentifier, createLocalContextIdentifier } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

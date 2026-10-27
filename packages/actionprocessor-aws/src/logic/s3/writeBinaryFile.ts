@@ -1,4 +1,4 @@
-import { QPQBinaryData } from 'quidproquo-core';
+import { QPQBinaryData } from '@qpqjs/core';
 
 import { PutObjectCommand, S3Client, StorageClass } from '@aws-sdk/client-s3';
 

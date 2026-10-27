@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import type { EventDocAiChatMessage } from '../../models';
 import { EventDocAiEffect } from '../effects/EventDocAiEffect';

@@ -1,4 +1,4 @@
-import { KvsCoreDataType } from 'quidproquo-core';
+import { KvsCoreDataType } from '@qpqjs/core';
 
 import { DeleteItemCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 

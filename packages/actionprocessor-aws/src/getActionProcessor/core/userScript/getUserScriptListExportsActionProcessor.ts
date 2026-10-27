@@ -12,7 +12,7 @@ import {
   UserScriptListExportsActionPayload,
   UserScriptModuleExports,
   UserScriptRunnerRequestKind,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { requestUserScriptRunner } from './logic/requestUserScriptRunner';
 

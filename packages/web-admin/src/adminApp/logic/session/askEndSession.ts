@@ -1,4 +1,4 @@
-import { askDelay, AskResponse, askStateRead } from 'quidproquo-core';
+import { askDelay, AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { AdminAppState } from '../../AdminAppState';

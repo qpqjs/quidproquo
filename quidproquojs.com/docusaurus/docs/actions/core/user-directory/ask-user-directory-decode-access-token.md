@@ -11,7 +11,7 @@ Verifies and decodes an access token issued by a [user directory](../../../confi
 - **On AWS:** verifies the JWT signature against the pool's public JWKs over HTTPS — no Cognito API call and no IAM required, so it works against foreign directories too.
 
 ```typescript
-import { askUserDirectoryDecodeAccessToken } from 'quidproquo-core';
+import { askUserDirectoryDecodeAccessToken } from '@qpqjs/core';
 
 export function* askWhoIs(accessToken: string) {
   const decoded = yield* askUserDirectoryDecodeAccessToken('app-users', false, accessToken);

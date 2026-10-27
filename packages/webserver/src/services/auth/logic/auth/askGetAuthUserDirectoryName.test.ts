@@ -1,4 +1,4 @@
-import { captureRequester, ConfigActionType } from 'quidproquo-core';
+import { captureRequester, ConfigActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

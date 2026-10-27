@@ -1,4 +1,4 @@
-import { qpqCoreUtils, resolveScheduleFields } from 'quidproquo-core';
+import { qpqCoreUtils, resolveScheduleFields } from '@qpqjs/core';
 
 import { ResolvedDevServerConfig } from '../../types';
 import { DevServerScheduleJob } from './types';

@@ -1,4 +1,4 @@
-import { AwsOrganizationQPQConfigSetting } from 'quidproquo-config-aws';
+import { AwsOrganizationQPQConfigSetting } from '@qpqjs/config-aws';
 
 import * as cdk from 'aws-cdk-lib';
 import { aws_iam, aws_organizations, aws_sso } from 'aws-cdk-lib';

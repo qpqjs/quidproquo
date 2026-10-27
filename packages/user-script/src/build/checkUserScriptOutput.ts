@@ -1,4 +1,4 @@
-import { getUserScriptModuleMap, listUserScriptExports, UserScriptModuleMap } from 'quidproquo-actionprocessor-node';
+import { getUserScriptModuleMap, listUserScriptExports, UserScriptModuleMap } from '@qpqjs/actionprocessor-node';
 
 import fs from 'fs';
 

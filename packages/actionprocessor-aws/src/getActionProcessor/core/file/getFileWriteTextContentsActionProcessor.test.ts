@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, FileActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,7 +7,7 @@ import { writeTextFile } from '../../../logic/s3/s3Utils';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));

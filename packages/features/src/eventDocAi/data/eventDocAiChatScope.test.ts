@@ -6,7 +6,7 @@ import {
   FileActionType,
   KeyValueStoreActionType,
   runStory,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

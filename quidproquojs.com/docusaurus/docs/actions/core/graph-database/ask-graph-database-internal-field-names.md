@@ -16,7 +16,7 @@ import {
   askGraphDatabaseExecuteOpenCypherQuery,
   askGraphDatabaseInternalFieldNames,
   GraphDatabaseInstanceType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export function* askNodesByLabel(label: string) {
   const fields = yield* askGraphDatabaseInternalFieldNames();
@@ -44,7 +44,7 @@ None.
 
 ## Returns
 
-`GraphDatabaseInternalFieldNames` (importable from quidproquo-core) — a map of the engine's internal field-name tokens:
+`GraphDatabaseInternalFieldNames` (importable from @qpqjs/core) — a map of the engine's internal field-name tokens:
 
 ```typescript
 type GraphDatabaseInternalFieldNames = {

@@ -4,8 +4,8 @@
 // the app's qpq:predeploy hook, which go:docker fires before the workspace is built, so
 // this command deliberately loads no service config (that would import unbuilt packages)
 // and takes the lambda architecture as a flag instead.
-import { JavascriptRuntimeArchitecture } from 'quidproquo-core';
-import { getUserScriptBuilderLayerDir } from 'quidproquo-user-script';
+import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
+import { getUserScriptBuilderLayerDir } from '@qpqjs/user-script';
 
 import { getArgValue } from '../lib/args';
 import { buildUserScriptBuilderLayer } from '../lib/userScriptBuilderLayer';

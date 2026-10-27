@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { VolatileEffect } from './VolatileEffect';
 import { VolatileSearchCompletedPayload } from './VolatileSearchCompletedPayload';

@@ -1,4 +1,4 @@
-import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 import { createEventDocInitialDocumentState } from '../../../../../../eventDoc/fold/createEventDocInitialDocumentState';
 import { EventDocDocument } from '../../../../../../eventDoc/models/EventDocDocument';

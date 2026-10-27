@@ -1,4 +1,4 @@
-import { askFileCopy, askNewGuid, AskResponse } from 'quidproquo-core';
+import { askFileCopy, askNewGuid, AskResponse } from '@qpqjs/core';
 
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';

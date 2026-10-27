@@ -1,7 +1,7 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import * as quidproquoCore from 'quidproquo-core';
-import { FEDERATED_SHARED_PACKAGE_NAMES, getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
-import * as quidproquoWebserver from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import * as quidproquoCore from '@qpqjs/core';
+import { FEDERATED_SHARED_PACKAGE_NAMES, getFederatedKeyFromQpqFunctionRuntime, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/core';
+import * as quidproquoWebserver from '@qpqjs/webserver';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';
@@ -22,7 +22,7 @@ import { FederatedModuleStoreManifest } from './FederatedModuleStoreManifest';
 // WHERE THE STORE COMES FROM
 //   process.env.federatedCodeStoreUrl = "s3://<bucket>/<service>" is set on every
 //   lambda by the CDK Function construct when the service declared
-//   defineFederatedModuleStore(...). The build/publish half (quidproquo-deploy-webpack)
+//   defineFederatedModuleStore(...). The build/publish half (@qpqjs/deploy-webpack)
 //   put the artifacts there. The two halves agree via FederatedModuleStoreManifest and
 //   the machine-independent key getFederatedKeyFromQpqFunctionRuntime (in core).
 //
@@ -130,8 +130,8 @@ const isManifestNotFoundError = (error: unknown): boolean => {
 // story code resolves the SAME module instances as the bundled runtime. The package
 // list is shared with the remote build so the two can't drift (FEDERATED_SHARED_PACKAGE_NAMES in core).
 const SHARED_LIBS: Record<string, unknown> = {
-  'quidproquo-core': quidproquoCore,
-  'quidproquo-webserver': quidproquoWebserver,
+  '@qpqjs/core': quidproquoCore,
+  '@qpqjs/webserver': quidproquoWebserver,
 };
 
 const getHostSharedModules = () =>

@@ -1,5 +1,5 @@
-import { createInitialEventDocAiState, eventDocAiReducer, sharedEventDocAiApi } from 'quidproquo-features';
-import { createQpqRuntimeDefinition } from 'quidproquo-web-react';
+import { createInitialEventDocAiState, eventDocAiReducer, sharedEventDocAiApi } from '@qpqjs/features';
+import { createQpqRuntimeDefinition } from '@qpqjs/web-react';
 
 import { askEventDocAiLogChatBoot } from './logic/askEventDocAiLogChatBoot';
 

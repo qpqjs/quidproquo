@@ -5,7 +5,7 @@ import {
   defineStorageDrive,
   DynamicModuleLoader,
   FileActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
 

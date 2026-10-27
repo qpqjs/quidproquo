@@ -14,7 +14,7 @@ It is built on the quidproquo **eventDoc** feature — an event document is an a
 - **On AWS:** it deploys whatever the underlying eventDoc feature deploys (storage, routes, and WebSocket infrastructure for the session document). The document and its routes are scoped to the log service and never materialise elsewhere.
 
 ```typescript
-import { defineAdminSessionEventDoc } from 'quidproquo-features';
+import { defineAdminSessionEventDoc } from '@qpqjs/features';
 
 export default [
   // Audit admin sessions in the 'log' service.

@@ -1,4 +1,4 @@
-import { AiStreamFinishReasonEnum } from 'quidproquo-core';
+import { AiStreamFinishReasonEnum } from '@qpqjs/core';
 
 const knownFinishReasons = new Set<string>(Object.values(AiStreamFinishReasonEnum));
 

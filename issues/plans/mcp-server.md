@@ -24,7 +24,7 @@ Doc tools with a `docId` run after the collection's own `authorise` hook (as its
 
 ## What was built
 
-All in `quidproquo-features`:
+All in `@qpqjs/features`:
 
 - **Registrations, so runtime code can find things in config.**
   - `defineEventDocRoutes` also returns `defineEventDocCollectionRegistration` (the store with its `authorise`/`scopeResolver` hooks).
@@ -44,7 +44,7 @@ The proof of concept hard-codes eventDoc and tenant handling into the server. Th
 - **Toolsets.** The server takes plain `tools` (like `defineAi`) plus toolsets, each a `listTools` and a `runTool({ name, args })` inline function. The eventDoc AI handling (`listDocs`, doc permission check, `askEventDocAiContextProvide`) becomes one toolset.
 - **`readOnly` on tools**, filtered in the core and sent as `readOnlyHint`, with token scopes deciding whether write tools are offered.
 
-### Step 1, built: `askRouteAuthValidationResolveContext` (quidproquo-webserver)
+### Step 1, built: `askRouteAuthValidationResolveContext` (@qpqjs/webserver)
 
 - New swappable action next to the decode. The default processor returns `{}`; a route overrides it through its runtime's `actionProcessors`.
 - Yielded in `askValidateRouteAuth` after the decode and api key checks, so a rejection is a 401, and again in `askGetHttpApiEventStorySession`, where its result is merged into the session context.
@@ -113,7 +113,7 @@ Client: the app client's Connect tab shows `claude mcp add --scope user --transp
 
 - 2026-10-12: generic core: toolsets (`defineMcpToolset`) replace the built-in eventDoc handling, which moved to the `mcpEventDocAi` toolset. Mímir on `harry-kiln` adds `defineMcpEventDocAiToolset`.
 
-- 2026-10-12: added `askRouteAuthValidationResolveContext` to quidproquo-webserver (step 1 of the end state); session building now fails closed.
+- 2026-10-12: added `askRouteAuthValidationResolveContext` to @qpqjs/webserver (step 1 of the end state); session building now fails closed.
 - 2026-10-12: added Mímir's `createPlan` MCP tool on doccypoccy `harry-kiln` (local only).
 
 - 2026-10-12: built the proof of concept on `mcp-server`: tenant as a checked tool argument, listTenants/listDocs built-ins, server tools for doc-less actions like create.

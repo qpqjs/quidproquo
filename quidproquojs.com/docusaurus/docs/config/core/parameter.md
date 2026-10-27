@@ -10,7 +10,7 @@ Declares a **parameter**: a named, non-secret configuration value that can be re
 - **On AWS:** provisions an AWS Systems Manager Parameter Store `StringParameter` (Standard tier) and grants the service's role `ssm:GetParameter`, `ssm:GetParameters`, and `ssm:DescribeParameters`. The physical name is derived from application/module/environment.
 
 ```typescript
-import { defineParameter } from 'quidproquo-core';
+import { defineParameter } from '@qpqjs/core';
 
 export default [
   // Seed an initial value; it can be changed later at runtime.

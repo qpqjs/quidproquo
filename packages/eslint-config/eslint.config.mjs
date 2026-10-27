@@ -9,7 +9,7 @@ import { reactConfigs } from './config/react.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
 // Standalone use, without adopting the whole shared config:
-//   import { qpqPlugin } from 'quidproquo-eslint-config';
+//   import { qpqPlugin } from '@qpqjs/eslint-config';
 //   export default [qpqPlugin.configs.recommended];
 export { qpqPlugin };
 

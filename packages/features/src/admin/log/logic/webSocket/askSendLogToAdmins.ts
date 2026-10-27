@@ -1,4 +1,4 @@
-import { askMapParallelBatch, AskResponse, StoryResultMetadata } from 'quidproquo-core';
+import { askMapParallelBatch, AskResponse, StoryResultMetadata } from '@qpqjs/core';
 
 import { askWebSocketQueueGetConnections } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueGetConnections';
 import { askSendMessage } from './askSendMessage';

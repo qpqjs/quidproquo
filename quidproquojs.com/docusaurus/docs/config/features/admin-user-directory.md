@@ -12,7 +12,7 @@ Declares the **admin user directory** — the authentication store the quidproqu
 - **On AWS:** because it delegates to [defineUserDirectory](../core/user-directory.md), it deploys a Cognito user pool and app client (or, when `owner` points at another module, a foreign reference to a pool deployed there). See [defineUserDirectory](../core/user-directory.md#on-aws) for the full breakdown.
 
 ```typescript
-import { defineAdminUserDirectory } from 'quidproquo-features';
+import { defineAdminUserDirectory } from '@qpqjs/features';
 
 export default [
   // The admin pool is owned by the 'log' service, alongside the admin settings.

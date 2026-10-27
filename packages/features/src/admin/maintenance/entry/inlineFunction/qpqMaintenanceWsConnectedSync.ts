@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
 import { askSendMessage } from '../../../../webSocketQueue/logic/webSocket/askSendMessage';
 import { WebSocketQueueServerMessageEventType } from '../../../../webSocketQueue/types/serverMessages/WebSocketQueueServerMessageEventType';

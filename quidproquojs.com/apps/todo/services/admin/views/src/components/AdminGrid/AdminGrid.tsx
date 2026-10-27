@@ -1,4 +1,4 @@
-import { DataGridColumDefinitions, LoadingSpinner } from 'quidproquo-web-admin';
+import { DataGridColumDefinitions, LoadingSpinner } from '@qpqjs/web-admin';
 
 import { AdminGridProps } from './types/AdminGridProps';
 import useStyles from './styles';

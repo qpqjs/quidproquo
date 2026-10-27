@@ -10,7 +10,7 @@ A [defineEventDocTransfer](./event-doc-transfer.md) with the tenant scope resolv
 The pairing matters: transferring collections declared with [defineTenantedEventDoc](./tenanted-event-doc.md) through an unscoped transfer would read an empty collection and write into the wrong partition. The deploying service must still register the resolver implementation by calling [defineTenant](./tenant.md) (with the same `owner` used everywhere else). Use plain [defineEventDocTransfer](./event-doc-transfer.md) for services whose collections never partition by tenant.
 
 ```typescript
-import { defineTenant, defineTenantedEventDoc, defineTenantedEventDocTransfer } from 'quidproquo-features';
+import { defineTenant, defineTenantedEventDoc, defineTenantedEventDocTransfer } from '@qpqjs/features';
 import { articleDefinition } from './articleDefinition';
 
 const collections = [articleDefinition];

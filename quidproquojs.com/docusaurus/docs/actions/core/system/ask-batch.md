@@ -10,7 +10,7 @@ Yields an array of actions as one **batch** so the runtime processes them togeth
 - **Action type:** `SystemActionType.Batch`
 
 ```typescript
-import { askBatch } from 'quidproquo-core';
+import { askBatch } from '@qpqjs/core';
 
 export function* askLoadDashboard(userId: string) {
   // Both reads are dispatched together instead of sequentially.

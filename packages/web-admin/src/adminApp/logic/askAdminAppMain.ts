@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { askUIShowError } from '../../platformLogic/effects/system/systemActionCreators';
 import { askRunSessionFlushLoop } from './session/askRunSessionFlushLoop';

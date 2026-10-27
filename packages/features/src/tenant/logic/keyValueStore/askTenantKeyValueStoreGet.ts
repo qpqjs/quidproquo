@@ -1,4 +1,4 @@
-import { askKeyValueStoreGet, AskResponse } from 'quidproquo-core';
+import { askKeyValueStoreGet, AskResponse } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

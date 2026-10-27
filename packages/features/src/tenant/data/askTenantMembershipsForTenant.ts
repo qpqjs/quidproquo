@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsEqual, QpqPagedData } from '@qpqjs/core';
 
 import { TENANT_MEMBERSHIPS_STORE } from '../constants/tenantStoreNames';
 import { TenantId } from '../models/TenantId';

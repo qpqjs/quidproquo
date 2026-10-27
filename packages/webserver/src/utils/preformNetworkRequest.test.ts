@@ -1,4 +1,4 @@
-import type { NetworkRequestActionPayload } from 'quidproquo-core';
+import type { NetworkRequestActionPayload } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

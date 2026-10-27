@@ -10,7 +10,7 @@ import {
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import path from 'path';
 import { afterEach, describe, expect, it } from 'vitest';

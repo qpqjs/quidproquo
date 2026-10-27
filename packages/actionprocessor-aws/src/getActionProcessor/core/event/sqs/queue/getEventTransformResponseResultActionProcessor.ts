@@ -6,7 +6,7 @@ import {
   EventActionType,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { SQSBatchItemFailure } from 'aws-lambda';
 

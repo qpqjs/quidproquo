@@ -1,4 +1,4 @@
-import { StoryResultMetadataWithChildren } from 'quidproquo-core';
+import { StoryResultMetadataWithChildren } from '@qpqjs/core';
 
 import { Box } from '@mui/material';
 

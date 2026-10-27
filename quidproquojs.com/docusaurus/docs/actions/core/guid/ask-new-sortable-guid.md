@@ -15,7 +15,7 @@ Like [askNewGuid](./ask-new-guid.md), minting an id is non-deterministic, so it 
 **What "sortable" means:** because the timestamp is in the most-significant bits, a lexicographic (alphabetical / byte-order) sort of these ids matches their creation order. That makes them a good primary/sort key in a key-value store when you want "newest last" (or "newest first" reversed) without storing a separate timestamp column, while still being globally unique.
 
 ```typescript
-import { askNewSortableGuid } from 'quidproquo-core';
+import { askNewSortableGuid } from '@qpqjs/core';
 
 export function* askAppendEvent(kind: string) {
   // Later events get larger ids, so a range scan returns them in order.

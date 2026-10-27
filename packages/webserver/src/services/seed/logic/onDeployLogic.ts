@@ -7,7 +7,7 @@ import {
   getUniqueKeyFromQpqFunctionRuntime,
   QpqFunctionRuntime,
   QueueMessage,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allSeeds = yield* askConfigGetGlobal<QpqFunctionRuntime[]>('qpqSeeds');

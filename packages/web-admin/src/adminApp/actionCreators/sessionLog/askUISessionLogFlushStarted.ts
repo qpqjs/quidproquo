@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { SessionLogEffect } from '../../effects/sessionLog/SessionLogEffect';
 import { SessionLogFlushStartedEffect } from '../../effects/sessionLog/SessionLogFlushStartedEffect';

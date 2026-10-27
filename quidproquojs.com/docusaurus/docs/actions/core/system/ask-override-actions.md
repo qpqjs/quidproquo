@@ -12,7 +12,7 @@ This is an advanced, low-level primitive. It is the mechanism [askContextProvide
 - **Built from:** a generator that sits between the story and the runtime, matching each yielded action against an override map and running the matching handler; it also cracks open [askBatch](./ask-batch.md) batches to apply overrides to the actions nested inside.
 
 ```typescript
-import { askOverrideActions, MathActionType } from 'quidproquo-core';
+import { askOverrideActions, MathActionType } from '@qpqjs/core';
 
 export function* askWithFixedRandom(story: AskResponse<number>) {
   // Force every random-number action inside `story` to resolve to 0.42.

@@ -1,4 +1,4 @@
-import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { askMcpReadConfig } from '../../actions/askMcpReadConfig';
 import { buildMcpConfig } from '../../logic/buildMcpConfig';

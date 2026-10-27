@@ -1,4 +1,4 @@
-import { getDeploySettingEnvName, QpqAppDeployment, QpqDeployEnvVar } from 'quidproquo-core';
+import { getDeploySettingEnvName, QpqAppDeployment, QpqDeployEnvVar } from '@qpqjs/core';
 
 /**
  * Writes a deployment into process.env for everything loaded afterwards (service configs,

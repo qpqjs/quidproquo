@@ -1,4 +1,4 @@
-import { AiReasoningEffort } from 'quidproquo-core';
+import { AiReasoningEffort } from '@qpqjs/core';
 
 // The thinking token budget an effort level means on a model that takes `budget_tokens` instead
 // of an effort. Anthropic's floor is 1,024; Medium is the long-standing default.

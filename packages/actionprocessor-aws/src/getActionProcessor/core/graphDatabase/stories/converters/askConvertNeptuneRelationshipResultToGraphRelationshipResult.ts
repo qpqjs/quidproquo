@@ -1,4 +1,4 @@
-import { AskResponse, GraphEntityType, GraphRelationshipResult } from 'quidproquo-core';
+import { AskResponse, GraphEntityType, GraphRelationshipResult } from '@qpqjs/core';
 
 import { NeptuneRelationshipResult } from '../types';
 

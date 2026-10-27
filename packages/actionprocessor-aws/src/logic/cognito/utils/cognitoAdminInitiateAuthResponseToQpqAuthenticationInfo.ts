@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse } from 'quidproquo-core';
+import { AuthenticateUserResponse } from '@qpqjs/core';
 
 import { AdminInitiateAuthResponse } from '@aws-sdk/client-cognito-identity-provider';
 

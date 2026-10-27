@@ -1,4 +1,4 @@
-import { StorySession } from 'quidproquo-core';
+import { StorySession } from '@qpqjs/core';
 
 /**
  * The root story session for lambdas whose triggering event carries no session

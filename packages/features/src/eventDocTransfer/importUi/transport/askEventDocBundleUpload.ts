@@ -1,4 +1,4 @@
-import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 const BUNDLE_CONTENT_TYPE = 'application/json';
 

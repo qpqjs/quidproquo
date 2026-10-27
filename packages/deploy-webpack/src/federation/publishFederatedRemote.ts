@@ -10,8 +10,8 @@
 // The <hash> is a content hash of the build, so identical code -> identical hash (a
 // no-op republish), and any change -> a new hash the warm lambdas detect and hot-swap.
 // ─────────────────────────────────────────────────────────────────────────────
-import type { FederatedModuleStoreManifest } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import type { FederatedModuleStoreManifest } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import crypto from 'crypto';
 import fs from 'fs';

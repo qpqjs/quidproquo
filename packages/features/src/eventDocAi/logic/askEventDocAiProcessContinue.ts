@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
 import { askEventDocAiChatHistoryLoad } from '../data/askEventDocAiChatHistoryLoad';

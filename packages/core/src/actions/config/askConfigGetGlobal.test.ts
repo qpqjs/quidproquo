@@ -1,4 +1,4 @@
-import { expectGenerator } from 'quidproquo-testing';
+import { expectGenerator } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { QpqExecutionTraceValue } from 'quidproquo-core';
+import { QpqExecutionTraceValue } from '@qpqjs/core';
 
 import React, { useMemo } from 'react';
 

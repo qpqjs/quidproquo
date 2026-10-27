@@ -1,4 +1,4 @@
-import { KvsAdvancedDataType } from 'quidproquo-core';
+import { KvsAdvancedDataType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

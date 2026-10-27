@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocWorkspaceSlotError } from '../types/EventDocWorkspaceSlotError';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';

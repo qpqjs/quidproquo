@@ -1,4 +1,4 @@
-import { askFileExists, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askFileExists, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc';
 import type { EventDocAiAttachment } from '../models';

@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 import { EventDocEventPayload } from '../../eventDoc/models';
 import { TenantSetBrandData } from '../models/TenantSetBrandData';

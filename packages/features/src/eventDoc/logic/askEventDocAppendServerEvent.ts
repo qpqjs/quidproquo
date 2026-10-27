@@ -1,4 +1,4 @@
-import { askNewGuid, AskResponse } from 'quidproquo-core';
+import { askNewGuid, AskResponse } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocEventActor, EventDocEventOrigin } from '../models';
 import { askEventDocEventAppend } from './askEventDocEventAppend';

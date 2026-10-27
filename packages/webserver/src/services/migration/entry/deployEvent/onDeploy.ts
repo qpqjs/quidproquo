@@ -1,4 +1,4 @@
-import { AskResponse, DeployEvent, DeployEventResponse } from 'quidproquo-core';
+import { AskResponse, DeployEvent, DeployEventResponse } from '@qpqjs/core';
 
 import * as onDeployLogic from '../../logic/onDeployLogic';
 

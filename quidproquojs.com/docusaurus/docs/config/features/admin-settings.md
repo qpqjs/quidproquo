@@ -12,8 +12,8 @@ Wires up the **admin feature**: the log-service backend that powers the quidproq
 - **On AWS:** this define does not deploy infrastructure of its own — it composes other `define*` settings ([defineStorageDrive](../core/storage-drive.md), [defineKeyValueStore](../core/key-value-store.md), [defineQueue](../core/queue.md), [defineEventBus](../core/event-bus.md), routes, and a WebSocket queue), and each of those deploys its usual AWS resources. The reads served over its routes are backed by the [askAdminGetLogs](../../actions/webserver/admin/ask-admin-get-logs.md) family of actions.
 
 ```typescript
-import { defineAdminSettings } from 'quidproquo-features';
-import { defineAdminUserDirectory } from 'quidproquo-features';
+import { defineAdminSettings } from '@qpqjs/features';
+import { defineAdminUserDirectory } from '@qpqjs/features';
 
 export default [
   // The admins' auth directory (see defineAdminUserDirectory)
@@ -80,7 +80,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 ## Examples
 
 ```typescript
-import { defineAdminSettings, defineAdminUserDirectory } from 'quidproquo-features';
+import { defineAdminSettings, defineAdminUserDirectory } from '@qpqjs/features';
 
 export default [
   ...defineAdminUserDirectory({ owner: { module: 'log' } }),

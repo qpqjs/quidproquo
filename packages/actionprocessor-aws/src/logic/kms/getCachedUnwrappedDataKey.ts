@@ -1,5 +1,5 @@
-import { canonicalizeCryptoContext } from 'quidproquo-actionprocessor-node';
-import { CryptoContext } from 'quidproquo-core';
+import { canonicalizeCryptoContext } from '@qpqjs/actionprocessor-node';
+import { CryptoContext } from '@qpqjs/core';
 
 import { decryptDataKey } from './decryptDataKey';
 

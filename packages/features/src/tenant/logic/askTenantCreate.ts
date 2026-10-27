@@ -1,4 +1,4 @@
-import { askNewGuid, AskResponse, askStorageScopeProvide } from 'quidproquo-core';
+import { askNewGuid, AskResponse, askStorageScopeProvide } from '@qpqjs/core';
 
 import { askEventDocCreate } from '../../eventDoc/logic/askEventDocCreate';
 import { EventDocEventActor, EventDocSummary } from '../../eventDoc/models';

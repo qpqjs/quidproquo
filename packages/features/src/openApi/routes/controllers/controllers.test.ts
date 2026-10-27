@@ -1,5 +1,5 @@
-import { ConfigActionType, runStory } from 'quidproquo-core';
-import { HTTPEvent, OpenApiActionType } from 'quidproquo-webserver';
+import { ConfigActionType, runStory } from '@qpqjs/core';
+import { HTTPEvent, OpenApiActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -17,7 +17,7 @@ import {
   askStateRead,
   buildMutableEffectReducer,
   Effect,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 // 1. Model the state and the effects that change it.
 interface CounterState {
@@ -122,7 +122,7 @@ In both, each handler receives `(state, payload)` — the effect's `payload` is 
 Composes two reducers into one that handles the **union** of their effects. It tries the first reducer; if that returns `handled: true` it wins, otherwise the (possibly-updated) state is passed to the second:
 
 ```typescript
-import { combineQpqReducers } from 'quidproquo-core';
+import { combineQpqReducers } from '@qpqjs/core';
 
 const appReducer = combineQpqReducers(counterReducer, markReducer);
 // handles CounterEffects | MarkEffects
@@ -135,7 +135,7 @@ Chain calls to combine more than two. The result is a `QpqReducer` you can pass 
 `askReduceState` reduces effects **live** as a story dispatches them. `replayEffects` is its synchronous, event-sourcing counterpart: given a stored **array** of effects, it reduces them into state with no story and no generator involved:
 
 ```typescript
-import { replayEffects } from 'quidproquo-core';
+import { replayEffects } from '@qpqjs/core';
 
 const state = replayEffects({ count: 0 }, counterReducer, [
   { type: 'counter/Add', payload: 5 },

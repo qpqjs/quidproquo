@@ -1,4 +1,4 @@
-import { QpqAppDeployment, QpqDeployEnvVar } from 'quidproquo-core';
+import { QpqAppDeployment, QpqDeployEnvVar } from '@qpqjs/core';
 
 import { afterEach, describe, expect, it } from 'vitest';
 

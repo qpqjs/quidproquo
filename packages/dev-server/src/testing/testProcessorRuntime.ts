@@ -1,4 +1,4 @@
-import { ActionProcessor, buildTestStorySession, DynamicModuleLoader, StorySession, StreamRegistry } from 'quidproquo-core';
+import { ActionProcessor, buildTestStorySession, DynamicModuleLoader, StorySession, StreamRegistry } from '@qpqjs/core';
 
 // Invokes an action processor with throwaway runtime collaborators.
 //

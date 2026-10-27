@@ -1,4 +1,4 @@
-import { KeyValueStoreActionType } from 'quidproquo-core';
+import { KeyValueStoreActionType } from '@qpqjs/core';
 
 export const coreKeyValueStoreActionComponentMap: Record<string, string[]> = {
   [KeyValueStoreActionType.Query]: ['askKeyValueStoreQuery', 'keyValueStoreName', 'keyCondition', 'options'],

@@ -15,7 +15,7 @@ import {
   StorySessionUpdater,
   SystemActionType,
   SystemTraceStoryActionPayload,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { traceStoryExecution } from './traceStoryExecution';
 

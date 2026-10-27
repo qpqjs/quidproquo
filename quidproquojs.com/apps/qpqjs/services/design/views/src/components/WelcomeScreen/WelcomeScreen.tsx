@@ -1,6 +1,6 @@
 // federated.export: This file will be exported using module federation
 
-import { getApiUrl } from 'quidproquo-web';
+import { getApiUrl } from '@qpqjs/web';
 
 import { type CSSProperties, useState } from 'react';
 

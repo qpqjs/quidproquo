@@ -1,5 +1,5 @@
-import { askCatch, askConfigGetGlobal, AskResponse } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { askCatch, askConfigGetGlobal, AskResponse } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { EVENT_DOC_TYPE_GLOBAL } from '../../../eventDoc';
 import { askServiceRequestRespond, isServiceRequestDeferred } from '../../../webSocketQueue/logic/service';

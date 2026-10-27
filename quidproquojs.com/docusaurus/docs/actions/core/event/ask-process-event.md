@@ -65,7 +65,7 @@ Instead of processing records in parallel, it walks them **one at a time**. When
 
 ## The pipeline actions
 
-The individual `askEvent*` actions above are **extension points**, not story-author API — each service type implements them in its action-processor package (e.g. the HTTP API event processors in `quidproquo-webserver`). You compose stories that get *matched and executed* by this pipeline; you don't yield these actions directly. Related transform hooks used by specific service types include `askEventTransformEventParams`, `askEventTransformEventRecord`, `askEventTransformEventRecordResponse`, and `askEventResolveCaughtError`.
+The individual `askEvent*` actions above are **extension points**, not story-author API — each service type implements them in its action-processor package (e.g. the HTTP API event processors in `@qpqjs/webserver`). You compose stories that get *matched and executed* by this pipeline; you don't yield these actions directly. Related transform hooks used by specific service types include `askEventTransformEventParams`, `askEventTransformEventRecord`, `askEventTransformEventRecordResponse`, and `askEventResolveCaughtError`.
 
 ## Related
 

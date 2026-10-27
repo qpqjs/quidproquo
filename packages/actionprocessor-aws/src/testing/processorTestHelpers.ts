@@ -1,4 +1,4 @@
-import { QPQError } from 'quidproquo-core';
+import { QPQError } from '@qpqjs/core';
 
 // The runtime arguments every action processor receives after its payload. Tests almost never
 // care about these, so they are stubbed by default and only overridden where a test needs a real

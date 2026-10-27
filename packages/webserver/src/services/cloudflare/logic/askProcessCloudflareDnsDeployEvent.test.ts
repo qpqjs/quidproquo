@@ -1,4 +1,4 @@
-import { ConfigActionType, LogActionType, NetworkActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, LogActionType, NetworkActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

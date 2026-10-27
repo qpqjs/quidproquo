@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, createContextIdentifier, createContextProvider, createContextReader, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, createContextIdentifier, createContextProvider, createContextReader, ErrorTypeEnum } from '@qpqjs/core';
 
 export type WebsocketConnectionInfo = {
   apiName?: string;

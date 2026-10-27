@@ -1,4 +1,4 @@
-import { AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, Nullable } from '@qpqjs/core';
 
 import { askApplyEventDocEvent } from '../../../actions/eventDocEvent/askApplyEventDocEvent';
 import { EventDocWorkspaceChromeEffect } from '../effects/EventDocWorkspaceChromeEffect';

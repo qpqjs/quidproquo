@@ -1,4 +1,4 @@
-import { DeployEventsQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { DeployEventsQPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

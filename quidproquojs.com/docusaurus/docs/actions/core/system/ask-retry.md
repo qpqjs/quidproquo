@@ -10,7 +10,7 @@ Runs a story and retries it if it fails, waiting between attempts. It returns th
 - **Built from:** [askCatch](./ask-catch.md) (to run each attempt and capture its outcome as a value), plus `askDelay` for the waits and `askNewGuid` for jitter entropy.
 
 ```typescript
-import { askRetry, ErrorTypeEnum } from 'quidproquo-core';
+import { askRetry, ErrorTypeEnum } from '@qpqjs/core';
 
 export function* askChargeCard(paymentId: string) {
   const outcome = yield* askRetry(

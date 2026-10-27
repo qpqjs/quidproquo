@@ -1,4 +1,4 @@
-import { authContext, QpqContextProvider, QpqRuntimeEffectCatcher } from 'quidproquo-web-react';
+import { authContext, QpqContextProvider, QpqRuntimeEffectCatcher } from '@qpqjs/web-react';
 
 import { ReactNode, useContext } from 'react';
 

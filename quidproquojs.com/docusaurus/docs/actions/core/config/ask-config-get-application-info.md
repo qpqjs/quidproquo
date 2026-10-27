@@ -11,7 +11,7 @@ Returns the identity of the currently running service — its application name, 
 - **Resolution:** derived from the resolved `QPQConfig` — no external call.
 
 ```typescript
-import { askConfigGetApplicationInfo } from 'quidproquo-core';
+import { askConfigGetApplicationInfo } from '@qpqjs/core';
 
 export function* askIsProduction() {
   const { environment } = yield* askConfigGetApplicationInfo();

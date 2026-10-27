@@ -1,4 +1,4 @@
-import { type AiStreamUsage, sumAiStreamUsage } from 'quidproquo-core';
+import { type AiStreamUsage, sumAiStreamUsage } from '@qpqjs/core';
 
 import type { EventDocAiState } from '../EventDocAiState';
 

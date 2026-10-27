@@ -25,7 +25,7 @@ describe('defineUserScriptModule', () => {
   });
 
   it('refuses to shadow a shared framework package', () => {
-    expect(() => defineUserScriptModule('quidproquo-core', '/x::y')).toThrow('shared framework package');
+    expect(() => defineUserScriptModule('@qpqjs/core', '/x::y')).toThrow('shared framework package');
   });
 
   it.each(['', './local', '/abs', 'node:fs'])('refuses [%s] as an import name', (name) => {

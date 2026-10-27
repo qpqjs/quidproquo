@@ -1,4 +1,4 @@
-import { EventActionType, KvsStreamEventType } from 'quidproquo-core';
+import { EventActionType, KvsStreamEventType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 

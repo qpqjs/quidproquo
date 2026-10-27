@@ -1,4 +1,4 @@
-import { useStateUpdater } from 'quidproquo-web-react';
+import { useStateUpdater } from '@qpqjs/web-react';
 
 import { useState } from 'react';
 

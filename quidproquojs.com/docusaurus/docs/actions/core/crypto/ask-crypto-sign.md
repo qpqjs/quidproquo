@@ -12,7 +12,7 @@ Signs a string with a [signing key](../../../config/core/signing-key.md) and ret
 - **On the dev server:** the same signature computed with Node's `crypto` against the locally seeded pair at `.qpq-runtime/<app>/signingKeys/<service>.json`.
 
 ```typescript
-import { askCryptoSign } from 'quidproquo-core';
+import { askCryptoSign } from '@qpqjs/core';
 
 export function* askSignWebhookBody(body: string) {
   return yield* askCryptoSign('webhook-signing-key', body);

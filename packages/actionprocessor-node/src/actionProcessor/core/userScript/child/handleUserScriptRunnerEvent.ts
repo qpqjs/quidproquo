@@ -16,7 +16,7 @@ import {
   UserScriptRunnerEvent,
   UserScriptRunnerRequestKind,
   UserScriptRunnerResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

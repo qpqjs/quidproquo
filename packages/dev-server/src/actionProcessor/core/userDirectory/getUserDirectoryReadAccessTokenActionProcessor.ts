@@ -7,7 +7,7 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
 

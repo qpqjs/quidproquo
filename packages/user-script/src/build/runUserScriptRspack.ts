@@ -4,7 +4,7 @@ import { loadRspackModule } from './loadRspackModule';
 
 /**
  * One-shot rspack build as a promise; rejects on a compiler error or on stats errors.
- * Kept here rather than imported from quidproquo-deploy-rspack because this package is
+ * Kept here rather than imported from @qpqjs/deploy-rspack because this package is
  * bundled into lambdas and must not pull that package's deploy-time dependencies in.
  */
 export const runUserScriptRspack = async (config: Configuration): Promise<void> => {

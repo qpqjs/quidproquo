@@ -1,5 +1,5 @@
-import { Nullable } from 'quidproquo-core';
-import { MaintenanceLevel, MaintenanceType } from 'quidproquo-features';
+import { Nullable } from '@qpqjs/core';
+import { MaintenanceLevel, MaintenanceType } from '@qpqjs/features';
 
 import { useEffect, useState } from 'react';
 import {

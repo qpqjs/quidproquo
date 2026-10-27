@@ -4,7 +4,7 @@ import * as core from './index';
 
 // The package entry point re-exports every public barrel. Importing it here exercises
 // each re-export chain and guards against a barrel that fails to resolve.
-describe('quidproquo-core entry point', () => {
+describe('@qpqjs/core entry point', () => {
   it('re-exports the core building blocks', () => {
     expect(typeof core.defineApplication).toBe('function');
     expect(typeof core.runStory).toBe('function');

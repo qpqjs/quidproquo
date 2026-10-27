@@ -97,14 +97,14 @@ Capture limits: max value depth 3, max string 1k, max props 50 per object, max v
 
 ## Where each piece lives
 
-### 1. `quidproquo-actionprocessor-node` — the tracer itself
+### 1. `@qpqjs/actionprocessor-node` — the tracer itself
 - `traceStoryExecution(storyResult, runtime, options): Promise<QpqExecutionTrace>` —
   wraps `qpqExecuteLog`, owns the worker-thread controller, stepping loop, locals capture,
   source-map resolution, budgets. Pure node — reusable by the dev server later (same tracer,
   local).
-- `QpqExecutionTrace` type in `quidproquo-core` (types only, no node deps in core).
+- `QpqExecutionTrace` type in `@qpqjs/core` (types only, no node deps in core).
 
-### 2. `quidproquo-deploy-webpack` — build changes
+### 2. `@qpqjs/deploy-webpack` — build changes
 - Remote build: `devtool: 'source-map'`, `optimization: { minimize: false }`.
 - No changes needed in `publishFederatedRemote` or `loadFederatedStory` (verified: file
   enumeration and /tmp sync already carry arbitrary files).
@@ -130,7 +130,7 @@ risks shared-package version skew).
   either await (v1, with the step budget keeping traces to seconds) or return 202 + poll the
   trace location (upgrade path if big stories appear).
 
-### 4. `quidproquo-web-admin` — UI
+### 4. `@qpqjs/web-admin` — UI
 - LogDialog: a **Trace** button beside Execute → hits the new route via the platform API URL
   (note: Execute currently hardcodes `http://localhost:8080/…`; the new button must use
   `useBaseUrlResolvers` so it works deployed).
@@ -179,7 +179,7 @@ Implementation notes:
   Claude SDK etc. out of every lambda bundle) with a default script pattern of the
   federated code cache dir.
 - `defineAdminSettings` now gives EVERY service a `qpqTraceLogExecution` service
-  function (entry story in quidproquo-features `admin/config/entry/serviceFunction/`),
+  function (entry story in @qpqjs/features `admin/config/entry/serviceFunction/`),
   so traces run inside the service that owns the log.
 - Admin log route `POST /log/{correlationId}/trace` → `logController.traceLog`: reads
   the log from the logs drive (cold-storage guarded), calls the owning service's
@@ -232,7 +232,7 @@ the synchronous route path dies at the API lambda's 25s default / API Gateway's 
 first-runs still exceed that on big services, the durable fix is the async shape
 (fire-and-forget service function + a store-result callback + UI polling).
 
-**Follow-up: framework source maps (2026-07-08)** — quidproquo-tsconfig base now sets
+**Follow-up: framework source maps (2026-07-08)** — @qpqjs/tsconfig base now sets
 `sourceMap: true` + `inlineSources: true`, so ALL framework packages ship maps with
 embedded TS (verified: features' defineAdminSettings.js.map carries sourcesContent).
 Requires republishing the framework for consumers to pick up.

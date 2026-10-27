@@ -2,7 +2,7 @@
 // deploys from. Per service it is the CDK cloud assembly plus a manifest under
 // dist/qpq/go-docker/<app>/<service>, with the views bundle and the federated
 // remote left where their bundlers write them and pointed at from the manifest.
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';

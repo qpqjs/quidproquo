@@ -1,5 +1,5 @@
-import { runStory, StateActionType, StateDispatchAction } from 'quidproquo-core';
-import { QueryParamsActionType, QueryParamsSetAction } from 'quidproquo-web';
+import { runStory, StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { QueryParamsActionType, QueryParamsSetAction } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 

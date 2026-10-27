@@ -1,5 +1,5 @@
-import { buildTestQpqConfig, defineStorageDrive, EventActionType, InvalidScopeError } from 'quidproquo-core';
-import { StorageDriveEventType } from 'quidproquo-webserver';
+import { buildTestQpqConfig, defineStorageDrive, EventActionType, InvalidScopeError } from '@qpqjs/core';
+import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
+import { QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { defineEventDoc, EventDocCollectionOptions, EventDocFunctions } from '../../eventDoc';
 import { TENANT_EVENT_DOC_AUTHORISER_FN, TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';

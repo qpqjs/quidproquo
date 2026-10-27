@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { TENANT_ROLES_GLOBAL } from '../constants/tenantGlobalNames';
 import { TenantRolesConfig } from '../models/TenantRolesConfig';

@@ -11,7 +11,7 @@ Reads a [global](../../../config/core/global.md) config value by name. Globals a
 - **Resolution:** the value is read straight from the resolved `QPQConfig`, so it works on every runtime — including local JS execution with no cloud resources.
 
 ```typescript
-import { askConfigGetGlobal } from 'quidproquo-core';
+import { askConfigGetGlobal } from '@qpqjs/core';
 
 interface FeatureLimits {
   maxUploadsPerDay: number;

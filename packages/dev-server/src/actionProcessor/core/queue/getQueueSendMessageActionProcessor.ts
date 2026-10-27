@@ -10,7 +10,7 @@ import {
   qpqCoreUtils,
   QueueActionType,
   toCrossServiceSession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { eventBus } from '../../../logic/eventBus';
 import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';

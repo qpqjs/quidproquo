@@ -1,5 +1,5 @@
-import { getQpqAppDeployment, primeAwsDeploymentEnv, primeDeploymentEnv, validateAwsDeployment } from 'quidproquo-config-aws';
-import { QpqDeployEnvVar } from 'quidproquo-core';
+import { getQpqAppDeployment, primeAwsDeploymentEnv, primeDeploymentEnv, validateAwsDeployment } from '@qpqjs/config-aws';
+import { QpqDeployEnvVar } from '@qpqjs/core';
 
 import * as cdk from 'aws-cdk-lib';
 

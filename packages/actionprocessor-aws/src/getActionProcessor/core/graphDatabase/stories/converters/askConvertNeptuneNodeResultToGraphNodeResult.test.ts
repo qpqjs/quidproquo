@@ -1,4 +1,4 @@
-import { GraphEntityType, runStory } from 'quidproquo-core';
+import { GraphEntityType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

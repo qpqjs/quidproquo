@@ -1,6 +1,6 @@
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { WebEntryActionType } from 'quidproquo-webserver';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { WebEntryActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

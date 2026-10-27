@@ -1,4 +1,4 @@
-import { createQpqRuntimeComputed, useQpqRuntimeComputed } from 'quidproquo-web-react';
+import { createQpqRuntimeComputed, useQpqRuntimeComputed } from '@qpqjs/web-react';
 
 import { adminAppRuntime } from '../adminAppRuntime';
 import { AdminSessionState } from '../AdminSessionState';

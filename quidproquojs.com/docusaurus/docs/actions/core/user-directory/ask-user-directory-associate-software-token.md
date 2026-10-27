@@ -15,7 +15,7 @@ import {
   askUserDirectoryAssociateSoftwareToken,
   askUserDirectoryRespondToAuthChallenge,
   AuthenticateUserChallenge,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export function* askEnrolMfa(username: string, session: string, mfaCode: string) {
   // 1. Get the secret + a fresh session (show secretCode to the user as a QR code)

@@ -10,7 +10,7 @@ Drives an open stream to completion and collects it into an array. It reads chun
 `askStreamMap` is not a distinct action; it is a story composed of [askStreamRead](./ask-stream-read.md) and [askStreamClose](./ask-stream-close.md). It reads in the default blocking mode, skips any chunk whose `data` is `undefined` or that is marked `skipped`, stops on `done`, and always closes the handle before returning the collected array. When no callback is supplied, the chunks are collected as-is.
 
 ```typescript
-import { askAiPromptStream, askStreamMap, AiModel } from 'quidproquo-core';
+import { askAiPromptStream, askStreamMap, AiModel } from '@qpqjs/core';
 
 export function* askCollectStreamedParts(prompt: string) {
   const stream = yield* askAiPromptStream(AiModel.ClaudeSonnet46, prompt);
@@ -25,7 +25,7 @@ export function* askCollectStreamedParts(prompt: string) {
 With a transform callback, map each chunk to a value of your choosing:
 
 ```typescript
-import { askFileStreamOpen, askStreamMap } from 'quidproquo-core';
+import { askFileStreamOpen, askStreamMap } from '@qpqjs/core';
 
 export function* askChunkLengths(filepath: string) {
   const handle = yield* askFileStreamOpen('logs', filepath, 'text');

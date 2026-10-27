@@ -1,4 +1,4 @@
-import { FileActionType } from 'quidproquo-core';
+import { FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

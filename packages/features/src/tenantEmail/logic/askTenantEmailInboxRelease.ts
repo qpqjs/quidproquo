@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { TenantId } from '../../tenant/models/TenantId';
 import { askTenantEmailInboxDelete } from '../data/askTenantEmailInboxDelete';

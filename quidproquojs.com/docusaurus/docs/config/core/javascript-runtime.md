@@ -9,10 +9,10 @@ Selects the **JavaScript runtime version and CPU architecture** for the service'
 
 Declare it once per service to pin the Node version and architecture. If you omit it, the service uses the defaults below.
 
-- **On AWS:** does not deploy a resource of its own, but every Lambda the service deploys is configured from it. The deploy layer maps `runtimeVersion` to an `aws_lambda.Runtime` (Node 20/22/24) and `architecture` to an `aws_lambda.Architecture` (`getLambdaRuntime` / `getLambdaArchitecture` in `quidproquo-deploy-awscdk`, via `qpqCoreUtils.getJavascriptRuntimeConfig`).
+- **On AWS:** does not deploy a resource of its own, but every Lambda the service deploys is configured from it. The deploy layer maps `runtimeVersion` to an `aws_lambda.Runtime` (Node 20/22/24) and `architecture` to an `aws_lambda.Architecture` (`getLambdaRuntime` / `getLambdaArchitecture` in `@qpqjs/deploy-awscdk`, via `qpqCoreUtils.getJavascriptRuntimeConfig`).
 
 ```typescript
-import { defineJavascriptRuntime, JavascriptRuntimeVersion } from 'quidproquo-core';
+import { defineJavascriptRuntime, JavascriptRuntimeVersion } from '@qpqjs/core';
 
 export default [
   defineJavascriptRuntime({ runtimeVersion: JavascriptRuntimeVersion.Node24 }),
@@ -62,7 +62,7 @@ import {
   defineJavascriptRuntime,
   JavascriptRuntimeVersion,
   JavascriptRuntimeArchitecture,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 export default [
   // Pin to Node 24 on x86_64

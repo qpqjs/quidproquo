@@ -1,4 +1,4 @@
-import { CrossModuleOwner, defineKeyValueStore, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
+import { CrossModuleOwner, defineKeyValueStore, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { EventObject, MachineConfig, MachineContext } from 'xstate';
 

@@ -12,7 +12,7 @@ You rarely call this directly; the four chat [request builders](./ask-event-doc-
 - Built from webserver `askServiceRequest`; reads context via [askEventDocAiContextRead](./ask-event-doc-ai-context-read.md).
 
 ```typescript
-import { askEventDocAiServiceRequest } from 'quidproquo-features';
+import { askEventDocAiServiceRequest } from '@qpqjs/features';
 
 // How a request builder uses it (payload/response typed by the caller):
 export function* askMyEventDocAiMethod(payload: MyPayload) {

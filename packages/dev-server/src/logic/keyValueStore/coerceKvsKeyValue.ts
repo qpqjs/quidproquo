@@ -1,4 +1,4 @@
-import { KvsKeyType } from 'quidproquo-core';
+import { KvsKeyType } from '@qpqjs/core';
 
 /**
  * Keys travel the repository interface as strings; the key columns hold real

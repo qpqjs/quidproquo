@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askThrowError, askUserScriptListExports } from 'quidproquo-core';
+import { askCatch, AskResponse, askThrowError, askUserScriptListExports } from '@qpqjs/core';
 
 import { assertUserScriptExports } from '../../build/assertUserScriptExports';
 import { UserScriptBuildError, UserScriptBuildErrorCode } from '../../build/UserScriptBuildError';

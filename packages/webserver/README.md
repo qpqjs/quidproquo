@@ -1,11 +1,11 @@
-# quidproquo-webserver
+# @qpqjs/webserver
 
 The web layer of [quidproquo](https://github.com/qpqjs/quidproquo). It adds everything a service needs to be reachable over the network: routes, apis, websockets, dns, email, and the config settings that describe them.
 
-Most applications should install [`quidproquo`](https://www.npmjs.com/package/quidproquo), which re-exports this package together with `quidproquo-core`.
+Most applications should install [`quidproquo`](https://www.npmjs.com/package/quidproquo), which re-exports this package together with `@qpqjs/core`.
 
 ```bash
-npm install quidproquo-webserver
+npm install @qpqjs/webserver
 ```
 
 ## What it adds
@@ -31,7 +31,7 @@ A service config is a plain array. The deploy packages read it to build infrastr
 
 ## Where the platform bits live
 
-This package stays platform-neutral. Anything that is specific to one cloud lives in the layer that owns it: `quidproquo-config-aws` for AWS-only settings, and the `quidproquo-actionprocessor-*` packages for the implementations that run these actions.
+This package stays platform-neutral. Anything that is specific to one cloud lives in the layer that owns it: `@qpqjs/config-aws` for AWS-only settings, and the `quidproquo-actionprocessor-*` packages for the implementations that run these actions.
 
 ## Status
 

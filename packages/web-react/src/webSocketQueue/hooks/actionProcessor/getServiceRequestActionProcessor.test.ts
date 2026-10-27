@@ -1,5 +1,5 @@
-import { ErrorTypeEnum } from 'quidproquo-core';
-import { ServiceActionType } from 'quidproquo-features';
+import { ErrorTypeEnum } from '@qpqjs/core';
+import { ServiceActionType } from '@qpqjs/features';
 
 import { describe, expect, it, vi } from 'vitest';
 

@@ -10,7 +10,7 @@ Returns the **correlation id** (a guid) of the story that is currently running. 
 - **Action type:** `SystemActionType.GetRuntimeCorrelation`
 
 ```typescript
-import { askGetRuntimeCorrelation } from 'quidproquo-core';
+import { askGetRuntimeCorrelation } from '@qpqjs/core';
 
 export function* askRecordJob() {
   const correlation = yield* askGetRuntimeCorrelation();

@@ -1,5 +1,5 @@
-import { askCatch, askLogCreate, AskResponse, LogLevelEnum } from 'quidproquo-core';
-import { askServiceFunctionExecute } from 'quidproquo-webserver';
+import { askCatch, askLogCreate, AskResponse, LogLevelEnum } from '@qpqjs/core';
+import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
 import { MCP_EXPORT_LIST_TOOLS_FN } from '../constants/mcpExportListToolsFn';
 import { McpExportListToolsRequest } from '../models/McpExportListToolsRequest';

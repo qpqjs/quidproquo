@@ -1,4 +1,4 @@
-import { askCatch, askFileReadTextContents, AskResponse, Nullable } from 'quidproquo-core';
+import { askCatch, askFileReadTextContents, AskResponse, Nullable } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';

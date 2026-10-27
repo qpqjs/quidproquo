@@ -5,7 +5,7 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { getNestedValue } from './applyKvsUpdates';
 

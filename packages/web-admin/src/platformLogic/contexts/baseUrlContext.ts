@@ -1,4 +1,4 @@
-import { createContextIdentifier } from 'quidproquo-core';
+import { createContextIdentifier } from '@qpqjs/core';
 
 export type BaseUrls = {
   api: string;

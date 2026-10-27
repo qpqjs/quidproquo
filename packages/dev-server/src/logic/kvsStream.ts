@@ -1,4 +1,4 @@
-import { KvsStreamEventType, KvsStreamRecord, QPQConfig, qpqCoreUtils, StorySession, toCrossServiceSession } from 'quidproquo-core';
+import { KvsStreamEventType, KvsStreamRecord, QPQConfig, qpqCoreUtils, StorySession, toCrossServiceSession } from '@qpqjs/core';
 
 import { KvsStreamMessageWithSession } from '../actionProcessor/core/event/kvsStream/types';
 import { eventBus } from './eventBus';

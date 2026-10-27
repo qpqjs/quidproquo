@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { EmailReceivingDomainQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { EmailReceivingDomainQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { aws_route53, aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

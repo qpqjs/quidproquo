@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { askQueryParamsGetAll, askQueryParamsSet } from 'quidproquo-web';
+import { AskResponse } from '@qpqjs/core';
+import { askQueryParamsGetAll, askQueryParamsSet } from '@qpqjs/web';
 
 import { askSharedQueryParamsUISetParam } from '../sharedQueryParamsActionCreator';
 

@@ -1,4 +1,4 @@
-import { WebAddressing, WebAddressingMode } from 'quidproquo-webserver';
+import { WebAddressing, WebAddressingMode } from '@qpqjs/webserver';
 
 import { afterEach, describe, expect, it } from 'vitest';
 

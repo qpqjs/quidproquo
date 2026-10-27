@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askCatch, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocEventLast } from '../data/askEventDocEventLast';
 import { EventDocAppendBase } from '../models';

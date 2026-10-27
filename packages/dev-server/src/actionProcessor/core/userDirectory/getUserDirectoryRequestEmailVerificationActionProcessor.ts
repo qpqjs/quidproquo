@@ -5,8 +5,8 @@ import {
   ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-} from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { resolveDevUsername } from '../../../logic/auth/devAuth';
 

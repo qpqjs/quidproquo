@@ -1,4 +1,4 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { EventDocTransferPlanRow } from '../../models';
 import { askUIEventDocImportSetApplying } from '../actionCreators/askUIEventDocImportSetApplying';

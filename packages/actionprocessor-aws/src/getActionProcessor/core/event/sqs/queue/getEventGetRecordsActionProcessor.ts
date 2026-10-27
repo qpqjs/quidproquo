@@ -11,7 +11,7 @@ import {
   ProcessorFor,
   QPQConfig,
   QueueEvent,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { AnyQueueMessageWithSession, CloudWatchAlarmNotification, EventInput, InternalEventRecord } from './types';
 

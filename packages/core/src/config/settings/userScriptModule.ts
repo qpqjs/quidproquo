@@ -30,7 +30,7 @@ export type UserScriptModuleOptions = {
  * instance, loaded through the dynamic module loader. The module ships with the service,
  * so its actions run through the service's processors.
  *
- * A name may not shadow a shared framework package (`quidproquo-core`), which the host
+ * A name may not shadow a shared framework package (`@qpqjs/core`), which the host
  * already provides. With `options.types`, the module's declarations are also available to
  * editors through askUserScriptModuleTypes.
  */

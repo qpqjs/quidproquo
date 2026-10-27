@@ -1,4 +1,4 @@
-import { buildEffectReducer } from 'quidproquo-core';
+import { buildEffectReducer } from '@qpqjs/core';
 
 import { SessionLogEffect } from './effects/sessionLog/SessionLogEffect';
 import { SessionLogEffects } from './effects/sessionLog/SessionLogEffects';

@@ -1,4 +1,4 @@
-import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import {
   AccountBudgetQPQConfigSetting,

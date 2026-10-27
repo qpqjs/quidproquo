@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from '@qpqjs/core';
 
 export enum AdminActionType {
   GetLog = '@quidproquo-webserver/Admin/GetLog',

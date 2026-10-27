@@ -1,4 +1,4 @@
-import { loadUserScriptHostModules } from 'quidproquo-actionprocessor-node';
+import { loadUserScriptHostModules } from '@qpqjs/actionprocessor-node';
 import {
   ActionProcessorList,
   actionResult,
@@ -16,7 +16,7 @@ import {
   StorySessionUpdater,
   StreamRegistry,
   UserScriptBuildFromZipActionPayload,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
 

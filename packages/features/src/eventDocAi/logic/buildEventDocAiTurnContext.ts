@@ -1,4 +1,4 @@
-import type { AiMessage } from 'quidproquo-core';
+import type { AiMessage } from '@qpqjs/core';
 
 import { EVENT_DOC_AI_CONTINUATION_NUDGE } from '../constants/eventDocAiContinuationNudge';
 

@@ -1,3 +1,3 @@
-import { askStorageScopeRead } from 'quidproquo-core';
+import { askStorageScopeRead } from '@qpqjs/core';
 
 export const askActiveTenantRead = askStorageScopeRead;

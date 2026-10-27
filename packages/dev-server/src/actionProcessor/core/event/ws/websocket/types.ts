@@ -1,5 +1,5 @@
-import { MatchStoryResult } from 'quidproquo-core';
-import { WebsocketEvent, WebsocketEventResponse } from 'quidproquo-webserver';
+import { MatchStoryResult } from '@qpqjs/core';
+import { WebsocketEvent, WebsocketEventResponse } from '@qpqjs/webserver';
 
 // Deep import (not the implementations/webSocket barrel): that barrel exports
 // webSocketImplementation, which imports these websocket processors back — going

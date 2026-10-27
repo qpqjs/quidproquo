@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askUIEventDocListSetConfig } from '../actionCreators/askUIEventDocListSetConfig';
 import type { EventDocListConfig } from '../types/EventDocListConfig';

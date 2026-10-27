@@ -1,4 +1,4 @@
-import { KvsCoreDataType } from 'quidproquo-core';
+import { KvsCoreDataType } from '@qpqjs/core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 

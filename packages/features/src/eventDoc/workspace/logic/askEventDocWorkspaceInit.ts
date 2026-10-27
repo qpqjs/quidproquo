@@ -1,4 +1,4 @@
-import { askMapParallel, AskResponse, Nullable } from 'quidproquo-core';
+import { askMapParallel, AskResponse, Nullable } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocSnapshotBase } from '../../models';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';

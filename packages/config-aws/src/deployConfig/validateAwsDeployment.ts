@@ -1,4 +1,4 @@
-import { QpqAppDeployment } from 'quidproquo-core';
+import { QpqAppDeployment } from '@qpqjs/core';
 
 import { AWS_DEPLOY_PLATFORM } from './AWS_DEPLOY_PLATFORM';
 import { QpqAwsAppDeployment } from './types';

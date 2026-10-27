@@ -49,7 +49,7 @@ type ResolvedFederationRuntime = {
 };
 
 // Remotes with a reload in flight: mf container name -> current reload nonce.
-// Module scope is safe: quidproquo-web is a module-federation shared singleton, so
+// Module scope is safe: @qpqjs/web is a module-federation shared singleton, so
 // one copy serves the page.
 const remoteReloadNonces = new Map<string, number>();
 

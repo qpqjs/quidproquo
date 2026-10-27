@@ -1,4 +1,4 @@
-import { WebSocketQueueClientEventMessagePing, WebSocketQueueClientMessageEventType } from 'quidproquo-features';
+import { WebSocketQueueClientEventMessagePing, WebSocketQueueClientMessageEventType } from '@qpqjs/features';
 
 import { useRunEvery } from '../../../hooks';
 import { useWebsocketSendEvent } from '../../../websocket/hooks';

@@ -1,3 +1,3 @@
-import qpqESLintConfig from 'quidproquo-eslint-config';
+import qpqESLintConfig from '@qpqjs/eslint-config';
 
 export default qpqESLintConfig;

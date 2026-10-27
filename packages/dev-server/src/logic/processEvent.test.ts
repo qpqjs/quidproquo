@@ -6,7 +6,7 @@ import {
   EventActionType,
   noopDynamicModuleLoader,
   QpqRuntimeType,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,7 +20,7 @@ vi.mock('../actionProcessor', () => ({
   getExpressApiEventEventProcessor: async () => ({}),
 }));
 
-vi.mock('quidproquo-actionprocessor-js', () => ({
+vi.mock('@qpqjs/actionprocessor-js', () => ({
   getCustomActionActionProcessor: async () => ({}),
 }));
 

@@ -1,4 +1,4 @@
-import { AccountBudgetQPQConfigSetting, BudgetThreshold, BudgetThresholdType, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AccountBudgetQPQConfigSetting, BudgetThreshold, BudgetThresholdType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import { aws_budgets, aws_ce } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

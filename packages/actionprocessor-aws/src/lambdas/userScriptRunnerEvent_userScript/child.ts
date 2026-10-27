@@ -1,4 +1,4 @@
-import { runUserScriptChildMain } from 'quidproquo-actionprocessor-node';
+import { runUserScriptChildMain } from '@qpqjs/actionprocessor-node';
 
 import { dynamicModuleLoader } from '../dynamicModuleLoader';
 import { getQpqConfig } from '../lambda-utils';

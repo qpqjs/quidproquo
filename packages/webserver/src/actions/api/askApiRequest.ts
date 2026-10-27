@@ -1,4 +1,4 @@
-import { Action, AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from 'quidproquo-core';
+import { Action, AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from '@qpqjs/core';
 
 import { ApiActionType } from './ApiActionType';
 

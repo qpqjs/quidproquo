@@ -1,4 +1,4 @@
-import { ActionOf, runStory } from 'quidproquo-core';
+import { ActionOf, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

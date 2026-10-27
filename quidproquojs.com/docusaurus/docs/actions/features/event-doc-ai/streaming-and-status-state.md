@@ -7,7 +7,7 @@ description: UI state setters for the in-flight assistant stream, the sending fl
 
 These `ask`-generators are **client-side UI state setters** for the Event Doc AI chat feature. They run inside the browser SPA and mutate the in-memory `EventDocAiState` so the chat UI re-renders. This page covers the setters that drive the **live assistant reply** (`streamSegments`), the **sending** flag, and the surfaced **error** message.
 
-Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `quidproquo-core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
+Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `@qpqjs/core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
 
 `streamSegments` is the reply currently in flight, already in the durable segment format. Each `AiStreamPart` arriving over the socket is folded into the last segment as it lands (`foldStreamPart`): text and reasoning deltas extend the current segment, a `ToolInputStart` adds a tool entry with an empty input, and `ToolCall` / `ToolResult` fill in that entry's input and output. Tool argument deltas are not sent to the browser at all, so a large tool input costs the UI one update at the start and one at the end. `isStreaming` is true from the first part until the stream is cleared, so the UI can show activity before any renderable segment exists. When the reply finishes, the backend dispatches the finalized `EventDocAiChatMessage` (via [`askUIEventDocAiAppendChatMessage`](./active-chat-state.md)) and clears the buffer.
 
@@ -29,7 +29,7 @@ type EventDocAiState = {
 };
 ```
 
-`AiStreamPart` is the streaming-chunk union from `quidproquo-core` (text/reasoning deltas, file parts, tool-use events, finish markers, etc.).
+`AiStreamPart` is the streaming-chunk union from `@qpqjs/core` (text/reasoning deltas, file parts, tool-use events, finish markers, etc.).
 
 ---
 
@@ -41,8 +41,8 @@ Appends one streaming chunk to the in-flight assistant reply. Called for each pa
 - **State change:** folds `part` into `streamSegments` and sets `isStreaming` to `true`.
 
 ```typescript
-import { askUIEventDocAiAppendStreamChunk } from 'quidproquo-features';
-import type { AiStreamPart } from 'quidproquo-core';
+import { askUIEventDocAiAppendStreamChunk } from '@qpqjs/features';
+import type { AiStreamPart } from '@qpqjs/core';
 
 export function* onStreamPart(part: AiStreamPart) {
   yield* askUIEventDocAiAppendStreamChunk(part);
@@ -74,8 +74,8 @@ Clears the in-flight stream buffer — call this once the reply has been finaliz
 import {
   askUIEventDocAiAppendChatMessage,
   askUIEventDocAiClearStream,
-} from 'quidproquo-features';
-import type { EventDocAiChatMessage } from 'quidproquo-features';
+} from '@qpqjs/features';
+import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* finalizeReply(reply: EventDocAiChatMessage) {
   yield* askUIEventDocAiAppendChatMessage(reply);
@@ -101,7 +101,7 @@ Toggles the "sending a message" flag so the composer can disable input and show 
 - **State change:** sets `isSending`.
 
 ```typescript
-import { askUIEventDocAiSetSending } from 'quidproquo-features';
+import { askUIEventDocAiSetSending } from '@qpqjs/features';
 
 export function* sendTurn() {
   yield* askUIEventDocAiSetSending(true);
@@ -132,7 +132,7 @@ Sets or clears the error message surfaced to the user (e.g. a failed send or loa
 - **State change:** sets `error` to the message, or `null` to clear it.
 
 ```typescript
-import { askUIEventDocAiSetError } from 'quidproquo-features';
+import { askUIEventDocAiSetError } from '@qpqjs/features';
 
 export function* showError() {
   yield* askUIEventDocAiSetError('Failed to send message. Please try again.');

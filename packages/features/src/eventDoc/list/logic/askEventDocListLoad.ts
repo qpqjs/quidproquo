@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, askStateRead } from 'quidproquo-core';
+import { askCatch, AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askUIEventDocListPageLoaded } from '../actionCreators/askUIEventDocListPageLoaded';
 import { askUIEventDocListSetError } from '../actionCreators/askUIEventDocListSetError';

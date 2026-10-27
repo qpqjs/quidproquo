@@ -1,4 +1,4 @@
-import { UserScriptModuleExports } from 'quidproquo-core';
+import { UserScriptModuleExports } from '@qpqjs/core';
 
 import { UserScriptBuildError, UserScriptBuildErrorCode } from './UserScriptBuildError';
 

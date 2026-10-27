@@ -1,4 +1,4 @@
-import { AskResponse, askStateRead, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../../platformLogic';
 import { askAuthUISetAuthInfo } from '../../../logic';

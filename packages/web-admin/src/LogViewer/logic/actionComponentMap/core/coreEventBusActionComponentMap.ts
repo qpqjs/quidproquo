@@ -1,4 +1,4 @@
-import { EventBusActionType } from 'quidproquo-core';
+import { EventBusActionType } from '@qpqjs/core';
 
 const coreEventBusActionComponentMap: Record<string, string[]> = {
   [EventBusActionType.SendMessages]: ['askEventBusSendMessages', 'eventBusName', 'eventBusMessages'],

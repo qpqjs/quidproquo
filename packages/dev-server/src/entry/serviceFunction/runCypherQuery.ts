@@ -3,8 +3,8 @@ import {
   AskResponse,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-} from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 export function* runCypherQuery(
   event: ExecuteServiceFunctionEvent<GraphDatabaseExecuteOpenCypherQueryActionPayload>,

@@ -1,4 +1,4 @@
-import { ConfigActionType } from 'quidproquo-core';
+import { ConfigActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

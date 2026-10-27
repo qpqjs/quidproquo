@@ -12,7 +12,7 @@ The recipient is what names the tenant, and the mail provider delivered the mess
 Needs [defineTenant](./tenant.md) in the same service: the routes gate on the tenant header and membership, and check `tenant:email:inboxes:manage`, which the app bundles into a role in its `roles.catalog` (`TenantEmailPermission.InboxesManage`).
 
 ```typescript
-import { defineTenantedEmailReceiver } from 'quidproquo-features';
+import { defineTenantedEmailReceiver } from '@qpqjs/features';
 
 export default [
   defineTenantedEmailReceiver('inbound', {
@@ -26,8 +26,8 @@ export default [
 The handler runs under `TENANT#<id>`, so anything it writes to a scoped drive or store is partitioned by the inbox's tenant:
 
 ```typescript
-import { AskResponse } from 'quidproquo-core';
-import { TenantedEmailReceivedEvent, TenantedEmailReceivedEventResponse } from 'quidproquo-features';
+import { AskResponse } from '@qpqjs/core';
+import { TenantedEmailReceivedEvent, TenantedEmailReceivedEventResponse } from '@qpqjs/features';
 
 export function* onTenantEmail({ message, recipient, inbox }: TenantedEmailReceivedEvent): AskResponse<TenantedEmailReceivedEventResponse> {
   if (message.authentication.dkim !== 'pass') {

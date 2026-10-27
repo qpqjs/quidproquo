@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL } from '../constants';
 

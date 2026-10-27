@@ -10,7 +10,7 @@ Writes a record with [askKeyValueStoreUpsert](./ask-key-value-store-upsert.md), 
 - **Built from:** wraps [askKeyValueStoreUpsert](./ask-key-value-store-upsert.md) in `askRetry`, retrying on `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable` and `KeyValueStoreUpsertErrorTypeEnum.WriteContention`. It is a helper story, not a distinct action.
 
 ```typescript
-import { askKeyValueStoreUpsertWithRetry } from 'quidproquo-core';
+import { askKeyValueStoreUpsertWithRetry } from '@qpqjs/core';
 
 interface User {
   userId: string;

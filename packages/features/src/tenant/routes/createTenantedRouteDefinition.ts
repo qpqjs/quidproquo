@@ -1,5 +1,5 @@
-import { AskResponse, askStorageScopeProvide, HTTPMethod } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
+import { AskResponse, askStorageScopeProvide, HTTPMethod } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, RouteOptions } from '@qpqjs/webserver';
 
 import {
   createRouteDefinition,

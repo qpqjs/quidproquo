@@ -1,11 +1,11 @@
-# quidproquo-web
+# @qpqjs/web
 
 Browser-side building blocks for [quidproquo](https://github.com/qpqjs/quidproquo), with no UI framework attached.
 
-If you are writing a React app, install [`quidproquo-web-react`](https://www.npmjs.com/package/quidproquo-web-react) instead. It depends on this package and adds the hooks, state store, and providers.
+If you are writing a React app, install [`@qpqjs/web-react`](https://www.npmjs.com/package/@qpqjs/web-react) instead. It depends on this package and adds the hooks, state store, and providers.
 
 ```bash
-npm install quidproquo-web
+npm install @qpqjs/web
 ```
 
 ## What is in here

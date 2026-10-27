@@ -1,4 +1,4 @@
-import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { askStateMachineGetBase, StateMachineActionType } from '../actions';
 import { getStateMachineByName } from '../config';

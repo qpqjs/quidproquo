@@ -1,4 +1,4 @@
-import { Effect } from 'quidproquo-core';
+import { Effect } from '@qpqjs/core';
 
 export enum SystemEffect {
   StartLoading = 'system/startLoading',

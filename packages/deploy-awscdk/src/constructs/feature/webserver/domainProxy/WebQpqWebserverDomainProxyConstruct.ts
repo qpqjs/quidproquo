@@ -1,8 +1,8 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { DomainProxyQPQWebServerConfigSetting, DomainTarget, qpqWebServerUtils } from 'quidproquo-webserver';
-import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { DomainProxyQPQWebServerConfigSetting, DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
+import { DomainProxyViewerProtocolPolicy } from '@qpqjs/webserver';
 
 import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

@@ -11,7 +11,7 @@ Sends a payload to one connected WebSocket client, addressed by its `connectionI
 - **On AWS:** the payload is `JSON.stringify`'d and delivered through the **API Gateway Management API** `PostToConnection` call against the resolved WebSocket API endpoint. A throttling response from the service surfaces as `Throttled`; sending to a connection that has already closed surfaces as `Disconnected`.
 
 ```typescript
-import { askWebsocketSendMessage } from 'quidproquo-webserver';
+import { askWebsocketSendMessage } from '@qpqjs/webserver';
 
 export function* askNotifyClient(connectionId: string) {
   yield* askWebsocketSendMessage('api', connectionId, {
@@ -53,8 +53,8 @@ function* askWebsocketSendMessage<T>(
 Wrap the call in [askCatch](../../../actions/core/system/ask-catch.md) to handle these without unwinding the story:
 
 ```typescript
-import { askCatch } from 'quidproquo-core';
-import { askWebsocketSendMessage, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { askCatch } from '@qpqjs/core';
+import { askWebsocketSendMessage, WebsocketSendMessageErrorTypeEnum } from '@qpqjs/webserver';
 
 export function* askTrySend(connectionId: string, payload: unknown) {
   const outcome = yield* askCatch(askWebsocketSendMessage('api', connectionId, payload));

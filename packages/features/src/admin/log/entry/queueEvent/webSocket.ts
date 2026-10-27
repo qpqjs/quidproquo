@@ -1,4 +1,4 @@
-import { AskResponse, QueueEventResponse } from 'quidproquo-core';
+import { AskResponse, QueueEventResponse } from '@qpqjs/core';
 
 import { logsLogic, WebSocketQueueQpqAdminMarkLogCheckedQueueEvent, WebSocketQueueQpqAdminRefreshLogMetadataQueueEvent } from '../../logic';
 

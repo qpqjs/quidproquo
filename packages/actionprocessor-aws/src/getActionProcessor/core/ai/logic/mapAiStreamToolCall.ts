@@ -1,4 +1,4 @@
-import { AiStreamPartType, AiStreamToolCall } from 'quidproquo-core';
+import { AiStreamPartType, AiStreamToolCall } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 

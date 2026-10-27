@@ -1,4 +1,4 @@
-import { LogCreateActionPayload, LogLevelEnum, resolveLookupText } from 'quidproquo-core';
+import { LogCreateActionPayload, LogLevelEnum, resolveLookupText } from '@qpqjs/core';
 
 import { AlertColor, Box, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';

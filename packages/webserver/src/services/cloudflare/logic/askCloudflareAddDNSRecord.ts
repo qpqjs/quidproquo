@@ -1,4 +1,4 @@
-import { askLogCreate, askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum, LogLevelEnum } from 'quidproquo-core';
+import { askLogCreate, askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum, LogLevelEnum } from '@qpqjs/core';
 
 import { CloudflareDnsEntry } from '../../../types';
 import { CloudflareDNSRecord, CloudflareResponse } from '../types';

@@ -1,4 +1,4 @@
-import { GraphDatabaseActionType, runStory } from 'quidproquo-core';
+import { GraphDatabaseActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

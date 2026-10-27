@@ -12,7 +12,7 @@ Read the context anywhere inside a story that runs under it; provide it to estab
 - Built from core [askContextRead](../../core/context/ask-context-read.md) and [askContextProvideValue](../../core/context/ask-context-provide-value.md).
 
 ```typescript
-import { askEventDocAiContextProvide, askEventDocAiContextRead } from 'quidproquo-features';
+import { askEventDocAiContextProvide, askEventDocAiContextRead } from '@qpqjs/features';
 
 // Provide the scope around a story, then any nested read sees it.
 export function* askScopedChatWork() {

@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import * as logMetadataData from '../../entry/data/logMetadataData';
 import { askGetLoggedInUsername } from '../auth';

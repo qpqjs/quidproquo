@@ -1,4 +1,4 @@
-import { AuthenticationDeliveryDetails } from 'quidproquo-core';
+import { AuthenticationDeliveryDetails } from '@qpqjs/core';
 
 import {
   CognitoIdentityProviderClient,

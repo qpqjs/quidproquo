@@ -1,4 +1,4 @@
-import { AskResponse, EitherActionResult } from 'quidproquo-core';
+import { AskResponse, EitherActionResult } from '@qpqjs/core';
 
 import { askWebsocketReadConnectionInfo } from '../../context';
 import { WebSocketQueueServerEventMessageServiceRequestResponse } from '../../types/serverMessages/WebSocketQueueServerEventMessageServiceRequestResponse';

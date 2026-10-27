@@ -11,7 +11,7 @@ Creates a user account in a [user directory](../../../config/core/user-directory
 - **On AWS:** issues Cognito `AdminCreateUser` against the pool.
 
 ```typescript
-import { askUserDirectoryCreateUser } from 'quidproquo-core';
+import { askUserDirectoryCreateUser } from '@qpqjs/core';
 
 export function* askInviteUser(email: string, temporaryPassword: string) {
   yield* askUserDirectoryCreateUser('app-users', {

@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, DynamicModuleLoader, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askEmailReceivingHosts, qpqWebServerUtils } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, DynamicModuleLoader, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askEmailReceivingHosts, qpqWebServerUtils } from '@qpqjs/webserver';
 
 const getProcessEmailReceivingHosts = async (
   qpqConfig: QPQConfig,

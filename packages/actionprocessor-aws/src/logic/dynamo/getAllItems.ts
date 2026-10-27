@@ -1,4 +1,4 @@
-import { KvsQueryOperation } from 'quidproquo-core';
+import { KvsQueryOperation } from '@qpqjs/core';
 
 import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 

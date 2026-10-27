@@ -10,7 +10,7 @@ Returns the **OpenAPI document** describing every route in the service. Stories 
 - **Action type:** `OpenApiActionType.GetDocument`
 
 ```typescript
-import { askOpenApiGetDocument, qpqWebServerUtils } from 'quidproquo-webserver';
+import { askOpenApiGetDocument, qpqWebServerUtils } from '@qpqjs/webserver';
 
 export function* getSpec() {
   const document = yield* askOpenApiGetDocument({ title: 'Widgets API', version: '1.2.0' });

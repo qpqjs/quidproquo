@@ -34,7 +34,7 @@ export const entryNames = [
 
 /**
  * Maps each lambda entry name to its handler path, for deploy bundlers
- * (quidproquo-deploy-rspack/webpack) to use as bundle entry points.
+ * (@qpqjs/deploy-rspack/webpack) to use as bundle entry points.
  */
 export const getLambdaEntries = (): Record<string, string> =>
   Object.fromEntries(entryNames.map((name) => [name, path.join(__dirname, `./lambdas/${name}`)]));

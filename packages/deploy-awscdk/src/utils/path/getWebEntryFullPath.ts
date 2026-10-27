@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { join } from 'upath';
 

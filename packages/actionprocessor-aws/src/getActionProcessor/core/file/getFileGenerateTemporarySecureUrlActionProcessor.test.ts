@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, buildTestQpqConfig, ErrorTypeEnum, FileActionType } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, buildTestQpqConfig, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,7 +6,7 @@ import { generatePresignedUrl } from '../../../logic/s3/generatePresignedUrl';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 
-vi.mock('quidproquo-config-aws', () => ({
+vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));

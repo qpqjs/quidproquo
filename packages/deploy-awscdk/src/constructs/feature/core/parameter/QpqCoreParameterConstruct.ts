@@ -1,6 +1,6 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

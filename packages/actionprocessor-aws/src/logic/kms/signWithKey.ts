@@ -1,4 +1,4 @@
-import { RS256_KMS_SIGNING_ALGORITHM } from 'quidproquo-actionprocessor-node';
+import { RS256_KMS_SIGNING_ALGORITHM } from '@qpqjs/actionprocessor-node';
 
 import { KMSClient, SignCommand } from '@aws-sdk/client-kms';
 

@@ -1,5 +1,5 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { qpqCoreUtils } from '@qpqjs/core';
 
 import { Construct } from 'constructs';
 

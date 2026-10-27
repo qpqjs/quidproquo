@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';

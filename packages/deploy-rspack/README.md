@@ -1,14 +1,14 @@
-# quidproquo-deploy-rspack
+# @qpqjs/deploy-rspack
 
 Rspack build configuration for [quidproquo](https://github.com/qpqjs/quidproquo) services.
 
 It produces the bundles a qpq app deploys: the handler bundles that run on the platform, the `quidproquo-dynamic-loader` virtual module that lets a function resolve its business logic at runtime, and module federation remotes for frontends and dynamically loaded backend code.
 
 ```bash
-npm install quidproquo-deploy-rspack
+npm install @qpqjs/deploy-rspack
 ```
 
-`@rspack/core` is a peer dependency. You normally drive this through the [`qpq` CLI](https://www.npmjs.com/package/quidproquo-cli) rather than calling it directly.
+`@rspack/core` is a peer dependency. You normally drive this through the [`qpq` CLI](https://www.npmjs.com/package/@qpqjs/cli) rather than calling it directly.
 
 ## What it handles
 
@@ -18,7 +18,7 @@ npm install quidproquo-deploy-rspack
 
 ## webpack or rspack
 
-[`quidproquo-deploy-webpack`](https://www.npmjs.com/package/quidproquo-deploy-webpack) is the same API surface on webpack. Pick one. Rspack is faster and is what the scaffolded app and the CLI use by default; webpack is kept for projects that need it or that depend on a webpack-only plugin.
+[`@qpqjs/deploy-webpack`](https://www.npmjs.com/package/@qpqjs/deploy-webpack) is the same API surface on webpack. Pick one. Rspack is faster and is what the scaffolded app and the CLI use by default; webpack is kept for projects that need it or that depend on a webpack-only plugin.
 
 ## Status
 

@@ -13,7 +13,7 @@ Replays a previously recorded story execution (a `StoryResult` from the logs) ag
 The recorded `StoryResult` already contains every action result the original run saw, so the replay is deterministic: the story re-executes with the exact same inputs and answers, and the tracer captures what happened between the actions. The story's code is loaded through the runtime's dynamic module loader (which federates on Lambda), so the trace runs the same code that ran originally.
 
 ```typescript
-import { askTraceStory } from 'quidproquo-core';
+import { askTraceStory } from '@qpqjs/core';
 
 export function* askDebugExecution(storyResult: StoryResult<any>) {
   const trace = yield* askTraceStory(storyResult);

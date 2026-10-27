@@ -1,5 +1,5 @@
-import { defineStorageDrive, HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
-import { RouteAuthSettings, RouteOptions } from 'quidproquo-webserver';
+import { defineStorageDrive, HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
+import { RouteAuthSettings, RouteOptions } from '@qpqjs/webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';

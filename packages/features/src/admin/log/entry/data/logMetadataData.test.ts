@@ -9,7 +9,7 @@ import {
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
   runStory,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

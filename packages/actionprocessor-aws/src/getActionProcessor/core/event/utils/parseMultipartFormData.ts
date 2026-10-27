@@ -1,5 +1,5 @@
-import { QPQBinaryData } from 'quidproquo-core';
-import { FileUploadErrorTypeEnum, FileUploadSettings } from 'quidproquo-webserver';
+import { QPQBinaryData } from '@qpqjs/core';
+import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import Busboy from 'busboy';

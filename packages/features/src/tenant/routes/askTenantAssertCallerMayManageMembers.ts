@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { TenantPermission } from '../constants/TenantPermission';
 import { askTenantMemberHasPermission } from '../logic/askTenantMemberHasPermission';

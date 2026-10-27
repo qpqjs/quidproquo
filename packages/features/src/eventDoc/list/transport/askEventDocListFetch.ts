@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData } from 'quidproquo-core';
-import { askApiRequest } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData } from '@qpqjs/core';
+import { askApiRequest } from '@qpqjs/webserver';
 
 import { EventDocSummary } from '../../models';
 import { eventDocListCollectionEndpoint } from './eventDocListCollectionEndpoint';

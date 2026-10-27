@@ -1,4 +1,4 @@
-import { askUserScriptExecute, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from 'quidproquo-core';
+import { askUserScriptExecute, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
 
 import path from 'path';
 import { describe, expect, it } from 'vitest';

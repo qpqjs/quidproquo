@@ -1,4 +1,4 @@
-import { InlineFunctionQPQConfigSetting, QPQCoreConfigSettingType, StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { InlineFunctionQPQConfigSetting, QPQCoreConfigSettingType, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

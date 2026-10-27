@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { defineWebSocketQueue, QPQConfigAdvancedWebsocketQueueSettings } from '../../webSocketQueue';
 import { TENANT_CONNECTION_SCOPE_RESOLVER_FN, TENANT_TOPIC_AUTHORISER_FN } from '../constants/tenantStoreNames';

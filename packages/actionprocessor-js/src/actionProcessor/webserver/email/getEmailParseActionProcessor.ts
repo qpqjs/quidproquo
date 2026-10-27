@@ -1,5 +1,5 @@
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askEmailParse } from 'quidproquo-webserver';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askEmailParse } from '@qpqjs/webserver';
 
 import { parseEmailMessage } from './parseEmailMessage';
 

@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -10,7 +10,7 @@ import {
   ProcessorFor,
   QPQConfig,
   stripScopedFilePath,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { listFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';

@@ -1,5 +1,5 @@
 import { defineQueue, QPQConfig } from 'quidproquo';
-import { defineEventDoc } from 'quidproquo-features';
+import { defineEventDoc } from '@qpqjs/features';
 
 import {
   SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE,

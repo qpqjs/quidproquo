@@ -1,4 +1,4 @@
-import { Action } from 'quidproquo-core';
+import { Action } from '@qpqjs/core';
 
 import TruncatedText from './TruncatedText';
 

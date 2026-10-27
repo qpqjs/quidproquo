@@ -1,4 +1,4 @@
-import { generateSimpleHash, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
+import { generateSimpleHash, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
 
 import { CacheSettings, QPQWebServerConfigSettingType } from '../QPQConfig';
 

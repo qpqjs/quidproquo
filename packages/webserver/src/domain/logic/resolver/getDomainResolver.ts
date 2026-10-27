@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { getPrimaryRootDomain } from '../../../configUtils/dns/getPrimaryRootDomain';
 import { DomainResolver } from '../../../domain/types/DomainResolver';

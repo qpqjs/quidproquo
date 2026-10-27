@@ -1,5 +1,5 @@
-import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { Construct } from 'constructs';
 

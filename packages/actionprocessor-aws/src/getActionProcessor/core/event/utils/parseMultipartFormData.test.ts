@@ -1,4 +1,4 @@
-import { FileUploadErrorTypeEnum, FileUploadSettings } from 'quidproquo-webserver';
+import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';

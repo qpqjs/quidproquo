@@ -11,7 +11,7 @@ import {
   ProcessorFor,
   QPQConfig,
   StorySession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { RouteOptions } from '../../config/settings/route';
 import { askGetHttpApiEventStorySession, GetHttpApiEventStorySessionPayload } from '../../stories/askGetHttpApiEventStorySession';

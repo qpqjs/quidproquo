@@ -10,7 +10,7 @@ Publishes one or more messages to an [event bus](../../../config/core/event-bus.
 - **Action type:** `EventBusActionType.SendMessages`
 
 ```typescript
-import { askEventBusSendMessages } from 'quidproquo-core';
+import { askEventBusSendMessages } from '@qpqjs/core';
 
 export function* onUserRegistered(user: { id: string; email: string }) {
   yield* askEventBusSendMessages({
@@ -76,7 +76,7 @@ export type EventBusMessage<T> = {
 | `EventBusSendMessagesErrorTypeEnum.TopicNotFound` | The underlying topic does not exist. |
 | `EventBusSendMessagesErrorTypeEnum.ServiceUnavailable` | Internal error or throttling from the messaging service. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(

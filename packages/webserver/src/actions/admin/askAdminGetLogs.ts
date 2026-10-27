@@ -1,4 +1,4 @@
-import { createActionRequester } from 'quidproquo-core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { AdminActionType } from './AdminActionType';
 import { QpqLogList } from './AdminActionType';

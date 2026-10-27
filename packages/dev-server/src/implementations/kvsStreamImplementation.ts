@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
 
 import { getKvsStreamEventProcessor } from '../actionProcessor/core/event/kvsStream';
 import { KvsStreamMessageWithSession } from '../actionProcessor/core/event/kvsStream/types';

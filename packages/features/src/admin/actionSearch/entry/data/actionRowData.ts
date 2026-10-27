@@ -8,7 +8,7 @@ import {
   kvsEqual,
   KvsQueryOperation,
   QpqPagedData,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { QPQ_LOG_ACTIONS_KVS_NAME } from '../../constants/qpqLogActionsKvsName';
 import { ActionSearchActionRow } from '../../domain/ActionSearchActionRow';

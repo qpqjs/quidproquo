@@ -10,7 +10,7 @@ Enqueues one or more messages onto a [queue](../../../config/core/queue.md). Eac
 - **Action type:** `QueueActionType.SendMessages`
 
 ```typescript
-import { askQueueSendMessages } from 'quidproquo-core';
+import { askQueueSendMessages } from '@qpqjs/core';
 
 export function* scheduleWelcomeEmail(user: { id: string; email: string }) {
   yield* askQueueSendMessages('emails',
@@ -65,7 +65,7 @@ export type QueueMessage<T> = {
 | `QueueSendMessagesErrorTypeEnum.QueueNotFound` | The underlying queue does not exist. |
 | `QueueSendMessagesErrorTypeEnum.ServiceUnavailable` | Internal error or throttling from the messaging service. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(

@@ -8,10 +8,10 @@ description: Send an RPC-style request to another qpq service, identified by a m
 Sends an **RPC-style request to another qpq service**, identified by a service name and a method name, with a typed payload, and returns the service's typed response. It is the low-level action behind the `createServiceRequester` helper, which binds a service + method into a reusable, typed requester.
 
 - **Action type:** `ServiceActionType.Request`
-- The request is dispatched as a `qpq/serviceRequest/<serviceName>/<method>` message and its correlated response is awaited. In a browser (quidproquo-web-react) client this travels over the app's WebSocket queue connection; the response is returned when the correlated reply arrives.
+- The request is dispatched as a `qpq/serviceRequest/<serviceName>/<method>` message and its correlated response is awaited. In a browser (@qpqjs/web-react) client this travels over the app's WebSocket queue connection; the response is returned when the correlated reply arrives.
 
 ```typescript
-import { askServiceRequest } from 'quidproquo-features';
+import { askServiceRequest } from '@qpqjs/features';
 
 interface GetQuoteRequest { symbol: string; }
 interface GetQuoteResponse { symbol: string; price: number; }
@@ -30,7 +30,7 @@ export function* askGetQuote(symbol: string) {
 Prefer `createServiceRequester` for a typed, reusable wrapper:
 
 ```typescript
-import { createServiceRequester } from 'quidproquo-features';
+import { createServiceRequester } from '@qpqjs/features';
 
 // Bind the service + method once, with request/response types
 const askGetQuote = createServiceRequester<GetQuoteRequest, GetQuoteResponse>('market', 'getQuote');
@@ -68,7 +68,7 @@ function* askServiceRequest<TPayload, TResponse>(
 A handler wrapped by `serviceRequest` normally has its return value sent back as the correlated response. Returning `SERVICE_REQUEST_DEFERRED` instead sends nothing: the handler is promising that a later execution carrying the same session (an async [service function](../../webserver/service-function/ask-service-function-execute.md), say) will answer through `askServiceRequestRespond`. The browser keeps the correlation open, so intermediate state dispatches from those later executions still reach the caller. The eventDocAi chat uses this to resume a turn on a fresh Lambda before the current one times out.
 
 ```typescript
-import { askServiceRequestRespond, SERVICE_REQUEST_DEFERRED } from 'quidproquo-features';
+import { askServiceRequestRespond, SERVICE_REQUEST_DEFERRED } from '@qpqjs/features';
 
 // In the first handler: hand off and defer.
 yield* askServiceFunctionExecute(serviceName, 'continueWork', { jobId }, true);

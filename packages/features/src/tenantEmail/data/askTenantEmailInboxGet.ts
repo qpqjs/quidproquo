@@ -1,4 +1,4 @@
-import { askKeyValueStoreGet, AskResponse, Nullable } from 'quidproquo-core';
+import { askKeyValueStoreGet, AskResponse, Nullable } from '@qpqjs/core';
 
 import { TENANT_EMAIL_INBOX_STORE } from '../constants/tenantEmailStoreNames';
 import { TenantEmailInbox } from '../models/TenantEmailInbox';

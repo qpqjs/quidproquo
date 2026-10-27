@@ -1,4 +1,4 @@
-import { FEDERATED_VIEWS_SUBDOMAIN } from 'quidproquo-webserver';
+import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
 
 import { getWebAddressing } from './getWebAddressing';
 import { getWebEntryUrl } from './getWebEntryUrl';

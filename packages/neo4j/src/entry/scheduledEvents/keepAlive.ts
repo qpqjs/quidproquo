@@ -1,4 +1,4 @@
-import { askGraphDatabaseExecuteOpenCypherQuery, AskResponse, GraphDatabaseInstanceType, ScheduledEventParams } from 'quidproquo-core';
+import { askGraphDatabaseExecuteOpenCypherQuery, AskResponse, GraphDatabaseInstanceType, ScheduledEventParams } from '@qpqjs/core';
 
 /**
  * Scheduled entry point that runs a trivial read query so the Neo4j Aura

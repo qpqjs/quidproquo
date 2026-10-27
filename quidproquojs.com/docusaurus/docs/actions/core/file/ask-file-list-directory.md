@@ -11,7 +11,7 @@ Lists the files under a folder path on a [storage drive](../../../config/core/st
 - **On AWS:** performs a paged S3 `ListObjectsV2` under the folder prefix on the drive's bucket, stamping each returned entry with the `drive` name.
 
 ```typescript
-import { askFileListDirectory } from 'quidproquo-core';
+import { askFileListDirectory } from '@qpqjs/core';
 
 export function* askListReportPage(pageToken?: string) {
   const page = yield* askFileListDirectory('reports', 'exports/', 50, pageToken);
@@ -76,7 +76,7 @@ When `pageToken` is `undefined`, the last page has been returned.
 | `FileListDirectoryErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
 | `FileListDirectoryErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `folderPath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askFileListDirectory('reports', 'exports/'));
@@ -90,7 +90,7 @@ if (outcome.success) {
 
 ## Notes
 
-- To pull **every** page in one call, use `askFileListAllDirectory(drive, folderPath, scope?)` — a companion requester exported from quidproquo-core that loops internally and returns a flat `FileInfo[]`. Prefer paging with `askFileListDirectory` for large directories.
+- To pull **every** page in one call, use `askFileListAllDirectory(drive, folderPath, scope?)` — a companion requester exported from @qpqjs/core that loops internally and returns a flat `FileInfo[]`. Prefer paging with `askFileListDirectory` for large directories.
 
 ## Related
 

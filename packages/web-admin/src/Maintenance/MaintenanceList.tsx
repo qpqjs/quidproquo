@@ -1,6 +1,6 @@
-import { generateUuid } from 'quidproquo-core';
-import { EventDocSummary, MaintenanceEffect, MaintenanceLevel, MaintenanceType, toEventDocListItem } from 'quidproquo-features';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { generateUuid } from '@qpqjs/core';
+import { EventDocSummary, MaintenanceEffect, MaintenanceLevel, MaintenanceType, toEventDocListItem } from '@qpqjs/features';
+import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
 
 import { useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';

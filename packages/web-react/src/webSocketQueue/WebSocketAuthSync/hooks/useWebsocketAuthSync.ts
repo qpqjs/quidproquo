@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticationInfo } from '@qpqjs/core';
 import {
   WebSocketQueueClientEventMessageAuthenticate,
   WebSocketQueueClientEventMessageUnauthenticate,
@@ -6,8 +6,8 @@ import {
   WebSocketQueueServerEventMessageAuthenticated,
   WebSocketQueueServerEventMessageUnauthenticated,
   WebSocketQueueServerMessageEventType,
-} from 'quidproquo-features';
-import { WebsocketServiceEvent } from 'quidproquo-web';
+} from '@qpqjs/features';
+import { WebsocketServiceEvent } from '@qpqjs/web';
 
 import { useEffect, useState } from 'react';
 

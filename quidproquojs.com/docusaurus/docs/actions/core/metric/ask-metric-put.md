@@ -11,7 +11,7 @@ Emits a single custom metric data point — a named value, with an optional unit
 - **On AWS:** the metric is written to **CloudWatch** as an [Embedded Metric Format](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html) (EMF) log line, from which CloudWatch extracts the metric — no API call, no extra IAM, and no latency added to the story. The namespace is `qpq/<application>/<environment>[/<feature>]` and a `service` dimension is always included alongside any dimensions you supply.
 
 ```typescript
-import { askMetricPut, MetricUnit } from 'quidproquo-core';
+import { askMetricPut, MetricUnit } from '@qpqjs/core';
 
 export function* askCompleteCheckout(amountMs: number) {
   yield* askMetricPut('CheckoutsCompleted');

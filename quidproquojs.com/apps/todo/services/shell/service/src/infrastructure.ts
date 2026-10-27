@@ -3,8 +3,8 @@ import {
   defineWebEntry,
   QPQConfigAdvancedWebEntrySettings,
 } from 'quidproquo';
-import { defineDevServerOptions } from 'quidproquo-dev-server/config';
-import { defineDynamicRoutes } from 'quidproquo-features';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
+import { defineDynamicRoutes } from '@qpqjs/features';
 
 import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';

@@ -155,7 +155,7 @@ jobs:
 
       # One tarball for the deploy job: the monorepo libs, so it can run qpq
       # without building, and the saved build (the layout is listed at the top
-      # of quidproquo-cli's goDocker.ts). A tarball rather than a zipped
+      # of @qpqjs/cli's goDocker.ts). A tarball rather than a zipped
       # artifact because it keeps file permissions, which zipping resets.
       - name: pack the saved build
         run: |

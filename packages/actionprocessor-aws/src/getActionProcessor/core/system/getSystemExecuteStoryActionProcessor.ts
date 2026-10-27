@@ -10,7 +10,7 @@ import {
   QpqRuntimeType,
   storyResultToActionResult,
   StorySession,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import { getDateNow } from './getDateNow';

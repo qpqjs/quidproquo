@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askFileExists, askFileReadObjectJson, AskResponse } from 'quidproquo-core';
+import { askConfigGetGlobal, askFileExists, askFileReadObjectJson, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc';
 import { EVENT_DOC_AI_CHAT_DRIVE_GLOBAL } from '../constants/eventDocAiGlobalNames';

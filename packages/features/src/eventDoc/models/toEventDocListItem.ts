@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { EventDocListItem } from './EventDocListItem';
 import { EventDocSummary } from './EventDocSummary';

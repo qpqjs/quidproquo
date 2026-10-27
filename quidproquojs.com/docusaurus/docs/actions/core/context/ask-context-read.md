@@ -13,7 +13,7 @@ If no provider up the tree has set a value for the identifier, the identifier's 
 - **Resolution:** read from the story session's context bag (or the separate local-context bag for a [local identifier](#local-context)); no external call.
 
 ```typescript
-import { askContextRead, createContextIdentifier } from 'quidproquo-core';
+import { askContextRead, createContextIdentifier } from '@qpqjs/core';
 
 // Declare an identifier once, export it, and share it between reader and provider.
 export const CurrentTenantContext = createContextIdentifier<string>('current-tenant', 'public');
@@ -59,7 +59,7 @@ interface QpqContextIdentifier<T> {
 Use `createContextIdentifier<T>(uniqueName, defaultValue)` to make an identifier, and share the same instance between the code that provides the value and the code that reads it:
 
 ```typescript
-import { createContextIdentifier } from 'quidproquo-core';
+import { createContextIdentifier } from '@qpqjs/core';
 
 export const RequestIdContext = createContextIdentifier<string>('request-id', '');
 ```
@@ -69,7 +69,7 @@ export const RequestIdContext = createContextIdentifier<string>('request-id', ''
 If you read the same context in many places, `createContextReader(identifier)` returns a zero-argument generator bound to that identifier, so call sites don't repeat it:
 
 ```typescript
-import { createContextReader, createContextIdentifier } from 'quidproquo-core';
+import { createContextReader, createContextIdentifier } from '@qpqjs/core';
 
 const CurrentTenantContext = createContextIdentifier<string>('current-tenant', 'public');
 export const askCurrentTenant = createContextReader(CurrentTenantContext);

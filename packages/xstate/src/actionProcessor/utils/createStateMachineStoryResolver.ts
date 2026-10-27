@@ -6,7 +6,7 @@ import {
   QpqLogger,
   StorySession,
   StreamRegistry,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 /** Resolves a story to a StoryResult; every state machine processor runs its KVS, guard and side-effect stories through one. */
 export type StateMachineStoryResolver = ReturnType<typeof createImplementationRuntime>;

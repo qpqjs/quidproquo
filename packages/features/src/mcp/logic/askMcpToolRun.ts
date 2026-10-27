@@ -1,5 +1,5 @@
-import { askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { McpToolBinding } from '../models/McpToolBinding';
 import { McpToolKind } from '../models/McpToolKind';

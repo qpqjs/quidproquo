@@ -1,4 +1,4 @@
-import { QpqExecutionTrace, QpqExecutionTraceValue } from 'quidproquo-core';
+import { QpqExecutionTrace, QpqExecutionTraceValue } from '@qpqjs/core';
 
 // Per-line rollup of a trace for one source file: how many times the line executed, and
 // which locals changed as a result of executing it.

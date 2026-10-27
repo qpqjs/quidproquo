@@ -1,5 +1,5 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { getDevServerOptions } from '../settings/defineDevServerOptions';
 import { WebEntryHost } from './WebEntryHost';

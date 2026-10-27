@@ -11,7 +11,7 @@ Starts the self-service password-reset flow for a user in a [user directory](../
 - **On AWS:** issues Cognito `ForgotPassword`. The message can be customised via the [emailTemplates.resetPassword](../../../config/core/user-directory.md#email-templates) handler.
 
 ```typescript
-import { askUserDirectoryForgotPassword } from 'quidproquo-core';
+import { askUserDirectoryForgotPassword } from '@qpqjs/core';
 
 export function* askStartPasswordReset(username: string) {
   const delivery = yield* askUserDirectoryForgotPassword('app-users', username);

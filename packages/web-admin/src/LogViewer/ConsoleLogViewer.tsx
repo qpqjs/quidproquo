@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from '@qpqjs/core';
 
 import { memo } from 'react';
 import { ObjectInspector } from 'react-inspector';

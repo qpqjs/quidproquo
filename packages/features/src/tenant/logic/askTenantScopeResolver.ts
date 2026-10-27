@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { askTenantResolveRequestScope } from './askTenantResolveRequestScope';
 

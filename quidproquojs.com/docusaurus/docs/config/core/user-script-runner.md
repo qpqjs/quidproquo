@@ -13,7 +13,7 @@ The sandbox is two walls:
 - **Pure actions only.** The runner's action processors are date, guid, log, math and error. A script can yield `askDateNow` or `askNewGuid`, and its story runs as usual. Anything else it yields has no processor and fails at that point.
 
 ```typescript
-import { defineUserScriptRunner } from 'quidproquo-core';
+import { defineUserScriptRunner } from '@qpqjs/core';
 
 export default [
   defineUserScriptRunner({ timeoutInSeconds: 30, memoryInMiB: 512 }),

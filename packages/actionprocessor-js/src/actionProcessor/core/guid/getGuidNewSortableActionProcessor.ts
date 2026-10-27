@@ -1,4 +1,4 @@
-import { actionResult, askNewSortableGuid, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askNewSortableGuid, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { uuidv7 } from 'uuidv7';
 

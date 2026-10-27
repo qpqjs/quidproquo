@@ -1,4 +1,4 @@
-import { kvsAnd, kvsBetween, kvsContains, kvsEqual, kvsGreaterThanOrEqual, kvsLessThanOrEqual } from 'quidproquo-core';
+import { kvsAnd, kvsBetween, kvsContains, kvsEqual, kvsGreaterThanOrEqual, kvsLessThanOrEqual } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

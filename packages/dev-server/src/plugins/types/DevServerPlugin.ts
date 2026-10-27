@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { DevServerShutdownPhase } from '../../logic/shutdown/DevServerShutdownPhase';
 import { ResolvedDevServerConfig } from '../../types';

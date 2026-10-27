@@ -1,4 +1,4 @@
-import { CryptoActionType } from 'quidproquo-core';
+import { CryptoActionType } from '@qpqjs/core';
 
 const coreCryptoActionComponentMap: Record<string, string[]> = {
   [CryptoActionType.Encrypt]: ['askCryptoEncrypt', 'keyName', 'context'],

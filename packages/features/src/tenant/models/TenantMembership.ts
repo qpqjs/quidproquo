@@ -1,4 +1,4 @@
-import { QpqIsoDateTime } from 'quidproquo-core';
+import { QpqIsoDateTime } from '@qpqjs/core';
 
 import { TenantId } from './TenantId';
 import { TenantPermissionGrant } from './TenantPermissionGrant';

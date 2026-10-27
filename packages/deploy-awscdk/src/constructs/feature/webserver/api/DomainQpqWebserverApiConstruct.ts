@@ -1,4 +1,4 @@
-import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

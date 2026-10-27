@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

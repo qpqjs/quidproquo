@@ -1,4 +1,4 @@
-import { defineDynamicFunctions, defineGlobal, defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from 'quidproquo-core';
+import { defineDynamicFunctions, defineGlobal, defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';

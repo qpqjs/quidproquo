@@ -1,4 +1,4 @@
-import type { AiStreamPart, Effect } from 'quidproquo-core';
+import type { AiStreamPart, Effect } from '@qpqjs/core';
 
 import { EventDocAiEffect } from './EventDocAiEffect';
 

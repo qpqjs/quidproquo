@@ -1,4 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { RouteAuthSettings, RouteQPQWebServerConfigSetting } from '../config/settings/route';
 import { RouteOptions } from '../config/settings/route';

@@ -1,5 +1,5 @@
-import { ErrorTypeEnum, EventActionType, storageScopeContext } from 'quidproquo-core';
-import { StorageDriveEventType } from 'quidproquo-webserver';
+import { ErrorTypeEnum, EventActionType, storageScopeContext } from '@qpqjs/core';
+import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

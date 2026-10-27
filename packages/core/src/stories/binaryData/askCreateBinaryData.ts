@@ -27,7 +27,7 @@ const TextFileTypeMimeTypeMap: { [key in TextFileType]: string } = {
 };
 
 // Base64-encode a string's UTF-8 bytes using web globals (TextEncoder/btoa) rather than
-// Node's Buffer, so this also works in browser bundles of quidproquo-core. Mirrors the
+// Node's Buffer, so this also works in browser bundles of @qpqjs/core. Mirrors the
 // decode direction in StreamReadRequester, which already uses atob.
 const encodeUtf8ToBase64 = (textData: string): string => {
   const utf8Bytes = new TextEncoder().encode(textData);

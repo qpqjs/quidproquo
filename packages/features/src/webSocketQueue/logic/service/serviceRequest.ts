@@ -1,4 +1,4 @@
-import { askCatch, AskResponse, QueueEvent, QueueEventResponse, QueueMessage } from 'quidproquo-core';
+import { askCatch, AskResponse, QueueEvent, QueueEventResponse, QueueMessage } from '@qpqjs/core';
 
 import { askServiceRequestRespond } from './askServiceRequestRespond';
 import { ServiceRequester } from './createServiceRequester';

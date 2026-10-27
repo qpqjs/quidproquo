@@ -1,4 +1,4 @@
-import { createQpqRuntimeDefinition, useQpqRuntime } from 'quidproquo-web-react';
+import { createQpqRuntimeDefinition, useQpqRuntime } from '@qpqjs/web-react';
 
 import { useEffect, useRef } from 'react';
 import LockIcon from '@mui/icons-material/Lock';

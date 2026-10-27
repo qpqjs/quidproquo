@@ -1,4 +1,4 @@
-import { actionResult, askMetricPut, createActionProcessor, MetricUnit, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, askMetricPut, createActionProcessor, MetricUnit, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 // Emits the metric as a CloudWatch Embedded Metric Format (EMF) log line: CloudWatch
 // extracts metrics from the function's log stream - no api calls, no extra IAM, no

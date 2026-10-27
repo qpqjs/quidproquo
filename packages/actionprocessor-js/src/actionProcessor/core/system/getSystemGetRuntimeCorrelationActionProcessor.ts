@@ -1,4 +1,4 @@
-import { actionResult, askGetRuntimeCorrelation, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askGetRuntimeCorrelation, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessSystemGetRuntimeCorrelation = (qpqConfig: QPQConfig): ProcessorFor<typeof askGetRuntimeCorrelation> => {
   return async (payload, session) => {

@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { Nullable } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
+import { Nullable } from '@qpqjs/core';
 
 import { askEventDocGetByCode } from './askEventDocGetByCode';
 

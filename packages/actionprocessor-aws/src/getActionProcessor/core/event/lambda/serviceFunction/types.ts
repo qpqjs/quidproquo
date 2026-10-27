@@ -1,5 +1,5 @@
-import { EitherActionResult, MatchStoryResult, StoryResult, StorySession } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { EitherActionResult, MatchStoryResult, StoryResult, StorySession } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { Context } from 'aws-lambda';
 

@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { askOpenApiGetDocument, qpqWebServerUtils } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { askOpenApiGetDocument, qpqWebServerUtils } from '@qpqjs/webserver';
 
 // The dev server serves every api on one origin, mounted at /<apiSubdomain>/<service>
 // instead of on its own subdomain, so the document's servers must say so or the

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineParameter } from 'quidproquo-core';
+import { buildTestQpqConfig, defineParameter } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

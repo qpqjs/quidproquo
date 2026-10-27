@@ -1,4 +1,4 @@
-import { EmailActionType } from 'quidproquo-webserver';
+import { EmailActionType } from '@qpqjs/webserver';
 
 import { WebserverEmailSendEmailCustomAction } from '../../custom';
 import { ActionComponent } from '../../types';

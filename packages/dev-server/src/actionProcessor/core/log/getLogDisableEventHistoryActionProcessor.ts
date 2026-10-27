@@ -1,4 +1,4 @@
-import { actionResult, askLogDisableEventHistory, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogDisableEventHistory, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessLogDisableEventHistory = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogDisableEventHistory> => {
   return async ({ enable, reason }, session, _actionProcessors, logger) => {

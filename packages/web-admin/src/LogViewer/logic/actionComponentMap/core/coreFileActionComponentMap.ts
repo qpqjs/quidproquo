@@ -1,4 +1,4 @@
-import { FileActionType } from 'quidproquo-core';
+import { FileActionType } from '@qpqjs/core';
 
 const coreFileActionComponentMap: Record<string, string[]> = {
   [FileActionType.ReadTextContents]: ['askFileReadTextContents', 'drive', 'filepath'],

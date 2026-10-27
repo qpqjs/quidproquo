@@ -1,4 +1,4 @@
-import { QpqReducer } from 'quidproquo-core';
+import { QpqReducer } from '@qpqjs/core';
 
 import { buildEventDocFoldReducer } from '../../eventDoc/fold/buildEventDocFoldReducer';
 import { EventDocEvent } from '../../eventDoc/models';

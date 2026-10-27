@@ -11,7 +11,7 @@ Updates the value of a [parameter](../../../config/core/parameter.md) at runtime
 - **On AWS:** writes to AWS Systems Manager Parameter Store.
 
 ```typescript
-import { askConfigSetParameter } from 'quidproquo-core';
+import { askConfigSetParameter } from '@qpqjs/core';
 
 export function* askDisableCheckout() {
   yield* askConfigSetParameter('new-checkout-enabled', 'false');

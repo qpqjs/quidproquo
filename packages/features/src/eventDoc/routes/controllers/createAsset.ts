@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+import { AskResponse } from '@qpqjs/core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
 import { askEventDocGenerateAssetUploadUrl } from '../../data/askEventDocGenerateAssetUploadUrl';

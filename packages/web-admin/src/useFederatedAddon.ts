@@ -1,4 +1,4 @@
-import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from '@qpqjs/web-react';
 
 import { useEffect, useState } from 'react';
 

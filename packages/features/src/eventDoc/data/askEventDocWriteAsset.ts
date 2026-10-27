@@ -1,4 +1,4 @@
-import { askFileWriteBinaryContents, askNewGuid, AskResponse, QPQBinaryData } from 'quidproquo-core';
+import { askFileWriteBinaryContents, askNewGuid, AskResponse, QPQBinaryData } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocAssetRef } from '../models';

@@ -1,4 +1,4 @@
-import { EmailMessage, EmailMessageAddress, EmailMessageAttachment, EmailMessageAuthentication } from 'quidproquo-webserver';
+import { EmailMessage, EmailMessageAddress, EmailMessageAttachment, EmailMessageAuthentication } from '@qpqjs/webserver';
 
 import PostalMime, { Address, Attachment } from 'postal-mime';
 

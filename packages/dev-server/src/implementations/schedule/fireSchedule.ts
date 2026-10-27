@@ -1,4 +1,4 @@
-import { generateUuid, QpqFunctionRuntime, QpqRuntimeType } from 'quidproquo-core';
+import { generateUuid, QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
 
 import { getScheduleEventProcessor } from '../../actionProcessor/core/event/schedule';
 import { ScheduleMessageWithSession } from '../../actionProcessor/core/event/schedule/types';

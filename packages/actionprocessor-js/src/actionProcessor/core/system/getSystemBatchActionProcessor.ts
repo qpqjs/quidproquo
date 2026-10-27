@@ -11,7 +11,7 @@ import {
   QPQConfig,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 // Unwraps one processed batch item. Actions flagged returnErrors get the Either
 // envelope (so callers like askCatch can branch); the rest have already been

@@ -1,11 +1,11 @@
-import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession, toCrossServiceSession } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession, toCrossServiceSession } from '@qpqjs/core';
+import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { getLambdaServiceFunctionEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-// TODO: also declared in quidproquo-dev-server (serviceFunction/types.ts); this
-// cross-layer shape belongs in quidproquo-webserver as a named model.
+// TODO: also declared in @qpqjs/dev-server (serviceFunction/types.ts); this
+// cross-layer shape belongs in @qpqjs/webserver as a named model.
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<unknown[]> & {
   storySession: StorySession;
 };

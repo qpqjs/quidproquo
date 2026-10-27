@@ -1,5 +1,5 @@
-import { Effect } from 'quidproquo-core';
-import { EventDocEventPayload } from 'quidproquo-features';
+import { Effect } from '@qpqjs/core';
+import { EventDocEventPayload } from '@qpqjs/features';
 
 import { SessionEndReason } from '../../types/SessionEndReason';
 import { AdminSessionEventType } from './AdminSessionEventType';

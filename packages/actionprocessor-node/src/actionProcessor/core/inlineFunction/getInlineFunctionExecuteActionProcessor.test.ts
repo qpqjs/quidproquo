@@ -9,7 +9,7 @@ import {
   InlineFunctionActionType,
   resolveActionResult,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

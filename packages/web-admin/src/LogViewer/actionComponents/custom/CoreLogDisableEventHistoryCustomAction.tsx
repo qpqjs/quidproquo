@@ -1,4 +1,4 @@
-import { LogDisableEventHistoryActionPayload } from 'quidproquo-core';
+import { LogDisableEventHistoryActionPayload } from '@qpqjs/core';
 
 import { Box, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';

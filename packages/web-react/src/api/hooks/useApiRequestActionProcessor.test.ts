@@ -9,8 +9,8 @@ import { BaseUrlResolvers } from '../../baseUrl/types';
 
 const { createApiRequestActionProcessor } = vi.hoisted(() => ({ createApiRequestActionProcessor: vi.fn().mockReturnValue(async () => ({})) }));
 
-vi.mock('quidproquo-actionprocessor-web', async (importOriginal: <T>() => Promise<T>) => {
-  const original = await importOriginal<typeof import('quidproquo-actionprocessor-web')>();
+vi.mock('@qpqjs/actionprocessor-web', async (importOriginal: <T>() => Promise<T>) => {
+  const original = await importOriginal<typeof import('@qpqjs/actionprocessor-web')>();
   return { ...original, createApiRequestActionProcessor };
 });
 

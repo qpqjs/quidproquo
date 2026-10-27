@@ -12,7 +12,7 @@ Takes a **list** of roots so selecting several documents produces one merged man
 - **Built from:** [askEventDocReferences](../event-doc/ask-event-doc-references.md) (per doc, to find its outbound links) and [askEventDocTransferProvideCollection](#askeventdoctransferprovidecollection) (to run each visit against the right collection's store). Requires an `EventDocTransferRegistry` — read one with `askEventDocTransferReadRegistry`, or call from a built-in transfer route where it's already resolved.
 
 ```typescript
-import { askEventDocManifest, askEventDocTransferReadRegistry } from 'quidproquo-features';
+import { askEventDocManifest, askEventDocTransferReadRegistry } from '@qpqjs/features';
 
 export function* previewExport(docs: EventDocDocRef[]) {
   const registry = yield* askEventDocTransferReadRegistry();

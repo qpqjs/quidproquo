@@ -1,4 +1,4 @@
-import { KvsUpdate, KvsUpdateActionType } from 'quidproquo-core';
+import { KvsUpdate, KvsUpdateActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

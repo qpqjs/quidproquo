@@ -5,8 +5,8 @@ import {
   createStreamRegistry,
   createStubLogger,
   noopDynamicModuleLoader,
-} from 'quidproquo-core';
-import { defineRoute, OpenApiActionType, OpenApiDocument } from 'quidproquo-webserver';
+} from '@qpqjs/core';
+import { defineRoute, OpenApiActionType, OpenApiDocument } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askEventDocGenerateNewId } from '../../eventDoc/logic/askEventDocGenerateNewId';
 import { TenantId } from '../models/TenantId';

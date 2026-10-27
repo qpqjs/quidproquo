@@ -1,4 +1,4 @@
-import { InvalidScopeError, InvalidScopeErrorCode } from 'quidproquo-core';
+import { InvalidScopeError, InvalidScopeErrorCode } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

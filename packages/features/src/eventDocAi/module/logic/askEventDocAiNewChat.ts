@@ -1,5 +1,5 @@
-import type { Nullable } from 'quidproquo-core';
-import { askCatch, AskResponse } from 'quidproquo-core';
+import type { Nullable } from '@qpqjs/core';
+import { askCatch, AskResponse } from '@qpqjs/core';
 
 import type { EventDocAiChatSummary } from '../../models';
 import { askUIEventDocAiClearStream } from '../actionCreators/askUIEventDocAiClearStream';

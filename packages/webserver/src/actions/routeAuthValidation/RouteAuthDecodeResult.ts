@@ -1,4 +1,4 @@
-import { DecodedAccessToken } from 'quidproquo-core';
+import { DecodedAccessToken } from '@qpqjs/core';
 
 import { RouteAuthDecodeOutcome } from './RouteAuthDecodeOutcome';
 

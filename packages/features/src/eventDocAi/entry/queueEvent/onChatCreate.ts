@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid } from 'quidproquo-core';
+import { askDateNow, askNewGuid } from '@qpqjs/core';
 
 import { askEventDocResolveActor } from '../../../eventDoc';
 import { createServiceRequester } from '../../../webSocketQueue/logic/service';

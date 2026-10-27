@@ -20,7 +20,7 @@ import {
   QpqRuntimeType,
   StoryResultMetadata,
   StoryResultMetadataWithChildren,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { LogMetadata } from '../domain/LogMetadata';
 

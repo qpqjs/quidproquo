@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, GraphDatabaseActionType } from 'quidproquo-core';
+import { DynamicModuleLoader, GraphDatabaseActionType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
+import { QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
 
 export const getServiceEntryQpqFunctionRuntime = (
   serviceName: string,

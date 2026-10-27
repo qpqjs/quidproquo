@@ -1,4 +1,4 @@
-import { askConfigGetApplicationInfo, askDateNow, askFileReadBinaryContents, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
+import { askConfigGetApplicationInfo, askDateNow, askFileReadBinaryContents, AskResponse, QpqIsoDateTime } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../../eventDoc/context';
 import { askEventDocEventListAll, askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc/data';

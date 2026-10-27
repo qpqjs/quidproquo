@@ -1,6 +1,6 @@
-import { QpqExecutionTrace, QpqRuntimeType } from 'quidproquo-core';
-import { WebSocketQueueQpqAdminServerEventMessageTraceDone, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-features';
-import { useAuthAccessToken, useBaseUrlResolvers, useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
+import { QpqExecutionTrace, QpqRuntimeType } from '@qpqjs/core';
+import { WebSocketQueueQpqAdminServerEventMessageTraceDone, WebSocketQueueQpqAdminServerMessageEventType } from '@qpqjs/features';
+import { useAuthAccessToken, useBaseUrlResolvers, useSubscribeToWebSocketEvent } from '@qpqjs/web-react';
 
 import React, { useEffect, useRef, useState } from 'react';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';

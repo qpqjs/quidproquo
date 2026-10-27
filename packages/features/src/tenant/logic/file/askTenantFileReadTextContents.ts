@@ -1,4 +1,4 @@
-import { askFileReadTextContents, AskResponse } from 'quidproquo-core';
+import { askFileReadTextContents, AskResponse } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

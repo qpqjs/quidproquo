@@ -19,7 +19,7 @@
 // the bundled tier itself throws instead of resolving, so an unpublished thin shell
 // fails loudly rather than silently serving stale code.
 // ─────────────────────────────────────────────────────────────────────────────
-import { QpqFunctionRuntime } from 'quidproquo-core';
+import { QpqFunctionRuntime } from '@qpqjs/core';
 // @ts-expect-error - injected at build time by QpqPlugin (virtual module)
 import { qpqConfig, qpqDynamicModuleLoader } from 'quidproquo-dynamic-loader';
 

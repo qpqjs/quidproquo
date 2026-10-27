@@ -1,4 +1,4 @@
-import { ActionSearchActionRow } from 'quidproquo-features';
+import { ActionSearchActionRow } from '@qpqjs/features';
 
 export type EntityTimeline = {
   linkKey: string;

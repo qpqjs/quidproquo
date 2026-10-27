@@ -1,4 +1,4 @@
-import { AskResponse, askUserDirectoryAssociateSoftwareToken, AssociateSoftwareTokenResult } from 'quidproquo-core';
+import { AskResponse, askUserDirectoryAssociateSoftwareToken, AssociateSoftwareTokenResult } from '@qpqjs/core';
 
 import { askGetAuthUserDirectoryName } from './askGetAuthUserDirectoryName';
 

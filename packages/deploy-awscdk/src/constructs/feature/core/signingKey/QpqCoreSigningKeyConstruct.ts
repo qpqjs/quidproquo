@@ -1,5 +1,5 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, qpqCoreUtils, SigningKeyQPQConfigSetting } from 'quidproquo-core';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { QPQConfig, qpqCoreUtils, SigningKeyQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_kms } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';

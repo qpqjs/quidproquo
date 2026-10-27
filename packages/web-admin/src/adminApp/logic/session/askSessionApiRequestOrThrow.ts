@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from '@qpqjs/core';
 
 import { askSessionApiRequest } from './askSessionApiRequest';
 

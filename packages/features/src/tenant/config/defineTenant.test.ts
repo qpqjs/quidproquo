@@ -1,5 +1,5 @@
-import { QPQCoreConfigSettingType } from 'quidproquo-core';
-import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+import { QPQCoreConfigSettingType } from '@qpqjs/core';
+import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

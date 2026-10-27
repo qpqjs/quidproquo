@@ -1,4 +1,4 @@
-import { actionResult, actionResultErrorFromCaughtError, askConfigGetSecret, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultErrorFromCaughtError, askConfigGetSecret, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { getOrSeedSecretValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';

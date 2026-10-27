@@ -1,4 +1,4 @@
-import { askFileListDirectory, AskResponse, DirectoryList, FileInfo } from 'quidproquo-core';
+import { askFileListDirectory, AskResponse, DirectoryList, FileInfo } from '@qpqjs/core';
 
 import { askActiveTenantReadOrThrow } from '../../context/askActiveTenantReadOrThrow';
 

@@ -6,7 +6,7 @@ import {
   ProcessorFor,
   QPQConfig,
   SECURE_TOKEN_MAX_BYTE_LENGTH,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessSecureTokenGenerate = (qpqConfig: QPQConfig): ProcessorFor<typeof askSecureTokenGenerate> => {
   return async ({ byteLength }) => {

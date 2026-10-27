@@ -1,4 +1,4 @@
-import { Nullable, QpqReducer } from 'quidproquo-core';
+import { Nullable, QpqReducer } from '@qpqjs/core';
 
 import { EventDocEvent } from '../models';
 import { EventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlot';

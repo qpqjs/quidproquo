@@ -1,5 +1,5 @@
 {
-  "extends": "quidproquo-tsconfig/tsconfig.umd.json",
+  "extends": "@qpqjs/tsconfig/tsconfig.umd.json",
   "compilerOptions": {
     "outDir": "./lib/umd"
   },

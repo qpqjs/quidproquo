@@ -1,4 +1,4 @@
-import { flattenKvsQueryConditions, KvsAdvancedDataType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType } from 'quidproquo-core';
+import { flattenKvsQueryConditions, KvsAdvancedDataType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType } from '@qpqjs/core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 

@@ -1,5 +1,5 @@
-import { JavascriptRuntimeArchitecture } from 'quidproquo-core';
-import { USER_SCRIPT_BUILDER_LAYER_MODULES } from 'quidproquo-user-script';
+import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
+import { USER_SCRIPT_BUILDER_LAYER_MODULES } from '@qpqjs/user-script';
 
 import { execFileSync } from 'child_process';
 import fs from 'fs';

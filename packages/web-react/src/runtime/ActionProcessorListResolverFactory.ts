@@ -1,4 +1,4 @@
-import { ActionProcessorListResolver } from 'quidproquo-core';
+import { ActionProcessorListResolver } from '@qpqjs/core';
 
 import { Dispatch } from 'react';
 

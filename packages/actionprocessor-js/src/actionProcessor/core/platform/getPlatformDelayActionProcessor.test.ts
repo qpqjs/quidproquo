@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, PlatformActionType, resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, PlatformActionType, resolveActionResult } from '@qpqjs/core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

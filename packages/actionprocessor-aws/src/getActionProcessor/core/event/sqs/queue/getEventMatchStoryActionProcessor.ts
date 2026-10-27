@@ -9,7 +9,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   QueueQPQConfigSetting,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';

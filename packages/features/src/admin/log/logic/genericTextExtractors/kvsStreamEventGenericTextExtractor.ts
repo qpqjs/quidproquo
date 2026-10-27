@@ -7,7 +7,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
   StoryResult,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 // A row with no scope is unscoped, which is a real state rather than missing data. Spelling
 // it out keeps the two apart in search: an empty `[]` reads as a truncated log, and a bare

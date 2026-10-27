@@ -1,5 +1,5 @@
-import { AskResponse } from 'quidproquo-core';
-import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
+import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { EventDocVersionState } from '../models';

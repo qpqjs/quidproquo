@@ -1,5 +1,5 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineApi, defineDns, defineWebEntry, defineWebsocket, DomainResolver, WebAddressingMode } from 'quidproquo-webserver';
+import { buildTestQpqConfig } from '@qpqjs/core';
+import { defineApi, defineDns, defineWebEntry, defineWebsocket, DomainResolver, WebAddressingMode } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

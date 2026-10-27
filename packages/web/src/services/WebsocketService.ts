@@ -1,4 +1,4 @@
-import { AnyEventMessage, Nullable } from 'quidproquo-core';
+import { AnyEventMessage, Nullable } from '@qpqjs/core';
 
 type WebSocketEventListenerFunction = (this: WebSocket, ev: Event) => void;
 

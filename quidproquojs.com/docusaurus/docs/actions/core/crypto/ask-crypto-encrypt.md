@@ -12,7 +12,7 @@ Encrypts a string with a [crypto key](../../../config/core/crypto-key.md) and re
 - **On the dev server:** the same envelope code runs against a local master key seeded at `.qpq-runtime/<app>/cryptoKeys/<service>.json`. No AWS credentials or network needed. Dev ciphertext is not readable in prod (or on another machine), and that is intentional.
 
 ```typescript
-import { askCryptoEncrypt, askKeyValueStoreUpdate } from 'quidproquo-core';
+import { askCryptoEncrypt, askKeyValueStoreUpdate } from '@qpqjs/core';
 
 export function* askStoreCustomerApiKey(customerId: string, apiKey: string) {
   const ciphertext = yield* askCryptoEncrypt('app-crypto-key', apiKey, { customerId });

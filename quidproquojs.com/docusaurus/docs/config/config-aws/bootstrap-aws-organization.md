@@ -12,7 +12,7 @@ This is an **organization bootstrap setting**: it configures AWS Organizations i
 - **On AWS:** deploys an `aws_organizations.CfnOrganizationalUnit` under the given root/parent OU, and one `aws_organizations.CfnAccount` per name in `accountNames`, each placed in the new OU. Member accounts are named `<organizationName>-<accountName>`, given a cross-account access role `account-<accountName>-AccessRole`, and assigned a generated `+`-suffixed email derived from `baseEmailAddress` (e.g. `me+<org>-<account>@example.com`). Deployed by `QpqBootstrapConfigAwsOrganizationConstruct`.
 
 ```typescript
-import { defineBootstrapAwsOrganization } from 'quidproquo-config-aws';
+import { defineBootstrapAwsOrganization } from '@qpqjs/config-aws';
 
 export default [
   defineBootstrapAwsOrganization(
@@ -61,7 +61,7 @@ The member accounts to create inside the OU. Each entry produces one AWS account
 ## Examples
 
 ```typescript
-import { defineBootstrapAwsOrganization } from 'quidproquo-config-aws';
+import { defineBootstrapAwsOrganization } from '@qpqjs/config-aws';
 
 export default [
   defineBootstrapAwsOrganization(
@@ -77,4 +77,4 @@ export default [
 
 - [defineBootstrapWaf](./bootstrap-waf.md) — another bootstrap-phase setting deployed by the same `BootstrapQpqServiceStack`.
 - [defineAccountBudget](./account-budget.md), [defineAccountCloudTrail](./account-cloud-trail.md), [defineAccountSecurityServices](./account-security-services.md) — account-level settings applied per member account (from that account's own account config).
-- **AWS implementation:** `QpqBootstrapConfigAwsOrganizationConstruct` (Organizations OU + member accounts) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqBootstrapConfigAwsOrganizationConstruct` (Organizations OU + member accounts) in `@qpqjs/deploy-awscdk`.

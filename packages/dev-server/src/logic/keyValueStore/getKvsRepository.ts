@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { ResolvedDevServerConfig } from '../../types';
 import { KvsRepository } from './KvsRepository';

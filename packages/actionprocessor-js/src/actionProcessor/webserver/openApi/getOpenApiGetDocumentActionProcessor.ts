@@ -1,5 +1,5 @@
-import { actionResult, createActionProcessor, DynamicModuleLoader, ProcessorFor, QPQConfig } from 'quidproquo-core';
-import { askOpenApiGetDocument, qpqWebServerUtils } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, DynamicModuleLoader, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askOpenApiGetDocument, qpqWebServerUtils } from '@qpqjs/webserver';
 
 const getProcessOpenApiGetDocument = async (
   qpqConfig: QPQConfig,

@@ -1,5 +1,5 @@
-import { askCatch, AskResponse } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askCatch, AskResponse } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { McpJsonRpcErrorCode } from '../constants/McpJsonRpcErrorCode';
 import { McpConfig } from '../models/McpConfig';

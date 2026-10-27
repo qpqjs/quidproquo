@@ -1,4 +1,4 @@
-import { qpqHeaderIsBot } from 'quidproquo-webserver';
+import { qpqHeaderIsBot } from '@qpqjs/webserver';
 
 import { CloudFrontRequestEvent, Context } from 'aws-lambda';
 

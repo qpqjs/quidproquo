@@ -1,4 +1,4 @@
-import { KeyValueStoreActionType, KeyValueStoreQueryOptions, KvsQueryOperation, runStory } from 'quidproquo-core';
+import { KeyValueStoreActionType, KeyValueStoreQueryOptions, KvsQueryOperation, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

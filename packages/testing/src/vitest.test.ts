@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { expectGenerator } from './vitest';
 
-describe('quidproquo-testing/vitest entry point', () => {
+describe('@qpqjs/testing/vitest entry point', () => {
   it('registers custom matchers and re-exports the barrel', () => {
     expect(expectGenerator).toBeTypeOf('function');
 

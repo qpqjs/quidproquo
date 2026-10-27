@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EventDocSummary } from '../../../eventDoc/models';
 import { TenantClientTarget } from '../../models/TenantClientTarget';

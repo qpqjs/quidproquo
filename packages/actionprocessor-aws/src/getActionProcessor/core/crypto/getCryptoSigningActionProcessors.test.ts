@@ -1,6 +1,6 @@
-import { generateRs256KeyPair, rs256Sign, rs256Verify } from 'quidproquo-actionprocessor-node';
-import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { askCryptoGetPublicKey, askCryptoSign, askCryptoVerify, buildTestQpqConfig, CryptoActionType, defineSigningKey } from 'quidproquo-core';
+import { generateRs256KeyPair, rs256Sign, rs256Verify } from '@qpqjs/actionprocessor-node';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askCryptoGetPublicKey, askCryptoSign, askCryptoVerify, buildTestQpqConfig, CryptoActionType, defineSigningKey } from '@qpqjs/core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

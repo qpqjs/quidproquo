@@ -1,5 +1,5 @@
-import { ConfigActionType, ContextActionType, EventBusActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from 'quidproquo-core';
-import { WebsocketActionType } from 'quidproquo-webserver';
+import { ConfigActionType, ContextActionType, EventBusActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 

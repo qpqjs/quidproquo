@@ -9,14 +9,14 @@ import {
   UserScriptRunnerEvent,
   UserScriptRunnerRequest,
   UserScriptRunnerRequestKind,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
 import { handleUserScriptRunnerEvent } from './handleUserScriptRunnerEvent';
 
 const SCRIPT = `
-  const { askNewGuid, askFileReadTextContents } = require('quidproquo-core');
+  const { askNewGuid, askFileReadTextContents } = require('@qpqjs/core');
   exports.add = (a, b) => a + b;
   exports.stamped = function* (text) { const id = yield* askNewGuid(); return text + ':' + id.length; };
   exports.readsAFile = function* () { return yield* askFileReadTextContents('secrets', 'keys.txt'); };

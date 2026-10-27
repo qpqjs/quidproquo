@@ -1,4 +1,4 @@
-import { AskResponse, AskResponseReturnType, Story } from 'quidproquo-core';
+import { AskResponse, AskResponseReturnType, Story } from '@qpqjs/core';
 
 // Helper type to remap keys from "askXyz" to "xyz" (with lowercase first letter)
 export type RemoveQpqAskPrefix<K extends string> = K extends `ask${infer R}` ? Uncapitalize<R> : never;

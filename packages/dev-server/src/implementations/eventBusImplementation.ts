@@ -1,9 +1,9 @@
-// import { EventBusActionType, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QueueActionType } from 'quidproquo-core';
+// import { EventBusActionType, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QueueActionType } from '@qpqjs/core';
 
 // import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 // import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
 // import { eventBus } from '../logic';
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';

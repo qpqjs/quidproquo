@@ -1,4 +1,4 @@
-import { askMapParallel, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { askMapParallel, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { EventDocWorkspaceBuiltInApi } from '../types/EventDocWorkspaceBuiltInApi';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';

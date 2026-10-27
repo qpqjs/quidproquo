@@ -6,7 +6,7 @@ import {
   decomposedStringToString,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { redactLogValue } from '../../logic/redactLogValue';
 

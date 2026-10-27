@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
 import { EventDocWorkspaceStoryApi } from '../types/EventDocWorkspaceStoryApi';

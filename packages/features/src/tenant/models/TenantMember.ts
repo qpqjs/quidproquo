@@ -1,4 +1,4 @@
-import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
+import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
 /** A membership row as the management UI lists it, hydrated with the directory's email + name (null when the directory no longer knows the user). */
 export type TenantMember = {

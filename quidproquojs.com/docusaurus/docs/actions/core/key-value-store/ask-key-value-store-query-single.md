@@ -10,7 +10,7 @@ Runs [askKeyValueStoreQuery](./ask-key-value-store-query.md) and returns the **f
 - **Built from:** [askKeyValueStoreQuery](./ask-key-value-store-query.md), paging until at least `limit` records are collected, then returning the first. It is a helper story, not a distinct action.
 
 ```typescript
-import { askKeyValueStoreQuerySingle, kvsEqual } from 'quidproquo-core';
+import { askKeyValueStoreQuerySingle, kvsEqual } from '@qpqjs/core';
 
 interface User {
   userId: string;

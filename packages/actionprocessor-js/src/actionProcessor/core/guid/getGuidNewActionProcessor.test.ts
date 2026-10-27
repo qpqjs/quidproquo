@@ -1,10 +1,10 @@
-import { buildTestQpqConfig, GuidActionType, resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, GuidActionType, resolveActionResult } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { getGuidNewActionProcessor } from './getGuidNewActionProcessor';
 
-vi.mock('quidproquo-core', async (importActual: () => Promise<typeof import('quidproquo-core')>) => {
+vi.mock('@qpqjs/core', async (importActual: () => Promise<typeof import('@qpqjs/core')>) => {
   const actual = await importActual();
   return {
     ...actual,

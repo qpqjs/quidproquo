@@ -7,10 +7,10 @@ description: Define a named CDN cache policy (TTLs) that web entries and SEO rou
 
 Defines a named **cache policy** — a set of CDN cache TTLs — that other web settings reference by name. A [web entry](./web-entry.md) applies it via `cacheSettingsName`, and a [defineSeo](./seo.md) route can reference its own cache policy the same way. Declaring caching once and referencing it by name keeps a consistent policy across behaviors.
 
-- **On AWS:** deploys a CloudFront `CachePolicy` (`QpqWebServerCacheConstruct` in `quidproquo-deploy-awscdk`) with the configured min/default/max TTLs. The policy caches on an allow-list of headers — `x-qpq-is-bot` (so bot vs. human responses cache separately, which pairs with SEO edge rendering) plus the CORS request headers (`Origin`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`) — and enables gzip and brotli. The policy id is exported so web entries in other stacks can attach it.
+- **On AWS:** deploys a CloudFront `CachePolicy` (`QpqWebServerCacheConstruct` in `@qpqjs/deploy-awscdk`) with the configured min/default/max TTLs. The policy caches on an allow-list of headers — `x-qpq-is-bot` (so bot vs. human responses cache separately, which pairs with SEO edge rendering) plus the CORS request headers (`Origin`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`) — and enables gzip and brotli. The policy id is exported so web entries in other stacks can attach it.
 
 ```typescript
-import { defineCache } from 'quidproquo-webserver';
+import { defineCache } from '@qpqjs/webserver';
 
 export default [
   defineCache('default', {
@@ -66,7 +66,7 @@ export interface CacheSettings {
 ## Examples
 
 ```typescript
-import { defineCache, defineWebEntry } from 'quidproquo-webserver';
+import { defineCache, defineWebEntry } from '@qpqjs/webserver';
 
 export default [
   // Cache aggressively by default, but bypass the SPA shell so deploys land instantly
@@ -91,4 +91,4 @@ export default [
 - [defineWebEntry](./web-entry.md) — applies a cache policy via `cacheSettingsName` and lists `ignoreCache` bypass patterns.
 - [defineSeo](./seo.md) — SEO routes can reference their own cache policy by name.
 - [askWebEntryInvalidateCache](../../actions/webserver/web-entry/ask-web-entry-invalidate-cache.md) — force cached objects to be re-fetched before their TTL expires.
-- **AWS implementation:** `QpqWebServerCacheConstruct` (CloudFront `CachePolicy`) in `quidproquo-deploy-awscdk`.
+- **AWS implementation:** `QpqWebServerCacheConstruct` (CloudFront `CachePolicy`) in `@qpqjs/deploy-awscdk`.

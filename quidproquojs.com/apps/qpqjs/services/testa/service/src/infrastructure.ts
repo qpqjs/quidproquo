@@ -1,4 +1,4 @@
-import { defineDevServerOptions } from 'quidproquo-dev-server/config';
+import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineQpqjsService } from '@qpqjs/service-utils';

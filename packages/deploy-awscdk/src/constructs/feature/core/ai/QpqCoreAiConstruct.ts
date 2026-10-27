@@ -1,4 +1,4 @@
-import { AiQPQConfigSetting } from 'quidproquo-core';
+import { AiQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam } from 'aws-cdk-lib';
 

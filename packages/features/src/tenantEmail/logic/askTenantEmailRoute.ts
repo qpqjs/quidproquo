@@ -1,5 +1,5 @@
-import { askConfigGetGlobal, askInlineFunctionExecute, askLog, AskResponse, askStorageScopeProvide } from 'quidproquo-core';
-import { EmailMessage } from 'quidproquo-webserver';
+import { askConfigGetGlobal, askInlineFunctionExecute, askLog, AskResponse, askStorageScopeProvide } from '@qpqjs/core';
+import { EmailMessage } from '@qpqjs/webserver';
 
 import { composeTenantScope } from '../../tenant/logic/storageScope';
 import { TENANT_EMAIL_ON_EMAIL_GLOBAL } from '../constants/tenantEmailGlobalNames';

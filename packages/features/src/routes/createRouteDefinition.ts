@@ -1,5 +1,5 @@
-import { HTTPMethod } from 'quidproquo-core';
-import { RouteOptions } from 'quidproquo-webserver';
+import { HTTPMethod } from '@qpqjs/core';
+import { RouteOptions } from '@qpqjs/webserver';
 
 import { dynamicRoute, DynamicRouteHandler, DynamicRouteRuntime } from './dynamicRoute';
 import { DynamicRouteConfig } from './DynamicRouteConfig';

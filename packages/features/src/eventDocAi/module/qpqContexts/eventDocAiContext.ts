@@ -1,4 +1,4 @@
-import { createContextIdentifier, createContextProvider, createContextReader } from 'quidproquo-core';
+import { createContextIdentifier, createContextProvider, createContextReader } from '@qpqjs/core';
 
 import type { EventDocAiContext } from '../../models';
 

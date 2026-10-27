@@ -1,4 +1,4 @@
-import { askDateNow, AskResponse } from 'quidproquo-core';
+import { askDateNow, AskResponse } from '@qpqjs/core';
 
 import { askTenantMembershipGet } from '../data/askTenantMembershipGet';
 import { askTenantMembershipWrite } from '../data/askTenantMembershipWrite';

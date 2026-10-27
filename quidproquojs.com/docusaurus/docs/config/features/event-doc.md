@@ -12,7 +12,7 @@ An event document is not stored as a mutable row. It is derived by folding an or
 - **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (DynamoDB tables for the summary, events, and snapshots, plus an S3 bucket for assets), everything [defineEventDocRoutes](./event-doc-routes.md) deploys (the API Gateway routes and their Lambda handlers), and a [defineDynamicFunctions](../core/dynamic-functions.md) registration for `functions` — no infrastructure of its own. It reads `functions`' `storeName`/`type` off the object itself, so `options` carries no identity fields.
 
 ```typescript
-import { defineEventDoc } from 'quidproquo-features';
+import { defineEventDoc } from '@qpqjs/features';
 import { articleDefinition } from './articleDefinition';
 
 export default [
@@ -121,7 +121,7 @@ The same object [defineEventDocRoutes](./event-doc-routes.md#parameters) takes, 
 ## Examples
 
 ```typescript
-import { defineEventDoc } from 'quidproquo-features';
+import { defineEventDoc } from '@qpqjs/features';
 import { articleDefinition } from './articleDefinition';
 
 export default [

@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, DeployEventType, QueueMessage } from 'quidproquo-core';
+import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, DeployEventType, QueueMessage } from '@qpqjs/core';
 
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';

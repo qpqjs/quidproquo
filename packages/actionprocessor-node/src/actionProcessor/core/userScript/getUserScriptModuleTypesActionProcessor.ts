@@ -9,7 +9,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserScriptModuleTypes,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const { errorType } = askUserScriptModuleTypes;
 

@@ -1,4 +1,4 @@
-import { actionResult, actionResultError, askAiPromptStream, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultError, askAiPromptStream, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { streamText } from 'ai';
 

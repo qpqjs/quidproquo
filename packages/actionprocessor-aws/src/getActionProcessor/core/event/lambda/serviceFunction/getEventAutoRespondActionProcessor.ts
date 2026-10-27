@@ -1,4 +1,4 @@
-import { actionResult, askEventAutoRespondBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askEventAutoRespondBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { InternalEventOutput, InternalEventRecord, MatchResult } from './types';
 

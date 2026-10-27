@@ -1,1 +1,1 @@
-{ "label": "Validation", "link": { "type": "generated-index", "description": "Validation stories from quidproquo-features — validate models against a schema and fail with a catchable qpq error." } }
+{ "label": "Validation", "link": { "type": "generated-index", "description": "Validation stories from @qpqjs/features — validate models against a schema and fail with a catchable qpq error." } }

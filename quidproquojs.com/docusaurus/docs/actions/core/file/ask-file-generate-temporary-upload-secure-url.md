@@ -11,7 +11,7 @@ Generates a temporary, signed URL that lets a client **upload** a single file di
 - **On AWS:** returns a SigV4 presigned S3 `PutObject` URL for the object. The expiry cannot exceed **7 days** — the maximum lifetime of a SigV4 presigned URL. If `contentType` and/or `contentDisposition` are supplied they are bound into the signature, so the upload's `Content-Type` / `Content-Disposition` headers must match, and S3 stores them so later downloads serve the object with the same headers.
 
 ```typescript
-import { askFileGenerateTemporaryUploadSecureUrl } from 'quidproquo-core';
+import { askFileGenerateTemporaryUploadSecureUrl } from '@qpqjs/core';
 
 export function* askGetAvatarUploadUrl(userId: string) {
   // Valid for 15 minutes, pinned to PNG
@@ -68,7 +68,7 @@ function* askFileGenerateTemporaryUploadSecureUrl(
 | `FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong` | The requested `expirationMs` exceeds the 7 day maximum for signed URLs. |
 | `FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
-Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(
@@ -84,7 +84,7 @@ if (outcome.success) {
 
 ## Notes
 
-- For browser uploads, allow the client origin with `defineStorageDriveCorsSettings` (quidproquo-webserver).
+- For browser uploads, allow the client origin with `defineStorageDriveCorsSettings` (@qpqjs/webserver).
 - If the drive declares an `onEvent.create` handler in [defineStorageDrive](../../../config/core/storage-drive.md#file-events-onevent), it fires when the client completes the upload — a convenient hook for post-processing.
 
 ## Related

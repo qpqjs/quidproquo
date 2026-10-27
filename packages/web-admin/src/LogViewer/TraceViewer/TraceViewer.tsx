@@ -1,4 +1,4 @@
-import { QpqExecutionTrace } from 'quidproquo-core';
+import { QpqExecutionTrace } from '@qpqjs/core';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {

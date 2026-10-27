@@ -4,4 +4,4 @@
  * instances instead of bundling its own. One list for the lambda federation host, the
  * remote builds and the user-script loader, so none of them can drift.
  */
-export const FEDERATED_SHARED_PACKAGE_NAMES = ['quidproquo-core', 'quidproquo-webserver'] as const;
+export const FEDERATED_SHARED_PACKAGE_NAMES = ['@qpqjs/core', '@qpqjs/webserver'] as const;

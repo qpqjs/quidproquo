@@ -1,4 +1,4 @@
-import { actionResult, askLogTemplateLiteral, createActionProcessor, decomposedStringToString, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogTemplateLiteral, createActionProcessor, decomposedStringToString, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessLogTemplateLiteral = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogTemplateLiteral> => {
   return async ({ messageParts }) => {

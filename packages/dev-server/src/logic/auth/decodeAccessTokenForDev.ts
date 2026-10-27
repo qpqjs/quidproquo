@@ -1,5 +1,5 @@
-import { DecodedAccessToken } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { DecodedAccessToken } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 /**
  * Dev server optimized access token decoder.

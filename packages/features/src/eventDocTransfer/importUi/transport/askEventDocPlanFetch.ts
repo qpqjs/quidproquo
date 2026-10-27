@@ -1,5 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { askApiRequest } from 'quidproquo-webserver';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { askApiRequest } from '@qpqjs/webserver';
 
 import { eventDocTransferEndpoint } from '../../constants';
 import { EventDocTransferPlanResult } from '../../models';

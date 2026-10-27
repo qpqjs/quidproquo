@@ -5,7 +5,7 @@ import {
   askFileGenerateTemporaryUploadSecureUrl,
   FileActionType,
   resolveActionResultError,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,7 +15,7 @@ import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
 
-// Under npm link or module federation two copies of quidproquo-core can load,
+// Under npm link or module federation two copies of @qpqjs/core can load,
 // and an InvalidScopeError thrown by the OTHER copy fails instanceof while
 // keeping its explicit `.name`. These processors must map it by name (the
 // actionResultErrorFromCaughtError chokepoint), never by prototype, or a scope

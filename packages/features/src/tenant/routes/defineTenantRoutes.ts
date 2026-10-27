@@ -1,5 +1,5 @@
-import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
-import { RouteOptions } from 'quidproquo-webserver';
+import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
+import { RouteOptions } from '@qpqjs/webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../../eventDoc/context/buildEventDocStore';

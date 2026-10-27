@@ -1,4 +1,4 @@
-import { Nullable } from 'quidproquo-core';
+import { Nullable } from '@qpqjs/core';
 import {
   eventDocHeadMovedTopic,
   WebSocketQueueClientEventMessageSubscribe,
@@ -8,7 +8,7 @@ import {
   WebSocketQueueServerEventMessageEventDocHeadMoved,
   WebSocketQueueServerEventPayloadEventDocHeadMoved,
   WebSocketQueueServerMessageEventType,
-} from 'quidproquo-features';
+} from '@qpqjs/features';
 
 import { useEffect, useRef, useState } from 'react';
 

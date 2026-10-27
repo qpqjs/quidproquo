@@ -1,4 +1,4 @@
-import { actionResult, askGetRuntimeRemainingTime, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askGetRuntimeRemainingTime, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 // Plain JS has no execution deadline. Platforms that do (lambda) spread their own
 // processor over this one per invocation.

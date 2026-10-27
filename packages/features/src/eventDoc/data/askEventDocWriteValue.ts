@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_VALUE_INLINE_MAX_BYTES } from '../constants/eventDocValueInlineLimits';
 import { serializeEventDocValue } from '../logic/serializeEventDocValue';

@@ -4,7 +4,7 @@ import { decodeAccessTokenForDev } from './decodeAccessTokenForDev';
 
 const { unsafeDecodeJWTPayload } = vi.hoisted(() => ({ unsafeDecodeJWTPayload: vi.fn() }));
 
-vi.mock('quidproquo-webserver', () => ({
+vi.mock('@qpqjs/webserver', () => ({
   qpqWebServerUtils: { unsafeDecodeJWTPayload },
 }));
 

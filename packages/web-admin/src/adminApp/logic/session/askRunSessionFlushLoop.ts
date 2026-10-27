@@ -1,5 +1,5 @@
-import { askCatch, askDelay, AskResponse, askStateRead } from 'quidproquo-core';
-import { EventDocEventInput } from 'quidproquo-features';
+import { askCatch, askDelay, AskResponse, askStateRead } from '@qpqjs/core';
+import { EventDocEventInput } from '@qpqjs/features';
 
 import { askUISessionLogEventSaved } from '../../actionCreators/sessionLog/askUISessionLogEventSaved';
 import { askUISessionLogFlushFailed } from '../../actionCreators/sessionLog/askUISessionLogFlushFailed';

@@ -1,4 +1,4 @@
-import { actionResult, askDelay, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askDelay, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessPlatformDelay = (qpqConfig: QPQConfig): ProcessorFor<typeof askDelay> => {
   return async ({ timeMs }) => {

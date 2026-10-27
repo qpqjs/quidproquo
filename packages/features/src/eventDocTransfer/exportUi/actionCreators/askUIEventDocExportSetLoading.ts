@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { EventDocExportUiEffect } from '../effects/EventDocExportUiEffect';
 import type { EventDocExportUiSetLoadingEffect } from '../effects/EventDocExportUiSetLoadingEffect';

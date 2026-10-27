@@ -1,4 +1,4 @@
-import { ApiLayer } from 'quidproquo-config-aws';
+import { ApiLayer } from '@qpqjs/config-aws';
 
 import { getUserScriptBuilderLayerDir } from './getUserScriptBuilderLayerDir';
 import { USER_SCRIPT_BUILDER_LAYER_MODULES } from './USER_SCRIPT_BUILDER_LAYER_MODULES';

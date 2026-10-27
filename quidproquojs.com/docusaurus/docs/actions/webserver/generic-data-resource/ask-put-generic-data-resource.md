@@ -14,7 +14,7 @@ No action processor currently implements this action on any platform (AWS, dev s
 :::
 
 ```typescript
-import { askPutGenericDataResource } from 'quidproquo-webserver';
+import { askPutGenericDataResource } from '@qpqjs/webserver';
 
 export function* saveRecord(tableName: string) {
   const stored = yield* askPutGenericDataResource(tableName, {

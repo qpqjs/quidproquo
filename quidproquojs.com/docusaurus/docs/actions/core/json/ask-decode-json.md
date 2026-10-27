@@ -10,7 +10,7 @@ Parses a JSON string into a typed value, optionally validating the result with a
 - A composed story that wraps `JSON.parse` and, on failure, delegates to `askThrowError` with `ErrorTypeEnum.Invalid`.
 
 ```typescript
-import { askDecodeJson } from 'quidproquo-core';
+import { askDecodeJson } from '@qpqjs/core';
 
 interface Settings {
   theme: string;
@@ -58,7 +58,7 @@ The generic `T` is the expected shape of the decoded value; it is applied as a c
 | `validateObject` is supplied and returns `false`. | `ErrorTypeEnum.Invalid` — the error text notes the JSON parsed but failed structural validation. |
 | `validateObject` is supplied and throws. | `ErrorTypeEnum.Invalid`: the error text notes the JSON parsed but the validation function threw, and includes the thrown message. |
 
-Because these are thrown through the qpq error mechanism, catch them with `askCatch` from quidproquo-core, which returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
+Because these are thrown through the qpq error mechanism, catch them with `askCatch` from @qpqjs/core, which returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
 ```typescript
 const outcome = yield* askCatch(askDecodeJson<Settings>(raw));

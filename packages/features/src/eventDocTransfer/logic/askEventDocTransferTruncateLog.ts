@@ -1,4 +1,4 @@
-import { askFileWriteObjectJson, AskResponse } from 'quidproquo-core';
+import { askFileWriteObjectJson, AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventDelete, askEventDocResolveScope } from '../../eventDoc/data';
 import { EventDocEvent } from '../../eventDoc/models';

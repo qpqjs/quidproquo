@@ -1,4 +1,4 @@
-import { StreamActionType } from 'quidproquo-core';
+import { StreamActionType } from '@qpqjs/core';
 
 const coreStreamActionComponentMap: Record<string, string[]> = {
   [StreamActionType.Read]: ['askStreamRead', 'streamId', 'noWait'],

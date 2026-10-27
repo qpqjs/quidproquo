@@ -1,4 +1,4 @@
-import { askInlineFunctionExecute, AskResponse, Nullable } from 'quidproquo-core';
+import { askInlineFunctionExecute, AskResponse, Nullable } from '@qpqjs/core';
 
 import { askEventDocResolveStore } from '../../eventDoc/context';
 import { askEventDocEventWrite, askEventDocUpsert } from '../../eventDoc/data';

@@ -4,7 +4,7 @@ import { apiRequestGet, apiRequestPost, externalRequestGet } from './apiRequest'
 
 const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
 
-vi.mock('quidproquo-webserver', () => ({ preformNetworkRequest }));
+vi.mock('@qpqjs/webserver', () => ({ preformNetworkRequest }));
 
 const okResponse = (data: unknown) => ({ headers: {}, status: 200, statusText: 'OK', data });
 

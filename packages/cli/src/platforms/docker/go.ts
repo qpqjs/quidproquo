@@ -14,11 +14,11 @@
 //
 // Not production-grade (single process, sqlite KVS, in-memory queues) —
 // it's the whole product on one box with one command.
-import { getQpqAppDeployment } from 'quidproquo-config-aws';
-import { QpqDeployEnvVar } from 'quidproquo-core';
-import { getAppServiceQpqConfigs, getDevServerRspackConfig, runRspack } from 'quidproquo-deploy-rspack';
-import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from 'quidproquo-dev-server';
-import { FEDERATED_VIEWS_SUBDOMAIN } from 'quidproquo-webserver';
+import { getQpqAppDeployment } from '@qpqjs/config-aws';
+import { QpqDeployEnvVar } from '@qpqjs/core';
+import { getAppServiceQpqConfigs, getDevServerRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
+import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from '@qpqjs/dev-server';
+import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
 
 import fs from 'fs';
 import path from 'path';

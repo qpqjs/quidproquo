@@ -6,7 +6,7 @@ import {
   QpqRuntimeType,
   QueueEvent,
   QueueMessage,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 import { SQSEvent } from 'aws-lambda';
 

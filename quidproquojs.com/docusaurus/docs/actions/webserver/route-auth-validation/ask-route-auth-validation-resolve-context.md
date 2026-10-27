@@ -17,8 +17,8 @@ It runs twice per request:
 - **Action type:** `RouteAuthValidationActionType.ResolveContext`
 
 ```typescript
-import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, storageScopeContext } from 'quidproquo-core';
-import { askRouteAuthValidationResolveContext } from 'quidproquo-webserver';
+import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, storageScopeContext } from '@qpqjs/core';
+import { askRouteAuthValidationResolveContext } from '@qpqjs/webserver';
 
 // Attached to one route's runtime via actionProcessors.
 export const getTenantContextProcessor = createActionProcessor(askRouteAuthValidationResolveContext, () => async ({ decodedAccessToken }) => {

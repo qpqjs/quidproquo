@@ -6,7 +6,7 @@ import {
   ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
-} from 'quidproquo-core';
+} from '@qpqjs/core';
 
 const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetParameter> => {
   return async ({ parameterName }) => {

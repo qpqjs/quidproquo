@@ -1,5 +1,5 @@
-import { askDecodeJson, AskResponse, isString } from 'quidproquo-core';
-import { WebsocketEvent } from 'quidproquo-webserver';
+import { askDecodeJson, AskResponse, isString } from '@qpqjs/core';
+import { WebsocketEvent } from '@qpqjs/webserver';
 
 import { askWebsocketProvideConnectionInfo } from '../../context';
 import { webSocketQueueLogic } from '../../logic';

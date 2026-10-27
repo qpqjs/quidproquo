@@ -1,4 +1,4 @@
-import { MatchStoryResult, ScheduledEventParams } from 'quidproquo-core';
+import { MatchStoryResult, ScheduledEventParams } from '@qpqjs/core';
 
 import { Context, EventBridgeEvent } from 'aws-lambda';
 

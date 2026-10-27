@@ -1,5 +1,5 @@
-import { askInlineFunctionExecute, AskResponse } from 'quidproquo-core';
-import { HTTPEvent } from 'quidproquo-webserver';
+import { askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
+import { HTTPEvent } from '@qpqjs/webserver';
 
 import { EventDocAuthoriseInput } from '../../eventDoc/types/EventDocAuthoriseInput';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';

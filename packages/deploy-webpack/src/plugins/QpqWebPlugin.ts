@@ -1,4 +1,4 @@
-import { ApplicationConfigInfo, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ApplicationConfigInfo, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import type { Compiler, WebpackPluginInstance } from 'webpack';
 

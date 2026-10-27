@@ -1,7 +1,7 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { AwsServiceDashboardQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsServiceDashboardQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_cloudwatch, Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
