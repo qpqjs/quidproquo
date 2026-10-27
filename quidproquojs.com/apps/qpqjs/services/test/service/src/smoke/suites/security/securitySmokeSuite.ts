@@ -5,6 +5,7 @@ import { askRunRuntimeErrorTextLeakTest } from './probes/askRunRuntimeErrorTextL
 import { askRunSourceMapNotServedTest } from './probes/askRunSourceMapNotServedTest';
 import { askRunUnverifiedBearerNoExpiryTest } from './probes/askRunUnverifiedBearerNoExpiryTest';
 import { askRunUnverifiedBearerTest } from './probes/askRunUnverifiedBearerTest';
+import { askRunWebsiteBucketNotPublicTest } from './probes/askRunWebsiteBucketNotPublicTest';
 
 /** Regression probes from the security audit, one per checklist item. Each calls the deployed surface the way an attacker would and asserts the platform refuses or stays quiet. */
 export const securitySmokeSuite: SmokeSuite = {
@@ -26,6 +27,11 @@ export const securitySmokeSuite: SmokeSuite = {
     {
       name: 'securitySourceMapNotServed',
       askRun: askRunSourceMapNotServedTest,
+      deployedOnly: true,
+    },
+    {
+      name: 'securityWebsiteBucketNotPublic',
+      askRun: askRunWebsiteBucketNotPublicTest,
       deployedOnly: true,
     },
   ],
