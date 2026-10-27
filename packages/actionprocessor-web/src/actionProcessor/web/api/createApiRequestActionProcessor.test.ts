@@ -82,6 +82,17 @@ describe('createApiRequestActionProcessor', () => {
     return actionError;
   };
 
+  // Security regression: the processor attaches no credential of its own; a bearer only ever comes from the host app's
+  // getHeaders, and when that is absent the request carries exactly the per-call headers.
+  it('attaches no credential header when the host app provides no getHeaders', async () => {
+    const processor = await getProcessor();
+
+    await processor(buildRequest());
+
+    const sent = preformNetworkRequest.mock.calls[0][0];
+    expect(Object.keys(sent.headers).map((name) => name.toLowerCase())).toEqual(['x-call']);
+  });
+
   it('maps a timeout to the Timeout error type', async () => {
     const error = await rejectWith(new NetworkRequestError(NetworkRequestErrorCode.timeout, 'Network request timed out'));
 
