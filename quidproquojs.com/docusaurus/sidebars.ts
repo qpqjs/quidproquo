@@ -7,6 +7,7 @@ const sidebars: SidebarsConfig = {
     'core-concepts',
     'use-cases',
     'architecture-overview',
+    'security-model',
     'eslint-plugin',
   ],
 
