@@ -46,6 +46,28 @@ describe('askDynamicRouteParseInput', () => {
     expect(defaulted.query).toEqual({ limit: 10 });
   });
 
+  // Security regression: the handler sees only what the schema declares, and a 422 names the path and expectation
+  // without echoing the submitted value.
+  it('drops undeclared body fields so a client cannot smuggle extra properties to the handler', () => {
+    const input = runStory(askDynamicRouteParseInput(buildEvent({ body: '{"name":"x","isAdmin":true,"__proto__":{"a":1}}' }), { body: bodySchema }));
+
+    expect(input.body).toEqual({ name: 'x' });
+    expect(Object.keys(input.body as object)).toEqual(['name']);
+  });
+
+  it('never echoes a rejected value in the 422 message', () => {
+    const schema = z.object({ count: z.number() });
+    const run = () => runStory(askDynamicRouteParseInput(buildEvent({ body: '{"count":"leaked-secret-value-123"}' }), { body: schema }));
+
+    expect(run).toThrow(StoryError);
+    try {
+      run();
+    } catch (error) {
+      expect((error as StoryError).errorType).toBe(ErrorTypeEnum.Invalid);
+      expect((error as StoryError).errorText).not.toContain('leaked-secret-value-123');
+    }
+  });
+
   it('throws BadRequest on malformed json', () => {
     const run = () => runStory(askDynamicRouteParseInput(buildEvent({ body: '{nope' }), { body: bodySchema }));
 
