@@ -44,6 +44,17 @@ describe('generateUuid', () => {
     expect(uuid).toBe(uuid.toLowerCase());
   });
 
+  // Security regression: ids are RFC 4122 v4 from 16 random bytes, so the variant nibble is always 8, 9, a or b and no
+  // two ids repeat.
+  it('sets the variant nibble (the 20th character) to 8, 9, a or b and never repeats', () => {
+    const ids = Array.from({ length: 200 }, () => generateUuid());
+
+    for (const id of ids) {
+      expect(['8', '9', 'a', 'b']).toContain(id.charAt(19));
+    }
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it('sets the version nibble to 4 (the 15th character)', () => {
     // RFC 4122: the first character of the 3rd group encodes the version.
     expect(generateUuid()[14]).toBe('4');
