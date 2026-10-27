@@ -8,7 +8,8 @@ import { closeHttpServerGracefully } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
-const startHost = (host: WebEntryHost, dir: string): Server => {
+/** One listener serving a built web entry from `dir`: static files, then the SPA fallback to the entry's index. */
+export const startHost = (host: WebEntryHost, dir: string): Server => {
   const app = express();
 
   app.use(express.static(dir));
