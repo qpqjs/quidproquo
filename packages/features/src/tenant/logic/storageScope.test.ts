@@ -39,4 +39,14 @@ describe('getTenantIdFromScope', () => {
     expect(getTenantIdFromScope('PERSONAL#u1')).toBeNull();
     expect(getTenantIdFromScope('something-else')).toBeNull();
   });
+
+  // Security regression: a tenant id is never read out of a personal scope, and the prefix match is exact, so a
+  // personal partition can never be mistaken for a tenant one.
+  it('never reads a tenant id out of a personal scope or a prefix lookalike', () => {
+    expect(getTenantIdFromScope('PERSONAL#TENANT#tenant-a')).toBeNull();
+    expect(getTenantIdFromScope('PERSONAL#u1')).toBeNull();
+    expect(parseStorageScope('tenant#a')).toBeNull();
+    expect(parseStorageScope(' TENANT#a')).toBeNull();
+    expect(() => composeTenantScope(toTenantId('a/../b'))).toThrowError();
+  });
 });
