@@ -9,10 +9,22 @@ import {
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
   QpqRuntimeType,
+  StoryResult,
 } from '@qpqjs/core';
 
 import { askListLogs } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';
+import { redactStoryResult } from '../redaction/redactStoryResult';
+
+// The deep filter is a substring oracle over the log text, so it has to run over the same redacted log the admin
+// can read, never the raw file. Anything that is not a story result is unsearchable.
+const toSearchableLogText = (rawLogText: string): string => {
+  try {
+    return JSON.stringify(redactStoryResult(JSON.parse(rawLogText) as StoryResult<any>));
+  } catch {
+    return '';
+  }
+};
 
 export function* askGetLogs(
   runtimeType: QpqRuntimeType,
@@ -49,7 +61,7 @@ export function* askGetLogs(
     const data = deep
       ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log): AskResponse<string> {
           const logData = yield* askCatch(askFileReadTextContents(QPQ_LOGS_STORAGE_DRIVE_NAME, `${log.correlation}.json`));
-          return logData.success ? logData.result : '';
+          return logData.success ? toSearchableLogText(logData.result) : '';
         })
       : [];
 
