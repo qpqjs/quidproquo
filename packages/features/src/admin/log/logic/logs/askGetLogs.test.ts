@@ -31,4 +31,29 @@ describe('askGetLogs', () => {
 
     expect(result.items).toEqual([{ correlation: 'a' }]);
   });
+
+  // The deep filter is an oracle over the log text: an admin learning whether a guessed substring is in a log
+  // must only ever learn it about the redacted log, never about a secret the admin cannot otherwise read.
+  it('never matches a deep search term against a value the admin log redaction removes', () => {
+    const items = [{ correlation: 'a' }];
+    const rawLog = JSON.stringify({
+      correlation: 'mod::a',
+      moduleName: 'mod',
+      runtimeType: QpqRuntimeType.API,
+      startedAt: TIMESTAMP,
+      finishedAt: TIMESTAMP,
+      tags: [],
+      input: [],
+      session: { depth: 0, context: {}, accessToken: 'tok-secret-abc' },
+      history: [],
+    });
+
+    const result = runStory(askGetLogs(...args('tok-secret-abc')), {
+      [DateActionType.Now]: TIMESTAMP,
+      [KeyValueStoreActionType.Query]: { items, nextPageKey: undefined },
+      [FileActionType.ReadTextContents]: rawLog,
+    });
+
+    expect(result.items).toEqual([]);
+  });
 });
