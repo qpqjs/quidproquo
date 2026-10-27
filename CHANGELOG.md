@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.0
+
+- packages: every package except `quidproquo` and `create-qpq-app` is now `@qpqjs/<folder>`, with `actionprocessor-awslambda` becoming `@qpqjs/actionprocessor-aws` and `deploy-awscdk` becoming `@qpqjs/deploy-aws`. Action type strings keep their `@quidproquo-*` ids, so stored logs and older services still match. `deploy-webpack` is gone and `@qpqjs/deploy-rspack` is the only bundler package
+- core/user-script/cli: user scripts. `askUserScriptExecute` calls a named export of a built script on a drive (`createUserScriptCaller` is its typed proxy), and `askUserScriptBuild` / `askUserScriptBuildFromZip` bundle a script project on a drive into one file, opted into with `defineUserScriptBuilder()` from the new `@qpqjs/user-script` package. `qpq script:new` and `qpq script:build` make and build one locally, and `qpq script:builder-layer` produces the rspack layer a lambda build needs
+- core/actionprocessor-aws/dev-server: user scripts run in a sandbox. `defineUserScriptRunner()` gives a service a runner function with its own role that forks a fresh child per call, with only pure actions (network requests included) and no direct AWS access; the dev server runs scripts in a child process the same way. Builds check the script's exports inside the sandbox through `askUserScriptListExports`
+- core: `defineUserScriptModule` lets user scripts import a module the service provides, and with a `types` entry `askUserScriptModuleTypes()` hands its bundled declarations to a script editor
+- features: `createEventDocDefinition` takes `serverEventTypes`, event types only server code may append. A client append of one is `Forbidden`, and `askEventDocAppendServerEvent` takes `{ validate }` to run the domain rules first
+- core/actionprocessor-aws: `askAiPrompt` takes `outputSchema`, checks the reply against it and returns the parsed value as `object`, with `outputRepairAttempts` to show a reply that doesn't match back to the model to fix
+- cli: a deploy builds only the deploying app's workspace packages, skipping other apps' unless this one depends on them
+- security: an unverified bearer token is never an identity, the raw access token no longer travels on cross-service sessions, websocket queues that authenticate refuse messages from connections that haven't, and the admin service list route needs an admin token
+- security: a thrown exception's message stays out of `errorText` (runtime, `askCatch`, ai prompts), admin log redaction covers presigned file urls and more credential key spellings, production views builds emit no source maps, and the admin app drops the typed password once login is answered
+- security: dev server file urls use a random per-process secret and stay inside the storage root, dev server websocket connection ids are minted on the server, seeds only run on this service's own api stack creation, query params ignore inherited keys like `__proto__`, and the user script runner kills the sandbox's whole process group once it has answered
+
+### Breaking changes
+
+- packages are renamed to `@qpqjs/<folder>` (`qpqDeployAwsCdkUtils` is now `qpqDeployAwsUtils`); swap the names in package.json and imports
+- `quidproquo-deploy-webpack` is discontinued; build with `@qpqjs/deploy-rspack`
+- `FEDERATED_SHARED_PACKAGE_NAMES` moves to `@qpqjs/core` and lists the `@qpqjs` names, so a federation host and its remotes upgrade together
+- event doc functions gain `getServerEventTypes()`; hand-rolled functions objects and mocks must answer it
+- `AuthState` drops `password`
+- `askUserDirectoryReadAccessToken` returns `Unauthorized` for a token that was never verified, which is any token on a route without token auth
+- a thrown exception's message no longer reaches `errorText`; it names the error class and the message stays in `errorStack`
+
 ## 0.1.34
 
 - features: event-doc workspace live sync. A collection whose definition (or routes option) carries `sync: { websocketApiName }` pushes a head-moved message over the websocket queue on every append, including appends made by service code through `createEventDocBackend`, and can push to several queues. `useEventDocWorkspaceSync` subscribes a workspace to its docs' topics and pulls the tail when a push arrives, so other clients see changes without polling
