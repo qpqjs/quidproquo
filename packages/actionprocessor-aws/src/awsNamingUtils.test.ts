@@ -17,6 +17,7 @@ import {
   getCFExportNameUserPoolIdFromConfig,
   getCFExportNameWebsocketApiIdFromConfig,
   getConfigRuntimeBootstrapResourceName,
+  getConfigRuntimeBootstrapResourceNameFromConfig,
   getConfigRuntimeResourceName,
   getConfigRuntimeResourceNameFromConfig,
   getConfigRuntimeResourceNameFromConfigWithServiceOverride,
@@ -271,5 +272,34 @@ describe('getKvsIndexPartitionKey', () => {
   it('keeps the declared key for an index sharing the table pk, and on an unscoped store', () => {
     expect(getKvsIndexPartitionKey(scopedStore, scopedStore.indexes[1])).toEqual({ key: 'id', type: 'string' });
     expect(getKvsIndexPartitionKey(openStore, openStore.indexes[0])).toEqual({ key: 'level', type: 'number' });
+  });
+});
+
+// Security regression: two deployments only share a resource when their names collide, so the runtime,
+// bootstrap and stack names of sibling apps, environments, features and modules must all differ.
+describe('awsNamingUtils deployment isolation', () => {
+  const deployments = [
+    buildTestQpqConfig(),
+    buildTestQpqConfig([], { applicationName: 'other-app' }),
+    buildTestQpqConfig([], { environment: 'production' }),
+    buildTestQpqConfig([], { feature: 'joe' }),
+    buildTestQpqConfig([], { moduleName: 'other-module' }),
+  ];
+
+  const unique = (names: string[]) => new Set(names).size === names.length;
+
+  it('gives every sibling deployment its own runtime resource and stack names', () => {
+    expect(unique(deployments.map((config) => getConfigRuntimeResourceNameFromConfig('orders', config)))).toBe(true);
+    expect(unique(deployments.map((config) => getQpqRuntimeResourceNameFromConfig('orders', config, 'kvs')))).toBe(true);
+    expect(unique(deployments.map((config) => getApiStackName(config)))).toBe(true);
+    expect(unique(deployments.map((config) => getWebStackName(config)))).toBe(true);
+  });
+
+  it('shares bootstrap names across modules of one deployment only', () => {
+    const [base, otherApp, otherEnv, feature, otherModule] = deployments;
+    const bootstrap = (config: typeof base) => getConfigRuntimeBootstrapResourceNameFromConfig('net', config);
+
+    expect(bootstrap(otherModule)).toBe(bootstrap(base));
+    expect(unique([bootstrap(base), bootstrap(otherApp), bootstrap(otherEnv), bootstrap(feature)])).toBe(true);
   });
 });
