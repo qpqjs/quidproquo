@@ -54,4 +54,22 @@ describe('getUserDirectoryAuthenticateUserActionProcessor', () => {
 
     expect(error?.errorType).toBe(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound);
   });
+
+  // Security regression: an unknown user and a wrong password must be indistinguishable to the caller, and the
+  // provider's own message must never be echoed.
+  it('answers an unknown user and a wrong password with the identical error', async () => {
+    const processor = await resolveProcessor();
+    const answers: string[] = [];
+
+    for (const errorName of ['UserNotFoundException', 'NotAuthorizedException']) {
+      vi.mocked(resolveUsernameByPreferredUsername).mockRejectedValue(
+        Object.assign(new Error(`provider detail for ${errorName}`), { name: errorName }),
+      );
+      const [, error] = await invoke(processor);
+      answers.push(JSON.stringify({ type: error?.errorType, text: error?.errorText }));
+      expect(error?.errorText).not.toContain('provider detail');
+    }
+
+    expect(new Set(answers).size).toBe(1);
+  });
 });
