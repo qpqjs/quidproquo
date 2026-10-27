@@ -18,6 +18,15 @@ describe('tenantPermissionGrantSatisfies', () => {
     expect(tenantPermissionGrantSatisfies([all], buildTenantPermissionRequirement(close))).toBe(false);
   });
 
+  // Security regression: a grant scoped to ids or kinds never widens to another id, another kind, or a bare permission.
+  it('an ids or kinds grant never covers another resource or a resource-less requirement', () => {
+    expect(tenantPermissionGrantSatisfies([ids], buildTenantPermissionRequirement(approve, 'case-2', 'fraud'))).toBe(false);
+    expect(tenantPermissionGrantSatisfies([ids], buildTenantPermissionRequirement(approve))).toBe(false);
+    expect(tenantPermissionGrantSatisfies([kinds], buildTenantPermissionRequirement(approve, 'case-1', 'theft'))).toBe(false);
+    expect(tenantPermissionGrantSatisfies([kinds], buildTenantPermissionRequirement(approve))).toBe(false);
+    expect(tenantPermissionGrantSatisfies([ids, kinds], buildTenantPermissionRequirement(close, 'case-1', 'fraud'))).toBe(false);
+  });
+
   it('an all grant covers any resource and no resource', () => {
     expect(tenantPermissionGrantSatisfies([all], buildTenantPermissionRequirement(approve))).toBe(true);
     expect(tenantPermissionGrantSatisfies([all], buildTenantPermissionRequirement(approve, 'case-9', 'fraud'))).toBe(true);

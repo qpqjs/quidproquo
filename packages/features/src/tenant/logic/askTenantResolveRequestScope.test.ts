@@ -1,7 +1,7 @@
 import { ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
 import { HTTPEvent } from '@qpqjs/webserver';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_TENANT_HEADER_NAME } from '../constants/tenantGlobalNames';
 import { askTenantResolveRequestScope } from './askTenantResolveRequestScope';
@@ -52,6 +52,38 @@ describe('askTenantResolveRequestScope', () => {
 
     expect(runForged).toThrowError(/not a member/);
   });
+
+  // Security regression: a disabled membership, or a store answer for a different (user, tenant) pair, never grants the
+  // tenant scope.
+  it('throws Forbidden for a disabled membership or a row for another pair', () => {
+    const runWith = (row: Record<string, unknown>) => () =>
+      runStory(askTenantResolveRequestScope(buildEvent('tenant-a'), 'app-users'), {
+        [ConfigActionType.GetGlobal]: '',
+        [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
+        [KeyValueStoreActionType.Query]: { items: [row], nextPageKey: undefined },
+      });
+
+    expect(runWith({ userId: 'u1', tenantId: 'tenant-a', roles: [], grants: [], disabled: true })).toThrowError();
+    expect(runWith({ userId: 'u2', tenantId: 'tenant-a', roles: [], grants: [] })).toThrowError();
+    expect(runWith({ userId: 'u1', tenantId: 'tenant-b', roles: [], grants: [] })).toThrowError();
+  });
+
+  // Security regression: a header that is not a plain scope segment is refused before the membership store is read.
+  it.each(['tenant/../other', 'tenant-a/x', 'a\u0000b', 't'.repeat(200)])(
+    'refuses the malformed tenant header %j without reading the store',
+    (header) => {
+      const query = vi.fn(() => ({ items: [], nextPageKey: undefined }));
+
+      expect(() =>
+        runStory(askTenantResolveRequestScope(buildEvent(header), 'app-users'), {
+          [ConfigActionType.GetGlobal]: '',
+          [UserDirectoryActionType.ReadAccessToken]: { userId: 'u1' },
+          [KeyValueStoreActionType.Query]: query,
+        }),
+      ).toThrowError();
+      expect(query).not.toHaveBeenCalled();
+    },
+  );
 
   it('throws Unauthorized rather than resolving anonymously', () => {
     const runAnonymous = () =>
