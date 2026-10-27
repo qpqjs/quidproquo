@@ -179,6 +179,25 @@ describe('WebsocketService', () => {
     expect(FakeWebSocket.instances.length).toBe(2);
   });
 
+  // Security regression: the token travels in an Authenticate message, never in the url, so a reconnect opens
+  // the same bare url and replays nothing from before the close; the auth hook re-claims on OPEN.
+  it('reconnects to the bare url and does not replay messages sent while it was open', () => {
+    vi.useFakeTimers();
+    const service = new WebsocketService('wss://example.com/ws');
+    const first = lastSocket();
+    service.sendEvent({ type: 'Authenticate', payload: { accessToken: 'tok-123' } } as any);
+
+    first.emit(WebsocketServiceEvent.CLOSE);
+    vi.runOnlyPendingTimers();
+    const second = lastSocket();
+    second.emit(WebsocketServiceEvent.OPEN);
+
+    expect(second).not.toBe(first);
+    expect(second.url).toBe('wss://example.com/ws');
+    expect(second.url).not.toContain('tok-123');
+    expect(second.sent).toEqual([]);
+  });
+
   it('does not reconnect once destroyed', () => {
     vi.useFakeTimers();
     const service = new WebsocketService('wss://example.com');

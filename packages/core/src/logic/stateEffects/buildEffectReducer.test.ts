@@ -38,4 +38,18 @@ describe('buildEffectReducer', () => {
       expect(next).toBe(state);
     }
   });
+
+  // Security regression: a pushed or replayed effect is data; a prototype-shaped type with a payload must
+  // leave the state object and the handlers map untouched, never define or call anything.
+  it('leaves state and handlers untouched for a prototype-shaped effect carrying a payload', () => {
+    const state = { count: 1 };
+    const handlersBefore = Object.getOwnPropertyNames(Object.prototype).length;
+
+    const [next, handled] = reducer(state, { type: '__proto__', payload: { polluted: true } } as unknown as CounterEffect);
+
+    expect(handled).toBe(false);
+    expect(next).toBe(state);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(Object.getOwnPropertyNames(Object.prototype).length).toBe(handlersBefore);
+  });
 });

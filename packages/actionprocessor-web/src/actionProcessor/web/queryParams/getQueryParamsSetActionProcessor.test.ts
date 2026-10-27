@@ -57,6 +57,38 @@ describe('getQueryParamsSetActionProcessor', () => {
     expect(window.location.href.endsWith('?')).toBe(false);
   });
 
+  // Security regression: a param value or key is encoded into the query only; it can never rewrite the
+  // path, origin or hash, and the page never navigates (history state only).
+  it.each([
+    ['//evil.example/phish', 'returnTo'],
+    ['https://evil.example/?x=1#frag', 'next'],
+    ['../../admin', 'path'],
+    ['<script>alert(1)</script>', 'q'],
+    ['a&b=c#hash', 'q'],
+  ])('keeps the hostile value %j under key %j inside the query string', async (value, key) => {
+    window.history.replaceState(null, '', '/page?keep=1#top');
+    const processor = await getProcessor();
+
+    await processor({ key, values: [value], createHistoryEntry: false });
+
+    expect(window.location.origin).toBe('http://localhost:3000');
+    expect(window.location.pathname).toBe('/page');
+    expect(window.location.hash).toBe('#top');
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll(key)).toEqual([value]);
+    expect(params.get('keep')).toBe('1');
+    expect(params.has('b')).toBe(false);
+  });
+
+  it('encodes a key that looks like a query separator rather than splitting on it', async () => {
+    const processor = await getProcessor();
+
+    await processor({ key: 'a=b&c', values: ['1'], createHistoryEntry: false });
+
+    expect(new URLSearchParams(window.location.search).get('a=b&c')).toBe('1');
+    expect(new URLSearchParams(window.location.search).has('c')).toBe(false);
+  });
+
   it('pushes a new history entry when createHistoryEntry is true', async () => {
     const before = window.history.length;
     const processor = await getProcessor();
