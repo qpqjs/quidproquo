@@ -159,6 +159,17 @@ describe('sanitizeFilename', () => {
     expect(sanitizeFilename('a\u0000b.txt')).toBe('ab.txt');
   });
 
+  // Security regression: a stored filename is one flat segment with no separators or control characters, whatever
+  // encoding or mix of separators the client used.
+  it('never yields a name with a separator, however the traversal is spelt', () => {
+    for (const name of ['../\u0000../etc/passwd', 'a/../../b.txt', '..\\/..\\/c.txt', '%2e%2e%2fetc%2fpasswd']) {
+      const sanitized = sanitizeFilename(name);
+      expect(sanitized).not.toMatch(/[/\\]/);
+      expect(sanitized.includes('\u0000')).toBe(false);
+      expect(sanitized).not.toBe('..');
+    }
+  });
+
   it('falls back to unnamed for empty or dot-only names', () => {
     expect(sanitizeFilename(undefined)).toBe('unnamed');
     expect(sanitizeFilename('')).toBe('unnamed');

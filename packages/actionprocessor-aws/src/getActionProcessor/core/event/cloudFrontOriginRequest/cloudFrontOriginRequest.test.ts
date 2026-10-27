@@ -1,5 +1,5 @@
 import { buildTestQpqConfig, ErrorTypeEnum, EventActionType } from '@qpqjs/core';
-import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { defineDns, QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -40,6 +40,23 @@ describe('cloudFrontOriginRequest getEventGetRecordsActionProcessor', () => {
       headers: { host: 'example.com' },
       query: {},
     });
+  });
+});
+
+// Security regression: with a declared domain the seo record's domain comes from the config, never from a Host or
+// X-Forwarded-Host header a client controls.
+describe('cloudFrontOriginRequest getEventGetRecordsActionProcessor host handling', () => {
+  it('never takes the domain from an unknown Host or an X-Forwarded-Host header', async () => {
+    const config = buildTestQpqConfig([defineDns('example.com')]);
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
+    const request = buildCloudFrontRequest('/page');
+    request.cf.request.headers = { host: [{ value: 'evil.example' }], 'x-forwarded-host': [{ value: 'evil.example' }] };
+
+    const [records] = await processor({ eventParams: [{ Records: [request] }, context] });
+
+    const domain = (records as any[])[0].domain as string;
+    expect(domain).not.toContain('evil.example');
+    expect(domain.endsWith('example.com')).toBe(true);
   });
 });
 

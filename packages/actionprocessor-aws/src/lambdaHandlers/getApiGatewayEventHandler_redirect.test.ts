@@ -36,4 +36,29 @@ describe('getApiGatewayEventHandler_redirect', () => {
 
     expect(response.headers?.Location).toBe('https://example.com?a=1&b=two');
   });
+
+  // Security regression: the request contributes only a path and encoded query values, so no request can move the
+  // redirect to another host or break the Location header with a line break.
+  it('keeps a protocol-relative or user-info shaped path on the configured host', async () => {
+    process.env.redirectBaseUrl = JSON.stringify('https://staging.example.com');
+    process.env.appendPath = JSON.stringify(true);
+
+    for (const path of ['//evil.example/x', '/@evil.example/x', '/\\evil.example']) {
+      const response = await runHandler({ path, queryStringParameters: null });
+
+      expect(new URL(response.headers?.Location as string).host).toBe('staging.example.com');
+    }
+  });
+
+  it('encodes line breaks and separators out of query values', async () => {
+    process.env.redirectBaseUrl = JSON.stringify('https://example.com');
+
+    const response = await runHandler({ path: '/', queryStringParameters: { next: 'x\r\nSet-Cookie: a=b', 'a&b': '1#2' } });
+
+    const location = response.headers?.Location as string;
+    expect(location).not.toMatch(/[\r\n]/);
+    expect(new URL(location).host).toBe('example.com');
+    expect(new URL(location).searchParams.get('next')).toBe('x\r\nSet-Cookie: a=b');
+    expect(new URL(location).searchParams.get('a&b')).toBe('1#2');
+  });
 });
