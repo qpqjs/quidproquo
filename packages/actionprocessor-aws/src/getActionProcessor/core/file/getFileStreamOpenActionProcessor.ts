@@ -20,15 +20,17 @@ import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
 async function* chunkedReadableIterator(stream: Readable, chunkSize: number, transform: (buf: Buffer) => string): AsyncIterableIterator<string> {
+  // A chunk size below one would make the drain loop spin forever on an empty buffer.
+  const size = Number.isFinite(chunkSize) && chunkSize >= 1 ? Math.floor(chunkSize) : 1;
   let buffer = Buffer.alloc(0);
 
   for await (const chunk of stream) {
     const incoming = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : (chunk as Buffer);
     buffer = Buffer.concat([buffer, incoming]);
 
-    while (buffer.length >= chunkSize) {
-      yield transform(buffer.subarray(0, chunkSize));
-      buffer = buffer.subarray(chunkSize);
+    while (buffer.length >= size) {
+      yield transform(buffer.subarray(0, size));
+      buffer = buffer.subarray(size);
     }
   }
 
