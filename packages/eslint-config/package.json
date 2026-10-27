@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/eslint-config",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "eslint config for quidproquo projects.",
   "main": "eslint.config.mjs",
   "publishConfig": {

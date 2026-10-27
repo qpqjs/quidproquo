@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- release: the publish job runs in the npm environment
+
 ## 0.2.0
 
 - packages: every package except `quidproquo` and `create-qpq-app` is now `@qpqjs/<folder>`, with `actionprocessor-awslambda` becoming `@qpqjs/actionprocessor-aws` and `deploy-awscdk` becoming `@qpqjs/deploy-aws`. Action type strings keep their `@quidproquo-*` ids, so stored logs and older services still match. `deploy-webpack` is gone and `@qpqjs/deploy-rspack` is the only bundler package

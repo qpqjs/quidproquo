@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/actionprocessor-node",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -36,15 +36,15 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
     "@jridgewell/trace-mapping": "^0.3.25",
-    "@qpqjs/actionprocessor-js": "0.2.0",
-    "@qpqjs/core": "0.2.0",
-    "@qpqjs/webserver": "0.2.0",
+    "@qpqjs/actionprocessor-js": "0.2.1",
+    "@qpqjs/core": "0.2.1",
+    "@qpqjs/webserver": "0.2.1",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
     "@jridgewell/gen-mapping": "^0.3.13",
     "@types/node": "^22.13.13",
-    "@qpqjs/tsconfig": "0.2.0",
+    "@qpqjs/tsconfig": "0.2.1",
     "typescript": "^5.8.2"
   }
 }
