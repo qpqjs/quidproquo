@@ -76,4 +76,15 @@ describe('buildDynamoUpdateExpression', () => {
       "Default value must be provided for 'Increment' action",
     );
   });
+
+  // Security regression: a path segment is a placeholder whatever it contains, so update text cannot be injected.
+  it('renders injection-shaped attribute paths as placeholders only', () => {
+    const hostile = 'name = :x REMOVE secret';
+    const updates: KvsUpdate = [{ attributePath: hostile, action: KvsUpdateActionType.Set, value: 'Ada' }];
+
+    const expression = buildDynamoUpdateExpression(updates);
+
+    expect(expression).toBe(`SET ${getItemName(hostile)} = ${getValueName('Ada')}`);
+    expect(expression).not.toContain('REMOVE secret');
+  });
 });

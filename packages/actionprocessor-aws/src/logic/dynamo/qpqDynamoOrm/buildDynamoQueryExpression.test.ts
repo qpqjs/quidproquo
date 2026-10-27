@@ -86,4 +86,18 @@ describe('buildDynamoQueryExpression', () => {
       `(${getItemName('age')} = ${getValueName(1)}) OR (${getItemName('name')} = ${getValueName('x')})`,
     );
   });
+
+  // Security regression: attribute names and values travel as placeholders, so condition text that looks like
+  // expression syntax never reaches the rendered expression.
+  it('renders injection-shaped keys and values as placeholders only', () => {
+    const hostileKey = 'age) OR attribute_exists(secret';
+    const hostileValue = ':v OR 1 = 1';
+
+    const expression = buildDynamoQueryExpression(condition({ key: hostileKey, valueA: hostileValue }));
+
+    expect(expression).toBe(`${getItemName(hostileKey)} = ${getValueName(hostileValue)}`);
+    expect(expression).not.toContain('attribute_exists');
+    expect(expression).not.toContain('OR 1');
+    expect(expression).toMatch(/^#\w+ = :\w+$/);
+  });
 });

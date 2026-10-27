@@ -8,6 +8,7 @@ import {
   DateActionType,
   FileActionType,
   GuidActionType,
+  KeyValueStoreActionType,
   NetworkActionType,
   QpqRuntimeType,
 } from '@qpqjs/core';
@@ -41,6 +42,14 @@ describe('getUserScriptRunnerActionProcessors', () => {
     expect(Object.keys(processors).some((type) => type.includes('/File/') || type.includes('/KeyValueStore/') || type.includes('/Config/'))).toBe(
       false,
     );
+  });
+
+  // Security regression: the cross-scope scan is migration-only and must never be reachable from a user script.
+  it('never serves the scan-all-scopes action', async () => {
+    const processors = await getUserScriptRunnerActionProcessors(qpqConfig, async () => null);
+
+    expect(processors[KeyValueStoreActionType.ScanAllScopes]).toBeUndefined();
+    expect(processors[KeyValueStoreActionType.Scan]).toBeUndefined();
   });
 
   it('runs a story made of pure actions', async () => {
