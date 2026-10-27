@@ -1,5 +1,5 @@
 import { type QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-import { getWorkspaceServiceQpqConfig } from '@qpqjs/deploy-awscdk';
+import { getWorkspaceServiceQpqConfig } from '@qpqjs/deploy-aws';
 
 import { getRoot, getServiceNames } from './discovery';
 

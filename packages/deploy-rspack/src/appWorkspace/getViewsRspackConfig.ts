@@ -4,7 +4,7 @@
 // packages. Dev-only remotes: everything points at
 // http://localhost:<port>/mf-manifest.json.
 import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-import { requireDomainResolver } from '@qpqjs/deploy-awscdk';
+import { requireDomainResolver } from '@qpqjs/deploy-aws';
 import { getWebAddressing } from '@qpqjs/dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from '@qpqjs/webserver';
 

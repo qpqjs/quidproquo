@@ -64,7 +64,7 @@
     "packages/dev-server",
     "packages/deploy-webpack",
     "packages/deploy-rspack",
-    "packages/deploy-awscdk",
+    "packages/deploy-aws",
     "packages/web",
     "packages/actionprocessor-web",
     "packages/web-react",

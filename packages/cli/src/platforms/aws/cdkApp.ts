@@ -2,7 +2,7 @@ import path from 'path';
 
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 
-// The CDK app command (`cdk ... --app "<this>"`): @qpqjs/deploy-awscdk's
+// The CDK app command (`cdk ... --app "<this>"`): @qpqjs/deploy-aws's
 // generic workspace app under ts-node hooks, with DEPLOY_* in the env.
 export const getCdkAppCommand = (): string => {
   // Resolve ts-node from this package, not the workspace cwd — under npm link

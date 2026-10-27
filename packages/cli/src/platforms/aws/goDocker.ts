@@ -43,7 +43,7 @@
 // local builds are CPU-bound) and GO_DOCKER_DEPLOY_CONCURRENCY (default
 // unlimited — deploys just wait on CloudFormation).
 import { QpqDeployEnvVar } from '@qpqjs/core';
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import { getServiceRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
 
 import fs from 'fs';
@@ -276,9 +276,9 @@ const resolveBuildManifest = (
       stacks === 'views'
         ? null
         : {
-            inf: qpqDeployAwsCdkUtils.getInfStackName(qpqConfig),
-            api: qpqDeployAwsCdkUtils.getApiStackName(qpqConfig),
-            web: qpqDeployAwsCdkUtils.getWebStackName(qpqConfig),
+            inf: qpqDeployAwsUtils.getInfStackName(qpqConfig),
+            api: qpqDeployAwsUtils.getApiStackName(qpqConfig),
+            web: qpqDeployAwsUtils.getWebStackName(qpqConfig),
           },
     views: hasViews ? { dir: toManifestPath(getViewsDistDir(appName, service)), destinations: getViewsS3Destinations(appName, service) } : null,
     remote: hasRemote ? resolveRemoteEntry(appName, service) : null,

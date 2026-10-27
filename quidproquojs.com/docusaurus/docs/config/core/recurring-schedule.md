@@ -8,7 +8,7 @@ description: Define a recurring schedule, a trigger that runs a story on a timet
 Defines a **recurring schedule**: a time-based trigger that runs a story on a timetable, with no incoming request. Use it for periodic work — nightly cleanups, polling, report generation, cache warming. Like a [queue](./queue.md) or [event bus](./event-bus.md), a schedule is an **event source**: each fire delivers a `ScheduledEvent` to the target story through the same [askProcessEvent](../../actions/core/event/ask-process-event.md) pipeline.
 
 - **Locally:** the dev server ticks once a minute and runs any schedule whose recurrence matches that UTC minute. See [Locally](#locally) below.
-- **On AWS:** deploys an **EventBridge rule** whose cron expression is rendered from the recurrence and a **consumer Lambda** as its target (`QpqCoreRecurringScheduleConstruct` in `@qpqjs/deploy-awscdk`). The rule fires on the cron cadence and invokes the Lambda, passing the schedule's `metadata` as the event `detail`. The Lambda has a 15-minute timeout, and `maxConcurrentExecutions` (when set) becomes the Lambda's reserved concurrent executions.
+- **On AWS:** deploys an **EventBridge rule** whose cron expression is rendered from the recurrence and a **consumer Lambda** as its target (`QpqCoreRecurringScheduleConstruct` in `@qpqjs/deploy-aws`). The rule fires on the cron cadence and invokes the Lambda, passing the schedule's `metadata` as the event `detail`. The Lambda has a 15-minute timeout, and `maxConcurrentExecutions` (when set) becomes the Lambda's reserved concurrent executions.
 
 ```typescript
 import { defineRecurringSchedule } from '@qpqjs/core';
@@ -117,4 +117,4 @@ The dev server arms every schedule its services own and ticks once a minute, run
 - [askProcessEvent](../../actions/core/event/ask-process-event.md) — the pipeline that runs the target story for each schedule fire.
 - [defineQueue](./queue.md) and [defineEventBus](./event-bus.md) — the other core event sources.
 - [defineDeployEvent](./deploy-event.md) — a related time/lifecycle-based trigger that runs at deploy time rather than on a timetable.
-- **AWS implementation:** `QpqCoreRecurringScheduleConstruct` (EventBridge rule + target Lambda) in `@qpqjs/deploy-awscdk`. `renderAwsCronExpression`, alongside it, is the only place in the codebase that knows the EventBridge cron dialect.
+- **AWS implementation:** `QpqCoreRecurringScheduleConstruct` (EventBridge rule + target Lambda) in `@qpqjs/deploy-aws`. `renderAwsCronExpression`, alongside it, is the only place in the codebase that knows the EventBridge cron dialect.

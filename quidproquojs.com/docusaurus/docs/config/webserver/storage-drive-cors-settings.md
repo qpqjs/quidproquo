@@ -70,4 +70,4 @@ export default [
 - [defineStorageDrive](../core/storage-drive.md) — declares the drive this CORS policy applies to.
 - [defineWebEntry](./web-entry.md) — has its own `corsAllowedOrigins` for a web entry's served assets (a distinct concern from a drive's object CORS).
 - **Browser-direct transfers:** the presigned-URL file actions (`askFileGenerateTemporaryUploadSecureUrl`, `askFileGenerateTemporarySecureUrl` in @qpqjs/core) are what a browser uses to hit the drive directly — this CORS policy is what makes those cross-origin calls succeed.
-- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket CORS rule) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket CORS rule) in `@qpqjs/deploy-aws`.

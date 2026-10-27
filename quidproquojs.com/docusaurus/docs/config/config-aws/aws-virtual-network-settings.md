@@ -7,7 +7,7 @@ description: Tune the AWS VPC (AZs, NAT, endpoints, flow logs) that backs a core
 
 Tunes the AWS **VPC** that backs a core [`defineVirtualNetwork(name)`](../core/virtual-network.md). The core define declares the network provider-agnostically; this AWS setting layers on the concrete VPC knobs — availability zones, NAT gateways, gateway/interface endpoints, and flow logs. It is secure-by-default: even when you never declare it, VPCs get flow logs to CloudWatch and the free S3/DynamoDB gateway endpoints. Declare it (keyed by the same network name) only to opt out of a default or to add interface endpoints / NAT / AZ overrides.
 
-- **On AWS:** resolved by `getAwsVirtualNetworkSettings` (falling back to defaults when absent) and applied by `BootstrapQpqCoreVirtualNetworkConstruct` in `@qpqjs/deploy-awscdk`. It sets the VPC's `maxAzs` and `natGateways`, adds S3 and DynamoDB gateway endpoints unless disabled, adds any requested interface endpoints (one ENI per AZ, private DNS on), and — unless disabled — creates a flow-log group at `/qpq/vpc-flow-logs/{vpcName}` with the requested retention and traffic type.
+- **On AWS:** resolved by `getAwsVirtualNetworkSettings` (falling back to defaults when absent) and applied by `BootstrapQpqCoreVirtualNetworkConstruct` in `@qpqjs/deploy-aws`. It sets the VPC's `maxAzs` and `natGateways`, adds S3 and DynamoDB gateway endpoints unless disabled, adds any requested interface endpoints (one ENI per AZ, private DNS on), and — unless disabled — creates a flow-log group at `/qpq/vpc-flow-logs/{vpcName}` with the requested retention and traffic type.
 
 ```typescript
 import { defineVirtualNetwork } from '@qpqjs/core';

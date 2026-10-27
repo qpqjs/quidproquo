@@ -4,7 +4,7 @@
 // (values flow through SSM), so this order is prudence, not a hard dependency.
 // Bootstrap, domain and account stacks are deliberately out of scope — they
 // outlive any one service and are torn down by hand if ever.
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import { synthCommand } from '../../commands/synth';
 import { TeardownPlan } from '../../lib/deployPrompts';
@@ -14,9 +14,9 @@ import { isAwsCredentialsValid } from './awsCredentials';
 import { destroyServiceStack } from './stacks';
 
 const teardownPhases = [
-  { label: 'Web', getStackName: qpqDeployAwsCdkUtils.getWebStackName },
-  { label: 'Api', getStackName: qpqDeployAwsCdkUtils.getApiStackName },
-  { label: 'Inf', getStackName: qpqDeployAwsCdkUtils.getInfStackName },
+  { label: 'Web', getStackName: qpqDeployAwsUtils.getWebStackName },
+  { label: 'Api', getStackName: qpqDeployAwsUtils.getApiStackName },
+  { label: 'Inf', getStackName: qpqDeployAwsUtils.getInfStackName },
 ];
 
 export const awsTeardown = async (appName: string, plan: TeardownPlan): Promise<void> => {

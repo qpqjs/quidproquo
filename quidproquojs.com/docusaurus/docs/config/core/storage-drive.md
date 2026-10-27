@@ -7,7 +7,7 @@ description: Define a storage drive — a logical file container (an S3 bucket o
 
 Defines a **storage drive**: a named, logical container for files. Stories never talk to S3 or a filesystem directly — they read and write files on a drive by name using the [File action requesters](../../actions/core/file/ask-file-read-text-contents.md), and the runtime maps the drive to real storage.
 
-- **On AWS:** deploys an S3 bucket (`QpqCoreStorageDriveConstruct` in `@qpqjs/deploy-awscdk`). The bucket is versioned, blocks all public access, and is retained on stack teardown unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`.
+- **On AWS:** deploys an S3 bucket (`QpqCoreStorageDriveConstruct` in `@qpqjs/deploy-aws`). The bucket is versioned, blocks all public access, and is retained on stack teardown unless the service opts into destroy via `defineAwsDataStoreRemovalPolicy`.
 
 ```typescript
 import { defineStorageDrive } from '@qpqjs/core';
@@ -141,4 +141,4 @@ export default [
 - [defineFederatedModuleStore](./federated-module-store.md) — loads a service's story code from a drive declared here.
 - [defineEventDocSummary](../features/event-doc-summary.md) — declares an event-document collection's asset bucket as a drive of this kind.
 - **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the bucket on teardown).
-- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket, lifecycle, KMS, IAM grants) in `@qpqjs/deploy-awscdk`; file action processors in `@qpqjs/actionprocessor-aws`.
+- **AWS implementation:** `QpqCoreStorageDriveConstruct` (bucket, lifecycle, KMS, IAM grants) in `@qpqjs/deploy-aws`; file action processors in `@qpqjs/actionprocessor-aws`.

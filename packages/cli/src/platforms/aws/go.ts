@@ -6,7 +6,7 @@
 // (built + uploaded + manifest flipped), so a deploy that ships new backend
 // code also republishes the code the lambdas federate.
 import { QpqDeployEnvVar } from '@qpqjs/core';
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import { getServiceRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
 
 import path from 'path';
@@ -49,17 +49,17 @@ const buildAndDeploy = async (
 
   if (needsInfStack) {
     console.log('Deploy Inf: ', serviceName);
-    await deployServiceStack(serviceName, qpqDeployAwsCdkUtils.getInfStackName(qpqConfigForService), appName);
+    await deployServiceStack(serviceName, qpqDeployAwsUtils.getInfStackName(qpqConfigForService), appName);
   }
 
   if (needsApiStack) {
     console.log('Deploy Api: ', serviceName);
-    await deployServiceStack(serviceName, qpqDeployAwsCdkUtils.getApiStackName(qpqConfigForService), appName);
+    await deployServiceStack(serviceName, qpqDeployAwsUtils.getApiStackName(qpqConfigForService), appName);
   }
 
   if (needsWebStack) {
     console.log('Deploy Web: ', serviceName);
-    await deployServiceStack(serviceName, qpqDeployAwsCdkUtils.getWebStackName(qpqConfigForService), appName);
+    await deployServiceStack(serviceName, qpqDeployAwsUtils.getWebStackName(qpqConfigForService), appName);
   }
 
   if (needsViewStack && getServiceNamesWithViews(appName).includes(serviceName)) {

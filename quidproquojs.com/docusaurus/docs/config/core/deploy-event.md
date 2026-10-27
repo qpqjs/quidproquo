@@ -7,7 +7,7 @@ description: Define a deploy event — a hook story that runs at deploy time whe
 
 Defines a **deploy event**: a lifecycle hook story that runs at **deploy time** rather than in response to a request. It fires when the service's infrastructure stacks finish creating, updating, or deleting — the place for deploy-time work like seeding data, running migrations, warming caches, or notifying an external system that a new version is live. Like the other event sources it delivers its event through the [askProcessEvent](../../actions/core/event/ask-process-event.md) pipeline.
 
-- **On AWS:** deploys a **Lambda** plus an **EventBridge rule** matching `aws.cloudformation` "CloudFormation Stack Status Change" events (`QpqCoreDeployEventConstruct` in `@qpqjs/deploy-awscdk`). On every stack status change the rule invokes the Lambda; the processor resolves which of the service's stacks changed (mapping it to `Api`, `Web`, or `Unknown`) and the completion status (`Create`, `Update`, `Delete`, or `Unknown`), then runs your story with that `DeployEvent`. The Lambda has a 15-minute timeout.
+- **On AWS:** deploys a **Lambda** plus an **EventBridge rule** matching `aws.cloudformation` "CloudFormation Stack Status Change" events (`QpqCoreDeployEventConstruct` in `@qpqjs/deploy-aws`). On every stack status change the rule invokes the Lambda; the processor resolves which of the service's stacks changed (mapping it to `Api`, `Web`, or `Unknown`) and the completion status (`Create`, `Update`, `Delete`, or `Unknown`), then runs your story with that `DeployEvent`. The Lambda has a 15-minute timeout.
 
 ```typescript
 import { defineDeployEvent } from '@qpqjs/core';
@@ -91,4 +91,4 @@ export default [
 - [defineRecurringSchedule](./recurring-schedule.md) — a related time-based trigger that runs a story on a cron timetable rather than at deploy time.
 - [defineMigration](../webserver/migration.md) — a webserver helper built on this hook that runs data migrations once per deploy.
 - [defineSeed](../webserver/seed.md) — a webserver helper built on this hook that seeds initial data on the first deploy.
-- **AWS implementation:** `QpqCoreDeployEventConstruct` (handler Lambda + CloudFormation EventBridge rule) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqCoreDeployEventConstruct` (handler Lambda + CloudFormation EventBridge rule) in `@qpqjs/deploy-aws`.

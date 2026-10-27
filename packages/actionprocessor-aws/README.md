@@ -4,7 +4,7 @@ The AWS runtime for [quidproquo](https://github.com/qpqjs/quidproquo).
 
 A qpq story yields actions, and a **processor** is the function that actually carries one out. This package maps the qpq action catalogue onto AWS services, and supplies the Lambda handlers that turn an AWS event into a story execution.
 
-You do not usually install this yourself. It arrives as a dependency of `@qpqjs/deploy-awscdk` and the CLI.
+You do not usually install this yourself. It arrives as a dependency of `@qpqjs/deploy-aws` and the CLI.
 
 ## Actions to services
 

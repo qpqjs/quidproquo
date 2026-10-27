@@ -114,4 +114,4 @@ export default [
 
 - [defineAccountCloudTrail](./account-cloud-trail.md) — account audit logging, another `defineAccount*` bootstrap setting deployed by the same account stack.
 - [defineAccountSecurityServices](./account-security-services.md) — account threat-detection services deployed by the same account stack.
-- **AWS implementation:** `QpqAccountBudgetConstruct` (AWS Budgets + Cost Explorer anomaly detection) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqAccountBudgetConstruct` (AWS Budgets + Cost Explorer anomaly detection) in `@qpqjs/deploy-aws`.

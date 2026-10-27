@@ -72,4 +72,4 @@ export default [
 
 - [defineAccountSecurityServices](./account-security-services.md) — consumes this trail's CloudWatch log group for its Cognito auth-failure alarm.
 - [defineAccountBudget](./account-budget.md) — cost budget & anomaly alerts, another `defineAccount*` bootstrap setting on the same account stack.
-- **AWS implementation:** `QpqAccountCloudTrailConstruct` (CloudTrail trail, S3 log bucket, optional CloudWatch Logs group) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `QpqAccountCloudTrailConstruct` (CloudTrail trail, S3 log bucket, optional CloudWatch Logs group) in `@qpqjs/deploy-aws`.

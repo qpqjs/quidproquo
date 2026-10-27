@@ -7,7 +7,7 @@ description: Define an event bus — a named pub/sub topic that stories publish 
 
 Defines an **event bus**: a named publish/subscribe channel. Stories publish messages to a bus by name with [askEventBusSendMessages](../../actions/core/event-bus/ask-event-bus-send-messages.md); any number of [queues](./queue.md) subscribe to the bus (via their `eventBusSubscriptions` option) and their consumer stories run for each delivered message. Publishers never know who is listening.
 
-- **On AWS:** deploys an **SNS topic** (`QpqCoreEventBusConstruct` in `@qpqjs/deploy-awscdk`). The topic allows cross-account subscription and lets CloudWatch alarms publish to it. When `isFifo` is `true` a FIFO SNS topic is created (`.fifo` suffix); content-based deduplication is left off (dedup ids are set explicitly at publish time). Subscriptions are wired up from the subscribing queue's side.
+- **On AWS:** deploys an **SNS topic** (`QpqCoreEventBusConstruct` in `@qpqjs/deploy-aws`). The topic allows cross-account subscription and lets CloudWatch alarms publish to it. When `isFifo` is `true` a FIFO SNS topic is created (`.fifo` suffix); content-based deduplication is left off (dedup ids are set explicitly at publish time). Subscriptions are wired up from the subscribing queue's side.
 
 ```typescript
 import { defineEventBus } from '@qpqjs/core';
@@ -85,4 +85,4 @@ export default [
 - [defineRecurringSchedule](./recurring-schedule.md) and [defineNotifyError](./notify-error.md) — other event sources; a notify-error publishes alarm-state changes to a bus declared here.
 - [defineEventBusQuickSubscription](../config-aws/event-bus-quick-subscription.md) — attach direct SNS email/webhook subscribers to a bus on AWS (no compute), for using it as an alert channel.
 - [defineAwsAlarm](../config-aws/aws-alarm.md) — publishes CloudWatch alarm state to a bus via `onAlarm.publishToEventBus`.
-- **AWS implementation:** `QpqCoreEventBusConstruct` (SNS topic, subscriptions, IAM) in `@qpqjs/deploy-awscdk`; the send-message processor in `@qpqjs/actionprocessor-aws`.
+- **AWS implementation:** `QpqCoreEventBusConstruct` (SNS topic, subscriptions, IAM) in `@qpqjs/deploy-aws`; the send-message processor in `@qpqjs/actionprocessor-aws`.

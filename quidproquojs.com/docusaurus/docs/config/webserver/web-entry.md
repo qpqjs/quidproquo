@@ -7,7 +7,7 @@ description: Host a static web app / SPA — its build output is served from a C
 
 Defines a **web entry**: a hosted static web app (a single-page app or any static site) served on a domain through a CDN. The build output is uploaded to a storage bucket and served through a CDN distribution, with an SPA fallback so client-side routes resolve to your app shell.
 
-- **On AWS:** deploys an S3 bucket (private, versioned, all public access blocked) as the origin and a CloudFront distribution in front of it (`WebQpqWebserverWebEntryConstruct` in `@qpqjs/deploy-awscdk`). CloudFront reads the bucket via Origin Access Control, redirects HTTP to HTTPS, optionally compresses responses, and serves the certificate for your domain (an ACM certificate looked up in `us-east-1`). A Route 53 A-record aliases your (sub)domain to the distribution. `404`/`403` responses are rewritten to `200` served from `/` — the **SPA fallback** that lets client-side routing handle deep links. When WAF protection is enabled for the app, the shared CloudFront web ACL is attached. If `autoUpload` is on, the build output is uploaded to the bucket on every deploy.
+- **On AWS:** deploys an S3 bucket (private, versioned, all public access blocked) as the origin and a CloudFront distribution in front of it (`WebQpqWebserverWebEntryConstruct` in `@qpqjs/deploy-aws`). CloudFront reads the bucket via Origin Access Control, redirects HTTP to HTTPS, optionally compresses responses, and serves the certificate for your domain (an ACM certificate looked up in `us-east-1`). A Route 53 A-record aliases your (sub)domain to the distribution. `404`/`403` responses are rewritten to `200` served from `/` — the **SPA fallback** that lets client-side routing handle deep links. When WAF protection is enabled for the app, the shared CloudFront web ACL is attached. If `autoUpload` is on, the build output is uploaded to the bucket on every deploy.
 
 ```typescript
 import { defineWebEntry } from '@qpqjs/webserver';
@@ -144,4 +144,4 @@ export default [
 - [defineStorageDrive](../core/storage-drive.md) — the drive referenced by `storageDrive.sourceStorageDrive`.
 - [defineStorageDriveCorsSettings](./storage-drive-cors-settings.md) — browser CORS for a storage drive's own objects (as opposed to `corsAllowedOrigins` here, which covers this web entry's assets).
 - [askWebEntryInvalidateCache](../../actions/webserver/web-entry/ask-web-entry-invalidate-cache.md) — drop cached assets after a deploy.
-- **AWS implementation:** `WebQpqWebserverWebEntryConstruct` (S3 origin, CloudFront distribution, OAC, Route 53 alias, security headers, SEO edge lambdas) in `@qpqjs/deploy-awscdk`.
+- **AWS implementation:** `WebQpqWebserverWebEntryConstruct` (S3 origin, CloudFront distribution, OAC, Route 53 alias, security headers, SEO edge lambdas) in `@qpqjs/deploy-aws`.

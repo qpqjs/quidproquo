@@ -7,7 +7,7 @@ description: Redirect a subdomain to another URL via a small API Gateway + Lambd
 
 Redirects a **subdomain** (rooted at the service's [DNS base](./dns.md)) to another URL. A common use is redirecting `www.example.com` to `example.com`, or an old subdomain to a new destination.
 
-- **On AWS:** deploys a small redirect **Lambda** (`functionType: 'apiGatewayEventHandler_redirect'`) fronted by an **API Gateway** `LambdaRestApi` (proxy integration), plus an API Gateway custom **domain name** for the subdomain, a Route53 **`A` alias record**, and a base-path mapping (`QpqWebserverSubdomainRedirectConstruct` in `@qpqjs/deploy-awscdk`). Requests hitting the subdomain are handled by the Lambda, which responds with an HTTP redirect to `redirectUrl`. The redirect config (including `subdomain` and `redirectUrl`) is passed to the Lambda as environment. An optional Cloudflare API-key secret name is carried for Cloudflare-managed DNS setups.
+- **On AWS:** deploys a small redirect **Lambda** (`functionType: 'apiGatewayEventHandler_redirect'`) fronted by an **API Gateway** `LambdaRestApi` (proxy integration), plus an API Gateway custom **domain name** for the subdomain, a Route53 **`A` alias record**, and a base-path mapping (`QpqWebserverSubdomainRedirectConstruct` in `@qpqjs/deploy-aws`). Requests hitting the subdomain are handled by the Lambda, which responds with an HTTP redirect to `redirectUrl`. The redirect config (including `subdomain` and `redirectUrl`) is passed to the Lambda as environment. An optional Cloudflare API-key secret name is carried for Cloudflare-managed DNS setups.
 
 ```typescript
 import { defineSubdomainRedirect } from '@qpqjs/webserver';

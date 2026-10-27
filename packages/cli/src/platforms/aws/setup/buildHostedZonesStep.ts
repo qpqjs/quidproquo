@@ -1,4 +1,4 @@
-import { qpqDeployAwsCdkUtils } from '@qpqjs/deploy-awscdk';
+import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { ListHostedZonesByNameCommand, Route53Client } from '@aws-sdk/client-route-53';
@@ -14,9 +14,7 @@ const getRequiredZones = (ctx: AwsSetupContext): string[] => {
     ...new Set(
       qpqWebServerUtils
         .getRootDomains(config)
-        .map((rootDomain) =>
-          qpqDeployAwsCdkUtils.resolveHostedZoneForHost(config, qpqDeployAwsCdkUtils.resolveDeployHostForRoot(config, rootDomain, {})),
-        ),
+        .map((rootDomain) => qpqDeployAwsUtils.resolveHostedZoneForHost(config, qpqDeployAwsUtils.resolveDeployHostForRoot(config, rootDomain, {}))),
     ),
   ];
 };
