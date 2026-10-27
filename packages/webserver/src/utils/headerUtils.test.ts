@@ -125,6 +125,24 @@ describe('getCorsHeaders', () => {
     expect(headers['Access-Control-Allow-Headers']).not.toBe('*');
   });
 
+  // Security regression: a route that sends credentials must never reflect an unknown origin or answer `*`,
+  // even when the config lists `*` for open routes.
+  it('never echoes an unknown origin, nor a wildcard, on a route that allows credentials', () => {
+    const config = prodConfig({ allowedOrigins: ['*'] });
+    const authed = { routeAuthSettings: { userDirectoryName: 'users' } };
+    const headers = getCorsHeaders(config, authed, { origin: 'https://evil.example' });
+
+    expect(headers['Access-Control-Allow-Credentials']).toBe('true');
+    expect(headers['Access-Control-Allow-Origin']).not.toBe('https://evil.example');
+    expect(headers['Access-Control-Allow-Origin']).not.toBe('*');
+  });
+
+  it('never echoes an unknown origin on an open route without a wildcard in its config', () => {
+    const headers = getCorsHeaders(prodConfig(), {}, { origin: 'https://evil.example' });
+
+    expect(headers['Access-Control-Allow-Origin']).toBe('https://example.com');
+  });
+
   it('falls back to explicit header and method lists when the request omits them', () => {
     const config = prodConfig();
     const headers = getCorsHeaders(config, {}, { origin: 'https://example.com' });

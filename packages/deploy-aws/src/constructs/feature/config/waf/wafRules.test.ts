@@ -46,4 +46,21 @@ describe('buildWebAclRules', () => {
       ruleActionOverrides: undefined,
     });
   });
+
+  // Security regression: the per-IP rate rule is the only request rate limit the platform has (API Gateway
+  // stages run on account defaults), so it must block, aggregate per IP and sit ahead of the managed groups.
+  it('emits a blocking per-IP rate rule ahead of the managed groups', () => {
+    const rules = buildWebAclRules({
+      ...wafConfigBase,
+      rateLimits: [{ name: 'all-traffic', limit: 2000 }],
+      managedRuleGroups: [WafManagedRuleGroup.common],
+    });
+
+    const [rateLimit, common] = rules;
+
+    expect(rateLimit.name).toBe('rate-limit-all-traffic');
+    expect(rateLimit.action).toEqual({ block: {} });
+    expect(rateLimit.statement.rateBasedStatement).toMatchObject({ limit: 2000, aggregateKeyType: 'IP' });
+    expect(rateLimit.priority).toBeLessThan(common.priority);
+  });
 });
