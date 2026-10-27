@@ -12,6 +12,7 @@ vi.hoisted(() => {
 
 import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
+import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 
 const SCOPE_DELIMITER = '@@QPQSCOPE@@';
 
@@ -111,5 +112,18 @@ describe('dynamo/streamEvent getEventGetRecordsActionProcessor', () => {
 
   it('rejects a record with no eventName rather than calling it a modify', async () => {
     await expect(getRecords([{ dynamodb: { Keys: { pk: { S: 'doc-1' }, sk: { S: '0001' } } } }])).rejects.toThrow(/eventName/);
+  });
+
+  // Security regression: a stream record carries no identity; the handler always starts from a blank session, whatever
+  // session-shaped data a row might contain.
+  describe('dynamo/streamEvent getEventGetStorySessionActionProcessor', () => {
+    it('returns no session even when the record carries a session-shaped field', async () => {
+      const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
+      const record = { eventName: 'INSERT', scope: 'TENANT#a', key: { pk: '1' }, newImage: { storySession: { accessToken: 'raw' } } };
+
+      const [session] = await processor({ qpqEventRecord: record, eventParams: [{ Records: [] }, {}] });
+
+      expect(session).toBeUndefined();
+    });
   });
 });
