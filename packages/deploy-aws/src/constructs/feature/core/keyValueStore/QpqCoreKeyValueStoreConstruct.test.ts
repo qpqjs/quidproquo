@@ -3,7 +3,7 @@ import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreQPQConfigSetting,
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { QpqCoreKeyValueStoreConstruct } from './QpqCoreKeyValueStoreConstruct';
 
@@ -85,5 +85,32 @@ describe('QpqCoreKeyValueStoreConstruct global secondary indexes', () => {
         }),
       ]),
     });
+  });
+});
+
+// Security regression: a store table is retained with deletion protection, keeps point in time
+// recovery on, bills per request and opens no stream unless a handler is configured.
+describe('QpqCoreKeyValueStoreConstruct table defaults', () => {
+  it('retains the table with deletion protection, point in time recovery and no stream', () => {
+    const template = synth(defineKeyValueStore<Order>('orders', 'id'));
+
+    template.hasResource('AWS::DynamoDB::Table', {
+      DeletionPolicy: 'Retain',
+      UpdateReplacePolicy: 'Retain',
+      Properties: Match.objectLike({
+        DeletionProtectionEnabled: true,
+        BillingMode: 'PAY_PER_REQUEST',
+        PointInTimeRecoverySpecification: { PointInTimeRecoveryEnabled: true },
+        StreamSpecification: Match.absent(),
+      }),
+    });
+  });
+
+  it('turns point in time recovery off only when the store opts out', () => {
+    const template = synth(defineKeyValueStore<Order>('orders', 'id', [], { disablePointInTimeRecovery: true }));
+    const tables = Object.values(template.findResources('AWS::DynamoDB::Table'));
+
+    expect((tables[0] as any).Properties.PointInTimeRecoverySpecification).toEqual({ PointInTimeRecoveryEnabled: false });
+    expect((tables[0] as any).Properties.DeletionProtectionEnabled).toBe(true);
   });
 });
