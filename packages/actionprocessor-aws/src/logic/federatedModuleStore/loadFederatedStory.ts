@@ -158,6 +158,20 @@ const ensureHostInitialised = (): void => {
   hostInitialised = true;
 };
 
+// The manifest is data from the store, so every path it names is pinned under the
+// directory it belongs to: a container name, hash, file or entry that resolves
+// outside it (`..`, an absolute path) is a bad or hostile publish, not a location.
+const resolveInside = (baseDirectory: string, relativePath: string): string => {
+  const resolved = path.resolve(baseDirectory, relativePath);
+  const base = path.resolve(baseDirectory);
+
+  if (resolved !== base && !resolved.startsWith(`${base}${path.sep}`)) {
+    throw new FederatedModuleLoadError(FederatedModuleLoadErrorCode.manifestInvalid, `manifest path [${relativePath}] escapes [${baseDirectory}]`);
+  }
+
+  return resolved;
+};
+
 // ── Version loading ──────────────────────────────────────────────────────────
 // Downloads a manifest's files (atomically) and registers the container with the MF
 // runtime under a HASH-UNIQUE remote name, so loadRemote can't serve a previous
@@ -165,12 +179,12 @@ const ensureHostInitialised = (): void => {
 // This is the step that actually puts a new version's code into effect.
 const loadStoreVersion = async (getFile: (p: string) => Promise<Buffer>, manifest: FederatedModuleStoreManifest): Promise<string> => {
   const cacheRoot = process.env.federatedCodeStoreCacheDir || '/tmp/qpq-federated-code';
-  const versionDirectory = path.join(cacheRoot, manifest.containerName, manifest.hash);
+  const versionDirectory = resolveInside(cacheRoot, path.join(manifest.containerName, manifest.hash));
   await fs.promises.mkdir(versionDirectory, { recursive: true });
 
   await Promise.all(
     manifest.files.map(async (file) => {
-      const localPath = path.join(versionDirectory, file);
+      const localPath = resolveInside(versionDirectory, file);
       // Files are immutable under their hash dir AND only ever appear via the atomic
       // rename below, so an existing file is always complete and valid - this is what
       // lets a re-check of an unchanged version skip re-downloading.
@@ -191,7 +205,7 @@ const loadStoreVersion = async (getFile: (p: string) => Promise<Buffer>, manifes
     }),
   );
 
-  const entryPath = path.join(versionDirectory, manifest.entry);
+  const entryPath = resolveInside(versionDirectory, manifest.entry);
   const containerRequire = createRequire(entryPath);
   const containerModule = containerRequire(entryPath);
   const container = containerModule[manifest.containerName] ?? containerModule.default ?? containerModule;
