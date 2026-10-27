@@ -36,6 +36,29 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
     expect(vi.mocked(executeLambdaByName).mock.calls[0][0]).toBe('doThing-sfunc-test-app-auth-development');
   });
 
+  // Security regression: the invoke payload that crosses to another service carries the cross-service session,
+  // never the caller's raw bearer token, local context or function globals.
+  it('strips the token, local context and function globals from the session it sends', async () => {
+    vi.mocked(executeLambdaByName).mockResolvedValue({ success: true, result: 'ok' } as any);
+    const processor = await resolveProcessor();
+    const session = {
+      ...buildTestStorySession(),
+      accessToken: 'raw-bearer-token',
+      localContext: { secretThing: 'x' },
+      functionGlobals: { apiKey: 'k' },
+    } as any;
+
+    await invokeProcessor(processor, { functionName: 'doThing', service: 'auth', payload: [1], isAsync: false }, { session });
+
+    const payload = vi
+      .mocked(executeLambdaByName)
+      .mock.calls[0].find((arg) => arg && typeof arg === 'object' && 'storySession' in (arg as any)) as any;
+    expect(payload.storySession.accessToken).toBeUndefined();
+    expect(payload.storySession.localContext).toBeUndefined();
+    expect(payload.storySession.functionGlobals).toBeUndefined();
+    expect(JSON.stringify(vi.mocked(executeLambdaByName).mock.calls[0])).not.toContain('raw-bearer-token');
+  });
+
   it('returns void when the lambda produces no result', async () => {
     vi.mocked(executeLambdaByName).mockResolvedValue(undefined as any);
     const processor = await resolveProcessor();
