@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config'
 import packageJson from './package.json'
 
 const packagesToSkip = [
-  'quidproquo-tsconfig'
+  'packages/tsconfig'
 ];
 
 export default defineConfig({

@@ -39,8 +39,8 @@ Rules of thumb:
 - **Assert on requests** by using the function form of a mock (or a `vi.fn`) and checking the
   action it received.
 
-See `quidproquo-core/src/testing/storyTesting.test.ts` for the full surface and
-`quidproquo-core/src/stories/askRetry.test.ts` for a representative composed-story test.
+See `packages/core/src/testing/storyTesting.test.ts` for the full surface and
+`packages/core/src/stories/askRetry.test.ts` for a representative composed-story test.
 
 ## 2. Action-requester tests with `expectGenerator`
 
@@ -60,7 +60,7 @@ expectGenerator(askConfigGetSecret('my-secret'))
 
 Reducers, validators, lookups, and date math are plain functions — test them directly with
 `expect`. Prefer `it.each` for table-driven cases (see
-`quidproquo-core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts`).
+`packages/core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts`).
 
 ## Keep tests clean
 

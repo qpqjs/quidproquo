@@ -199,7 +199,7 @@ implementation:
   quidproquo-config-aws AND quidproquo-dev-server (for reading
   defineDevServerOptions) — quidproquo-dev-server moved earlier in the root
   workspaces build order to satisfy this.
-- **`quidproquo-dev-server/config` subpath** (folder-stub package.json):
+- **`packages/dev-server/config` subpath** (folder-stub package.json):
   service `infrastructure.ts` files import `defineDevServerOptions` from there
   so the dev server's express/native deps never enter lambda bundles.
   `viewsWorkspace` resolves a views port as: defineDevServerOptions → legacy

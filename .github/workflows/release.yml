@@ -65,7 +65,7 @@ jobs:
           npm version "$LEVEL" --ws --no-workspaces-update
           npx tsx ./scripts/applyPatch.ts
           npm install
-          version=$(node -p "require('./quidproquo-core/package.json').version")
+          version=$(node -p "require('./packages/core/package.json').version")
           if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
             echo "::error::$version is already tagged"
             exit 1

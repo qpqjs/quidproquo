@@ -26,7 +26,7 @@ Node's `node:inspector` lets a process debug itself with no port and no attach s
    (`Debugger.setBlackboxPatterns` — traced scripts live under the federated cache dir,
    `/tmp/qpq-federated-code/<container>/<hash>/…`, so the allow-pattern is trivial).
 4. The main thread runs `qpqExecuteLog(...)` as normal. The existing `debugger;` statement in
-   `quidproquo-core/src/qpqExecuteLog.ts` fires the first `Debugger.paused` event — that is the
+   `packages/core/src/qpqExecuteLog.ts` fires the first `Debugger.paused` event — that is the
    controller's "start tracing" signal (nice: the statement finally earns its keep in the cloud).
 5. The controller then loops: `Debugger.stepInto` → on `Debugger.paused`, record
    `{scriptUrl, line, column, functionName}` from the top call frame, and capture locals with
@@ -152,7 +152,7 @@ resumptions, and Runtime.getProperties cost. Both strategies work; breakpoints m
 service and confirm `.map` files land in the store and /tmp.
 
 **Phase 2 — tracer ✅ DONE** — `traceStoryExecution` in
-`quidproquo-actionprocessor-node/src/traceStoryExecution/` + `QpqExecutionTrace` in core
+`packages/actionprocessor-node/src/traceStoryExecution/` + `QpqExecutionTrace` in core
 types. Tests cover step/locals capture, step-budget truncation, and a real source-map
 round-trip (TS transpiled at test time, steps asserted against original TS lines/content).
 Implementation notes:

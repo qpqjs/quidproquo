@@ -13,12 +13,12 @@ Commit the changes that are currently staged in git. Do **not** stage anything y
 3. **Check for breaking changes against the last release** (see "Breaking changes" section below). Add, rewrite or remove bullets under the `## vNext` heading of `breaking-changes.md` so it matches what the staged diff means for someone upgrading from the last release, then `git add breaking-changes.md` if you changed it so it rides in this same commit.
 4. **Check for fundamental changes that affect documentation** (see "Documentation updates" section below). If the staged diff adds or changes a documented action, config helper, or feature, create or update the relevant page(s) under `quidproquojs.com/docusaurus/docs/`, then `git add` those files by name so they ride in this same commit. Together with step 3, this is the **only** case in which this command is allowed to stage files beyond what was already staged by the user.
 5. Determine the **prefix**:
-   - For each staged file, take its top-level directory. If it starts with `quidproquo-`, that's the package.
+   - For each staged file under `packages/<folder>/`, that folder is the package.
    - Collect the unique set of packages touched.
-   - **Exactly one package** → prefix is that package name with `quidproquo-` stripped, followed by `: `. Examples:
-     - `quidproquo-core` → `core: `
-     - `quidproquo-actionprocessor-node` → `actionprocessor-node: `
-     - `quidproquo-webserver` → `webserver: `
+   - **Exactly one package** → prefix is its folder name, followed by `: `. Examples:
+     - `packages/core` → `core: `
+     - `packages/actionprocessor-node` → `actionprocessor-node: `
+     - `packages/webserver` → `webserver: `
    - **Two or more packages**, or changes only in root/tooling files → **no prefix**.
 6. Write a **short, lowercase-leaning, human-sounding** summary of the change (1 line, ideally under ~70 chars). Match the terse style of recent commits like `text support for network request`, `stream json types`, `added disableReservedConcurrency to aws config`.
 7. Run the commit:
@@ -71,7 +71,7 @@ The docs site lives at `quidproquojs.com/docusaurus/docs/`. It's a hand-written 
 
 A staged change is **fundamental** (docs-worthy) when it does any of the following to something a consumer of a package would use:
 
-- Adds a new exported action requester (an `ask*` generator in `quidproquo-core/src/actions/**` or an equivalent in another package's action layer).
+- Adds a new exported action requester (an `ask*` generator in `packages/core/src/actions/**` or an equivalent in another package's action layer).
 - Adds a new exported `define*` config helper, or a new option on an existing one.
 - Changes an existing documented action's or config helper's signature, parameters, defaults, return shape, or error enum.
 - Changes documented runtime behavior (anything already described in prose on an existing page).
@@ -101,7 +101,7 @@ When you find a docs-worthy change:
 
 ## Examples
 
-- Staged: only files under `quidproquo-core/src/actions/network/` → `core: text support for network request`
-- Staged: files under `quidproquo-actionprocessor-node/` only → `actionprocessor-node: handle empty response body`
-- Staged: files in `quidproquo-core` and `quidproquo-actionprocessor-lambda` → `stream json types` (no prefix)
+- Staged: only files under `packages/core/src/actions/network/` → `core: text support for network request`
+- Staged: files under `packages/actionprocessor-node/` only → `actionprocessor-node: handle empty response body`
+- Staged: files in `packages/core` and `packages/actionprocessor-aws` → `stream json types` (no prefix)
 - Staged: only `package.json` and `package-lock.json` at the root → `bump: 0.0.624` (no package prefix)
