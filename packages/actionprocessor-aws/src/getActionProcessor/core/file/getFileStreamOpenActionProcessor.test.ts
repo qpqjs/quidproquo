@@ -51,6 +51,18 @@ describe('getProcessFileStreamOpen', () => {
     expect(await drain(iterator)).toEqual(['hell', 'o']);
   });
 
+  // Security regression: a chunk size of zero or less must never spin the iterator forever (a hung lambda until its
+  // timeout); the stream still terminates and yields every byte.
+  it.each([0, -5, Number.NaN])('terminates and yields the whole content for the chunk size %s', async (chunkSize) => {
+    send.mockResolvedValue({ Body: Readable.from(['hello']) });
+    const registry = { register: vi.fn() };
+
+    await invoke({ drive: 'assets', filepath: 'a.txt', encoding: 'text', chunkSize }, registry);
+
+    const iterator = registry.register.mock.calls[0][1] as AsyncIterableIterator<string>;
+    expect((await drain(iterator)).join('')).toBe('hello');
+  });
+
   it('base64 encodes chunks when encoding is not text', async () => {
     send.mockResolvedValue({ Body: Readable.from(['hi']) });
     const registry = { register: vi.fn() };
