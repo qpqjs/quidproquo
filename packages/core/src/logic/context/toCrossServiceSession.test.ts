@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { StorySession } from '../../types';
+import { createContextIdentifier } from './createContextIdentifier';
+import { createLocalContextIdentifier } from './createLocalContextIdentifier';
 import { toCrossServiceSession } from './toCrossServiceSession';
 
 describe('toCrossServiceSession', () => {
@@ -45,5 +47,23 @@ describe('toCrossServiceSession', () => {
 
     expect(session.localContext).toEqual({ secret: 'x' });
     expect(session.functionGlobals).toEqual({ routeGlobal: 'g' });
+  });
+
+  // Security regression: a value provided under a local context identifier never crosses a service boundary, while a
+  // value under an ordinary identifier does.
+  it('drops values filed under local identifiers and keeps ordinary context', () => {
+    const local = createLocalContextIdentifier<string>('db-password', '');
+    const shared = createContextIdentifier<string>('tenant-id', '');
+    const session = {
+      depth: 0,
+      context: { [shared.uniqueName]: 'tenant-a' },
+      localContext: { [local.uniqueName]: 'hunter2' },
+    } as StorySession;
+
+    const crossed = toCrossServiceSession(session);
+
+    expect(crossed.context).toEqual({ [shared.uniqueName]: 'tenant-a' });
+    expect(crossed.localContext).toBeUndefined();
+    expect(JSON.stringify(crossed)).not.toContain('hunter2');
   });
 });
