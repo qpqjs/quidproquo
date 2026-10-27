@@ -32,8 +32,9 @@ export const writeJsonFileStore = async <T>(
   await fs.mkdir(path.dirname(filePath), { recursive: true });
 
   // Write-then-rename so a concurrent reader never sees a half-written file
-  // (JSON.parse of a truncated store is a SyntaxError, not ENOENT)
+  // (JSON.parse of a truncated store is a SyntaxError, not ENOENT). Owner-only
+  // mode: the same store layout holds dev secrets and key material.
   const tempFilePath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-  await fs.writeFile(tempFilePath, JSON.stringify(values, null, 2));
+  await fs.writeFile(tempFilePath, JSON.stringify(values, null, 2), { mode: 0o600 });
   await fs.rename(tempFilePath, filePath);
 };
