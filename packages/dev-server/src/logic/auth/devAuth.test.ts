@@ -72,6 +72,17 @@ describe('createDevJwt', () => {
     expect(decodeJwtPayload(createDevJwt(DIRECTORY, 'joe@example.com')).sub).toBe(decodeJwtPayload(createDevJwt(DIRECTORY, 'Joe@Example.com')).sub);
   });
 
+  // Security regression: a dev token must never verify against a real pool. The header says alg none and the
+  // signature segment is a fixed placeholder, so any RS256 verifier rejects it before looking at the claims.
+  it('mints an unsigned token that no RS256 verifier could accept', () => {
+    const jwt = createDevJwt(DIRECTORY, 'joe@example.com');
+    const [header, , signature] = jwt.split('.');
+
+    expect(JSON.parse(Buffer.from(header, 'base64url').toString())).toEqual({ alg: 'none', typ: 'JWT' });
+    expect(signature).toBe('dev-signature');
+    expect(decodeJwtPayload(jwt).iss).toBeUndefined();
+  });
+
   it('mints different subs for the same login in different directories', () => {
     expect(decodeJwtPayload(createDevJwt(DIRECTORY, 'joe@example.com')).sub).not.toBe(
       decodeJwtPayload(createDevJwt(SIBLING_DIRECTORY, 'joe@example.com')).sub,
