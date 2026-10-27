@@ -35,8 +35,11 @@ npm run format
 ```
 
 ### Publishing
+
+Releases normally go through the `release` GitHub Actions workflow (`.github/workflows/release.yml`), run by hand on main with a patch/minor/major choice: `gh workflow run release.yml -f level=minor`. On 0.x, anything breaking is a minor bump, and a patch is refused while `breaking-changes.md` has bullets under `## vNext`. `npm run go` is the local fallback (patch only).
+
 ```bash
-# Version bump, build, and publish all packages
+# Version bump, build, and publish all packages (local fallback)
 npm run go
 
 # Publish all packages (after build)

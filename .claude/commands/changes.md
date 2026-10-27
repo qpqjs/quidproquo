@@ -2,7 +2,7 @@
 description: Build the CHANGELOG.md entry for the version being released
 ---
 
-Build the changelog entry for the release that is about to be published, and do the release-time bookkeeping in `breaking-changes.md`. This command runs from the `go` script right after `npm run patch`, so the new version numbers are sitting in the working tree uncommitted. It must work non-interactively: never stop to ask a question, make the sensible call and note it in the final report instead.
+Build the changelog entry for the release that is about to be published, and do the release-time bookkeeping in `breaking-changes.md`. This command runs right after the version bump (from the `go` script, or from the release workflow in `.github/workflows/release.yml`), so the new version numbers are sitting in the working tree uncommitted. It must work non-interactively: never stop to ask a question, make the sensible call and note it in the final report instead.
 
 ## Steps
 
@@ -10,19 +10,15 @@ Build the changelog entry for the release that is about to be published, and do 
 
 Read `"version"` from the working-tree `quidproquo-core/package.json`. That is V, the version this entry is for.
 
-### 2. Work out the previous version (P) and the commit range
+### 2. Work out the previous release (P) and the commit range
 
-1. Get the committed version: `git show HEAD:quidproquo-core/package.json | grep '"version"'`.
-2. If that differs from V (the normal case, bump not yet committed), it is P.
-3. If it equals V (the bump was already committed), walk back through `git log --format=%H -- quidproquo-core/package.json`, checking `git show <sha>:quidproquo-core/package.json` at each, until you hit a commit whose version is not V. That version is P.
-4. Find the boundary commit B, the commit that bumped the version **to** P: run `git log -S '"version": "<P>"' --format='%H %s' -- quidproquo-core/package.json` and for each candidate check `git show <sha>:quidproquo-core/package.json` until you find the newest sha where the version actually equals P (`-S` also matches the commit that later removed the string, skip that one).
-5. Sanity check: B is usually a commit with a subject like `bump: <P>`. If what you found looks wrong (e.g. version at B is not P), fall back to searching subjects: `git log --format='%H %s' | grep 'bump: <P>'`.
+Every release is tagged with its bare version (`0.1.34`), so P is the newest tag reachable from `HEAD`: `git describe --tags --abbrev=0`. If that tag is V itself (a rerun after the bump was already tagged), use the one before it: `git describe --tags --abbrev=0 <V>^`. `/commit` judges breaking changes against the same tag, so the two always agree on what "the last release" is.
 
-The release range is `B..HEAD`, minus any commit that is itself the bump for V.
+The release range is `<P>..HEAD`, minus any commit that is itself the bump for V.
 
 ### 3. Read the commits
 
-Run `git log --format='%h %s' <B>..HEAD`. For anything whose subject doesn't tell you what it means for a consumer, look closer with `git show --stat <sha>` or the diff. Then turn the range into feature bullets:
+Run `git log --format='%h %s' <P>..HEAD`. For anything whose subject doesn't tell you what it means for a consumer, look closer with `git show --stat <sha>` or the diff. Then turn the range into feature bullets:
 
 - Write for someone who uses the packages, not someone reading the repo. Say what they can now do or what got fixed.
 - **Group related commits into one bullet.** A feature that landed across five commits (e.g. tenant branding, or a cli command plus its follow-up fixes) is one line, not five.
@@ -64,7 +60,7 @@ In `breaking-changes.md`, rename the `## vNext` heading to `## <V>` and add a fr
 
 ### 7. Report
 
-Do not commit anything; the release bump commit picks these files up later. Finish by reporting: V, P, the boundary commit, how many commits were summarized into how many bullets, and the paths you edited.
+Do not commit anything; the release bump commit picks these files up later. Finish by reporting: V, P, how many commits were summarized into how many bullets, and the paths you edited.
 
 ## Hard rules
 
