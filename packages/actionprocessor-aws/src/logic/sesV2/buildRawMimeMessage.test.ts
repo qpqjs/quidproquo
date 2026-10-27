@@ -74,7 +74,7 @@ describe('buildRawMimeMessage', () => {
       from: `noreply@example.com${injected}`,
       to: [`someone@example.com${injected}`],
       cc: [`cc@example.com${injected}`],
-      replyTo: `reply@example.com${injected}`,
+      replyTo: [`reply@example.com${injected}`],
       attachments: [{ base64Data: 'aGVsbG8=', filename: `a.txt${injected}`, mimetype: 'text/plain' }],
     });
 
