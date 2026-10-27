@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // The JSON contract that ties the two halves of federation together:
-//   WRITTEN BY   packages/deploy-webpack/src/federation/publishFederatedRemote.ts
+//   WRITTEN BY   packages/deploy-rspack/src/federation/publishFederatedRemote.ts
 //   READ BY      @qpqjs/actionprocessor-aws .../loadFederatedStory.ts
 //
 // Store layout (under s3://<bucket>/<service>/ once uploaded):

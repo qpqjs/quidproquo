@@ -62,7 +62,6 @@
     "packages/actionprocessor-aws",
     "packages/neo4j",
     "packages/dev-server",
-    "packages/deploy-webpack",
     "packages/deploy-rspack",
     "packages/deploy-aws",
     "packages/web",

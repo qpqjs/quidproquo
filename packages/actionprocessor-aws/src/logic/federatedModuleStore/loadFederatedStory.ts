@@ -22,7 +22,7 @@ import { FederatedModuleStoreManifest } from './FederatedModuleStoreManifest';
 // WHERE THE STORE COMES FROM
 //   process.env.federatedCodeStoreUrl = "s3://<bucket>/<service>" is set on every
 //   lambda by the CDK Function construct when the service declared
-//   defineFederatedModuleStore(...). The build/publish half (@qpqjs/deploy-webpack)
+//   defineFederatedModuleStore(...). The build/publish half (@qpqjs/deploy-rspack)
 //   put the artifacts there. The two halves agree via FederatedModuleStoreManifest and
 //   the machine-independent key getFederatedKeyFromQpqFunctionRuntime (in core).
 //
