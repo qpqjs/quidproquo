@@ -59,6 +59,36 @@ describe('redactStoryResult', () => {
     expect(redacted.history[0].act.payload.msg).toBe(`client-1 sent ${REDACTED_STRING}`);
   });
 
+  // Security regression: the custom auth challenge answer sits in the createAuthChallenge result
+  // (privateChallengeParameters) and the user's reply in the verifyAuthChallenge input (challengeAnswer);
+  // an admin reading those logs must never see a one-time code that may still be live.
+  it('redacts the private challenge parameters and the challenge answer of custom auth logs', () => {
+    const redacted = redactStoryResult({
+      ...storyResult,
+      input: [{ challengeAnswer: { code: '482913' }, privateChallengeParameters: { answer: '482913' }, userAttributes: { email: 'a@b.com' } }],
+      history: [
+        {
+          act: { type: 'Log/Create', payload: { msg: 'issuing code' } },
+          res: [
+            { challengeName: 'emailCode', privateChallengeParameters: { answer: '482913' }, publicChallengeParameters: { hint: 'check your inbox' } },
+            undefined,
+          ],
+        },
+      ],
+    });
+
+    expect(redacted.input[0]).toEqual({
+      challengeAnswer: { code: REDACTED_STRING },
+      privateChallengeParameters: { answer: REDACTED_STRING },
+      userAttributes: { email: 'a@b.com' },
+    });
+    expect(redacted.history[0].res[0]).toEqual({
+      challengeName: 'emailCode',
+      privateChallengeParameters: { answer: REDACTED_STRING },
+      publicChallengeParameters: { hint: 'check your inbox' },
+    });
+  });
+
   it('does not mutate the input', () => {
     const before = JSON.stringify(storyResult);
 
