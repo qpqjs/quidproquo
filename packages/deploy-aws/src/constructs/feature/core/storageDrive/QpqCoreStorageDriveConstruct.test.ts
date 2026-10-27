@@ -58,3 +58,28 @@ describe('QpqCoreStorageDriveConstruct lockedDown', () => {
     expect(() => synth(defineStorageDrive('logs', { lockedDown: true }), false)).toThrow(/lockedDown/);
   });
 });
+
+// Security regression: every drive bucket blocks all public access, is versioned and carries at least
+// SSE-S3; a drive that names a crypto key moves to KMS with the bucket key on.
+describe('QpqCoreStorageDriveConstruct bucket hardening', () => {
+  it('blocks all public access, versions objects and encrypts with SSE-S3 by default', () => {
+    const template = synth(defineStorageDrive('uploads'));
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      PublicAccessBlockConfiguration: { BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true },
+      VersioningConfiguration: { Status: 'Enabled' },
+      BucketEncryption: {
+        ServerSideEncryptionConfiguration: [Match.objectLike({ ServerSideEncryptionByDefault: { SSEAlgorithm: 'AES256' } })],
+      },
+    });
+    template.resourceCountIs('AWS::S3::Bucket', 1);
+  });
+
+  it('never grants public read through an ACL or a bucket policy', () => {
+    const template = synth(defineStorageDrive('uploads'));
+    const buckets = Object.values(template.findResources('AWS::S3::Bucket'));
+
+    expect((buckets[0] as any).Properties.AccessControl).toBeUndefined();
+    template.resourceCountIs('AWS::S3::BucketPolicy', 0);
+  });
+});
