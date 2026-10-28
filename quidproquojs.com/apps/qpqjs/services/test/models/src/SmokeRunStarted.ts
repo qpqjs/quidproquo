@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // What POST /smoke/run returns: just the handle to poll with.
 export const SmokeRunStartedSchema = z.object({

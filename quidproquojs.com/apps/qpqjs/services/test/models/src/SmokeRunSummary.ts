@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // Counts derived from a run's test entries at read time, never stored, so they
 // cannot drift from the entries themselves.

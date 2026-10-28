@@ -104,8 +104,7 @@
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.3.0",
     "util": "^0.12.5",
-    "zod": "^3.25.76",
-    "zod-validation-error": "^1.1.0"
+    "zod": "^4.6.7"
   },
   "overrides": {
     "js-yaml": "4.3.0",

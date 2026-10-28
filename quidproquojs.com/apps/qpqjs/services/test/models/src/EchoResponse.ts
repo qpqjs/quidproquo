@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // What POST /echo/{pathValue} returns: the path and body values, untouched.
 export const EchoResponseSchema = z.object({

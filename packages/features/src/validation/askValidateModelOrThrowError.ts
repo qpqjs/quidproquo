@@ -1,16 +1,13 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { z } from 'zod';
-import { fromZodError } from 'zod-validation-error';
 
-export function* askValidateModelOrThrowError<T extends z.ZodTypeAny>(model: z.infer<T>, schema: T): AskResponse<z.infer<T>> {
-  // validate model
+/** Parses `model` against `schema`; a mismatch throws Invalid naming the path and expectation, never the submitted value. */
+export function* askValidateModelOrThrowError<T extends z.ZodType>(model: z.infer<T>, schema: T): AskResponse<z.infer<T>> {
   const validation = schema.safeParse(model);
 
-  // Throw error on invalid payload
   if (!validation.success) {
-    const error = fromZodError(validation.error);
-    yield* askThrowError(ErrorTypeEnum.Invalid, error.message, error.stack);
+    yield* askThrowError(ErrorTypeEnum.Invalid, z.prettifyError(validation.error));
   }
 
   return model;

@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // Body of POST /echo/{pathValue}: one value to be sent straight back.
 export const EchoRequestSchema = z.object({

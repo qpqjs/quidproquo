@@ -12,7 +12,7 @@ const selector = z.discriminatedUnion('kind', [
 ]);
 
 /** Shape of TenantMemberRolesSetRequest; permission keys are checked for form, never against a vocabulary. */
-export const tenantMemberRolesSetRequestSchema: z.ZodType<TenantMemberRolesSetRequest, z.ZodTypeDef, unknown> = z.object({
+export const tenantMemberRolesSetRequestSchema: z.ZodType<TenantMemberRolesSetRequest, unknown> = z.object({
   roles: z.array(z.string().min(1)),
   grants: z.array(z.object({ permission, selector })),
 });

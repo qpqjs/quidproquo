@@ -13,7 +13,7 @@ import {
   QpqFunctionRuntime,
 } from 'quidproquo';
 
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
 import {
