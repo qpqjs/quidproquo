@@ -62,6 +62,8 @@ beforeEach(() => {
 const originalIsTTY = process.stdin.isTTY;
 
 afterEach(() => {
+  // restoreAllMocks only restores spies; the vi.fn() behind the mocked prompt keeps its call count.
+  vi.clearAllMocks();
   vi.restoreAllMocks();
   process.stdin.isTTY = originalIsTTY;
   for (const name of primed) delete process.env[name];

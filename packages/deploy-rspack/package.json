@@ -37,7 +37,7 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
     "@module-federation/enhanced": "2.6.0",
-    "@module-federation/node": "2.7.45",
+    "@module-federation/node": "2.7.52",
     "@rspack/plugin-react-refresh": "^2.0.2",
     "dts-bundle-generator": "9.5.1",
     "path-browserify": "^1.0.1",
