@@ -60,6 +60,7 @@
     "@module-federation/enhanced": "2.6.0",
     "@types/aws-lambda": "^8.10.162",
     "ai": "^7.0.133",
+    "zod": "^4.6.7",
     "ajv": "^8.20.0",
     "aws-jwt-verify": "^3.4.0",
     "busboy": "^1.6.0",

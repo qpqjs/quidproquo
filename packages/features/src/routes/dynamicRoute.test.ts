@@ -2,7 +2,7 @@ import { AskResponse, askThrowError, ErrorTypeEnum, runStory, StoryError } from 
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { dynamicRoute } from './dynamicRoute';
 

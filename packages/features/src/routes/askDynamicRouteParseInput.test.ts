@@ -2,7 +2,7 @@ import { ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { askDynamicRouteParseInput } from './askDynamicRouteParseInput';
 

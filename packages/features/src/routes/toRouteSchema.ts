@@ -1,6 +1,6 @@
 import { JsonSchema, RouteSchema } from '@qpqjs/webserver';
 
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { DynamicRouteSchema } from './DynamicRouteSchema';
 

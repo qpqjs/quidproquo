@@ -1,7 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { DynamicRouteInput } from './DynamicRouteInput';
 import { DynamicRouteSchema } from './DynamicRouteSchema';

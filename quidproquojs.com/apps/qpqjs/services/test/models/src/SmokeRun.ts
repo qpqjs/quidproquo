@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { SmokeRunStatus } from './SmokeRunStatus';
 import { SmokeTestResultSchema } from './SmokeTestResult';
