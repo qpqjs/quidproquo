@@ -1,4 +1,9 @@
-import { EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
+import {
+  EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL,
+  EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
+  EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL,
+  EVENT_DOC_TRANSFER_SERVICE_GLOBAL,
+} from '../constants';
 import { EventDocTransferCollection } from '../models';
 
 /** Input to buildEventDocTransferGlobals. */
@@ -6,10 +11,16 @@ export type EventDocTransferGlobalsOptions = {
   service: string;
   collections: EventDocTransferCollection[];
   scopeResolver?: string;
+  authorise?: string;
 };
 
 /** The per-route globals askEventDocTransferReadRegistry reads back. Optional fields are always set ('' when unconfigured). */
-export const buildEventDocTransferGlobals = ({ service, collections, scopeResolver }: EventDocTransferGlobalsOptions): Record<string, unknown> => ({
+export const buildEventDocTransferGlobals = ({
+  service,
+  collections,
+  scopeResolver,
+  authorise,
+}: EventDocTransferGlobalsOptions): Record<string, unknown> => ({
   [EVENT_DOC_TRANSFER_SERVICE_GLOBAL]: service,
   [EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]: collections.map(({ storeName, type, onPublish, onAppend }) => ({
     storeName,
@@ -18,4 +29,5 @@ export const buildEventDocTransferGlobals = ({ service, collections, scopeResolv
     onAppend: onAppend ?? '',
   })),
   [EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL]: scopeResolver ?? '',
+  [EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL]: authorise ?? '',
 });

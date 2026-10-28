@@ -4,3 +4,5 @@ export const EVENT_DOC_TRANSFER_SERVICE_GLOBAL = 'eventDocTransferService';
 export const EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL = 'eventDocTransferCollections';
 /** Per-route global: the scope resolver inline function name ('' when unset). */
 export const EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL = 'eventDocTransferScopeResolver';
+/** Per-route global: the collection authoriser inline function name ('' when unset). */
+export const EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL = 'eventDocTransferAuthoriser';

@@ -2,6 +2,8 @@ import { AskResponse } from '@qpqjs/core';
 
 import { askEventDocGetByIdOrThrow, askEventDocReferences } from '../../eventDoc/logic';
 import { EventDocLink } from '../../eventDoc/models';
+import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
+import { askEventDocTransferAuthorise } from '../globals/askEventDocTransferAuthorise';
 import { EventDocDocRef, EventDocManifestItem, EventDocTransferRegistry } from '../models';
 import { askEventDocTransferProvideCollection } from './askEventDocTransferProvideCollection';
 
@@ -22,6 +24,8 @@ type VisitResult = {
 
 // A soft-deleted doc is reported but not walked into: it will not be bundled, so its dependencies are moot.
 function* askEventDocManifestVisit(docId: string): AskResponse<VisitResult> {
+  yield* askEventDocTransferAuthorise(EventDocPermissionAction.read);
+
   const summary = yield* askEventDocGetByIdOrThrow(docId);
 
   if (summary.deletedAt) {

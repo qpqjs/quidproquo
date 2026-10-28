@@ -2,6 +2,8 @@ import { AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventListAll } from '../../eventDoc/data';
 import { EventDocEvent } from '../../eventDoc/models';
+import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
+import { askEventDocTransferAuthorise } from '../globals/askEventDocTransferAuthorise';
 import { EventDocBundleApplyOptions, EventDocBundleDoc, EventDocTransferPlanRow, EventDocTransferStatus } from '../models';
 import { askEventDocBundlePlanDoc } from './askEventDocBundlePlanDoc';
 import { askEventDocTransferTruncateLog } from './askEventDocTransferTruncateLog';
@@ -30,6 +32,8 @@ export function* askEventDocBundleApplyDoc(doc: EventDocBundleDoc, options: Even
   const row = yield* askEventDocBundlePlanDoc(doc);
 
   if (isWritable(row.status)) {
+    yield* askEventDocTransferAuthorise(row.status === EventDocTransferStatus.New ? EventDocPermissionAction.create : EventDocPermissionAction.write);
+
     const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, row.existingEvents, {
       importerUserId: options.importerUserId,
     });
@@ -41,6 +45,10 @@ export function* askEventDocBundleApplyDoc(doc: EventDocBundleDoc, options: Even
   if (!options.force || !isForceable(row.status)) {
     return row;
   }
+
+  // Discarding the tail is a delete, and the fast-forward after it a write.
+  yield* askEventDocTransferAuthorise(EventDocPermissionAction.delete);
+  yield* askEventDocTransferAuthorise(EventDocPermissionAction.write);
 
   const existingEvents = yield* askEventDocEventListAll(doc.id);
   const fromIndex = overwriteFromIndex(existingEvents, doc.events);
