@@ -78,6 +78,16 @@ describe('cloudFrontOriginRequest getEventMatchStoryActionProcessor', () => {
 
     expect((match as any).runtime).toEqual(runtime);
   });
+
+  it('decodes seo path params', async () => {
+    const runtime = { src: 'seo' } as any;
+    const config = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.Seo, path: '/page/{slug}', runtime } as any]);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
+
+    const [match] = await processor({ qpqEventRecord: { path: '/page/caf%C3%A9' } });
+
+    expect((match as any).runtimeOptions).toEqual({ slug: 'café' });
+  });
 });
 
 describe('cloudFrontOriginRequest getEventTransformResponseResultActionProcessor', () => {

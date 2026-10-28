@@ -2,7 +2,7 @@ import { StorageDriveTier } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { findApiRoute, getS3BucketStorageClassFromStorageDriveTier, matchUrl, randomGuid } from './awsLambdaUtils';
+import { findApiRoute, getS3BucketStorageClassFromStorageDriveTier, matchRoutePath, matchUrl, randomGuid } from './awsLambdaUtils';
 
 describe('randomGuid', () => {
   it('returns a v4-shaped uuid', () => {
@@ -43,6 +43,26 @@ describe('matchUrl', () => {
   });
 });
 
+describe('matchRoutePath', () => {
+  it('percent-decodes each param after matching', () => {
+    expect(matchRoutePath('/log/{id}', '/log/svc%3A%3Aabc%20d')).toEqual({ didMatch: true, params: { id: 'svc::abc d' } });
+    expect(matchRoutePath('/users/{id}', '/users/a%2Fb').params).toEqual({ id: 'a/b' });
+  });
+
+  it('matches a static path and reports no params', () => {
+    expect(matchRoutePath('/health', '/health').didMatch).toBe(true);
+    expect(matchRoutePath('/health', '/other').didMatch).toBe(false);
+  });
+
+  // Security regression: the match runs on the encoded path, so an encoded slash never reaches a different route or
+  // adds a segment, and a malformed escape is a clean no-match instead of an unhandled URIError.
+  it('never routes through an encoded separator and never throws on a malformed escape', () => {
+    expect(matchRoutePath('/users/{id}', '/users/a%2Fb/c').didMatch).toBe(false);
+    expect(matchRoutePath('/users/{id}', '/users/%E0')).toEqual({ didMatch: false, params: null });
+    expect(matchRoutePath('/users/{id}', '/users/100%').didMatch).toBe(false);
+  });
+});
+
 describe('findApiRoute', () => {
   const route = (method: string, path: string) => ({ method, path, runtime: { src: path, runtimeType: 'Function' }, options: {} }) as any;
 
@@ -54,6 +74,13 @@ describe('findApiRoute', () => {
     expect(findApiRoute(routes, 'GET', '/admin/me')?.route.path).toBe('/admin/me');
     expect(findApiRoute(routes, 'GET', '/admin/other')?.route.path).toBe('/admin/{id}');
     expect(findApiRoute(routes, 'DELETE', '/admin/me')).toBeNull();
+  });
+
+  it('hands the handler decoded params', () => {
+    const routes = [route('GET', '/admin/{id}')];
+
+    expect(findApiRoute(routes, 'GET', '/admin/svc%3A%3A1')?.match.params).toEqual({ id: 'svc::1' });
+    expect(findApiRoute(routes, 'GET', '/admin/%E0')).toBeNull();
   });
 });
 

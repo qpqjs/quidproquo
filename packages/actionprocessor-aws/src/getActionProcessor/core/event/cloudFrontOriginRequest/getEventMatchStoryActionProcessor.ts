@@ -10,7 +10,7 @@ import {
 } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { matchUrl } from '../../../../awsLambdaUtils';
+import { matchRoutePath } from '../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
@@ -28,7 +28,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // Find the most relevant match
     const matchedSeoConfig = sortedSeoConfigs
       .map((r) => ({
-        match: matchUrl(r.path, qpqEventRecord.path),
+        match: matchRoutePath(r.path, qpqEventRecord.path),
         route: r,
       }))
       .find((m) => m.match.didMatch);

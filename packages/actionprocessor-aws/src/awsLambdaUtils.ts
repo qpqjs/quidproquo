@@ -14,7 +14,7 @@ export type UrlMatch = {
   params: Nullable<Record<string, string>>;
 };
 
-/** Matches a url against a `{param}` templated route path, extracting the path params on a hit. */
+/** Matches a url against a `{param}` templated route path, extracting the path params exactly as written on a hit. */
 export const matchUrl = (path: string, url: string): UrlMatch => {
   // /attempt/{attemptUuid}/result/{test} => /attempt/:attemptUuid/result/:test
   const modifiedPath = path.replaceAll(/{(.+?)}/g, (m, g) => `:${g}`);
@@ -24,6 +24,25 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     didMatch: matchResult.matches,
     params: matchResult.params,
   };
+};
+
+/**
+ * Matches an http request path against a `{param}` templated route path and percent-decodes each param. The match
+ * runs on the encoded path, so an encoded slash never adds a segment; a param that is not valid percent-encoding
+ * (`%E0`, a lone `%`) is no match rather than a throw.
+ */
+export const matchRoutePath = (path: string, url: string): UrlMatch => {
+  const encoded = matchUrl(path, url);
+  if (!encoded.didMatch || !encoded.params) {
+    return encoded;
+  }
+
+  try {
+    const params = Object.fromEntries(Object.entries(encoded.params).map(([name, value]) => [name, decodeURIComponent(value)]));
+    return { didMatch: true, params };
+  } catch {
+    return { didMatch: false, params: null };
+  }
 };
 
 export type FoundApiRoute = {
@@ -43,7 +62,7 @@ export const findApiRoute = (routes: RouteQPQWebServerConfigSetting[], method: H
   return (
     qpqWebServerUtils
       .sortPathMatchConfigs(candidates)
-      .map((route) => ({ route, match: matchUrl(route.path, path) }))
+      .map((route) => ({ route, match: matchRoutePath(route.path, path) }))
       .find((found) => found.match.didMatch) ?? null
   );
 };

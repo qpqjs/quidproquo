@@ -34,6 +34,14 @@ describe('getEventMatchStoryActionProcessor (express)', () => {
     expect(match.config).toBeDefined();
   });
 
+  it('decodes route params and refuses a malformed escape', async () => {
+    const decoded = await invoke(buildConfigWithRoute(), { method: 'GET', path: '/users/svc%3A%3A1', headers: {} });
+    const malformed = await invoke(buildConfigWithRoute(), { method: 'GET', path: '/users/%E0', headers: {} });
+
+    expect(resolveActionResult(decoded).runtimeOptions).toEqual({ id: 'svc::1' });
+    expect(resolveActionResultError(malformed).errorType).toBe(ErrorTypeEnum.NotFound);
+  });
+
   it('matches any route method when the request method is OPTIONS', async () => {
     const result = await invoke(buildConfigWithRoute(), { method: 'OPTIONS', path: '/users/42', headers: {} });
 

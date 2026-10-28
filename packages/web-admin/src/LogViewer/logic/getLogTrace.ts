@@ -1,7 +1,6 @@
 import { QpqExecutionTrace } from '@qpqjs/core';
 
 import { apiRequestPost, externalRequestGet } from '../../logic';
-import { encodeLogPathSegment } from './encodeLogPathSegment';
 
 export interface LogTraceRequestOptions {
   // Force a fresh trace run even when one is stored
@@ -34,7 +33,7 @@ export const getLogTrace = async (
 ): Promise<LogTraceResult> => {
   const query = `refresh=${!!options.refresh}&check=${!!options.checkOnly}&onlyOwnCode=${!!options.onlyOwnCode}`;
   const traceUrl = await apiRequestPost<{ url?: string; pending?: boolean }>(
-    `/log/${encodeLogPathSegment(correlation)}/trace?${query}`,
+    `/log/${encodeURIComponent(correlation)}/trace?${query}`,
     {},
     apiBaseUrl,
     accessToken,
