@@ -1,7 +1,6 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { getAwsAccountIds } from '@qpqjs/config-aws';
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, QueueQPQConfigSetting } from '@qpqjs/core';
+import { QPQConfig, qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_sqs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -14,6 +13,25 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;
 }
+
+// The same owner-fallback derivation the runtime send processor and the service role use.
+const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string[] =>
+  queueConfig.eventBusSubscriptions.map((eventBusName) => {
+    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    if (!eventBusConfig) {
+      throw new Error(`Queue [${queueConfig.name}] subscribes to an undefined event bus [${eventBusName}]`);
+    }
+
+    return awsNamingUtils.getEventBusSnsTopicArn(
+      eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
+      qpqConfig,
+      eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
+      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+      eventBusConfig.isFifo,
+    );
+  });
 
 export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
   abstract queue: aws_sqs.IQueue;
@@ -108,26 +126,28 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       evaluationPeriods: 1,
     });
 
-    const accountIds = getAwsAccountIds(props.qpqConfig);
+    // The subscription itself is made in the api stack against an imported queue, which
+    // cannot carry a policy, so the grant lives here: exactly the topics this queue
+    // subscribes to (foreign buses resolve through their owner), never the whole account,
+    // because a delivered body carries a session the handler trusts.
+    const subscribedTopicArns = resolveSubscribedTopicArns(props.qpqConfig, props.queueConfig);
 
-    // This has to be any topic arn as we want other services / apps to be able
-    // to publish to this queue
-    accountIds.forEach((accountId) => {
+    if (subscribedTopicArns.length > 0) {
       this.queue.addToResourcePolicy(
         new aws_iam.PolicyStatement({
-          sid: `AllowSNSServicePrincipal_${accountId}`,
+          sid: 'AllowSubscribedTopics',
           effect: aws_iam.Effect.ALLOW,
           principals: [new aws_iam.ServicePrincipal('sns.amazonaws.com')],
           actions: ['sqs:SendMessage'],
           resources: [this.queue.queueArn],
           conditions: {
             ArnEquals: {
-              'aws:SourceArn': `arn:aws:sns:*:${accountId}:*`,
+              'aws:SourceArn': subscribedTopicArns,
             },
           },
         }),
       );
-    });
+    }
   }
 
   public static authorizeActionsForRole(role: aws_iam.IRole, queues: QpqCoreQueueConstruct[]) {
