@@ -1,4 +1,5 @@
 export * from './askEventDocAiAttachmentsValidate';
+export * from './askEventDocAiAuthorise';
 export * from './askEventDocAiContinueHandoff';
 export * from './askEventDocAiProcessContinue';
 export * from './askEventDocAiProcessSend';

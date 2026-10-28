@@ -2,10 +2,12 @@ import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_TYPE_GLOBAL } from '../../eventDoc';
 import { askEventDocResolveActor } from '../../eventDoc';
+import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 import { serviceRequest, ServiceRequestDeferred, ServiceRequester } from '../../webSocketQueue/logic/service';
 import { EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiDocRef } from '../models';
 import { askEventDocAiContextProvide } from '../module';
+import { askEventDocAiAuthorise } from './askEventDocAiAuthorise';
 
 type PayloadOf<R> = R extends ServiceRequester<infer T, any> ? T : never;
 type ResponseOf<R> = R extends ServiceRequester<any, infer T> ? T : never;
@@ -22,6 +24,8 @@ export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(
 ) =>
   serviceRequest(requester, function* askEventDocAiServiceHandler(wirePayload: PayloadOf<R> & EventDocAiDocRef) {
     yield* askEventDocResolveActor();
+    // Every chat method reads the document on the caller's behalf, so it needs the collection's read permission.
+    yield* askEventDocAiAuthorise(EventDocPermissionAction.read);
 
     const { docId, ...payload } = wirePayload;
 
