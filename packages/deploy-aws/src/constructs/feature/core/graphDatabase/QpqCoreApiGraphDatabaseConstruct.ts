@@ -47,6 +47,10 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       vpc,
       instanceType: aws_neptune.InstanceType.SERVERLESS,
 
+      // Network reach is not enough: every request must be SigV4-signed by a principal holding the
+      // neptune-db actions below, which only the service role is granted.
+      iamAuthentication: true,
+
       serverlessScalingConfiguration: {
         minCapacity: 1,
         maxCapacity: 2.5,
@@ -80,6 +84,10 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       vpc,
     );
     this.cluster.connections.allowDefaultPortFrom(workloadSecurityGroup, 'qpq workload lambdas');
+
+    // The data-plane grant needs the cluster's resource id, known only here, so it is made beside the
+    // cluster rather than with the name-derived control-plane grant in authorizeActionsForRole.
+    this.cluster.grant(this.getServiceRole(), 'neptune-db:ReadDataViaQuery', 'neptune-db:WriteDataViaQuery', 'neptune-db:DeleteDataViaQuery');
   }
 
   public static authorizeActionsForRole(role: aws_iam.IRole, graphDatabaseConfigs: GraphDatabaseQPQConfigSetting[], qpqConfig: QPQConfig) {

@@ -8,7 +8,7 @@ import {
   GraphDatabaseInstanceType,
 } from '@qpqjs/core';
 
-import { askGraphDatabaseForNeptuneGetEndpoints } from '../customActions';
+import { askGraphDatabaseForNeptuneGetEndpoints, askGraphDatabaseForNeptuneSignRequest } from '../customActions';
 import { askConvertNeptuneCypherResponseToCypherResponse } from './converters/askConvertNeptuneCypherResponseToCypherResponse';
 import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
 import { convertQpqQueryToNeptune } from './utils';
@@ -27,13 +27,16 @@ export function* askRunNeptuneOpenCypherQuery({
   }
 
   const neptuneQuery = convertQpqQueryToNeptune(openCypherQuery);
+  const url = `${graphEndpoint}/openCypher`;
 
-  const response = yield* askNetworkRequest<NeptuneCypherRequest, NeptuneCypherResponse>('POST', `${graphEndpoint}/openCypher`, {
-    body: { query: neptuneQuery, parameters: params },
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+  // The cluster requires IAM authentication: the body is serialised once so the signature covers the exact bytes sent.
+  const request: NeptuneCypherRequest = { query: neptuneQuery, parameters: params };
+  const body = JSON.stringify(request);
+  const signedHeaders = yield* askGraphDatabaseForNeptuneSignRequest(url, body);
+
+  const response = yield* askNetworkRequest<string, NeptuneCypherResponse>('POST', url, {
+    body,
+    headers: signedHeaders,
   });
 
   if (response.status < 200 || response.status >= 300) {
