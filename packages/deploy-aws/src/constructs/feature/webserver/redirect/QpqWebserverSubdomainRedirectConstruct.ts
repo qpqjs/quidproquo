@@ -1,7 +1,8 @@
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigateway } from 'aws-cdk-lib';
+import { aws_apigateway, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
@@ -53,10 +54,21 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       handler: func.lambdaFunction,
       deployOptions: {
         loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
-        dataTraceEnabled: true,
+        dataTraceEnabled: false,
       },
       proxy: true,
     });
+
+    // Same regional web acl as the service apis (see ApiQpqWebserverApiConstruct)
+    if (qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)) {
+      new aws_wafv2.CfnWebACLAssociation(this, 'waf-association', {
+        resourceArn: restApi.deploymentStage.stageArn,
+        webAclArn: aws_ssm.StringParameter.valueForStringParameter(
+          this,
+          qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('regional', props.qpqConfig),
+        ),
+      });
+    }
 
     const target: DomainTarget = {
       subdomain: props.subdomainRedirectConfig.subdomain,
