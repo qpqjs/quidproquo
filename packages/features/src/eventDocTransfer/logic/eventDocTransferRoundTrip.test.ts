@@ -4,8 +4,10 @@ import {
   DateActionType,
   DynamicFunctionsActionType,
   DynamicFunctionsExecuteErrorTypeEnum,
+  ErrorTypeEnum,
   FileActionType,
   GuidActionType,
+  InlineFunctionActionType,
   KeyValueStoreActionType,
   KvsLogicalOperator,
   KvsLogicalOperatorType,
@@ -26,6 +28,7 @@ import { eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode, EventDocSummary } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import {
+  EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL,
   EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
   EVENT_DOC_TRANSFER_DRIVE_NAME,
   EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL,
@@ -124,18 +127,29 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
   throw new Error(`Test KVS mock does not support logical operator: ${logical.operation}`);
 };
 
+type AuthoriseCall = { functionName: string; payload: { storeName: string; action: string } };
+
 type TestEnvironment = {
   tables: Record<string, Record<string, unknown>[]>;
   files: Record<string, unknown>;
   mocks: Record<string, unknown>;
   seedDoc: (type: string, events: EventDocEvent[], assets?: { guid: string; data: QPQBinaryData }[]) => void;
+  // Every call the transfer made to the collection authoriser (only when the environment declares one).
+  authoriseCalls: AuthoriseCall[];
+  // Actions the authoriser refuses with Forbidden.
+  forbidActions: Set<string>;
 };
+
+// An event the registered validator rejects: the append gate refuses it, so an import must too.
+const REJECTED_EVENT_TYPE = 'BAD_EVENT';
 
 // One environment: its own KVS tables and its own blob storage. Nothing is shared between two of
 // these, which is what makes the round trip an honest cross-environment test.
-const buildEnvironment = (environmentName: string): TestEnvironment => {
+const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironment => {
   const tables: Record<string, Record<string, unknown>[]> = {};
   const files: Record<string, unknown> = {};
+  const authoriseCalls: AuthoriseCall[] = [];
+  const forbidActions = new Set<string>();
 
   let guidCounter = 0;
   let clock = Date.parse('2026-07-26T00:00:00.000Z');
@@ -149,6 +163,7 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
       onAppend: '',
     })),
     [EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL]: '',
+    [EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL]: authorise,
   };
 
   const tableFor = (storeName: string): Record<string, unknown>[] => (tables[storeName] ??= []);
@@ -196,11 +211,33 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
         );
       }
 
+      // The registered definition's fold and validator, as an app would register them: the state counts the
+      // events folded so far, and the validator refuses REJECTED_EVENT_TYPE.
+      if (action.payload.functionName === 'foldDocumentState') {
+        const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], { count: number } | undefined];
+        return { count: (seed?.count ?? 0) + folded.length };
+      }
+
+      if (action.payload.functionName === 'validateEvent') {
+        const [candidate] = action.payload.args as unknown as [EventDocEvent];
+        return candidate.type === REJECTED_EVENT_TYPE ? `${REJECTED_EVENT_TYPE} is not allowed` : null;
+      }
+
       if (action.payload.functionName !== 'collectReferences') {
         throw new Error(`Unexpected dynamic function member: ${action.payload.functionName}`);
       }
 
       return action.payload.args[0].filter((candidate) => LINK_EVENT_TYPES.includes(candidate.type)).map((candidate) => candidate.payload.data);
+    },
+
+    // The collection authoriser, when the environment declares one: records every call and refuses the
+    // actions the test marks as forbidden.
+    [InlineFunctionActionType.Execute]: (action: { payload: AuthoriseCall }) => {
+      authoriseCalls.push(action.payload);
+
+      return forbidActions.has(action.payload.payload.action)
+        ? throwsError(ErrorTypeEnum.Forbidden, `Missing permission: eventDoc:${action.payload.payload.storeName}:${action.payload.payload.action}`)
+        : undefined;
     },
 
     [KeyValueStoreActionType.Upsert]: (action: {
@@ -300,7 +337,7 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
       `https://${environmentName}.example.com/upload/${action.payload.drive}/${action.payload.filepath}`,
   };
 
-  return { tables, files, mocks, seedDoc };
+  return { tables, files, mocks, seedDoc, authoriseCalls, forbidActions };
 };
 
 const httpEvent = (body: unknown): HTTPEvent => ({
@@ -766,5 +803,103 @@ describe('eventDoc transfer round trip', () => {
     // Overwriting this doc's own tail would not free the code, so force must not touch it.
     expect(templateRow.status).toBe(EventDocTransferStatus.CodeConflict);
     expect(templateRow.eventsWritten).toBe(0);
+  });
+});
+
+// Stages the source's exported bundle into the target as an upload and returns the transfer id.
+const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: EventDocDocRefLike[]): string => {
+  const exportResult = runStory(exportBundle(httpEvent({ docs })), source.mocks);
+  expect(exportResult.status).toBe(200);
+  const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+  const bundle = source.files[exportedKey] as EventDocBundle;
+
+  const uploadTarget = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+  target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(uploadTarget.transferId)}`] = bundle;
+
+  return uploadTarget.transferId;
+};
+
+type EventDocDocRefLike = { service: string; type: string; id: string };
+
+// Security regression: an uploaded bundle is whatever the uploader says it is, so its tail goes through the same
+// validator and fold the append gate runs; a rejected event never reaches a document log.
+describe('eventDoc transfer import validation', () => {
+  it('refuses a bundle whose tail the registered validator rejects and writes nothing for that doc', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({ pk: 'template-1', sk: eventId(4), data: event(4, REJECTED_EVENT_TYPE, {}) });
+
+    const transferId = stageBundle(source, target, [templateRef]);
+
+    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/BAD_EVENT is not allowed/);
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+  });
+
+  it('still imports a valid log through the validator', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+
+    expect(rows.find((row: { id: string }) => row.id === 'template-1').eventsWritten).toBe(4);
+  });
+});
+
+// Security regression: inside a tenant the transfer runs the collection authoriser for what it does to each
+// collection: read to export or plan, create or write to import, delete to force an overwrite.
+describe('eventDoc transfer authorise', () => {
+  it('asks the authoriser for read on export and create on a new import', () => {
+    const source = buildEnvironment('dev', 'docs-authorise');
+    const target = buildEnvironment('uat', 'docs-authorise');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    expect(source.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: TEMPLATES_STORE, action: 'read' });
+    expect(source.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: CONTENT_STORE, action: 'read' });
+    expect(source.authoriseCalls.every((call) => call.functionName === 'docs-authorise')).toBe(true);
+
+    const importResult = runStory(importBundle(httpEvent({ transferId })), target.mocks);
+    expect(importResult.status).toBe(200);
+    expect(target.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: TEMPLATES_STORE, action: 'create' });
+    expect(target.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: STYLES_STORE, action: 'create' });
+  });
+
+  it('refuses an import the authoriser forbids and writes nothing', () => {
+    const source = buildEnvironment('dev', 'docs-authorise');
+    const target = buildEnvironment('uat', 'docs-authorise');
+    seedDiamond(source);
+    target.forbidActions.add('create');
+
+    const transferId = stageBundle(source, target, [templateRef]);
+
+    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/Missing permission: eventDoc:styles:create/);
+    expect(target.tables[TEMPLATES_STORE] ?? []).toHaveLength(0);
+    expect(target.tables[STYLES_STORE] ?? []).toHaveLength(0);
+  });
+
+  it('asks for delete before a forced overwrite', () => {
+    const source = buildEnvironment('dev', 'docs-authorise');
+    const target = buildEnvironment('uat', 'docs-authorise');
+    seedDiamond(source);
+    seedDiamond(target);
+    // The target edited the template directly, so the logs diverge at event 3.
+    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)] = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].filter(
+      (row) => !(row.pk === 'template-1' && row.sk === 3),
+    );
+    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
+      pk: 'template-1',
+      sk: eventId(3),
+      data: event(3, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content')),
+    });
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId, force: true })), target.mocks).body!);
+
+    expect(rows.find((row: { id: string }) => row.id === 'template-1').status).toBe(EventDocTransferStatus.Overwritten);
+    expect(target.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: TEMPLATES_STORE, action: 'delete' });
   });
 });
