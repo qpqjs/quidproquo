@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- Http route params are now percent-decoded before they reach the handler, on Lambda, the dev server and CloudFront seo routes: a request to `/log/svc%3A%3A1` gives `params.correlationId === 'svc::1'`. Matching still runs on the encoded path, so an encoded slash never changes the route, and a param that is not valid percent-encoding is a 404. Remove any `decodeURIComponent(params.x)` in a controller (it would now double-decode) and any client that left characters unencoded so the server would see them literally; `encodeURIComponent` the whole segment instead. Queue message type matching (`awsLambdaUtils.matchUrl`) is unchanged; http routes use the new `awsLambdaUtils.matchRoutePath`.
+
 ## 0.2.1
 
 ## 0.2.0

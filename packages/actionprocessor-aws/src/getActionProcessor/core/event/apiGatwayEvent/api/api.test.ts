@@ -118,6 +118,27 @@ describe('apiGatwayEvent/api getEventMatchStoryActionProcessor', () => {
     expect((match as any).runtime).toEqual(runtime);
   });
 
+  it('decodes route params before handing them to the story', async () => {
+    const runtime = { src: 'handler', runtimeType: 'Function' } as any;
+    const config = buildTestQpqConfig([
+      {
+        configSettingType: QPQWebServerConfigSettingType.Route,
+        uniqueKey: 'GET/log/{id}',
+        path: '/log/{id}',
+        method: 'GET',
+        runtime,
+        options: { allowedOrigins: [] },
+      } as any,
+    ]);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
+
+    const [match] = await processor({ qpqEventRecord: { path: '/log/svc%3A%3A1', method: 'GET', headers: {} } });
+    const [, error] = await processor({ qpqEventRecord: { path: '/log/%E0', method: 'GET', headers: {} } });
+
+    expect((match as any).runtimeOptions).toEqual({ id: 'svc::1' });
+    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+  });
+
   // Security regression: the matcher compares the raw path, so dot segments or encoded slashes never fold a request
   // onto a different route.
   it('never matches a route through dot segments or encoded separators', async () => {

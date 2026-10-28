@@ -9,8 +9,9 @@ describe('getLogUrl', () => {
     expect(getLogUrl('abc-123')).toBe('/log/downloadUrl/abc-123');
   });
 
-  it('keeps the module::uuid id shape as the server minted it', () => {
-    expect(getLogUrl('svc::7f6b0e2a-1c2d-4e3f-8a9b-0c1d2e3f4a5b')).toBe('/log/downloadUrl/svc::7f6b0e2a-1c2d-4e3f-8a9b-0c1d2e3f4a5b');
+  // The server decodes route params, so the whole id is encoded and the handler still sees `svc::uuid`.
+  it('percent-encodes the module::uuid id as one path segment', () => {
+    expect(getLogUrl('svc::7f6b0e2a-1c2d-4e3f-8a9b-0c1d2e3f4a5b')).toBe('/log/downloadUrl/svc%3A%3A7f6b0e2a-1c2d-4e3f-8a9b-0c1d2e3f4a5b');
   });
 
   it('returns an empty string when the correlation is empty', () => {

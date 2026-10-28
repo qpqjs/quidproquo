@@ -8,7 +8,7 @@ import { askTenantEmailRequest } from '../askTenantEmailRequest';
 export function* remove(event: HTTPEvent, params: { address: string }): AskResponse<HTTPEventResponse> {
   const { tenantId } = yield* askTenantEmailRequest(event);
 
-  yield* askTenantEmailInboxRelease(tenantId, decodeURIComponent(params.address));
+  yield* askTenantEmailInboxRelease(tenantId, params.address);
 
   return qpqWebServerUtils.toJsonEventResponse({ ok: true });
 }

@@ -1,7 +1,6 @@
 import { QpqPagedData, StoryResultMetadata } from '@qpqjs/core';
 
 import { apiRequestGet, cache } from '../../logic';
-import { encodeLogPathSegment } from './encodeLogPathSegment';
 
 export const fineLogDirectChildren = cache(async function findLogDirectChildren(
   logCorrelation: string,
@@ -11,7 +10,7 @@ export const fineLogDirectChildren = cache(async function findLogDirectChildren(
   try {
     // TODO: Paging
     const fetchedChildLogs = await apiRequestGet<QpqPagedData<StoryResultMetadata>>(
-      `/log/children/${encodeLogPathSegment(logCorrelation)}`,
+      `/log/children/${encodeURIComponent(logCorrelation)}`,
       apiBaseUrl,
       accessToken,
     );
