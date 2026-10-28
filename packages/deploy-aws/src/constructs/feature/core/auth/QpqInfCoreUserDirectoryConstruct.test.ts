@@ -69,3 +69,17 @@ describe('QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole', () => {
     expect(Template.fromStack(stack).findResources('AWS::IAM::Policy')).toEqual({});
   });
 });
+
+// Security regression: the pool client hides whether an account exists. Without it, forgot-password answers
+// UserNotFound for unknown emails and lets anyone enumerate accounts.
+describe('QpqInfCoreUserDirectoryConstruct user pool client', () => {
+  it('prevents user existence errors on the app client', () => {
+    const userDirectoryConfig = defineUserDirectory('users');
+    const ownConfig = buildTestQpqConfig([defineAwsServiceAccountInfo(env.account, env.region), userDirectoryConfig]);
+    const stack = new Stack(new App(), 'inf', { env });
+
+    new QpqInfCoreUserDirectoryConstruct(stack, 'users', { qpqConfig: ownConfig, userDirectoryConfig });
+
+    Template.fromStack(stack).hasResourceProperties('AWS::Cognito::UserPoolClient', { PreventUserExistenceErrors: 'ENABLED' });
+  });
+});
