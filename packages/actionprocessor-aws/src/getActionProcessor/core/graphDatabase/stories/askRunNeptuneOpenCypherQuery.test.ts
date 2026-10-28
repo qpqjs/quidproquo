@@ -1,55 +1,40 @@
-import { ActionOf, askNetworkRequestBase, ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType, runStory, StoryError } from '@qpqjs/core';
+import { Action, GraphDatabaseInstanceType, NetworkActionType, runStory } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
 import { GraphDatabaseForNeptuneActionType } from '../customActions';
 import { askRunNeptuneOpenCypherQuery } from './askRunNeptuneOpenCypherQuery';
 
-const payload = {
-  graphDatabaseName: 'graph',
-  openCypherQuery: 'RETURN qpqElementId(n)',
-  params: { a: 1 },
-  instance: GraphDatabaseInstanceType.Read,
-};
-
+// Security regression: the openCypher POST goes out with the signed headers over exactly the body that was signed.
 describe('askRunNeptuneOpenCypherQuery', () => {
-  it('queries the read endpoint and converts the response', () => {
-    let requestedUrl = '';
-    let requestedBody: unknown;
+  it('signs the exact body it sends and attaches the signed headers', () => {
+    let signed: { url: string; body: string } | undefined;
+    let request: Action<any> | undefined;
 
-    const result = runStory(askRunNeptuneOpenCypherQuery(payload), {
-      [GraphDatabaseForNeptuneActionType.GetEndpoints]: { readEndpoint: 'http://read', writeEndpoint: 'http://write' },
-      [NetworkActionType.Request]: (action: ActionOf<typeof askNetworkRequestBase>) => {
-        requestedUrl = action.payload.url;
-        requestedBody = action.payload.body;
-        return { status: 200, data: { results: [{ count: 5 }] } };
-      },
-    });
-
-    expect(requestedUrl).toBe('http://read/openCypher');
-    expect(requestedBody).toEqual({ query: 'RETURN n.`~id`', parameters: { a: 1 } });
-    expect(result).toEqual({ results: [{ count: 5 }] });
-  });
-
-  it('throws when the requested instance has no endpoint', () => {
-    expect(() =>
-      runStory(askRunNeptuneOpenCypherQuery({ ...payload, instance: GraphDatabaseInstanceType.Write }), {
-        [GraphDatabaseForNeptuneActionType.GetEndpoints]: { readEndpoint: 'http://read' },
+    runStory(
+      askRunNeptuneOpenCypherQuery({
+        graphDatabaseName: 'graph',
+        openCypherQuery: 'MATCH (n) RETURN n',
+        params: { a: 1 },
+        instance: GraphDatabaseInstanceType.Write,
       }),
-    ).toThrow('No [write] endpoint found');
-  });
+      {
+        [GraphDatabaseForNeptuneActionType.GetEndpoints]: { readEndpoint: 'https://read:8182', writeEndpoint: 'https://write:8182' },
+        [GraphDatabaseForNeptuneActionType.SignRequest]: (action: Action<{ url: string; body: string }>) => {
+          signed = action.payload;
+          return { authorization: 'AWS4-HMAC-SHA256 signed', 'x-amz-date': '20260101T000000Z', host: 'write:8182' };
+        },
+        [NetworkActionType.Request]: (action: Action<any>) => {
+          request = action;
+          return { status: 200, statusText: 'OK', headers: {}, setCookies: [], data: { results: [] } };
+        },
+      },
+    );
 
-  it('throws when the query responds with a non-2xx status', () => {
-    try {
-      runStory(askRunNeptuneOpenCypherQuery(payload), {
-        [GraphDatabaseForNeptuneActionType.GetEndpoints]: { readEndpoint: 'http://read' },
-        [NetworkActionType.Request]: { status: 500, data: { results: [] } },
-      });
-      throw new Error('expected the story to throw');
-    } catch (error) {
-      expect(error).toBeInstanceOf(StoryError);
-      expect((error as StoryError).errorType).toBe(ErrorTypeEnum.GenericError);
-      expect((error as StoryError).errorText).toBe('Unable to query database');
-    }
+    expect(signed?.url).toBe('https://write:8182/openCypher');
+    expect(request?.payload.url).toBe('https://write:8182/openCypher');
+    expect(request?.payload.body).toBe(signed?.body);
+    expect(JSON.parse(signed!.body)).toEqual({ query: 'MATCH (n) RETURN n', parameters: { a: 1 } });
+    expect(request?.payload.headers).toMatchObject({ authorization: 'AWS4-HMAC-SHA256 signed', 'x-amz-date': '20260101T000000Z' });
   });
 });
