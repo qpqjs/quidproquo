@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0
+
+- features/actionprocessor-aws: move to zod 4 and drop `zod-validation-error`; vitest 4, plus bumps to undici, adm-zip, postal-mime and module-federation node
+- webserver/actionprocessor-aws: http route params are percent-decoded before they reach the handler, on lambda, the dev server and cloudfront seo routes
+- security: event doc transfers run the collection authoriser per action (tenanted ones default to the tenant authoriser), imported tails are validated and folded before they are written, and websocket chats in `defineEventDocAi` run the collection's `authorise` hook for read
+- security: neptune clusters require iam authentication, the service role holds only the query actions on its own cluster, and every openCypher request is sigv4-signed
+- security: the aws stacks tighten their policies. Sns delivers only from the exact topics a queue subscribes to, only this app's sqs queues may subscribe to an event bus, drive buckets and queues deny plain http, and the service role drops account-wide cloudwatch log reads and the transfer family trust
+- security: every web entry sends hsts, nosniff, frame deny and a referrer policy (csp only when configured), and the subdomain redirect api sits behind the regional web acl and no longer traces request bodies
+- security: user pool clients prevent existence errors, and forgot-password answers an unknown account like a known one
+- security: admin log search filters the redacted log instead of the raw one, custom auth challenge answers are redacted, and the admin app percent-encodes correlation ids in log request paths
+- security: the federated module store refuses manifest paths that resolve outside the cache directory, dev server json file stores are written owner-only, and tinker repl history moves to the gitignored runtime folder
+- core: the file stream chunk size is clamped to at least one so the iterator always terminates
+- docs: added the security model page
+
+### Breaking changes
+
+- `@qpqjs/features` moves to zod 4 and drops `zod-validation-error`, so service schemas must come from zod 4 and validation error text changed
+- neptune clusters need iam database authentication, so unsigned requests to the cluster are refused after deploy
+- `defineEventDocTransfer` gains `authorise`, and tenanted transfers now need per-collection roles (`authorise: ''` keeps the old gating)
+- `EventDocAuthoriseInput.event` is optional, and `defineEventDocAi` takes the collection's `authorise` name
+- http route params arrive percent-decoded, so drop any `decodeURIComponent` in controllers
+
 ## 0.2.1
 
 - release: the publish job runs in the npm environment

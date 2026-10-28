@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/deploy-rspack",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -41,20 +41,20 @@
     "@rspack/plugin-react-refresh": "^2.0.2",
     "dts-bundle-generator": "9.5.1",
     "path-browserify": "^1.0.1",
-    "@qpqjs/actionprocessor-aws": "0.2.1",
-    "@qpqjs/actionprocessor-node": "0.2.1",
-    "@qpqjs/config-aws": "0.2.1",
-    "@qpqjs/core": "0.2.1",
-    "@qpqjs/deploy-aws": "0.2.1",
-    "@qpqjs/dev-server": "0.2.1",
-    "@qpqjs/webserver": "0.2.1",
+    "@qpqjs/actionprocessor-aws": "0.3.0",
+    "@qpqjs/actionprocessor-node": "0.3.0",
+    "@qpqjs/config-aws": "0.3.0",
+    "@qpqjs/core": "0.3.0",
+    "@qpqjs/deploy-aws": "0.3.0",
+    "@qpqjs/dev-server": "0.3.0",
+    "@qpqjs/webserver": "0.3.0",
     "react-refresh": "^0.18.0"
   },
   "devDependencies": {
     "@rspack/core": "^2.1.2",
     "@types/node": "^22.13.13",
     "@types/path-browserify": "^1.0.3",
-    "@qpqjs/tsconfig": "0.2.1",
+    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
