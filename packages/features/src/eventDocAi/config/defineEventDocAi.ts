@@ -54,6 +54,7 @@ export const defineEventDocAi = ({
   storeName,
   type,
   scoped = false,
+  authorise,
   serviceName,
   eventBusName,
   userDirectoryName,
@@ -68,7 +69,7 @@ export const defineEventDocAi = ({
   cacheTtl = AiCacheTtl.Dynamic,
   sendUsageToFrontend = false,
 }: EventDocAiOptions): QPQConfig => {
-  const store = buildEventDocStore({ storeName, type });
+  const store = buildEventDocStore({ storeName, type, authorise });
   const chatDrive = eventDocAiChatDriveName(storeName);
   const chatListStore = eventDocAiChatListStoreName(storeName);
 

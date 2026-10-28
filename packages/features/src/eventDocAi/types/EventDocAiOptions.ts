@@ -8,6 +8,9 @@ export type EventDocAiOptions = {
   // routes have a scopeResolver (the ws connection's scope), so the chat store and drive
   // refuse unscoped calls just like the collection's own.
   scoped?: boolean;
+  // The collection's `authorise` inline function name (the same one its routes declare), run for read before every
+  // chat method. Omitted, chats are gated by scope alone.
+  authorise?: string;
   // The service the ws requests route through — must match the serviceName the
   // frontend passes to askEventDocAiInit.
   serviceName: string;
