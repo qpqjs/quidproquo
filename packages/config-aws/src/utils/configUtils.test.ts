@@ -327,6 +327,32 @@ describe('getAwsServiceAccountInfoByDeploymentInfo', () => {
 
     expect(() => getAwsServiceAccountInfoByDeploymentInfo(config, 'nope', 'nope', 'nope', 'nope')).toThrow();
   });
+
+  // Security regression: a service info entry pinned to another environment or application must never answer a lookup
+  // for this deployment, otherwise a cross-module reference (bucket, table, topic) would be built against the wrong
+  // account. The local deployment's own entry wins over a partial match from elsewhere.
+  it('never resolves a production-only entry for a development lookup', () => {
+    const production: ServiceAccountInfo = { moduleName: 'auth', environment: 'production', awsAccountId: 'prod', awsRegion: 'r1' };
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'us-east-1', [production])]);
+
+    expect(getAwsServiceAccountInfoByDeploymentInfo(config, 'auth', 'development', undefined, 'test-app').awsAccountId).toBe('111');
+    expect(resolveAwsServiceAccountInfo(config, { module: 'auth', environment: 'production' }).awsAccountId).toBe('prod');
+  });
+
+  it("never resolves another application's entry for this application", () => {
+    const foreign: ServiceAccountInfo = { moduleName: 'auth', applicationName: 'other-app', awsAccountId: 'other', awsRegion: 'r1' };
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'us-east-1', [foreign])]);
+
+    expect(resolveAwsServiceAccountInfo(config, { module: 'auth' }).awsAccountId).toBe('111');
+  });
+
+  it('prefers the entry pinned to this environment over an environment wildcard', () => {
+    const anyEnvironment: ServiceAccountInfo = { moduleName: 'auth', awsAccountId: 'any', awsRegion: 'r1' };
+    const thisEnvironment: ServiceAccountInfo = { moduleName: 'auth', environment: 'development', awsAccountId: 'dev', awsRegion: 'r1' };
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'us-east-1', [anyEnvironment, thisEnvironment])]);
+
+    expect(resolveAwsServiceAccountInfo(config, { module: 'auth' }).awsAccountId).toBe('dev');
+  });
 });
 
 describe('getOwnedAwsAlarmConfigs', () => {
