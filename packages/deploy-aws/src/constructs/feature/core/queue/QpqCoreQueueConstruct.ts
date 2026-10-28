@@ -71,6 +71,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       queueName: awsNamingUtils.withFifoSuffix(this.resourceName(`${props.queueConfig.name}-dead`), isFifo),
       fifo: isFifo || undefined,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      enforceSSL: true,
     });
 
     this.queue = new aws_sqs.Queue(this, 'MainQueue', {
@@ -78,6 +79,8 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       fifo: isFifo || undefined,
       visibilityTimeout: cdk.Duration.seconds(props.queueConfig.ttRetryInSeconds),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Message bodies carry a story session; refuse plain-http requests
+      enforceSSL: true,
 
       deadLetterQueue: {
         maxReceiveCount: props.queueConfig.maxTries,

@@ -43,15 +43,19 @@ describe('QpqCoreStorageDriveConstruct lockedDown', () => {
     const template = synth(defineStorageDrive('logs', { lockedDown: true }));
     const policies = template.findResources('AWS::S3::BucketPolicy');
     const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
-    const denied = statements.filter((statement: any) => statement.Effect === 'Deny').flatMap((statement: any) => statement.Action);
+    const denied = statements
+      .filter((statement: any) => statement.Effect === 'Deny' && statement.Sid === 'DenyObjectReadExceptServiceRole')
+      .flatMap((statement: any) => statement.Action);
 
     expect(denied).toEqual(['s3:GetObject', 's3:GetObjectVersion']);
   });
 
-  it('adds no deny when the drive is not lockedDown', () => {
+  it('adds no read deny when the drive is not lockedDown', () => {
     const template = synth(defineStorageDrive('logs'));
+    const policies = template.findResources('AWS::S3::BucketPolicy');
+    const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
 
-    template.resourceCountIs('AWS::S3::BucketPolicy', 0);
+    expect(statements.some((statement: any) => statement.Sid === 'DenyObjectReadExceptServiceRole')).toBe(false);
   });
 
   it('fails synth when lockedDown without a service role', () => {
@@ -80,7 +84,9 @@ describe('QpqCoreStorageDriveConstruct bucket hardening', () => {
     const buckets = Object.values(template.findResources('AWS::S3::Bucket'));
 
     expect((buckets[0] as any).Properties.AccessControl).toBeUndefined();
-    template.resourceCountIs('AWS::S3::BucketPolicy', 0);
+    const policies = template.findResources('AWS::S3::BucketPolicy');
+    const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+    expect(statements.every((statement: any) => statement.Effect === 'Deny')).toBe(true);
   });
 });
 

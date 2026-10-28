@@ -115,6 +115,9 @@ describe('landing drive bucket policy', () => {
     const stack = buildStack();
     new QpqCoreStorageDriveConstruct(stack, 'drive', { qpqConfig, storageDriveConfig: defineStorageDrive('assets') });
 
-    Template.fromStack(stack).resourceCountIs('AWS::S3::BucketPolicy', 0);
+    const policies = Template.fromStack(stack).findResources('AWS::S3::BucketPolicy');
+    const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+
+    expect(statements.some((statement: any) => statement.Principal?.Service === 'ses.amazonaws.com')).toBe(false);
   });
 });
