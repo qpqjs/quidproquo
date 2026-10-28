@@ -12,6 +12,23 @@ export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
   eventBusConfig: EventBusQPQConfigSetting;
 }
 
+// `*-<app>-*-<env>[-<feature>]` in every app account, plain and FIFO: the queue naming scheme
+// with the queue and service segments wildcarded.
+const resolveSubscriberQueueArnPatterns = (qpqConfig: QPQConfig): string[] => {
+  const queueNamePattern = awsNamingUtils.getConfigRuntimeResourceName(
+    '*',
+    qpqCoreUtils.getApplicationName(qpqConfig),
+    '*',
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+  );
+
+  return getAwsAccountIds(qpqConfig).flatMap((accountId) => [
+    `arn:aws:sqs:*:${accountId}:${queueNamePattern}`,
+    `arn:aws:sqs:*:${accountId}:${awsNamingUtils.withFifoSuffix(queueNamePattern, true)}`,
+  ]);
+};
+
 export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
   abstract topic: aws_sns.ITopic;
 
@@ -66,6 +83,12 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.topic, props.qpqConfig);
 
+    // Subscribers are this app's own queues (any service, same environment and feature),
+    // which other stacks attach without an identity grant of their own. The endpoint
+    // condition keeps a principal elsewhere in a shared account from attaching a queue
+    // and reading every message, session included.
+    const subscriberEndpointPatterns = resolveSubscriberQueueArnPatterns(props.qpqConfig);
+
     const accountIds = getAwsAccountIds(props.qpqConfig);
     accountIds.forEach((accountId) => {
       this.topic.addToResourcePolicy(
@@ -75,6 +98,10 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
           principals: [new aws_iam.AccountPrincipal(accountId)],
           actions: ['sns:Subscribe'],
           resources: [this.topic.topicArn],
+          conditions: {
+            StringEquals: { 'sns:Protocol': 'sqs' },
+            StringLike: { 'sns:Endpoint': subscriberEndpointPatterns },
+          },
         }),
       );
     });
