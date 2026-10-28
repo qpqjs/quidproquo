@@ -3,6 +3,7 @@ import { defineSecuritySmoke } from './config/defineSecuritySmoke';
 import { askRunAdminServicesRequireAuthTest } from './probes/askRunAdminServicesRequireAuthTest';
 import { askRunRuntimeErrorTextLeakTest } from './probes/askRunRuntimeErrorTextLeakTest';
 import { askRunSourceMapNotServedTest } from './probes/askRunSourceMapNotServedTest';
+import { askRunTenantIsolationTest } from './probes/askRunTenantIsolationTest';
 import { askRunUnverifiedBearerNoExpiryTest } from './probes/askRunUnverifiedBearerNoExpiryTest';
 import { askRunUnverifiedBearerTest } from './probes/askRunUnverifiedBearerTest';
 import { askRunWebsiteBucketNotPublicTest } from './probes/askRunWebsiteBucketNotPublicTest';
@@ -40,5 +41,6 @@ export const securitySmokeSuite: SmokeSuite = {
       askRun: askRunWebsiteSecurityHeadersTest,
       deployedOnly: true,
     },
+    { name: 'securityTenantIsolation', askRun: askRunTenantIsolationTest },
   ],
 };
