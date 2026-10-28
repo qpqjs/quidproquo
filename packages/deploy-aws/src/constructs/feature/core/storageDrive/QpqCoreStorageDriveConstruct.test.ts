@@ -83,3 +83,20 @@ describe('QpqCoreStorageDriveConstruct bucket hardening', () => {
     template.resourceCountIs('AWS::S3::BucketPolicy', 0);
   });
 });
+
+// Security regression: every drive bucket refuses plain-http requests (Security Hub S3.5), so a presigned url rewritten
+// to http:// or an sdk call without tls is denied instead of served.
+describe('QpqCoreStorageDriveConstruct transport', () => {
+  it.each([
+    ['plain drive', defineStorageDrive('uploads')],
+    ['lockedDown drive', defineStorageDrive('logs', { lockedDown: true })],
+  ])('denies plain http on a %s', (_name, drive) => {
+    synth(drive).hasResourceProperties('AWS::S3::BucketPolicy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({ Effect: 'Deny', Action: 's3:*', Principal: { AWS: '*' }, Condition: { Bool: { 'aws:SecureTransport': 'false' } } }),
+        ]),
+      },
+    });
+  });
+});
