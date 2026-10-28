@@ -125,6 +125,9 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
       versioned: true,
 
+      // Refuse plain-http requests, presigned urls included (Security Hub S3.5)
+      enforceSSL: true,
+
       cors: [
         {
           allowedOrigins: props.corsAllowedOrigins ?? ['*'],
