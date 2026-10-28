@@ -15,6 +15,9 @@ export type EventDocTransferOptions = {
   collections: EventDocTransferCollectionSource[];
   // Scopes the whole request; needed here because a transfer spans collections. Omit only if none of them partition.
   scopeResolver?: string;
+  // The collections' `authorise` inline function name, run per collection for what the transfer does to it: read to
+  // manifest, export or plan; create or write to import; delete to force an overwrite. Omit for scope-only gating.
+  authorise?: string;
   // Import writes unvalidated history, so gate these routes harder than the collections' own.
   routeAuthSettings?: RouteAuthSettings;
   version?: number;
@@ -24,11 +27,19 @@ export type EventDocTransferOptions = {
 const TRANSFER_BASE_PATH = '/transfer';
 
 /** The export/import surface for one service: a staging drive plus the manifest/export/upload/plan/import routes. */
-export const defineEventDocTransfer = ({ service, collections, scopeResolver, routeAuthSettings, version }: EventDocTransferOptions): QPQConfig => {
+export const defineEventDocTransfer = ({
+  service,
+  collections,
+  scopeResolver,
+  authorise,
+  routeAuthSettings,
+  version,
+}: EventDocTransferOptions): QPQConfig => {
   const globals: Record<string, unknown> = buildEventDocTransferGlobals({
     service,
     collections: collections.map(toEventDocTransferCollection),
     scopeResolver,
+    authorise,
   });
 
   // askEventDocResolveUserId/Actor (which a tenant scope resolver calls on every request) read the directory off this global.

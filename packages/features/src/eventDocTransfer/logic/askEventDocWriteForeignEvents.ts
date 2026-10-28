@@ -1,8 +1,12 @@
-import { askInlineFunctionExecute, AskResponse, Nullable } from '@qpqjs/core';
+import { askCatch, askInlineFunctionExecute, AskResponse, askThrowError, createDynamicFunctionCaller, Nullable } from '@qpqjs/core';
 
+import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { askEventDocResolveStore } from '../../eventDoc/context';
 import { askEventDocEventWrite, askEventDocUpsert } from '../../eventDoc/data';
+import { EventDocInvokableFunctions } from '../../eventDoc/definition/types/EventDocInvokableFunctions';
 import { askEventDocHookStates } from '../../eventDoc/logic/askEventDocHookStates';
+import { askEventDocValidateAppendRun } from '../../eventDoc/logic/askEventDocValidateAppendRun';
+import { isEventDocFunctionsMissing } from '../../eventDoc/logic/isEventDocFunctionsMissing';
 import {
   EventDocEffect,
   EventDocEvent,
@@ -59,9 +63,31 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
   }
 }
 
+// The uploader is the bundle's only provenance, so the tail gets the append gate's validator and fold, each event
+// against the state its predecessors fold to. The opening INIT_STATE seeds the state like a create does, so the run
+// starts after it. A collection with no registered definition degrades to an unvalidated write, as an append does.
+function* askEventDocValidateForeignTail(events: EventDocEvent[], fromIndex: number): AskResponse<void> {
+  const { storeName, type } = yield* askEventDocResolveStore();
+  const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
+
+  const seedCount = Math.max(fromIndex, 1);
+  const seed = yield* askCatch(functionsCaller.foldDocumentState(events.slice(0, seedCount)));
+
+  if (!seed.success) {
+    if (isEventDocFunctionsMissing(seed.error.errorType)) {
+      return;
+    }
+
+    return yield* askThrowError(seed.error.errorType, seed.error.errorText);
+  }
+
+  yield* askEventDocValidateAppendRun(events.slice(seedCount), seed.result);
+}
+
 /**
  * Writes `events[fromIndex..]` into the collection's log verbatim except for `createdBy.userId`, which becomes the importer.
- * Bypasses askEventDocEventAppend on purpose: replayed history was validated at its origin and must not be restamped.
+ * Bypasses askEventDocEventAppend's restamping on purpose (replayed history keeps its ids and times) but not its gate: the
+ * tail is validated and folded first, so a crafted bundle cannot land an event the document fold cannot read.
  * `events` is the complete incoming log; the import is a fast-forward, so ids continue the local log. Requires the store context.
  */
 export function* askEventDocWriteForeignEvents(
@@ -74,6 +100,10 @@ export function* askEventDocWriteForeignEvents(
 
   const localised = events.map((event) => toLocalActor(event, importerUserId));
   const missing = localised.slice(fromIndex);
+
+  if (missing.length > 0) {
+    yield* askEventDocValidateForeignTail(localised, fromIndex);
+  }
 
   for (const event of missing) {
     yield* askEventDocEventWrite(docId, event);

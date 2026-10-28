@@ -3,6 +3,8 @@ import { AskResponse } from '@qpqjs/core';
 import { askEventDocEventListAll, askEventDocGetById } from '../../eventDoc/data';
 import { askEventDocGetIdByCode } from '../../eventDoc/logic';
 import { foldEventDocSummary } from '../../eventDoc/summary';
+import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
+import { askEventDocTransferAuthorise } from '../globals/askEventDocTransferAuthorise';
 import { EventDocBundleDoc, EventDocTransferPlanRow, EventDocTransferStatus } from '../models';
 import { findEventDocLogDivergence } from './findEventDocLogDivergence';
 
@@ -30,6 +32,8 @@ const toPlanRow = (
 
 /** What an import of one doc would do. Writes nothing; identity comes from folding the incoming log. Requires the store context. */
 export function* askEventDocBundlePlanDoc(doc: EventDocBundleDoc): AskResponse<EventDocTransferPlanRow> {
+  yield* askEventDocTransferAuthorise(EventDocPermissionAction.read);
+
   const { code, name } = foldEventDocSummary(doc.events);
 
   // An export never emits an empty log; this only fires for a hand-edited bundle.
