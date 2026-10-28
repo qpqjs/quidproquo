@@ -3,6 +3,7 @@ import * as qpqCore from '@qpqjs/core';
 import * as qpqWebserver from '@qpqjs/webserver';
 
 import { randomUUID } from 'crypto';
+import fs from 'fs';
 import path from 'path';
 import * as repl from 'repl';
 import * as util from 'util';
@@ -156,8 +157,11 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         preview: false, // Disable preview to make multiline easier
       });
 
-      // Enable editor mode by default for better multiline support
-      replServer.setupHistory('.qpq-tinker-history', () => {});
+      // History can hold literal secrets typed at the prompt, so it lives under the
+      // gitignored runtime folder rather than the project root.
+      const historyPath = path.resolve(devServerConfig.runtimePath, 'tinker-history');
+      fs.mkdirSync(path.dirname(historyPath), { recursive: true });
+      replServer.setupHistory(historyPath, () => {});
 
       // Add a helper command to enter editor mode
       replServer.defineCommand('e', {
