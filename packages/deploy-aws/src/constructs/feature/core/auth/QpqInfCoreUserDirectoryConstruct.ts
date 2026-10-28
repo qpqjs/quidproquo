@@ -236,6 +236,8 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       },
       accessTokenValidity: tokenValidity,
       idTokenValidity: tokenValidity,
+      // Unknown accounts answer like known ones, so forgot-password and login cannot enumerate users
+      preventUserExistenceErrors: true,
     });
 
     qpqDeployAwsUtils.exportStackValue(
