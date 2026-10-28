@@ -15,5 +15,8 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
+    // Node 25+ ships an experimental global localStorage that shadows jsdom's; the root
+    // config's execArgv does not reach a project, so the flag is repeated here.
+    execArgv: ['--no-experimental-webstorage'],
   },
 });
