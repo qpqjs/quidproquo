@@ -4,7 +4,9 @@ import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
-import { EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
+import { defineTenantedEventDocTransfer } from '../../tenant/config/defineTenantedEventDocTransfer';
+import { TENANT_EVENT_DOC_AUTHORISER_FN } from '../../tenant/constants/tenantStoreNames';
+import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL, EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
 import { defineEventDocTransfer } from './defineEventDocTransfer';
 
 const collections = [{ storeName: 'templates', type: 'template' }];
@@ -77,5 +79,27 @@ describe('defineEventDocTransfer', () => {
     const config = defineEventDocTransfer({ service: 'template', collections }).flat(Infinity) as { configSettingType: string }[];
 
     expect(config.some((setting) => setting.configSettingType === QPQCoreConfigSettingType.storageDrive)).toBe(true);
+  });
+});
+
+// Security regression: a transfer reads every collection and rewrites their logs, so inside a tenant it must run the
+// same per-collection authoriser the collections' own routes do. The tenanted definer wires the tenant authoriser in.
+describe('defineEventDocTransfer authorise', () => {
+  it('carries the collection authoriser to every transfer route', () => {
+    const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections, authorise: 'docs-authorise' }));
+
+    expect(globals.every((entry) => entry[EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL] === 'docs-authorise')).toBe(true);
+  });
+
+  it('carries an empty authoriser when none is declared', () => {
+    const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections }));
+
+    expect(globals.every((entry) => entry[EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL] === '')).toBe(true);
+  });
+
+  it('gates a tenanted transfer with the tenant authoriser', () => {
+    const globals = routeGlobals(defineTenantedEventDocTransfer({ service: 'template', collections }));
+
+    expect(globals.every((entry) => entry[EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL] === TENANT_EVENT_DOC_AUTHORISER_FN)).toBe(true);
   });
 });
