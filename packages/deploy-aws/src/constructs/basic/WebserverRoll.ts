@@ -20,7 +20,6 @@ export class WebserverRoll extends QpqConstructBlock {
       roleName: this.resourceName('service-role'),
       assumedBy: new aws_iam.CompositePrincipal(
         new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
-        new aws_iam.ServicePrincipal('transfer.amazonaws.com'),
         new aws_iam.ServicePrincipal('edgelambda.amazonaws.com'),
         // new aws_iam.ServicePrincipal('neptune.amazonaws.com'),
       ),
@@ -110,19 +109,12 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: ['*'],
       },
 
-      // Standard Lambda logging + log retrieval for the `askGetLogs` flow. Account-pinned;
-      // region is left open because edge lambdas write logs in their execution region.
+      // Standard Lambda logging, write only: story logs are read from the logs storage drive,
+      // and a read grant on log-group:* would reach every other app in the account. Region is
+      // left open because edge lambdas write logs in their execution region.
       {
         sid: 'CloudWatchLogsManagement',
-        actions: [
-          'logs:CreateLogGroup',
-          'logs:CreateLogStream',
-          'logs:DescribeLogGroups',
-          'logs:DescribeLogStreams',
-          'logs:PutLogEvents',
-          'logs:GetLogEvents',
-          'logs:FilterLogEvents',
-        ],
+        actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:DescribeLogGroups', 'logs:PutLogEvents'],
         resources: [`arn:aws:logs:*:${accountId}:log-group:*`],
       },
 
