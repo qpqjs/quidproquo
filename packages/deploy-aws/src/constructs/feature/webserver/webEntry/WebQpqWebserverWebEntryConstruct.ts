@@ -84,38 +84,37 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
-    // NOTE: This is used in the ignore cache down the bottom.
-    const responseHeaderPolicy =
-      props.webEntryConfig.securityHeaders &&
-      new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
-        responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
-        // customHeadersBehavior: {
-        //   customHeaders: [
-        //     {
-        //       header: 'Cache-Control',
-        //       value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
-        //         props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
-        //       }`,
-        //       override: true,
-        //     },
-        //   ],
-        // },
-        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
+    // Every behaviour below shares this policy: the baseline security headers are
+    // unconditional, the csp and cors come from config.
+    const responseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
+      responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
+      // customHeadersBehavior: {
+      //   customHeaders: [
+      //     {
+      //       header: 'Cache-Control',
+      //       value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
+      //         props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
+      //       }`,
+      //       override: true,
+      //     },
+      //   ],
+      // },
+      securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
 
-        corsBehavior: {
-          accessControlAllowCredentials: false,
-          accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
-          accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
-          accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(
-            props.qpqConfig,
-            props.webEntryConfig.corsAllowedOrigins,
-            requireDomainResolver(props.qpqConfig),
-          ),
-          accessControlExposeHeaders: ['*'],
-          accessControlMaxAge: cdk.Duration.seconds(600),
-          originOverride: true,
-        },
-      });
+      corsBehavior: {
+        accessControlAllowCredentials: false,
+        accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
+        accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
+        accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(
+          props.qpqConfig,
+          props.webEntryConfig.corsAllowedOrigins,
+          requireDomainResolver(props.qpqConfig),
+        ),
+        accessControlExposeHeaders: ['*'],
+        accessControlMaxAge: cdk.Duration.seconds(600),
+        originOverride: true,
+      },
+    });
 
     // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
