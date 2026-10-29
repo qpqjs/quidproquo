@@ -1,4 +1,4 @@
-export interface ExecuteServiceFunctionEvent<T> {
+export type ExecuteServiceFunctionEvent<T> = {
   functionName: string;
   payload: T;
-}
+};

@@ -13,12 +13,12 @@ import {
 import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../constants';
 
-export interface Migration {
+export type Migration = {
   runtime: QpqFunctionRuntime;
   deployType: DeployEventType;
-}
+};
 
-export interface QPQConfigAdvancedMigrationSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedMigrationSettings = {} & QPQConfigAdvancedSettings;
 
 function removeLeadingSlashs(text: string): string {
   if (text.startsWith('/')) {

@@ -3,12 +3,12 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { ResponseSecurityHeaders } from '../types/ResponseSecurityHeaders';
 
-export interface WebDomainOptions {
+export type WebDomainOptions = {
   subDomainName?: string;
   onRootDomain: boolean;
-}
+};
 
-export interface StorageDriveOptions {
+export type StorageDriveOptions = {
   sourceStorageDrive?: string;
   autoUpload: boolean;
 
@@ -19,9 +19,9 @@ export interface StorageDriveOptions {
    * service a standalone host on its own domain, the way shell is the root site.
    */
   syncServiceViews?: boolean;
-}
+};
 
-export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedWebEntrySettings = {
   buildPath?: string;
 
   storageDrive?: StorageDriveOptions;
@@ -45,9 +45,9 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
    * origin (e.g. serving assets as a public CDN / cross-origin fonts).
    */
   corsAllowedOrigins?: string[];
-}
+} & QPQConfigAdvancedSettings;
 
-export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
+export type WebEntryQPQWebServerConfigSetting = {
   name: string;
   indexRoot: string;
 
@@ -65,7 +65,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   securityHeaders?: ResponseSecurityHeaders;
 
   corsAllowedOrigins?: string[];
-}
+} & QPQConfigSetting;
 
 export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntrySettings): WebEntryQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.WebEntry,

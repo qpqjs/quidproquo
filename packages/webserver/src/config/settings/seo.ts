@@ -2,19 +2,19 @@ import { generateSimpleHash, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFun
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedSeoSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedSeoSettings = {
   webEntry?: string;
   cacheSettingsName?: string;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface SeoQPQWebServerConfigSetting extends QPQConfigSetting {
+export type SeoQPQWebServerConfigSetting = {
   path: string;
   runtime: QpqFunctionRuntime;
   deprecated: boolean;
   webEntry?: string;
 
   cacheSettingsName?: string;
-}
+} & QPQConfigSetting;
 
 export const defineSeo = (path: string, runtime: QpqFunctionRuntime, options?: QPQConfigAdvancedSeoSettings): SeoQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Seo,

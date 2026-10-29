@@ -4,33 +4,33 @@ export enum CloudflareDnsDeployEventEnum {
   Delete = 'Delete',
 }
 
-export interface CloudflareDnsEntry {
+export type CloudflareDnsEntry = {
   value: string;
   type: 'CNAME' | 'A';
   proxied: boolean;
-}
+};
 
-export interface CloudflareDnsEntries {
+export type CloudflareDnsEntries = {
   [Key: string]: CloudflareDnsEntry;
-}
+};
 
-export interface CloudflareDnsDeployEventCommon {
+export type CloudflareDnsDeployEventCommon = {
   siteDns: string;
   dnsEntries: CloudflareDnsEntries;
   apiSecretName: string;
-}
-export interface CloudflareDnsDeployEventCreate extends CloudflareDnsDeployEventCommon {
+};
+export type CloudflareDnsDeployEventCreate = {
   RequestType: CloudflareDnsDeployEventEnum.Create;
-}
+} & CloudflareDnsDeployEventCommon;
 
-export interface CloudflareDnsDeployEventUpdate extends CloudflareDnsDeployEventCommon {
+export type CloudflareDnsDeployEventUpdate = {
   RequestType: CloudflareDnsDeployEventEnum.Update;
   oldDnsEntries: CloudflareDnsEntries;
-}
+} & CloudflareDnsDeployEventCommon;
 
-export interface CloudflareDnsDeployEventDelete extends CloudflareDnsDeployEventCommon {
+export type CloudflareDnsDeployEventDelete = {
   RequestType: CloudflareDnsDeployEventEnum.Delete;
-}
+} & CloudflareDnsDeployEventCommon;
 
 export type CloudflareDnsDeployEvent = CloudflareDnsDeployEventCreate | CloudflareDnsDeployEventUpdate | CloudflareDnsDeployEventDelete;
 

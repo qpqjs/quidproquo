@@ -2,9 +2,9 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface EmailReceivingDomainQPQWebServerConfigSetting extends QPQConfigSetting {
+export type EmailReceivingDomainQPQWebServerConfigSetting = {
   subdomain: string;
-}
+} & QPQConfigSetting;
 
 /**
  * The app's receiving domain, one per root: `<subdomain>.<env>.<root>` resolved like every other

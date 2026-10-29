@@ -6,10 +6,10 @@ import { RouteAuthSettings } from '../config/settings/route';
 import { HTTPEvent } from '../types/HTTPEvent';
 import { getHeaderValue } from '../utils/headerUtils';
 
-export interface ValidateRouteAuthPayload {
+export type ValidateRouteAuthPayload = {
   event: HTTPEvent;
   routeAuthSettings?: RouteAuthSettings;
-}
+};
 
 export function* askValidateRouteAuth({ event, routeAuthSettings }: ValidateRouteAuthPayload): AskResponse<boolean> {
   if (!routeAuthSettings) {

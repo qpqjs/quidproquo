@@ -6,13 +6,13 @@ import { executeNetworkRequest } from './networkRequestUtils';
 
 const fetchMock = vi.fn();
 
-interface FakeResponseInit {
+type FakeResponseInit = {
   status?: number;
   statusText?: string;
   // Array-of-pairs form allows repeated header names (multiple Set-Cookie lines).
   headers?: Record<string, string> | [string, string][];
   body?: unknown;
-}
+};
 
 // A minimal stand-in for the parts of `Response` the implementation consumes,
 // giving precise control over headers without the real Response auto-populating them.

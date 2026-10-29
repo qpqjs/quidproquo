@@ -20,9 +20,9 @@ export enum QPQWebServerConfigSettingType {
 }
 
 // TODO: @joe-coady: move this somewhere better
-export interface CacheSettings {
+export type CacheSettings = {
   minTTLInSeconds: number;
   maxTTLInSeconds: number;
   defaultTTLInSeconds: number;
   mustRevalidate: boolean;
-}
+};

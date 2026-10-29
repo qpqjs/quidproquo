@@ -2,14 +2,14 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedCertificateSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedCertificateSettings = {} & QPQConfigAdvancedSettings;
 
-export interface CertificateQPQWebServerConfigSetting extends QPQConfigSetting {
+export type CertificateQPQWebServerConfigSetting = {
   onRootDomain: boolean;
   subdomain?: string;
   rootDomain: string;
   deprecated: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineCertificate = (
   onRootDomain: boolean,

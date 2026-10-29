@@ -5,11 +5,11 @@ import { HTTPEvent } from '../../types/HTTPEvent';
 import { RouteAuthDecodeResult } from './RouteAuthDecodeResult';
 import { RouteAuthValidationActionType } from './RouteAuthValidationActionType';
 
-export interface RouteAuthValidationDecodeActionPayload {
+export type RouteAuthValidationDecodeActionPayload = {
   event: HTTPEvent;
   routeAuthSettings: RouteAuthSettings;
   ignoreExpiration: boolean;
-}
+};
 
 export const askRouteAuthValidationDecode = createActionRequester<RouteAuthDecodeResult>()({
   actionType: RouteAuthValidationActionType.Decode,

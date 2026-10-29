@@ -1,12 +1,12 @@
 import { HTTPMethod, QPQBinaryData } from '@qpqjs/core';
 
-export interface HttpEventHeaders {
+export type HttpEventHeaders = {
   [key: string]: undefined | string;
-}
+};
 
-export interface HttpEventRouteParams {
+export type HttpEventRouteParams = {
   [key: string]: string;
-}
+};
 
 export enum FileUploadErrorTypeEnum {
   fileTooLarge = 'fileTooLarge',
@@ -16,12 +16,12 @@ export enum FileUploadErrorTypeEnum {
   malformed = 'malformed',
 }
 
-export interface HTTPEventFileUploadError {
+export type HTTPEventFileUploadError = {
   errorType: FileUploadErrorTypeEnum;
   message: string;
-}
+};
 
-export interface HTTPEvent {
+export type HTTPEvent = {
   path: string;
   query: { [key: string]: undefined | string | string[] };
   body?: string;
@@ -36,14 +36,14 @@ export interface HTTPEvent {
   // limits) or cannot be parsed; the event auto-responds with the matching 4xx before the
   // route story runs.
   fileUploadError?: HTTPEventFileUploadError;
-}
+};
 
-export interface HTTPEventResponse {
+export type HTTPEventResponse = {
   status: number;
   body?: string;
   headers?: HttpEventHeaders;
   isBase64Encoded: boolean;
-}
+};
 
 // type ParseParamType<S extends string> = S extends `${infer ParamName}:number`
 //   ? { name: ParamName; type: number }

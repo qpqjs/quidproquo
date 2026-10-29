@@ -2,7 +2,7 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface FileUploadSettings {
+export type FileUploadSettings = {
   /** Maximum size of any single uploaded file. Uploads with a larger file are rejected with a 413. */
   maxFileSizeBytes: number;
 
@@ -20,11 +20,11 @@ export interface FileUploadSettings {
    * (`type/*` wildcards supported). Omit to accept any content type.
    */
   allowedMimeTypes?: string[];
-}
+};
 
-export interface FileUploadSettingsQPQWebServerConfigSetting extends QPQConfigSetting {
+export type FileUploadSettingsQPQWebServerConfigSetting = {
   fileUploadSettings: Partial<FileUploadSettings>;
-}
+} & QPQConfigSetting;
 
 /**
  * Service-wide limits for multipart/form-data file uploads. Sensible defaults

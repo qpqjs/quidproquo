@@ -7,7 +7,7 @@ export enum AdminActionType {
   GetLogs = '@quidproquo-webserver/Admin/GetLogs',
 }
 
-export interface QpqLogList {
+export type QpqLogList = {
   items: StoryResultMetadata[];
   nextPageKey?: string;
-}
+};

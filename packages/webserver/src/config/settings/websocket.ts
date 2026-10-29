@@ -2,15 +2,15 @@ import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreU
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QpqWebSocketEventProcessors {
+export type QpqWebSocketEventProcessors = {
   onConnect?: QpqFunctionRuntime;
   onDisconnect?: QpqFunctionRuntime;
   onMessage?: QpqFunctionRuntime;
 
   // [type: string]: QpqSourceEntry;
-}
+};
 
-export interface QPQConfigAdvancedWebSocketSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedWebSocketSettings = {
   onRootDomain?: boolean;
   apiName?: string;
 
@@ -24,9 +24,9 @@ export interface QPQConfigAdvancedWebSocketSettings extends QPQConfigAdvancedSet
   maxConcurrentExecutions?: number;
 
   owner?: CrossModuleOwner<'websocketApiName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
+export type WebSocketQPQWebServerConfigSetting = {
   apiSubdomain: string;
 
   onRootDomain: boolean;
@@ -40,7 +40,7 @@ export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
   cloudflareApiKeySecretName?: string;
 
   maxConcurrentExecutions?: number;
-}
+} & QPQConfigSetting;
 
 export const defineWebsocket = (
   apiSubdomain: string,

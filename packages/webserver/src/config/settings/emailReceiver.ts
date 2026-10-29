@@ -4,12 +4,12 @@ import { EMAIL_RECEIVER_ON_EMAIL_GLOBAL } from '../../services/emailReceiving/co
 import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface EmailReceiverQPQWebServerConfigSetting extends QPQConfigSetting {
+export type EmailReceiverQPQWebServerConfigSetting = {
   name: string;
   // The drive raw messages land in, owned by the receiver; apps never name it.
   storageDriveName: string;
   onEmailFunctionName: string;
-}
+} & QPQConfigSetting;
 
 export type EmailReceiverOptions = {
   // Runs once per received message with an EmailReceivedEvent.

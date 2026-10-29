@@ -11,12 +11,12 @@ export enum DomainProxyViewerProtocolPolicy {
   ALLOW_ALL = 'allow-all',
 }
 
-export interface DomainProxyDomainOptions {
+export type DomainProxyDomainOptions = {
   subDomainNames?: string[];
   onRootDomain: boolean;
-}
+};
 
-export interface QPQConfigAdvancedDomainProxySettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedDomainProxySettings = {
   httpProxyDomain: string;
 
   domain: DomainProxyDomainOptions;
@@ -26,9 +26,9 @@ export interface QPQConfigAdvancedDomainProxySettings extends QPQConfigAdvancedS
   ignoreCache?: string[];
 
   domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface DomainProxyQPQWebServerConfigSetting extends QPQConfigSetting {
+export type DomainProxyQPQWebServerConfigSetting = {
   name: string;
 
   domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy;
@@ -38,7 +38,7 @@ export interface DomainProxyQPQWebServerConfigSetting extends QPQConfigSetting {
 
   cacheSettingsName?: string;
   ignoreCache: string[];
-}
+} & QPQConfigSetting;
 
 export const defineDomainProxy = (name: string, options: QPQConfigAdvancedDomainProxySettings): DomainProxyQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.DomainProxy,

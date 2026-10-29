@@ -2,15 +2,15 @@ import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreU
 
 import { CacheSettings, QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedCacheSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedCacheSettings = {
   owner?: CrossModuleOwner<'cacheName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface CacheQPQWebServerConfigSetting extends QPQConfigSetting {
+export type CacheQPQWebServerConfigSetting = {
   name: string;
 
   cache: CacheSettings;
-}
+} & QPQConfigSetting;
 
 export const defineCache = (name: string, cache: CacheSettings, options?: QPQConfigAdvancedCacheSettings): CacheQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Cache,

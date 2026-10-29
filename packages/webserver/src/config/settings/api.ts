@@ -2,7 +2,7 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedApiSettings = {
   subDomain?: string;
   cloudflareApiKeySecretName?: string;
   virtualNetworkName?: string;
@@ -12,9 +12,9 @@ export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings 
   // so this bounds the api as a whole. Free, but carved out of the deploy
   // account's shared concurrency pool.
   maxConcurrentExecutions?: number;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
+export type ApiQPQWebServerConfigSetting = {
   apiSubdomain: string;
 
   apiName: string;
@@ -26,7 +26,7 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   virtualNetworkName?: string;
 
   maxConcurrentExecutions?: number;
-}
+} & QPQConfigSetting;
 
 export const defineApi = (apiName: string, options?: QPQConfigAdvancedApiSettings): ApiQPQWebServerConfigSetting => {
   return {

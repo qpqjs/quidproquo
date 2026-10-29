@@ -4,7 +4,7 @@ import { ApiActionType } from './ApiActionType';
 
 // basePath is resolved by the processor, so it is omitted from the caller options
 export type ApiRequestOptions<T> = Omit<HTTPRequestOptions<T>, 'basePath'>;
-export interface ApiRequestActionPayload<T> {
+export type ApiRequestActionPayload<T> = {
   service: string;
   endpoint: string;
   method: HTTPMethod;
@@ -12,7 +12,7 @@ export interface ApiRequestActionPayload<T> {
   params?: Record<string, string>;
   headers?: Record<string, string>;
   responseType: ResponseType;
-}
+};
 
 export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
   actionType: ApiActionType.Request,
