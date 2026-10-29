@@ -4,20 +4,14 @@
 // into a build half and a deploy half that can run on different machines.
 import { buildDeployPlanFromArgs, promptDeployPlan } from '../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, resolveGoDockerMode } from '../lib/goDockerMode';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
-import { resolveDeployment } from '../lib/resolveDeployment';
-import { getPlatformDriver } from '../platforms';
+import { requireDriverCapability } from '../lib/requireDriverCapability';
+import { resolveCommandContext } from '../lib/resolveCommandContext';
 
 export const goDockerCommand = async (argv: string[]): Promise<void> => {
   const mode = resolveGoDockerMode(argv);
-  const appName = await resolveAppSelection({ argv, envVar: 'DEPLOY_APP_NAME' });
-  const { deployment } = await resolveDeployment(argv, appName);
-  const driver = getPlatformDriver(deployment.platform);
-
-  if (!driver.goDocker) {
-    console.error(`Platform '${deployment.platform}' has no dockerized deploy — use qpq go instead.`);
-    process.exit(1);
-  }
+  const context = await resolveCommandContext(argv);
+  const goDocker = requireDriverCapability(context, 'goDocker', 'Use qpq go instead.');
+  const { appName } = context;
 
   // Positional args (`qpq go:docker all all`) run prompt-free; otherwise ask.
   const plan = buildDeployPlanFromArgs(appName, argv) ?? (await promptDeployPlan(appName));
@@ -29,5 +23,5 @@ export const goDockerCommand = async (argv: string[]): Promise<void> => {
     process.exit(1);
   }
 
-  await driver.goDocker(appName, plan, mode);
+  await goDocker(appName, plan, mode);
 };

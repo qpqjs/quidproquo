@@ -9,10 +9,8 @@ import { Nullable } from '@qpqjs/core';
 
 import { getArgValue } from '../lib/args';
 import { promptCheckbox } from '../lib/prompts';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
-import { resolveDeployment } from '../lib/resolveDeployment';
+import { resolveCommandContext } from '../lib/resolveCommandContext';
 import { SetupCheckResult, SetupStep } from '../lib/setupStep';
-import { getPlatformDriver } from '../platforms';
 
 type CheckedStep = { step: SetupStep; result: Nullable<SetupCheckResult> };
 
@@ -74,10 +72,9 @@ const selectFromArgs = (steps: SetupStep[], argv: string[]): Nullable<SetupStep[
 };
 
 export const setupCommand = async (argv: string[]): Promise<void> => {
-  const appName = await resolveAppSelection({ argv, envVar: 'DEPLOY_APP_NAME' });
-  const { deploymentName, deployment } = await resolveDeployment(argv, appName);
-  const driver = getPlatformDriver(deployment.platform);
+  const { appName, deploymentName, deployment, driver } = await resolveCommandContext(argv);
 
+  // Nothing to set up is a normal outcome here, not a refused command.
   if (!driver.setupSteps) {
     console.log(`The '${deployment.platform}' platform has nothing to set up for deployment '${deploymentName}'.`);
     return;

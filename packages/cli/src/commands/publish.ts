@@ -9,9 +9,8 @@
 //   qpq publish --app docgen --service template
 import { getArgValue } from '../lib/args';
 import { getServiceNames } from '../lib/discovery';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
-import { resolveDeployment } from '../lib/resolveDeployment';
-import { getPlatformDriver, QpqPlatformDriver } from '../platforms';
+import { resolveCommandContext } from '../lib/resolveCommandContext';
+import { QpqPlatformDriver } from '../platforms';
 
 type PublishSelection = {
   driver: QpqPlatformDriver;
@@ -20,13 +19,12 @@ type PublishSelection = {
 };
 
 const resolvePublishSelection = async (argv: string[]): Promise<PublishSelection> => {
-  const appName = await resolveAppSelection({ argv, envVar: 'DEPLOY_APP_NAME' });
-  const { deployment } = await resolveDeployment(argv, appName);
+  const { appName, driver } = await resolveCommandContext(argv);
 
   const requestedService = getArgValue(argv, '--service');
   const serviceNames = requestedService ? [requestedService] : getServiceNames(appName);
 
-  return { driver: getPlatformDriver(deployment.platform), appName, serviceNames };
+  return { driver, appName, serviceNames };
 };
 
 export const publishCommand = async (argv: string[]): Promise<void> => {
