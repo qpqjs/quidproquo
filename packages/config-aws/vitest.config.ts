@@ -1,16 +1,3 @@
-import { fileURLToPath } from 'node:url';
-import { defineConfig } from 'vitest/config';
+import { defineQpqVitestConfig } from '@qpqjs/testing/vitest-config';
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    pool: 'threads',
-  },
-  resolve: {
-    alias: {
-      '@qpqjs/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
-      '@qpqjs/webserver': fileURLToPath(new URL('../webserver/src/index.ts', import.meta.url)),
-    },
-  },
-});
+export default defineQpqVitestConfig(import.meta.url);
