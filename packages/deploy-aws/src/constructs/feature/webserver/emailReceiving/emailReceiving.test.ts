@@ -1,4 +1,4 @@
-import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { awsNamingUtils, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineStorageDrive, QPQConfig } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineEmailReceiver, defineEmailReceivingDomain, qpqWebServerUtils } from '@qpqjs/webserver';
@@ -8,8 +8,6 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import { describe, expect, it } from 'vitest';
 
 import { QpqCoreStorageDriveConstruct } from '../../core/storageDrive/QpqCoreStorageDriveConstruct';
-import { emailReceiptRuleName } from './emailReceiptRuleName';
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
 import { QpqApiWebserverEmailReceiverConstruct } from './QpqApiWebserverEmailReceiverConstruct';
 
 const onEmail = '/entry/email/onEmail::onEmail';
@@ -33,7 +31,7 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
     new QpqApiWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver });
 
     Template.fromStack(stack).hasResourceProperties('AWS::SES::ReceiptRule', {
-      RuleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
+      RuleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
       Rule: Match.objectLike({
         Name: 'support-test-app-test-module-development',
         Enabled: true,
@@ -80,7 +78,7 @@ describe('landing drive bucket policy', () => {
     new QpqCoreStorageDriveConstruct(stack, 'drive', {
       qpqConfig,
       storageDriveConfig,
-      emailReceiptRuleNames: [emailReceiptRuleName(qpqConfig, 'support')],
+      emailReceiptRuleNames: [awsNamingUtils.getEmailReceiptRuleName('support', qpqConfig)],
     });
 
     Template.fromStack(stack).hasResourceProperties('AWS::S3::BucketPolicy', {
@@ -95,7 +93,7 @@ describe('landing drive bucket policy', () => {
               StringEquals: {
                 'AWS:SourceAccount': '123456789012',
                 'AWS:SourceArn': [
-                  `arn:aws:ses:ap-southeast-2:123456789012:receipt-rule-set/${QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/support-test-app-test-module-development`,
+                  `arn:aws:ses:ap-southeast-2:123456789012:receipt-rule-set/${awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/support-test-app-test-module-development`,
                 ],
               },
             },

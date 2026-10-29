@@ -16,7 +16,6 @@ import { qpqAwsCdkPathUtils } from '../../../../utils';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../../webserver/emailReceiving/emailReceiptRuleSetName';
 
 export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
@@ -212,7 +211,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
             StringEquals: {
               'AWS:SourceAccount': awsAccountId,
               'AWS:SourceArn': props.emailReceiptRuleNames.map(
-                (ruleName) => `arn:aws:ses:${region}:${awsAccountId}:receipt-rule-set/${QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/${ruleName}`,
+                (ruleName) =>
+                  `arn:aws:ses:${region}:${awsAccountId}:receipt-rule-set/${awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/${ruleName}`,
               ),
             },
           },

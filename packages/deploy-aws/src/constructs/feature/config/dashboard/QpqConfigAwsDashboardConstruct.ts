@@ -249,7 +249,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
           namespace: 'AWS/WAFV2',
           metricName,
           dimensionsMap: {
-            WebACL: `qpq-waf-regional-${qpqCoreUtils.getApplicationName(props.qpqConfig)}-${qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig)}`,
+            WebACL: awsNamingUtils.getWafWebAclName('regional', props.qpqConfig),
             Region: qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig),
             Rule: 'ALL',
           },

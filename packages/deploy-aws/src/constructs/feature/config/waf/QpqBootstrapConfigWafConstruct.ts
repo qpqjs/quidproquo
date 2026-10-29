@@ -18,7 +18,7 @@ export class QpqBootstrapConfigWafConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqBootstrapConfigWafConstructProps) {
     super(scope, id, props);
 
-    const webAclName = awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig('qpq-waf-regional', props.qpqConfig);
+    const webAclName = awsNamingUtils.getWafWebAclName('regional', props.qpqConfig);
 
     const webAcl = new aws_wafv2.CfnWebACL(this, 'web-acl', {
       name: webAclName,

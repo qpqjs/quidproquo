@@ -291,6 +291,32 @@ export const getEventBusSnsTopicArnFromConfig = (eventBusName: string, qpqConfig
   );
 };
 
+/** The bootstrap-owned web ACL for a WAF scope; the dashboard reads its metrics by this name. */
+export const getWafWebAclName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig) =>
+  getConfigRuntimeBootstrapResourceNameFromConfig(`qpq-waf-${wafScope}`, qpqConfig);
+
+/** The bootstrap SNS topic (and its schedule rule) that keeps the app's lambdas warm. */
+export const getWarmLambdasTopicName = (qpqConfig: QPQConfig) => getConfigRuntimeBootstrapResourceNameFromConfig('WarmLambdas', qpqConfig);
+
+/**
+ * The name of the account's one active SES receipt rule set. Fixed, not derived from any app:
+ * the set is shared by every app in the account and region, and each app's rule is what
+ * carries the app-specific name.
+ */
+export const QPQ_EMAIL_RECEIPT_RULE_SET_NAME = 'qpq-email-receiving';
+
+/**
+ * The app's rule in the account's shared receipt rule set. Carries app, environment and module
+ * so every app instance in the account gets its own rule, and the landing bucket policy can
+ * name it exactly. Deliberately without the feature segment: the format is what deployed
+ * rules already carry.
+ */
+export const getEmailReceiptRuleName = (receiverName: string, qpqConfig: QPQConfig): string => {
+  const { application, service, environment } = resolveOwnerDeploymentContext(qpqConfig);
+
+  return `${receiverName}-${application}-${service}-${environment}`;
+};
+
 // The account stack owns account-level resources (cloud trail, budgets, security services)
 // so they never share an app's lifecycle. The name is deliberately static: stack names are
 // already namespaced per account+region, and the resources it holds meter/audit the whole

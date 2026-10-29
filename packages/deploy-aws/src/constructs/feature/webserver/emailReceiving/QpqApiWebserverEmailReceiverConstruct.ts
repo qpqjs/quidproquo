@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { EmailReceiverQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
@@ -5,8 +6,6 @@ import { aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { emailReceiptRuleName } from './emailReceiptRuleName';
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
 import { resolveEmailReceivingHosts } from './resolveEmailReceivingHosts';
 
 export type QpqApiWebserverEmailReceiverConstructProps = {
@@ -36,9 +35,9 @@ export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
     }
 
     new aws_ses.CfnReceiptRule(this, 'rule', {
-      ruleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
+      ruleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
       rule: {
-        name: emailReceiptRuleName(props.qpqConfig, name),
+        name: awsNamingUtils.getEmailReceiptRuleName(name, props.qpqConfig),
         enabled: true,
         recipients,
         scanEnabled: true,

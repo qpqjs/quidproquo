@@ -1,7 +1,8 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
+
 import { aws_events, aws_events_targets, aws_sns } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { BootstrapResource } from '../../constants';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export type BSQpqLambdaWarmerEventConstructProps = {} & QpqConstructBlockProps;
@@ -11,12 +12,12 @@ export class BSQpqLambdaWarmerEventConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const rule = new aws_events.Rule(this, 'WarmLambdaRule', {
-      ruleName: this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas),
+      ruleName: awsNamingUtils.getWarmLambdasTopicName(this.qpqConfig),
       schedule: aws_events.Schedule.expression('rate(5 minutes)'),
     });
 
     const topic = new aws_sns.Topic(this, 'MyTopic', {
-      topicName: this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas),
+      topicName: awsNamingUtils.getWarmLambdasTopicName(this.qpqConfig),
       displayName: 'Warm Lambdas',
     });
 

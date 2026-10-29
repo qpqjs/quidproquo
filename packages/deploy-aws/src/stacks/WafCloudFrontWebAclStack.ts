@@ -31,7 +31,7 @@ export class WafCloudFrontWebAclStack extends Stack {
       },
     });
 
-    const webAclName = awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig('qpq-waf-cloudfront', props.qpqConfig);
+    const webAclName = awsNamingUtils.getWafWebAclName('cloudfront', props.qpqConfig);
 
     const webAcl = new aws_wafv2.CfnWebACL(this, 'web-acl', {
       name: webAclName,

@@ -7,7 +7,6 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { join } from 'upath';
 
-import { BootstrapResource } from '../../constants';
 import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
 import * as qpqDeployAwsUtils from '../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
@@ -134,7 +133,7 @@ export class Function extends QpqConstructBlock {
       const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
       const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 
-      const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
+      const topicName = awsNamingUtils.getWarmLambdasTopicName(this.qpqConfig);
       const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
       const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);
 

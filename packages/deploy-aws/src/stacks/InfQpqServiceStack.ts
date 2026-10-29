@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
@@ -24,7 +25,6 @@ import {
 import { WebserverRole } from '../constructs/basic/WebserverRole';
 import { OwnedCryptoKeys, resolveCryptoKeyForResource } from '../constructs/feature/core/cryptoKey/resolveCryptoKeyForResource';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
-import { emailReceiptRuleName } from '../constructs/feature/webserver/emailReceiving/emailReceiptRuleName';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 export type InfQpqServiceStackProps = {} & QpqServiceStackProps;
@@ -60,7 +60,9 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
     // A drive a receiver writes into is written by the account's receipt rule of that name.
     const emailReceiptRuleNamesForDrive = (storageDriveName: string): string[] =>
-      qpqWebServerUtils.getEmailReceiversForStorageDrive(storageDriveName, props.qpqConfig).map((r) => emailReceiptRuleName(props.qpqConfig, r.name));
+      qpqWebServerUtils
+        .getEmailReceiversForStorageDrive(storageDriveName, props.qpqConfig)
+        .map((r) => awsNamingUtils.getEmailReceiptRuleName(r.name, props.qpqConfig));
 
     // Build the storage drives
     qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).map(
