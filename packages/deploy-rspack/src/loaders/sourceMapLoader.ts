@@ -22,8 +22,8 @@ const SOURCE_MAPPING_URL_REGEX = /(?:\/\/[#@][ \t]*sourceMappingURL=([^\s'"]+)[ 
 // The parts of the standard source-map JSON shape this loader touches; nulls
 // mirror the spec (a source with no retrievable content is null).
 type RawSourceMap = {
-  sources?: (string | null)[];
-  sourcesContent?: (string | null)[];
+  sources?: Nullable<string>[];
+  sourcesContent?: Nullable<string>[];
   sourceRoot?: string;
   [key: string]: unknown;
 };
