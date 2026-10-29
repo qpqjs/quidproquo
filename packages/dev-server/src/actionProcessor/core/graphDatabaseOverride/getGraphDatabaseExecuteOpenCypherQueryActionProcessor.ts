@@ -5,7 +5,6 @@ import {
   askGraphDatabaseExecuteOpenCypherQuery,
   AskResponse,
   askThrowError,
-  ErrorTypeEnum,
   generateUuid,
   getProcessCustomImplementation,
   GraphCypherResponse,
@@ -29,7 +28,7 @@ const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
 
     if (!graphDatabaseConfig) {
       return yield* askThrowError(
-        ErrorTypeEnum.GenericError,
+        askGraphDatabaseExecuteOpenCypherQuery.errorType.GraphDatabaseNotFound,
         `Invalid graph config for [${graphDatabaseExecuteOpenCypherQueryActionPayload.graphDatabaseName}]`,
       );
     }

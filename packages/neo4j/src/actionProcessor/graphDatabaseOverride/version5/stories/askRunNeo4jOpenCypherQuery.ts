@@ -1,10 +1,10 @@
 import {
   askConfigGetParameter,
   askConfigGetSecret,
+  askGraphDatabaseExecuteOpenCypherQuery,
   askNetworkRequest,
   AskResponse,
   askThrowError,
-  ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
 } from '@qpqjs/core';
@@ -48,7 +48,7 @@ export function* askRunNeo4jOpenCypherQuery({
   );
 
   if (response.status < 200 || response.status >= 300) {
-    return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to query database');
+    return yield* askThrowError(askGraphDatabaseExecuteOpenCypherQuery.errorType.QueryFailed, 'Unable to query database');
   }
 
   return yield* askConvertNeo4jCypherResponseToCypherResponse(response.data);

@@ -16,6 +16,11 @@ export type GraphDatabaseExecuteOpenCypherQueryActionPayload = {
 
 export const askGraphDatabaseExecuteOpenCypherQuery = createActionRequester<GraphCypherResponse>()({
   actionType: GraphDatabaseActionType.ExecuteOpenCypherQuery,
+  errorTypes: [
+    'GraphDatabaseNotFound', // no graph database is defined under graphDatabaseName
+    'EndpointNotFound', // the database has no endpoint for the requested instance (read or write)
+    'QueryFailed', // the database answered the query with an error status
+  ],
   getPayload: (
     graphDatabaseName: string,
     instance: GraphDatabaseInstanceType,
