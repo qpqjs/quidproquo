@@ -43,7 +43,6 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
         config.secureUrlSecret,
       );
 
-      // Build the secure URL
       const baseUrl = getSecureUrlBaseUrl(config);
       const url = `${baseUrl}/secure-upload?token=${token}`;
 

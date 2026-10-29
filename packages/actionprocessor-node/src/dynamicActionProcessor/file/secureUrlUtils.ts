@@ -17,7 +17,6 @@ export const createSecureUrlToken = (token: SecureUrlToken, secret: string): str
   // Create HMAC signature
   const signature = crypto.createHmac('sha256', secret).update(payloadBase64).digest('base64url');
 
-  // Return token as payload.signature
   return `${payloadBase64}.${signature}`;
 };
 

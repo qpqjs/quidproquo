@@ -40,7 +40,6 @@ const getProcessFileGenerateTemporarySecureUrl = (
         config.secureUrlSecret,
       );
 
-      // Build the secure URL
       const baseUrl = getSecureUrlBaseUrl(config);
       const url = `${baseUrl}/secure-download?token=${token}`;
 

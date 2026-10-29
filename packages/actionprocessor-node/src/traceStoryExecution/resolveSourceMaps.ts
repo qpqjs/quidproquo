@@ -1,5 +1,5 @@
 // Post-processing: map the controller's raw steps (generated script positions) back to
-// original sources via the .map files sitting next to the traced scripts on disk —
+// original sources via the .map files sitting next to the traced scripts on disk ,
 // the same files the federated store syncs to /tmp alongside the code. When a map
 // carries sourcesContent (the federated remote build embeds it), the original source
 // text is embedded in the trace so viewers need no access to the repo.
@@ -47,20 +47,20 @@ const loadTraceMap = (scriptPath: string): TraceMap | null => {
     const mapPath = path.resolve(path.dirname(scriptPath), sourceMappingUrl);
     return new TraceMap(fs.readFileSync(mapPath, 'utf8'));
   } catch {
-    // No map is a degraded trace, not a failure — generated positions still tell the story
+    // No map is a degraded trace, not a failure, generated positions still tell the story
     return null;
   }
 };
 
-// Which candidate breakpoint positions land in the service's OWN code — answers the
+// Which candidate breakpoint positions land in the service's OWN code, answers the
 // controller worker's filterLocations request when onlyOwnCode tracing is on (the eval
 // worker can't load trace-mapping itself). Positions mapping into node_modules
 // (framework/deps) or not mapping at all (webpack runtime glue) are dropped. No map
-// means the bundle can't be classified — everything stays traced.
+// means the bundle can't be classified, everything stays traced.
 //
 // ownCodeMarkers is a second, opt-in signal: substrings identifying the traced story's
 // own source root. The node_modules check alone assumes framework/deps are bundled from
-// real node_modules — true for lambda's federated remotes, but not for hosts (the dev
+// real node_modules, true for lambda's federated remotes, but not for hosts (the dev
 // server) that bundle workspace framework packages from source alongside every hosted
 // service in one script, where framework code never lands in node_modules either. When
 // markers are given, a location must ALSO map into one of them to count as own code.
@@ -85,7 +85,7 @@ export const filterOwnCodeLocations = <TLocation extends { lineNumber: number; c
 // Derives own-code markers from a service's absolute source root (QpqFunctionRuntimeAdvanced.basePath,
 // or getConfigRoot(qpqConfig) for the relative-string runtime form). Bundlers emit
 // source-map `source` entries as either real filesystem paths or webpack://<namespace>/./<path
-// relative to the build context> pseudo urls — both preserve the original directory names
+// relative to the build context> pseudo urls, both preserve the original directory names
 // verbatim, so matching on the root's own trailing segments works for either form without
 // needing to know the bundler's exact context/namespace.
 export const getOwnCodeMarkersFromRoot = (root: string): string[] => {
