@@ -6,7 +6,7 @@ import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 // name the CDK construct derives), or null when no defineCryptoKey matches so
 // processors can fail with KeyNotConfigured instead of a generic error.
 export const resolveCryptoKeyAlias = (cryptoKeyName: string, qpqConfig: QPQConfig): Nullable<string> => {
-  const cryptoKeyConfig = qpqCoreUtils.getAllCryptoKeyConfigs(qpqConfig).find((k) => k.keyName === cryptoKeyName);
+  const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
 
   if (!cryptoKeyConfig) {
     return null;

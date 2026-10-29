@@ -14,7 +14,7 @@ import { MatchResult } from './types';
 const GLOBAL_DEPLOY_EVENT_NAME = process.env.deployEventConfigName!;
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const deployConfig = qpqCoreUtils.getDeployEventConfigs(qpqConfig).find((c) => c.name === GLOBAL_DEPLOY_EVENT_NAME);
+  const deployConfig = qpqCoreUtils.getDeployEventByName(GLOBAL_DEPLOY_EVENT_NAME, qpqConfig);
 
   return async ({ qpqEventRecord }) => {
     if (!deployConfig) {

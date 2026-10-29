@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoDecrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoDecrypt> => {
   return async ({ keyName, ciphertext, context }) => {
-    const cryptoKeyConfig = qpqCoreUtils.getAllCryptoKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
+    const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(keyName, qpqConfig);
     if (!cryptoKeyConfig) {
       return actionResultError(
         askCryptoDecrypt.errorType.KeyNotConfigured,

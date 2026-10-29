@@ -13,7 +13,7 @@ import { EmailSendEventType } from '@qpqjs/webserver';
 import { GLOBAL_USER_DIRECTORY_NAME, InternalEventRecord } from './types';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(GLOBAL_USER_DIRECTORY_NAME, qpqConfig);
 
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's

@@ -6,7 +6,7 @@ import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 // CDK construct derives for a defineSigningKey, or null when none matches so
 // processors can fail with KeyNotConfigured instead of a generic error.
 export const resolveSigningKeyAlias = (signingKeyName: string, qpqConfig: QPQConfig): Nullable<string> => {
-  const signingKeyConfig = qpqCoreUtils.getAllSigningKeyConfigs(qpqConfig).find((k) => k.keyName === signingKeyName);
+  const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(signingKeyName, qpqConfig);
 
   if (!signingKeyConfig) {
     return null;

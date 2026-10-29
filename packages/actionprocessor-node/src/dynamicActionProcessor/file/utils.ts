@@ -7,7 +7,7 @@ import { FileStorageConfig } from './types';
 
 // Resolve a drive name to a filesystem path
 export const isStorageDriveNameValid = (drive: string, qpqConfig: QPQConfig): boolean => {
-  const storageDrive = qpqCoreUtils.getStorageDrives(qpqConfig).find((d) => d.storageDrive === drive);
+  const storageDrive = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
 
   if (!storageDrive) {
     return false;

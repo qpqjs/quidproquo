@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoSign> => {
   return async ({ keyName, message }) => {
-    const signingKeyConfig = qpqCoreUtils.getAllSigningKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
+    const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(keyName, qpqConfig);
     if (!signingKeyConfig) {
       return actionResultError(
         askCryptoSign.errorType.KeyNotConfigured,

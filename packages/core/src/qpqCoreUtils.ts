@@ -312,6 +312,9 @@ export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConf
   return deployEvents;
 };
 
+export const getDeployEventByName = (name: string, qpqConfig: QPQConfig): Nullable<DeployEventsQPQConfigSetting> =>
+  getDeployEventConfigs(qpqConfig).find((c) => c.name === name) ?? null;
+
 export const getVirtualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQPQConfigSetting[] => {
   return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
 };

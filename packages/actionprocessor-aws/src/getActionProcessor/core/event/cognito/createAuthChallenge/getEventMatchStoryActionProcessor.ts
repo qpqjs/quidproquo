@@ -14,7 +14,7 @@ import { MatchResult } from './types';
 const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(GLOBAL_USER_DIRECTORY_NAME, qpqConfig);
 
   return async ({ qpqEventRecord }) => {
     if (!userDirectoryConfig?.customAuthRuntime?.createAuthChallenge) {
