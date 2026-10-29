@@ -27,7 +27,7 @@ const resolveParameterStorageLocation = (parameterName: string, qpqConfig: QPQCo
 
   return {
     serviceName: qpqCoreUtils.resolveOwnerModuleName(parameterConfig.owner, qpqConfig),
-    key: parameterConfig.owner?.resourceNameOverride || parameterName,
+    key: qpqCoreUtils.resolveOwnedResourceLocalName(parameterName, parameterConfig.owner),
   };
 };
 
@@ -36,7 +36,7 @@ const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig):
 
   return {
     serviceName: qpqCoreUtils.resolveOwnerModuleName(secretConfig.owner, qpqConfig),
-    key: secretConfig.owner?.resourceNameOverride || secretName,
+    key: qpqCoreUtils.resolveOwnedResourceLocalName(secretName, secretConfig.owner),
   };
 };
 

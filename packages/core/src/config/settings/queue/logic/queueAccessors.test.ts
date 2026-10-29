@@ -8,7 +8,12 @@ import { getOwnedQueueConfigs } from './getOwnedQueueConfigs';
 import { getQueueByName } from './getQueueByName';
 import { resolveQueueOrThrow } from './resolveQueueOrThrow';
 
-const config = [defineApplication('app', 'root'), defineModule('svc'), defineQueue('jobs', { created: '/q/created::run' }), defineQueue('mail', {})];
+const config = [
+  defineApplication('app', 'production', 'root'),
+  defineModule('svc'),
+  defineQueue('jobs', { created: '/q/created::run' }),
+  defineQueue('mail', {}),
+];
 
 describe('queue accessors', () => {
   it('lists every queue and the owned ones (queues carry no owner, so all are owned)', () => {

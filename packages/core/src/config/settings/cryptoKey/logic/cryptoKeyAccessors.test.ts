@@ -9,7 +9,7 @@ import { getOwnedCryptoKeyConfigs } from './getOwnedCryptoKeyConfigs';
 import { resolveCryptoKeyOrThrow } from './resolveCryptoKeyOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineCryptoKey('mine'),
   defineCryptoKey('theirs', { owner: { module: 'other', cryptoKeyName: 'theirs' } }),

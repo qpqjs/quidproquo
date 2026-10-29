@@ -9,7 +9,7 @@ import { getParameterByName } from './getParameterByName';
 import { resolveParameterOrThrow } from './resolveParameterOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineParameter('mine', { value: '1' }),
   defineParameter('theirs', { owner: { module: 'other', parameterName: 'theirs' } }),

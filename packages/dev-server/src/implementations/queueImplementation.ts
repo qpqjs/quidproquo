@@ -67,16 +67,13 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   const thisServiceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   const allEventBuses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => {
-    const srcApplication = ebc.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-    const srcEnvironment = ebc.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-    const srcFeature = ebc.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-    const srcModule = qpqCoreUtils.resolveOwnerModuleName(ebc.owner, qpqConfig);
+    const source = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, ebc.owner);
 
     return (
-      srcApplication === ebMessage.targetApplication &&
-      srcEnvironment === ebMessage.targetEnvironment &&
-      srcModule === ebMessage.targetModule &&
-      ((!srcFeature && !ebMessage.targetFeature) || srcFeature === ebMessage.targetFeature)
+      source.application === ebMessage.targetApplication &&
+      source.environment === ebMessage.targetEnvironment &&
+      source.module === ebMessage.targetModule &&
+      ((!source.feature && !ebMessage.targetFeature) || source.feature === ebMessage.targetFeature)
     );
   });
   // All the queues that we should publish to
@@ -90,12 +87,14 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
     .filter(
       (q) =>
         // The target is this service
-        (!q.owner?.module || q.owner?.module === thisServiceName) &&
+        qpqCoreUtils.resolveOwnerModuleName(q.owner, qpqConfig) === thisServiceName &&
         // And we are subed to the message that its trying to get to
         q.eventBusSubscriptions.includes(ebMessage.eventBusName),
     );
 
   for (const queue of queues) {
+    const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, queue.owner);
+
     const queueMessage: AnyQueueMessageWithSession = {
       payload: ebMessage.payload,
       type: ebMessage.type,
@@ -107,10 +106,10 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       // FIFO: carry the bus message's group through to the queue, like SNS FIFO -> SQS FIFO
       groupId: queue.isFifo ? ebMessage.groupId : undefined,
 
-      targetApplication: queue.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      targetEnvironment: queue.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      targetFeature: queue.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      targetModule: qpqCoreUtils.resolveOwnerModuleName(queue.owner, qpqConfig),
+      targetApplication: target.application,
+      targetEnvironment: target.environment,
+      targetFeature: target.feature,
+      targetModule: target.module,
 
       messageId: generateUuid(),
     };

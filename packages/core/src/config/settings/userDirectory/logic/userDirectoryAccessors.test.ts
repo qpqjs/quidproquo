@@ -9,7 +9,7 @@ import { getUserDirectoryByName } from './getUserDirectoryByName';
 import { resolveUserDirectoryOrThrow } from './resolveUserDirectoryOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineUserDirectory('main'),
   defineUserDirectory('foreign', { owner: { module: 'other', userDirectoryName: 'foreign' } }),

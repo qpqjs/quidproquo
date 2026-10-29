@@ -45,7 +45,7 @@ export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QP
 
   return {
     serviceName: qpqCoreUtils.resolveOwnerModuleName(userDirectoryConfig.owner, qpqConfig),
-    directoryName: userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName,
+    directoryName: qpqCoreUtils.resolveOwnedResourceLocalName(userDirectoryName, userDirectoryConfig.owner),
   };
 };
 

@@ -9,7 +9,7 @@ import { getOwnedEventBusConfigs } from './getOwnedEventBusConfigs';
 import { resolveEventBusOrThrow } from './resolveEventBusOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineEventBus('mine'),
   defineEventBus('local', { owner: { module: 'other', eventBusName: 'sharedBus' } }),

@@ -9,7 +9,7 @@ import { getOwnedKeyValueStoreConfigs } from './getOwnedKeyValueStoreConfigs';
 import { resolveKeyValueStoreOrThrow } from './resolveKeyValueStoreOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineKeyValueStore('mine', 'id'),
   defineKeyValueStore('theirs', 'id', [], { owner: { module: 'other' } }),

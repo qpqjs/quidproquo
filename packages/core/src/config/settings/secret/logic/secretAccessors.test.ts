@@ -9,7 +9,7 @@ import { getSecretByName } from './getSecretByName';
 import { resolveSecretOrThrow } from './resolveSecretOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineSecret('mine'),
   defineSecret('theirs', { owner: { module: 'other', secretName: 'theirs' } }),

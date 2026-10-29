@@ -9,7 +9,7 @@ import { getSigningKeyByName } from './getSigningKeyByName';
 import { resolveSigningKeyOrThrow } from './resolveSigningKeyOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineSigningKey('mine'),
   defineSigningKey('theirs', { owner: { module: 'other', signingKeyName: 'theirs' } }),

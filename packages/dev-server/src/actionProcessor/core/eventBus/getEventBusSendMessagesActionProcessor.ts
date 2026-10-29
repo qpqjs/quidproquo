@@ -36,6 +36,8 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         }
       }
 
+      const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, eventBusConfig.owner);
+
       const eventBusEvent: AnyEventBusMessageWithSession = {
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
@@ -48,10 +50,10 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         // per-entity groups via groupId on the message
         groupId: eventBusConfig.isFifo ? (eventBusMessage.groupId ?? eventBusName) : undefined,
 
-        targetApplication: eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-        targetEnvironment: eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-        targetFeature: eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-        targetModule: qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, qpqConfig),
+        targetApplication: target.application,
+        targetEnvironment: target.environment,
+        targetFeature: target.feature,
+        targetModule: target.module,
       };
 
       eventBus.publish(EventBusActionType.SendMessages, eventBusEvent);

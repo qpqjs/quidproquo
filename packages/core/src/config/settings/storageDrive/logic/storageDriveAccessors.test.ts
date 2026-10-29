@@ -9,7 +9,7 @@ import { getStorageDriveByName } from './getStorageDriveByName';
 import { resolveStorageDriveOrThrow } from './resolveStorageDriveOrThrow';
 
 const config = [
-  defineApplication('app', 'root'),
+  defineApplication('app', 'production', 'root'),
   defineModule('svc'),
   defineStorageDrive('mine'),
   defineStorageDrive('theirs', { owner: { module: 'other', storageDriveName: 'theirs' } }),

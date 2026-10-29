@@ -44,12 +44,12 @@ const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
 // The identity tags applyEnvironmentTags stamps on the owner's resources, with each
 // field falling back to this deployment's when the owner does not override it.
 const getOwnerResourceTagConditions = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): Record<string, string> => {
-  const feature = owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, module, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, owner);
 
   return {
-    'aws:ResourceTag/application': owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-    'aws:ResourceTag/module': qpqCoreUtils.resolveOwnerModuleName(owner, qpqConfig),
-    'aws:ResourceTag/environment': owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    'aws:ResourceTag/application': application,
+    'aws:ResourceTag/module': module,
+    'aws:ResourceTag/environment': environment,
     ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
   };
 };

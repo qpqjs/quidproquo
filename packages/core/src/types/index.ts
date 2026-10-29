@@ -21,6 +21,7 @@ export * from './LogLevelEnum';
 export * from './Lookup';
 export * from './NotifyErrorQueueEvent';
 export * from './Nullable';
+export * from './OwnerDeploymentContext';
 export * from './QPQBinaryData';
 export * from './QpqContextIdentifier';
 export * from './QpqExecutionTrace';

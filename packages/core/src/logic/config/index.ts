@@ -8,3 +8,5 @@ export * from './getApplicationName';
 export * from './getConfigSetting';
 export * from './getConfigSettings';
 export * from './getOwnedItems';
+export * from './resolveOwnedResourceLocalName';
+export * from './resolveOwnerDeploymentContext';

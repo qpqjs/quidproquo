@@ -137,23 +137,24 @@ const startServer = (
 };
 
 const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): WebSocketQPQWebServerConfigSettingMap[] => {
-  return qpqConfigs
-    .flatMap((qpqConfig) => {
-      const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-      return qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).flatMap((wsc) => {
-        const item: WebSocketQPQWebServerConfigSettingMap = {
-          apiName: wsc.apiName,
-          service,
-          setting: wsc,
-          qpqConfig,
-        };
+  return (
+    qpqConfigs
+      .flatMap((qpqConfig) => {
+        const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+        return qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).flatMap((wsc) => {
+          const item: WebSocketQPQWebServerConfigSettingMap = {
+            apiName: wsc.apiName,
+            service,
+            setting: wsc,
+            qpqConfig,
+          };
 
-        return item;
-      });
-    })
-    .filter(
-      (item, index, arr) => arr[index]?.apiName !== item.apiName || !item.setting.owner?.module || arr[index]?.service === item.setting.owner?.module,
-    );
+          return item;
+        });
+      })
+      // Only the websockets this service owns are served here; a foreign one is reached through its owner.
+      .filter((item) => qpqCoreUtils.resolveOwnerModuleName(item.setting.owner, item.qpqConfig) === item.service)
+  );
 };
 
 export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {

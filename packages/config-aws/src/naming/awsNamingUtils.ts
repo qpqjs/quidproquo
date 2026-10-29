@@ -21,15 +21,12 @@ type AwsDeploymentContext = {
   feature?: string;
 };
 
-// A resource declared with a CrossModuleOwner belongs to another service. Every owner field
-// falls back to the executing service's own deployment context, so all consumers resolve the
-// exact name the owning service deployed under.
-const resolveOwnerDeploymentContext = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): AwsDeploymentContext => ({
-  application: owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-  service: qpqCoreUtils.resolveOwnerModuleName(owner, qpqConfig),
-  environment: owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-  feature: owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-});
+// Core owns the owner fallback; this only renames `module` to the `service` these name builders take.
+const resolveOwnerDeploymentContext = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): AwsDeploymentContext => {
+  const { application, module, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, owner);
+
+  return { application, service: module, environment, feature };
+};
 
 export const getGlobalConfigRuntimeResourceName = (resourceName: string, application: string, environment: string, feature?: string) => {
   const baseName = `${resourceName}-${application}-${environment}`;
@@ -82,7 +79,7 @@ export const getConfigRuntimeResourceNameFromConfig = (resourceName: string, qpq
  * Deploy-time grants and runtime lookups must both go through here so they agree.
  */
 export const resolveOwnedResourceName = (resourceName: string, qpqConfig: QPQConfig, owner?: CrossModuleOwner) =>
-  resolveConfigRuntimeResourceNameFromConfig(owner?.resourceNameOverride || resourceName, qpqConfig, owner);
+  resolveConfigRuntimeResourceNameFromConfig(qpqCoreUtils.resolveOwnedResourceLocalName(resourceName, owner), qpqConfig, owner);
 
 // AWS FIFO resources (SQS queues, SNS topics) must be named with a trailing .fifo - it has
 // to be the final characters, so it goes after the app-service-env decoration. Every FIFO
@@ -159,7 +156,7 @@ const getUserPoolCFExportName = (userDirectoryName: string, qpqConfig: QPQConfig
   const userDirectoryConfig = qpqCoreUtils.resolveUserDirectoryOrThrow(userDirectoryName, qpqConfig);
 
   const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, userDirectoryConfig.owner);
-  const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;
+  const resourceName = qpqCoreUtils.resolveOwnedResourceLocalName(userDirectoryName, userDirectoryConfig.owner);
 
   return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, resourceType);
 };
@@ -227,7 +224,7 @@ const resolveWebsocketApiNaming = (websocketApiName: string, qpqConfig: QPQConfi
 
   return {
     context: resolveOwnerDeploymentContext(qpqConfig, websocketApiConfig.owner),
-    resourceName: websocketApiConfig.owner?.resourceNameOverride || websocketApiName,
+    resourceName: qpqCoreUtils.resolveOwnedResourceLocalName(websocketApiName, websocketApiConfig.owner),
   };
 };
 

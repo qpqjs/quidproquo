@@ -34,6 +34,8 @@ import {
   getConfigSetting,
   getConfigSettings,
   getOwnedItems,
+  resolveOwnedResourceLocalName,
+  resolveOwnerDeploymentContext,
 } from './logic/config';
 import { CrossModuleOwner } from './types/CrossModuleOwner';
 import {
@@ -102,6 +104,8 @@ export {
   getConfigSetting,
   getConfigSettings,
   getOwnedItems,
+  resolveOwnedResourceLocalName,
+  resolveOwnerDeploymentContext,
 } from './logic/config';
 
 export const getConfigRoot = (qpqConfig: QPQConfig): string => {
@@ -145,7 +149,7 @@ export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
 
 /** The module a setting belongs to: its declared owner, or the executing module when it declares none. */
 export const resolveOwnerModuleName = (owner: CrossModuleOwner | undefined, qpqConfig: QPQConfig): string =>
-  owner?.module || getApplicationModuleName(qpqConfig);
+  resolveOwnerDeploymentContext(qpqConfig, owner).module;
 
 export const getAllGraphDatabaseConfigs = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   const graphDatabases = getConfigSettings<GraphDatabaseQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.graphDatabase);
@@ -369,18 +373,15 @@ export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(r
 };
 
 export const getFullyQualifiedResourceName = (qpqConfig: QPQConfig, resourceName: string, config?: QPQConfigSetting): FullyQualifiedResource => {
-  const confApplication = getApplicationName(qpqConfig);
-  const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
-  const confFeature = getApplicationModuleFeature(qpqConfig);
-  const confModule = getApplicationModuleName(qpqConfig);
+  const { application, module, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, config?.owner);
 
   return {
-    resourceName: config?.owner?.resourceNameOverride || resourceName,
+    resourceName: resolveOwnedResourceLocalName(resourceName, config?.owner),
 
-    application: config?.owner?.application || confApplication,
-    environment: config?.owner?.environment || confEnvironment,
-    module: config?.owner?.module || confModule,
-    feature: config?.owner?.feature || confFeature || '',
+    application,
+    environment,
+    module,
+    feature: feature || '',
   };
 };
 

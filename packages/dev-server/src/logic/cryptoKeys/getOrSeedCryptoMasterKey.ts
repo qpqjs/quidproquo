@@ -20,7 +20,7 @@ export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyNam
   // Mirrors the AWS runtime's resolveCryptoKeyAlias: a cross-module owner
   // redirects storage to the owning service's file
   const serviceName = qpqCoreUtils.resolveOwnerModuleName(cryptoKeyConfig.owner, qpqConfig);
-  const key = cryptoKeyConfig.owner?.resourceNameOverride || cryptoKeyName;
+  const key = qpqCoreUtils.resolveOwnedResourceLocalName(cryptoKeyName, cryptoKeyConfig.owner);
 
   const keys = await readJsonFileStore<string>(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName);
 

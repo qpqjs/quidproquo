@@ -31,6 +31,8 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
         }
       }
 
+      const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, queueConfig.owner);
+
       const queueEvent: AnyQueueMessageWithSession = {
         payload: queueMessage.payload,
         type: queueMessage.type,
@@ -44,10 +46,10 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
         // per-entity groups via groupId on the message
         groupId: queueConfig.isFifo ? (queueMessage.groupId ?? queueName) : undefined,
 
-        targetApplication: queueConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-        targetEnvironment: queueConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-        targetFeature: queueConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-        targetModule: qpqCoreUtils.resolveOwnerModuleName(queueConfig.owner, qpqConfig),
+        targetApplication: target.application,
+        targetEnvironment: target.environment,
+        targetFeature: target.feature,
+        targetModule: target.module,
       };
 
       eventBus.publish(QueueActionType.SendMessages, queueEvent);
