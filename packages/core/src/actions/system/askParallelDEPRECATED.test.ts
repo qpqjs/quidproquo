@@ -5,14 +5,14 @@ import { describe, expect, it } from 'vitest';
 import { AskResponse } from '../../types';
 import { askGuidNew } from '../guid/askGuidNew';
 import { GuidActionType } from '../guid/GuidActionType';
-import { askRandomNumber } from '../math/askRandomNumber';
+import { askMathRandomNumber } from '../math/askMathRandomNumber';
 import { MathActionType } from '../math/MathActionType';
 import { askParallelDEPRECATED } from './askParallelDEPRECATED';
 
 describe('askParallelDEPRECATED', () => {
   it('runs each story and returns their results positionally', () => {
     function* storyA(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
     function* storyB(): AskResponse<string> {
       return yield* askGuidNew();
@@ -68,7 +68,7 @@ describe('askParallelDEPRECATED', () => {
 
   it('propagates a failing action in one of the stories as a thrown error', () => {
     function* storyA(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
     function* storyB(): AskResponse<string> {
       return yield* askGuidNew();

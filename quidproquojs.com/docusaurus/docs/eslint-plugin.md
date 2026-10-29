@@ -48,7 +48,7 @@ Two patterns stay legal, because they are how stories are meant to be composed a
 
 ```typescript
 // ask calls as arguments build generators for the outer ask to run
-yield* askRunParallel([askRandomNumber(), askDateNow()]);
+yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
 
 // outside a generator you cannot yield; tests and forwarding
 // wrappers create generators and hand them off

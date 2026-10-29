@@ -5,7 +5,7 @@ import { ContextActionType } from '../../actions/context/ContextActionType';
 import { askDateNow } from '../../actions/date/askDateNow';
 import { DateActionType } from '../../actions/date/DateActionType';
 import { ErrorActionType } from '../../actions/error/ErrorActionType';
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
 import { SystemActionType } from '../../actions/system/SystemActionType';
 import { AskResponse, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
@@ -134,7 +134,7 @@ describe('askContextProvideValue', () => {
 
   it('does not double-wrap a passthrough (wildcard) action under askCatch', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const { result } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {
@@ -145,7 +145,7 @@ describe('askContextProvideValue', () => {
 
   it('propagates a passthrough error under askCatch instead of masking it as success', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const { result } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {
@@ -157,7 +157,7 @@ describe('askContextProvideValue', () => {
 
   it('injects the provided context onto passthrough actions', () => {
     function* story(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
 
     const { result, yieldedActions } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {
@@ -171,7 +171,7 @@ describe('askContextProvideValue', () => {
 
   it('does not double-wrap batched passthrough actions under askCatch', () => {
     function* story(): AskResponse<EitherActionResult<[number, string]>> {
-      return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+      return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
     }
 
     const { result } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {

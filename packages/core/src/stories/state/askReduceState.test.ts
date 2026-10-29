@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
 import { askStateDispatch } from '../../actions/state/askStateDispatch';
 import { askStateRead } from '../../actions/state/askStateRead';
@@ -89,7 +89,7 @@ describe('askReduceState', () => {
 
   it('passes non-state actions through to the runtime', () => {
     function* logic(): AskResponse<void> {
-      const n = yield* askRandomNumber();
+      const n = yield* askMathRandomNumber();
       yield* askStateDispatchEffect<AddEffect>(CounterEffect.Add, n);
     }
 

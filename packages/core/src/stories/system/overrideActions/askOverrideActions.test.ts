@@ -5,7 +5,7 @@ import { DateActionType } from '../../../actions/date/DateActionType';
 import { ErrorActionType } from '../../../actions/error/ErrorActionType';
 import { askGuidNew } from '../../../actions/guid/askGuidNew';
 import { GuidActionType } from '../../../actions/guid/GuidActionType';
-import { askRandomNumber } from '../../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../../actions/math/MathActionType';
 import { SystemActionType } from '../../../actions/system/SystemActionType';
 import { Action, AskResponse, EitherActionResult } from '../../../types';
@@ -172,7 +172,7 @@ describe('askOverrideActions', () => {
 
     it('passes a non-overridden action through to the runtime', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result, runtimeActions } = runWithRuntime(askOverrideActions(story(), {}), { [MathActionType.RandomNumber]: 0.42 });
@@ -183,7 +183,7 @@ describe('askOverrideActions', () => {
 
     it('passes multiple non-overridden actions through in order', () => {
       function* story(): AskResponse<[number, string, string]> {
-        const r = yield* askRandomNumber();
+        const r = yield* askMathRandomNumber();
         const d = yield* askDateNow();
         const g = yield* askGuidNew();
         return [r, d, g];
@@ -197,7 +197,7 @@ describe('askOverrideActions', () => {
 
     it('intercepts an action with a matching type override, reaching no runtime', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result, runtimeActions } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }));
@@ -208,7 +208,7 @@ describe('askOverrideActions', () => {
 
     it('intercepts an action with a wildcard override', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { '*': returns(0.99) }));
@@ -218,7 +218,7 @@ describe('askOverrideActions', () => {
 
     it('prefers a specific type override over the wildcard', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(0.55), '*': returns(0.99) }));
@@ -228,7 +228,7 @@ describe('askOverrideActions', () => {
 
     it('lets an override handler yield its own action to the runtime', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const overrides: ActionOverrideMap = {
@@ -246,7 +246,7 @@ describe('askOverrideActions', () => {
 
     it('lets an override handler yield several actions to the runtime', () => {
       function* story(): AskResponse<string> {
-        return yield* askRandomNumber() as any;
+        return yield* askMathRandomNumber() as any;
       }
 
       const overrides: ActionOverrideMap = {
@@ -265,7 +265,7 @@ describe('askOverrideActions', () => {
 
     it('feeds an override result back so the story continues with its later actions', () => {
       function* story(): AskResponse<{ random: number; date: string }> {
-        const random = yield* askRandomNumber();
+        const random = yield* askMathRandomNumber();
         const date = yield* askDateNow();
         return { random, date };
       }
@@ -280,7 +280,7 @@ describe('askOverrideActions', () => {
 
     it('mixes overridden and non-overridden actions, yielding only the latter', () => {
       function* story(): AskResponse<[number, string, string]> {
-        const r = yield* askRandomNumber();
+        const r = yield* askMathRandomNumber();
         const d = yield* askDateNow();
         const g = yield* askGuidNew();
         return [r, d, g];
@@ -299,7 +299,7 @@ describe('askOverrideActions', () => {
 
     it('feeds an undefined override result back to the story', () => {
       function* story(): AskResponse<number | undefined> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(undefined) }));
@@ -309,7 +309,7 @@ describe('askOverrideActions', () => {
 
     it('lets the story ignore the override result and return its own value', () => {
       function* story(): AskResponse<string> {
-        yield* askRandomNumber();
+        yield* askMathRandomNumber();
         return 'my-own-value';
       }
 
@@ -363,7 +363,7 @@ describe('askOverrideActions', () => {
   describe('batch scenarios', () => {
     it('passes a batch with no overrides through to the runtime', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), {}), defaultResponses);
@@ -373,7 +373,7 @@ describe('askOverrideActions', () => {
 
     it('handles a fully overridden batch internally, reaching no runtime', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const overrides: ActionOverrideMap = {
@@ -389,7 +389,7 @@ describe('askOverrideActions', () => {
 
     it('keeps batch order when some actions are overridden and some pass through', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }), defaultResponses);
@@ -399,7 +399,7 @@ describe('askOverrideActions', () => {
 
     it('overrides only the middle action of a three-way batch', () => {
       function* story(): AskResponse<[number, string, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow(), askGuidNew()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow(), askGuidNew()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [DateActionType.Now]: returns(MOCK_DATE) }), defaultResponses);
@@ -409,7 +409,7 @@ describe('askOverrideActions', () => {
 
     it('throws an uncaught error when a batch action fails without returnErrors', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const { threwError } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }), {
@@ -422,7 +422,7 @@ describe('askOverrideActions', () => {
 
     it('captures the failure of an overridden (relayed) batch action under askCatch', () => {
       function* story(): AskResponse<EitherActionResult<[number, string]>> {
-        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+        return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
       }
 
       // The relayed RandomNumber fails at the runtime. Before the slot-level askCatch fix the
@@ -438,7 +438,7 @@ describe('askOverrideActions', () => {
 
     it('passes a batch failure back to the story when wrapped in askCatch', () => {
       function* story(): AskResponse<EitherActionResult<[number, string]>> {
-        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+        return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }), {
@@ -453,7 +453,7 @@ describe('askOverrideActions', () => {
   describe('askCatch composition', () => {
     it('returns a successful EitherActionResult from a fully overridden askCatch', () => {
       function* story(): AskResponse<EitherActionResult<number>> {
-        return yield* askCatch(askRandomNumber());
+        return yield* askCatch(askMathRandomNumber());
       }
 
       const overrides: ActionOverrideMap = {
@@ -470,7 +470,7 @@ describe('askOverrideActions', () => {
 
     it('passes an askCatch action through to the runtime when not overridden', () => {
       function* story(): AskResponse<EitherActionResult<number>> {
-        return yield* askCatch(askRandomNumber());
+        return yield* askCatch(askMathRandomNumber());
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), {}), defaultResponses);
@@ -480,7 +480,7 @@ describe('askOverrideActions', () => {
 
     it('combines askCatch, a parallel batch and a partial override', () => {
       function* story(): AskResponse<EitherActionResult<[number, string]>> {
-        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+        return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }), defaultResponses);
@@ -490,7 +490,7 @@ describe('askOverrideActions', () => {
 
     it('combines askCatch and a parallel batch with everything overridden', () => {
       function* story(): AskResponse<EitherActionResult<[number, string, string]>> {
-        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow(), askGuidNew()]));
+        return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow(), askGuidNew()]));
       }
 
       const overrides: ActionOverrideMap = {
@@ -508,7 +508,7 @@ describe('askOverrideActions', () => {
   describe('nested batch scenarios', () => {
     it('overrides an action inside a nested batch', () => {
       function* innerStory(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
       function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([innerStory(), askGuidNew()]);
@@ -521,7 +521,7 @@ describe('askOverrideActions', () => {
 
     it('overrides an action three batch-levels deep', () => {
       function* level1(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
       function* level2(): AskResponse<[number, string]> {
         return yield* askRunParallel([level1(), askDateNow()]);
@@ -537,7 +537,7 @@ describe('askOverrideActions', () => {
 
     it('resolves a nested batch with askCatch at every level', () => {
       function* innerStory(): AskResponse<EitherActionResult<[number, string]>> {
-        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+        return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
       }
       function* story(): AskResponse<EitherActionResult<[EitherActionResult<[number, string]>, string]>> {
         return yield* askCatch(askRunParallel([innerStory(), askGuidNew()]));
@@ -555,7 +555,7 @@ describe('askOverrideActions', () => {
   describe('wildcard behavior', () => {
     it('catches the individual actions inside a batch, not the batch itself', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { '*': returns('wildcard-caught') }), defaultResponses);
@@ -565,7 +565,7 @@ describe('askOverrideActions', () => {
 
     it('catches actions inside nested batches', () => {
       function* innerStory(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
       function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([innerStory(), askGuidNew()]);
@@ -584,7 +584,7 @@ describe('askOverrideActions', () => {
 
     it('prefers a specific override over the wildcard inside a batch', () => {
       function* story(): AskResponse<[number, string, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow(), askGuidNew()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow(), askGuidNew()]);
       }
 
       const overrides: ActionOverrideMap = {
@@ -599,7 +599,7 @@ describe('askOverrideActions', () => {
 
     it('lets a wildcard handler yield its own action to the runtime', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const overrides: ActionOverrideMap = {
@@ -619,7 +619,7 @@ describe('askOverrideActions', () => {
   describe('overriding batch actions directly', () => {
     it('respects a specific override for the Batch action', () => {
       function* story(): AskResponse<any> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       // askRunParallel feeds the batch override's array back to the sub-generators in order.
@@ -631,7 +631,7 @@ describe('askOverrideActions', () => {
 
     it('ignores a wildcard for the batch itself but honours a specific batch override', () => {
       function* story(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
 
       const wildcard = runWithRuntime(askOverrideActions(story(), { '*': returns('wild') }), defaultResponses);
@@ -645,7 +645,7 @@ describe('askOverrideActions', () => {
   describe('complex composition', () => {
     it('lets an override handler run its own parallel sub-stories', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const overrides: ActionOverrideMap = {
@@ -662,7 +662,7 @@ describe('askOverrideActions', () => {
 
     it('sends an override handler’s own yields to the runtime, not back through the overrides', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const overrides: ActionOverrideMap = {
@@ -682,7 +682,7 @@ describe('askOverrideActions', () => {
 
     it('intercepts every directly-yielded action when each has an override', () => {
       function* story(): AskResponse<[number, string]> {
-        const random = yield* askRandomNumber();
+        const random = yield* askMathRandomNumber();
         const date = yield* askDateNow();
         return [random, date];
       }
@@ -700,7 +700,7 @@ describe('askOverrideActions', () => {
 
     it('threads sequential dependencies through mixed overrides', () => {
       function* story(): AskResponse<string> {
-        const random = yield* askRandomNumber();
+        const random = yield* askMathRandomNumber();
         const date = yield* askDateNow();
         const guid = yield* askGuidNew();
         return `${random}-${date}-${guid}`;
@@ -719,7 +719,7 @@ describe('askOverrideActions', () => {
 
     it('resolves a parallel + nested success case under an outer askCatch', () => {
       function* innerStory(): AskResponse<[number, string]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
       }
       function* story(): AskResponse<EitherActionResult<[[number, string], string]>> {
         return yield* askCatch(askRunParallel([innerStory(), askGuidNew()]));
@@ -735,7 +735,7 @@ describe('askOverrideActions', () => {
         return yield* askCatch(
           askRunParallel([
             (function* (): AskResponse<[number, string]> {
-              return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+              return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
             })(),
             askGuidNew(),
           ]),
@@ -759,7 +759,7 @@ describe('askOverrideActions', () => {
 
     it('nests one askOverrideActions inside another, each owning its own override', () => {
       function* innerStory(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
       function* story(): AskResponse<[string, number]> {
         const date = yield* askDateNow();
@@ -777,7 +777,7 @@ describe('askOverrideActions', () => {
   describe('edge cases', () => {
     it('passes everything through with an empty override map', () => {
       function* story(): AskResponse<number> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const { result, runtimeActions } = runWithRuntime(askOverrideActions(story(), {}), { [MathActionType.RandomNumber]: MOCK_RANDOM });
@@ -799,9 +799,9 @@ describe('askOverrideActions', () => {
 
     it('invokes the override afresh for each occurrence of the same action type', () => {
       function* story(): AskResponse<number[]> {
-        const a = yield* askRandomNumber();
-        const b = yield* askRandomNumber();
-        const c = yield* askRandomNumber();
+        const a = yield* askMathRandomNumber();
+        const b = yield* askMathRandomNumber();
+        const c = yield* askMathRandomNumber();
         return [a, b, c];
       }
 
@@ -839,7 +839,7 @@ describe('askOverrideActions', () => {
 
     it('supports an override handler that uses askCatch internally', () => {
       function* story(): AskResponse<any> {
-        return yield* askRandomNumber();
+        return yield* askMathRandomNumber();
       }
 
       const overrides: ActionOverrideMap = {
@@ -855,7 +855,7 @@ describe('askOverrideActions', () => {
 
     it('handles a single-action batch (the askBatch optimization)', () => {
       function* story(): AskResponse<[number]> {
-        return yield* askRunParallel([askRandomNumber()]);
+        return yield* askRunParallel([askMathRandomNumber()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), {}), defaultResponses);
@@ -881,7 +881,7 @@ describe('askOverrideActions', () => {
         return (yield { type: 'constructor' }) as string;
       }
       function* story(): AskResponse<[string, number]> {
-        return yield* askRunParallel([subStory(), askRandomNumber()]);
+        return yield* askRunParallel([subStory(), askMathRandomNumber()]);
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), {}), { constructor: 'runtime-answer', ...defaultResponses });
@@ -891,7 +891,7 @@ describe('askOverrideActions', () => {
 
     it('handles a large batch with partial overrides', () => {
       function* story(): AskResponse<number[]> {
-        return yield* askRunParallel([askRandomNumber(), askDateNow(), askGuidNew(), askRandomNumber(), askDateNow()]) as any;
+        return yield* askRunParallel([askMathRandomNumber(), askDateNow(), askGuidNew(), askMathRandomNumber(), askDateNow()]) as any;
       }
 
       const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: returns(MOCK_RANDOM) }), defaultResponses);
@@ -911,7 +911,7 @@ describe('askOverrideActions', () => {
 describe('relay handlers (return yield action)', () => {
   it('relays a raw value from the runtime', () => {
     function* story(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
 
     const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: relay }), defaultResponses);
@@ -921,7 +921,7 @@ describe('relay handlers (return yield action)', () => {
 
   it('relays a success EitherActionResult under askCatch with a single wrap', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: relay }), defaultResponses);
@@ -931,7 +931,7 @@ describe('relay handlers (return yield action)', () => {
 
   it('relays a failure EitherActionResult under askCatch instead of masking it as success', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const { result } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: relay }), {
@@ -944,7 +944,7 @@ describe('relay handlers (return yield action)', () => {
 
   it('requires a handler returning its OWN value to shape it for returnErrors', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const overrides: ActionOverrideMap = {

@@ -2,25 +2,25 @@ import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/test
 
 import { describe, expect, it } from 'vitest';
 
-import { askRandomNumber } from './askRandomNumber';
+import { askMathRandomNumber } from './askMathRandomNumber';
 import { MathActionType } from './MathActionType';
 
-describe('askRandomNumber', () => {
+describe('askMathRandomNumber', () => {
   it('yields a RandomNumber action', () => {
-    const { action } = captureRequester(askRandomNumber());
+    const { action } = captureRequester(askMathRandomNumber());
 
     expect(action).toEqual({ type: MathActionType.RandomNumber });
   });
 
   it('returns the number the runtime resolves', () => {
-    const { returned } = captureRequester(askRandomNumber(), 0.42);
+    const { returned } = captureRequester(askMathRandomNumber(), 0.42);
 
     expect(returned).toBe(0.42);
   });
 
   it('propagates a random number failure as a thrown error', () => {
     const run = () =>
-      runStory(askRandomNumber(), {
+      runStory(askMathRandomNumber(), {
         [MathActionType.RandomNumber]: throwsError('GenericError', 'entropy source failed'),
       });
 

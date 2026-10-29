@@ -4,7 +4,7 @@ import { askDateNow } from '@qpqjs/core';
 import { DateActionType } from '@qpqjs/core';
 import { askGuidNew } from '@qpqjs/core';
 import { GuidActionType } from '@qpqjs/core';
-import { askRandomNumber } from '@qpqjs/core';
+import { askMathRandomNumber } from '@qpqjs/core';
 import { MathActionType } from '@qpqjs/core';
 import { askCatch } from '@qpqjs/core';
 import { askRunParallel } from '@qpqjs/core';
@@ -18,7 +18,7 @@ import { runStory, StoryError, throwsError } from './storyTesting';
 describe('runStory', () => {
   it('mocks a single action with a literal value', () => {
     function* story(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
 
     expect(runStory(story(), { [MathActionType.RandomNumber]: 0.42 })).toBe(0.42);
@@ -26,7 +26,7 @@ describe('runStory', () => {
 
   it('mocks each action in a sequence and threads results through the story', () => {
     function* story(): AskResponse<string> {
-      const random = yield* askRandomNumber();
+      const random = yield* askMathRandomNumber();
       const guid = yield* askGuidNew();
       return `${random}-${guid}`;
     }
@@ -41,8 +41,8 @@ describe('runStory', () => {
 
   it('re-invokes a function mock on each matching action, so it can be stateful', () => {
     function* story(): AskResponse<number> {
-      const a = yield* askRandomNumber();
-      const b = yield* askRandomNumber();
+      const a = yield* askMathRandomNumber();
+      const b = yield* askMathRandomNumber();
       return a + b;
     }
 
@@ -64,7 +64,7 @@ describe('runStory', () => {
 
   it('answers actions run in parallel (batches) by type', () => {
     function* story(): AskResponse<[number, string]> {
-      return yield* askRunParallel([askRandomNumber(), askDateNow()]);
+      return yield* askRunParallel([askMathRandomNumber(), askDateNow()]);
     }
 
     expect(
@@ -77,7 +77,7 @@ describe('runStory', () => {
 
   it('wraps mocked values for askCatch automatically', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     expect(runStory(story(), { [MathActionType.RandomNumber]: 0.9 })).toEqual({ success: true, result: 0.9 });
@@ -85,7 +85,7 @@ describe('runStory', () => {
 
   it('surfaces an uncaught throwsError as a thrown StoryError', () => {
     function* story(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
 
     expect(() => runStory(story(), { [MathActionType.RandomNumber]: throwsError('Boom', 'kaboom') })).toThrow(StoryError);
@@ -93,7 +93,7 @@ describe('runStory', () => {
 
   it('surfaces a caught throwsError as a failed result under askCatch', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const result = runStory(story(), { [MathActionType.RandomNumber]: throwsError('Boom', 'kaboom') });
@@ -103,8 +103,8 @@ describe('runStory', () => {
 
   it('a wildcard mock answers any action', () => {
     function* story(): AskResponse<[number, number]> {
-      const a = yield* askRandomNumber();
-      const b = yield* askRandomNumber();
+      const a = yield* askMathRandomNumber();
+      const b = yield* askMathRandomNumber();
       return [a, b];
     }
 

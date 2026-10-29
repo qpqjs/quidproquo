@@ -1,9 +1,9 @@
 ---
-title: askRandomNumber
+title: askMathRandomNumber
 description: Get a non-deterministic random number as an action so stories stay pure.
 ---
 
-# askRandomNumber
+# askMathRandomNumber
 
 Returns a random floating-point number.
 
@@ -13,10 +13,10 @@ Returns a random floating-point number.
 Randomness is the classic source of non-determinism, so a story never calls `Math.random()` inline. It `yield*`s this action and the runtime supplies the value, recording it in the execution log. That keeps the story a pure generator that can be inspected, tested, and replayed — a replay reuses the exact number the original run drew rather than rolling a fresh one.
 
 ```typescript
-import { askRandomNumber } from '@qpqjs/core';
+import { askMathRandomNumber } from '@qpqjs/core';
 
 export function* askRollDice() {
-  const r = yield* askRandomNumber();
+  const r = yield* askMathRandomNumber();
   // Scale the [0, 1) value into 1..6
   return Math.floor(r * 6) + 1;
 }
@@ -25,7 +25,7 @@ export function* askRollDice() {
 ## Signature
 
 ```typescript
-function* askRandomNumber(): AskResponse<number>;
+function* askMathRandomNumber(): AskResponse<number>;
 ```
 
 ## Parameters

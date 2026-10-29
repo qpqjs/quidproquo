@@ -6,7 +6,7 @@ import { askDateNow } from '../../actions/date/askDateNow';
 import { DateActionType } from '../../actions/date/DateActionType';
 import { askGuidNew } from '../../actions/guid/askGuidNew';
 import { GuidActionType } from '../../actions/guid/GuidActionType';
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
 import { AskResponse, EitherActionResult } from '../../types';
 import { askCatch } from './askCatch';
@@ -14,7 +14,7 @@ import { askRunParallel } from './askRunParallel';
 
 describe('askRunParallel', () => {
   it('returns the results of every story in input order', () => {
-    const result = runStory(askRunParallel([askRandomNumber(), askDateNow(), askGuidNew()]), {
+    const result = runStory(askRunParallel([askMathRandomNumber(), askDateNow(), askGuidNew()]), {
       [MathActionType.RandomNumber]: 0.5,
       [DateActionType.Now]: 'now',
       [GuidActionType.New]: 'guid-1',
@@ -38,7 +38,7 @@ describe('askRunParallel', () => {
       return `${a}+${b}`;
     }
     function* shortStory(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
 
     let guidCount = 0;
@@ -74,8 +74,8 @@ describe('askRunParallel', () => {
       yield* askGuidNew();
     }
     function* randomTwice(): AskResponse<void> {
-      yield* askRandomNumber();
-      yield* askRandomNumber();
+      yield* askMathRandomNumber();
+      yield* askMathRandomNumber();
     }
 
     runStory(askRunParallel([guidTwice(), randomTwice()]), {
@@ -89,7 +89,7 @@ describe('askRunParallel', () => {
 
   it('propagates a failure to an enclosing askCatch', () => {
     function* story(): AskResponse<EitherActionResult<[number, string]>> {
-      return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+      return yield* askCatch(askRunParallel([askMathRandomNumber(), askDateNow()]));
     }
 
     const result = runStory(story(), {

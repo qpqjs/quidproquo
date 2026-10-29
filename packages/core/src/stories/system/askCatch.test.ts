@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { askGuidNew } from '../../actions/guid/askGuidNew';
 import { GuidActionType } from '../../actions/guid/GuidActionType';
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
 import { AskResponse, EitherActionResult, ErrorTypeEnum } from '../../types';
 import { askCatch } from './askCatch';
@@ -12,7 +12,7 @@ import { askCatch } from './askCatch';
 describe('askCatch', () => {
   it('wraps a story that completes in a successful result', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     expect(runStory(story(), { [MathActionType.RandomNumber]: 0.5 })).toEqual({ success: true, result: 0.5 });
@@ -20,7 +20,7 @@ describe('askCatch', () => {
 
   it('captures a failed action as a failed result', () => {
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber());
+      return yield* askCatch(askMathRandomNumber());
     }
 
     const result = runStory(story(), { [MathActionType.RandomNumber]: throwsError('Boom', 'kaboom') });
@@ -35,7 +35,7 @@ describe('askCatch', () => {
       ran = true;
     }
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber(), cleanup());
+      return yield* askCatch(askMathRandomNumber(), cleanup());
     }
 
     const result = runStory(story(), { [MathActionType.RandomNumber]: 1, [GuidActionType.New]: 'g' });
@@ -51,7 +51,7 @@ describe('askCatch', () => {
       ran = true;
     }
     function* story(): AskResponse<EitherActionResult<number>> {
-      return yield* askCatch(askRandomNumber(), cleanup());
+      return yield* askCatch(askMathRandomNumber(), cleanup());
     }
 
     const result = runStory(story(), { [MathActionType.RandomNumber]: throwsError('Boom', 'kaboom'), [GuidActionType.New]: 'g' });
@@ -78,7 +78,7 @@ describe('askCatch', () => {
 
   it('passes the either result down to a nested askCatch', () => {
     function* story(): AskResponse<EitherActionResult<EitherActionResult<number>>> {
-      return yield* askCatch(askCatch(askRandomNumber()));
+      return yield* askCatch(askCatch(askMathRandomNumber()));
     }
 
     const result = runStory(story(), { [MathActionType.RandomNumber]: throwsError('Boom', 'kaboom') });
