@@ -269,12 +269,7 @@ em {
   transform: translateX(-50%);
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(34, 211, 238, 0.07) 0%,
-    rgba(34, 211, 238, 0.02) 42%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.07) 0%, rgba(34, 211, 238, 0.02) 42%, transparent 70%);
 }
 
 .hero__inner {

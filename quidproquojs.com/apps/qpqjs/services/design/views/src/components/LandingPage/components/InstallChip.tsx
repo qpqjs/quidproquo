@@ -11,7 +11,7 @@ export function InstallChip() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      // clipboard unavailable — the command is still visible to copy by hand
+      // clipboard unavailable: the command is still visible to copy by hand
     }
   };
 

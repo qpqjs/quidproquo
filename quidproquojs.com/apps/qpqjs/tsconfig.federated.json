@@ -2,12 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@qpqjs/design-service-views/LandingPage": [
-        "apps/qpqjs/services/design/views/src/components/LandingPage/LandingPage.tsx"
-      ],
-      "@qpqjs/design-service-views/WelcomeScreen": [
-        "apps/qpqjs/services/design/views/src/components/WelcomeScreen/WelcomeScreen.tsx"
-      ]
+      "@qpqjs/design-service-views/LandingPage": ["apps/qpqjs/services/design/views/src/components/LandingPage/LandingPage.tsx"],
+      "@qpqjs/design-service-views/WelcomeScreen": ["apps/qpqjs/services/design/views/src/components/WelcomeScreen/WelcomeScreen.tsx"]
     }
   }
 }

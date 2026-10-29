@@ -12,30 +12,16 @@ import { fileURLToPath } from 'node:url';
 
 const serviceDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectDir = join(serviceDir, '..', '..', '..', 'userScripts', 'smoke');
-const generatedDir = join(
-  serviceDir,
-  'src',
-  'smoke',
-  'suites',
-  'userScript',
-  'generated'
-);
+const generatedDir = join(serviceDir, 'src', 'smoke', 'suites', 'userScript', 'generated');
 
 const listFiles = (dir) =>
-  readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
-    entry.isDirectory()
-      ? listFiles(join(dir, entry.name))
-      : [join(dir, entry.name)]
-  );
+  readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (entry.isDirectory() ? listFiles(join(dir, entry.name)) : [join(dir, entry.name)]));
 
 const srcDir = join(projectDir, 'src');
 const sources = Object.fromEntries(
   listFiles(srcDir)
     .sort()
-    .map((file) => [
-      relative(projectDir, file).split('\\').join('/'),
-      readFileSync(file, 'utf8'),
-    ])
+    .map((file) => [relative(projectDir, file).split('\\').join('/'), readFileSync(file, 'utf8')]),
 );
 
 mkdirSync(generatedDir, { recursive: true });
@@ -48,7 +34,7 @@ writeFileSync(
     '/** The smoke user script project, path to text, as the smoke test writes it to the probe drive. */',
     `export const SMOKE_USER_SCRIPT_SOURCES: Record<string, string> = ${JSON.stringify(sources, null, 2)};`,
     '',
-  ].join('\n')
+  ].join('\n'),
 );
 
 // Zipped the way a tool zips a folder: wrapped in one top-level directory.
@@ -64,9 +50,9 @@ writeFileSync(
     '/** The smoke user script project as a zip (wrapped in one top-level folder), base64, for askUserScriptBuildFromZip. */',
     `export const SMOKE_USER_SCRIPT_ZIP_BASE64 = ${JSON.stringify(zip.toBuffer().toString('base64'))};`,
     '',
-  ].join('\n')
+  ].join('\n'),
 );
 
 console.log(
-  `collectSmokeUserScriptSources: wrote generated/SMOKE_USER_SCRIPT_SOURCES.ts (${Object.keys(sources).length} files) and generated/SMOKE_USER_SCRIPT_ZIP_BASE64.ts`
+  `collectSmokeUserScriptSources: wrote generated/SMOKE_USER_SCRIPT_SOURCES.ts (${Object.keys(sources).length} files) and generated/SMOKE_USER_SCRIPT_ZIP_BASE64.ts`,
 );

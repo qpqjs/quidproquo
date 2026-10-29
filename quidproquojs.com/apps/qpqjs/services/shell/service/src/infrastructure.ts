@@ -45,7 +45,7 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
 
 // The Docusaurus docs site. No storage drive: the web entry owns its bucket,
 // and autoUpload (the default) packages docusaurus/build as a CDK asset at
-// synth time, uploads it at deploy time, and invalidates the distribution —
+// synth time, uploads it at deploy time, and invalidates the distribution,
 // so `docusaurus` must be built before the web stack deploys.
 const docsWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   buildPath: '../../../../../../docusaurus/build',

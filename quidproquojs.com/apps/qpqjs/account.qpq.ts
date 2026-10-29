@@ -1,7 +1,7 @@
 // Account-level guardrail extras (audit trail, budget + cost anomaly alerts,
 // GuardDuty posture), deployed once per AWS account as the statically named
 // 'qpq-account' stack. Exactly one repo/config owns this per account, and
-// actor deploys must not deploy it — account resources have nothing to do with
+// actor deploys must not deploy it, account resources have nothing to do with
 // any app's lifecycle. Identity plumbing comes from the workspace CDK app.
 import {
   AwsDataStoreRemovalPolicy,

@@ -1,14 +1,19 @@
 # quidproquojs.com
 
-The quidproquo framework's own website (app **qpqjs**), built with quidproquo itself: TypeScript npm workspaces, AWS Lambda service backends bundled with Rspack, React microfrontend views built with Rspack and Module Federation, deployed with AWS CDK.
+The quidproquo framework's own website (app **qpqjs**), built with quidproquo itself: TypeScript npm workspaces, AWS Lambda service backends bundled
+with Rspack, React microfrontend views built with Rspack and Module Federation, deployed with AWS CDK.
 
-This folder lives inside the quidproquo monorepo but is **not** one of its workspaces. It is a self-contained consumer app. All `@qpqjs/*` dependencies are `file:../<pkg>` refs to the sibling packages, so the site always runs against the in-repo HEAD. Build the framework first (`npm install && npm run build` at the repo root) before installing here.
+This folder lives inside the quidproquo monorepo but is **not** one of its workspaces. It is a self-contained consumer app. All `@qpqjs/*`
+dependencies are `file:../<pkg>` refs to the sibling packages, so the site always runs against the in-repo HEAD. Build the framework first
+(`npm install && npm run build` at the repo root) before installing here.
 
-It doubles as the `create-qpq-app` template: the scaffolder snapshots this workspace at publish time, so anything broken here is broken in every new app.
+It doubles as the `create-qpq-app` template: the scaffolder snapshots this workspace at publish time, so anything broken here is broken in every new
+app.
 
 ## Getting started
 
-> Requires the repo's pinned Node version (see `.nvmrc`, currently 24.x). Run `nvm use` **before** `npm install`. On an older Node, `npm install` refuses to run (`engines` plus `engine-strict`).
+> Requires the repo's pinned Node version (see `.nvmrc`, currently 24.x). Run `nvm use` **before** `npm install`. On an older Node, `npm install`
+> refuses to run (`engines` plus `engine-strict`).
 
 ```bash
 nvm use              # always first: switches to the Node version in .nvmrc
@@ -43,15 +48,26 @@ docusaurus/                       # docs site (docs.quidproquojs.com), built fir
                                   # web entry auto-uploads docusaurus/build at deploy
 ```
 
-There is no tools/ directory. All build, dev, and deploy orchestration ships in the `@qpqjs/cli` package (the `qpq` bin, which the root npm scripts alias), with the rspack config builders in `@qpqjs/deploy-rspack` and the generic CDK app in `@qpqjs/deploy-aws`.
+There is no tools/ directory. All build, dev, and deploy orchestration ships in the `@qpqjs/cli` package (the `qpq` bin, which the root npm scripts
+alias), with the rspack config builders in `@qpqjs/deploy-rspack` and the generic CDK app in `@qpqjs/deploy-aws`.
 
 ## How it fits together
 
-- **Libraries** build to their own `dist/` with `tsc -b` (TypeScript project references, so only what changed rebuilds). Each lib's `package.json` `main`, `types`, and `exports` point at `dist/src`, and npm workspaces symlink it into `node_modules/@qpqjs/*`, so imports resolve like any npm package. Libs build before services because the root `workspaces` array lists all lib globs ahead of `apps/*/services/*/service`.
-- **Service backends** are bundled to AWS Lambda by Rspack, programmatically at deploy time (`qpq go` calls `getServiceRspackConfig` from `@qpqjs/deploy-rspack`). There are no per-service `rspack.config.ts` files or `bundle` scripts, and a service's `build` script only type-checks.
-- **Views** are microfrontends built by Rspack and `@module-federation/enhanced`. There are no per-view federation config files: exposes are computed at build time from `// federated.export` markers, and remotes are discovered from sibling views packages (dev port from each service's `defineDevServerOptions({ views: { port } })` in its `infrastructure.ts`). The only generated artifact is `apps/<app>/tsconfig.federated.json`, regenerated with `npm run prep` after adding or removing a marker.
-- **The dev server** (`npx qpq go:dev:api`, powered by `@qpqjs/dev-server`) loads each service's `infrastructure.ts` directly, so no synth is needed, just built libs. Its bundle externalizes `node_modules` (an externals function in its rspack config) so native modules like `sqlite3` load at runtime from their install location.
-- **The `admin` service** owns the log and admin backbone. Every service's config references `defineAdminSettings(Admin, …)` and `logServiceName: Admin`, so the dev server resolves log globals from the `admin` module. Running a single service without `admin` spams `Global config qpq-log-retention-days not found`.
+- **Libraries** build to their own `dist/` with `tsc -b` (TypeScript project references, so only what changed rebuilds). Each lib's `package.json`
+  `main`, `types`, and `exports` point at `dist/src`, and npm workspaces symlink it into `node_modules/@qpqjs/*`, so imports resolve like any npm
+  package. Libs build before services because the root `workspaces` array lists all lib globs ahead of `apps/*/services/*/service`.
+- **Service backends** are bundled to AWS Lambda by Rspack, programmatically at deploy time (`qpq go` calls `getServiceRspackConfig` from
+  `@qpqjs/deploy-rspack`). There are no per-service `rspack.config.ts` files or `bundle` scripts, and a service's `build` script only type-checks.
+- **Views** are microfrontends built by Rspack and `@module-federation/enhanced`. There are no per-view federation config files: exposes are computed
+  at build time from `// federated.export` markers, and remotes are discovered from sibling views packages (dev port from each service's
+  `defineDevServerOptions({ views: { port } })` in its `infrastructure.ts`). The only generated artifact is `apps/<app>/tsconfig.federated.json`,
+  regenerated with `npm run prep` after adding or removing a marker.
+- **The dev server** (`npx qpq go:dev:api`, powered by `@qpqjs/dev-server`) loads each service's `infrastructure.ts` directly, so no synth is needed,
+  just built libs. Its bundle externalizes `node_modules` (an externals function in its rspack config) so native modules like `sqlite3` load at
+  runtime from their install location.
+- **The `admin` service** owns the log and admin backbone. Every service's config references `defineAdminSettings(Admin, …)` and
+  `logServiceName: Admin`, so the dev server resolves log globals from the `admin` module. Running a single service without `admin` spams
+  `Global config qpq-log-retention-days not found`.
 
 ## Commands
 
@@ -94,16 +110,27 @@ npx qpq go             # interactive aws deploy: pick app, services, stacks (inf
                        # bundles (rspack production), cdk deploy, and s3 sync per phase
 ```
 
-`qpq go` needs AWS credentials plus a deployment: an entry in `apps/<app>/deploy.config.json` selected with `--deployment <name>`. Each entry is the whole story for that target (`platform`, `name`, `environment`, optional `feature`, `platformSettings` such as `accountId`/`region` for aws, and optional string `settings` that reach `infrastructure.ts` through `getDeploySetting`). The file is the source of truth: no env var or flag overrides it, so to change a target you edit the file or add an entry. Service configs read the primed `APPLICATION_NAME`, `ENVIRONMENT` and `FEATURE_NAME` env vars. App-specific bootstrap and account extras live in `apps/<app>/bootstrap.qpq.ts` and `apps/<app>/account.qpq.ts` as config fragments; the identity plumbing is provided by the generic CDK app in `@qpqjs/deploy-aws`.
+`qpq go` needs AWS credentials plus a deployment: an entry in `apps/<app>/deploy.config.json` selected with `--deployment <name>`. Each entry is the
+whole story for that target (`platform`, `name`, `environment`, optional `feature`, `platformSettings` such as `accountId`/`region` for aws, and
+optional string `settings` that reach `infrastructure.ts` through `getDeploySetting`). The file is the source of truth: no env var or flag overrides
+it, so to change a target you edit the file or add an entry. Service configs read the primed `APPLICATION_NAME`, `ENVIRONMENT` and `FEATURE_NAME` env
+vars. App-specific bootstrap and account extras live in `apps/<app>/bootstrap.qpq.ts` and `apps/<app>/account.qpq.ts` as config fragments; the
+identity plumbing is provided by the generic CDK app in `@qpqjs/deploy-aws`.
 
-- Production views bundles get prod remote URLs (the `views` host on the primary root, under the app's domain resolver) derived from the service's qpq config. Dev bundles use localhost ports.
-- `cdk.context.json` at the repo root is CDK's regenerable Route53 lookup cache. It is written on the first deploy, and checking it in means later synths need no live AWS lookups.
+- Production views bundles get prod remote URLs (the `views` host on the primary root, under the app's domain resolver) derived from the service's qpq
+  config. Dev bundles use localhost ports.
+- `cdk.context.json` at the repo root is CDK's regenerable Route53 lookup cache. It is written on the first deploy, and checking it in means later
+  synths need no live AWS lookups.
 
 ## Adding a service
 
 1. Create its `config`, `models`, `x-models`, `shared-logic`, `x-logic`, `service-utils`, and `service` packages.
-2. Each lib gets a `package.json` with `"build": "tsc -b"` and the dist-pointing `main`, `types`, and `exports`; a `tsconfig.json` (extends the root base, **no paths**, references `./tsconfig.lib.json`); and a `tsconfig.lib.json` (`composite`, `outDir ./dist`, `rootDir .`, with `references` to its workspace deps' `tsconfig.lib.json`). There is no root-level list to touch, since `npm run build --workspaces` discovers the new lib automatically.
-3. `service/` gets a `package.json` (`@qpqjs/<svc>-service`, `private`, `"build": "tsc -p tsconfig.app.json"`) and a `tsconfig.app.json`. No rspack.config.ts and no bundle script, because `qpq go` bundles it by convention. `npm run build` then picks it up automatically.
+2. Each lib gets a `package.json` with `"build": "tsc -b"` and the dist-pointing `main`, `types`, and `exports`; a `tsconfig.json` (extends the root
+   base, **no paths**, references `./tsconfig.lib.json`); and a `tsconfig.lib.json` (`composite`, `outDir ./dist`, `rootDir .`, with `references` to
+   its workspace deps' `tsconfig.lib.json`). There is no root-level list to touch, since `npm run build --workspaces` discovers the new lib
+   automatically.
+3. `service/` gets a `package.json` (`@qpqjs/<svc>-service`, `private`, `"build": "tsc -p tsconfig.app.json"`) and a `tsconfig.app.json`. No
+   rspack.config.ts and no bundle script, because `qpq go` bundles it by convention. `npm run build` then picks it up automatically.
 
 ## Test
 

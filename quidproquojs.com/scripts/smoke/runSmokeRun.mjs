@@ -26,7 +26,7 @@ const mintToken = async () => {
 
   if (!tokenRequestUrl || !tokenRequestToken) {
     throw new Error(
-      'ACTIONS_ID_TOKEN_REQUEST_URL / ACTIONS_ID_TOKEN_REQUEST_TOKEN are not set. This needs a GitHub Actions job with `permissions: id-token: write`'
+      'ACTIONS_ID_TOKEN_REQUEST_URL / ACTIONS_ID_TOKEN_REQUEST_TOKEN are not set. This needs a GitHub Actions job with `permissions: id-token: write`',
     );
   }
 
@@ -45,9 +45,7 @@ const mintToken = async () => {
 
 const printTests = (log, tests) => {
   for (const test of tests) {
-    log(
-      `  #${test.id} ${test.name.padEnd(24)} ${test.status.padEnd(8)} ${test.message}`
-    );
+    log(`  #${test.id} ${test.name.padEnd(24)} ${test.status.padEnd(8)} ${test.message}`);
   }
 };
 
@@ -64,9 +62,7 @@ export const runSmokeRun = async (apiUrl, log) => {
       headers: { Authorization: `Bearer ${await mintToken()}` },
     });
     if (!response.ok) {
-      throw new Error(
-        `${method} ${path} failed with ${response.status}: ${await response.text()}`
-      );
+      throw new Error(`${method} ${path} failed with ${response.status}: ${await response.text()}`);
     }
     return response.json();
   };
@@ -82,7 +78,7 @@ export const runSmokeRun = async (apiUrl, log) => {
     const run = await callApi('GET', `/smoke/run/${runId}`);
     const { summary } = run;
     log(
-      `status=${run.status} completed ${summary.completed}/${summary.total} passed ${summary.passed} failed ${summary.failed} skipped ${summary.skipped}`
+      `status=${run.status} completed ${summary.completed}/${summary.total} passed ${summary.passed} failed ${summary.failed} skipped ${summary.skipped}`,
     );
 
     if (run.status === 'passed' || run.status === 'failed') {

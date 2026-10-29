@@ -3,17 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "rootDir": ".",
     "composite": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "jest.config.ts",
-    "src/**/*.spec.ts"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts"]
 }

@@ -2,12 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@todo/design-service-views/WelcomeScreen": [
-        "apps/todo/services/design/views/src/components/WelcomeScreen/WelcomeScreen.tsx"
-      ],
-      "@todo/todo-service-views/TodoList": [
-        "apps/todo/services/todo/views/src/components/TodoList/TodoList.tsx"
-      ]
+      "@todo/design-service-views/WelcomeScreen": ["apps/todo/services/design/views/src/components/WelcomeScreen/WelcomeScreen.tsx"],
+      "@todo/todo-service-views/TodoList": ["apps/todo/services/todo/views/src/components/TodoList/TodoList.tsx"]
     }
   }
 }

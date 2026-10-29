@@ -57,13 +57,13 @@ const itemStyle: CSSProperties = {
   borderRadius: '0.5rem',
 };
 
-interface TodoItem {
+type TodoItem = {
   id: number;
   text: string;
   done: boolean;
-}
+};
 
-// In-memory only for now — the exampler's next step is persisting these
+// In-memory only for now: the exampler's next step is persisting these
 // through the todo service's api.
 export const TodoList = () => {
   const [todos, setTodos] = useState<TodoItem[]>([]);

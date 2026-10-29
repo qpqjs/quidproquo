@@ -1,2 +1,2 @@
-// Intentionally empty — noop placeholder package for the todo app.
+// Intentionally empty: noop placeholder package for the todo app.
 export {};

@@ -19,7 +19,7 @@ import { TODO_USER_DIRECTORY, TodoServiceEnum, todoServiceNames } from '@todo/co
 // Identity comes from the selected deployment in deploy.config.json, primed by the CLI.
 const modulePrefix = process.env.APPLICATION_NAME!;
 
-// The deployed version tag — git sha when available, so a fresh checkout
+// The deployed version tag, git sha when available, so a fresh checkout
 // (or a scaffold that skipped git init) still loads.
 const getVersionTag = (): string => {
   try {
@@ -33,7 +33,7 @@ const getVersionTag = (): string => {
   }
 };
 
-// The shared config every todo service starts from — app identity, dns,
+// The shared config every todo service starts from, app identity, dns,
 // auth, admin, api and caching. Each service's infrastructure.ts layers its
 // own resources on top of this.
 export const defineTodoService = (
@@ -59,7 +59,7 @@ export const defineTodoService = (
   defineAuthSystem(TodoServiceEnum.Auth, TODO_USER_DIRECTORY),
 
   // Both todo deployments are docker images, so there's no cross-account
-  // service map — identity comes from the deployment when an aws target is
+  // service map, identity comes from the deployment when an aws target is
   // ever added.
   defineAwsServiceAccountInfo(process.env.AWS_DEFAULT_ACCOUNT!, process.env.AWS_DEFAULT_REGION!, [], {
     apiLayers,
