@@ -4,7 +4,6 @@ export * from './constants';
 export * from './createImplementationRuntime';
 export * from './deployment';
 export * from './logic';
-export * from './logic/actionLogic';
 export * from './promiseify';
 export * from './qpqCoreUtilsLib';
 export * from './qpqExecuteLog';
