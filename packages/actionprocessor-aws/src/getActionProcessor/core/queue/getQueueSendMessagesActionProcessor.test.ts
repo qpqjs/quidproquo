@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sendMessages } from '../../../logic/sqs/sendMessages';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
-import { getQueueSendMessagesActionProcessor } from './getQueueSendMessageActionProcessor';
+import { getQueueSendMessagesActionProcessor } from './getQueueSendMessagesActionProcessor';
 
 vi.mock('../../../logic/sqs/sendMessages', () => ({
   sendMessages: vi.fn(),

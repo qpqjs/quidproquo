@@ -1,6 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
-import { getQueueSendMessagesActionProcessor } from './getQueueSendMessageActionProcessor';
+import { getQueueSendMessagesActionProcessor } from './getQueueSendMessagesActionProcessor';
 
 export const getQueueActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

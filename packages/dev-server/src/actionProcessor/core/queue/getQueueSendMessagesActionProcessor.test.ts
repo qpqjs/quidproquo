@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../../logic/eventBus';
 import { invokeProcessor } from '../../../testing/testProcessorRuntime';
-import { getQueueSendMessagesActionProcessor } from './getQueueSendMessageActionProcessor';
+import { getQueueSendMessagesActionProcessor } from './getQueueSendMessagesActionProcessor';
 
 vi.mock('../../../logic/eventBus', () => ({
   eventBus: { publish: vi.fn(), publishAndWaitForResponse: vi.fn() },
