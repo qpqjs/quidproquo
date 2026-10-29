@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { copyFile } from '../../../logic/s3';
@@ -30,6 +31,7 @@ const getProcessFileCopy = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileCo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileCopy.errorType.AccessDenied, 'Access denied copying file'),
         NoSuchBucket: () => actionResultError(askFileCopy.errorType.DriveNotFound, `Storage drive not found: ${sourceDrive} or ${targetDrive}`),
         NoSuchKey: () => actionResultError(askFileCopy.errorType.FileNotFound, `File not found: ${sourceFilepath}`),

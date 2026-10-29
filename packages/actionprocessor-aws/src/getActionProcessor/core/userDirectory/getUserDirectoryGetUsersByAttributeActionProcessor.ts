@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -24,6 +25,7 @@ const getProcessGetUsersByAttribute = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidParameterException: () =>
           actionResultError(
             askUserDirectoryGetUsersByAttribute.errorType.InvalidSearchParameters,

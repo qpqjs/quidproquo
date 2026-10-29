@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getSecret } from '../../../logic/secretsManager/getSecret';
@@ -21,6 +22,7 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       return actionResult(secretValue);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         ResourceNotFoundException: () => actionResultError(askConfigGetSecret.errorType.ResourceNotFound, `Secret not found: [${secretName}]`),
         ThrottlingException: () => actionResultError(askConfigGetSecret.errorType.Throttled, 'Throttling: Rate exceeded'),
       });

@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -31,6 +32,7 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         // An unknown account must look like a known one (the pool client prevents existence errors; this
         // covers the exception if it still arrives), so the caller cannot enumerate emails.
         UserNotFoundException: () =>

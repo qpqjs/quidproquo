@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -29,6 +30,7 @@ const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typ
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         CodeMismatchException: () => actionResultError(askUserDirectoryConfirmForgotPassword.errorType.InvalidCode, 'Confirmation code is incorrect'),
         ExpiredCodeException: () => actionResultError(askUserDirectoryConfirmForgotPassword.errorType.ExpiredCode, 'Confirmation code has expired'),
         InvalidPasswordException: () =>

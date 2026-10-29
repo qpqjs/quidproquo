@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { readBinaryFile } from '../../../logic/s3';
@@ -22,6 +23,7 @@ const getProcessFileReadBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<ty
       return actionResult(await readBinaryFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidObjectState: () => actionResultError(askFileReadBinaryContents.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(askFileReadBinaryContents.errorType.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(askFileReadBinaryContents.errorType.FileNotFound, `File not found: ${filepath}`),

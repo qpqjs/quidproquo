@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { globalSignOut } from '../../../logic/cognito/globalSignOut';
@@ -21,6 +22,7 @@ const getProcessSignOutUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUse
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () => actionResultError(askUserDirectorySignOutUser.errorType.Unauthorized, 'Access token is invalid or has expired'),
         TooManyRequestsException: () =>
           actionResultError(askUserDirectorySignOutUser.errorType.LimitExceeded, 'Too many attempts, please try again later'),

@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getParameter } from '../../../logic/parametersManager/getParameter';
@@ -21,6 +22,7 @@ const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof
       return actionResult(parameterValue);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         ThrottlingException: () => actionResultError(askConfigGetParameter.errorType.Throttled, 'Throttling: Rate exceeded'),
       });
     }

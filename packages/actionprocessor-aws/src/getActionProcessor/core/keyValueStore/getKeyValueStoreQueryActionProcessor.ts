@@ -9,6 +9,7 @@ import {
   QPQConfig,
   resolveKvsQueryIndex,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { query } from '../../../logic/dynamo';
@@ -46,6 +47,7 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof
       return actionResult(items);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InternalServerError: () => actionResultError(askKeyValueStoreQueryBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreQueryBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.InvalidScope, error.message),

@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getObjectStorageClass } from '../../../logic/s3/getObjectStorageClass';
@@ -24,6 +25,7 @@ const getProcessFileIsColdStorage = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       return actionResult(isColdStorage);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileIsColdStorage.errorType.AccessDenied, 'Access denied reading file storage class'),
         Forbidden: () => actionResultError(askFileIsColdStorage.errorType.AccessDenied, 'Access denied reading file storage class'),
         NotFound: () => actionResultError(askFileIsColdStorage.errorType.FileNotFound, `File not found: ${filepath}`),

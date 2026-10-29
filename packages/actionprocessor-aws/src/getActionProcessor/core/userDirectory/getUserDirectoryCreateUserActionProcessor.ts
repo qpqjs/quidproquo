@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -36,6 +37,7 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUser
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UsernameExistsException: () => actionResultError(askUserDirectoryCreateUser.errorType.Conflict, 'An account with this email already exists'),
         InvalidPasswordException: () =>
           actionResultError(askUserDirectoryCreateUser.errorType.InvalidPassword, 'Password does not meet the password policy'),

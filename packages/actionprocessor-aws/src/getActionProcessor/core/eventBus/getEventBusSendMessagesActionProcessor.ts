@@ -12,6 +12,7 @@ import {
   qpqCoreUtils,
   StorySession,
   toCrossServiceSession,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';
@@ -61,6 +62,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AuthorizationErrorException: () =>
           actionResultError(askEventBusSendMessagesBase.errorType.AccessDenied, 'Access denied publishing to event bus'),
         NotFoundException: () => actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus topic not found: ${eventBusName}`),

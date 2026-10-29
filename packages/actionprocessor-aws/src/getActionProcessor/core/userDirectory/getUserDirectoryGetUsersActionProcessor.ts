@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -24,6 +25,7 @@ const getProcessGetUsers = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDi
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidParameterException: () => actionResultError(askUserDirectoryGetUsers.errorType.InvalidPageKey, 'The supplied page key is invalid'),
         TooManyRequestsException: () =>
           actionResultError(askUserDirectoryGetUsers.errorType.LimitExceeded, 'Too many requests, please try again later'),

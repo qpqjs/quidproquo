@@ -9,6 +9,7 @@ import {
   ProcessorFor,
   QPQConfig,
   stripScopedFilePath,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { listFiles } from '../../../logic/s3';
@@ -40,6 +41,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileListDirectory.errorType.AccessDenied, 'Access denied listing directory'),
         Forbidden: () => actionResultError(askFileListDirectory.errorType.AccessDenied, 'Access denied listing directory'),
         NoSuchBucket: () => actionResultError(askFileListDirectory.errorType.DriveNotFound, `Storage drive not found: ${drive}`),

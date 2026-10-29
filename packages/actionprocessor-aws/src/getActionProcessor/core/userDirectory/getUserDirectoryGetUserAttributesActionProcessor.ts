@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -27,6 +28,7 @@ const getProcessGetUserAttributes = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectoryGetUserAttributes.errorType.UserNotFound, 'User not found'),
       });
     }

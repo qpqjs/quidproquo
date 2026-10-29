@@ -8,6 +8,7 @@ import {
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { deleteItem } from '../../../logic/dynamo';
@@ -27,6 +28,7 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InternalServerError: () => actionResultError(askKeyValueStoreDelete.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreDelete.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreDelete.errorType.InvalidScope, error.message),

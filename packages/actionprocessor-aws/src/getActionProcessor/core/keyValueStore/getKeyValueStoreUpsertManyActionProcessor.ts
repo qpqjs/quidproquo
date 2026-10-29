@@ -8,6 +8,7 @@ import {
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { batchPutItems, transactPutItems } from '../../../logic/dynamo';
@@ -58,6 +59,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         // Retries exhausted on UnprocessedItems, sustained throttle, a transient

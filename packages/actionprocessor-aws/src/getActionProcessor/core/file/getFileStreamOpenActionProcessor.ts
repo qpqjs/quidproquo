@@ -9,6 +9,7 @@ import {
   generateUuid,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { Readable } from 'stream';
@@ -73,6 +74,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidObjectState: () => actionResultError(askFileStreamOpenBase.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),

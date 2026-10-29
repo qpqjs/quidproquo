@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -37,6 +38,7 @@ const getProcessAuthenticateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof a
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),

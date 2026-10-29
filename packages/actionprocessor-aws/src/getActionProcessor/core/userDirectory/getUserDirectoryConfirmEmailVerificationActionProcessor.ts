@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { verifyUserEmail } from '../../../logic/cognito/verifyUserEmail';
@@ -21,6 +22,7 @@ const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): ProcessorFor<
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         CodeMismatchException: () =>
           actionResultError(askUserDirectoryConfirmEmailVerification.errorType.InvalidCode, 'Verification code is incorrect'),
         ExpiredCodeException: () =>

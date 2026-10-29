@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { createKmsDataKeyProvider, resolveCryptoKeyAlias } from './utils';
@@ -29,6 +30,7 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig): ProcessorFor<typeof askC
       return actionResult(ciphertext);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotFoundException: () => actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Crypto key not found: [${keyName}]`),
         DisabledException: () => actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Crypto key is disabled: [${keyName}]`),
         KMSInvalidStateException: () =>

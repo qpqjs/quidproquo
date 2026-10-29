@@ -12,6 +12,7 @@ import {
   QueueMessage,
   StorySession,
   toCrossServiceSession,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { sendMessages, SqsQueueMessageEntry } from '../../../logic/sqs/sendMessages';
@@ -54,6 +55,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
         AccessDeniedException: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
         QueueDoesNotExist: () => actionResultError(askQueueSendMessagesBase.errorType.QueueNotFound, `Queue not found: ${queueName}`),

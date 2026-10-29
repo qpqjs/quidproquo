@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { requestEmailVerificationCode } from '../../../logic/cognito/requestEmailVerificationCode';
@@ -21,6 +22,7 @@ const getProcessRequestEmailVerification = (qpqConfig: QPQConfig): ProcessorFor<
       return actionResult(deliveryDetails);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryRequestEmailVerification.errorType.Unauthorized, 'Access token is invalid or has expired'),
         LimitExceededException: () =>

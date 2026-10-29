@@ -9,6 +9,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
@@ -93,6 +94,7 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): ProcessorFor<ty
       return actionResult(response);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         CodeMismatchException: () =>
           actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.InvalidCode, 'The supplied code is incorrect'),
         EnableSoftwareTokenMFAException: () =>

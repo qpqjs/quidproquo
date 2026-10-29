@@ -1,5 +1,13 @@
 import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  createActionProcessor,
+  ProcessorFor,
+  QPQConfig,
+  transientErrorMap,
+} from '@qpqjs/core';
 import { askWebsocketSendMessageBase } from '@qpqjs/webserver';
 
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
@@ -17,6 +25,7 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         ThrottlingException: () => actionResultError(askWebsocketSendMessageBase.errorType.Throttled, 'Rate exceeded'),
         GoneException: () => actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists'),
       });

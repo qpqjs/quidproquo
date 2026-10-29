@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -27,6 +28,7 @@ const getProcessSetPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUse
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectorySetPassword.errorType.UserNotFound, 'No account found for this user'),
         InvalidPasswordException: () =>
           actionResultError(askUserDirectorySetPassword.errorType.InvalidNewPassword, 'Password does not meet the password policy'),

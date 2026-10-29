@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
@@ -31,6 +32,7 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(askFileWriteObjectJsonBase.errorType.DriveNotFound, `Storage drive not found: ${drive}`),

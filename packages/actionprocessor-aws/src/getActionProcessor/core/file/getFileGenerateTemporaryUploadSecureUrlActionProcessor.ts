@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { generatePresignedUploadUrl } from '../../../logic/s3/generatePresignedUploadUrl';
@@ -42,6 +43,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): P
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of @qpqjs/core.
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidScopeError: (error) => actionResultError(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope, error.message),
       });
     }

@@ -13,4 +13,3 @@ export * from './qpqPackage';
 export * from './scope';
 export * from './stateEffects';
 export * from './stream';
-export * from './transientErrorNames';

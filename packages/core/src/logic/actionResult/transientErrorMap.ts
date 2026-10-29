@@ -1,3 +1,7 @@
+import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
+import { actionResultError } from './actionResultError';
+import { ErrorMap } from './ErrorMap';
+
 /**
  * AWS / runtime error names that mean "try again shortly", not "this will never work".
  *
@@ -45,3 +49,14 @@ export const TRANSIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
 
 /** Whether an error name or OS code names a transient, worth-retrying condition. */
 export const isTransientErrorName = (name?: string): boolean => !!name && TRANSIENT_ERROR_NAMES.has(name);
+
+/**
+ * The error-map entries that classify every transient name, for a processor to spread ahead of its own
+ * map: `actionResultErrorFromCaughtError(error, { ...transientErrorMap(), NoSuchBucket: ... })`. The
+ * processor's own entry for a name wins. Defaults to the bare OutOfResources; pass the action's own
+ * catalogued throttle entry where it has one.
+ */
+export const transientErrorMap = (errorType: string = ErrorTypeEnum.OutOfResources): ErrorMap =>
+  Object.fromEntries(
+    [...TRANSIENT_ERROR_NAMES].map((name) => [name, () => actionResultError(errorType, `A transient error occurred, retry [${name}].`)]),
+  );

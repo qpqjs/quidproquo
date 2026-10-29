@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -26,6 +27,7 @@ const getProcessRevokeRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryRevokeRefreshToken.errorType.Unauthorized, 'Refresh token is invalid or already revoked'),
         TooManyRequestsException: () =>

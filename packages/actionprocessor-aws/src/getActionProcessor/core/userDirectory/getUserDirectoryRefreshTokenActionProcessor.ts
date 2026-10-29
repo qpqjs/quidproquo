@@ -7,6 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -37,6 +38,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryRefreshToken.errorType.Unauthorized, 'Refresh token is invalid or has expired'),
         TooManyRequestsException: () =>

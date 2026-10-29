@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { objectExists } from '../../../logic/s3';
@@ -21,6 +22,7 @@ const getProcessFileExists = (qpqConfig: QPQConfig): ProcessorFor<typeof askFile
       return actionResult(await objectExists(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileExists.errorType.AccessDenied, 'Access denied checking file existence'),
         Forbidden: () => actionResultError(askFileExists.errorType.AccessDenied, 'Access denied checking file existence'),
         InvalidScopeError: (error) => actionResultError(askFileExists.errorType.InvalidScope, error.message),
