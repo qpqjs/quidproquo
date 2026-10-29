@@ -28,7 +28,13 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askService
     const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
     const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-    const awsFunctionName = awsNamingUtils.getConfigRuntimeResourceName(`${functionName}-sfunc`, appName, service, environment, feature);
+    const awsFunctionName = awsNamingUtils.getConfigRuntimeResourceName(
+      awsNamingUtils.getServiceFunctionLambdaBaseName(functionName),
+      appName,
+      service,
+      environment,
+      feature,
+    );
 
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,

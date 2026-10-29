@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 // Host-side `cdk deploy` helpers. No cdk.json anywhere: the CDK app command is
 // passed via --app and runs @qpqjs/deploy-aws's generic workspace app
 // (bin/qpq-cdk-app.js) under ts-node hooks. The child inherits the primed
@@ -86,7 +87,7 @@ export const deployBootstrapStack = async (appName: string): Promise<void> => {
   const appPrefix = getAppPrefix(appName);
   const environment = process.env[QpqDeployEnvVar.environment];
   const feature = process.env[QpqDeployEnvVar.featureName];
-  const stackName = feature ? `${appPrefix}-${environment}-${feature}-bs` : `${appPrefix}-${environment}-bs`;
+  const stackName = awsNamingUtils.getAppStackName(appPrefix, environment ?? '', feature, 'bs');
   await deployStack(stackName, {
     DEPLOY_SERVICE_NAME: '',
     DEPLOY_APP_NAME: appName,

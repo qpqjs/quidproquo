@@ -89,7 +89,7 @@ export class WebserverRole extends QpqConstructBlock {
         sid: 'LambdaInvokeFunction',
         actions: ['lambda:InvokeFunction'],
         resources: [
-          `arn:aws:lambda:${region}:${accountId}:function:${awsNamingUtils.getConfigRuntimeResourceName('*-sfunc', applicationName, '*', environment, feature)}`,
+          `arn:aws:lambda:${region}:${accountId}:function:${awsNamingUtils.getConfigRuntimeResourceName(awsNamingUtils.getServiceFunctionLambdaBaseName('*'), applicationName, '*', environment, feature)}`,
         ],
       },
 

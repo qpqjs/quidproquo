@@ -15,6 +15,7 @@ import { qpqWebServerUtils } from '@qpqjs/webserver';
 import { qpqConfigAwsUtils } from '../qpqConfigAwsUtils';
 import { getAwsServiceAccountInfoByDeploymentInfo } from '../utils/configUtils';
 import { getScopedKvsIndexAttributeName } from './getScopedKvsIndexAttributeName';
+import { withFeatureSuffix } from './withFeatureSuffix';
 
 type AwsDeploymentContext = {
   application: string;
@@ -30,15 +31,8 @@ const resolveOwnerDeploymentContext = (qpqConfig: QPQConfig, owner?: CrossModule
   return { application, service: module, environment, feature };
 };
 
-export const getGlobalConfigRuntimeResourceName = (resourceName: string, application: string, environment: string, feature?: string) => {
-  const baseName = `${resourceName}-${application}-${environment}`;
-
-  if (feature) {
-    return `${baseName}-${feature}`;
-  }
-
-  return baseName;
-};
+export const getGlobalConfigRuntimeResourceName = (resourceName: string, application: string, environment: string, feature?: string) =>
+  withFeatureSuffix(`${resourceName}-${application}-${environment}`, feature);
 
 export const getGlobalQpqRuntimeResourceName = (
   resourceName: string,
@@ -51,14 +45,17 @@ export const getGlobalQpqRuntimeResourceName = (
   return `${name}-qpq${resourceType}`;
 };
 
-export const getConfigRuntimeResourceName = (resourceName: string, application: string, service: string, environment: string, feature?: string) => {
-  const baseName = `${resourceName}-${application}-${service}-${environment}`;
+export const getConfigRuntimeResourceName = (resourceName: string, application: string, service: string, environment: string, feature?: string) =>
+  withFeatureSuffix(`${resourceName}-${application}-${service}-${environment}`, feature);
 
-  if (feature) {
-    return `${baseName}-${feature}`;
-  }
+/** `<application>-<environment>[-<feature>]`: the deployment a shared, service-less resource belongs to. */
+export const getDeploymentName = (application: string, environment: string, feature?: string) =>
+  withFeatureSuffix(`${application}-${environment}`, feature);
 
-  return baseName;
+export const getDeploymentNameFromConfig = (qpqConfig: QPQConfig) => {
+  const { application, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
+
+  return getDeploymentName(application, environment, feature);
 };
 
 // Bootstrap resources are shared per app+environment, so like global names they carry no
@@ -305,13 +302,7 @@ export const getAccountStackName = () => 'qpq-account';
 export const getBaseStackName = (qpqConfig: QPQConfig) => {
   const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
 
-  const baseName = `${application}-${service}-${environment}`;
-
-  if (feature) {
-    return `${baseName}-${feature}`;
-  }
-
-  return baseName;
+  return withFeatureSuffix(`${application}-${service}-${environment}`, feature);
 };
 
 export const getInfStackName = (qpqConfig: QPQConfig) => {
@@ -328,20 +319,19 @@ export const getApiStackName = (qpqConfig: QPQConfig) => {
 
 // App-level stacks (bootstrap, domain) are shared by every module of the app, so their
 // names carry no module segment.
-const getAppStackName = (qpqConfig: QPQConfig, suffix: string) => {
-  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+// App-level stacks (bootstrap, domain) are per deployment, not per service.
+export const getAppStackName = (application: string, environment: string, feature: string | undefined, suffix: string) =>
+  `${getDeploymentName(application, environment, feature)}-${suffix}`;
 
-  const baseName = `${appName}-${environment}`;
+const getAppStackNameFromConfig = (qpqConfig: QPQConfig, suffix: string) => {
+  const { application, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
 
-  if (feature) {
-    return `${baseName}-${feature}-${suffix}`;
-  }
-
-  return `${baseName}-${suffix}`;
+  return getAppStackName(application, environment, feature, suffix);
 };
 
-export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackName(qpqConfig, 'bs');
+export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackNameFromConfig(qpqConfig, 'bs');
 
-export const getDomainStackName = (qpqConfig: QPQConfig) => getAppStackName(qpqConfig, 'domain');
+export const getDomainStackName = (qpqConfig: QPQConfig) => getAppStackNameFromConfig(qpqConfig, 'domain');
+
+export * from './lambdaNames';
+export { withFeatureSuffix } from './withFeatureSuffix';

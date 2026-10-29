@@ -41,7 +41,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     const func = new Function(this, 'api-function', {
-      functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.websocketConfig.apiName, awsNamingUtils.QpqLambdaKind.Websocket)),
       handler: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
 
       qpqConfig: props.qpqConfig,

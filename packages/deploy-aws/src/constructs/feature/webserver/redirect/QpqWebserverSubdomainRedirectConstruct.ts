@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
@@ -36,7 +36,9 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
     const { redirectBaseUrl, appendPath } = resolveRedirectTarget(props.qpqConfig, props.subdomainRedirectConfig.redirectUrl);
 
     const func = new Function(this, 'redirect', {
-      functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
+      functionName: this.resourceName(
+        awsNamingUtils.getLambdaBaseName(props.subdomainRedirectConfig.subdomain, awsNamingUtils.QpqLambdaKind.Redirect),
+      ),
       handler: 'apiGatewayEventHandler_redirect',
 
       qpqConfig: props.qpqConfig,

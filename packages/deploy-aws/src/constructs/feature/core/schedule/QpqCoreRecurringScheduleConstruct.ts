@@ -1,4 +1,5 @@
 import { LambdaRuntimeConfig } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { resolveScheduleFields, ScheduleQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
@@ -18,7 +19,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
-      functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.scheduleConfig.uniqueKey, awsNamingUtils.QpqLambdaKind.Schedule)),
       handler: 'eventBridgeEvent_recurringSchedule',
 
       qpqConfig: props.qpqConfig,

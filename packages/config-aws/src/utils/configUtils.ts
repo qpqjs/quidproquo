@@ -21,6 +21,7 @@ import {
   EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
+import { withFeatureSuffix } from '../naming/withFeatureSuffix';
 import { LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
 /** Every defineAwsServiceAccountInfo in the config: one for an AWS service, none for a config that never deploys there. */
@@ -123,13 +124,9 @@ export const isWafProtectionEnabled = (qpqConfig: QPQConfig): boolean =>
 // config that creates them and the service configs that attach them are separate arrays -
 // both sides can derive this name from their own app/env/feature.
 export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig): string => {
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig);
 
-  const deploymentName = feature ? `${application}-${environment}-${feature}` : `${application}-${environment}`;
-
-  return `/qpq/waf/web-acl-arn/${wafScope}/${deploymentName}`;
+  return `/qpq/waf/web-acl-arn/${wafScope}/${withFeatureSuffix(`${application}-${environment}`, feature)}`;
 };
 
 export const getAccountCloudTrailConfigs = (qpqConfig: QPQConfig): AccountCloudTrailQPQConfigSetting[] =>

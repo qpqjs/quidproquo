@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
@@ -19,7 +20,7 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
-      functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.queueConfig.uniqueKey, awsNamingUtils.QpqLambdaKind.Queue)),
       handler: 'sqsEvent_queueEvent',
 
       qpqConfig: props.qpqConfig,

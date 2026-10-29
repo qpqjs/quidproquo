@@ -39,7 +39,7 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
     // Build Function
     new Function(this, 'api-function', {
-      functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
+      functionName: this.resourceName(awsNamingUtils.getServiceFunctionLambdaBaseName(props.serviceFunctionConfig.functionName)),
       handler: 'anyExecuteServiceFunctionEvent_serviceFunction',
 
       timeoutInSeconds: 14.5 * 60,

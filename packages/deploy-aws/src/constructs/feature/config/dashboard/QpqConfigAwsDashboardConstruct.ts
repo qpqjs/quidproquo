@@ -23,11 +23,19 @@ const FIVE_MINUTES = Duration.minutes(5);
 // dashboard focused. All names are config-derived - no construct handles needed.
 const getServiceLambdaFunctionNames = (qpqConfig: QPQConfig): string[] => {
   const baseNames = [
-    ...qpqWebServerUtils.getAllApiConfigs(qpqConfig).map((api) => `${api.apiName}-route`),
-    ...qpqWebServerUtils.getOwnedServiceFunctions(qpqConfig).map((serviceFunction) => `${serviceFunction.functionName}-sfunc`),
-    ...qpqCoreUtils.getAllQueueConfigs(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
-    ...qpqCoreUtils.getOwnedScheduleEvents(qpqConfig).map((schedule) => `${schedule.uniqueKey}-SE`),
-    ...qpqWebServerUtils.getOwnedWebsocketConfigs(qpqConfig).map((websocket) => `${websocket.apiName}-ws`),
+    ...qpqWebServerUtils.getAllApiConfigs(qpqConfig).map((api) => awsNamingUtils.getLambdaBaseName(api.apiName, awsNamingUtils.QpqLambdaKind.Route)),
+    ...qpqWebServerUtils
+      .getOwnedServiceFunctions(qpqConfig)
+      .map((serviceFunction) => awsNamingUtils.getServiceFunctionLambdaBaseName(serviceFunction.functionName)),
+    ...qpqCoreUtils
+      .getAllQueueConfigs(qpqConfig)
+      .map((queue) => awsNamingUtils.getLambdaBaseName(queue.uniqueKey, awsNamingUtils.QpqLambdaKind.Queue)),
+    ...qpqCoreUtils
+      .getOwnedScheduleEvents(qpqConfig)
+      .map((schedule) => awsNamingUtils.getLambdaBaseName(schedule.uniqueKey, awsNamingUtils.QpqLambdaKind.Schedule)),
+    ...qpqWebServerUtils
+      .getOwnedWebsocketConfigs(qpqConfig)
+      .map((websocket) => awsNamingUtils.getLambdaBaseName(websocket.apiName, awsNamingUtils.QpqLambdaKind.Websocket)),
   ];
 
   return baseNames.map((name) => awsNamingUtils.getConfigRuntimeResourceNameFromConfig(name, qpqConfig));

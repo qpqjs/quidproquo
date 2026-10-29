@@ -43,7 +43,7 @@ const buildCdkAssumeStatement = (accountId: string, regions: string[]): aws_iam.
 // Outside CloudFormation a deploy only syncs built views and federated remotes into this
 // app's buckets, which are all named `<name>-<app>-<service>-<env>[-<feature>]`.
 const buildAppBucketStatements = (application: string, environment: string, feature: string | undefined): aws_iam.PolicyStatement[] => {
-  const suffix = feature ? `${application}-*-${environment}-${feature}` : `${application}-*-${environment}`;
+  const suffix = awsNamingUtils.withFeatureSuffix(`${application}-*-${environment}`, feature);
   const bucketArn = `arn:aws:s3:::*-${suffix}`;
 
   return [

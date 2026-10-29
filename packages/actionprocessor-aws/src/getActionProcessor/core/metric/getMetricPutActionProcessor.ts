@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { actionResult, askMetricPut, createActionProcessor, MetricUnit, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 // Emits the metric as a CloudWatch Embedded Metric Format (EMF) log line: CloudWatch
@@ -11,10 +12,8 @@ const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetri
   // merge same-named metrics, per-developer feature sandboxes (e.g. qpq/docgen/development/jane)
   // never pollute mainline, and dimensions are reserved for slices WITHIN the deployment
   // (service + caller-supplied).
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-  const namespace = `qpq/${application}/${environment}${feature ? `/${feature}` : ''}`;
+  const { application, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig);
+  const namespace = awsNamingUtils.withFeatureSuffix(`qpq/${application}/${environment}`, feature, '/');
 
   const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
