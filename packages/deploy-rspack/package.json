@@ -7,7 +7,8 @@
   "types": "./lib/esm/index.d.ts",
   "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "!lib/**/__fixtures__/**"
   ],
   "publishConfig": {
     "access": "public"
