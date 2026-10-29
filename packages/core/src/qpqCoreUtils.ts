@@ -3,6 +3,12 @@ import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/set
 export { getAllCryptoKeyConfigs, getCryptoKeyByName, getOwnedCryptoKeyConfigs, resolveCryptoKeyOrThrow } from './config/settings/cryptoKey/logic';
 export { getAllEventBusConfigs, getEventBusByName, getOwnedEventBusConfigs, resolveEventBusOrThrow } from './config/settings/eventBus/logic';
 export {
+  getAllSigningKeyConfigs,
+  getOwnedSigningKeyConfigs,
+  getSigningKeyByName,
+  resolveSigningKeyOrThrow,
+} from './config/settings/signingKey/logic';
+export {
   getAllStorageDriveConfigs,
   getOwnedStorageDriveConfigs,
   getStorageDriveByName,
@@ -52,7 +58,6 @@ import {
   QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
   ServiceSettingsQPQConfigSetting,
-  SigningKeyQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   UserScriptModuleQPQConfigSetting,
   UserScriptRunnerQPQConfigSetting,
@@ -290,29 +295,6 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
 
   const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
-};
-
-export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): Nullable<SigningKeyQPQConfigSetting> =>
-  getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey).find((k) => k.keyName === signingKeyName) ?? null;
-
-export const resolveSigningKeyOrThrow = (signingKeyName: string, qpqConfig: QPQConfig): SigningKeyQPQConfigSetting => {
-  const signingKey = getSigningKeyByName(signingKeyName, qpqConfig);
-
-  if (!signingKey) {
-    throw new Error(`Can not find signing key [${signingKeyName}]`);
-  }
-
-  return signingKey;
-};
-
-export const getAllSigningKeyConfigs = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
-  return getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
-};
-
-export const getOwnedSigningKeys = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
-  const signingKeys = getAllSigningKeyConfigs(qpqConfig);
-
-  return getOwnedItems(signingKeys, qpqConfig);
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {

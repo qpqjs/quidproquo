@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineSigningKey } from './signingKey';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineSigningKey } from './defineSigningKey';
 
 describe('defineSigningKey', () => {
   it('builds a SigningKey setting with the given key name', () => {
