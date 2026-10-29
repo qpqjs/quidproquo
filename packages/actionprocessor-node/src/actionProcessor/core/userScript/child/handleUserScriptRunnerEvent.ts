@@ -21,11 +21,11 @@ import {
 
 import { getUserScriptRunnerActionProcessors } from '../getUserScriptRunnerActionProcessors';
 import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
+import { isUserScriptModuleNotFoundError } from '../logic/isUserScriptModuleNotFoundError';
 import { listUserScriptExports } from '../logic/listUserScriptExports';
 import { loadUserScriptHostModules } from '../logic/loadUserScriptHostModules';
 import { runUserScript } from '../logic/runUserScript';
 import { UserScriptModuleMap } from '../logic/UserScriptModuleMap';
-import { UserScriptModuleNotFoundError } from '../logic/UserScriptModuleNotFoundError';
 import { fetchUserScriptSource } from './fetchUserScriptSource';
 
 const { errorType } = askUserScriptExecuteBase;
@@ -45,7 +45,7 @@ const listExports = (filename: string, source: string, modules: UserScriptModule
   try {
     return actionResult(listUserScriptExports(filename, source, modules));
   } catch (error) {
-    if (error instanceof UserScriptModuleNotFoundError) {
+    if (isUserScriptModuleNotFoundError(error)) {
       return actionResultError(askUserScriptListExports.errorType.ModuleNotFound, error.message);
     }
     return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, getErrorMessage(error));

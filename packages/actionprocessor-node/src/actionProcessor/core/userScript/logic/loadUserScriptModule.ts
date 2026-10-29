@@ -1,6 +1,7 @@
 import { compileFunction } from 'node:vm';
 import * as path from 'path';
 
+import { isUserScriptModuleNotFoundError } from './isUserScriptModuleNotFoundError';
 import { UserScriptLoadError } from './UserScriptLoadError';
 import { UserScriptModuleMap } from './UserScriptModuleMap';
 import { UserScriptModuleNotFoundError } from './UserScriptModuleNotFoundError';
@@ -27,7 +28,7 @@ export const loadUserScriptModule = (filename: string, source: string, modules: 
     const run = compileFunction(source, ['exports', 'require', 'module', '__filename', '__dirname'], { filename });
     run(module.exports, require, module, filename, path.posix.dirname(filename));
   } catch (error) {
-    if (error instanceof UserScriptModuleNotFoundError) {
+    if (isUserScriptModuleNotFoundError(error)) {
       throw error;
     }
     throw new UserScriptLoadError(filename, error);

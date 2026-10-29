@@ -28,6 +28,7 @@ const killProcessGroup = (child: ChildProcess): void => {
   try {
     process.kill(-child.pid, 'SIGKILL');
   } catch {
+    // Deliberate: no process group here (or it is already gone), so fall back to killing the child alone.
     child.kill('SIGKILL');
   }
 };

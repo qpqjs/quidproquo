@@ -3,6 +3,7 @@ import {
   ActionProcessorList,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   askFileReadBinaryContents,
   askUserScriptBuildFromZip,
   createActionProcessor,
@@ -94,14 +95,13 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
         payload.sourceMap,
         hostModules,
       );
-    } catch (error) {
-      if (error instanceof UserScriptArchiveError) {
-        return actionResultError(getArchiveErrorType(error), `[${payload.drive}:${payload.zipFilepath}] ${error.message}`);
-      }
-      if (error instanceof UserScriptBuildError) {
-        return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
-      }
-      throw error;
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserScriptArchiveError: (error) =>
+          actionResultError(getArchiveErrorType(error as UserScriptArchiveError), `[${payload.drive}:${payload.zipFilepath}] ${error.message}`),
+        UserScriptBuildError: (error) =>
+          actionResultError(getUserScriptBuildErrorType((error as UserScriptBuildError).code, errorType), error.message),
+      });
     }
 
     const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);

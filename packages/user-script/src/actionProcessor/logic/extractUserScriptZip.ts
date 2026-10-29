@@ -5,6 +5,7 @@ import path from 'path';
 import yauzl, { Entry, ZipFile } from 'yauzl';
 
 import { isSafeProjectPath } from './isSafeProjectPath';
+import { isUserScriptArchiveError } from './isUserScriptArchiveError';
 import { USER_SCRIPT_SOURCE_LIMITS } from './USER_SCRIPT_SOURCE_LIMITS';
 import { UserScriptArchiveError, UserScriptArchiveErrorCode } from './UserScriptArchiveError';
 
@@ -128,7 +129,7 @@ export const extractUserScriptZip = async (zip: Buffer, projectDir: string): Pro
   try {
     planned = await planEntries(zip);
   } catch (error) {
-    if (error instanceof UserScriptArchiveError) throw error;
+    if (isUserScriptArchiveError(error)) throw error;
     throw invalid(`cannot read the archive: ${error instanceof Error ? error.message : String(error)}`);
   }
 
@@ -154,7 +155,7 @@ export const extractUserScriptZip = async (zip: Buffer, projectDir: string): Pro
       written.push(relativePath);
     });
   } catch (error) {
-    if (error instanceof UserScriptArchiveError) throw error;
+    if (isUserScriptArchiveError(error)) throw error;
     throw invalid(`cannot unpack the archive: ${error instanceof Error ? error.message : String(error)}`);
   }
 

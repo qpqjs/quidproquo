@@ -8,9 +8,9 @@ import {
 } from '@qpqjs/core';
 
 import { isStoryIterator } from '../../logic/isStoryIterator';
+import { isUserScriptModuleNotFoundError } from './isUserScriptModuleNotFoundError';
 import { loadUserScriptModule } from './loadUserScriptModule';
 import { UserScriptModuleMap } from './UserScriptModuleMap';
-import { UserScriptModuleNotFoundError } from './UserScriptModuleNotFoundError';
 
 const { errorType } = askUserScriptExecuteBase;
 
@@ -42,7 +42,7 @@ export const runUserScript = async <R>(input: RunUserScriptInput): Promise<Actio
   try {
     scriptExports = loadUserScriptModule(input.filename, input.source, input.modules);
   } catch (error) {
-    if (error instanceof UserScriptModuleNotFoundError) {
+    if (isUserScriptModuleNotFoundError(error)) {
       return actionResultError(errorType.ModuleNotFound, error.message);
     }
     return actionResultError(errorType.ScriptInvalid, getErrorMessage(error));

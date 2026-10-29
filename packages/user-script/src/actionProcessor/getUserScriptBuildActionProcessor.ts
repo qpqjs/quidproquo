@@ -2,6 +2,7 @@ import { loadUserScriptHostModules } from '@qpqjs/actionprocessor-node';
 import {
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   askFileListDirectory,
   askFileReadTextContents,
   askUserScriptBuild,
@@ -68,11 +69,11 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
         payload.sourceMap,
         hostModules,
       );
-    } catch (error) {
-      if (error instanceof UserScriptBuildError) {
-        return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
-      }
-      throw error;
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserScriptBuildError: (error) =>
+          actionResultError(getUserScriptBuildErrorType((error as UserScriptBuildError).code, errorType), error.message),
+      });
     }
 
     const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
