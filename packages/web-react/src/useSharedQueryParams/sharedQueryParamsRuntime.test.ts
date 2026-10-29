@@ -8,6 +8,6 @@ describe('sharedQueryParamsRuntime', () => {
   it('builds a runtime definition seeded with the shared query params logic and state', () => {
     expect(sharedQueryParamsRuntime.uniqueName).toBe('qpq/web-react/sharedQueryParams');
     expect(sharedQueryParamsRuntime.api).toBe(frontendSharedQueryParamsApi);
-    expect(sharedQueryParamsRuntime.initialState).toBe(createInitialSharedQueryParamsState());
+    expect(sharedQueryParamsRuntime.initialState).toEqual(createInitialSharedQueryParamsState());
   });
 });
