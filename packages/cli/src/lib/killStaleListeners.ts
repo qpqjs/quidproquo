@@ -9,6 +9,9 @@ import { Nullable } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
+import { createOutput } from './out';
+
+const out = createOutput('kill-stale-listeners');
 
 // Matches any invocation of the qpq CLI itself, regardless of how it was
 // launched: `node node_modules/.bin/qpq ...` (the npm-script shim, which has
@@ -60,7 +63,7 @@ const waitForPidGone = (pid: number, timeoutMs = 8000): boolean => {
 
 // Last resort for a process that ignored, or wedged during, its graceful stop.
 const killPidHard = (pid: number): void => {
-  console.warn(`Process ${pid} did not exit gracefully — sending SIGKILL.`);
+  out.warn(`Process ${pid} did not exit gracefully — sending SIGKILL.`);
   try {
     process.kill(pid, 'SIGKILL');
   } catch {
@@ -139,7 +142,7 @@ export const killOtherQpqDevProcesses = (root: string): void => {
     if (!pid || ownPids.has(pid) || !isQpqCliCommand(command)) continue;
     if (getProcessCwd(pid) !== resolvedRoot) continue;
 
-    console.log(`Killing other qpq dev process for this repo (pid ${pid}): ${command}`);
+    out.log(`Killing other qpq dev process for this repo (pid ${pid}): ${command}`);
     process.kill(pid, 'SIGINT');
     if (!waitForPidGone(pid)) {
       killPidHard(pid);
@@ -185,8 +188,8 @@ const getPortListeners = (port: number): { pid: number; command: string }[] => {
 export const reportPortHolders = (ports: number[]): void => {
   for (const port of ports) {
     for (const { pid, command } of getPortListeners(port)) {
-      console.warn(`Port ${port} is currently held by pid ${pid}: ${command}`);
-      console.warn(`  Starting anyway. If it still holds port ${port} once this server binds, startup will fail with EADDRINUSE.`);
+      out.warn(`Port ${port} is currently held by pid ${pid}: ${command}`);
+      out.warn(`  Starting anyway. If it still holds port ${port} once this server binds, startup will fail with EADDRINUSE.`);
     }
   }
 };
@@ -195,13 +198,13 @@ export const killStaleListeners = (ports: number[], isOurs: (command: string) =>
   for (const port of ports) {
     for (const { pid, command } of getPortListeners(port)) {
       if (isOurs(command)) {
-        console.log(`Killing stale dev server on port ${port} (pid ${pid})`);
+        out.log(`Killing stale dev server on port ${port} (pid ${pid})`);
         process.kill(pid);
         if (!waitForPidGone(pid)) {
           killPidHard(pid);
         }
       } else {
-        console.warn(`Port ${port} is in use by an unrelated process (pid ${pid}: ${command}) — not killing it.`);
+        out.warn(`Port ${port} is in use by an unrelated process (pid ${pid}: ${command}) — not killing it.`);
       }
     }
   }

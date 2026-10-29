@@ -4,6 +4,9 @@ import path from 'path';
 import { getAppDirectory, getAppsDirectory, getAvailableApps, getRoot } from './discovery';
 import { nextPrefixColor, runCommand, runCommandPrefixed } from './runCommand';
 import { runDependencyTasks, TaskFailure } from './runTasks';
+import { createOutput } from './out';
+
+const out = createOutput('hooks');
 
 type HookPackageJson = {
   name?: string;
@@ -38,7 +41,7 @@ export const runAppHook = async (appName: string, hook: string): Promise<boolean
     return false;
   }
 
-  console.log(`Running ${scriptName} for [${appName}]`);
+  out.log(`Running ${scriptName} for [${appName}]`);
   await runCommand('npm', ['run', scriptName], { cwd: getAppDirectory(appName) });
   return true;
 };
@@ -168,7 +171,7 @@ const runHookForPackages = async (candidates: HookPackage[], hook: string, jobs:
     .filter((candidate): candidate is HookPackage & { scriptName: string } => candidate.scriptName !== undefined);
 
   if (hookPackages.length === 0) {
-    console.log(`No app or workspace package defines a "qpq:${hook}" or "${hook}" script, nothing to run.`);
+    out.log(`No app or workspace package defines a "qpq:${hook}" or "${hook}" script, nothing to run.`);
     return [];
   }
 
@@ -183,7 +186,7 @@ const runHookForPackages = async (candidates: HookPackage[], hook: string, jobs:
     run: () => runCommandPrefixed(hookPackage.label, 'npm', ['run', hookPackage.scriptName], { cwd: hookPackage.dir, color: nextPrefixColor() }),
   }));
 
-  console.log(`Running ${hook} hooks in ${tasks.length} package(s) (${jobs} jobs, dependency ordered)`);
+  out.log(`Running ${hook} hooks in ${tasks.length} package(s) (${jobs} jobs, dependency ordered)`);
   return runDependencyTasks(tasks, jobs);
 };
 

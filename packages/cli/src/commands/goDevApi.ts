@@ -24,9 +24,12 @@ import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { spawnCommand } from '../lib/runCommand';
+
+const out = createOutput('go:dev:api');
 
 // 8080/8888 are set in the generated entry; 3001 is the @qpqjs/dev-server
 // file-storage (secure URL) default port.
@@ -38,7 +41,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
   process.env.QPQ_DEV_APP = appName;
   await resolveDeployment(argv, appName);
-  console.log(`Dev server for app [${appName}]`);
+  out.log(`Dev server for app [${appName}]`);
 
   // The sweep matches on a RELATIVE bundle path, so every checkout's dev
   // server looks like ours and a sibling worktree gets taken down with it.
@@ -46,7 +49,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   // the same either way, so what you get instead is EADDRINUSE. Report who
   // holds them, or that failure says nothing about the cause.
   if (hasArgFlag(argv, KEEP_OTHER_DEV_SERVERS_FLAG)) {
-    console.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
+    out.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
     reportPortHolders(getDevServerPortList(appName));
   } else {
     // Catches a lingering watcher from a previous run even if its spawned
@@ -74,7 +77,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
       if (!restartQueued) {
         // Crashed (or exited) on its own, leave it down; the next successful
         // rebuild (i.e. the next file save) brings it back up.
-        console.log(`Dev server exited with code ${code}. Save a file to restart it.`);
+        out.log(`Dev server exited with code ${code}. Save a file to restart it.`);
       }
     });
   };
@@ -97,17 +100,17 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     void killChildWithEscalation(child);
   };
 
-  console.log('Bundling dev server (watch mode)...');
+  out.log('Bundling dev server (watch mode)...');
   let lastHash: string | null | undefined;
   const compiler = rspack(rspackConfig);
   compiler.watch({ aggregateTimeout: 200 }, (err, stats) => {
     if (err) {
-      console.error(err);
+      out.error(err);
       return;
     }
     if (stats?.hasErrors()) {
-      console.error(stats.toString({ colors: true, chunks: false, modules: false }));
-      console.log('Build failed — dev server not restarted. Fix the error and save again.');
+      out.error(stats.toString({ colors: true, chunks: false, modules: false }));
+      out.log('Build failed — dev server not restarted. Fix the error and save again.');
       return;
     }
     // Skip no-op rebuilds (e.g. the virtual-module-triggered second compile at
@@ -116,7 +119,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
       return;
     }
     lastHash = stats?.hash;
-    console.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
+    out.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
     restartServer();
   });
 

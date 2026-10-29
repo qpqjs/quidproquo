@@ -25,8 +25,11 @@ import fs from 'fs';
 import path from 'path';
 
 import { getRoot, getServiceDirectory } from '../../lib/discovery';
+import { createOutput } from '../../lib/out';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
+
+const out = createOutput('aws:remote');
 
 // Everything the upload/deploy phases need to publish a built remote. Resolved
 // from the on-disk build output + service config, so each phase can run in its
@@ -74,7 +77,7 @@ export const buildRemote = async (appName: string, serviceName: string): Promise
   const serviceDir = path.join(getServiceDirectory(appName, serviceName), 'service');
   const qpqConfig = loadServiceQpqConfig(appName, serviceName);
 
-  console.log(`Building federated remote: [${serviceName}]`);
+  out.log(`Building federated remote: [${serviceName}]`);
   const config = getServiceRemoteRspackConfig(qpqConfig, serviceDir);
   await runRspack(config);
 
@@ -108,7 +111,7 @@ export const resolvePublishTarget = (appName: string, serviceName: string): Remo
 export const uploadRemoteVersion = async (target: RemotePublishTarget): Promise<void> => {
   const { serviceName, publishPath, manifestHash, bucketName, servicePrefix } = target;
 
-  console.log(`Uploading [${serviceName}] version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/${manifestHash}]`);
+  out.log(`Uploading [${serviceName}] version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/${manifestHash}]`);
   await runCommand('aws', ['s3', 'sync', path.join(publishPath, manifestHash), `s3://${bucketName}/${servicePrefix}/${manifestHash}`]);
 };
 
@@ -117,6 +120,6 @@ export const uploadRemoteVersion = async (target: RemotePublishTarget): Promise<
 export const deployRemoteManifest = async (target: RemotePublishTarget): Promise<void> => {
   const { serviceName, publishPath, manifestHash, bucketName, servicePrefix } = target;
 
-  console.log(`Deploying [${serviceName}] manifest for version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/manifest.json]`);
+  out.log(`Deploying [${serviceName}] manifest for version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/manifest.json]`);
   await runCommand('aws', ['s3', 'cp', path.join(publishPath, 'manifest.json'), `s3://${bucketName}/${servicePrefix}/manifest.json`]);
 };

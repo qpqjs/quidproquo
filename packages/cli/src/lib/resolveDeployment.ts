@@ -5,6 +5,10 @@ import { getPlatformDriver } from '../platforms';
 import { getArgValue } from './args';
 import { getRoot } from './discovery';
 import { promptSelect } from './prompts';
+import { CliError } from './CliError';
+import { createOutput } from './out';
+
+const out = createOutput('resolve-deployment');
 
 const DEPLOYMENT_FLAG = '--deployment';
 
@@ -21,17 +25,16 @@ const selectDeploymentName = async (argv: string[], appName: string, configuredN
 
   if (requested) {
     if (!configuredNames.includes(requested)) {
-      console.error(
+      throw new CliError(
         `Unknown deployment '${requested}' in ${getQpqAppDeployConfigPath(getRoot(), appName)}. Configured: ${configuredNames.join(', ')}`,
       );
-      process.exit(1);
     }
     return requested;
   }
 
   const [onlyName] = configuredNames;
   if (configuredNames.length === 1 && onlyName !== undefined) {
-    console.log(`Using deployment: ${onlyName}`);
+    out.log(`Using deployment: ${onlyName}`);
     return onlyName;
   }
 
@@ -39,8 +42,7 @@ const selectDeploymentName = async (argv: string[], appName: string, configuredN
     return promptSelect('Select deployment', configuredNames);
   }
 
-  console.error(`No deployment selected. Pass ${DEPLOYMENT_FLAG} <name>. Configured: ${configuredNames.join(', ')}`);
-  return process.exit(1);
+  throw new CliError(`No deployment selected. Pass ${DEPLOYMENT_FLAG} <name>. Configured: ${configuredNames.join(', ')}`);
 };
 
 /**

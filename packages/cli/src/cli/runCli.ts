@@ -1,7 +1,11 @@
 import { Nullable } from '@qpqjs/core';
 
+import { CliError } from '../lib/CliError';
+import { createOutput } from '../lib/out';
 import { promptCommandFromMenu } from './commandMenu';
 import { buildUsage, CliCommand, cliCommands } from './commandRegistry';
+
+const out = createOutput('cli');
 
 // Service infrastructure.ts files (and app config fragments) are TypeScript, so
 // register ts-node's transpile-only require hook so the CLI can require them
@@ -42,7 +46,7 @@ export const runCli = async (argv: string[]): Promise<void> => {
   const [commandName, ...argvRest] = argv;
 
   if (commandName === 'help' || commandName === '--help') {
-    console.log(buildUsage());
+    out.log(buildUsage());
     return;
   }
 
@@ -52,7 +56,7 @@ export const runCli = async (argv: string[]): Promise<void> => {
   if (!commandName) {
     // Only prompt on a real terminal; piped/CI invocations get the usage text.
     if (!process.stdin.isTTY || !process.stdout.isTTY) {
-      console.log(buildUsage());
+      out.log(buildUsage());
       return;
     }
 
@@ -68,8 +72,8 @@ export const runCli = async (argv: string[]): Promise<void> => {
     commandArgv = argvRest;
 
     if (!command) {
-      console.error(`Unknown command: ${commandName}`);
-      console.log(buildUsage());
+      out.error(`Unknown command: ${commandName}`);
+      out.log(buildUsage());
       process.exitCode = 1;
       return;
     }
@@ -80,7 +84,13 @@ export const runCli = async (argv: string[]): Promise<void> => {
   try {
     await command.run(commandArgv);
   } catch (error) {
-    console.error(`qpq ${command.name} failed:`, error);
+    if (error instanceof CliError) {
+      out.error(error.message);
+      process.exitCode = error.exitCode;
+      return;
+    }
+
+    out.error(`qpq ${command.name} failed:`, error);
     process.exitCode = 1;
   }
 };

@@ -13,6 +13,9 @@ import { getWorkspacePackageDirs } from '@qpqjs/deploy-rspack';
 import { ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { createOutput } from './out';
+
+const out = createOutput('type-watcher');
 
 // Routine tsc watch status lines; everything else is worth showing.
 const routineTscPatterns = [/Starting compilation in watch mode/, /File change detected/, /Found 0 errors/];
@@ -25,7 +28,7 @@ const forwardTscOutput = (chunk: Buffer): void => {
     if (line.trim().length === 0 || isRoutineTscLine(line)) {
       continue;
     }
-    console.log(`[types] ${line}`);
+    out.log(`[types] ${line}`);
   }
 };
 
@@ -56,7 +59,7 @@ export const startTypeWatcher = (root: string): Nullable<ChildProcess> => {
   child.stdout?.on('data', forwardTscOutput);
   child.stderr?.on('data', forwardTscOutput);
 
-  console.log(`Type watcher: tsc -b --watch over ${relativeDirs.length} workspace packages (disable with --no-types).`);
+  out.log(`Type watcher: tsc -b --watch over ${relativeDirs.length} workspace packages (disable with --no-types).`);
 
   return child;
 };

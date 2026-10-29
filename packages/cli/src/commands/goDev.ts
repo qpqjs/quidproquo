@@ -7,11 +7,14 @@
 import { getAllViews } from '@qpqjs/deploy-rspack';
 
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { startTypeWatcher } from '../lib/typeWatcher';
 import { goDevApiCommand } from './goDevApi';
 import { goDevWebCommand } from './goDevWeb';
+
+const out = createOutput('go:dev');
 
 export const goDevCommand = async (argv: string[]): Promise<void> => {
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
@@ -30,7 +33,7 @@ export const goDevCommand = async (argv: string[]): Promise<void> => {
   await goDevApiCommand(argv);
 
   if (getAllViews(getRoot(), appName).length === 0) {
-    console.log('No views projects found. Running the API dev server only.');
+    out.log('No views projects found. Running the API dev server only.');
     return;
   }
 

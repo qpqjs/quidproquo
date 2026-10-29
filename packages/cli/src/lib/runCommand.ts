@@ -1,5 +1,8 @@
 import { ChildProcess, spawn, spawnSync, StdioOptions } from 'child_process';
 import type { Readable } from 'stream';
+import { createOutput } from './out';
+
+const out = createOutput('run-command');
 
 export type RunCommandOptions = {
   // Extra environment variables merged over the parent process env.
@@ -74,7 +77,7 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
     const validArgs = args.filter((a) => !!a);
 
     if (options.logCommand) {
-      console.log(`Running command: ${command} ${validArgs.join(' ')}`);
+      out.log(`Running command: ${command} ${validArgs.join(' ')}`);
     }
 
     const child = spawnCommand(command, validArgs, options);

@@ -10,11 +10,14 @@ import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import path from 'path';
 
 import { getRoot, getServiceNames } from '../../lib/discovery';
+import { createOutput } from '../../lib/out';
 import { getAppPrefix, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { getCdkAppCommand } from './cdkApp';
 import { getDeployEnv } from './getDeployEnv';
+
+const out = createOutput('aws:stacks');
 
 export const deployStack = async (stackName: string, env: Record<string, string> = {}): Promise<void> => {
   logTimeStart(stackName);
@@ -54,7 +57,7 @@ export const deployDomainStack = async (appName: string): Promise<void> => {
   }
   const qpqConfig = loadServiceQpqConfig(appName, firstService);
   const stackName = qpqDeployAwsUtils.getDomainStackName(qpqConfig);
-  console.log('Deploy Domain: ', stackName);
+  out.log('Deploy Domain: ', stackName);
   await deployStack(stackName, getDeployEnv(appName));
 };
 
@@ -64,7 +67,7 @@ export const deployDomainStack = async (appName: string): Promise<void> => {
 // 'account' menu option always deploys).
 export const deployAccountStack = async (appName: string): Promise<void> => {
   const stackName = qpqDeployAwsUtils.getAccountStackName();
-  console.log('Deploy Account: ', stackName);
+  out.log('Deploy Account: ', stackName);
   await deployStack(stackName, getDeployEnv(appName));
 };
 

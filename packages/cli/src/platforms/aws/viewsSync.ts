@@ -9,9 +9,12 @@ import { qpqWebServerUtils } from '@qpqjs/webserver';
 import fs from 'fs';
 import path from 'path';
 
+import { createOutput } from '../../lib/out';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { getViewsDistDir } from '../../lib/views';
+
+const out = createOutput('aws:views-sync');
 
 // The mutable entry points: fixed names whose CONTENT changes every deploy. They
 // must never be cached without revalidation, a browser holding a stale
@@ -59,7 +62,7 @@ export const syncViewsToS3 = async (appName: string, serviceName: string): Promi
   const distDir = getViewsDistDir(appName, serviceName);
 
   for (const destination of getViewsS3Destinations(appName, serviceName)) {
-    console.log(`Copying [${serviceName}] views to [${destination}]`);
+    out.log(`Copying [${serviceName}] views to [${destination}]`);
 
     // Content-hashed assets: cache forever.
     await runCommand('aws', [

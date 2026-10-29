@@ -5,6 +5,9 @@
 // failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
+
+const out = createOutput('check:circular');
 
 type CycleGroup = { files: string[]; chainCount: number };
 
@@ -52,7 +55,7 @@ export const checkCircularCommand = async (argv: string[]): Promise<void> => {
   const cycles = await findWorkspaceImportCycles(getRoot());
 
   if (cycles.length === 0) {
-    console.log('check:circular: no circular imports found');
+    out.log('check:circular: no circular imports found');
     return;
   }
 
@@ -61,9 +64,9 @@ export const checkCircularCommand = async (argv: string[]): Promise<void> => {
   const colour = warnOnly ? '\x1b[33m' : '\x1b[31m';
   for (const group of groups) {
     const chainNote = group.chainCount > 1 ? `, ${group.chainCount} distinct loops` : '';
-    console.warn(`${colour}Circular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
+    out.warn(`${colour}Circular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
   }
-  console.warn(`${colour}check:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
+  out.warn(`${colour}check:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
 
   if (!warnOnly) {
     process.exitCode = 1;

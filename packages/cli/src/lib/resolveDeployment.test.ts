@@ -4,6 +4,7 @@ import path from 'path';
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { promptSelect } from './prompts';
+import { CliError } from './CliError';
 import { resolveDeployment } from './resolveDeployment';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-cli-deployment-'));
@@ -113,13 +114,12 @@ describe('resolveDeployment', () => {
   it('exits headless with several entries and no selection', async () => {
     process.stdin.isTTY = false;
 
-    await expect(resolveDeployment([], 'multi')).rejects.toThrow('exit 1');
+    await expect(resolveDeployment([], 'multi')).rejects.toThrow(CliError);
     expect(promptSelect).not.toHaveBeenCalled();
   });
 
   it('exits on an unknown deployment name', async () => {
-    await expect(resolveDeployment(['--deployment=nope'], 'multi')).rejects.toThrow('exit 1');
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    await expect(resolveDeployment(['--deployment=nope'], 'multi')).rejects.toThrow("Unknown deployment 'nope'");
   });
 
   it('does not prime aws identity for a docker deployment', async () => {

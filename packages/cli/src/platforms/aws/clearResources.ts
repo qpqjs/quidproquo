@@ -23,8 +23,11 @@ import {
 import { DeleteObjectsCommand, ListObjectVersionsCommand, NoSuchBucket, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
 
 import { ClearableResource, ClearResourcesPlan } from '../../lib/clearResourcesPlan';
+import { createOutput } from '../../lib/out';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { isAwsCredentialsValid } from './awsCredentials';
+
+const out = createOutput('aws:clear-resources');
 
 // Log a progress heartbeat roughly every this-many removals, so a large
 // resource visibly ticks along instead of looking hung.
@@ -53,7 +56,7 @@ const emptyBucket = async (bucketName: string, region: string): Promise<number> 
     }
 
     if (removed - lastReported >= PROGRESS_EVERY) {
-      console.log(`    ... ${removed} objects/versions so far`);
+      out.log(`    ... ${removed} objects/versions so far`);
       lastReported = removed;
     }
 
@@ -111,7 +114,7 @@ const truncateTable = async (tableName: string, region: string): Promise<number>
     }
 
     if (removed - lastReported >= PROGRESS_EVERY) {
-      console.log(`    ... ${removed} items so far`);
+      out.log(`    ... ${removed} items so far`);
       lastReported = removed;
     }
 
@@ -127,13 +130,13 @@ const clearResource = async (appName: string, resource: ClearableResource): Prom
 
   if (resource.kind === 'storageDrive') {
     const bucketName = resolveStorageDriveBucketName(resource.resourceName, qpqConfig);
-    console.log(`  emptying s3://${bucketName} ...`);
+    out.log(`  emptying s3://${bucketName} ...`);
     try {
       const removed = await emptyBucket(bucketName, region);
-      console.log(`  emptied s3://${bucketName} (${removed} objects/versions)`);
+      out.log(`  emptied s3://${bucketName} (${removed} objects/versions)`);
     } catch (error) {
       if (error instanceof NoSuchBucket) {
-        console.log(`  skipped s3://${bucketName} (bucket does not exist - not deployed?)`);
+        out.log(`  skipped s3://${bucketName} (bucket does not exist - not deployed?)`);
         return;
       }
       throw error;
@@ -144,13 +147,13 @@ const clearResource = async (appName: string, resource: ClearableResource): Prom
   // 'kvs' matches the resourceType every runtime KVS action processor passes,
   // giving the deployed '-qpqkvs' table name suffix.
   const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(resource.resourceName, qpqConfig, 'kvs');
-  console.log(`  truncating ${tableName} ...`);
+  out.log(`  truncating ${tableName} ...`);
   try {
     const removed = await truncateTable(tableName, region);
-    console.log(`  truncated ${tableName} (${removed} items)`);
+    out.log(`  truncated ${tableName} (${removed} items)`);
   } catch (error) {
     if (error instanceof ResourceNotFoundException) {
-      console.log(`  skipped ${tableName} (table does not exist - not deployed?)`);
+      out.log(`  skipped ${tableName} (table does not exist - not deployed?)`);
       return;
     }
     throw error;
@@ -163,11 +166,11 @@ export const awsClearResources = async (appName: string, plan: ClearResourcesPla
   }
 
   if ((await isAwsCredentialsValid()) === false) {
-    console.log('Credentials are expired or invalid.');
+    out.log('Credentials are expired or invalid.');
     return;
   }
 
-  console.log('\nEmptying resources:');
+  out.log('\nEmptying resources:');
 
   // Sequential on purpose: predictable output, and no burst of parallel scans
   // against provisioned-throughput tables.
@@ -175,5 +178,5 @@ export const awsClearResources = async (appName: string, plan: ClearResourcesPla
     await clearResource(appName, resource);
   }
 
-  console.log('Done.');
+  out.log('Done.');
 };

@@ -4,8 +4,11 @@
 // into a build half and a deploy half that can run on different machines.
 import { buildDeployPlanFromArgs, promptDeployPlan } from '../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, resolveGoDockerMode } from '../lib/goDockerMode';
+import { createOutput } from '../lib/out';
 import { requireDriverCapability } from '../lib/requireDriverCapability';
 import { resolveCommandContext } from '../lib/resolveCommandContext';
+
+const out = createOutput('go:docker');
 
 export const goDockerCommand = async (argv: string[]): Promise<void> => {
   const mode = resolveGoDockerMode(argv);
@@ -19,7 +22,7 @@ export const goDockerCommand = async (argv: string[]): Promise<void> => {
   // account, domain and bootstrap stacks deploy host-side through the workspace
   // CDK app in one step; there is no saved build to split them across.
   if (mode !== 'full' && (plan.kind === 'account' || plan.kind === 'bootstrap')) {
-    console.error(`${BUILD_ONLY_FLAG} and ${FROM_BUILD_FLAG} apply to service deploys only; account, domain and bootstrap deploy in one step.`);
+    out.error(`${BUILD_ONLY_FLAG} and ${FROM_BUILD_FLAG} apply to service deploys only; account, domain and bootstrap deploy in one step.`);
     process.exit(1);
   }
 

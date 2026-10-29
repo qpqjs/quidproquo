@@ -11,19 +11,22 @@ import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
 import { getRequestedAppName, resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 
+const out = createOutput('synth');
+
 const processConfig = (folderName: string, appName: string): void => {
-  console.log(`Processing infrastructure: [${folderName}] for app [${appName}]`);
+  out.log(`Processing infrastructure: [${folderName}] for app [${appName}]`);
   const qpqConfig = loadServiceQpqConfig(appName, folderName);
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   const directoryPath = getInfrastructureConfigPath(getRoot(), appName);
   fs.mkdirSync(directoryPath, { recursive: true });
   fs.writeFileSync(path.join(directoryPath, `${moduleName}-config.json`), JSON.stringify(qpqConfig, null, 2));
-  console.log(`  -> ${appName}/infrastructure/${moduleName}-config.json`);
+  out.log(`  -> ${appName}/infrastructure/${moduleName}-config.json`);
 };
 
 export const synthCommand = async (argv: string[]): Promise<void> => {
@@ -34,7 +37,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     // A bare service name is unambiguous, synth it in whichever app owns it.
     const appWithService = getAvailableApps().find((appName) => getServiceNamesWithSubdir(appName, 'service').includes(specifiedServiceName));
     if (!appWithService) {
-      console.error(`Service '${specifiedServiceName}' not found in any app`);
+      out.error(`Service '${specifiedServiceName}' not found in any app`);
       process.exit(1);
     }
     appNames = [appWithService];
@@ -43,7 +46,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     appNames = selection === 'all' ? getAvailableApps() : [selection];
   }
 
-  console.log(`QPQ synthesizing apps: ${appNames.join(', ')}`);
+  out.log(`QPQ synthesizing apps: ${appNames.join(', ')}`);
 
   for (const appName of appNames) {
     // Service configs read the deployment env vars at require time, so the
@@ -56,7 +59,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     // value normalizes into an arbitrary require target.
     const appServices = getServiceNamesWithSubdir(appName, 'service');
     if (specifiedServiceName && !appServices.includes(specifiedServiceName)) {
-      console.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);
+      out.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);
       process.exitCode = 1;
       continue;
     }
@@ -67,7 +70,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
       try {
         processConfig(folderName, appName);
       } catch (error) {
-        console.error(`Failed to process ${folderName} in ${appName}:`, error);
+        out.error(`Failed to process ${folderName} in ${appName}:`, error);
         process.exitCode = 1;
       }
     }

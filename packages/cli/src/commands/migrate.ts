@@ -15,9 +15,12 @@ import { rspack } from '@rspack/core';
 
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { spawnCommand } from '../lib/runCommand';
+
+const out = createOutput('migrate');
 
 export const migrateCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
@@ -25,7 +28,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
   process.env.QPQ_DEV_APP = appName;
   await resolveDeployment(argv, appName);
 
-  console.log(`Running local migrations for app [${appName}]`);
+  out.log(`Running local migrations for app [${appName}]`);
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName, 'migrate');
@@ -46,7 +49,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
       }
 
       if (stats?.hasErrors()) {
-        console.error(stats.toString({ colors: true, all: false, errors: true }));
+        out.error(stats.toString({ colors: true, all: false, errors: true }));
         return reject(new Error('Failed to bundle migrations'));
       }
 

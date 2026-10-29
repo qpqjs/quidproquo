@@ -1,3 +1,6 @@
+import { createOutput } from './out';
+
+const out = createOutput('prompts');
 // Present a single-choice list prompt and return the selected value.
 // @inquirer/prompts is imported lazily so commands only pay for it when
 // actually prompting.
@@ -33,7 +36,7 @@ export const promptTypedConfirmation = async (target: string): Promise<boolean> 
   const confirmation = await promptText(`Type '${target}' to confirm`);
 
   if (confirmation !== target) {
-    console.log('Confirmation did not match. Exiting!');
+    out.log('Confirmation did not match. Exiting!');
     return false;
   }
 

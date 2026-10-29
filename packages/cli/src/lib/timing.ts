@@ -1,6 +1,9 @@
-export const logTimeStart = (name: string): void => console.time(name);
+import { createOutput } from './out';
+
+const out = createOutput('timing');
+export const logTimeStart = (name: string): void => out.time(name);
 
 export const logTimeEnd = (name: string): void => {
-  console.log('When:', new Date().toLocaleTimeString());
-  console.timeEnd(name);
+  out.log('When:', new Date().toLocaleTimeString());
+  out.timeEnd(name);
 };

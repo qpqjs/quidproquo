@@ -11,6 +11,9 @@ import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { promptCheckbox, promptSelect, promptTypedConfirmation } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
+import { createOutput } from './out';
+
+const out = createOutput('clear-resources-plan');
 
 export type ClearableResourceKind = 'storageDrive' | 'keyValueStore';
 
@@ -79,7 +82,7 @@ export const promptClearResourcesPlan = async (appName: string): Promise<ClearRe
   const clearable = getClearableResources(appName);
 
   if (clearable.length === 0) {
-    console.log('No storage drives or key value stores found in this app.');
+    out.log('No storage drives or key value stores found in this app.');
     return { kind: 'cancelled' };
   }
 
@@ -88,13 +91,13 @@ export const promptClearResourcesPlan = async (appName: string): Promise<ClearRe
   const resources = mode === BY_SERVICE ? await pickByService(clearable) : await pickByResource(clearable);
 
   if (resources.length === 0) {
-    console.log('Nothing selected. Exiting!');
+    out.log('Nothing selected. Exiting!');
     return { kind: 'cancelled' };
   }
 
-  console.log(`\nThis will EMPTY (delete all stored data from) ${resources.length} resource(s) in [${deployInfo}]:`);
+  out.log(`\nThis will EMPTY (delete all stored data from) ${resources.length} resource(s) in [${deployInfo}]:`);
   for (const resource of resources) {
-    console.log(`  ${resource.service} — ${resource.resourceName} (${resource.kind === 'storageDrive' ? 'bucket' : 'table'})`);
+    out.log(`  ${resource.service} — ${resource.resourceName} (${resource.kind === 'storageDrive' ? 'bucket' : 'table'})`);
   }
 
   if (!(await promptTypedConfirmation(deployInfo))) {

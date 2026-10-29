@@ -1,12 +1,15 @@
+import { CliError } from '../../lib/CliError';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, GoDockerMode } from '../../lib/goDockerMode';
+import { createOutput } from '../../lib/out';
 import { QpqPlatformDriver } from '../types';
 import { getDockerPlatformSettings } from './getDockerPlatformSettings';
 import { dockerGo } from './go';
 
+const out = createOutput('docker');
+
 const publishNotSupported = async (): Promise<void> => {
-  console.error('The docker platform has no federated code store — story code is baked into the image. Rebuild with qpq go instead.');
-  process.exit(1);
+  throw new CliError('The docker platform has no federated code store: story code is baked into the image. Rebuild with qpq go instead.');
 };
 
 // A docker platform's deploy already is the containerised one, so `qpq go:docker`
@@ -14,10 +17,9 @@ const publishNotSupported = async (): Promise<void> => {
 // the deploy, so there is no saved build to split across two runs.
 const dockerGoDocker = async (appName: string, plan: DeployPlan, mode: GoDockerMode): Promise<void> => {
   if (mode !== 'full') {
-    console.error(
+    throw new CliError(
       `The docker platform builds and deploys in one step; ${BUILD_ONLY_FLAG} and ${FROM_BUILD_FLAG} do not apply. Run qpq go:docker without them.`,
     );
-    process.exit(1);
   }
 
   await dockerGo(appName, plan);

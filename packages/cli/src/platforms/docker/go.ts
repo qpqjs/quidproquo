@@ -29,6 +29,7 @@ import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
+import { createOutput } from '../../lib/out';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 import { runCommand } from '../../lib/runCommand';
 import { assertNoFailures } from '../../lib/runTasks';
@@ -40,6 +41,8 @@ import { getDockerPlatformSettings, ParsedDockerPlatformSettings } from './getDo
 import { getImageName } from './getImageName';
 import { resolvePortMappings } from './resolvePortMappings';
 import { writeComposeFile } from './writeComposeFile';
+
+const out = createOutput('docker');
 
 const getImageContextDir = (root: string, appName: string): string => getDockerImageContextPath(root, appName);
 
@@ -156,7 +159,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   }
 
   if (plan.kind === 'account' || plan.kind === 'bootstrap') {
-    console.log(`Nothing to do — the docker platform has no ${plan.kind} stacks.`);
+    out.log(`Nothing to do — the docker platform has no ${plan.kind} stacks.`);
     return;
   }
 
@@ -171,7 +174,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   // The dev server hosts every service of the app, so per-service/stack
   // selections don't apply, the image is always the whole app.
-  console.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
+  out.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
 
   logTimeStart('totalTime');
 
@@ -179,11 +182,11 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   // Workspace packages resolve through their built dist/ (package.json main),
   // so bundles would ship stale code unless every lib is tsc'd first.
-  console.log('Building workspace packages');
+  out.log('Building workspace packages');
   assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // ---- Server bundle: the dev server + every service, one main.js ----
-  console.log('Bundling server (dev server + all services)');
+  out.log('Bundling server (dev server + all services)');
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
 
   // Resolved before anything slow runs, so a bad port or domain fails the build up front.
@@ -207,14 +210,14 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   process.env.QPQ_VIEWS_REMOTE_BASE = `/${FEDERATED_VIEWS_SUBDOMAIN}`;
   const viewServices = getServiceNamesWithViews(appName);
   for (const serviceName of viewServices) {
-    console.log(`Bundling views: [${serviceName}]`);
+    out.log(`Bundling views: [${serviceName}]`);
     await bundleViews(appName, serviceName);
   }
   delete process.env.QPQ_VIEWS_REMOTE_BASE;
   clearWebAddressingEnv();
 
   // ---- Assemble the image context ----
-  console.log('Assembling image context');
+  out.log('Assembling image context');
   const contextDir = getImageContextDir(root, appName);
   fs.rmSync(contextDir, { recursive: true, force: true });
   fs.mkdirSync(contextDir, { recursive: true });
@@ -223,7 +226,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   writeImagePackageJson(root, contextDir);
 
   const vendored = vendorQuidproquoPackages(root, contextDir);
-  console.log(`Vendored ${vendored} quidproquo packages`);
+  out.log(`Vendored ${vendored} quidproquo packages`);
 
   fs.cpSync(getDevServerDistPath(root), path.join(contextDir, 'server'), { recursive: true });
 
@@ -244,7 +247,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   });
 
   // ---- Build the image ----
-  console.log(
+  out.log(
     `Building docker image${dockerSettings.arch ? ` for ${dockerSettings.arch}` : ''}${dockerSettings.registry ? `, pushing to ${dockerSettings.registry}` : ''}`,
   );
   await buildImage(imageName, contextDir, dockerSettings);
@@ -264,7 +267,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const onHost = dockerSettings.registry
     ? `On the host (Unraid: Compose Manager, or any docker host), copy the compose file there and run:`
     : `Run it here:`;
-  console.log(`
+  out.log(`
 Done. The image is ${where}.
 
 ${onHost}

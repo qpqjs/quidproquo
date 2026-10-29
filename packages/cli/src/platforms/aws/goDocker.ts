@@ -56,6 +56,7 @@ import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../li
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { GoDockerMode } from '../../lib/goDockerMode';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
+import { createOutput } from '../../lib/out';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { nextPrefixColor, runCommand, runCommandBestEffort, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';
@@ -78,6 +79,8 @@ import {
 import { buildRemote, resolvePublishTarget } from './remote';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack } from './stacks';
 import { getViewsS3Destinations, NO_CACHE_FILES } from './viewsSync';
+
+const out = createOutput('aws:go-docker');
 
 const IMAGE_TAG = 'qpq-cdk-deployer';
 const AWS_CLI_IMAGE = 'amazon/aws-cli';
@@ -124,7 +127,7 @@ const assertDockerRunning = async (): Promise<void> => {
 // Pin the image's CDK CLI to the CLI's own aws-cdk version so it can always
 // read the assembly schema the host synthesized.
 const buildDeployerImage = async (cdkVersion: string): Promise<void> => {
-  console.log(`Building deployer image [${IMAGE_TAG}] (aws-cdk ${cdkVersion})`);
+  out.log(`Building deployer image [${IMAGE_TAG}] (aws-cdk ${cdkVersion})`);
   await runCommand('docker', ['build', '-t', IMAGE_TAG, '--build-arg', `CDK_VERSION=${cdkVersion}`, getDockerDir()]);
 };
 
@@ -301,7 +304,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
 
   const viewServices = need.views ? services.filter((service) => getServiceNamesWithViews(appName).includes(service)) : [];
 
-  console.log('\n=== Build ===\n');
+  out.log('\n=== Build ===\n');
 
   // A stale assembly or manifest from an earlier build must not outlive a
   // change of stack selection, so every selected service starts empty.
@@ -315,7 +318,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
   // so bundles would ship stale code unless every lib is tsc'd first. Other
   // apps' packages are skipped: nothing this app deploys can import them
   // unless it declares them, and declared ones are built.
-  console.log('Building workspace packages');
+  out.log('Building workspace packages');
   assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // Synth the selected services' QPQ configs (and shell's, which the views
@@ -339,7 +342,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
         services.map((service) => ({
           label: `bundle-api:${service}`,
           run: async () => {
-            console.log(`Bundling api: [${service}]`);
+            out.log(`Bundling api: [${service}]`);
             const qpqConfig = loadServiceQpqConfig(appName, service);
             await runRspack(getServiceRspackConfig(qpqConfig, path.join(getServiceDirectory(appName, service), 'service')));
           },
@@ -355,7 +358,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
       viewServices.map((service) => ({
         label: `bundle-views:${service}`,
         run: async () => {
-          console.log(`Bundling views: [${service}]`);
+          out.log(`Bundling views: [${service}]`);
           await bundleViews(appName, service);
         },
       })),
@@ -372,7 +375,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
       federatedServices.map((service) => ({
         label: `bundle-remote:${service}`,
         run: async () => {
-          console.log(`Bundling federated remote: [${service}]`);
+          out.log(`Bundling federated remote: [${service}]`);
           await buildRemote(appName, service);
         },
       })),
@@ -420,9 +423,9 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
     );
     writeGoDockerBuildManifest(appName, service, manifest);
 
-    console.log(`Saved build for [${service}]:`);
+    out.log(`Saved build for [${service}]:`);
     for (const dir of getSavedBuildDirs(appName, service, manifest)) {
-      console.log(`  ${dir}`);
+      out.log(`  ${dir}`);
     }
   }
 };
@@ -494,7 +497,7 @@ const deployGoDockerOutput = async (appName: string, deploymentName: string, pla
 
   // ---- Wave 1: inf stacks, one container per service, all concurrent ----
   if (need.inf) {
-    console.log('\n=== Deploy inf stacks (docker) ===\n');
+    out.log('\n=== Deploy inf stacks (docker) ===\n');
     logTimeStart('infWave');
     assertNoFailures(
       'Inf deploy',
@@ -518,7 +521,7 @@ const deployGoDockerOutput = async (appName: string, deploymentName: string, pla
 
   // ---- Wave 2: api + web stacks, all concurrent ----
   if (need.api || need.web) {
-    console.log('\n=== Deploy api + web stacks (docker) ===\n');
+    out.log('\n=== Deploy api + web stacks (docker) ===\n');
     logTimeStart('apiWebWave');
     assertNoFailures(
       'Api/Web deploy',
@@ -546,7 +549,7 @@ const deployGoDockerOutput = async (appName: string, deploymentName: string, pla
 
   // ---- Views: sync the pre-built bundles to S3, all concurrent ----
   if (viewServices.length > 0) {
-    console.log('\n=== Sync views to S3 (docker) ===\n');
+    out.log('\n=== Sync views to S3 (docker) ===\n');
     logTimeStart('viewsWave');
     assertNoFailures(
       'Views sync',
@@ -563,7 +566,7 @@ const deployGoDockerOutput = async (appName: string, deploymentName: string, pla
 
   // ---- Publish: the pre-built federated remotes to S3, all concurrent ----
   if (federatedServices.length > 0) {
-    console.log('\n=== Publish federated remotes to S3 (docker) ===\n');
+    out.log('\n=== Publish federated remotes to S3 (docker) ===\n');
     logTimeStart('publishWave');
     assertNoFailures(
       'Federated publish',
@@ -585,7 +588,7 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan, mode: GoDoc
   }
 
   if ((await isAwsCredentialsValid()) === false) {
-    console.log('Credentials are expired or invalid.');
+    out.log('Credentials are expired or invalid.');
     return;
   }
 
@@ -613,9 +616,9 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan, mode: GoDoc
     throw new Error(`no deployment selected (${QpqDeployEnvVar.deployName} is unset)`);
   }
 
-  console.log(`\n\nRunning dockerized deploy (${mode})\n\n`);
-  console.log('Executing for services');
-  console.log(plan.services.join(', '));
+  out.log(`\n\nRunning dockerized deploy (${mode})\n\n`);
+  out.log('Executing for services');
+  out.log(plan.services.join(', '));
 
   if (mode !== 'from-build') {
     await buildGoDockerOutput(appName, deploymentName, plan);

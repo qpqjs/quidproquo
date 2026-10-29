@@ -1,5 +1,9 @@
 import { QpqPlatformDriver } from '../platforms';
 import { CommandContext } from './resolveCommandContext';
+import { CliError } from './CliError';
+import { createOutput } from './out';
+
+const out = createOutput('require-driver-capability');
 
 type OptionalCapability = {
   [K in keyof QpqPlatformDriver]-?: undefined extends QpqPlatformDriver[K] ? K : never;
@@ -15,8 +19,7 @@ export const requireDriverCapability = <K extends OptionalCapability>(
   const implementation = context.driver[capability];
 
   if (!implementation) {
-    console.error(`The '${context.deployment.platform}' platform has no ${capability} strategy.${hint ? ` ${hint}` : ''}`);
-    process.exit(1);
+    throw new CliError(`The '${context.deployment.platform}' platform has no ${capability} strategy.${hint ? ` ${hint}` : ''}`);
   }
 
   return implementation as NonNullable<QpqPlatformDriver[K]>;

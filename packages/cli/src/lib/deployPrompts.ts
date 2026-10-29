@@ -8,6 +8,10 @@ import { getPositionalArgs } from './args';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { promptSelect, promptTypedConfirmation, promptYesNo } from './prompts';
+import { CliError } from './CliError';
+import { createOutput } from './out';
+
+const out = createOutput('deploy-prompts');
 
 export type StackType = 'all' | 'inf' | 'api' | 'web' | 'views';
 
@@ -61,14 +65,12 @@ export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Nullab
 
   const unknownServices = services.filter((service) => !allServices.includes(service));
   if (unknownServices.length > 0) {
-    console.error(`Unknown service(s): ${unknownServices.join(', ')}. Valid services: ${allServices.join(', ')}`);
-    process.exit(1);
+    throw new CliError(`Unknown service(s): ${unknownServices.join(', ')}. Valid services: ${allServices.join(', ')}`);
   }
 
   const stacks = (stacksArg ?? 'all') as StackType;
   if (!STACK_TYPES.includes(stacks)) {
-    console.error(`Unknown stacks '${stacksArg}'. Valid stacks: ${STACK_TYPES.join(', ')}`);
-    process.exit(1);
+    throw new CliError(`Unknown stacks '${stacksArg}'. Valid stacks: ${STACK_TYPES.join(', ')}`);
   }
 
   return { kind: 'services', appName, services: [...new Set(services)], stacks };
@@ -78,7 +80,7 @@ export const promptDeployPlan = async (appName: string): Promise<DeployPlan> => 
   const deployInfo = getDeployTargetLabel();
 
   if (!(await promptYesNo(`Deploying to: [${deployInfo}]`))) {
-    console.log('Exiting!');
+    out.log('Exiting!');
     return { kind: 'cancelled' };
   }
 
@@ -148,7 +150,7 @@ export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan>
 
   services = [...new Set(services)];
 
-  console.log(`\nThis will DESTROY the web, api and inf stacks (including all stored data) for: ${services.join(', ')}`);
+  out.log(`\nThis will DESTROY the web, api and inf stacks (including all stored data) for: ${services.join(', ')}`);
   if (!(await promptTypedConfirmation(deployInfo))) {
     return { kind: 'cancelled' };
   }

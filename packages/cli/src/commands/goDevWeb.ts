@@ -20,9 +20,12 @@ import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { setWebAddressingEnv } from '../lib/webAddressingEnv';
+
+const out = createOutput('go:dev:web');
 
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
@@ -56,7 +59,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   let views = getAllViews(root, appName);
   if (only) views = views.filter((v) => only.includes(v.service));
   if (views.length === 0) {
-    console.error('No views projects found.');
+    out.error('No views projects found.');
     process.exit(1);
   }
 
@@ -78,8 +81,8 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   // Service names are padded to a common width so the "(started)" chips align.
   const serviceColumnWidth = Math.max(...views.map((v) => v.service.length));
 
-  console.log(`Starting ${views.length} views dev servers for [${appName}]:`);
-  for (const v of views) console.log(`  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}`);
+  out.log(`Starting ${views.length} views dev servers for [${appName}]:`);
+  for (const v of views) out.log(`  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}`);
 
   const servers: RspackDevServer[] = [];
   let shuttingDown = false;
@@ -97,7 +100,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   let linesBelowList = 0;
 
   const logBelowList = (line: string): void => {
-    console.log(line);
+    out.log(line);
     linesBelowList += 1;
   };
 
