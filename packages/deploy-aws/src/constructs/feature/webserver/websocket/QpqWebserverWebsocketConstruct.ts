@@ -70,8 +70,8 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
   // first (publishing their api-id SSM params), so the deploy-time SSM dynamic references
   // here always resolve. No-op when the config references no unowned websockets.
   public static authorizeManageConnectionsForReferencedWebsockets(scope: Construct, qpqConfig: QPQConfig): void {
-    const ownedApiNames = new Set(qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((setting) => setting.apiName));
-    const unownedWebsocketSettings = qpqWebServerUtils.getWebsocketSettings(qpqConfig).filter((setting) => !ownedApiNames.has(setting.apiName));
+    const ownedApiNames = new Set(qpqWebServerUtils.getOwnedWebsocketConfigs(qpqConfig).map((setting) => setting.apiName));
+    const unownedWebsocketSettings = qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).filter((setting) => !ownedApiNames.has(setting.apiName));
 
     if (unownedWebsocketSettings.length === 0) {
       return;

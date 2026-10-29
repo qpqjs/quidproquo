@@ -16,9 +16,9 @@ import {
   SeoQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
-  WebSocketQPQWebServerConfigSetting,
 } from '../config';
 import { ApiQPQWebServerConfigSetting, WebEntryQPQWebServerConfigSetting } from '../config';
+import { getOwnedWebsocketConfigs } from '../config/settings/websocket/logic';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Route);
@@ -54,7 +54,7 @@ export const getOwnedServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQ
 };
 
 const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
-  return getOwnedWebsocketSettings(qpqConfig)
+  return getOwnedWebsocketConfigs(qpqConfig)
     .flatMap((s) => [s.eventProcessors.onConnect, s.eventProcessors.onDisconnect, s.eventProcessors.onMessage])
     .filter(isDefined);
 };
@@ -83,18 +83,6 @@ export const getWebEntry = (configs: QPQConfig): string => {
   }
 
   return webEntry?.buildPath;
-};
-
-export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting => {
-  const websocketSettings = getWebsocketSettings(qpqConfig);
-
-  const websocketSetting = websocketSettings.find((s) => s.apiName === apiName);
-
-  if (!websocketSetting) {
-    throw new Error(`No websocket setting found for api [${apiName}]`);
-  }
-
-  return websocketSetting;
 };
 
 export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQWebServerConfigSetting[] => {
@@ -172,16 +160,3 @@ export const getEmailReceiverConfigs = (qpqConfig: QPQConfig): EmailReceiverQPQW
 /** The receivers that write into a drive, which the mail provider must be allowed to write into. */
 export const getEmailReceiversForStorageDrive = (qpqConfig: QPQConfig, storageDriveName: string): EmailReceiverQPQWebServerConfigSetting[] =>
   getEmailReceiverConfigs(qpqConfig).filter((receiver) => receiver.storageDriveName === storageDriveName);
-
-export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
-  const websocketSettings =
-    qpqCoreUtils.getConfigSettings<WebSocketQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.WebSocket) || [];
-
-  return websocketSettings;
-};
-
-export const getOwnedWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
-  const websocketSettings = getWebsocketSettings(qpqConfig);
-
-  return qpqCoreUtils.getOwnedItems(websocketSettings, qpqConfig);
-};

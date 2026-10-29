@@ -140,7 +140,7 @@ const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): Web
   return qpqConfigs
     .flatMap((qpqConfig) => {
       const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-      return qpqWebServerUtils.getWebsocketSettings(qpqConfig).flatMap((wsc) => {
+      return qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).flatMap((wsc) => {
         const item: WebSocketQPQWebServerConfigSettingMap = {
           apiName: wsc.apiName,
           service,

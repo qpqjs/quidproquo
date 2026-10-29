@@ -28,7 +28,7 @@ const getServiceLambdaFunctionNames = (qpqConfig: QPQConfig): string[] => {
     ...qpqWebServerUtils.getOwnedServiceFunctions(qpqConfig).map((serviceFunction) => `${serviceFunction.functionName}-sfunc`),
     ...qpqCoreUtils.getAllQueueConfigs(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
     ...qpqCoreUtils.getOwnedScheduleEvents(qpqConfig).map((schedule) => `${schedule.uniqueKey}-SE`),
-    ...qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((websocket) => `${websocket.apiName}-ws`),
+    ...qpqWebServerUtils.getOwnedWebsocketConfigs(qpqConfig).map((websocket) => `${websocket.apiName}-ws`),
   ];
 
   return baseNames.map((name) => awsNamingUtils.getConfigRuntimeResourceNameFromConfig(name, qpqConfig));

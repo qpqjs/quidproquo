@@ -24,7 +24,7 @@ const getApiAddresses = (qpqConfigs: QPQConfig[], resolve: WebAddressingResolver
 
 const getWebSocketAddresses = (qpqConfigs: QPQConfig[], resolve: WebAddressingResolver): ApiAddress[] =>
   qpqConfigs.flatMap((qpqConfig) =>
-    qpqWebServerUtils.getWebsocketSettings(qpqConfig).map((webSocket) => ({
+    qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).map((webSocket) => ({
       service: qpqCoreUtils.getApplicationModuleName(qpqConfig),
       apiSubdomain: webSocket.apiSubdomain,
       hosts: qpqWebServerUtils.resolveHosts(

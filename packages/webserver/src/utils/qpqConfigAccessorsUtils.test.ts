@@ -29,12 +29,9 @@ import {
   getDomainProxyConfigs,
   getFileUploadSettings,
   getOwnedServiceFunctions,
-  getOwnedWebsocketSettings,
   getSubdomainRedirects,
   getWebEntry,
   getWebEntryConfigs,
-  getWebsocketEntryByApiName,
-  getWebsocketSettings,
   isStorageDriveWebEntryOrigin,
 } from './qpqConfigAccessorsUtils';
 
@@ -78,22 +75,6 @@ describe('getWebEntry', () => {
 
   it('throws when no web entry build path is configured', () => {
     expect(() => getWebEntry(buildTestQpqConfig())).toThrow('please use defineWebEntry');
-  });
-});
-
-describe('websocket selectors', () => {
-  const config = buildTestQpqConfig([defineWebsocket('api', {}, { apiName: 'realtime' })]);
-
-  it('returns all websocket settings', () => {
-    expect(getWebsocketSettings(config)).toHaveLength(1);
-  });
-
-  it('finds a websocket by api name', () => {
-    expect(getWebsocketEntryByApiName('realtime', config).apiName).toBe('realtime');
-  });
-
-  it('throws when no websocket matches the api name', () => {
-    expect(() => getWebsocketEntryByApiName('missing', config)).toThrow('No websocket setting found');
   });
 });
 
@@ -188,7 +169,6 @@ describe('list and ownership selectors', () => {
 
   it('returns owned resources for the deploying module', () => {
     expect(getOwnedServiceFunctions(config)).toHaveLength(1);
-    expect(getOwnedWebsocketSettings(config)).toHaveLength(1);
     expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });

@@ -17,7 +17,7 @@ import { sendMessageToWebSocketConnection } from '../../../implementations/webSo
 
 const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWebsocketSendMessageBase> => {
   return async ({ connectionId, payload, websocketApiName }) => {
-    const websocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+    const websocketConfig = qpqWebServerUtils.resolveWebsocketOrThrow(websocketApiName, qpqConfig);
     const service = qpqCoreUtils.resolveOwnerModuleName(websocketConfig.owner, qpqConfig);
 
     try {

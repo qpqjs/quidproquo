@@ -9,7 +9,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    const webSocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(qpqEventRecord.apiName, qpqConfig);
+    const webSocketConfig = qpqWebServerUtils.resolveWebsocketOrThrow(qpqEventRecord.apiName, qpqConfig);
 
     switch (qpqEventRecord.eventType) {
       case WebSocketEventType.Connect:

@@ -4,7 +4,7 @@ import { qpqWebServerUtils, WebSocketEventType } from '@qpqjs/webserver';
 import { GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqWebServerUtils.getWebsocketEntryByApiName(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
+  const userDirectoryConfig = qpqWebServerUtils.resolveWebsocketOrThrow(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
 
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's

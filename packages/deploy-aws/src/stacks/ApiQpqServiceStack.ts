@@ -109,7 +109,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     }
 
     // Build websocket apis
-    qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).forEach(
+    qpqWebServerUtils.getOwnedWebsocketConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

@@ -222,7 +222,7 @@ export const getCFExportNameDistributionIdArnFromConfig = (
 ) => getOverridableQpqResourceExportName(webEntryName, qpqConfig, 'distribution-id-export', serviceOverride, applicationOverride);
 
 const resolveWebsocketApiNaming = (websocketApiName: string, qpqConfig: QPQConfig) => {
-  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+  const websocketApiConfig = qpqWebServerUtils.resolveWebsocketOrThrow(websocketApiName, qpqConfig);
 
   return {
     context: resolveOwnerDeploymentContext(qpqConfig, websocketApiConfig.owner),

@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqWebServerUtils` websocket accessors follow D5: `getAllWebsocketConfigs(cfg)`, `getOwnedWebsocketConfigs(cfg)`, `getWebsocketByName(apiName, cfg)` (null when missing) and `resolveWebsocketOrThrow(apiName, cfg)` replace `getWebsocketSettings`, `getOwnedWebsocketSettings` and the throwing `getWebsocketEntryByApiName`; the setting lives in `config/settings/websocket/`.
 - `qpqWebServerUtils` cache accessors follow D5: `getAllCacheConfigs(cfg)`, `getOwnedCacheConfigs(cfg)` (was `getAllOwnedCacheConfigs`), `getCacheByName(name, cfg)` (null when missing) and `resolveCacheOrThrow(name, cfg)` (was the throwing `getCacheConfigByName`); the setting lives in `config/settings/cache/`.
 - `qpqCoreUtils.getUserDirectories` and `getOwnedUserDirectories` are `getAllUserDirectoryConfigs` and `getOwnedUserDirectoryConfigs`; the user directory setting, its MFA enums and types live in `config/settings/userDirectory/` (D5).
 - `qpqCoreUtils.getOwnedSigningKeys` is `getOwnedSigningKeyConfigs`; the signing key setting and accessors live in `config/settings/signingKey/` (D5).

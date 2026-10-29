@@ -205,7 +205,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end AI
 
     // Build websocket apis
-    const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
+    const websockets = qpqWebServerUtils.getOwnedWebsocketConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

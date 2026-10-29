@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineWebsocket, QpqWebSocketEventProcessors } from './websocket';
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { defineWebsocket } from './defineWebsocket';
+import { QpqWebSocketEventProcessors } from './types';
 
 const eventProcessors: QpqWebSocketEventProcessors = {
   onConnect: '/src/ws/connect::onConnect',
