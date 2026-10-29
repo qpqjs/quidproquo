@@ -1,4 +1,12 @@
-import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResultError,
+  createActionProcessor,
+  ErrorTypeEnum,
+  isErroredActionResult,
+  ProcessorFor,
+  QPQConfig,
+  resolveActionResult,
+} from '@qpqjs/core';
 
 import { askStateMachineGetBase } from '../actions';
 import { getStateMachineByName } from '../config';
@@ -23,11 +31,11 @@ const getProcessStateMachineGet = (qpqConfig: QPQConfig): ProcessorFor<typeof as
     );
 
     const entityResult = await loadStateMachineEntity(resolveStory, smConfig, payload.id);
-    if (!entityResult.success) {
-      return actionResultError(entityResult.error.errorType, entityResult.error.errorText);
+    if (isErroredActionResult(entityResult)) {
+      return entityResult;
     }
 
-    return actionResult(entityResult.result);
+    return entityResult;
   };
 };
 

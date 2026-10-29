@@ -15,6 +15,7 @@ import {
   QPQConfig,
   QpqLogger,
   QpqRuntimeType,
+  storyResultToActionResult,
   StorySession,
   StorySessionUpdater,
   StreamRegistry,
@@ -106,13 +107,13 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
 
     const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
     if (published.error) {
-      return actionResultError(published.error.errorType, published.error.errorText);
+      return storyResultToActionResult(published, 'UserScript Build publish');
     }
 
     // The output contract is judged where the script's top-level code cannot reach the host.
     const checked = await resolveStory(() => askUserScriptCheckPublishedOutput(payload.drive, payload.outputFilepath, payload.scope, errorType), []);
     if (checked.error) {
-      return actionResultError(checked.error.errorType, checked.error.errorText);
+      return storyResultToActionResult(checked, 'UserScript Build check output');
     }
 
     return actionResult({ exports: checked.result });

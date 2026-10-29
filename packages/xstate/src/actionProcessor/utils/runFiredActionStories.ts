@@ -1,11 +1,12 @@
-import { DynamicModuleLoader, Nullable, QPQError } from '@qpqjs/core';
+import { ActionProcessorResult, actionResultError, DynamicModuleLoader, ErrorTypeEnum, Nullable, storyResultToActionResult } from '@qpqjs/core';
 
 import { StateMachineQPQConfigSetting } from '../../config/settings/stateMachine';
 import { StateMachineStoryResolver } from './createStateMachineStoryResolver';
 
 /**
  * Runs the side-effect story configured for each machine action that fired, in
- * firing order. Returns the first story error, or null when all succeed.
+ * firing order. Returns the first failure as an errored action result (label and stack
+ * kept), or null when all succeed.
  */
 export const runFiredActionStories = async (
   resolveStory: StateMachineStoryResolver,
@@ -13,7 +14,7 @@ export const runFiredActionStories = async (
   smConfig: StateMachineQPQConfigSetting,
   firedActions: string[],
   storyArgs: unknown[],
-): Promise<Nullable<QPQError>> => {
+): Promise<Nullable<ActionProcessorResult<never>>> => {
   for (const actionName of firedActions) {
     const runtime = smConfig.actions[actionName];
     if (!runtime) {
@@ -21,9 +22,13 @@ export const runFiredActionStories = async (
     }
 
     const storyModule = await dynamicModuleLoader(runtime);
+    if (!storyModule) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Action story [${actionName}] could not be loaded`);
+    }
+
     const storyResult = await resolveStory(storyModule, storyArgs);
     if (storyResult.error) {
-      return storyResult.error;
+      return storyResultToActionResult(storyResult, `StateMachine action ${actionName}`);
     }
   }
 

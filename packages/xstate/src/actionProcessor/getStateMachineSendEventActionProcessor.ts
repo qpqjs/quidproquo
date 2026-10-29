@@ -1,4 +1,15 @@
-import { actionResult, actionResultError, askKeyValueStoreUpsert, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  askKeyValueStoreUpsert,
+  createActionProcessor,
+  ErrorTypeEnum,
+  isErroredActionResult,
+  ProcessorFor,
+  QPQConfig,
+  resolveActionResult,
+  storyResultToActionResult,
+} from '@qpqjs/core';
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
@@ -27,10 +38,10 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): ProcessorFor<typ
     );
 
     const entityResult = await loadStateMachineEntity(resolveStory, smConfig, payload.id);
-    if (!entityResult.success) {
-      return actionResultError(entityResult.error.errorType, entityResult.error.errorText);
+    if (isErroredActionResult(entityResult)) {
+      return entityResult;
     }
-    const entity = entityResult.result;
+    const entity = resolveActionResult(entityResult);
 
     // xstate guards are synchronous, so guard stories cannot run inside the
     // machine. Pre-evaluate every configured guard against the current entity
@@ -38,9 +49,13 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): ProcessorFor<typ
     const guardImpls: Record<string, () => boolean> = {};
     for (const [guardName, guardRuntime] of Object.entries(smConfig.guards)) {
       const guardModule = await dynamicModuleLoader(guardRuntime);
+      if (!guardModule) {
+        return actionResultError(ErrorTypeEnum.NotFound, `Guard story [${guardName}] could not be loaded`);
+      }
+
       const guardResult = await resolveStory(guardModule, [entity, payload.event]);
       if (guardResult.error) {
-        return actionResultError(guardResult.error.errorType, guardResult.error.errorText);
+        return storyResultToActionResult(guardResult, `StateMachine SendEvent guard ${guardName}`);
       }
 
       const guardOutcome: boolean = guardResult.result;
@@ -80,12 +95,12 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): ProcessorFor<typ
       yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity);
     }, []);
     if (upsertResult.error) {
-      return actionResultError(upsertResult.error.errorType, upsertResult.error.errorText);
+      return storyResultToActionResult(upsertResult, 'StateMachine SendEvent persist');
     }
 
     const sideEffectError = await runFiredActionStories(resolveStory, dynamicModuleLoader, smConfig, firedActions, [entity, payload.event]);
     if (sideEffectError) {
-      return actionResultError(sideEffectError.errorType, sideEffectError.errorText);
+      return sideEffectError;
     }
 
     return actionResult(entity);
