@@ -1,3 +1,4 @@
+export { buildStoryResult } from './buildStoryResult';
 export * from './configTesting';
 export { expectGenerator, GeneratorExpectChain } from './generatorExpect';
 export { invokeProcessor, ProcessorRuntimeOverrides } from './invokeProcessor';

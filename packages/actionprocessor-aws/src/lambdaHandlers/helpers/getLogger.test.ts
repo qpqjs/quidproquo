@@ -1,6 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildStoryResult, buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,15 +24,7 @@ vi.mock('@aws-sdk/client-s3', () => ({
 
 const fetchMock = vi.fn();
 
-const storyResult = (overrides: Partial<StoryResult<unknown[]>> = {}): StoryResult<unknown[]> =>
-  ({
-    correlation: 'corr-1',
-    history: [],
-    input: [],
-    tags: [],
-    moduleName: 'test-module',
-    ...overrides,
-  }) as unknown as StoryResult<unknown[]>;
+const storyResult = (overrides: Partial<StoryResult<unknown[]>> = {}): StoryResult<unknown[]> => buildStoryResult(overrides);
 
 const logAndWait = async (result: StoryResult<unknown[]>) => {
   const logger = getLogger(testConfig());

@@ -1,4 +1,5 @@
 import { actionResult, QpqRuntimeType, StoryResult } from '@qpqjs/core';
+import { buildStoryResult } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';
@@ -24,18 +25,8 @@ afterAll(() => {
   fs.rmSync(fixtureDirectory, { recursive: true, force: true });
 });
 
-const buildRecordedResult = (input: any[], history: Array<{ res: any }>): StoryResult<any> => ({
-  input,
-  session: { depth: 0, context: {} },
-  history: history as any,
-  startedAt: '2024-01-01T00:00:00.000Z',
-  finishedAt: '2024-01-01T00:00:00.000Z',
-  tags: [],
-  moduleName: 'test-module',
-  correlation: 'corr-trace-1',
-  fromCorrelation: 'corr-trace-0',
-  runtimeType: QpqRuntimeType.UNIT_TEST,
-});
+const buildRecordedResult = (input: any[], history: Array<{ res: any }>): StoryResult<any> =>
+  buildStoryResult({ input, history: history as any, correlation: 'corr-trace-1', fromCorrelation: 'corr-trace-0' });
 
 const plainStorySource = `
 function formatName(user) {

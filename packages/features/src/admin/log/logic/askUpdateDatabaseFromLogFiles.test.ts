@@ -10,7 +10,7 @@ import {
   QpqRuntimeType,
   UserDirectoryActionType,
 } from '@qpqjs/core';
-import { runStory, throwsError } from '@qpqjs/testing';
+import { buildStoryResult, runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -25,15 +25,13 @@ import {
   storyResultToMetadata,
 } from './askUpdateDatabaseFromLogFiles';
 
-const baseStoryResult = {
+const baseStoryResult = buildStoryResult({
   correlation: 'mod::abc',
   moduleName: 'mod',
   runtimeType: QpqRuntimeType.UI,
   startedAt: '2026-06-26T00:00:00.000Z',
   finishedAt: '2026-06-26T00:00:01.000Z',
-  tags: [],
-  history: [],
-} as any;
+});
 
 describe('getDecodedAccessTokenFromSetAccessTokenActionInStoryResult', () => {
   it('returns the decoded token from a SetAccessToken action', () => {

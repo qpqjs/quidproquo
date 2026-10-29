@@ -1,11 +1,11 @@
 import { Action, ErrorTypeEnum, FileActionType, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, QPQ_LOGS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
-import { runStory, StoryError } from '@qpqjs/testing';
+import { buildStoryResult, runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { askEnsureRedactedLog, askGetRedactedByCorrelation } from './redactedLogData';
 
-const rawLog = { correlation: 'abc', history: [] } as any;
+const rawLog = buildStoryResult({ correlation: 'abc' });
 
 describe('askEnsureRedactedLog', () => {
   it('returns the cached path without touching the raw log', () => {

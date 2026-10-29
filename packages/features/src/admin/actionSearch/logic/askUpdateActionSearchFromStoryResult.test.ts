@@ -8,7 +8,7 @@ import {
   StoryResult,
   SystemActionType,
 } from '@qpqjs/core';
-import { runStory } from '@qpqjs/testing';
+import { buildStoryResult, runStory } from '@qpqjs/testing';
 import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -46,14 +46,8 @@ const unindexedEntry: ActionHistory = {
   finishedAt: '2026-07-24T00:00:03.001Z',
 };
 
-const buildStoryResult = (history: ActionHistory[]): StoryResult<any> =>
-  ({
-    correlation: 'corr-1',
-    moduleName: 'test-service',
-    history,
-    startedAt: '2026-07-24T00:00:00.000Z',
-    finishedAt: '2026-07-24T00:00:05.000Z',
-  }) as unknown as StoryResult<any>;
+const buildTestStoryResult = (history: ActionHistory[]): StoryResult<any> =>
+  buildStoryResult({ moduleName: 'test-service', history, startedAt: '2026-07-24T00:00:00.000Z', finishedAt: '2026-07-24T00:00:05.000Z' });
 
 type UpsertAction = Action<{ keyValueStoreName: string; item: Record<string, unknown> }>;
 type QueryAction = Action<{ keyValueStoreName: string; keyCondition: KvsQueryCondition }>;
@@ -85,7 +79,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
   it('writes rows only for registered action types', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([networkEntry, emailEntry, unindexedEntry])), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([networkEntry, emailEntry, unindexedEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
@@ -115,7 +109,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
   it('folds the entity from the batch rows and writes prefixed lookup rows', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([emailEntry]), 12345), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry]), 12345), mocks);
 
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
@@ -153,7 +147,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
 
     const { mocks, upserts } = buildMocks([storedFailedRow]);
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([emailEntry])), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
       deliveryStatus: EmailDeliveryStatus.dropped,
@@ -166,13 +160,13 @@ describe('askUpdateActionSearchFromStoryResult', () => {
     const { mocks, upserts } = buildMocks();
 
     // First ingestion primes nothing; re-run with the stored copy visible in the query
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([emailEntry])), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
     const firstEntity = upserts[QPQ_LOG_ENTITIES_KVS_NAME][0];
 
     const storedCopy = upserts[QPQ_LOG_ACTIONS_KVS_NAME][0] as ActionSearchActionRow;
     const { mocks: rerunMocks, upserts: rerunUpserts } = buildMocks([storedCopy]);
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([emailEntry])), rerunMocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), rerunMocks);
 
     expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
     expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toEqual(firstEntity);
@@ -203,7 +197,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
 
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([batchEntry])), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([batchEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
@@ -216,7 +210,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
   it('does nothing for a story with no registered actions', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildStoryResult([unindexedEntry])), mocks);
+    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([unindexedEntry])), mocks);
 
     expect(upserts).toEqual({});
   });
