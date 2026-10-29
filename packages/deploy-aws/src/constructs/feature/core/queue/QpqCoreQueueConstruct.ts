@@ -36,7 +36,7 @@ const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQC
 export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
   abstract queue: aws_sqs.IQueue;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.queue.grant(
       grantee,
       'sqs:GetQueueAttributes',
@@ -47,7 +47,7 @@ export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
     );
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.queue.grant(grantee, 'sqs:SendMessage');
   }
 }

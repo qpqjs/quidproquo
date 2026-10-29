@@ -21,15 +21,15 @@ export type QpqCoreSigningKeyConstructProps = {
 export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements QpqResource {
   key: aws_kms.IKey;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.key.grantVerify(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.key.grantSign(grantee);
   }
 
-  public grantAll(grantee: aws_iam.IGrantable): void {
+  public override grantAll(grantee: aws_iam.IGrantable): void {
     this.key.grantSignVerify(grantee);
   }
 

@@ -19,9 +19,10 @@ const renderValues = (values: Nullable<number[]>, unit: number, offset = 0): str
 
   const shifted = values.map((value) => value + offset);
 
-  if (shifted.length > 1) {
-    const step = shifted[1] - shifted[0];
-    const isUniformRunFromStart = shifted[0] === offset && shifted.length === unit / step && shifted.every((value, i) => value === offset + i * step);
+  const [first, second] = shifted;
+  if (first !== undefined && second !== undefined) {
+    const step = second - first;
+    const isUniformRunFromStart = first === offset && shifted.length === unit / step && shifted.every((value, i) => value === offset + i * step);
 
     if (isUniformRunFromStart) {
       return step === 1 ? '*' : `${offset}/${step}`;

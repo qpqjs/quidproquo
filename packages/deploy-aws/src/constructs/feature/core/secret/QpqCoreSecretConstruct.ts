@@ -17,11 +17,11 @@ export type QpqCoreSecretConstructProps = {
 export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock implements QpqResource {
   abstract secret: aws_secretsmanager.ISecret;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.secret.grantRead(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.secret.grantWrite(grantee);
   }
 }

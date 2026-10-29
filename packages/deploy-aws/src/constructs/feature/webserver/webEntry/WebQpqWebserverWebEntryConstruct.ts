@@ -184,9 +184,14 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     );
 
     rootDomains.forEach((rootDomain, index) => {
+      const domainName = domainNames[index];
+      if (domainName === undefined) {
+        throw new Error(`Root domain [${rootDomain}] resolved to no host`);
+      }
+
       new aws_route53.ARecord(this, domainScopedId(props.qpqConfig, 'web-alias', rootDomain), {
-        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainNames[index])),
-        recordName: domainNames[index],
+        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainName)),
+        recordName: domainName,
         target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
       });
     });

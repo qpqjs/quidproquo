@@ -10,7 +10,7 @@ export type QpqBootstrapConfigAwsOrganizationConstructProps = {
 } & QpqConstructBlockProps;
 
 function getEmailForAccount(baseEmailAddress: string, orgName: string, accountName: string): string {
-  const [mainEmail, domainEmail] = baseEmailAddress.split('@');
+  const [mainEmail = '', domainEmail] = baseEmailAddress.split('@');
   const [mainEmailNoPlus] = mainEmail.split('@');
 
   return `${mainEmailNoPlus}+${orgName}-${accountName}@${domainEmail}`;

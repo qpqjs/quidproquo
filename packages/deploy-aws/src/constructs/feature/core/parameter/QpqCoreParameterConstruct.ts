@@ -16,11 +16,11 @@ export type QpqCoreParameterConstructProps = {
 export abstract class QpqCoreParameterConstructBase extends QpqConstructBlock {
   abstract stringParameter: aws_ssm.IStringParameter;
 
-  public grantRead(grantee: aws_iam.IGrantable) {
+  public override grantRead(grantee: aws_iam.IGrantable) {
     this.stringParameter.grantRead(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): void {
+  public override grantWrite(grantee: aws_iam.IGrantable): void {
     this.stringParameter.grantWrite(grantee);
   }
 }

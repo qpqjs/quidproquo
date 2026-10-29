@@ -325,10 +325,13 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
             'cognito-idp:DescribeUserPool',
             'cognito-idp:DescribeUserPoolClient',
           ],
-          resources: userDirectoryConfigs.map((userDirectoryConfig, index) => {
+          resources: userDirectoryConfigs.flatMap((userDirectoryConfig, index) => {
             const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner);
 
-            const userpoolId = userDirectoryConstructs[index].userPool.userPoolId;
+            const userpoolId = userDirectoryConstructs[index]?.userPool.userPoolId;
+            if (userpoolId === undefined) {
+              return [];
+            }
 
             return `arn:aws:cognito-idp:${awsRegion}:${awsAccountId}:userpool/${userpoolId}`;
           }),

@@ -79,14 +79,9 @@ export const convertContentSecurityPolicy = (
   };
 
   return {
-    contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
-      .map((directive) =>
-        [
-          directive,
-          ...contentSecurityPolicyCopy[directive].flatMap((entry) =>
-            qpqWebServerUtils.resolveContentSecurityPolicyEntry(qpqConfig, entry, domainResolver),
-          ),
-        ].join(' '),
+    contentSecurityPolicy: Object.entries(contentSecurityPolicyCopy)
+      .map(([directive, entries]) =>
+        [directive, ...entries.flatMap((entry) => qpqWebServerUtils.resolveContentSecurityPolicyEntry(qpqConfig, entry, domainResolver))].join(' '),
       )
       .join('; '),
     override: contentSecurityPolicy.override,

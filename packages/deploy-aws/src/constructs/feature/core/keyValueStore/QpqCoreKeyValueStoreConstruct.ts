@@ -23,15 +23,15 @@ export type QpqCoreKeyValueStoreConstructProps = {
 export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBlock {
   abstract table: aws_dynamodb.ITable;
 
-  public grantRead(grantee: aws_iam.IGrantable) {
+  public override grantRead(grantee: aws_iam.IGrantable) {
     this.table.grantReadData(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable) {
+  public override grantWrite(grantee: aws_iam.IGrantable) {
     this.table.grantWriteData(grantee);
   }
 
-  public grantAll(grantee: aws_iam.IGrantable) {
+  public override grantAll(grantee: aws_iam.IGrantable) {
     this.table.grantFullAccess(grantee);
   }
 }
@@ -126,9 +126,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     });
 
     // Do local secondary indexes
-    for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {
-      const sortKey = props.keyValueStoreConfig.sortKeys[i];
-
+    for (const sortKey of props.keyValueStoreConfig.sortKeys.slice(1)) {
       table.addLocalSecondaryIndex({
         indexName: sortKey.key,
         sortKey: convertKvsKeyToDynamodbAttribute(sortKey),

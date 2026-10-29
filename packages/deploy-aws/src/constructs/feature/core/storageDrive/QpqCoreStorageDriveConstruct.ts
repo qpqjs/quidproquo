@@ -58,11 +58,11 @@ export type QpqCoreStorageDriveConstructProps = {
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
   abstract bucket: aws_s3.IBucket;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.bucket.grantRead(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.bucket.grantWrite(grantee);
   }
 }

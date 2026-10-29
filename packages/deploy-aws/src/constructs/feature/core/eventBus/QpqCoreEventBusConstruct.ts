@@ -32,9 +32,9 @@ const resolveSubscriberQueueArnPatterns = (qpqConfig: QPQConfig): string[] => {
 export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
   abstract topic: aws_sns.ITopic;
 
-  public grantRead(grantee: aws_iam.IGrantable) {}
+  public override grantRead(grantee: aws_iam.IGrantable) {}
 
-  public grantWrite(grantee: aws_iam.IGrantable): void {
+  public override grantWrite(grantee: aws_iam.IGrantable): void {
     this.topic.grantPublish(grantee);
   }
 }
