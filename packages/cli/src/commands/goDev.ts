@@ -1,4 +1,4 @@
-// `qpq go:dev` — the whole local dev stack in one process: the API dev server
+// `qpq go:dev`, the whole local dev stack in one process: the API dev server
 // (go:dev:api) plus every views dev server (go:dev:web), so a single ctrl+c
 // tears it all down. A background tsc watcher keeps workspace declaration
 // output fresh for the editor (--no-types to skip it). The app is resolved

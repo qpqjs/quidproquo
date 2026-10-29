@@ -1,4 +1,4 @@
-// AWS federated remote publishing — build each backend service as a
+// AWS federated remote publishing, build each backend service as a
 // module-federation remote and publish it into that service's federated code
 // bucket (see ./remote for the three-phase mechanics).
 import { isAwsCredentialsValid } from './awsCredentials';

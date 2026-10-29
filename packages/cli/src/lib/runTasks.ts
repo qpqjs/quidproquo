@@ -1,7 +1,7 @@
 export type Task = { label: string; run: () => Promise<void> };
 export type TaskFailure = { label: string; error: Error };
 
-// Run tasks with at most `limit` in flight; never rejects — failures come back
+// Run tasks with at most `limit` in flight; never rejects, failures come back
 // labelled so a whole wave can finish before we report what broke.
 export const runTasks = async (tasks: Task[], limit: number): Promise<TaskFailure[]> => {
   const failures: TaskFailure[] = [];

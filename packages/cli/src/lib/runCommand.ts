@@ -24,7 +24,7 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
       stdio: 'inherit',
       // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
       // without a shell so the already-array args are passed straight to the
-      // program and can't be re-interpreted by `sh -c` — no command injection via
+      // program and can't be re-interpreted by `sh -c`, no command injection via
       // interpolated values (stack names, CI-supplied env, etc.).
       shell: process.platform === 'win32',
       cwd: options.cwd ?? process.cwd(),
@@ -41,7 +41,7 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
   });
 
 // Run a command for its side effect only, swallowing both its output and its
-// exit code — for best-effort cleanup steps (e.g. `docker rm -f` of a container
+// exit code, for best-effort cleanup steps (e.g. `docker rm -f` of a container
 // that may not exist) that must never fail the run. Without a shell there's no
 // `>/dev/null 2>&1 || true`, so quieting and non-failing happen here instead.
 export const runCommandBestEffort = (command: string, args: string[], options: RunCommandOptions = {}): Promise<void> =>
@@ -78,7 +78,7 @@ export const nextPrefixColor = (): number => {
 };
 
 // Like runCommand, but pipes output and prefixes every line with a colored
-// [label] — for running many commands concurrently without unreadable
+// [label], for running many commands concurrently without unreadable
 // interleaving. Rejects on non-zero exit.
 export const runCommandPrefixed = (label: string, command: string, args: string[], options: RunCommandPrefixedOptions = {}): Promise<void> =>
   new Promise((resolve, reject) => {
@@ -89,7 +89,7 @@ export const runCommandPrefixed = (label: string, command: string, args: string[
       stdio: ['ignore', 'pipe', 'pipe'],
       // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
       // without a shell so the already-array args are passed straight to the
-      // program and can't be re-interpreted by `sh -c` — no command injection via
+      // program and can't be re-interpreted by `sh -c`, no command injection via
       // interpolated values (stack names, CI-supplied env, etc.).
       shell: process.platform === 'win32',
       cwd: options.cwd ?? process.cwd(),

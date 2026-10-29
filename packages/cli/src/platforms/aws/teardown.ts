@@ -1,8 +1,8 @@
-// AWS sequential teardown (`qpq teardown`) — the stack phases of `qpq go` in
+// AWS sequential teardown (`qpq teardown`), the stack phases of `qpq go` in
 // reverse. Per phase it destroys every selected service's web, then api, then
 // inf CDK stacks. Phases don't cross-reference each other's CFN outputs
 // (values flow through SSM), so this order is prudence, not a hard dependency.
-// Bootstrap, domain and account stacks are deliberately out of scope — they
+// Bootstrap, domain and account stacks are deliberately out of scope, they
 // outlive any one service and are torn down by hand if ever.
 import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 

@@ -20,7 +20,7 @@ export const promptSelectDetailed = async <T>(
 // A yes/no list prompt, returning true for "Yes".
 export const promptYesNo = async (message: string): Promise<boolean> => (await promptSelect(message, ['No', 'Yes'])) === 'Yes';
 
-// A free-text prompt — used where a y/n is too easy to fat-finger (destructive
+// A free-text prompt, used where a y/n is too easy to fat-finger (destructive
 // confirmations that require typing the target name back).
 export const promptText = async (message: string): Promise<string> => {
   const { input } = await import('@inquirer/prompts');

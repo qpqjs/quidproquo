@@ -1,4 +1,4 @@
-// `qpq go:docker` — asks the same questions as `qpq go`, then builds locally
+// `qpq go:docker`, asks the same questions as `qpq go`, then builds locally
 // and deploys in parallel via docker. The two halves can run on different
 // machines, which is what lets a CI deploy run one job per service and phase:
 //
@@ -22,7 +22,7 @@
 // The deploy half, from the manifests:
 //   wave 1 (inf): one docker container per service deploys its inf stack, all
 //     concurrently. Containers run only the CDK CLI against the mounted
-//     assembly — the workspace (and its npm-linked quidproquo packages) never
+//     assembly, the workspace (and its npm-linked quidproquo packages) never
 //     needs to exist inside the image.
 //   wave 2 (api + web): once every inf stack is done, api and web stacks for
 //     all services deploy concurrently (they depend only on inf, not on each
@@ -34,14 +34,14 @@
 //     flipped, one aws-cli container per service, all concurrently. Follows
 //     every api deploy, so a lambda never runs a previous release's stories.
 //
-// domain/bootstrap menu options deploy host-side exactly like `qpq go` —
+// domain/bootstrap menu options deploy host-side exactly like `qpq go`:
 // a single stack gains nothing from docker.
 //
 // Requires the same env as `go` (the build half included: `cdk synth` still
 // looks up hosted zones and VPCs) plus a running docker daemon for the deploy
-// half. Knobs: GO_DOCKER_BUILD_CONCURRENCY (default: the machine's core count —
+// half. Knobs: GO_DOCKER_BUILD_CONCURRENCY (default: the machine's core count,
 // local builds are CPU-bound) and GO_DOCKER_DEPLOY_CONCURRENCY (default
-// unlimited — deploys just wait on CloudFormation).
+// unlimited, deploys just wait on CloudFormation).
 import { QpqDeployEnvVar } from '@qpqjs/core';
 import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import { getServiceRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
@@ -129,7 +129,7 @@ const buildDeployerImage = async (cdkVersion: string): Promise<void> => {
 
 // Deploy one stack from a pre-synthesized assembly in a throwaway container
 // named <service>-<stackType> (e.g. mini-web) so `docker ps` reads cleanly.
-// The assembly mounts read-only and is copied container-local first — the CDK
+// The assembly mounts read-only and is copied container-local first, the CDK
 // CLI writes lock files next to the assembly it reads, and the copy keeps
 // parallel api/web deploys of the same service fully isolated.
 const dockerDeployStack = async (
@@ -214,7 +214,7 @@ const dockerSyncViews = async (color: number, serviceName: string, views: GoDock
 
 // Publish one service's already-built federated remote to S3 in a throwaway
 // aws-cli container named <service>-publish. The version dir (everything the
-// manifest references) syncs first, then the manifest.json is copied last —
+// manifest references) syncs first, then the manifest.json is copied last:
 // same ordering guarantee as the host-side publish, so a reading lambda never
 // sees a manifest whose files aren't all present yet.
 const dockerPublishRemote = async (color: number, serviceName: string, remote: GoDockerRemoteEntry): Promise<void> => {
@@ -363,7 +363,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
   );
 
   // Build the federated remotes now (rspack needs the workspace), so the
-  // publish wave only has to sync the already-built output — mirroring how
+  // publish wave only has to sync the already-built output, mirroring how
   // views are bundled here and synced later.
   assertNoFailures(
     'Remote bundling',
@@ -381,7 +381,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
 
   if (needCdkSynth) {
     // One self-contained cloud assembly per service (all its stacks + staged
-    // assets) — separate --output dirs so synths can run in parallel and
+    // assets), separate --output dirs so synths can run in parallel and
     // containers never share mutable state.
     assertNoFailures(
       'CDK synth',

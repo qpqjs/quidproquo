@@ -1,4 +1,4 @@
-// `qpq go:docker` — asks the same questions as `qpq go`, then runs the
+// `qpq go:docker`, asks the same questions as `qpq go`, then runs the
 // platform driver's parallel containerized deploy (drivers without a docker
 // strategy don't offer one). `--build-only` and `--from-build` split that run
 // into a build half and a deploy half that can run on different machines.

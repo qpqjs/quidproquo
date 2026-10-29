@@ -1,18 +1,18 @@
-// Docker platform deploy (`qpq go` with platform 'docker') — proof-of-concept
+// Docker platform deploy (`qpq go` with platform 'docker'), proof-of-concept
 // self-hosting: bakes the QPQ dev server (a full local platform emulation)
 // plus every service of the app and its pre-built views into one docker image.
 //
 //   1. Build workspace packages, then the dev-server bundle (all services).
 //   2. Build every views microfrontend with a same-origin module-federation
 //      remote base (/<views subdomain>/<svc>), mirroring the AWS layout.
-//   3. Assemble an image context under dist/qpq/docker-image/<app>/ — server
+//   3. Assemble an image context under dist/qpq/docker-image/<app>/, server
 //      bundle, web root (every web entry, placed by its port or its domain),
 //      a workspaces-stripped package.json for runtime deps, and the
 //      locally-built quidproquo packages as a vendor overlay.
 //   4. docker build (buildx with a push when the deployment names a registry or
 //      a target platform), write a docker-compose.yml, print how to run it.
 //
-// Not production-grade (single process, sqlite KVS, in-memory queues) —
+// Not production-grade (single process, sqlite KVS, in-memory queues):
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from '@qpqjs/config-aws';
 import { isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
@@ -96,12 +96,12 @@ const writeDockerfile = (contextDir: string, containerPorts: number[]): void => 
 
 // The consumer root package.json, stripped to what the image's npm install
 // needs: runtime dependencies (+ overrides). Workspaces/scripts/devDeps are
-// host-only concerns — the workspace packages themselves are bundled into the
+// host-only concerns, the workspace packages themselves are bundled into the
 // server bundle from source.
 //
 // quidproquo deps declared as file: refs (a consumer living beside the qpq
 // monorepo) point outside the image context, where npm install would leave
-// dangling symlinks — rewrite them to the vendored copies inside the context.
+// dangling symlinks, rewrite them to the vendored copies inside the context.
 const writeImagePackageJson = (root: string, contextDir: string): void => {
   const rootPackageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 
@@ -126,7 +126,7 @@ const writeImagePackageJson = (root: string, contextDir: string): void => {
 // Copy the locally-built quidproquo packages (which may be npm-linked
 // checkouts newer than the registry) into vendor/ so the image runs the same
 // qpq code the bundle was built against. Follows the node_modules symlinks;
-// lib/config only — no node_modules, no src.
+// lib/config only, no node_modules, no src.
 const vendorQuidproquoPackages = (root: string, contextDir: string): number => {
   const nodeModules = path.join(root, 'node_modules');
   const vendorDir = path.join(contextDir, 'vendor');
@@ -170,7 +170,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const volumeName = `${containerName}-data`;
 
   // The dev server hosts every service of the app, so per-service/stack
-  // selections don't apply — the image is always the whole app.
+  // selections don't apply, the image is always the whole app.
   console.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
 
   logTimeStart('totalTime');

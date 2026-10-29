@@ -3,7 +3,7 @@
 // an orphaned process holding a dev port, and the next launch dies with
 // EADDRINUSE. Before starting, kill any listener on the given ports whose
 // command line matches `isOurs`. Anything else on the ports is left alone
-// and reported — it's not ours.
+// and reported, it's not ours.
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -24,22 +24,21 @@ export const isQpqCliCommand = (command: string): boolean =>
       return withoutExt === 'qpq';
     });
 
-// SIGTERM only requests termination — the caller (about to bind this same
+// SIGTERM only requests termination, the caller (about to bind this same
 // process's ports itself) needs it actually gone first. A stale dev server
 // can be mid-startup when killed (still resolving config, not yet bound to
 // every port it eventually binds) and keep running for a bit past the
-// signal, going on to bind a LATER port — waiting for just the one port that
+// signal, going on to bind a LATER port, waiting for just the one port that
 // matched isn't enough; wait for the whole pid to disappear so it can't bind
 // anything else afterward. Poll synchronously (this whole sweep runs before
-// anything async starts) via `kill(pid, 0)` — reliable and fast here because
+// anything async starts) via `kill(pid, 0)`, reliable and fast here because
 // these are unrelated, previously-orphaned processes, not children of this
 // one (a real child can sit as a zombie answering `kill(pid, 0)` until this
 // process's own event loop reaps it, which a tight sync loop would starve;
 // doesn't apply to a process we didn't spawn).
 //
 // The default covers the dev server's graceful shutdown (drain in-flight work,
-// then checkpoint the stores) with room to spare — it used to be 3s, which was
-// fine when the server died instantly and is not now. Returns whether the pid
+// then checkpoint the stores) with room to spare. Returns whether the pid
 // actually went, because a caller about to bind these ports has to escalate
 // rather than hope: giving up while the old server still holds 8080 is exactly
 // the EADDRINUSE this file exists to prevent.
@@ -88,7 +87,7 @@ const getProcessCwd = (pid: number): string | null => {
 // `npx qpq go:dev:api` (or via any shell whose -c string names qpq), the
 // ancestor chain (`sh -c "npx ... qpq ..."`, `npm exec qpq ...`) matches
 // isQpqCliCommand and shares our cwd, so excluding just process.pid isn't
-// enough — SIGINTing an ancestor tears down our own tree. Walk ppid to the
+// enough, SIGINTing an ancestor tears down our own tree. Walk ppid to the
 // top and exclude the whole chain.
 const getOwnAncestorPids = (): Set<number> => {
   const ancestors = new Set<number>();
@@ -109,11 +108,11 @@ const getOwnAncestorPids = (): Set<number> => {
 };
 
 // killStaleListeners only sees processes currently BOUND to one of the given
-// ports — it can't catch a still-running `qpq go:dev*` watcher whose spawned
+// ports, it can't catch a still-running `qpq go:dev*` watcher whose spawned
 // dev-server child already died (a crash, or us killing just the child):
 // the watcher itself holds no port at that moment, so it's invisible to a
-// port scan, yet it's still alive and can spawn a fresh child — and bind a
-// port — moments later, racing whatever we're about to start. Close that gap
+// port scan, yet it's still alive and can spawn a fresh child, and bind a
+// port, moments later, racing whatever we're about to start. Close that gap
 // by finding any OTHER qpq CLI process rooted in the same repo checkout
 // (matched by cwd, not by port or command-line args, which vary by how it
 // was invoked) and killing it outright, regardless of what it currently has

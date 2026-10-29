@@ -17,7 +17,7 @@ export const getAppPrefix = (appName: string): string => {
 // The subset of the given services that opt into module-federation publishing,
 // i.e. declare defineFederatedModuleStore(...). Federation is a config setting,
 // not a directory convention (unlike views/ backends), so detecting it means
-// loading each service's config — which is why this lives here and not in the
+// loading each service's config, which is why this lives here and not in the
 // directory-only discovery module. Used by the deploy drivers to decide which
 // backends to publish federated remotes for after a deploy.
 export const getServiceNamesWithFederation = (appName: string, serviceNames: string[]): string[] =>

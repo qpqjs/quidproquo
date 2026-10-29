@@ -1,4 +1,4 @@
-// `qpq go:dev:api` — boots the QPQ local dev server. Resolves the app,
+// `qpq go:dev:api`, boots the QPQ local dev server. Resolves the app,
 // generates the dev-server entry, builds the rspack config, then runs rspack
 // in watch mode, restarting the server process on every successful rebuild.
 //
@@ -8,7 +8,7 @@
 //
 // The one thing NOT hot-reloaded is the qpq configs themselves: each service's
 // infrastructure.ts is evaluated once at launch and baked into the
-// `quidproquo-dynamic-loader` virtual module — config changes need a full
+// `quidproquo-dynamic-loader` virtual module, config changes need a full
 // `go:dev:api` restart.
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
@@ -49,7 +49,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     reportPortHolders(getDevServerPortList(appName));
   } else {
     // Catches a lingering watcher from a previous run even if its spawned
-    // child already exited (see killOtherQpqDevProcesses) — then the usual
+    // child already exited (see killOtherQpqDevProcesses), then the usual
     // port-based sweep for anything else still bound to our ports.
     killOtherQpqDevProcesses(root);
     killStaleListeners(getDevServerPortList(appName), (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
@@ -71,7 +71,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     child.on('exit', (code) => {
       child = null;
       if (!restartQueued) {
-        // Crashed (or exited) on its own — leave it down; the next successful
+        // Crashed (or exited) on its own, leave it down; the next successful
         // rebuild (i.e. the next file save) brings it back up.
         console.log(`Dev server exited with code ${code}. Save a file to restart it.`);
       }

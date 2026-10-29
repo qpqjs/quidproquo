@@ -5,7 +5,7 @@ import { getOwnPackageRoot } from '../../lib/packageRoot';
 // The CDK app command (`cdk ... --app "<this>"`): @qpqjs/deploy-aws's
 // generic workspace app under ts-node hooks, with DEPLOY_* in the env.
 export const getCdkAppCommand = (): string => {
-  // Resolve ts-node from this package, not the workspace cwd — under npm link
+  // Resolve ts-node from this package, not the workspace cwd, under npm link
   // the CLI's dependencies are never hoisted into the workspace's node_modules,
   // so a bare `-r ts-node/...` preload fails there.
   const tsNodeRegister = require.resolve('ts-node/register/transpile-only');

@@ -1,4 +1,4 @@
-// `qpq synth [service]` — synthesizes each backend service's QPQ config to
+// `qpq synth [service]`, synthesizes each backend service's QPQ config to
 // dist/apps/<app>/infrastructure/<module>-config.json.
 //
 // Runs with ts-node hooks registered (see runCli), which transpiles each
@@ -34,7 +34,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
 
   let appNames: string[];
   if (specifiedServiceName && !hasExplicitApp) {
-    // A bare service name is unambiguous — synth it in whichever app owns it.
+    // A bare service name is unambiguous, synth it in whichever app owns it.
     const appWithService = getAvailableApps().find((appName) => getServiceNamesWithSubdir(appName, 'service').includes(specifiedServiceName));
     if (!appWithService) {
       console.error(`Service '${specifiedServiceName}' not found in any app`);
@@ -58,10 +58,9 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     await resolveDeployment(argv, appName);
 
     // Validate a specified service against the app's discovered services before it
-    // reaches loadServiceQpqConfig -> require. The bare-service-name branch above
-    // already checks this; the --app/env branch used to skip it, letting a typo hit
-    // a cryptic module-resolution error and a `../` value normalize into an arbitrary
-    // require target. Both paths now validate identically.
+    // reaches loadServiceQpqConfig -> require, exactly as the bare-service-name branch
+    // above does: an unchecked typo hits a cryptic module-resolution error and a `../`
+    // value normalizes into an arbitrary require target.
     const appServices = getServiceNamesWithSubdir(appName, 'service');
     if (specifiedServiceName && !appServices.includes(specifiedServiceName)) {
       console.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);

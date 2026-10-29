@@ -1,4 +1,4 @@
-// `qpq hooks <name>` — run the `qpq:<name>` script (or the plain `<name>`
+// `qpq hooks <name>`, run the `qpq:<name>` script (or the plain `<name>`
 // script when no qpq:-prefixed one exists) of every app and workspace package
 // that defines one, in dependency order with parallel execution.
 // Wire the root package.json's lifecycle to it, e.g.

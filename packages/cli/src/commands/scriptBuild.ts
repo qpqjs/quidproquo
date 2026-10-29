@@ -1,4 +1,4 @@
-// `qpq script:build <dir> [--out <dir>] [--source-map]` — bundle a user-script project
+// `qpq script:build <dir> [--out <dir>] [--source-map]`, bundle a user-script project
 // into one main.js that askUserScriptExecute can load from a drive. `--source-map`
 // embeds the map in main.js; no separate .map file is ever written.
 import { buildUserScript, checkUserScriptOutput, UserScriptBuildError } from '@qpqjs/user-script';

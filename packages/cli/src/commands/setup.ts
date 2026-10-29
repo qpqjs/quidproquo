@@ -1,4 +1,4 @@
-// `qpq setup` — takes a cloud environment from empty to deployed, in order, with
+// `qpq setup`, takes a cloud environment from empty to deployed, in order, with
 // every step checked first so the menu shows what is already in place and a
 // rerun on a half-set-up account is safe. The platform (from the deployment's
 // entry in deploy.config.json) contributes the steps.

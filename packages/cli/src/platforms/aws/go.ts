@@ -1,5 +1,5 @@
 // AWS sequential deploy (`qpq go`). Per service it: synths the QPQ config,
-// rspack-bundles the backend (programmatic — no per-service rspack.config.ts),
+// rspack-bundles the backend (programmatic, no per-service rspack.config.ts),
 // deploys the inf/api/web CDK stacks (cdk runs the generic workspace app via
 // --app), bundles views (rspack, production) and syncs them to S3. Finally, any
 // service that opts into module federation has its federated remote published
@@ -83,7 +83,7 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   }
 
   if (plan.kind === 'bootstrap') {
-    // Feature bootstraps deploy into a shared account — leave the account-level
+    // Feature bootstraps deploy into a shared account, leave the account-level
     // guardrails stack alone (deploy it explicitly via the 'account' option).
     if (process.env[QpqDeployEnvVar.featureName]) {
       console.log('Skipping account stack for feature deploy');

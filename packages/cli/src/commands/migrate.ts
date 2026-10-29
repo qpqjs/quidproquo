@@ -1,4 +1,4 @@
-// `qpq migrate` — run every pending migration against the LOCAL dev store, once, then exit.
+// `qpq migrate`, run every pending migration against the LOCAL dev store, once, then exit.
 //
 // Deployed, migrations are triggered by a stack update. Nothing locally ever deploys, so
 // without this a migration is first executed in a real environment, which is a poor place to

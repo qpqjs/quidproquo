@@ -1,9 +1,9 @@
-// `qpq clear-resources` — interactively EMPTY selected data resources (storage
+// `qpq clear-resources`, interactively EMPTY selected data resources (storage
 // drive buckets, key value store tables) without touching the stacks: the
 // "reset my data" counterpart to `qpq teardown`. Resolves the app +
 // deployment the same way as go/teardown, enumerates the app's owned
 // resources from its live qpq configs, multi-selects what to empty (with a
-// typed confirmation — this deletes stored data), then hands off to the
+// typed confirmation, this deletes stored data), then hands off to the
 // platform driver.
 import { promptClearResourcesPlan } from '../lib/clearResourcesPlan';
 import { resolveAppSelection } from '../lib/resolveAppSelection';

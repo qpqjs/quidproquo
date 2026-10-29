@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// The consumer repo root — qpq always runs from the workspace root (npm
+// The consumer repo root, qpq always runs from the workspace root (npm
 // scripts set cwd there).
 export const getRoot = (): string => process.cwd();
 
@@ -45,7 +45,7 @@ const serviceHasSubdir = (appName: string, service: string, subdir: string): boo
 export const getServiceNamesWithSubdir = (appName: string, subdir: string): string[] =>
   getAllServiceNames(appName).filter((service) => serviceHasSubdir(appName, service, subdir));
 
-// Backend services — those with a service/ subdir.
+// Backend services, those with a service/ subdir.
 export const getServiceNames = (appName: string): string[] => getServiceNamesWithSubdir(appName, 'service');
 
 // Backend services that also ship a frontend (views/ subdir).

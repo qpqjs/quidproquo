@@ -1,6 +1,6 @@
-// `qpq check:circular` — scan every workspace's src for circular imports (the
+// `qpq check:circular`, scan every workspace's src for circular imports (the
 // class of bug that TDZ-crashes ESM bundles and silently drops exports under
-// CJS). Cycles fail the command (exit 1) — they are never acceptable; --warn or
+// CJS). Cycles fail the command (exit 1), they are never acceptable; --warn or
 // QPQ_CIRCULAR_DEPS_WARN=1 is a temporary escape hatch that reports without
 // failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';

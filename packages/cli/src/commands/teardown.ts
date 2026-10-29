@@ -1,6 +1,6 @@
-// `qpq teardown` — interactive destroy, the counterpart of `qpq go`. Resolves
+// `qpq teardown`, interactive destroy, the counterpart of `qpq go`. Resolves
 // the app + deployment the same way, asks which services to tear down (with
-// a typed confirmation — this deletes stored data), then hands off to the
+// a typed confirmation, this deletes stored data), then hands off to the
 // platform driver to destroy the web, api and inf stacks in that order.
 import { promptTeardownPlan } from '../lib/deployPrompts';
 import { resolveAppSelection } from '../lib/resolveAppSelection';

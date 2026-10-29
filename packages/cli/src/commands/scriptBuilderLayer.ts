@@ -1,4 +1,4 @@
-// `qpq script:builder-layer [--arch arm64|x86_64]` — produce the lambda layer that gives
+// `qpq script:builder-layer [--arch arm64|x86_64]`, produce the lambda layer that gives
 // a service rspack, for services that registered defineUserScriptBuilder. The directory
 // is the one getUserScriptBuilderApiLayer points at, so nothing is told a path. Run from
 // the app's qpq:predeploy hook, which go:docker fires before the workspace is built, so

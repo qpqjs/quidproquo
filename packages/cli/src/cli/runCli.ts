@@ -1,12 +1,12 @@
 import { promptCommandFromMenu } from './commandMenu';
 import { buildUsage, CliCommand, cliCommands } from './commandRegistry';
 
-// Service infrastructure.ts files (and app config fragments) are TypeScript —
+// Service infrastructure.ts files (and app config fragments) are TypeScript, so
 // register ts-node's transpile-only require hook so the CLI can require them
 // directly, using the consumer root's tsconfig.json ts-node settings.
 //
 // CONTRACT: JavaScript apps (create-qpq-app --language javascript) also lean
-// on this hook — their tsconfig.json ts-node block sets allowJs (so their
+// on this hook, their tsconfig.json ts-node block sets allowJs (so their
 // ESM-syntax infrastructure.js compiles at require time) and scope/scopeDir
 // (so the hook never touches quidproquo libs outside the app). Any
 // replacement for ts-node here must honour those consumer tsconfig options.

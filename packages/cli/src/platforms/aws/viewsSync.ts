@@ -14,7 +14,7 @@ import { runCommand } from '../../lib/runCommand';
 import { getViewsDistDir } from '../../lib/views';
 
 // The mutable entry points: fixed names whose CONTENT changes every deploy. They
-// must never be cached without revalidation — a browser holding a stale
+// must never be cached without revalidation, a browser holding a stale
 // mf-manifest.json or remoteEntry.js keeps running the previous deploy's bundle
 // (the module-reload hot-swap and plain page refreshes both depend on these being
 // fresh). Everything else in a views dist is content-hashed and safely immutable.

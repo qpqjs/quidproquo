@@ -49,7 +49,13 @@ export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Deploy
   }
 
   const allServices = getServiceNames(appName);
-  const services = servicesArg === 'all' ? allServices : servicesArg.split(',').map((s) => s.trim()).filter(Boolean);
+  const services =
+    servicesArg === 'all'
+      ? allServices
+      : servicesArg
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
 
   const unknownServices = services.filter((service) => !allServices.includes(service));
   if (unknownServices.length > 0) {
@@ -117,7 +123,7 @@ export type TeardownPlan =
   | { kind: 'services'; appName: string; services: string[] };
 
 // The question flow for `qpq teardown`: pick services, then type the deploy
-// target back to confirm — destroying inf stacks takes user data (key value
+// target back to confirm, destroying inf stacks takes user data (key value
 // stores, user directories) with it, so a y/n prompt isn't enough friction.
 export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan> => {
   const deployInfo = getDeployTargetLabel();

@@ -1,4 +1,4 @@
-// `qpq script:new <dir>` — write the user-script template project into a new
+// `qpq script:new <dir>`, write the user-script template project into a new
 // directory. See templates/user-script/README.md for what a script is.
 import path from 'path';
 

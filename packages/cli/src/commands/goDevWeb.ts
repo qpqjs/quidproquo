@@ -1,7 +1,7 @@
-// `qpq go:dev:web` — boots every views microfrontend's Rspack dev server
+// `qpq go:dev:web`, boots every views microfrontend's Rspack dev server
 // in-process (shell is the MF host app, plus all remotes on their own ports).
 // Everything is served dynamically; remotes resolve at runtime via
-// mf-manifest.json on localhost ports. Programmatic — no per-views
+// mf-manifest.json on localhost ports. Programmatic, no per-views
 // rspack.config.ts or npm serve script needed.
 //
 // Usage:
@@ -71,7 +71,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   }
 
   // Every RspackDevServer.start() registers its own SIGINT/SIGTERM handler on
-  // process — with a dozen views servers in one process that trips node's
+  // process, with a dozen views servers in one process that trips node's
   // default 10-listener warning. Size the limit to the fleet.
   process.setMaxListeners(Math.max(process.getMaxListeners(), views.length * 2 + 10));
 

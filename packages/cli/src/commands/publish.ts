@@ -1,4 +1,4 @@
-// `qpq publish[:build|:upload|:deploy]` — build each backend service as a
+// `qpq publish[:build|:upload|:deploy]`, build each backend service as a
 // module-federation remote and publish it into the platform's federated code
 // store, so the deployed backends federate their story code instead of running
 // the bundled copy. The mechanics live in the platform driver (AWS: S3-backed,
