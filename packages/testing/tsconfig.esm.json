@@ -2,8 +2,16 @@
   "extends": "@qpqjs/tsconfig/tsconfig.esm.json",
   "compilerOptions": {
     "outDir": "./lib/esm",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ]
 }
