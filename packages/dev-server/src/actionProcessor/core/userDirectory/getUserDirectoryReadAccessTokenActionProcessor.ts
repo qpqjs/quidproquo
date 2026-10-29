@@ -9,8 +9,14 @@ import {
 } from '@qpqjs/core';
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
+import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
+import { getOrSeedDevJwtSecret } from '../../../logic/auth/devJwtSecret';
+import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
+const getProcessReadAccessToken = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
   return async ({ userDirectoryName, ignoreExpiration }, { decodedAccessToken, accessToken }) => {
     if (decodedAccessToken) {
       const nowInSeconds = Math.floor(Date.now() / 1000);
@@ -32,7 +38,8 @@ const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       return actionResult(decodedAccessToken);
     }
 
-    const decoded = decodeAccessTokenForDev(userDirectoryName, accessToken, ignoreExpiration);
+    const secret = await getOrSeedDevJwtSecret(devServerConfig.runtimePath, resolveDevUserDirectory(userDirectoryName, qpqConfig));
+    const decoded = decodeAccessTokenForDev(secret, userDirectoryName, accessToken, ignoreExpiration);
 
     if (!decoded) {
       return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
@@ -42,4 +49,5 @@ const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof as
   };
 };
 
-export const getUserDirectoryReadAccessTokenActionProcessor = createActionProcessor(askUserDirectoryReadAccessToken, getProcessReadAccessToken);
+export const getUserDirectoryReadAccessTokenActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryReadAccessToken, (qpqConfig) => getProcessReadAccessToken(qpqConfig, devServerConfig));

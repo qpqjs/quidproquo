@@ -1,5 +1,6 @@
 import {
   DecodedAccessToken,
+  defineUserDirectory,
   ErrorTypeEnum,
   isErroredActionResult,
   resolveActionResult,
@@ -8,9 +9,13 @@ import {
 } from '@qpqjs/core';
 import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
+import { signDevJwt } from '../../../logic/auth/devJwt';
 import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirectoryReadAccessTokenActionProcessor';
+
+vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));
 
 const nowInSeconds = Math.floor(Date.now() / 1000);
 
@@ -22,11 +27,13 @@ const buildDecodedToken = (exp: number): DecodedAccessToken => ({
   userDirectory: 'directory',
 });
 
-const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
-const buildJwtWithPayload = (payload: object): string => `${base64UrlEncode({ alg: 'none' })}.${base64UrlEncode(payload)}.dev-signature`;
+const buildJwtWithPayload = (payload: object): string => signDevJwt('test-secret', payload);
 
 const getProcessor = async () => {
-  const processors = await getUserDirectoryReadAccessTokenActionProcessor(buildTestQpqConfig([]), noopDynamicModuleLoader);
+  const processors = await getUserDirectoryReadAccessTokenActionProcessor(buildTestDevServerConfig())(
+    buildTestQpqConfig([defineUserDirectory('directory')]),
+    noopDynamicModuleLoader,
+  );
   return processors[UserDirectoryActionType.ReadAccessToken];
 };
 

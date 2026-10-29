@@ -1,37 +1,24 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { decodeAccessTokenForDev } from './decodeAccessTokenForDev';
+import { signDevJwt } from './devJwt';
 
-const { unsafeDecodeJWTPayload } = vi.hoisted(() => ({ unsafeDecodeJWTPayload: vi.fn() }));
-
-vi.mock('@qpqjs/webserver', () => ({
-  qpqWebServerUtils: { unsafeDecodeJWTPayload },
-}));
+const SECRET = 'test-secret';
+const now = () => Math.floor(Date.now() / 1000);
 
 describe('decodeAccessTokenForDev', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('returns null when no access token is supplied', () => {
-    expect(decodeAccessTokenForDev('dir')).toBeNull();
-    expect(unsafeDecodeJWTPayload).not.toHaveBeenCalled();
+    expect(decodeAccessTokenForDev(SECRET, 'dir')).toBeNull();
   });
 
-  it('returns null when the payload cannot be decoded', () => {
-    unsafeDecodeJWTPayload.mockReturnValue(null);
-    expect(decodeAccessTokenForDev('dir', 'token')).toBeNull();
+  it('returns null for a token that is not a JWT', () => {
+    expect(decodeAccessTokenForDev(SECRET, 'dir', 'not-a-token')).toBeNull();
   });
 
   it('extracts user info and marks a current token as valid', () => {
-    const exp = Math.floor(Date.now() / 1000) + 3600;
-    unsafeDecodeJWTPayload.mockReturnValue({ sub: 'user-1', username: 'joe', exp });
+    const exp = now() + 3600;
 
-    expect(decodeAccessTokenForDev('dir', 'token')).toEqual({
+    expect(decodeAccessTokenForDev(SECRET, 'dir', signDevJwt(SECRET, { sub: 'user-1', username: 'joe', exp }))).toEqual({
       userId: 'user-1',
       username: 'joe',
       exp,
@@ -40,26 +27,23 @@ describe('decodeAccessTokenForDev', () => {
     });
   });
 
-  it('marks an expired token as not valid', () => {
-    const exp = Math.floor(Date.now() / 1000) - 10;
-    unsafeDecodeJWTPayload.mockReturnValue({ sub: 'user-1', username: 'joe', exp });
+  it('marks an expired token as not valid, unless expiry is ignored', () => {
+    const token = signDevJwt(SECRET, { sub: 'user-1', username: 'joe', exp: now() - 10 });
 
-    expect(decodeAccessTokenForDev('dir', 'token')).toMatchObject({ wasValid: false });
+    expect(decodeAccessTokenForDev(SECRET, 'dir', token)).toMatchObject({ wasValid: false });
+    expect(decodeAccessTokenForDev(SECRET, 'dir', token, true)).toMatchObject({ wasValid: true });
   });
 
-  it('keeps an expired token valid when ignoreExpiration is true', () => {
-    const exp = Math.floor(Date.now() / 1000) - 10;
-    unsafeDecodeJWTPayload.mockReturnValue({ sub: 'user-1', username: 'joe', exp });
+  // Security regression: the claims are only believed when the signature is this directory's.
+  it('refuses a token signed with another secret, a tampered payload and an unsigned token', () => {
+    const exp = now() + 3600;
+    const token = signDevJwt(SECRET, { sub: 'user-1', username: 'joe', exp });
+    const [header, , signature] = token.split('.');
+    const tampered = `${header}.${Buffer.from(JSON.stringify({ sub: 'admin', username: 'admin', exp })).toString('base64url')}.${signature}`;
+    const unsigned = `${Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url')}.${token.split('.')[1]}.dev-signature`;
 
-    expect(decodeAccessTokenForDev('dir', 'token', true)).toMatchObject({ wasValid: true });
-  });
-
-  it('returns null when the decoder throws', () => {
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    unsafeDecodeJWTPayload.mockImplementation(() => {
-      throw new Error('boom');
-    });
-
-    expect(decodeAccessTokenForDev('dir', 'token')).toBeNull();
+    expect(decodeAccessTokenForDev('another-secret', 'dir', token)).toBeNull();
+    expect(decodeAccessTokenForDev(SECRET, 'dir', tampered)).toBeNull();
+    expect(decodeAccessTokenForDev(SECRET, 'dir', unsigned)).toBeNull();
   });
 });

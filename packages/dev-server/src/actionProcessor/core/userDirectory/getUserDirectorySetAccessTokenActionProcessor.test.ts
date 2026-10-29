@@ -4,6 +4,7 @@ import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamic
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
+import { signDevJwt } from '../../../logic/auth/devJwt';
 import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirectorySetAccessTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -11,12 +12,12 @@ const { userStore } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../../logic/auth/jsonUserStore', () => userStore);
+vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));
 
 const devServerConfig = buildTestDevServerConfig();
 const resolvedDirectory = { serviceName: 'test-module', directoryName: 'directory' };
 
-const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
-const buildJwt = (payload: object): string => `${base64UrlEncode({ alg: 'none' })}.${base64UrlEncode(payload)}.dev-signature`;
+const buildJwt = (payload: object): string => signDevJwt('test-secret', payload);
 
 const getProcessor = async () => {
   const processors = await getUserDirectorySetAccessTokenActionProcessor(devServerConfig)(
