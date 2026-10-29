@@ -5,7 +5,7 @@ import { SearchRequestedData } from './effects/session/SearchRequestedEvent';
 import { AdminSearchParams } from './types/AdminSearchParams';
 import { SessionSeededParams } from './types/SessionSeededParams';
 
-// The folded session — NEVER stored; always derived by folding the event log
+// The folded session, NEVER stored; always derived by folding the event log
 // (saved + pending) through adminSessionFoldReducer. Replaying the same log
 // reproduces this state exactly.
 export type AdminSessionState = EventDocDocument & {

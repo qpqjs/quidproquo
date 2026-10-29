@@ -20,6 +20,6 @@ export type LoadFederatedAddonsContext = {
   accessToken?: string;
 };
 
-// Provided by the host application via <App loadAddons={...} />. @qpqjs/web-admin
-// no longer owns the federation mechanism - it just asks for the addons.
+// Provided by the host application via <App loadAddons={...} />. The host owns the
+// federation mechanism; @qpqjs/web-admin just asks for the addons.
 export type LoadFederatedAddons = (context: LoadFederatedAddonsContext) => Promise<FederatedAddon[]>;

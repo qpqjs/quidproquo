@@ -13,7 +13,7 @@ const nextLocalEventId = (state: SessionLogState): number => {
 
 // Optimistic append with coalescing: while the previous event of the same
 // coalescable type is still pending, the new one replaces it (latest value
-// wins). The head is never coalesced while the flush has it in flight — the
+// wins). The head is never coalesced while the flush has it in flight, the
 // POSTed clientMessageId must stay matchable for the save ack.
 export const eventAppended = (state: SessionLogState, event: EventDocEvent): SessionLogState => {
   const last = state.pendingEvents[state.pendingEvents.length - 1];

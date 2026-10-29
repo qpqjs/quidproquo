@@ -27,7 +27,7 @@ export type VolatileState = {
   logLogResults: Record<string, VolatileLogLogResults>;
   realtimeErrorLogs: StoryResultMetadata[];
   serviceNames: string[];
-  // This admin instance's own deployed service name — needed to address the
+  // This admin instance's own deployed service name, needed to address the
   // EventDocAi log chat over the wire (qpq/serviceRequest/{logServiceName}/...).
   logServiceName: string;
 };

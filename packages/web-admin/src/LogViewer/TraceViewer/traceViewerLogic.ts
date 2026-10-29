@@ -15,7 +15,7 @@ export interface TraceLineAnnotation {
   returned?: string;
 }
 
-// Change detection compares the deepest capture available — previews can collide
+// Change detection compares the deepest capture available, previews can collide
 // (nested objects render as 'Object') where the json still differs.
 const valueIdentity = (value: QpqExecutionTraceValue | undefined): string | undefined =>
   value === undefined ? undefined : (value.json ?? value.preview);
@@ -68,7 +68,7 @@ export const formatLineAnnotation = (annotation: TraceLineAnnotation, maxEntries
 };
 
 // Bundle paths are huge (file:///tmp/qpq-federated-code/<container>/<hash>/<chunk>.js)
-// and share their prefix — trim the common directory prefix so the distinguishing tail
+// and share their prefix, trim the common directory prefix so the distinguishing tail
 // is what gets displayed. Single source: just the basename.
 export const getDisplaySourceNames = (paths: string[]): string[] => {
   if (paths.length === 0) {
@@ -90,7 +90,7 @@ export const getDisplaySourceNames = (paths: string[]): string[] => {
   return paths.map((path) => path.slice(cutAt) || path);
 };
 
-// One step whose captured values matched a search, with the locals that matched —
+// One step whose captured values matched a search, with the locals that matched;
 // RETURNS_MATCH_NAME stands in for a matching return value.
 export interface TraceValueMatch {
   stepIndex: number;
@@ -99,7 +99,7 @@ export interface TraceValueMatch {
 
 export const RETURNS_MATCH_NAME = '→ returns';
 
-// Case-insensitive substring search across every captured value of the given steps —
+// Case-insensitive substring search across every captured value of the given steps:
 // variable names, preview strings, and the deep json captures (values a preview clamps
 // or nests can still be found). stepIndexes ordered → matches come back ordered, so the
 // FIRST match is where a generated value first appears in the execution.
@@ -134,11 +134,11 @@ export const searchStepValues = (trace: QpqExecutionTrace, query: string, stepIn
 
 // "Your code" vs framework/dependency code, the same way devtools ignore-listing draws
 // the line: anything that resolved into node_modules is external. Unmapped generated
-// chunks (no node_modules in a file:///tmp/... url) stay visible — they mix user and
+// chunks (no node_modules in a file:///tmp/... url) stay visible, they mix user and
 // framework code and hiding them would hide user statements.
 export const isExternalSourcePath = (path: string): boolean => path.includes('node_modules');
 
-// The source most of the trace ran in — the sensible tab to open first.
+// The source most of the trace ran in, the sensible tab to open first.
 export const getDefaultSourceIndex = (trace: QpqExecutionTrace): number => {
   const stepCounts = new Map<number, number>();
   for (const step of trace.steps) {

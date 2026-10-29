@@ -1,5 +1,5 @@
 // Every user-intent event recorded in the admin session event doc. The session
-// state is a pure fold of these — replaying the doc reproduces the session.
+// state is a pure fold of these, replaying the doc reproduces the session.
 export enum AdminSessionEventType {
   sessionStarted = 'sessionStarted',
   tabChanged = 'tabChanged',

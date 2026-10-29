@@ -58,8 +58,8 @@ function* askFetchLogLogSearchPart(searchKey: string, search: AdminSearchParams,
   yield* askUIVolatileLogLogSearchPartLoaded(searchKey, logLogs);
 }
 
-// The Logs-tab search intent: recorded in the session doc, then fetched — one
-// part per resolved log level in parallel — into the volatile cache.
+// The Logs-tab search intent: recorded in the session doc, then fetched, one
+// part per resolved log level in parallel, into the volatile cache.
 export function* askRunLogLogSearch(): AskResponse<void> {
   const state = yield* askStateRead<AdminAppState>('');
   const search = selectSearchParams(state);

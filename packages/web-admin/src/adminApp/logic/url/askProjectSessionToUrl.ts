@@ -5,7 +5,7 @@ import { AdminAppState } from '../../AdminAppState';
 import { selectUrlProjection } from '../selectors/selectUrlProjection';
 
 // Pushes the session state's URL projection into the address bar (replaceState;
-// no history spam) — only params whose value actually changed are written.
+// no history spam), only params whose value actually changed are written.
 export function* askProjectSessionToUrl(): AskResponse<void> {
   const state = yield* askStateRead<AdminAppState>('');
   const projection = selectUrlProjection(state);

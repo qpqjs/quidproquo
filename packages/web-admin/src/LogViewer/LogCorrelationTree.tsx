@@ -31,7 +31,7 @@ const renderRectSvgNode = (setSelectedLogCorrelation: (logCorrelation: string) =
           : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
 
     // For story runtime types, collapse the runtimeType line away so the generic
-    // info takes its place — other runtime types keep their full label stack.
+    // info takes its place, other runtime types keep their full label stack.
     const isStoryRuntimeType =
       nodeDatum.runtimeType === QpqRuntimeType.EXECUTE_STORY || nodeDatum.runtimeType === QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY;
 

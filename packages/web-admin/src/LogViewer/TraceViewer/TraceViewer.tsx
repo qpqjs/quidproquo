@@ -32,7 +32,7 @@ interface TraceViewerProps {
   trace: QpqExecutionTrace;
 
   // "My code only" lives with the tab (not here) so Re-run Trace can send it to the
-  // tracer — a re-trace with it on never sets breakpoints outside the user's own code
+  // tracer, a re-trace with it on never sets breakpoints outside the user's own code
   hideExternalSteps: boolean;
   onHideExternalStepsChange: (hideExternalSteps: boolean) => void;
 
@@ -42,16 +42,16 @@ interface TraceViewerProps {
 }
 
 // Layout notes (deliberate, don't regress):
-// - the slider row contains ONLY the prev/slider/next controls — any text that changes
+// - the slider row contains ONLY the prev/slider/next controls, any text that changes
 //   width as you scrub (step counter, function names) lives in the rows above instead,
 //   so the slider never jumps under the pointer
-// - source paths are enormous (federated chunk files) — everything that shows one is
+// - source paths are enormous (federated chunk files), everything that shows one is
 //   width-bounded with tail-ellipsis (rtl trick keeps the distinguishing END visible)
 //   and carries the full path in a tooltip
 
 const monoFont = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 
-// Ellipsis that keeps the END of the text visible — for paths the tail is the part
+// Ellipsis that keeps the END of the text visible, for paths the tail is the part
 // that differs. (rtl only changes which side collapses; the string itself is ltr.)
 const tailEllipsisStyle: React.CSSProperties = {
   direction: 'rtl',
@@ -81,7 +81,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   const annotations = useMemo(() => buildLineAnnotations(trace, selectedSourceIndex), [trace, selectedSourceIndex]);
   const displaySourceNames = useMemo(() => getDisplaySourceNames(trace.sources.map((traceSource) => traceSource.path)), [trace.sources]);
 
-  // The scrubber walks these indexes into trace.steps — all of them, or only the steps
+  // The scrubber walks these indexes into trace.steps, all of them, or only the steps
   // that resolved into the user's own code when the "my code" filter is on.
   const visibleStepIndexes = useMemo(() => {
     const externalSourceIndexes = new Set(
@@ -93,7 +93,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   // Position of the selected step within the visible list (-1 while it's filtered out)
   const selectedPosition = visibleStepIndexes.indexOf(selectedStepIndex);
 
-  // Turning the filter on while parked on an external step — snap forward to the next
+  // Turning the filter on while parked on an external step, snap forward to the next
   // own-code step (or back to the last one)
   useEffect(() => {
     if (selectedPosition === -1 && visibleStepIndexes.length > 0) {
@@ -103,7 +103,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPosition, visibleStepIndexes]);
 
-  // Value search — which (visible) steps carry the query in a variable name, preview,
+  // Value search, which (visible) steps carry the query in a variable name, preview,
   // or deep json capture. Ordered, so the first match is where the value first appears.
   const matches = useMemo(() => searchStepValues(trace, searchQuery, visibleStepIndexes), [trace, searchQuery, visibleStepIndexes]);
   const matchStepIndexes = useMemo(() => matches.map((match) => match.stepIndex), [matches]);
@@ -122,7 +122,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
     }
   };
 
-  // Match marks on the scrubber — where the searched value lives across the run
+  // Match marks on the scrubber, where the searched value lives across the run
   const matchMarks = useMemo(() => {
     const positionByStepIndex = new Map(visibleStepIndexes.map((stepIndex, position) => [stepIndex, position]));
     return matches.flatMap((match) => {
@@ -140,7 +140,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   const source = trace.sources[selectedSourceIndex];
   const sourceLines = useMemo(() => (source?.content ? source.content.split('\n') : null), [source]);
 
-  // Scrubbing into a step from another source file follows the execution there — keyed
+  // Scrubbing into a step from another source file follows the execution there, keyed
   // on the step index only, so manual source selection isn't fought by the effect.
   useEffect(() => {
     if (selectedStep && selectedStep.sourceIndex !== selectedSourceIndex) {
@@ -157,7 +157,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%' }}>
-      {/* header row — source picker, stats, and the tab's actions (Re-run Trace) */}
+      {/* header row, source picker, stats, and the tab's actions (Re-run Trace) */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 1, minWidth: 0 }}>
         {trace.sources.length > 1 ? (
           <FormControl size="small" sx={{ flexShrink: 0, width: 280 }}>
@@ -216,7 +216,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
         {actions}
       </Box>
 
-      {/* search row — find where a value appears across the trace's variables; also the
+      {/* search row, find where a value appears across the trace's variables; also the
           step indicator's stable home (it changes width while scrubbing, so it must not
           share a row with the slider) */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 1, px: 1 }}>
@@ -258,7 +258,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
         />
       </Box>
 
-      {/* slider row — controls only, fixed geometry while scrubbing */}
+      {/* slider row, controls only, fixed geometry while scrubbing */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 2, px: 1 }}>
         <IconButton disabled={selectedPosition <= 0} onClick={() => setSelectedStepIndex(visibleStepIndexes[selectedPosition - 1])} size="small">
           ◀
@@ -283,7 +283,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
         </IconButton>
       </Box>
 
-      {/* main area — code on the left, Watch panel on the right */}
+      {/* main area, code on the left, Watch panel on the right */}
       <Box sx={{ display: 'flex', flex: 1, gap: 1, minHeight: 0 }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {!sourceLines && (
@@ -344,7 +344,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
           )}
         </Box>
 
-        {/* Watch — the selected step's locals, expandable */}
+        {/* Watch, the selected step's locals, expandable */}
         <Box
           sx={{
             border: '1px solid rgba(128, 128, 128, 0.3)',

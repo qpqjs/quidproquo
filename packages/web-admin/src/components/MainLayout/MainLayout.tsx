@@ -27,7 +27,7 @@ export function MainLayout() {
         sx={{
           flexGrow: 1,
           overflow: 'auto',
-          pb: '56px', // <— prevent content from being hidden behind bottom nav
+          pb: '56px', // keeps content clear of the bottom nav
         }}
       >
         {tabs

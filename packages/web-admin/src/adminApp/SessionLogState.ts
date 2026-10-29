@@ -1,6 +1,6 @@
 import { EventDocEvent } from '@qpqjs/features';
 
-// The session event log — the SOURCE OF TRUTH for session state. `events` are
+// The session event log, the SOURCE OF TRUTH for session state. `events` are
 // server-acked (immutable, server-stamped metadata); `pendingEvents` is the
 // optimistic dirty buffer the flush loop drains serially to the backend.
 export type SessionLogState = {

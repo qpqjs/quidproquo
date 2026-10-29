@@ -8,7 +8,7 @@ import { AdminAppState } from '../../AdminAppState';
 import { sessionFlushTiming } from '../../constants/sessionFlushTiming';
 import { askSessionApiAppendEvent } from './askSessionApiAppendEvent';
 
-// Drains pending session events to the backend STRICTLY SERIALLY — one POST at
+// Drains pending session events to the backend STRICTLY SERIALLY, one POST at
 // a time, head first. Serial order is what makes the server's latest-only
 // clientMessageId dedup safe, so this must never be parallelised. A failed
 // append retries the same head with the SAME clientMessageId (backoff grows

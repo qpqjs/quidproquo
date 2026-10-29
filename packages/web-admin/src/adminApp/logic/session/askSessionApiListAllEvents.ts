@@ -4,7 +4,7 @@ import { EventDocEvent } from '@qpqjs/features';
 import { adminSessionApiBasePath } from '../../constants/adminSessionApiBasePath';
 import { askSessionApiRequestOrThrow } from './askSessionApiRequestOrThrow';
 
-// GET /v1/admin/session/{id}/events — the full ordered log (paged).
+// GET /v1/admin/session/{id}/events, the full ordered log (paged).
 export function* askSessionApiListAllEvents(docId: string): AskResponse<EventDocEvent[]> {
   const events: EventDocEvent[] = [];
   let nextPageKey: string | undefined = undefined;

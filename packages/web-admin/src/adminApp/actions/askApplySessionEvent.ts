@@ -13,7 +13,7 @@ export const askApplySessionEventBase = createActionRequester<void>()({
   getPayload: (type: AdminSessionEventType, data: unknown): ApplySessionEventActionPayload => ({ type, data }),
 });
 
-// Pure: only yields the declarative ApplyEvent action — the registered
+// Pure: only yields the declarative ApplyEvent action, the registered
 // processor decides HOW (optimistic local append + background flush).
 export function* askApplySessionEvent<T>(type: AdminSessionEventType, data: T): AskResponse<void> {
   return yield* askApplySessionEventBase(type, data);

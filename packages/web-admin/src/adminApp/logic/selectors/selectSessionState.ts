@@ -5,7 +5,7 @@ import { foldAdminSessionLog } from '../../adminSessionFoldReducer';
 import { AdminSessionState } from '../../AdminSessionState';
 
 // The session state IS the fold of the log (acked + pending). Memoized on log
-// identity — the arrays are replaced immutably, so reference equality is exact.
+// identity, the arrays are replaced immutably, so reference equality is exact.
 let memoEvents: EventDocEvent[] | null = null;
 let memoPendingEvents: EventDocEvent[] | null = null;
 let memoSessionState: AdminSessionState | null = null;

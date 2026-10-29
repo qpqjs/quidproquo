@@ -48,7 +48,7 @@ type MaintenanceEditorProps = {
 type DialogMode = { kind: 'closed' } | { kind: 'add' } | { kind: 'edit'; update: MaintenanceUpdateEntry } | { kind: 'reopen' };
 
 // One maintenance: a read-only header card with the CURRENT folded state, and
-// the update feed it derives from. The UPDATE is the only mutation — adding one
+// the update feed it derives from. The UPDATE is the only mutation, adding one
 // (prefilled from the last, ETA blank against the running clock) moves the whole
 // status; editing/deleting entries re-derives, so deleting the newest rolls the
 // card back. Closing publishes; reopening demands a fresh update (level resets
@@ -148,7 +148,7 @@ export function MaintenanceEditor({ docId, onBack }: MaintenanceEditorProps) {
       {/* 70/30: the editor on the left, the what-users-see mock on the right. */}
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
         <Box sx={{ flex: '1 1 70%', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* The current folded state — read-only; it moves only via updates. */}
+          {/* The current folded state, read-only; it moves only via updates. */}
           <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }} variant="outlined">
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
               <EngineeringIcon color={isClosed ? 'disabled' : 'warning'} sx={{ fontSize: 40 }} />

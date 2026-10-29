@@ -18,7 +18,6 @@ export function AsyncButton({ onClick, children, disabled, type }: AsyncButtonPr
       await onClick(event);
     } catch (error) {
       console.error('Login error:', error);
-      // Handle error, show a message, etc.
     } finally {
       setLoading(false);
     }

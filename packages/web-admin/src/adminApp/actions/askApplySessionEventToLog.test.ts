@@ -8,7 +8,7 @@ import { SessionLogEffect } from '../effects/sessionLog/SessionLogEffect';
 import { askApplySessionEventToLog } from './askApplySessionEventToLog';
 
 describe('askApplySessionEventToLog', () => {
-  // The runtime invokes action processors with the action's PAYLOAD — this
+  // The runtime invokes action processors with the action's PAYLOAD, this
   // story must accept { type, data }, not the wrapping action.
   it('builds the event from the action payload and appends it to the session log', () => {
     const dispatched: { type: string; payload: EventDocEvent }[] = [];
