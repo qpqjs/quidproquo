@@ -1,14 +1,13 @@
 import {
   askKeyValueStoreUpsertManyBase,
-  buildTestQpqConfig,
   defineKeyValueStore,
   isErroredActionResult,
   KeyValueStoreActionType,
   kvsKey,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

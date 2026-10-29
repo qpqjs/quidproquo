@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, isErroredActionResult, StreamActionType } from '@qpqjs/core';
+import { isErroredActionResult, StreamActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

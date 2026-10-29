@@ -1,4 +1,5 @@
-import { ConfigActionType, ContextActionType, runStory } from '@qpqjs/core';
+import { ConfigActionType, ContextActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

@@ -1,7 +1,8 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { getBackendBundleOptions, getFrontendBundleOptions } from '../../qpqCoreUtils';
-import { buildTestQpqConfig } from '../../testing';
 import { QPQCoreConfigSettingType } from '../QPQConfig';
 import { defineBackendBundleOptions, defineFrontendBundleOptions } from './bundleOptions';
 

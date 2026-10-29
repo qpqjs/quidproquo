@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineBackendBundleOptions } from '@qpqjs/core';
+import { defineBackendBundleOptions } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 import { IgnorePlugin } from '@rspack/core';

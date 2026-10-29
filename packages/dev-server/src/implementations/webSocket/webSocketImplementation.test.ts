@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineWebsocket, QpqWebSocketEventProcessors } from '@qpqjs/webserver';
 
 import { request } from 'http';

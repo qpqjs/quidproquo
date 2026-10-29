@@ -1,6 +1,7 @@
+import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { ActionOf } from '../../types';
 import { askFileListAllDirectory, askFileListDirectory } from './askFileListDirectory';
 import { FileActionType, FileInfo } from './FileActionType';

@@ -12,11 +12,10 @@ import {
   KvsLogicalOperatorType,
   KvsQueryCondition,
   KvsQueryOperation,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
 import { KvsQueryOperationType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

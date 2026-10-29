@@ -2,14 +2,12 @@ import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   actionResult,
   askUserScriptListExports,
-  buildTestQpqConfig,
-  buildTestStorySession,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

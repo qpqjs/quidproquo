@@ -1,4 +1,5 @@
-import { askFileExists, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileExists, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

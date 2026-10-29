@@ -5,10 +5,10 @@ import {
   KeyValueStoreActionType,
   KvsQueryCondition,
   NetworkActionType,
-  runStory,
   StoryResult,
   SystemActionType,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

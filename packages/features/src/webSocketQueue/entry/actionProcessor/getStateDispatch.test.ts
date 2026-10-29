@@ -1,4 +1,5 @@
-import { ContextActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ContextActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';

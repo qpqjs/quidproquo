@@ -1,9 +1,10 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { SystemActionType } from '../actions';
 import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
-import { buildTestQpqConfig } from '../testing/configTesting';
-import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '../testing/runtimeTesting';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { AskResponse } from '../types/StorySession';
 import { getRun, getSystemExecuteStoryActionProcessor, qpqPromisify, QpqPromisifyActionError } from './getSystemExecuteStoryActionProcessor';

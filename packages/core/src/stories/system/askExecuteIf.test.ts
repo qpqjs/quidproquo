@@ -1,8 +1,9 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
-import { runStory } from '../../testing/storyTesting';
 import { askExecuteIf } from './askExecuteIf';
 
 describe('askExecuteIf', () => {

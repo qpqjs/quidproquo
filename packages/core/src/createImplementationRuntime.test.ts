@@ -1,7 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
-
-import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
-import { buildTestQpqConfig } from './testing/configTesting';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import {
   buildActionProcessorList,
   buildTestStorySession,
@@ -9,7 +6,11 @@ import {
   getTestTimeNow,
   noopDynamicModuleLoader,
   testRandomGuid,
-} from './testing/runtimeTesting';
+} from '@qpqjs/testing';
+
+import { describe, expect, it, vi } from 'vitest';
+
+import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
 import { AskResponse, QpqRuntimeType } from './types/StorySession';
 import { createImplementationRuntime, getProcessCustomImplementation } from './createImplementationRuntime';
 

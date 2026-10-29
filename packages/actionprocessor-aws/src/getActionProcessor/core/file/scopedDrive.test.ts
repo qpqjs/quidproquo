@@ -1,4 +1,5 @@
-import { askFileListDirectory, askFileWriteTextContents, buildTestQpqConfig, defineStorageDrive, FileActionType } from '@qpqjs/core';
+import { askFileListDirectory, askFileWriteTextContents, defineStorageDrive, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

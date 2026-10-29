@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineApi, defineDefaultRouteOptions, defineDns, defineRoute, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

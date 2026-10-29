@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askKeyValueStoreGetBase, buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { askKeyValueStoreGetBase, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

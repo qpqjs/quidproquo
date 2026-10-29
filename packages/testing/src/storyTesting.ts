@@ -1,9 +1,9 @@
-import { ContextActionType } from '../actions/context/ContextActionType';
-import { askThrowError } from '../actions/error/askThrowError';
-import { ErrorActionType } from '../actions/error/ErrorActionType';
-import { SystemActionType } from '../actions/system/SystemActionType';
-import { ActionOverrideMap, askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../stories/system/askOverrideActions';
-import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QPQError } from '../types';
+import { ContextActionType } from '@qpqjs/core';
+import { askThrowError } from '@qpqjs/core';
+import { ErrorActionType } from '@qpqjs/core';
+import { SystemActionType } from '@qpqjs/core';
+import { ActionOverrideMap, askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '@qpqjs/core';
+import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QPQError } from '@qpqjs/core';
 
 // ─── Story testing toolkit ─────────────────────────────────────────────────────
 //

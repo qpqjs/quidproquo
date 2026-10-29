@@ -1,4 +1,5 @@
-import { ConfigActionType, ContextActionType, EventBusActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { ConfigActionType, ContextActionType, EventBusActionType, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

@@ -1,12 +1,5 @@
-import {
-  Action,
-  ErrorTypeEnum,
-  FileActionType,
-  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
-  QPQ_LOGS_STORAGE_DRIVE_NAME,
-  runStory,
-  StoryError,
-} from '@qpqjs/core';
+import { Action, ErrorTypeEnum, FileActionType, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, QPQ_LOGS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

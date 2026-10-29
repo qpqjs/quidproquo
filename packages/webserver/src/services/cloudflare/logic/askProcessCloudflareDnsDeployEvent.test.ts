@@ -1,4 +1,5 @@
-import { ConfigActionType, LogActionType, NetworkActionType, runStory } from '@qpqjs/core';
+import { ConfigActionType, LogActionType, NetworkActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

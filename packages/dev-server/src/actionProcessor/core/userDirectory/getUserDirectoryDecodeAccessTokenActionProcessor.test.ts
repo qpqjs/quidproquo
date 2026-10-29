@@ -1,12 +1,5 @@
-import {
-  buildTestQpqConfig,
-  ErrorTypeEnum,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

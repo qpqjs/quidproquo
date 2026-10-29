@@ -1,7 +1,8 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { CryptoActionType } from '../../actions';
-import { runStory } from '../../testing';
 import { askCryptoSignJwt } from './askCryptoSignJwt';
 
 describe('askCryptoSignJwt', () => {

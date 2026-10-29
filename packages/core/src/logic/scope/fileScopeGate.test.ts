@@ -1,7 +1,8 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { defineStorageDrive } from '../../config';
-import { buildTestQpqConfig } from '../../testing';
 import { assertStorageDriveScopeRequirementOrThrow, composeStorageDriveFilePathOrThrow } from './fileScopeGate';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 

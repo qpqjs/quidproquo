@@ -2,9 +2,7 @@ import {
   askDateNow,
   askFileReadTextContents,
   askNewGuid,
-  buildTestQpqConfig,
   createRuntime,
-  createStubLogger,
   DateActionType,
   FileActionType,
   GuidActionType,
@@ -12,6 +10,7 @@ import {
   NetworkActionType,
   QpqRuntimeType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from '@qpqjs/core';
+import { DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

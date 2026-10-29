@@ -1,14 +1,5 @@
-import {
-  buildTestQpqConfig,
-  buildTestStorySession,
-  defineEventBus,
-  ErrorTypeEnum,
-  EventBusActionType,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { defineEventBus, ErrorTypeEnum, EventBusActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

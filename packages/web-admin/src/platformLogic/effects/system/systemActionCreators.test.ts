@@ -1,4 +1,5 @@
-import { captureRequester, DateActionType, GuidActionType, runStory, StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { DateActionType, GuidActionType, StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { captureRequester, runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

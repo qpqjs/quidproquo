@@ -1,4 +1,5 @@
-import { buildTestStorySession, resolveActionResult, SystemActionType } from '@qpqjs/core';
+import { resolveActionResult, SystemActionType } from '@qpqjs/core';
+import { buildTestStorySession } from '@qpqjs/testing';
 
 import { Context } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';

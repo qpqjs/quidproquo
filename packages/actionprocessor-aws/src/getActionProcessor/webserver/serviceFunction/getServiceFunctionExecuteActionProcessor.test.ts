@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';

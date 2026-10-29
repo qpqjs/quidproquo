@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineGlobal, defineSecret } from '@qpqjs/core';
+import { defineGlobal, defineSecret } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

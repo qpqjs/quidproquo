@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, defineQueue, defineUserDirectory, kvsKey, QPQConfig } from '@qpqjs/core';
+import { defineKeyValueStore, defineQueue, defineUserDirectory, kvsKey, QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineWebsocket } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

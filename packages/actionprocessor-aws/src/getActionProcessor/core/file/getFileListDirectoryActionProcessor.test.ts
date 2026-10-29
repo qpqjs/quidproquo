@@ -1,4 +1,5 @@
-import { askFileListDirectory, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileListDirectory, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

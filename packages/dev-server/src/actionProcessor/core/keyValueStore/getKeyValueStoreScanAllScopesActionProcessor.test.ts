@@ -1,12 +1,5 @@
-import {
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  isErroredActionResult,
-  KeyValueStoreActionType,
-  kvsKey,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-} from '@qpqjs/core';
+import { defineKeyValueStore, isErroredActionResult, KeyValueStoreActionType, kvsKey, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

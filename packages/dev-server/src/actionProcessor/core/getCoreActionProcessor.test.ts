@@ -1,17 +1,16 @@
 import {
-  buildTestQpqConfig,
   defineEventBus,
   defineKeyValueStore,
   defineQueue,
   EventBusActionType,
   KeyValueStoreActionType,
   LogActionType,
-  noopDynamicModuleLoader,
   PlatformActionType,
   QueueActionType,
   resolveActionResult,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

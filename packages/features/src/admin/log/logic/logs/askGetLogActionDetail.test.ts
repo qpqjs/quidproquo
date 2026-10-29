@@ -1,4 +1,5 @@
-import { ActionProcessorResult, FileActionType, runStory, StoryError } from '@qpqjs/core';
+import { ActionProcessorResult, FileActionType } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineWebEntry } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

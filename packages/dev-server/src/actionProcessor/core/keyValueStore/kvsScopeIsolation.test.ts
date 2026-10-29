@@ -1,14 +1,13 @@
 import {
-  buildTestQpqConfig,
   defineKeyValueStore,
   isErroredActionResult,
   KeyValueStoreActionType,
   KvsQueryOperationType,
   KvsUpdateActionType,
-  noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';

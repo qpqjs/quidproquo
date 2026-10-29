@@ -5,10 +5,10 @@ import {
   askCryptoSignJwt,
   askCryptoVerify,
   askCryptoVerifyJwt,
-  buildTestQpqConfig,
   CryptoActionType,
   defineSigningKey,
 } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { createPublicKey, verify } from 'crypto';
 import { existsSync } from 'fs';

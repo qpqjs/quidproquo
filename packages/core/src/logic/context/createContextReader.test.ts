@@ -1,8 +1,9 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { ContextActionType } from '../../actions/context';
 import { ContextReadAction } from '../../actions/context/askContextRead';
-import { runStory } from '../../testing';
 import { createContextIdentifier } from './createContextIdentifier';
 import { createContextReader } from './createContextReader';
 

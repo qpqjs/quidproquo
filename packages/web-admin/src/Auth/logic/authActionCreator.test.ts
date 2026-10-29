@@ -1,4 +1,5 @@
-import { AuthenticateUserResponse, captureRequester, StateActionType } from '@qpqjs/core';
+import { AuthenticateUserResponse, StateActionType } from '@qpqjs/core';
+import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

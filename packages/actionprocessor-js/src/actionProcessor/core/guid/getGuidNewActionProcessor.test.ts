@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, GuidActionType, resolveActionResult } from '@qpqjs/core';
+import { GuidActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

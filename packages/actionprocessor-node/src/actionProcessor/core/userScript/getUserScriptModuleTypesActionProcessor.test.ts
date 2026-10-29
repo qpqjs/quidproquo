@@ -1,14 +1,13 @@
 import {
   askUserScriptModuleTypes,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptModule,
   DynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
+import { defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

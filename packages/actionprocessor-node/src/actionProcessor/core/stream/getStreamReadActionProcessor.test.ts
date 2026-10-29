@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, resolveActionResult, StreamActionType } from '@qpqjs/core';
+import { resolveActionResult, StreamActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,5 @@
-import { askFileListDirectory, FileActionType, runStory, throwsError } from '@qpqjs/core';
+import { askFileListDirectory, FileActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

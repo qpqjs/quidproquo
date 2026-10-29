@@ -1,12 +1,5 @@
-import {
-  AuthenticateUserChallenge,
-  ContextActionType,
-  DateActionType,
-  GuidActionType,
-  NetworkActionType,
-  runStory,
-  StateActionType,
-} from '@qpqjs/core';
+import { AuthenticateUserChallenge, ContextActionType, DateActionType, GuidActionType, NetworkActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 

@@ -1,4 +1,5 @@
-import { askStorageScopeProvide, FileActionType, GuidActionType, runStory } from '@qpqjs/core';
+import { askStorageScopeProvide, FileActionType, GuidActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

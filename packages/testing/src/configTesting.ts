@@ -1,5 +1,4 @@
-import { defineApplicationModule } from '../config';
-import { QPQConfig, QPQConfigItem } from '../config';
+import { defineApplicationModule, QPQConfig, QPQConfigItem } from '@qpqjs/core';
 
 // ─── Config testing helper ───────────────────────────────────────────────────
 //

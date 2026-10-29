@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, MetricActionType, MetricUnit } from '@qpqjs/core';
+import { MetricActionType, MetricUnit } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

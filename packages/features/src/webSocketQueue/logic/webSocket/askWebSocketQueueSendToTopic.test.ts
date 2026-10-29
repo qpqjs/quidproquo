@@ -1,4 +1,5 @@
-import { KeyValueStoreActionType, runStory, throwsError } from '@qpqjs/core';
+import { KeyValueStoreActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { askWebsocketSendMessageBase, WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

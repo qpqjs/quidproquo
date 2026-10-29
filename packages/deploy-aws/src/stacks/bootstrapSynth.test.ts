@@ -1,5 +1,5 @@
 import { defineAwsGithubDeployRole, defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineEmailReceivingDomain } from '@qpqjs/webserver';
 
 import { App } from 'aws-cdk-lib';

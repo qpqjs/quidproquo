@@ -1,13 +1,5 @@
-import {
-  AiModel,
-  ConfigActionType,
-  ContextActionType,
-  FileActionType,
-  QueueEvent,
-  QueueMessage,
-  runStory,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { AiModel, ConfigActionType, ContextActionType, FileActionType, QueueEvent, QueueMessage, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

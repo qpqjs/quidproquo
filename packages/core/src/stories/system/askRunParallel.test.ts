@@ -1,3 +1,5 @@
+import { expectError, runStory, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { askDateNow } from '../../actions/date/askDateNow';
@@ -6,7 +8,6 @@ import { askNewGuid } from '../../actions/guid/askNewGuid';
 import { GuidActionType } from '../../actions/guid/GuidActionType';
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
-import { expectError, runStory, throwsError } from '../../testing/storyTesting';
 import { AskResponse, EitherActionResult } from '../../types';
 import { askCatch } from './askCatch';
 import { askRunParallel } from './askRunParallel';

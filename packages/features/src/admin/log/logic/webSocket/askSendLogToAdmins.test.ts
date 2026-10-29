@@ -1,4 +1,5 @@
-import { Action, KeyValueStoreActionType, runStory, StoryResultMetadata } from '@qpqjs/core';
+import { Action, KeyValueStoreActionType, StoryResultMetadata } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

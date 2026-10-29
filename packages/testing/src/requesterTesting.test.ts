@@ -1,6 +1,7 @@
+import { AskResponse } from '@qpqjs/core';
+
 import { describe, expect, it } from 'vitest';
 
-import { AskResponse } from '../types';
 import { captureRequester } from './requesterTesting';
 
 describe('captureRequester', () => {

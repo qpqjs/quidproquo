@@ -1,4 +1,5 @@
-import { ConfigActionType, runStory } from '@qpqjs/core';
+import { ConfigActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent, OpenApiActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

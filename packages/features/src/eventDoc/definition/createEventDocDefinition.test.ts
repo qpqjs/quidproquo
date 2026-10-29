@@ -1,4 +1,5 @@
-import { ActionMockMap, askReduceState, AskResponse, DateActionType, Effect, GuidActionType, QpqReducer, runStory } from '@qpqjs/core';
+import { askReduceState, AskResponse, DateActionType, Effect, GuidActionType, QpqReducer } from '@qpqjs/core';
+import { ActionMockMap, runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

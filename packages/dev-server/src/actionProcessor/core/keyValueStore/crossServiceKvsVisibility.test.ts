@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import * as os from 'os';

@@ -6,14 +6,13 @@ import {
   askFileListDirectory,
   askUserScriptBuild,
   askUserScriptListExports,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   FileActionType,
   resolveActionResult,
   resolveActionResultError,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import fs from 'fs';
 import os from 'os';

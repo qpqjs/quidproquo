@@ -1,4 +1,5 @@
-import { ActionProcessorListResolver, buildTestQpqConfig, EventActionType, QPQConfig, QPQError } from '@qpqjs/core';
+import { ActionProcessorListResolver, EventActionType, QPQConfig, QPQError } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 // Resolves a single event action processor from its resolver. Every event resolver in this
 // package returns `{ [EventActionType.X]: processor }`, so tests only ever want the one
@@ -6,9 +7,6 @@ import { ActionProcessorListResolver, buildTestQpqConfig, EventActionType, QPQCo
 // processor under test does not read anything specific out of it.
 // The constraint uses `any[]` because processor params are contravariant; `unknown[]`
 // would reject concretely-typed processors.
-/**
- *
- */
 export const resolveEventProcessor = async <Processor extends (...args: any[]) => Promise<[unknown, QPQError?]>>(
   resolver: ActionProcessorListResolver,
   actionType: EventActionType,

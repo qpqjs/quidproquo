@@ -1,6 +1,7 @@
+import { actionResult } from '@qpqjs/core';
+
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult } from '../logic/actionLogic';
 import {
   buildActionProcessorList,
   buildActionProcessorResolver,

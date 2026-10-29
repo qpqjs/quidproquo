@@ -1,6 +1,7 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { AskResponse } from '../../types';
 import { askNewGuid } from '../guid/askNewGuid';
 import { GuidActionType } from '../guid/GuidActionType';

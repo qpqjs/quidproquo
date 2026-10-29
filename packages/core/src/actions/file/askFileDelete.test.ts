@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askFileDelete } from './askFileDelete';
 import { FileActionType } from './FileActionType';
 

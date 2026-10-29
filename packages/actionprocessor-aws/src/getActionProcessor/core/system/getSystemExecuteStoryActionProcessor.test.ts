@@ -2,10 +2,7 @@ import {
   Action,
   ActionProcessor,
   actionResult,
-  buildTestQpqConfig,
-  buildTestStorySession,
   createStreamRegistry,
-  createStubLogger,
   DecodedAccessToken,
   ErrorTypeEnum,
   getDateNow,
@@ -13,6 +10,7 @@ import {
   StreamRegistry,
   SystemActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

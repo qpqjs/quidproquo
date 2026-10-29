@@ -1,4 +1,5 @@
-import { ConfigActionType, runStory, throwsError } from '@qpqjs/core';
+import { ConfigActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

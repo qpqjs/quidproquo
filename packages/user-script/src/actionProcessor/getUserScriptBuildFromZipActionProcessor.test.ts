@@ -5,9 +5,7 @@ import {
   askFileReadBinaryContents,
   askUserScriptBuildFromZip,
   askUserScriptListExports,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptModule,
   DynamicModuleLoader,
   FileActionType,
@@ -15,6 +13,7 @@ import {
   resolveActionResultError,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { zipSync } from 'fflate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

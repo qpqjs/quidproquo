@@ -1,12 +1,12 @@
 import {
   askSecureTokenGenerate,
-  buildTestQpqConfig,
   isErroredActionResult,
   resolveActionResult,
   resolveActionResultError,
   SECURE_TOKEN_MAX_BYTE_LENGTH,
   SecureTokenActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

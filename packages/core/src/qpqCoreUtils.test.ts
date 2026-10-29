@@ -1,3 +1,5 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -89,7 +91,6 @@ import {
   resolveCrossServiceResourceName,
   resolveGlobalValue,
 } from './qpqCoreUtils';
-import { buildTestQpqConfig } from './testing';
 
 describe('qpqCoreUtils', () => {
   describe('flattenQpqConfig', () => {

@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, buildTestStorySession, defineEventBus, ErrorTypeEnum, EventBusActionType } from '@qpqjs/core';
+import { defineEventBus, ErrorTypeEnum, EventBusActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

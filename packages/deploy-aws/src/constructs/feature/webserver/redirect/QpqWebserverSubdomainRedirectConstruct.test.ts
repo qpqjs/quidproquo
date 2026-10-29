@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo, defineWafProtection } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, QPQConfig } from '@qpqjs/core';
+import { QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineSubdomainRedirect, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';

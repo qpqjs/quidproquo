@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineStorageDrive, EventActionType, InvalidScopeError } from '@qpqjs/core';
+import { defineStorageDrive, EventActionType, InvalidScopeError } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';

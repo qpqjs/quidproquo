@@ -1,12 +1,5 @@
-import {
-  buildTestQpqConfig,
-  buildTestStorySession,
-  ErrorTypeEnum,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -5,10 +5,10 @@ import {
   DateActionType,
   GuidActionType,
   NetworkActionType,
-  runStory,
   StateActionType,
   StateDispatchAction,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

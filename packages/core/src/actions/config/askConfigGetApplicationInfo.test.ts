@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { askConfigGetApplicationInfo } from './askConfigGetApplicationInfo';
 import { ConfigActionType } from './ConfigActionType';

@@ -7,7 +7,6 @@ import * as core from './index';
 describe('@qpqjs/core entry point', () => {
   it('re-exports the core building blocks', () => {
     expect(typeof core.defineApplication).toBe('function');
-    expect(typeof core.runStory).toBe('function');
     expect(typeof core.askCatch).toBe('function');
     expect(typeof core.askNewGuid).toBe('function');
     expect(typeof core.isString).toBe('function');

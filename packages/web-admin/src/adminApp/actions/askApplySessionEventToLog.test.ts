@@ -1,5 +1,6 @@
-import { DateActionType, GuidActionType, runStory, StateActionType } from '@qpqjs/core';
+import { DateActionType, GuidActionType, StateActionType } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,17 +1,18 @@
+import { askConfigGetParameter } from '@qpqjs/core';
+import { ConfigActionType } from '@qpqjs/core';
+import { askDateNow } from '@qpqjs/core';
+import { DateActionType } from '@qpqjs/core';
+import { askNewGuid } from '@qpqjs/core';
+import { GuidActionType } from '@qpqjs/core';
+import { askRandomNumber } from '@qpqjs/core';
+import { MathActionType } from '@qpqjs/core';
+import { askCatch } from '@qpqjs/core';
+import { askRunParallel } from '@qpqjs/core';
+import { ActionOf } from '@qpqjs/core';
+import { AskResponse, EitherActionResult } from '@qpqjs/core';
+
 import { describe, expect, it, vi } from 'vitest';
 
-import { askConfigGetParameter } from '../actions/config/askConfigGetParameter';
-import { ConfigActionType } from '../actions/config/ConfigActionType';
-import { askDateNow } from '../actions/date/askDateNow';
-import { DateActionType } from '../actions/date/DateActionType';
-import { askNewGuid } from '../actions/guid/askNewGuid';
-import { GuidActionType } from '../actions/guid/GuidActionType';
-import { askRandomNumber } from '../actions/math/askRandomNumber';
-import { MathActionType } from '../actions/math/MathActionType';
-import { askCatch } from '../stories/system/askCatch';
-import { askRunParallel } from '../stories/system/askRunParallel';
-import { ActionOf } from '../types';
-import { AskResponse, EitherActionResult } from '../types';
 import { runStory, StoryError, throwsError } from './storyTesting';
 
 describe('runStory', () => {

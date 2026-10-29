@@ -1,5 +1,4 @@
 import {
-  ActionMockMap,
   askMapParallel,
   askReduceState,
   AskResponse,
@@ -11,8 +10,8 @@ import {
   Nullable,
   QpqPagedData,
   QpqReducer,
-  runStory,
 } from '@qpqjs/core';
+import { ActionMockMap, runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

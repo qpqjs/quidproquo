@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { askConfigSetParameter, buildTestQpqConfig, ConfigActionType, ErrorTypeEnum, noopDynamicModuleLoader } from '@qpqjs/core';
+import { askConfigSetParameter, ConfigActionType, ErrorTypeEnum } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

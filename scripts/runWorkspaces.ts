@@ -123,7 +123,9 @@ const buildTasks = (script: string, mode: 'all' | 'changed', useStages: boolean)
     const taskDirs = new Set(tasks.map((task) => task.dir));
     for (const task of tasks) {
       const pkg = pkgs.get(task.dir)!;
-      const declared = { ...pkg.dependencies, ...pkg.devDependencies, ...pkg.peerDependencies };
+      // devDependencies only serve tests, which no build compiles, so they are not build inputs;
+      // wiring them would also deadlock core (dev-depends on testing) against testing (depends on core).
+      const declared = { ...pkg.dependencies, ...pkg.peerDependencies };
       task.deps = Object.keys(declared)
         .map((name) => dirByName.get(name))
         .filter((depDir): depDir is string => depDir !== undefined && taskDirs.has(depDir));

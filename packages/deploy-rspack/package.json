@@ -60,10 +60,11 @@
     "react-refresh": "^0.18.0"
   },
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@rspack/core": "^2.1.2",
     "@types/node": "^22.13.13",
     "@types/path-browserify": "^1.0.3",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {

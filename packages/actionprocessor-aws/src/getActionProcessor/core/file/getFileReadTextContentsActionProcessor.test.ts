@@ -1,4 +1,5 @@
-import { askFileReadTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileReadTextContents, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

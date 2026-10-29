@@ -8,13 +8,13 @@ receive their results back. There are two complementary ways to test them.
 
 ## 1. Story-level tests with `runStory` (the default)
 
-`runStory` (from `@qpqjs/core`) runs a story to completion, answering every action it
+`runStory` (from `@qpqjs/testing`) runs a story to completion, answering every action it
 asks for from a mock map. It is built on `askOverrideActions`, so batches (`askRunParallel`),
 nested stories, and `askCatch` all work transparently. This is the pattern to reach for when a
 story composes several actions.
 
 ```ts
-import { runStory, throwsError, expectError } from '@qpqjs/core';
+import { runStory, throwsError, expectError } from '@qpqjs/testing';
 
 const result = runStory(askKeyValueStoreQueryAll('items', keyCondition), {
   // a literal value…

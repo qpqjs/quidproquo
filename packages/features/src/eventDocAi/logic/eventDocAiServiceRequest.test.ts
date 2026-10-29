@@ -7,10 +7,9 @@ import {
   InlineFunctionActionType,
   QueueEvent,
   QueueMessage,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

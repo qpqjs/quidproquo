@@ -1,4 +1,5 @@
-import { ContextActionType, ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { ContextActionType, ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

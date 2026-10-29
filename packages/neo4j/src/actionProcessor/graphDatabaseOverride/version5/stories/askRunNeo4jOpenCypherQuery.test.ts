@@ -1,13 +1,5 @@
-import {
-  ActionOf,
-  askNetworkRequestBase,
-  ConfigActionType,
-  ErrorTypeEnum,
-  GraphDatabaseInstanceType,
-  NetworkActionType,
-  runStory,
-  StoryError,
-} from '@qpqjs/core';
+import { ActionOf, askNetworkRequestBase, ConfigActionType, ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

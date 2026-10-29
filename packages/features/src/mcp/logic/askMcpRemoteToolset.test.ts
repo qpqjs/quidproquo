@@ -1,4 +1,5 @@
-import { Action, ConfigActionType, ErrorTypeEnum, LogActionType, runStory, StoryError, throwsError } from '@qpqjs/core';
+import { Action, ConfigActionType, ErrorTypeEnum, LogActionType } from '@qpqjs/core';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 import { HTTPEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

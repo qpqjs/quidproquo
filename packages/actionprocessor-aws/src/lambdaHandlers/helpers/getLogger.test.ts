@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
+import { LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

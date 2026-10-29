@@ -1,4 +1,5 @@
-import { Action, runStory, throwsError } from '@qpqjs/core';
+import { Action } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

@@ -1,9 +1,10 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askKeyValueStoreUpsertBase } from '../../actions/keyValueStore/askKeyValueStoreUpsert';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
-import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { askKeyValueStoreUpsertWithRetry } from './askKeyValueStoreUpsertWithRetry';
 
 const item = { id: '1', name: 'widget' };

@@ -1,6 +1,7 @@
+import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { askInlineFunctionExecute } from './askInlineFunctionExecute';
 import { InlineFunctionActionType } from './InlineFunctionActionType';

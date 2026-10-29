@@ -1,10 +1,11 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { ConfigActionType } from '../actions/config/ConfigActionType';
 import { EventActionType } from '../actions/event/EventActionType';
 import { LogActionType } from '../actions/log/LogActionType';
 import { SystemActionType } from '../actions/system/SystemActionType';
-import { runStory, StoryError, throwsError } from '../testing/storyTesting';
 import { askProcessEvent, askProcessEventWithGroupOrdering } from './askProcessEvent';
 
 describe('askProcessEvent', () => {

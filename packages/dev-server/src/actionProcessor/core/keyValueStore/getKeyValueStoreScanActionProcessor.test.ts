@@ -1,15 +1,14 @@
 import {
   askKeyValueStoreScanBase,
-  buildTestQpqConfig,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { Action, AskResponse, AskResponseReturnType } from '../types';
+import { Action, AskResponse, AskResponseReturnType } from '@qpqjs/core';
 
 // ─── Requester testing helper ───────────────────────────────────────────────────
 //

@@ -53,11 +53,12 @@
     "yauzl": "^3.4.0"
   },
   "devDependencies": {
+    "@qpqjs/actionprocessor-js": "0.3.0",
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@types/node": "^22.13.13",
     "@types/yauzl": "^3.4.0",
     "fflate": "^0.8.3",
-    "@qpqjs/actionprocessor-js": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },
   "engines": {

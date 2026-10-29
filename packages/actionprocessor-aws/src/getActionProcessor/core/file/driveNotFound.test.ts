@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

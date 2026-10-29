@@ -1,7 +1,8 @@
+import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
-import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '../testing/runtimeTesting';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { StorySession } from '../types/StorySession';
 import { processAction } from './processAction';

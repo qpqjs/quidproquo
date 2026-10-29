@@ -1,12 +1,5 @@
-import {
-  Action,
-  ConfigActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  LogActionType,
-  runStory,
-  storageScopeContext,
-} from '@qpqjs/core';
+import { Action, ConfigActionType, InlineFunctionActionType, KeyValueStoreActionType, LogActionType, storageScopeContext } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { EmailMessage } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

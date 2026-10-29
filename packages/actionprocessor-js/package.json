@@ -51,6 +51,7 @@
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },

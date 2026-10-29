@@ -1,4 +1,5 @@
-import { askNetworkRequestBase, buildTestQpqConfig, NetworkActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { askNetworkRequestBase, NetworkActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { NetworkRequestError, NetworkRequestErrorCode } from '@qpqjs/webserver';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';

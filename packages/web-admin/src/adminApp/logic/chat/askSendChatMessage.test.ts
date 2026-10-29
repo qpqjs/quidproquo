@@ -1,4 +1,5 @@
-import { ActionOf, runStory } from '@qpqjs/core';
+import { ActionOf } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

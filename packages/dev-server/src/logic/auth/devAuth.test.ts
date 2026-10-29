@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineUserDirectory } from '@qpqjs/core';
+import { defineUserDirectory } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

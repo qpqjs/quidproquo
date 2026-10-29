@@ -11,7 +11,6 @@ export * from './getKvsTableName';
 export * from './kvsJsonExtractExpression';
 export * from './kvsPageCursor';
 export * from './KvsRepository';
-export * from './kvsRepositoryContractTests';
 export * from './openKvsDatabase';
 export * from './quoteSqlIdentifier';
 export * from './scanAllScopesPageKey';

@@ -1,4 +1,5 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, runStory } from '@qpqjs/core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 

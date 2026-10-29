@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askConfigGetSecret, buildTestQpqConfig, ConfigActionType, defineSecret } from '@qpqjs/core';
+import { askConfigGetSecret, ConfigActionType, defineSecret } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

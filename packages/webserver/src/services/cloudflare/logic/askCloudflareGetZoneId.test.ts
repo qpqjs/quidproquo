@@ -1,4 +1,5 @@
-import { ErrorTypeEnum, NetworkActionType, runStory } from '@qpqjs/core';
+import { ErrorTypeEnum, NetworkActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

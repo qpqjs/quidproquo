@@ -1,4 +1,5 @@
-import { KeyValueStoreActionType, QpqIsoDateTime, runStory } from '@qpqjs/core';
+import { KeyValueStoreActionType, QpqIsoDateTime } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

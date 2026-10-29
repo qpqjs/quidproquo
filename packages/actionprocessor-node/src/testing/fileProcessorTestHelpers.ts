@@ -1,11 +1,5 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  buildTestQpqConfig,
-  defineStorageDrive,
-  DynamicModuleLoader,
-  FileActionType,
-} from '@qpqjs/core';
+import { ActionProcessorList, ActionProcessorListResolver, defineStorageDrive, DynamicModuleLoader, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
 

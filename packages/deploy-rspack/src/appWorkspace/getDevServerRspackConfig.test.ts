@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, USER_SCRIPT_MODULE_TYPES_QUERY } from '@qpqjs/core';
+import { USER_SCRIPT_MODULE_TYPES_QUERY } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import fs from 'fs';
 import os from 'os';

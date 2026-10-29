@@ -1,4 +1,5 @@
-import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { QueryParamsActionType } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';

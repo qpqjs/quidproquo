@@ -1,7 +1,8 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
-import { runStory } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { askMapParallelBatch } from './askMapParallelBatch';
 

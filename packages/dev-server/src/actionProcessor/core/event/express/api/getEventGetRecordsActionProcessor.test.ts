@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

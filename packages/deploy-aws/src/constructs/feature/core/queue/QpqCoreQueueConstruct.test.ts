@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineEventBus, defineQueue, QPQConfig, QueueQPQConfigSetting } from '@qpqjs/core';
+import { defineEventBus, defineQueue, QPQConfig, QueueQPQConfigSetting } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

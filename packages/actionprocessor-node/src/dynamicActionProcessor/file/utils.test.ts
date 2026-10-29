@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineStorageDrive } from '@qpqjs/core';
+import { defineStorageDrive } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';

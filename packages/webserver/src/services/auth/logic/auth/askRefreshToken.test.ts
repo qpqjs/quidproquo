@@ -1,4 +1,5 @@
-import { Action, AuthenticateUserResponse, ConfigActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { Action, AuthenticateUserResponse, ConfigActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

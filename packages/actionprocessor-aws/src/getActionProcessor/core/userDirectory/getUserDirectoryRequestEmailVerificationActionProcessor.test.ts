@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askUserDirectoryRequestEmailVerification, buildTestQpqConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { askUserDirectoryRequestEmailVerification, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

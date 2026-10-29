@@ -1,7 +1,8 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { CryptoActionType, DateActionType } from '../../actions';
-import { runStory } from '../../testing';
 import { base64UrlEncodeUtf8 } from '../../utils';
 import { askCryptoVerifyJwt } from './askCryptoVerifyJwt';
 

@@ -1,6 +1,7 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { runStory } from '../../testing/storyTesting';
 import { askCreateTextQpqBinaryData, TextFileType } from './askCreateBinaryData';
 
 describe('askCreateTextQpqBinaryData', () => {

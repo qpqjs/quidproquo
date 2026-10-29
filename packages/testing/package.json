@@ -54,6 +54,9 @@
     "url": "https://github.com/qpqjs/quidproquo/issues"
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
+  "dependencies": {
+    "@qpqjs/core": "0.3.0"
+  },
   "devDependencies": {
     "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2",

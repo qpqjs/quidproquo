@@ -6,8 +6,8 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
   QpqIsoDateTime,
-  runStory,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

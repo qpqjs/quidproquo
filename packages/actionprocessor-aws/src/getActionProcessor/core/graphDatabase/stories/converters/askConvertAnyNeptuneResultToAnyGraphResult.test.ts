@@ -1,4 +1,5 @@
-import { ErrorTypeEnum, GraphEntityType, runStory, StoryError } from '@qpqjs/core';
+import { ErrorTypeEnum, GraphEntityType } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
+import { defineKeyValueStore, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -6,7 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { runKvsRepositoryContractTests } from './kvsRepositoryContractTests';
+import { runKvsRepositoryContractTests } from './testing/kvsRepositoryContractTests';
 import { SqliteKvsRepository } from './SqliteKvsRepository';
 import { warnIfLegacyJsonKvsStores } from './warnIfLegacyJsonKvsStores';
 

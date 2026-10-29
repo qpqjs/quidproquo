@@ -1,11 +1,5 @@
-import {
-  AuthenticateUserChallenge,
-  buildTestQpqConfig,
-  defineUserDirectory,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { AuthenticateUserChallenge, defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

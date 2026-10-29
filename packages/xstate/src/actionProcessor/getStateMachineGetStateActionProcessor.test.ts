@@ -1,16 +1,5 @@
-import {
-  ActionProcessor,
-  actionResult,
-  actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStubLogger,
-  ErrorTypeEnum,
-  KeyValueStoreActionType,
-  noopDynamicModuleLoader,
-  QPQConfig,
-} from '@qpqjs/core';
+import { ActionProcessor, actionResult, actionResultError, ErrorTypeEnum, KeyValueStoreActionType, QPQConfig } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 import { createActor, createMachine } from 'xstate';

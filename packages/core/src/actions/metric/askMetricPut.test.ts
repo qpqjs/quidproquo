@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askMetricPut } from './askMetricPut';
 import { MetricActionType } from './MetricActionType';
 import { MetricUnit } from './MetricUnit';

@@ -1,6 +1,6 @@
-import { ActionProcessor, ActionProcessorList, ActionProcessorListResolver } from '../types/Action';
-import { QpqLogger } from '../types/QpqLogger';
-import { StorySession } from '../types/StorySession';
+import { ActionProcessor, ActionProcessorList, ActionProcessorListResolver } from '@qpqjs/core';
+import { QpqLogger } from '@qpqjs/core';
+import { StorySession } from '@qpqjs/core';
 
 // ─── Runtime testing toolkit ───────────────────────────────────────────────────
 //

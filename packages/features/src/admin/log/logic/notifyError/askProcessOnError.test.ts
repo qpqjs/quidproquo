@@ -1,4 +1,5 @@
-import { Action, DateActionType, KeyValueStoreActionType, LogLevelEnum, runStory } from '@qpqjs/core';
+import { Action, DateActionType, KeyValueStoreActionType, LogLevelEnum } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

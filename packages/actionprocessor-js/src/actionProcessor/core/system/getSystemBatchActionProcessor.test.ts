@@ -1,13 +1,5 @@
-import {
-  actionResult,
-  actionResultError,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStubLogger,
-  resolveActionResult,
-  resolveActionResultError,
-  SystemActionType,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, resolveActionResult, resolveActionResultError, SystemActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

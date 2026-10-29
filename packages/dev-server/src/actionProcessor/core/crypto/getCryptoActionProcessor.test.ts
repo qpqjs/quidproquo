@@ -1,5 +1,6 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
-import { ActionProcessor, askCryptoDecrypt, askCryptoEncrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { ActionProcessor, askCryptoDecrypt, askCryptoEncrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { existsSync } from 'fs';
 import { mkdtemp, rm } from 'fs/promises';

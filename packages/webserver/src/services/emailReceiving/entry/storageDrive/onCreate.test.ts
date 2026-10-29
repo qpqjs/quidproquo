@@ -1,4 +1,5 @@
-import { ConfigActionType, FileActionType, InlineFunctionActionType, runStory, StoryError, throwsError } from '@qpqjs/core';
+import { ConfigActionType, FileActionType, InlineFunctionActionType } from '@qpqjs/core';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

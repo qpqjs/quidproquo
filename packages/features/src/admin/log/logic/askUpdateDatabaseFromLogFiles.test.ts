@@ -8,10 +8,9 @@ import {
   LogActionType,
   LogLevelEnum,
   QpqRuntimeType,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

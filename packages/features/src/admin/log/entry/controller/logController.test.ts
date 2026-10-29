@@ -1,13 +1,5 @@
-import {
-  Action,
-  ConfigActionType,
-  ErrorTypeEnum,
-  FileActionType,
-  KeyValueStoreActionType,
-  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
-  runStory,
-  StoryError,
-} from '@qpqjs/core';
+import { Action, ConfigActionType, ErrorTypeEnum, FileActionType, KeyValueStoreActionType, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 import { HTTPEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

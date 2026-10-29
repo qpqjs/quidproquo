@@ -1,4 +1,5 @@
-import { Action, ErrorTypeEnum, InlineFunctionActionType, runStory, throwsError } from '@qpqjs/core';
+import { Action, ErrorTypeEnum, InlineFunctionActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

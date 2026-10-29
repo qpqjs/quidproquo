@@ -1,8 +1,9 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { StateActionType } from '../../actions/state';
 import { StateDispatchAction } from '../../actions/state/askStateDispatch';
-import { runStory } from '../../testing';
 import { askStateDispatchEffect } from './askStateDispatchEffect';
 import { Effect } from './Effect';
 

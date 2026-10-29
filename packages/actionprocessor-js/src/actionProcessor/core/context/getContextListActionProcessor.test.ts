@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, buildTestStorySession, ContextActionType, resolveActionResult } from '@qpqjs/core';
+import { ContextActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

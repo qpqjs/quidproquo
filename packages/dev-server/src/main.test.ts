@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineGlobal } from '@qpqjs/core';
+import { defineGlobal } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

@@ -1,4 +1,5 @@
-import { askStorageScopeProvide, ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { askStorageScopeProvide, ConfigActionType, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

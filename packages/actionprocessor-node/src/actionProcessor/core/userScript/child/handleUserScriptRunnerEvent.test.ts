@@ -1,7 +1,6 @@
 import {
   askUserScriptExecute,
   askUserScriptListExports,
-  buildTestQpqConfig,
   defineUserScriptModule,
   DynamicModuleLoader,
   FileActionType,
@@ -10,6 +9,7 @@ import {
   UserScriptRunnerRequest,
   UserScriptRunnerRequestKind,
 } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

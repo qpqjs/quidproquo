@@ -1,4 +1,5 @@
-import { ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { ConfigActionType, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';

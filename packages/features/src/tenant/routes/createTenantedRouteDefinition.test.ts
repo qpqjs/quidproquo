@@ -1,4 +1,5 @@
-import { AskResponse, ConfigActionType, ErrorTypeEnum, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { AskResponse, ConfigActionType, ErrorTypeEnum, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

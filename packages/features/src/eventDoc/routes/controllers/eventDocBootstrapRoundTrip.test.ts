@@ -12,10 +12,9 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

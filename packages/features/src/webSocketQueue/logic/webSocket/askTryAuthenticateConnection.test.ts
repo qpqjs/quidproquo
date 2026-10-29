@@ -1,12 +1,5 @@
-import {
-  ConfigActionType,
-  ContextActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  runStory,
-  throwsError,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { ConfigActionType, ContextActionType, InlineFunctionActionType, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

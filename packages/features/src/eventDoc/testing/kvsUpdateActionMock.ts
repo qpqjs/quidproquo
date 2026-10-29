@@ -8,8 +8,8 @@ import {
   KvsQueryOperationType,
   KvsUpdate,
   KvsUpdateActionType,
-  throwsError,
 } from '@qpqjs/core';
+import { throwsError } from '@qpqjs/testing';
 
 type Row = Record<string, unknown>;
 

@@ -1,4 +1,5 @@
-import { askFileReadObjectJsonBase, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileReadObjectJsonBase, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

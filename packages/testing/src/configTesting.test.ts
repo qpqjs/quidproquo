@@ -1,15 +1,11 @@
+import { QPQCoreConfigSettingType, qpqCoreUtils } from '@qpqjs/core';
+
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../config';
-import {
-  getApiBuildPath,
-  getApplicationModuleEnvironment,
-  getApplicationModuleFeature,
-  getApplicationModuleName,
-  getApplicationName,
-  getConfigRoot,
-} from '../qpqCoreUtils';
 import { buildTestQpqConfig } from './configTesting';
+
+const { getApiBuildPath, getApplicationModuleEnvironment, getApplicationModuleFeature, getApplicationModuleName, getApplicationName, getConfigRoot } =
+  qpqCoreUtils;
 
 describe('buildTestQpqConfig', () => {
   it('prepends a default application module so context selectors resolve', () => {

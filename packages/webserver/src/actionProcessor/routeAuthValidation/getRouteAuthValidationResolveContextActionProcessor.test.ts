@@ -1,11 +1,5 @@
-import {
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStreamRegistry,
-  createStubLogger,
-  noopDynamicModuleLoader,
-} from '@qpqjs/core';
+import { createStreamRegistry } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

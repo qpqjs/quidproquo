@@ -1,4 +1,5 @@
-import { Action, AskResponse, ErrorTypeEnum, runStory, StateActionType, throwsError } from '@qpqjs/core';
+import { Action, AskResponse, ErrorTypeEnum, StateActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

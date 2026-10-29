@@ -1,15 +1,14 @@
 import {
   actionResult,
   actionResultError,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   defineInlineFunction,
   ErrorTypeEnum,
   InlineFunctionActionType,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

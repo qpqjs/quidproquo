@@ -1,4 +1,5 @@
-import { GraphDatabaseActionType, GraphDatabaseExecuteOpenCypherQueryAction, GraphDatabaseInstanceType, runStory } from '@qpqjs/core';
+import { GraphDatabaseActionType, GraphDatabaseExecuteOpenCypherQueryAction, GraphDatabaseInstanceType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, DynamicFunctionsActionType, FileActionType, noopDynamicModuleLoader, UserScriptActionType } from '@qpqjs/core';
+import { DynamicFunctionsActionType, FileActionType, UserScriptActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

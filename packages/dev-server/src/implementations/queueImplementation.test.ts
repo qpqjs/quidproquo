@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineEventBus, defineQueue, EventBusActionType, QueueActionType } from '@qpqjs/core';
+import { defineEventBus, defineQueue, EventBusActionType, QueueActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

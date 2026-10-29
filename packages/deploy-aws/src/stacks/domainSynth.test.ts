@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, QPQConfig } from '@qpqjs/core';
+import { QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineApi, defineDns, defineWebEntry, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';

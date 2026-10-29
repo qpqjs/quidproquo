@@ -1,8 +1,9 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { runStory } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
 import { AskResponse } from '../../types';
 import { askArraySome } from './askArraySome';

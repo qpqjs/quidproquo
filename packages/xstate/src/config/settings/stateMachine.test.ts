@@ -1,10 +1,5 @@
-import {
-  ActionProcessorsQPQConfigSetting,
-  buildTestQpqConfig,
-  BundleEntriesQPQConfigSetting,
-  QPQCoreConfigSettingType,
-  qpqCoreUtils,
-} from '@qpqjs/core';
+import { ActionProcessorsQPQConfigSetting, BundleEntriesQPQConfigSetting, QPQCoreConfigSettingType, qpqCoreUtils } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

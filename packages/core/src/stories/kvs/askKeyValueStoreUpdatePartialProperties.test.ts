@@ -1,9 +1,10 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askKeyValueStoreUpdateBase } from '../../actions/keyValueStore/askKeyValueStoreUpdate';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
-import { runStory } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
 import { askKeyValueStoreUpdatePartialProperties } from './askKeyValueStoreUpdatePartialProperties';
 

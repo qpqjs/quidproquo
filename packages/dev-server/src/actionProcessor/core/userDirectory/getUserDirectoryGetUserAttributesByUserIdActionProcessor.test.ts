@@ -1,13 +1,12 @@
 import {
   askUserDirectoryGetUserAttributesByUserId,
-  buildTestQpqConfig,
   defineUserDirectory,
   isErroredActionResult,
-  noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

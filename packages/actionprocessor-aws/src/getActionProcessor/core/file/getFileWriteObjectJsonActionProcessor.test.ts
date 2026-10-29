@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

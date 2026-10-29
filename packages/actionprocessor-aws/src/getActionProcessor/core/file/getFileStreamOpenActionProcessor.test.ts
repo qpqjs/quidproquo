@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { Readable } from 'stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

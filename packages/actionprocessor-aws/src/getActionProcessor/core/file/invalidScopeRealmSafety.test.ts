@@ -1,4 +1,5 @@
-import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

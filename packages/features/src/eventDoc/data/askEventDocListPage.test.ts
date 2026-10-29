@@ -1,4 +1,5 @@
-import { KeyValueStoreActionType, KeyValueStoreQueryOptions, KvsQueryOperation, runStory } from '@qpqjs/core';
+import { KeyValueStoreActionType, KeyValueStoreQueryOptions, KvsQueryOperation } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

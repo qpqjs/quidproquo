@@ -6,8 +6,8 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   NetworkActionType,
-  runStory,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 

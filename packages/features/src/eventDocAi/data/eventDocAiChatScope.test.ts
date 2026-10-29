@@ -1,12 +1,5 @@
-import {
-  AskResponse,
-  askStorageScopeProvide,
-  ConfigActionType,
-  DateActionType,
-  FileActionType,
-  KeyValueStoreActionType,
-  runStory,
-} from '@qpqjs/core';
+import { AskResponse, askStorageScopeProvide, ConfigActionType, DateActionType, FileActionType, KeyValueStoreActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

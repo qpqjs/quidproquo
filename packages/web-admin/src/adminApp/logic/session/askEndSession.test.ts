@@ -1,4 +1,5 @@
-import { ActionOf, PlatformActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ActionOf, PlatformActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

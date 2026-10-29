@@ -2,12 +2,11 @@ import {
   askKeyValueStoreGetAllBase,
   askKeyValueStoreGetBase,
   askKeyValueStoreScanBase,
-  buildTestQpqConfig,
   defineKeyValueStore,
   KeyValueStoreActionType,
-  noopDynamicModuleLoader,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

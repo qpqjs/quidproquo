@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineCryptoKey } from '@qpqjs/core';
+import { defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

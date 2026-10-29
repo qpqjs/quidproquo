@@ -1,8 +1,9 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { KvsQueryOperationType, KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { defineKeyValueStore, kvsKey } from '../../config';
-import { buildTestQpqConfig } from '../../testing';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import {
   assertKvsScopeRequirementOrThrow,

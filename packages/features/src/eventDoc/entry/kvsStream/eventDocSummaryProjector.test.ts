@@ -1,5 +1,4 @@
 import {
-  ActionMockMap,
   ConfigActionType,
   DynamicFunctionsActionType,
   FileActionType,
@@ -10,8 +9,8 @@ import {
   KvsQueryOperationType,
   KvsStreamEventType,
   KvsStreamRecord,
-  runStory,
 } from '@qpqjs/core';
+import { ActionMockMap, runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

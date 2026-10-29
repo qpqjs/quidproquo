@@ -1,5 +1,6 @@
 import { getUserScriptModuleMap, loadUserScriptModule } from '@qpqjs/actionprocessor-node';
-import { FileActionType, runStory } from '@qpqjs/core';
+import { FileActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import fs from 'fs';
 import os from 'os';

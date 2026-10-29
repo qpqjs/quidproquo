@@ -8,8 +8,8 @@ import {
   kvsExists,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
-  runStory,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

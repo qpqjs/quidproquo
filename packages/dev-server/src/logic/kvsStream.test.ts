@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, kvsKey, KvsStreamEventType } from '@qpqjs/core';
+import { defineKeyValueStore, kvsKey, KvsStreamEventType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
