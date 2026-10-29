@@ -80,7 +80,7 @@ export class SqliteKvsRepository implements KvsRepository {
 
   private accessStore(keyValueStoreName: string): KvsStoreAccess {
     const storeConfig = resolveKvsStoreConfigOrThrow(this.qpqConfig, keyValueStoreName);
-    const tableName = getKvsTableName(this.qpqConfig, storeConfig, keyValueStoreName);
+    const tableName = getKvsTableName(keyValueStoreName, this.qpqConfig);
 
     if (!this.ensuredTables.has(tableName)) {
       ensureKvsTable(this.db, tableName, storeConfig);

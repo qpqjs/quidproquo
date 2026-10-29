@@ -75,8 +75,6 @@ const processQueueMessages = async (
 };
 
 const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage: AnyEventBusMessageWithSession) => {
-  const thisServiceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   const allEventBuses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => {
     const source = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, ebc.owner);
 
@@ -87,21 +85,12 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       ((!source.feature && !ebMessage.targetFeature) || source.feature === ebMessage.targetFeature)
     );
   });
-  // All the queues that we should publish to
+  // The queues this service owns (getOwnedQueueConfigs already keeps only those) that
+  // subscribe to the message's bus, where that bus is one of the matching ones above.
   const queues = qpqCoreUtils
     .getOwnedQueueConfigs(qpqConfig)
-    .filter((q) => {
-      return !!q.eventBusSubscriptions.find((ebsub) => {
-        return allEventBuses.some((eb) => ebsub === eb.name);
-      });
-    })
-    .filter(
-      (q) =>
-        // The target is this service
-        qpqCoreUtils.resolveOwnerModuleName(q.owner, qpqConfig) === thisServiceName &&
-        // And we are subed to the message that its trying to get to
-        q.eventBusSubscriptions.includes(ebMessage.eventBusName),
-    );
+    .filter((q) => q.eventBusSubscriptions.some((subscription) => allEventBuses.some((eb) => subscription === eb.name)))
+    .filter((q) => q.eventBusSubscriptions.includes(ebMessage.eventBusName));
 
   for (const queue of queues) {
     const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, queue.owner);
