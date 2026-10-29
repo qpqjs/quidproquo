@@ -1,11 +1,11 @@
-import { askContextRead, askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
+import { askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
 
 import { askLoadAuthToken } from '../config';
-import { baseUrlsContext } from '../contexts';
+import { askBaseUrlsRead } from '../context';
 import { askUIShowError, askUIStartLoading, askUIStopLoading } from '../effects';
 
 export function* askPlatformRequest<TResult, TPayload = unknown>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<TPayload>) {
-  const baseUrls = yield* askContextRead(baseUrlsContext);
+  const baseUrls = yield* askBaseUrlsRead();
 
   yield* askUIStartLoading();
 
