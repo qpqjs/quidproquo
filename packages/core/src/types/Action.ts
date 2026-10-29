@@ -53,8 +53,6 @@ export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
 // >
 export type ActionRequester<TAction extends Action<any>, TReturn = undefined, TQPQReturn = TReturn> = Generator<TAction, TReturn, TQPQReturn>;
 
-export type ActionProcessorReturnType<T extends Generator<any, any, any>> = ExtractGeneratorReturnType<T>;
-
 export type ActionProcessorList = {
   [key: string]: ActionProcessor<any, any>;
 };

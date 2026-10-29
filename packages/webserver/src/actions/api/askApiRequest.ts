@@ -14,11 +14,6 @@ export interface ApiRequestActionPayload<T> {
   responseType: ResponseType;
 }
 
-export interface ApiRequestAction<T> extends Action<ApiRequestActionPayload<T>> {
-  type: ApiActionType.Request;
-  payload: ApiRequestActionPayload<T>;
-}
-
 export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
   actionType: ApiActionType.Request,
   errorTypes: [

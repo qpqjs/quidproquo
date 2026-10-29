@@ -86,9 +86,6 @@ export type ExtractGeneratorReturnType<T extends Generator> = T extends Generato
 export type AskResponseReturnType<T extends AskResponse<any>> = ExtractGeneratorReturnType<T>;
 
 // Any generator function that returns an AskResponse
-// qpq runtimes are built on stories
-export type qpqStory = <T = any>(...args: any[]) => AskResponse<T>;
-
 export interface ActionHistory<P = any, R = any> {
   act: Action<P>;
   res: R;

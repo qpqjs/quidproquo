@@ -83,7 +83,7 @@ export const filterOwnCodeLocations = <TLocation extends { lineNumber: number; c
 };
 
 // Derives own-code markers from a service's absolute source root (QpqFunctionRuntimeAdvanced.basePath,
-// or getApplicationConfigRoot(qpqConfig) for the relative-string runtime form). Bundlers emit
+// or getConfigRoot(qpqConfig) for the relative-string runtime form). Bundlers emit
 // source-map `source` entries as either real filesystem paths or webpack://<namespace>/./<path
 // relative to the build context> pseudo urls — both preserve the original directory names
 // verbatim, so matching on the root's own trailing segments works for either form without

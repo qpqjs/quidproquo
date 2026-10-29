@@ -17,7 +17,7 @@ export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConf
 
   const [srcPath] = qpqFunctionRuntime.split('::');
 
-  const configRoot = qpqCoreUtils.getApplicationConfigRoot(qpqConfig);
+  const configRoot = qpqCoreUtils.getConfigRoot(qpqConfig);
 
   return path.join(configRoot, srcPath);
 };

@@ -64,7 +64,7 @@ export class StoryError extends Error {
 
 // Turns a friendly mock map into the ActionOverrideMap askOverrideActions consumes. Each
 // handler shapes its value for returnErrors and translates `throwsError` sentinels.
-export const mockActions = (mocks: ActionMockMap): ActionOverrideMap =>
+const mockActions = (mocks: ActionMockMap): ActionOverrideMap =>
   Object.fromEntries(
     Object.entries(mocks).map(([actionType, mock]) => [
       actionType,
@@ -129,15 +129,6 @@ const drive = <R>(story: AskResponse<R>): R => {
 // story error (askThrowError) surfaces as a thrown StoryError.
 export function runStory<T extends AskResponse<any>>(story: T, mocks: ActionMockMap = {}): AskResponseReturnType<T> {
   return drive(askOverrideActions(story, mockActions(mocks))) as AskResponseReturnType<T>;
-}
-
-// Narrows a captured EitherActionResult (e.g. from askCatch) to its value, failing the
-// test loudly if it was actually an error.
-export function expectSuccess<T>(result: EitherActionResult<T>): T {
-  if (!result.success) {
-    throw new Error(`Expected a successful result but got error: ${JSON.stringify(result.error)}`);
-  }
-  return result.result;
 }
 
 // Narrows a captured EitherActionResult to its error, failing the test loudly if it

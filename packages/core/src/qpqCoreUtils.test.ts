@@ -41,7 +41,6 @@ import {
   getAllSrcEntries,
   getAllUserScriptModules,
   getApiBuildPath,
-  getApplicationConfigRoot,
   getApplicationConfigSetting,
   getApplicationModuleEnvironment,
   getApplicationModuleFeature,
@@ -174,7 +173,6 @@ describe('qpqCoreUtils', () => {
 
       expect(getApplicationName(config)).toBe('my-app');
       expect(getApplicationModuleName(config)).toBe('my-module');
-      expect(getApplicationConfigRoot(config)).toBe('/root');
       expect(getConfigRoot(config)).toBe('/root');
       expect(getApplicationModuleFeature(config)).toBe('beta');
       expect(getApplicationConfigSetting(config).applicationName).toBe('my-app');

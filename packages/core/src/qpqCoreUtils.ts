@@ -175,16 +175,6 @@ export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
   return moduleSetting.moduleName;
 };
 
-export const getApplicationConfigRoot = (qpqConfig: QPQConfig): string => {
-  const moduleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
-
-  if (!moduleSetting) {
-    throw new Error('please use defineApplication in your QPQ config');
-  }
-
-  return moduleSetting.configRoot;
-};
-
 export const getApplicationName = (qpqConfig: QPQConfig): string => {
   return getApplicationConfigSetting(qpqConfig).applicationName;
 };
@@ -417,11 +407,6 @@ export const getAllDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQP
   return getConfigSettings<DynamicFunctionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.dynamicFunctions);
 };
 
-export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
-  return getOwnedItems(getAllDynamicFunctions(qpqConfig), qpqConfig);
-};
-
-// The modules this service lets user scripts import (defineUserScriptModule).
 export const getAllUserScriptModules = (qpqConfig: QPQConfig): UserScriptModuleQPQConfigSetting[] => {
   return getConfigSettings<UserScriptModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptModule);
 };
@@ -654,14 +639,8 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
-export const getQueueConfigSettingByName = (name: string, qpqConfig: QPQConfig): QueueQPQConfigSetting | undefined => {
-  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
-
-  return queueConfigs.find((c) => c.name === name);
-};
-
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-  return getQueueConfigSettingByName(name, qpqConfig)?.qpqQueueProcessors || {};
+  return getQueueByName(qpqConfig, name)?.qpqQueueProcessors || {};
 };
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {

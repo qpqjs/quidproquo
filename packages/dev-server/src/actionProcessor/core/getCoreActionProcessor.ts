@@ -26,9 +26,7 @@ const resolveDevServerOwnCodeMarkers = (qpqFunctionRuntimeInfo: QpqFunctionRunti
   }
 
   try {
-    const root = isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo)
-      ? qpqFunctionRuntimeInfo.basePath
-      : qpqCoreUtils.getApplicationConfigRoot(qpqConfig);
+    const root = isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.basePath : qpqCoreUtils.getConfigRoot(qpqConfig);
 
     return root ? getOwnCodeMarkersFromRoot(root) : undefined;
   } catch {
