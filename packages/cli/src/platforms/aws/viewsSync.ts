@@ -1,9 +1,9 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 // Views upload to S3. Every service's views go to its prefix in the shared
 // 'views' bucket (owned by shell). A service can also be a standalone host on
 // its own domain: each of its web entries marked `storageDrive.syncServiceViews`
 // gets the bundle at its drive's root. shell is the root website, which predates
 // that flag, so it keeps its 'website' bucket root when it declares none.
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import fs from 'fs';

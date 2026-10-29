@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { VirtualNetworkQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_ec2, aws_logs } from 'aws-cdk-lib';

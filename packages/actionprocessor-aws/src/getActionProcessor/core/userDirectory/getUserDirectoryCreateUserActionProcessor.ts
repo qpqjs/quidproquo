@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -10,7 +10,6 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { createUser } from '../../../logic/cognito/createUser';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
@@ -19,9 +18,12 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUser
   return async (payload) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(
+      awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
+      region,
+    );
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, payload.createUserRequest.email);
     if (resolvedUsername !== payload.createUserRequest.email) {

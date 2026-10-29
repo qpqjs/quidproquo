@@ -1,4 +1,4 @@
-import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
+import { awsNamingUtils, getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import {
   filterLogHistoryByActionTypes,
   LogActionType,
@@ -13,7 +13,6 @@ import fs from 'fs';
 import path from 'path';
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
-import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 import { LOG_EXTENSION_PORT } from '../../lambdaExtensions/logExtensionPort';
 
 // Where the old fs-buffered logger parked results. Nothing writes here today, but
@@ -74,7 +73,7 @@ const resolveLogTarget = (qpqConfig: QPQConfig): { bucketName: string; regionFor
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-  const bucketName = getConfigRuntimeResourceName(QPQ_LOGS_STORAGE_DRIVE_NAME, application, service, environment, feature);
+  const bucketName = awsNamingUtils.getConfigRuntimeResourceName(QPQ_LOGS_STORAGE_DRIVE_NAME, application, service, environment, feature);
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;
 
   return { bucketName, regionForBucket };

@@ -1,4 +1,5 @@
-import { awsNamingUtils, getLogExtensionLayerPath } from '@qpqjs/actionprocessor-aws';
+import { getLogExtensionLayerPath } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { ApiLayer, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 

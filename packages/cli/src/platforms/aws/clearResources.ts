@@ -8,8 +8,7 @@
 // Runtime names are resolved from each service's live qpq config with the
 // same naming utils the deployed runtime uses, so what gets emptied is
 // exactly what the app reads and writes.
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import {

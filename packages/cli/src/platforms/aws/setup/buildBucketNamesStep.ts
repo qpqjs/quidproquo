@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 

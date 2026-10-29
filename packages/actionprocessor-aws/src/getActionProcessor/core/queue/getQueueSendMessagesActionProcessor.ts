@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -14,7 +14,6 @@ import {
   toCrossServiceSession,
 } from '@qpqjs/core';
 
-import { getQueueRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 import { sendMessages, SqsQueueMessageEntry } from '../../../logic/sqs/sendMessages';
 
 // TODO: @joe-coady: Unify this once the lambda code moves from CDK to awslambda
@@ -24,7 +23,7 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueueSendMessagesBase> => {
   return async ({ queueName, queueMessages }, session) => {
-    const sqsQueueName = getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
+    const sqsQueueName = awsNamingUtils.getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
     const isFifo = qpqCoreUtils.getQueueByName(queueName, qpqConfig)?.isFifo || false;
 
     // Each entry carries the caller's session so the consuming service resumes

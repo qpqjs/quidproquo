@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -13,7 +13,6 @@ import {
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { respondToAuthChallenge } from '../../../logic/cognito/respondToAuthChallenge';
 import { verifySoftwareToken } from '../../../logic/cognito/verifySoftwareToken';
@@ -68,9 +67,9 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): ProcessorFor<ty
   return async ({ userDirectoryName, authChallenge }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
     // MFA_SETUP must verify the TOTP code first; Cognito returns a fresh session
     // that is then used to complete the challenge and issue tokens.

@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { EventBusQuickSubscriptionType, getAwsAccountIds, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, EventBusQuickSubscriptionType, getAwsAccountIds, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';

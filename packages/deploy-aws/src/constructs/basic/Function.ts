@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
+import { awsNamingUtils, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 

@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -12,7 +12,6 @@ import {
   resolveKvsStoreConfigOrThrow,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
 import { decomposeScopedKvsValue, stripScopedKvsIndexAttributes } from '../../../logic/dynamo/scope';
 
@@ -40,7 +39,7 @@ const toKvsScopedItem = (storeConfig: KeyValueStoreQPQConfigSetting, item: Recor
 // items indistinguishable from a scoped read, plus the scope beside them.
 const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreScanAllScopesBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {

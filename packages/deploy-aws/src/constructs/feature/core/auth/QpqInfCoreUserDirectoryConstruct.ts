@@ -1,5 +1,10 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import {
+  AwsDataStoreRemovalPolicy,
+  awsNamingUtils,
+  getLocalServiceAccountInfo,
+  qpqConfigAwsUtils,
+  resolveAwsServiceAccountInfo,
+} from '@qpqjs/config-aws';
 import {
   CrossModuleOwner,
   QPQConfig,

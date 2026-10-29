@@ -1,8 +1,7 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { askWebEntryInvalidateCache } from '@qpqjs/webserver';
 
-import { getCFExportNameDistributionIdArnFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { invalidateCache } from '../../../logic/cloudFront/invalidateCache';
 
@@ -10,7 +9,7 @@ const getProcessInvalidateCache = (qpqConfig: QPQConfig): ProcessorFor<typeof as
   return async ({ paths, webEntryName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const distributionId = await getExportedValue(getCFExportNameDistributionIdArnFromConfig(webEntryName, qpqConfig), region);
+    const distributionId = await getExportedValue(awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(webEntryName, qpqConfig), region);
 
     await invalidateCache(distributionId, region, paths);
 

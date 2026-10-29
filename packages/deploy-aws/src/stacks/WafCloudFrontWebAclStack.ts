@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm, aws_wafv2, Stack } from 'aws-cdk-lib';

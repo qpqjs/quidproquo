@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { DomainProxyQPQWebServerConfigSetting, DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
 import { DomainProxyViewerProtocolPolicy } from '@qpqjs/webserver';

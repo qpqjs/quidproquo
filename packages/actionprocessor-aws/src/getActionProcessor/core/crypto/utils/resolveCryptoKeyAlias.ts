@@ -1,6 +1,5 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 
 // Returns the deterministic KMS alias for a configured crypto key (the same
 // name the CDK construct derives), or null when no defineCryptoKey matches so
@@ -12,7 +11,7 @@ export const resolveCryptoKeyAlias = (cryptoKeyName: string, qpqConfig: QPQConfi
     return null;
   }
 
-  const resolvedName = resolveOwnedResourceName(cryptoKeyName, qpqConfig, cryptoKeyConfig.owner);
+  const resolvedName = awsNamingUtils.resolveOwnedResourceName(cryptoKeyName, qpqConfig, cryptoKeyConfig.owner);
 
   return `alias/${resolvedName}`;
 };

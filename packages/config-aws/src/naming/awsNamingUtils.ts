@@ -1,4 +1,3 @@
-import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   CrossModuleOwner,
   getScopedKvsIndexPartitionKeys,
@@ -11,7 +10,9 @@ import {
 } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { getScopedKvsIndexAttributeName } from './logic/dynamo/scope/scopedKvsIndexAttribute';
+import { qpqConfigAwsUtils } from '../qpqConfigAwsUtils';
+import { getAwsServiceAccountInfoByDeploymentInfo } from '../utils/configUtils';
+import { getScopedKvsIndexAttributeName } from './getScopedKvsIndexAttributeName';
 
 type AwsDeploymentContext = {
   application: string;

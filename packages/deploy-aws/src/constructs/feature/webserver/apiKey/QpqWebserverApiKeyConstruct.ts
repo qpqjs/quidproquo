@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { ApiKeyQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';

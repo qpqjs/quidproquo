@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   ActionProcessorList,
   ActionProcessorResult,
@@ -25,7 +25,6 @@ import {
 
 import { randomUUID } from 'crypto';
 
-import { getConfigRuntimeResourceNameFromConfig } from '../../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../../logic/lambda/executeLambdaByName';
 import { UserScriptRunnerErrorCatalog } from './UserScriptRunnerErrorCatalog';
 import { UserScriptRunnerSource } from './UserScriptRunnerSource';
@@ -111,7 +110,7 @@ export const requestUserScriptRunner = async <R>(input: RequestUserScriptRunnerI
     );
   }
 
-  const functionName = getConfigRuntimeResourceNameFromConfig(USER_SCRIPT_RUNNER_FUNCTION_NAME, qpqConfig);
+  const functionName = awsNamingUtils.getConfigRuntimeResourceNameFromConfig(USER_SCRIPT_RUNNER_FUNCTION_NAME, qpqConfig);
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
   let result: UserScriptRunnerResult | undefined;

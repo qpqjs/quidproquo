@@ -1,3 +1,4 @@
+import { getScopedKvsIndexAttributeName } from '@qpqjs/config-aws';
 import { KVS_RESERVED_MARKER, KvsCoreDataType } from '@qpqjs/core';
 
 import { KVS_SCOPE_DELIMITER } from './scopedKvsValue';
@@ -8,8 +9,8 @@ import { KVS_SCOPE_DELIMITER } from './scopedKvsValue';
 // callers can't use in attribute names on a scoped store, so they can't be
 // written or forged from caller data.
 
-/** The hidden attribute a scoped store's GSI on `attributeName` is keyed on, e.g. `@@QPQGSI_customerId@@`. */
-export const getScopedKvsIndexAttributeName = (attributeName: string): string => `${KVS_RESERVED_MARKER}GSI_${attributeName}@@`;
+// The attribute name itself is the naming module's (deploy keys the index on it too).
+export { getScopedKvsIndexAttributeName };
 
 /**
  * The hidden attribute's value: `${scope}${KVS_SCOPE_DELIMITER}${value}`, always a string. A GSI partition

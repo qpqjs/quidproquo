@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
 
 export const getAccountStackName = awsNamingUtils.getAccountStackName;

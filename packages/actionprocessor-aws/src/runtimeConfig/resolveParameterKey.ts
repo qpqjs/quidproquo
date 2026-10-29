@@ -1,6 +1,5 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { resolveOwnedResourceName } from '../awsNamingUtils';
 
 /**
  * Resolves a parameter name to its deployed SSM parameter key, honouring
@@ -10,5 +9,5 @@ import { resolveOwnedResourceName } from '../awsNamingUtils';
 export const resolveParameterKey = (parameterName: string, qpqConfig: QPQConfig) => {
   const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
-  return resolveOwnedResourceName(parameterName, qpqConfig, parameterConfig.owner);
+  return awsNamingUtils.resolveOwnedResourceName(parameterName, qpqConfig, parameterConfig.owner);
 };

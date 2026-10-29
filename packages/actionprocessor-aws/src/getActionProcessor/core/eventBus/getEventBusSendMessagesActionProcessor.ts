@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -14,7 +14,6 @@ import {
   toCrossServiceSession,
 } from '@qpqjs/core';
 
-import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';
 
 // TODO: @joe-coady: Unify this once the lambda code moves from CDK to awslambda
@@ -32,7 +31,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus ${eventBusName} not found`);
     }
 
-    const topicArn = getEventBusSnsTopicArn(
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
       eventBusConfig.owner?.resourceNameOverride || eventBusName,
       qpqConfig,
 

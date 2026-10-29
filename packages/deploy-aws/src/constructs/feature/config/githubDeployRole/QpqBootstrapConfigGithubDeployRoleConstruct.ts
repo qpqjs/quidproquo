@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsGithubDeployRoleQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsGithubDeployRoleQPQConfigSetting, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, CfnOutput, DefaultStackSynthesizer, Duration } from 'aws-cdk-lib';

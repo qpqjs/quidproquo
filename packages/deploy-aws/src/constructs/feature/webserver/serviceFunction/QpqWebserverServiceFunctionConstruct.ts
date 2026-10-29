@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { ServiceFunctionQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { aws_ec2, aws_lambda } from 'aws-cdk-lib';

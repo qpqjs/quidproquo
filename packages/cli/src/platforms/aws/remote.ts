@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 // Build a backend service as a module-federation remote and publish it into the
 // shared federated-code storage drive, under the service's own prefix. After this
 // runs, the already-deployed lambdas load their stories from the bucket (quidproquo's
@@ -17,7 +18,6 @@
 //   deployRemoteManifest - upload manifest.json, atomically flipping lambdas over
 // Version files always land before the manifest that references them, so a reading
 // lambda never sees a manifest whose files aren't all present yet.
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from '@qpqjs/deploy-rspack';
 

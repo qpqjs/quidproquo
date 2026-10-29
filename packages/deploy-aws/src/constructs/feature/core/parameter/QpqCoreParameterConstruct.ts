@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { awsNamingUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm } from 'aws-cdk-lib';

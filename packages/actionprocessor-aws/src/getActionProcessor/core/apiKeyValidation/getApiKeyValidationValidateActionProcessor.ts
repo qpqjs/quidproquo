@@ -1,10 +1,9 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { actionResult, createActionProcessor, Nullable, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { ApiKeyReference, askApiKeyValidationValidate } from '@qpqjs/webserver';
 
 import { timingSafeEqual } from 'crypto';
 
-import { getCFExportNameApiKeyIdFromConfig } from '../../../awsNamingUtils';
 import { getApiKeyValue } from '../../../logic/apiGateway/getApiKeyValue';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
@@ -31,7 +30,12 @@ const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ProcessorFor<
     const fetchRealApiKeyValue = async (apiKeyReference: ApiKeyReference): Promise<Nullable<string>> => {
       try {
         const apiKeyId = await getExportedValue(
-          getCFExportNameApiKeyIdFromConfig(apiKeyReference.name, qpqConfig, apiKeyReference.serviceName, apiKeyReference.applicationName),
+          awsNamingUtils.getCFExportNameApiKeyIdFromConfig(
+            apiKeyReference.name,
+            qpqConfig,
+            apiKeyReference.serviceName,
+            apiKeyReference.applicationName,
+          ),
           region,
         );
 

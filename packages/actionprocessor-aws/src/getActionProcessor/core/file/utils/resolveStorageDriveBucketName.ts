@@ -1,6 +1,6 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 import { StorageDriveNotFoundError } from './StorageDriveNotFoundError';
 
 /**
@@ -15,5 +15,5 @@ export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfi
     throw new StorageDriveNotFoundError(drive);
   }
 
-  return resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
+  return awsNamingUtils.resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
 };

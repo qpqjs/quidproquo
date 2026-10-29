@@ -1,5 +1,4 @@
 export * as awsLambdaUtils from './awsLambdaUtils';
-export * as awsNamingUtils from './awsNamingUtils';
 export * from './getActionProcessor';
 export * from './getLambdaEntries';
 export * from './lambdaHandlers';

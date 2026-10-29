@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   askEventGetRecordsBase,
@@ -8,7 +9,6 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
 import { EventInput, InternalEventRecord } from './types';
 
 const deployTypeMap: Record<string, DeployEventStatusType> = {
@@ -36,9 +36,9 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       deployEventStatusType: deployTypeMap[status] || DeployEventStatusType.Unknown,
     };
 
-    if (stackName === getApiStackName(qpqConfig)) {
+    if (stackName === awsNamingUtils.getApiStackName(qpqConfig)) {
       internalEventRecord.deployEventType = DeployEventType.Api;
-    } else if (stackName === getWebStackName(qpqConfig)) {
+    } else if (stackName === awsNamingUtils.getWebStackName(qpqConfig)) {
       internalEventRecord.deployEventType = DeployEventType.Web;
     }
 

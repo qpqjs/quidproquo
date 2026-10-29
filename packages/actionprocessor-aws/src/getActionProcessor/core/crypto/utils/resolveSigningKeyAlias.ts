@@ -1,6 +1,5 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 
 // The signing-key twin of resolveCryptoKeyAlias: the deterministic KMS alias the
 // CDK construct derives for a defineSigningKey, or null when none matches so
@@ -12,7 +11,7 @@ export const resolveSigningKeyAlias = (signingKeyName: string, qpqConfig: QPQCon
     return null;
   }
 
-  const resolvedName = resolveOwnedResourceName(signingKeyName, qpqConfig, signingKeyConfig.owner);
+  const resolvedName = awsNamingUtils.resolveOwnedResourceName(signingKeyName, qpqConfig, signingKeyConfig.owner);
 
   return `alias/${resolvedName}`;
 };

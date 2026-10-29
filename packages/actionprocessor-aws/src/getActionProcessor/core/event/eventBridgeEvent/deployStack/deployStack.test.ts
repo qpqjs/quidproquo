@@ -1,10 +1,10 @@
 import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionActionProcessor } from '@qpqjs/actionprocessor-js';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { defineDeployEvent, DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
@@ -20,7 +20,7 @@ describe('eventBridgeEvent/deployStack getEventGetRecordsActionProcessor', () =>
   it('classifies an api stack update', async () => {
     const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
 
-    const [records] = await processor({ eventParams: [buildEvent(getApiStackName(config), 'UPDATE_COMPLETE'), {}] });
+    const [records] = await processor({ eventParams: [buildEvent(awsNamingUtils.getApiStackName(config), 'UPDATE_COMPLETE'), {}] });
 
     expect(records).toEqual([{ deployEventType: DeployEventType.Api, deployEventStatusType: DeployEventStatusType.Update }]);
   });
@@ -28,7 +28,7 @@ describe('eventBridgeEvent/deployStack getEventGetRecordsActionProcessor', () =>
   it('classifies a web stack create', async () => {
     const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
 
-    const [records] = await processor({ eventParams: [buildEvent(getWebStackName(config), 'CREATE_COMPLETE'), {}] });
+    const [records] = await processor({ eventParams: [buildEvent(awsNamingUtils.getWebStackName(config), 'CREATE_COMPLETE'), {}] });
 
     expect(records).toEqual([{ deployEventType: DeployEventType.Web, deployEventStatusType: DeployEventStatusType.Create }]);
   });
@@ -43,8 +43,8 @@ describe('eventBridgeEvent/deployStack getEventGetRecordsActionProcessor', () =>
   ])('classifies the api and web stacks of %s as unknown', async (_label, sibling) => {
     const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
 
-    const [apiRecords] = await processor({ eventParams: [buildEvent(getApiStackName(sibling), 'UPDATE_COMPLETE'), {}] });
-    const [webRecords] = await processor({ eventParams: [buildEvent(getWebStackName(sibling), 'CREATE_COMPLETE'), {}] });
+    const [apiRecords] = await processor({ eventParams: [buildEvent(awsNamingUtils.getApiStackName(sibling), 'UPDATE_COMPLETE'), {}] });
+    const [webRecords] = await processor({ eventParams: [buildEvent(awsNamingUtils.getWebStackName(sibling), 'CREATE_COMPLETE'), {}] });
 
     expect((apiRecords as any[])[0].deployEventType).toBe(DeployEventType.Unknown);
     expect((webRecords as any[])[0].deployEventType).toBe(DeployEventType.Unknown);

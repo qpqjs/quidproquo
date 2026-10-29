@@ -1,8 +1,7 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { askWebsocketSendMessageBase } from '@qpqjs/webserver';
 
-import { getCFExportNameWebsocketApiIdFromConfig } from '../../../awsNamingUtils';
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
@@ -11,7 +10,7 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
-      const apiId = await getExportedValue(getCFExportNameWebsocketApiIdFromConfig(websocketApiName, qpqConfig), region);
+      const apiId = await getExportedValue(awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(websocketApiName, qpqConfig), region);
 
       await sendMessageToWebSocketConnection(apiId, connectionId, region, payload);
 
