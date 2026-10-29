@@ -20,7 +20,7 @@ export const resolveCryptoKeyForResource = (
   cryptoKeyName: string,
   ownedCryptoKeys: OwnedCryptoKeys,
 ): aws_kms.IKey => {
-  const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
+  const cryptoKeyConfig = qpqCoreUtils.resolveCryptoKeyOrThrow(cryptoKeyName, qpqConfig);
 
   const owned = ownedCryptoKeys[cryptoKeyName];
   if (owned) {

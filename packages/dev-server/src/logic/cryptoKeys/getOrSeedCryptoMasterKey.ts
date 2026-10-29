@@ -15,7 +15,7 @@ import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 const CRYPTO_KEYS_STORE_DIRECTORY = 'cryptoKeys';
 
 export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyName: string, qpqConfig: QPQConfig): Promise<Buffer> => {
-  const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
+  const cryptoKeyConfig = qpqCoreUtils.resolveCryptoKeyOrThrow(cryptoKeyName, qpqConfig);
 
   // Mirrors the AWS runtime's resolveCryptoKeyAlias: a cross-module owner
   // redirects storage to the owning service's file

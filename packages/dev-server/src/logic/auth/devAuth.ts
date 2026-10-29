@@ -41,7 +41,7 @@ export type DevUserDirectory = {
 // Mirrors the AWS runtime's user pool resolution (getCFExportNameUserPoolIdFromConfig):
 // the owner module redirects to the owning service, resourceNameOverride renames the directory.
 export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QPQConfig): DevUserDirectory => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
+  const userDirectoryConfig = qpqCoreUtils.resolveUserDirectoryOrThrow(userDirectoryName, qpqConfig);
 
   return {
     serviceName: userDirectoryConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),

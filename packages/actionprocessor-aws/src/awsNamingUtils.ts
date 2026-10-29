@@ -155,7 +155,7 @@ export const getKvsIndexPartitionKey = (storeConfig: KeyValueStoreQPQConfigSetti
     : index.partitionKey;
 
 const getUserPoolCFExportName = (userDirectoryName: string, qpqConfig: QPQConfig, resourceType: string) => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
+  const userDirectoryConfig = qpqCoreUtils.resolveUserDirectoryOrThrow(userDirectoryName, qpqConfig);
 
   const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, userDirectoryConfig.owner);
   const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;

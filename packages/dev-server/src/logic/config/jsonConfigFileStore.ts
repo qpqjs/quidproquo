@@ -23,7 +23,7 @@ type ConfigStorageLocation = {
 // a cross-module owner redirects storage to the owning service's file, and
 // resourceNameOverride renames the key within it.
 const resolveParameterStorageLocation = (parameterName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
-  const parameterConfig = qpqCoreUtils.getParameterConfig(parameterName, qpqConfig);
+  const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
   return {
     serviceName: parameterConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
@@ -32,7 +32,7 @@ const resolveParameterStorageLocation = (parameterName: string, qpqConfig: QPQCo
 };
 
 const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
-  const secretConfig = qpqCoreUtils.getSecretByName(secretName, qpqConfig);
+  const secretConfig = qpqCoreUtils.resolveSecretOrThrow(secretName, qpqConfig);
 
   return {
     serviceName: secretConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
@@ -90,7 +90,7 @@ export const getOrSeedParameterValue = async (runtimePath: string, parameterName
     ConfigStoreDirectory.parameters,
     serviceName,
     key,
-    () => qpqCoreUtils.getParameterConfig(parameterName, qpqConfig).value,
+    () => qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig).value,
   );
 };
 

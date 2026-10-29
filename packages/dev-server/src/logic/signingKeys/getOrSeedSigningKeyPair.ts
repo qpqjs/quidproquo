@@ -34,7 +34,7 @@ const readOrSeed = async (runtimePath: string, serviceName: string, key: string)
 };
 
 export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyName: string, qpqConfig: QPQConfig): Promise<Rs256KeyPair> => {
-  const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(signingKeyName, qpqConfig);
+  const signingKeyConfig = qpqCoreUtils.resolveSigningKeyOrThrow(signingKeyName, qpqConfig);
 
   // Mirrors the AWS runtime's resolveSigningKeyAlias: a cross-module owner
   // redirects storage to the owning service's file

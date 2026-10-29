@@ -8,7 +8,7 @@ import { resolveOwnedResourceName } from '../awsNamingUtils';
  * can read a parameter another module owns.
  */
 export const resolveParameterKey = (parameterName: string, qpqConfig: QPQConfig) => {
-  const parameterConfig = qpqCoreUtils.getParameterConfig(parameterName, qpqConfig);
+  const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
   return resolveOwnedResourceName(parameterName, qpqConfig, parameterConfig.owner);
 };

@@ -69,7 +69,7 @@ import {
   getOwnedSecrets,
   getOwnedStorageDrives,
   getOwnedUserDirectories,
-  getParameterConfig,
+  getParameterByName,
   getQueueByName,
   getQueueQueueProcessors,
   getQueues,
@@ -90,6 +90,9 @@ import {
   isSameResource,
   resolveCrossServiceResourceName,
   resolveGlobalValue,
+  resolveParameterOrThrow,
+  resolveSecretOrThrow,
+  resolveUserDirectoryOrThrow,
 } from './qpqCoreUtils';
 
 describe('qpqCoreUtils', () => {
@@ -403,11 +406,16 @@ describe('qpqCoreUtils', () => {
 
     it('lists all secrets and finds one by name', () => {
       expect(getAllSecretConfigs(config)).toHaveLength(2);
-      expect(getSecretByName('apiKey', config).key).toBe('apiKey');
+      expect(resolveSecretOrThrow('apiKey', config).key).toBe('apiKey');
     });
 
     it('throws when a secret is not found', () => {
-      expect(() => getSecretByName('missing', config)).toThrow(/Can not find secret/);
+      expect(() => resolveSecretOrThrow('missing', config)).toThrow(/Can not find secret/);
+    });
+
+    it('getSecretByName answers null for a missing secret', () => {
+      expect(getSecretByName('apiKey', config)?.key).toBe('apiKey');
+      expect(getSecretByName('missing', config)).toBeNull();
     });
 
     it('returns only owned secrets', () => {
@@ -423,11 +431,16 @@ describe('qpqCoreUtils', () => {
 
     it('lists all parameters and finds one by name', () => {
       expect(getAllParameterConfigs(config)).toHaveLength(2);
-      expect(getParameterConfig('region', config).value).toBe('us-east-1');
+      expect(resolveParameterOrThrow('region', config).value).toBe('us-east-1');
     });
 
     it('throws when a parameter is not found', () => {
-      expect(() => getParameterConfig('missing', config)).toThrow(/not found/);
+      expect(() => resolveParameterOrThrow('missing', config)).toThrow(/not found/);
+    });
+
+    it('getParameterByName answers null for a missing parameter', () => {
+      expect(getParameterByName('region', config)?.value).toBe('us-east-1');
+      expect(getParameterByName('missing', config)).toBeNull();
     });
 
     it('returns only owned parameters', () => {
@@ -462,11 +475,16 @@ describe('qpqCoreUtils', () => {
 
     it('lists directories and finds one by name', () => {
       expect(getUserDirectories(config)).toHaveLength(2);
-      expect(getUserDirectoryByName('main', config).name).toBe('main');
+      expect(resolveUserDirectoryOrThrow('main', config).name).toBe('main');
     });
 
     it('throws when a directory is not found', () => {
-      expect(() => getUserDirectoryByName('missing', config)).toThrow(/UserDirectory not found/);
+      expect(() => resolveUserDirectoryOrThrow('missing', config)).toThrow(/UserDirectory not found/);
+    });
+
+    it('getUserDirectoryByName answers null for a missing directory', () => {
+      expect(getUserDirectoryByName('main', config)?.name).toBe('main');
+      expect(getUserDirectoryByName('missing', config)).toBeNull();
     });
 
     it('returns only owned directories', () => {

@@ -467,10 +467,11 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
   return srcPath.split('/').pop() || '';
 };
 
-export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
+export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): Nullable<SecretQPQConfigSetting> =>
+  getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret).find((s) => s.key === secretName) ?? null;
 
-  const secret = secrets.find((s) => s.key === secretName);
+export const resolveSecretOrThrow = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
+  const secret = getSecretByName(secretName, qpqConfig);
 
   if (!secret) {
     throw new Error(`Can not find secret [${secretName}]`);
@@ -491,10 +492,11 @@ export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] 
   return getOwnedItems(secrets, qpqConfig);
 };
 
-export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting => {
-  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
+export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): Nullable<CryptoKeyQPQConfigSetting> =>
+  getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey).find((k) => k.keyName === cryptoKeyName) ?? null;
 
-  const cryptoKey = cryptoKeys.find((k) => k.keyName === cryptoKeyName);
+export const resolveCryptoKeyOrThrow = (cryptoKeyName: string, qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting => {
+  const cryptoKey = getCryptoKeyByName(cryptoKeyName, qpqConfig);
 
   if (!cryptoKey) {
     throw new Error(`Can not find crypto key [${cryptoKeyName}]`);
@@ -515,10 +517,11 @@ export const getOwnedCryptoKeys = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSett
   return getOwnedItems(cryptoKeys, qpqConfig);
 };
 
-export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): SigningKeyQPQConfigSetting => {
-  const signingKeys = getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
+export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): Nullable<SigningKeyQPQConfigSetting> =>
+  getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey).find((k) => k.keyName === signingKeyName) ?? null;
 
-  const signingKey = signingKeys.find((k) => k.keyName === signingKeyName);
+export const resolveSigningKeyOrThrow = (signingKeyName: string, qpqConfig: QPQConfig): SigningKeyQPQConfigSetting => {
+  const signingKey = getSigningKeyByName(signingKeyName, qpqConfig);
 
   if (!signingKey) {
     throw new Error(`Can not find signing key [${signingKeyName}]`);
@@ -570,8 +573,11 @@ export const getOwnedUserDirectories = (qpqConifg: QPQConfig): UserDirectoryQPQC
   return getOwnedItems(userDirectories, qpqConifg);
 };
 
-export const getUserDirectoryByName = (userDirectoryName: string, qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting => {
-  const userDirectory = getUserDirectories(qpqConifg).find((ud) => ud.name === userDirectoryName);
+export const getUserDirectoryByName = (userDirectoryName: string, qpqConfig: QPQConfig): Nullable<UserDirectoryQPQConfigSetting> =>
+  getUserDirectories(qpqConfig).find((ud) => ud.name === userDirectoryName) ?? null;
+
+export const resolveUserDirectoryOrThrow = (userDirectoryName: string, qpqConfig: QPQConfig): UserDirectoryQPQConfigSetting => {
+  const userDirectory = getUserDirectoryByName(userDirectoryName, qpqConfig);
 
   if (!userDirectory) {
     throw new Error(`UserDirectory not found: ${userDirectoryName}`);
@@ -586,10 +592,11 @@ export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfig
   return parameters;
 };
 
-export const getParameterConfig = (name: string, qpqConfig: QPQConfig): ParameterQPQConfigSetting => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
+export const getParameterByName = (name: string, qpqConfig: QPQConfig): Nullable<ParameterQPQConfigSetting> =>
+  getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter).find((p) => p.key === name) ?? null;
 
-  const param = parameters.find((p) => p.key === name);
+export const resolveParameterOrThrow = (name: string, qpqConfig: QPQConfig): ParameterQPQConfigSetting => {
+  const param = getParameterByName(name, qpqConfig);
 
   if (!param) {
     throw new Error(`Parameter ${name} not found`);
