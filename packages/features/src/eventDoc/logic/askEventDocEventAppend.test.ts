@@ -200,7 +200,7 @@ const buildHarness = (options: Harness = {}) => {
       sequence.push(`update:${action.payload.keyValueStoreName}`);
       summaryUpdates.push({ updates: action.payload.updates, condition: action.payload.options?.condition });
       if (options.summaryWriteFails) {
-        return throwsError(askKeyValueStoreUpdateBase.errorType.ServiceUnavailable, 'throttled');
+        return throwsError(askKeyValueStoreUpdateBase.errorType.Throttled, 'throttled');
       }
       return createKvsUpdateMock({ tableFor: (_scope, storeName) => (tables[storeName] ??= []), keyName: 'type', sortKeyName: 'id' })(
         action as never,

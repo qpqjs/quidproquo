@@ -52,11 +52,11 @@ describe('runUserScriptInChild', () => {
     expect(env).not.toContain('HOME');
   });
 
-  it('kills a child that does not answer in time and reports TimedOut', async () => {
+  it('kills a child that does not answer in time and reports Timeout', async () => {
     const result = await runUserScriptInChild({ modulePath, event: eventFor('hang'), timeoutMs: 300, env: process.env });
 
     expect(result.success).toBe(false);
-    expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.TimedOut);
+    expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.Timeout);
   });
 
   it('kills the child and what it spawned once it has answered, even when they ignore SIGTERM', async () => {

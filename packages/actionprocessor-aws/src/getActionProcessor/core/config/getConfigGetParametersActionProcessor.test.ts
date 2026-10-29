@@ -39,6 +39,6 @@ describe('getConfigGetParametersActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { parameterNames: ['a'] });
 
-    expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttling);
+    expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttled);
   });
 });

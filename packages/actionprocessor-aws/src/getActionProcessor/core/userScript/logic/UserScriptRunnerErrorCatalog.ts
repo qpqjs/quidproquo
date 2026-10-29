@@ -2,6 +2,6 @@
 export type UserScriptRunnerErrorCatalog = {
   InvalidScope: string;
   RunnerUnavailable: string;
-  TimedOut: string;
+  Timeout: string;
   PayloadTooLarge?: string;
 };

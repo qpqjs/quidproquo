@@ -47,7 +47,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Conflict, 'KVS item already exists'),
         TransactionConflictException: () =>

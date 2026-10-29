@@ -37,7 +37,7 @@ const killProcessGroup = (child: ChildProcess): void => {
  * gets only the given environment, and it and everything it started are killed once it has
  * answered or when `timeoutMs` passes, so nothing a script does can outlive the call or
  * leak into the next one. The answer is only resolved once the child is gone. Never rejects:
- * every failure of the child itself becomes a TimedOut or RunnerUnavailable result.
+ * every failure of the child itself becomes a Timeout or RunnerUnavailable result.
  */
 export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<UserScriptRunnerResult> =>
   new Promise((resolve) => {
@@ -62,7 +62,7 @@ export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<
 
     const timer = setTimeout(() => {
       killProcessGroup(child);
-      settle(answer ?? failed(errorType.TimedOut, `User script did not finish within ${input.timeoutMs}ms`));
+      settle(answer ?? failed(errorType.Timeout, `User script did not finish within ${input.timeoutMs}ms`));
     }, input.timeoutMs);
 
     child.on('message', (message) => {

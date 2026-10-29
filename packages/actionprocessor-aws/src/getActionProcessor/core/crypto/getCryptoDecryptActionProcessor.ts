@@ -44,7 +44,7 @@ const getProcessCryptoDecrypt = (qpqConfig: QPQConfig): ProcessorFor<typeof askC
         KMSInvalidStateException: () =>
           actionResultError(askCryptoDecrypt.errorType.KeyUnavailable, `Crypto key is in an unusable state: [${keyName}]`),
         AccessDeniedException: () => actionResultError(askCryptoDecrypt.errorType.KeyUnavailable, `Access denied to crypto key: [${keyName}]`),
-        ThrottlingException: () => actionResultError(askCryptoDecrypt.errorType.Throttling, 'Throttling: Rate exceeded'),
+        ThrottlingException: () => actionResultError(askCryptoDecrypt.errorType.Throttled, 'Throttling: Rate exceeded'),
       });
     }
   };

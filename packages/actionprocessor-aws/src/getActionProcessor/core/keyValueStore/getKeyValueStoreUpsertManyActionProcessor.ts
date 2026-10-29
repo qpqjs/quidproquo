@@ -59,12 +59,11 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         // Retries exhausted on UnprocessedItems, sustained throttle, a transient
         // fault: callers must see ServiceUnavailable, not a permanent failure.
-        BatchWriteUnprocessedItemsError: () =>
-          actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),
+        BatchWriteUnprocessedItemsError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Throttled, 'KVS batch write throttled'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         TransactionConflictException: () =>
           actionResultError(askKeyValueStoreUpsertManyBase.errorType.WriteContention, 'KVS item is being written by a transaction'),

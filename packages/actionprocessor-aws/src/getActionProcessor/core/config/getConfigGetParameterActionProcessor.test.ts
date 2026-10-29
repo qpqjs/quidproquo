@@ -39,7 +39,7 @@ describe('getConfigGetParameterActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { parameterName: 'flag' });
 
-    expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttling);
+    expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttled);
   });
 
   // Security regression: a story can only read parameters its config declares; an undeclared name never reaches SSM.

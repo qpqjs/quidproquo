@@ -80,7 +80,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     ['DisabledException', askCryptoDecrypt.errorType.KeyUnavailable],
     ['KMSInvalidStateException', askCryptoDecrypt.errorType.KeyUnavailable],
     ['AccessDeniedException', askCryptoDecrypt.errorType.KeyUnavailable],
-    ['ThrottlingException', askCryptoDecrypt.errorType.Throttling],
+    ['ThrottlingException', askCryptoDecrypt.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     const ciphertext = await buildCiphertext('shhh', undefined, randomBytes(32));
     vi.mocked(getCachedUnwrappedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));

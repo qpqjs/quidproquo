@@ -15,7 +15,7 @@ export enum ErrorTypeEnum {
   NotFound = 'NotFound',
 
   // The server timed out while waiting for a response from a resource
-  TimeOut = 'TimeOut',
+  Timeout = 'Timeout',
 
   // The request included an unsupported media type or format
   UnsupportedMediaType = 'UnsupportedMediaType',

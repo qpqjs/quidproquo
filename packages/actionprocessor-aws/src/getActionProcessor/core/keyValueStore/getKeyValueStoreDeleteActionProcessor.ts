@@ -28,7 +28,7 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreDelete.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        InternalServerError: () => actionResultError(askKeyValueStoreDelete.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreDelete.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreDelete.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreDelete.errorType.StoreNotFound, error.message),

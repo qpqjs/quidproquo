@@ -22,7 +22,7 @@ const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.PaymentRequired]: 402,
   [ErrorTypeEnum.Forbidden]: 403,
   [ErrorTypeEnum.NotFound]: 404,
-  [ErrorTypeEnum.TimeOut]: 408,
+  [ErrorTypeEnum.Timeout]: 408,
   [ErrorTypeEnum.Conflict]: 409,
   [ErrorTypeEnum.UnsupportedMediaType]: 415,
   [ErrorTypeEnum.OutOfResources]: 500,

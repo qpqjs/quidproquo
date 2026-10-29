@@ -55,7 +55,7 @@ describe('getUserScriptRunnerEvent_userScript', () => {
 
     const result = await handler(event, { getRemainingTimeInMillis: () => 1800 } as Context);
 
-    expect(result).toMatchObject({ success: false, error: { errorType: expect.stringContaining('TimedOut') } });
+    expect(result).toMatchObject({ success: false, error: { errorType: expect.stringContaining('Timeout') } });
   });
 });
 

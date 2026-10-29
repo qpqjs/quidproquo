@@ -28,7 +28,7 @@ const getProcessKeyValueStoreGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(result.map((item) => scoped.strip(item)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreGetAllBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        InternalServerError: () => actionResultError(askKeyValueStoreGetAllBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreGetAllBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreGetAllBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreGetAllBase.errorType.StoreNotFound, error.message),

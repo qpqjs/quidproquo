@@ -63,7 +63,7 @@ describe('signing key action processors (aws)', () => {
       ['DisabledException', askCryptoSign.errorType.KeyUnavailable],
       ['KMSInvalidStateException', askCryptoSign.errorType.KeyUnavailable],
       ['AccessDeniedException', askCryptoSign.errorType.KeyUnavailable],
-      ['ThrottlingException', askCryptoSign.errorType.Throttling],
+      ['ThrottlingException', askCryptoSign.errorType.Throttled],
     ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
       vi.mocked(signWithKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
       const { sign } = await resolveProcessors();

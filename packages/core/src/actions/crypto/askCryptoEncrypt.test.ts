@@ -61,7 +61,7 @@ describe('askCryptoEncrypt', () => {
       expect(askCryptoEncrypt.errorType).toEqual({
         KeyNotConfigured: `${CryptoActionType.Encrypt}-KeyNotConfigured`,
         KeyUnavailable: `${CryptoActionType.Encrypt}-KeyUnavailable`,
-        Throttling: `${CryptoActionType.Encrypt}-Throttling`,
+        Throttled: `${CryptoActionType.Encrypt}-Throttled`,
       });
     });
   });

@@ -54,7 +54,7 @@ describe('getCryptoEncryptActionProcessor', () => {
     ['DisabledException', askCryptoEncrypt.errorType.KeyUnavailable],
     ['KMSInvalidStateException', askCryptoEncrypt.errorType.KeyUnavailable],
     ['AccessDeniedException', askCryptoEncrypt.errorType.KeyUnavailable],
-    ['ThrottlingException', askCryptoEncrypt.errorType.Throttling],
+    ['ThrottlingException', askCryptoEncrypt.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getCachedGeneratedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

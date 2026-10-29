@@ -25,7 +25,7 @@ export const askUserScriptExecuteBase = createActionRequester<unknown>()({
     'FunctionNotFound', // the named export is not an own enumerable function of the module
     'FunctionThrew', // the function threw before returning a story, or its promise rejected
     'RunnerUnavailable', // the sandboxed runner could not be invoked, or answered with something other than a result
-    'TimedOut', // the runner did not finish within the service's configured runner timeout
+    'Timeout', // the runner did not finish within the service's configured runner timeout
     'PayloadTooLarge', // the args or the result exceed what can cross to the runner in one invoke
   ],
   getPayload: (drive: string, filepath: string, functionName: string, args: unknown[], scope?: string) => ({

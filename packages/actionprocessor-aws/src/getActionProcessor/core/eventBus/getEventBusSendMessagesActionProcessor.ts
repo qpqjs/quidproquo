@@ -76,8 +76,8 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         AuthorizationErrorException: () =>
           actionResultError(askEventBusSendMessagesBase.errorType.AccessDenied, 'Access denied publishing to event bus'),
         NotFoundException: () => actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus topic not found: ${eventBusName}`),
-        InternalErrorException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus service unavailable'),
-        ThrottledException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus throttled'),
+        InternalErrorException: () => actionResultError(askEventBusSendMessagesBase.errorType.Throttled, 'Event bus service unavailable'),
+        ThrottledException: () => actionResultError(askEventBusSendMessagesBase.errorType.Throttled, 'Event bus throttled'),
       });
     }
   };

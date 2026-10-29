@@ -46,7 +46,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
   });
 
   it.each([
-    ['InternalServerError', askKeyValueStoreUpsertBase.errorType.ServiceUnavailable],
+    ['InternalServerError', askKeyValueStoreUpsertBase.errorType.Throttled],
     ['ResourceNotFoundException', askKeyValueStoreUpsertBase.errorType.ResourceNotFound],
     ['ConditionalCheckFailedException', askKeyValueStoreUpsertBase.errorType.Conflict],
     ['TransactionConflictException', askKeyValueStoreUpsertBase.errorType.WriteContention],

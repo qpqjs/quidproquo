@@ -51,7 +51,7 @@ describe('askCryptoDecrypt', () => {
         ContextMismatch: `${CryptoActionType.Decrypt}-ContextMismatch`,
         MalformedCiphertext: `${CryptoActionType.Decrypt}-MalformedCiphertext`,
         KeyUnavailable: `${CryptoActionType.Decrypt}-KeyUnavailable`,
-        Throttling: `${CryptoActionType.Decrypt}-Throttling`,
+        Throttled: `${CryptoActionType.Decrypt}-Throttled`,
       });
     });
   });

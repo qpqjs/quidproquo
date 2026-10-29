@@ -29,7 +29,7 @@ import { getUserScriptChildEnv } from '../getUserScriptChildEnv';
 export type UserScriptChildErrorCatalog = {
   InvalidScope: string;
   RunnerUnavailable: string;
-  TimedOut: string;
+  Timeout: string;
   PayloadTooLarge?: string;
 };
 

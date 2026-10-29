@@ -21,7 +21,7 @@ export const askEventBusSendMessagesBase = createActionRequester<void>()({
   errorTypes: [
     'AccessDenied', // caller lacks permission to publish to the topic
     'TopicNotFound', // the bus's topic does not exist
-    'ServiceUnavailable', // the bus is throttling or failed internally; transient
+    'Throttled', // the bus is throttling or failed internally; transient
   ],
   getPayload: (eventBusSendMessageOptions: EventBusSendMessageOptions<unknown>) => eventBusSendMessageOptions,
 });

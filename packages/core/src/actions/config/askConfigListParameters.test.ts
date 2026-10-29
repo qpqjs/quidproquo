@@ -35,22 +35,22 @@ describe('askConfigListParameters', () => {
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askConfigListParameters(), {
-          [ConfigActionType.ListParameters]: throwsError(askConfigListParameters.errorType.Throttling, 'Rate exceeded'),
+          [ConfigActionType.ListParameters]: throwsError(askConfigListParameters.errorType.Throttled, 'Rate exceeded'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${askConfigListParameters.errorType.Throttling}: Rate exceeded`);
+      expect(runFailingStory).toThrow(`${askConfigListParameters.errorType.Throttled}: Rate exceeded`);
     });
   });
 
   describe('errorType', () => {
-    it('should have Throttling error type', () => {
-      expect(askConfigListParameters.errorType.Throttling).toBeDefined();
-      expect(askConfigListParameters.errorType.Throttling).toContain('Throttling');
+    it('should have Throttled error type', () => {
+      expect(askConfigListParameters.errorType.Throttled).toBeDefined();
+      expect(askConfigListParameters.errorType.Throttled).toContain('Throttled');
     });
 
     it('should be prefixed with the action type', () => {
-      expect(askConfigListParameters.errorType.Throttling).toContain(ConfigActionType.ListParameters);
+      expect(askConfigListParameters.errorType.Throttled).toContain(ConfigActionType.ListParameters);
     });
   });
 });

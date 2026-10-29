@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Error catalog entries are renamed to the standard names (A5): `Throttling` (config, crypto) and `ServiceUnavailable` (key value store, event bus, queue) are `Throttled`; `TimedOut` (user script) is `Timeout`; and `ErrorTypeEnum.TimeOut` is `ErrorTypeEnum.Timeout` (value `'Timeout'`). Code matching on `askX.errorType.Throttling`, `.ServiceUnavailable`, `.TimedOut` or `ErrorTypeEnum.TimeOut` changes to the new member.
 - `DynamicFunctionsExecuteErrorTypeEnum` is gone (A5): the four entries live on `askDynamicFunctionExecute.errorType` (`DynamicFunctionsNotFound`, `ModuleLoadFailed`, `FunctionNotFound`, `FunctionThrew`) and the values are now action-scoped strings.
 - `askGraphDatabaseExecuteOpenCypherQuery` carries an error catalog (A5): a missing database definition, a missing read or write endpoint and a query the database rejects answer `GraphDatabaseNotFound`, `EndpointNotFound` and `QueryFailed` on its `errorType` instead of `GenericError`.
 - `askStreamRead` carries an error catalog (A5): reading an unknown or closed stream answers `askStreamRead.errorType.StreamNotFound` and a producer failure `askStreamRead.errorType.StreamFailed` (both were a thrown `GenericError` before).

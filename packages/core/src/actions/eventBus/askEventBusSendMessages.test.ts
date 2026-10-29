@@ -48,7 +48,7 @@ describe('askEventBusSendMessagesBase.errorType', () => {
     expect(askEventBusSendMessagesBase.errorType).toEqual({
       AccessDenied: `${EventBusActionType.SendMessages}-AccessDenied`,
       TopicNotFound: `${EventBusActionType.SendMessages}-TopicNotFound`,
-      ServiceUnavailable: `${EventBusActionType.SendMessages}-ServiceUnavailable`,
+      Throttled: `${EventBusActionType.SendMessages}-Throttled`,
     });
   });
 });

@@ -22,7 +22,7 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig): ProcessorFor<typeof as
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ResourceNotFoundException: () => actionResultError(askConfigGetSecret.errorType.ResourceNotFound, `Secret not found: [${secretName}]`),
-        ThrottlingException: () => actionResultError(askConfigGetSecret.errorType.Throttling, 'Throttling: Rate exceeded'),
+        ThrottlingException: () => actionResultError(askConfigGetSecret.errorType.Throttled, 'Throttling: Rate exceeded'),
       });
     }
   };

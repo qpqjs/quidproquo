@@ -69,6 +69,6 @@ describe('getUserScriptListExportsActionProcessor (lambda)', () => {
 
     const [, error] = await invoke();
 
-    expect(error?.errorType).toBe(askUserScriptListExports.errorType.TimedOut);
+    expect(error?.errorType).toBe(askUserScriptListExports.errorType.Timeout);
   });
 });

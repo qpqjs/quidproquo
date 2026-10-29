@@ -70,7 +70,7 @@ describe('askConfigGetSecret', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
       expect(askConfigGetSecret.errorType).toEqual({
         ResourceNotFound: `${ConfigActionType.GetSecret}-ResourceNotFound`,
-        Throttling: `${ConfigActionType.GetSecret}-Throttling`,
+        Throttled: `${ConfigActionType.GetSecret}-Throttled`,
       });
     });
   });

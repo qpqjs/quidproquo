@@ -21,7 +21,7 @@ export function* askKeyValueStoreUpsertWithRetry<KvsItem>(
     250,
     // Both transient: the service is throttling, or another write holds the item for the
     // moment. Conflict (the item exists) is final and passes straight through.
-    [askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, askKeyValueStoreUpsertBase.errorType.WriteContention],
+    [askKeyValueStoreUpsertBase.errorType.Throttled, askKeyValueStoreUpsertBase.errorType.WriteContention],
   );
 
   if (!upsertResponse.success) {

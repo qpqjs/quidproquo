@@ -21,7 +21,7 @@ describe('askCryptoVerify', () => {
       KeyNotConfigured: `${CryptoActionType.Verify}-KeyNotConfigured`,
       MalformedSignature: `${CryptoActionType.Verify}-MalformedSignature`,
       KeyUnavailable: `${CryptoActionType.Verify}-KeyUnavailable`,
-      Throttling: `${CryptoActionType.Verify}-Throttling`,
+      Throttled: `${CryptoActionType.Verify}-Throttled`,
     });
   });
 });

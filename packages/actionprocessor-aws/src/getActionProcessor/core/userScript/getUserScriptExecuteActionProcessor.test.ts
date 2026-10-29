@@ -108,7 +108,7 @@ describe('getUserScriptExecuteActionProcessor (lambda)', () => {
   });
 
   it.each([
-    ['Lambda Error: Unhandled. Details: {"errorMessage":"2026-01-01T00:01:00.000Z abc Task timed out after 60.00 seconds"}', 'TimedOut'],
+    ['Lambda Error: Unhandled. Details: {"errorMessage":"2026-01-01T00:01:00.000Z abc Task timed out after 60.00 seconds"}', 'Timeout'],
     [
       'Lambda Error: Unhandled. Details: {"errorMessage":"Response payload size exceeded maximum allowed payload size (6291556 bytes)."}',
       'PayloadTooLarge',
@@ -120,7 +120,7 @@ describe('getUserScriptExecuteActionProcessor (lambda)', () => {
 
     const [, error] = await invoke();
 
-    expect(error?.errorType).toBe(askUserScriptExecute.errorType[expected as 'TimedOut']);
+    expect(error?.errorType).toBe(askUserScriptExecute.errorType[expected as 'Timeout']);
   });
 
   it('treats an answer without a result as the runner being unavailable', async () => {

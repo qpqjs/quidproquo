@@ -94,7 +94,7 @@ line3`;
   describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
       expect(askConfigSetParameter.errorType).toEqual({
-        Throttling: `${ConfigActionType.SetParameter}-Throttling`,
+        Throttled: `${ConfigActionType.SetParameter}-Throttled`,
         QuotaExceeded: `${ConfigActionType.SetParameter}-QuotaExceeded`,
       });
     });

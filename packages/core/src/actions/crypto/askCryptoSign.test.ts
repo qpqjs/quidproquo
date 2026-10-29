@@ -33,7 +33,7 @@ describe('askCryptoSign', () => {
     expect(askCryptoSign.errorType).toEqual({
       KeyNotConfigured: `${CryptoActionType.Sign}-KeyNotConfigured`,
       KeyUnavailable: `${CryptoActionType.Sign}-KeyUnavailable`,
-      Throttling: `${CryptoActionType.Sign}-Throttling`,
+      Throttled: `${CryptoActionType.Sign}-Throttled`,
     });
   });
 });

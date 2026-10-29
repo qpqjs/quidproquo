@@ -35,7 +35,7 @@ describe('getConfigGetSecretActionProcessor', () => {
 
   it.each([
     ['ResourceNotFoundException', askConfigGetSecret.errorType.ResourceNotFound],
-    ['ThrottlingException', askConfigGetSecret.errorType.Throttling],
+    ['ThrottlingException', askConfigGetSecret.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getSecret).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

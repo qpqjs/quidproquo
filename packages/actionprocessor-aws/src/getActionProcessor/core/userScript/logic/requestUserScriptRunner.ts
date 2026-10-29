@@ -36,7 +36,7 @@ const getErrorMessage = (error: unknown): string => (error instanceof Error ? er
 // runner itself is unavailable.
 const classifyInvokeError = (message: string, errorType: UserScriptRunnerErrorCatalog): string => {
   if (/timed out/i.test(message)) {
-    return errorType.TimedOut;
+    return errorType.Timeout;
   }
   if (/payload size|RequestEntityTooLarge/i.test(message)) {
     return errorType.PayloadTooLarge ?? errorType.RunnerUnavailable;

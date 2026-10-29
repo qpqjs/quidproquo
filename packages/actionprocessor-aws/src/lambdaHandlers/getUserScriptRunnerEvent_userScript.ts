@@ -8,7 +8,7 @@ import { getUserScriptRunnerChildEnv } from './helpers/getUserScriptRunnerChildE
 import { isSnsWarmerRecord } from './helpers/isSnsWarmerRecord';
 
 // Headroom under the lambda deadline so the parent can kill the child and answer
-// TimedOut itself, rather than the platform timing the whole invoke out.
+// Timeout itself, rather than the platform timing the whole invoke out.
 const DEADLINE_MARGIN_MS = 1500;
 
 const isSnsEvent = (event: unknown): event is SNSEvent => Array.isArray((event as SNSEvent)?.Records);

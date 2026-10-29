@@ -58,7 +58,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
         AccessDenied: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
         AccessDeniedException: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
         QueueDoesNotExist: () => actionResultError(askQueueSendMessagesBase.errorType.QueueNotFound, `Queue not found: ${queueName}`),
-        RequestThrottled: () => actionResultError(askQueueSendMessagesBase.errorType.ServiceUnavailable, 'Queue throttled'),
+        RequestThrottled: () => actionResultError(askQueueSendMessagesBase.errorType.Throttled, 'Queue throttled'),
       });
     }
   };

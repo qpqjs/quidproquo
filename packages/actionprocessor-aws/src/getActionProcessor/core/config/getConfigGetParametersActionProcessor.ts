@@ -21,7 +21,7 @@ const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(parameterValues);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        ThrottlingException: () => actionResultError(askConfigGetParameters.errorType.Throttling, 'Throttling: Rate exceeded'),
+        ThrottlingException: () => actionResultError(askConfigGetParameters.errorType.Throttled, 'Throttling: Rate exceeded'),
       });
     }
   };

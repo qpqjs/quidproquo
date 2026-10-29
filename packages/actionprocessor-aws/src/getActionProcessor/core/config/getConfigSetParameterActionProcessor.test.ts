@@ -34,7 +34,7 @@ describe('getConfigSetParameterActionProcessor', () => {
   });
 
   it.each([
-    ['ThrottlingException', askConfigSetParameter.errorType.Throttling],
+    ['ThrottlingException', askConfigSetParameter.errorType.Throttled],
     ['ParameterLimitExceeded', askConfigSetParameter.errorType.QuotaExceeded],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(setParameter).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));

@@ -37,7 +37,7 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResult(scoped.strip(item));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreUpdateBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpdateBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpdateBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpdateBase.errorType.ConditionFailed, 'KVS update condition failed'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpdateBase.errorType.InvalidScope, error.message),

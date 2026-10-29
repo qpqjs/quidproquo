@@ -61,6 +61,6 @@ describe('askEventDocSummaryViewWrite', () => {
   });
 
   it('rethrows any other failure', () => {
-    expect(() => write(() => throwsError(askKeyValueStoreUpdateBase.errorType.ServiceUnavailable, 'throttled'))).toThrow(/throttled/);
+    expect(() => write(() => throwsError(askKeyValueStoreUpdateBase.errorType.Throttled, 'throttled'))).toThrow(/throttled/);
   });
 });
