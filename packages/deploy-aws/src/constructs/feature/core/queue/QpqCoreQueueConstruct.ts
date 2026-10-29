@@ -21,15 +21,7 @@ const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQC
       throw new Error(`Queue [${queueConfig.name}] subscribes to an undefined event bus [${eventBusName}]`);
     }
 
-    return awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
-      qpqConfig,
-      qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, qpqConfig),
-      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      eventBusConfig.isFifo,
-    );
+    return awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusConfig.name, qpqConfig, eventBusConfig);
   });
 
 export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {

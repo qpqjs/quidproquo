@@ -44,15 +44,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, eventBusSubscription: string): QpqCoreEventBusConstructBase {
     const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusSubscription, qpqConfig);
 
-    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusConfig?.owner?.resourceNameOverride || eventBusSubscription,
-      qpqConfig,
-      qpqCoreUtils.resolveOwnerModuleName(eventBusConfig?.owner, qpqConfig),
-      eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      eventBusConfig?.isFifo,
-    );
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusSubscription, qpqConfig, eventBusConfig);
 
     class Import extends QpqCoreEventBusConstructBase {
       topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);

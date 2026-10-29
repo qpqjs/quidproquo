@@ -1,9 +1,11 @@
 import {
   CrossModuleOwner,
+  EventBusQPQConfigSetting,
   getScopedKvsIndexPartitionKeys,
   KeyValueStoreQPQConfigSetting,
   KvsIndex,
   KvsKey,
+  Nullable,
   QPQConfig,
   qpqCoreUtils,
   ResourceName,
@@ -270,6 +272,26 @@ export const getEventBusSnsTopicArn = (
   const region = accountInfo.awsRegion;
 
   return `arn:aws:sns:${region}:${awsAccountId}:${topicName}`;
+};
+
+/**
+ * The topic ARN for an event bus setting, under its owner's deployment context. The runtime
+ * send, the service role's publish grant and every subscription resolve the ARN through here
+ * so they can never disagree. A bus with no setting in this config (a subscription to a bus
+ * another service owns) is named as given under this deployment.
+ */
+export const getEventBusSnsTopicArnFromConfig = (eventBusName: string, qpqConfig: QPQConfig, eventBusConfig?: Nullable<EventBusQPQConfigSetting>) => {
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, eventBusConfig?.owner);
+
+  return getEventBusSnsTopicArn(
+    qpqCoreUtils.resolveOwnedResourceLocalName(eventBusName, eventBusConfig?.owner),
+    qpqConfig,
+    service,
+    environment,
+    application,
+    feature,
+    eventBusConfig?.isFifo,
+  );
 };
 
 // The account stack owns account-level resources (cloud trail, budgets, security services)

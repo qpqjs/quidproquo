@@ -43,18 +43,9 @@ export class WebserverRole extends QpqConstructBlock {
 
     // Every event-bus topic this service can publish to (owned + referenced cross-module) -
     // the same owner-fallback derivation the runtime send processor uses to build the ARN.
-    const eventBusTopicArns = qpqCoreUtils.getAllEventBusConfigs(props.qpqConfig).map((eventBusConfig) =>
-      awsNamingUtils.getEventBusSnsTopicArn(
-        eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
-        props.qpqConfig,
-
-        qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, props.qpqConfig),
-        eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
-        eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
-        eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
-        eventBusConfig.isFifo,
-      ),
-    );
+    const eventBusTopicArns = qpqCoreUtils
+      .getAllEventBusConfigs(props.qpqConfig)
+      .map((eventBusConfig) => awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusConfig.name, props.qpqConfig, eventBusConfig));
 
     const policies: aws_iam.PolicyStatementProps[] = [
       // Resolve cross-stack resource names at runtime via CloudFormation exports. ListExports

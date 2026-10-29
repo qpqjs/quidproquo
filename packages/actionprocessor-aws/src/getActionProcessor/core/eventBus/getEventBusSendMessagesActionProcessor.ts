@@ -31,17 +31,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
       return actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus ${eventBusName} not found`);
     }
 
-    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusConfig.owner?.resourceNameOverride || eventBusName,
-      qpqConfig,
-
-      qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, qpqConfig),
-      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-
-      eventBusConfig.isFifo,
-    );
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusName, qpqConfig, eventBusConfig);
 
     // Each entry carries the caller's session so the consuming service resumes
     // with the same correlation/context.
