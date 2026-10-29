@@ -4,7 +4,7 @@ import { askContextList } from '../../actions/context/askContextList';
 import { askContextReadBase } from '../../actions/context/askContextRead';
 import { ActionOf, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
 import { Nullable } from '../../types/Nullable';
-import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
+import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/overrideActions';
 
 export function* askContextProvideValue<R, T extends AskResponse<any>>(
   contextIdentifier: QpqContextIdentifier<R>,

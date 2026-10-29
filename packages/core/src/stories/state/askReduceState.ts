@@ -1,7 +1,7 @@
 import { askStateDispatchBase, askStateReadBase, StateActionType } from '../../actions/state';
 import { QpqReducer } from '../../logic/stateEffects';
 import { ActionOf, AskResponse } from '../../types';
-import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
+import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/overrideActions';
 
 // Runs an inner story purely for its dispatched state effects and returns the computed state.
 //
