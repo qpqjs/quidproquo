@@ -1,6 +1,6 @@
 import { actionResult, AiDataRegion, AiModel, AiModelRegionMap, askAiGetModelRegions, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
-import { bedrockModelMap } from './aiModelMap';
+import { bedrockModelMap } from './utils';
 
 const processAiGetModelRegions: ProcessorFor<typeof askAiGetModelRegions> = async () => {
   // Filled by walking every enum member, which is what makes the seed cast honest.

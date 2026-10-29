@@ -1,6 +1,6 @@
 import { AiDataRegion, AiModel } from '@qpqjs/core';
 
-import { BedrockModelRegions } from './types';
+import { BedrockModelRegions } from '../types';
 
 // Each region's id is the cross-region inference profile that runs the request in that region. A
 // model with only a Global entry is processed wherever Bedrock chooses, so the resolver's preference

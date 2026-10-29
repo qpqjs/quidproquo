@@ -1,8 +1,8 @@
 import { AiModel, AiReasoningConfig } from '@qpqjs/core';
 
-import { bedrockBudgetThinkingModels } from '../bedrockBudgetThinkingModels';
-import { bedrockThinkingBudgetByEffort } from '../bedrockThinkingBudgetByEffort';
 import { BedrockReasoningOptions } from '../types';
+import { bedrockBudgetThinkingModels } from '../utils';
+import { bedrockThinkingBudgetByEffort } from '../utils';
 
 /**
  * The provider options that turn extended thinking on for a model, or nothing when the caller

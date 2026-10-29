@@ -2,8 +2,8 @@ import { actionResult, askEventGetRecordsBase, createActionProcessor, HTTPMethod
 import { FileUploadErrorTypeEnum, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
-import { getApiRecordPath } from './getApiRecordPath';
 import { EventInput, InternalEventRecord } from './types';
+import { getApiRecordPath } from './utils';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);

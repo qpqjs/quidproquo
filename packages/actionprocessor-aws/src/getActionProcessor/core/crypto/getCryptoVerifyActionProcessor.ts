@@ -11,7 +11,7 @@ import {
 } from '@qpqjs/core';
 
 import { getCachedPublicKey } from '../../../logic/kms/getCachedPublicKey';
-import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './kmsSigningErrorMap';
+import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './utils';
 import { resolveSigningKeyAlias } from './utils';
 
 // Verifies locally against the cached public key rather than calling kms:Verify,

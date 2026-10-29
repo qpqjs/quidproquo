@@ -10,7 +10,7 @@ import {
 } from '@qpqjs/core';
 
 import { getCachedPublicKey } from '../../../logic/kms/getCachedPublicKey';
-import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './kmsSigningErrorMap';
+import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './utils';
 import { resolveSigningKeyAlias } from './utils';
 
 const getProcessCryptoGetPublicKey = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryptoGetPublicKey> => {
