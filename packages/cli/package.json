@@ -46,7 +46,7 @@
     "@aws-sdk/client-sts": "^3.1093.0",
     "@inquirer/prompts": "^8.5.2",
     "@rspack/dev-server": "^2.1.0",
-    "aws-cdk": "^2.1132.1",
+    "aws-cdk": "^2.1146.1",
     "madge": "^8.0.0",
     "quidproquo": "0.3.0",
     "@qpqjs/actionprocessor-aws": "0.3.0",
