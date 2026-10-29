@@ -6,13 +6,11 @@ import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { getApiGatewayWebsocketEventEventProcessor } from './getApiGatewayWebsocketEventEventProcessor';
+
 const eventProcessors = { onConnect: 'connectRt', onDisconnect: 'disconnectRt', onMessage: 'messageRt' };
 
-// GLOBAL_WEBSOCKET_API_NAME is read from process.env at import time and is undefined in tests,
-// so the matching websocket setting also uses an undefined apiName.
-const websocketConfig = buildTestQpqConfig([
-  { configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: undefined, eventProcessors } as any,
-]);
+const websocketConfig = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: 'ws', eventProcessors } as any]);
 
 describe('websocket getApiGatewayWebsocketEventEventProcessor', () => {
   it('auto responds with null', async () => {
@@ -26,5 +24,21 @@ describe('websocket getApiGatewayWebsocketEventEventProcessor', () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
 
     expect(await processor({ qpqEventRecord: {}, eventParams: [{}, {}] })).toEqual([null]);
+  });
+});
+
+describe('apiGatwayEvent/websocket getApiGatewayWebsocketEventEventProcessor', () => {
+  it('composes a processor for every event action for the api the handler names', async () => {
+    const processors = await getApiGatewayWebsocketEventEventProcessor('ws')(websocketConfig, null as any);
+
+    expect(Object.keys(processors).sort()).toEqual(
+      [
+        EventActionType.AutoRespond,
+        EventActionType.GetRecords,
+        EventActionType.GetStorySession,
+        EventActionType.MatchStory,
+        EventActionType.TransformResponseResult,
+      ].sort(),
+    );
   });
 });

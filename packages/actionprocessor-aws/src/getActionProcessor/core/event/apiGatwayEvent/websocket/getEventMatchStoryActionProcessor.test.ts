@@ -8,11 +8,7 @@ import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionPro
 
 const eventProcessors = { onConnect: 'connectRt', onDisconnect: 'disconnectRt', onMessage: 'messageRt' };
 
-// GLOBAL_WEBSOCKET_API_NAME is read from process.env at import time and is undefined in tests,
-// so the matching websocket setting also uses an undefined apiName.
-const websocketConfig = buildTestQpqConfig([
-  { configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: undefined, eventProcessors } as any,
-]);
+const websocketConfig = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: 'ws', eventProcessors } as any]);
 
 describe('apiGatwayEvent/websocket getEventMatchStoryActionProcessor', () => {
   it.each([
@@ -20,7 +16,7 @@ describe('apiGatwayEvent/websocket getEventMatchStoryActionProcessor', () => {
     [WebSocketEventType.Disconnect, eventProcessors.onDisconnect],
     [WebSocketEventType.Message, eventProcessors.onMessage],
   ])('routes the %s event to its configured processor', async (eventType: WebSocketEventType, runtime: string) => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, websocketConfig);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ws'), EventActionType.MatchStory, websocketConfig);
 
     const [match] = await processor({ qpqEventRecord: { eventType } });
 
@@ -28,7 +24,7 @@ describe('apiGatwayEvent/websocket getEventMatchStoryActionProcessor', () => {
   });
 
   it('returns a NotFound error for an unknown event type', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, websocketConfig);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ws'), EventActionType.MatchStory, websocketConfig);
 
     const [, error] = await processor({ qpqEventRecord: { eventType: 'OTHER' } });
 

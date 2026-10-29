@@ -8,15 +8,11 @@ import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionPro
 
 const eventProcessors = { onConnect: 'connectRt', onDisconnect: 'disconnectRt', onMessage: 'messageRt' };
 
-// GLOBAL_WEBSOCKET_API_NAME is read from process.env at import time and is undefined in tests,
-// so the matching websocket setting also uses an undefined apiName.
-const websocketConfig = buildTestQpqConfig([
-  { configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: undefined, eventProcessors } as any,
-]);
+const websocketConfig = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.WebSocket, apiName: 'ws', eventProcessors } as any]);
 
 describe('apiGatwayEvent/websocket getEventGetRecordsActionProcessor', () => {
   it('maps a websocket request context to an internal record', async () => {
-    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor('ws'), EventActionType.GetRecords);
     const event = {
       body: 'hello',
       requestContext: {
@@ -40,7 +36,7 @@ describe('apiGatwayEvent/websocket getEventGetRecordsActionProcessor', () => {
         userAgent: 'agent',
         requestTime: new Date(0).toISOString(),
         body: 'hello',
-        apiName: undefined,
+        apiName: 'ws',
       },
     ]);
   });

@@ -5,14 +5,12 @@ import { describe, expect, it } from 'vitest';
 
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
-const buildS3Record = (eventName: string, key: string): any => ({ eventName, s3: { object: { key } } });
-
 describe('s3/fileEvent getEventMatchStoryActionProcessor', () => {
-  it('returns the storage drive runtime from the environment default', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory);
+  it('always matches the handler the lambda was stamped with', async () => {
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('/entry/drive::onEvent'), EventActionType.MatchStory);
 
     const [match] = await processor({ qpqEventRecord: {} });
 
-    expect((match as any).runtime).toBe('/::');
+    expect((match as any).runtime).toBe('/entry/drive::onEvent');
   });
 });

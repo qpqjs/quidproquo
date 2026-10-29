@@ -1,7 +1,7 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 import { WebSocketEventType } from '@qpqjs/webserver';
 
-import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord } from './types';
+import { EventInput, InternalEventRecord } from './types';
 
 const awsToQoqEventTypeMap = {
   MESSAGE: WebSocketEventType.Message,
@@ -9,7 +9,7 @@ const awsToQoqEventTypeMap = {
   DISCONNECT: WebSocketEventType.Disconnect,
 };
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+const getProcessGetRecords = (websocketApiName: string): ProcessorFor<typeof askEventGetRecordsBase> => {
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
@@ -26,11 +26,13 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       requestTime: new Date(websocketEvent.requestContext.requestTimeEpoch).toISOString(),
       body: websocketEvent.body as string | Blob | ArrayBuffer | undefined,
 
-      apiName: GLOBAL_WEBSOCKET_API_NAME,
+      apiName: websocketApiName,
     };
 
     return actionResult([internalEventRecord]);
   };
 };
 
-export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);
+/** The api the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventGetRecordsActionProcessor = (websocketApiName: string) =>
+  createActionProcessor(askEventGetRecordsBase, () => getProcessGetRecords(websocketApiName));

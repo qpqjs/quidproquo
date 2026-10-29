@@ -1,19 +1,15 @@
 import { EventActionType } from '@qpqjs/core';
 import { resolveEventProcessor } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
-
-// The runtime is stamped on the lambda environment at module load, so it has to be in place
-// before the import below is evaluated.
-vi.hoisted(() => {
-  process.env.kvsStreamEntry = JSON.stringify('/entry/kvs::onStream');
-});
+import { describe, expect, it } from 'vitest';
 
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
+const settings = { keyValueStoreName: 'test-events', runtime: '/entry/kvs::onStream', coalesceByPartitionKey: true, partitionKey: 'pk' };
+
 describe('dynamo/streamEvent getEventMatchStoryActionProcessor', () => {
   it('always matches the one stream handler stamped on the lambda', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor(settings.runtime), EventActionType.MatchStory);
 
     const [match, error] = await processor({ qpqEventRecord: { eventType: 'INSERT' } });
 

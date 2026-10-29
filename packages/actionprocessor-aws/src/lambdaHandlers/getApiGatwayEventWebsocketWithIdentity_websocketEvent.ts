@@ -4,6 +4,7 @@ import { APIGatewayEventWebsocketRequestContextV2, APIGatewayProxyWebsocketEvent
 
 import { getApiGatewayWebsocketEventEventProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
+import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 // TODO: @joe-coady: this shape is also declared in getActionProcessor/core/event/apiGatwayEvent/websocket/types.ts;
@@ -18,7 +19,7 @@ export const getApiGatwayEventWebsocketWithIdentity_websocketEvent = (dynamicMod
   getQpqLambdaRuntimeForEvent<ApiGatwayEventWebsocketWithIdentity>(
     QpqRuntimeType.WEBSOCKET_EVENT,
     getBlankStorySession,
-    getApiGatewayWebsocketEventEventProcessor,
+    getApiGatewayWebsocketEventEventProcessor(requireLambdaEnvironment('websocketApiName')),
     dynamicModuleLoader,
     qpqConfig,
   );

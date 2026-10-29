@@ -1,13 +1,12 @@
-import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QpqFunctionRuntime } from '@qpqjs/core';
 
-import { GLOBAL_STORAGE_DRIVE_RUNTIME, MatchResult } from './types';
+import { MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  return async ({ qpqEventRecord }) => {
-    return actionResult<MatchResult>({
-      runtime: GLOBAL_STORAGE_DRIVE_RUNTIME,
-    });
-  };
+// One drive, one handler, stamped on the lambda by the CDK: there is nothing to route on.
+const getProcessMatchStory = (storageDriveRuntime: QpqFunctionRuntime): ProcessorFor<typeof askEventMatchStoryBase> => {
+  return async () => actionResult<MatchResult>({ runtime: storageDriveRuntime });
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The handler the lambda runs comes from the handler module, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (storageDriveRuntime: QpqFunctionRuntime) =>
+  createActionProcessor(askEventMatchStoryBase, () => getProcessMatchStory(storageDriveRuntime));

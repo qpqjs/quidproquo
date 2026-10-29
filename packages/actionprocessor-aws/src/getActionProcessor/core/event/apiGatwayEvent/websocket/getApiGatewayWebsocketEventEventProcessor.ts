@@ -5,13 +5,12 @@ import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionPro
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-export const getApiGatewayWebsocketEventEventProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-  dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => ({
-  ...(await getEventAutoRespondNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventGetStorySessionNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventMatchStoryActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
-});
+export const getApiGatewayWebsocketEventEventProcessor =
+  (websocketApiName: string): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
+    ...(await getEventAutoRespondNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetRecordsActionProcessor(websocketApiName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetStorySessionNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventMatchStoryActionProcessor(websocketApiName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
+  });

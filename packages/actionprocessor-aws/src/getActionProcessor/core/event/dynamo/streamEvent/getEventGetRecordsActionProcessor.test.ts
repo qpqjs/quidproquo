@@ -2,17 +2,11 @@ import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionAc
 import { EventActionType, KvsStreamEventType } from '@qpqjs/core';
 import { resolveEventProcessor } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
-
-// The processor reads its configuration from the environment at module load, so this has to
-// be in place before the import below is evaluated.
-vi.hoisted(() => {
-  process.env.keyValueStoreName = 'test-events';
-  process.env.kvsStreamPartitionKey = 'pk';
-  process.env.kvsStreamCoalesceByPartitionKey = 'true';
-});
+import { describe, expect, it } from 'vitest';
 
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
+
+const settings = { keyValueStoreName: 'test-events', runtime: '/entry/kvs::onStream', coalesceByPartitionKey: true, partitionKey: 'pk' };
 
 const SCOPE_DELIMITER = '@@QPQSCOPE@@';
 
@@ -25,7 +19,7 @@ const buildStreamRecord = (eventName: string, pk: string, sk: string, extra: Rec
 });
 
 const getRecords = async (records: any[]) => {
-  const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+  const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor(settings), EventActionType.GetRecords);
   const [result] = await processor({ eventParams: [{ Records: records }, {}] });
 
   return result as any[];
