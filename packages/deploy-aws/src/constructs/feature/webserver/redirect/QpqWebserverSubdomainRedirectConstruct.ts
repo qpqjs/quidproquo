@@ -43,8 +43,8 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       environment: {
-        redirectBaseUrl: JSON.stringify(redirectBaseUrl),
-        appendPath: JSON.stringify(appendPath),
+        redirectBaseUrl,
+        appendPath: String(appendPath),
       },
 
       role: this.getServiceRole(),
