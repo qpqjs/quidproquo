@@ -1,9 +1,10 @@
 // Comments describe the code as it is now (G7): no em dashes, and no narrating what the
 // code used to do. Git holds the history.
 const EM_DASH = /—/;
-// The narrative past tense only, not the passive "a value used to derive the key".
+// The narrative past tense only, not the passive "a value used to derive the key". "No longer" is
+// left alone: it is mostly present-tense logic ("a code the catalog no longer names").
 const HISTORY =
-  /\b(used to (be|have|do|call|run|return|live|sit|hold|point|take|get|make|need|mean|work|exist|require|keep|store|read|write|throw|skip|check|handle|send|load|invoke)|no longer|previously|moved from)\b/i;
+  /\b(used to (be|have|do|call|run|return|live|sit|hold|point|take|get|make|need|mean|work|exist|require|keep|store|read|write|throw|skip|check|handle|send|load|invoke)|previously|moved from)\b/i;
 
 export default {
   meta: {

@@ -7,6 +7,8 @@ const consoleAllowed = [
   '**/log/**',
   '**/metric/**',
   '**/lambdaExtensions/**',
+  // The console-redaction feature's processors write the redacted line to the console on purpose.
+  '**/consoleLogRedaction/**',
   // The console patcher that captures console output into a story's log.
   '**/resolveStoryWithLogs*',
 ];

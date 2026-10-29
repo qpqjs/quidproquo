@@ -13,9 +13,7 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-  QpqContextIdentifier,
   runStory,
-  storageScopeContext,
   throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
@@ -33,7 +31,7 @@ import {
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
 } from '../eventDoc/constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
-import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
+import { EventDocEffect, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
 import { toQpqPermission } from '../permission/logic/toQpqPermission';

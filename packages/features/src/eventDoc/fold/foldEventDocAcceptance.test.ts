@@ -3,7 +3,7 @@ import { QpqReducer } from '@qpqjs/core';
 import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW } from '../constants/eventDocRecentClientMessageIdWindow';
-import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocStatus } from '../models';
+import { EventDocDocument, EventDocEffect, EventDocEvent } from '../models';
 import { EventDocEventValidators } from '../validation/types/EventDocEventValidators';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
 import { foldEventDocBase } from './foldEventDocBase';

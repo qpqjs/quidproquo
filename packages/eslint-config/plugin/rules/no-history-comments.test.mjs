@@ -19,10 +19,11 @@ ruleTester.run('no-history-comments', rule, {
     '// The batch is a transaction: a losing writer gets Conflict with nothing landed.',
     '/** Reads the active tenant scope, or null outside a tenant-aware request. */',
     '// A value used to derive the key (the passive sense is not history)',
+    '// A code the catalog no longer names grants nothing',
   ],
   invalid: [
     { code: '// Resolve the host — the apex has no subdomain', errors: [{ messageId: 'emDash' }] },
     { code: '// This used to be four implementations', errors: [{ messageId: 'history' }] },
-    { code: '/* no longer reads the json files */', errors: [{ messageId: 'history' }] },
+    { code: '/* previously read the json files */', errors: [{ messageId: 'history' }] },
   ],
 });

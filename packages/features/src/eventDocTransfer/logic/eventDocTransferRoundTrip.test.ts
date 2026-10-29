@@ -383,7 +383,6 @@ const seedDiamond = (environment: TestEnvironment): void => {
 
 const secondTemplateRef = { service: SERVICE, type: TEMPLATE_TYPE, id: 'template-2' };
 const templateRef = { service: SERVICE, type: TEMPLATE_TYPE, id: 'template-1' };
-const contentRef = { service: SERVICE, type: CONTENT_TYPE, id: 'content-1' };
 
 const eventsFor = (environment: TestEnvironment, type: string, docId: string): EventDocEvent[] =>
   (environment.tables[eventDocEventsStoreName(storeNameForType(type))] ?? [])

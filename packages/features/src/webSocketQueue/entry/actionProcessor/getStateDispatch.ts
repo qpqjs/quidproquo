@@ -1,5 +1,4 @@
 import {
-  askLog,
   AskResponse,
   askStateDispatchBase,
   generateUuid,

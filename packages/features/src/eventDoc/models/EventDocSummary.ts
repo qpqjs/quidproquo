@@ -28,8 +28,4 @@ export type EventDocSummaryView = z.infer<typeof eventDocSummaryViewSchema>;
  * The summary view as stored (pk=type, sk=id). A row written before the view carried `eventId` has none, which the
  * writers treat as older than anything.
  */
-const eventDocSummarySchema = eventDocSummaryViewSchema.extend({
-  type: z.string(),
-});
-
-export type EventDocSummary = z.infer<typeof eventDocSummarySchema>;
+export type EventDocSummary = z.infer<typeof eventDocSummaryViewSchema> & { type: string };
