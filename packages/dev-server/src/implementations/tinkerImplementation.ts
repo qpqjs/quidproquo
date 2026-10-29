@@ -14,6 +14,12 @@ import { requestDevServerShutdown } from '../logic';
 import { ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from '../types';
 import { getDevServerLogger } from './logger';
 
+// The REPL is an interactive terminal, so stdout is its UI. Every line the tinker
+// prints goes through here, which keeps the rest of the file free of console calls.
+const tinkerPrint = (line: string): void => {
+  console.log(line);
+};
+
 const getDateNow = () => new Date().toISOString();
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
@@ -79,7 +85,7 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         throw new Error(`Service '${serviceName}' not found. Available services: ${availableServices.join(', ')}`);
       }
       currentServiceName = serviceName;
-      console.log(`Switched to service: ${serviceName}`);
+      tinkerPrint(`Switched to service: ${serviceName}`);
     },
 
     getCurrentService: () => currentServiceName,
@@ -89,21 +95,19 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
     getServiceConfig,
 
     startRepl: () => {
-      console.log(`\n🔧 QPQ Tinker - Interactive Development Environment`);
-      console.log(`📦 Current service: ${currentServiceName}`);
-      console.log(`📚 Available services: ${availableServices.join(', ')}\n`);
-      console.log(`Commands:`);
-      console.log(`  .editor or .e  - Enter multiline editor mode`);
-      console.log(`  .help         - Show all commands`);
-      console.log(`  .exit         - Exit tinker\n`);
-      console.log(`Usage (automatically runs in QPQ context):`);
-      console.log(`  yield* askDateNow()                        - Direct generator code`);
-      console.log(`  yield* askExecuteServiceFunction(...)      - Call service functions`);
-      console.log(`  requireLocal('./logic/utils')              - Import regular modules`);
-      console.log(`  await importLocal('./entry/queueEvent/x')  - Import QPQ entry points`);
-      console.log(`  tinker.switchService('serviceName')        - Change service context`);
-      console.log(`  tinker.getServices()                       - List services\n`);
-      console.log(`Tip: Code is automatically wrapped in a generator function and executed via run()\n`);
+      tinkerPrint(`\n🔧 QPQ Tinker - Interactive Development Environment`);
+      tinkerPrint(`📦 Current service: ${currentServiceName}`);
+      tinkerPrint(`📚 Available services: ${availableServices.join(', ')}\n`);
+      tinkerPrint(`Commands:`);
+      tinkerPrint(`  .editor or .e  - Enter multiline editor mode`);
+      tinkerPrint(`  .help         - Show all commands`);
+      tinkerPrint(`  .exit         - Exit tinker\n`);
+      tinkerPrint(`Usage (automatically runs in QPQ context):`);
+      tinkerPrint(`  yield* askDateNow()                        - Direct generator code`);
+      tinkerPrint(`  yield* askExecuteServiceFunction(...)      - Call service functions`);
+      tinkerPrint(`  tinker.switchService('serviceName')        - Change service context`);
+      tinkerPrint(`  tinker.getServices()                       - List services\n`);
+      tinkerPrint(`Tip: Code is automatically wrapped in a generator function and executed via run()\n`);
 
       const replServer = repl.start({
         prompt: `qpq:${currentServiceName}> `,
@@ -168,14 +172,14 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         help: 'Enter editor mode for multiline input',
         action() {
           (this as any).editorMode = true;
-          console.log('// Entering editor mode (Ctrl+D to finish, Ctrl+C to cancel)');
+          tinkerPrint('// Entering editor mode (Ctrl+D to finish, Ctrl+C to cancel)');
           this.displayPrompt();
         },
       });
 
       // Start in editor mode if requested
       if (tinkerOptions?.editorMode) {
-        console.log('Starting in editor mode. Use Ctrl+D to execute, Ctrl+C to cancel.\n');
+        tinkerPrint('Starting in editor mode. Use Ctrl+D to execute, Ctrl+C to cancel.\n');
         (replServer as any).editorMode = true;
       }
 
@@ -204,7 +208,7 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
       // whatever the session had just written and any projection it triggered
       // - the same data-loss bug as an unhandled SIGTERM, in a second place.
       const handleReplExit = async (): Promise<void> => {
-        console.log('\n👋 Goodbye from QPQ Tinker!');
+        tinkerPrint('\n👋 Goodbye from QPQ Tinker!');
         await requestDevServerShutdown();
         process.exit(0);
       };
