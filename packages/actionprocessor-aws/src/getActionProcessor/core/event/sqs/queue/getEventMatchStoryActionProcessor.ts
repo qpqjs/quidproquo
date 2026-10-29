@@ -25,12 +25,15 @@ export const getQueueConfigSetting = (qpqConfig: QPQConfig, queueName: string): 
   return queueQPQConfigSetting;
 };
 
-const getProcessMatchStory = (qpqConfig: QPQConfig, queueName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig, queueName);
-  const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
-  const queueTypes = Object.keys(queueQueueProcessors).sort();
+/** How a runtime learns which queue an event belongs to: the lambda knows from its environment, the dev server reads it off the message. */
+export type ResolveQueueName = (eventParams: unknown[]) => string;
 
-  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
+const getProcessMatchStory = (qpqConfig: QPQConfig, resolveQueueName: ResolveQueueName): ProcessorFor<typeof askEventMatchStoryBase> => {
+  return async ({ qpqEventRecord: rawQpqEventRecord, eventParams }) => {
+    const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig, resolveQueueName(eventParams));
+    const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
+    const queueTypes = Object.keys(queueQueueProcessors).sort();
+
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
@@ -63,6 +66,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig, queueName: string): Processo
   };
 };
 
-/** The queue the lambda drains comes from the handler, which reads it from the lambda environment once. */
-export const getEventMatchStoryActionProcessor = (queueName: string) =>
-  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, queueName));
+/** Shared by the lambda and the dev server (B6); each passes how it resolves the queue name. */
+export const getEventMatchStoryActionProcessor = (resolveQueueName: ResolveQueueName) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, resolveQueueName));

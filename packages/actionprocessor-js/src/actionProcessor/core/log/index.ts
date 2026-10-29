@@ -14,3 +14,7 @@ export const getLogActionProcessor: ActionProcessorListResolver = async (
   ...(await getLogTemplateLiteralActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getLogRedactStringActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
+
+// The dev server reuses these two instead of keeping copies (B6).
+export * from './getLogCreateActionProcessor';
+export * from './getLogDisableEventHistoryActionProcessor';

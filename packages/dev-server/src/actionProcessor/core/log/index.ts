@@ -1,7 +1,6 @@
+import { getLogCreateActionProcessor, getLogDisableEventHistoryActionProcessor } from '@qpqjs/actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
-import { getLogCreateActionProcessor } from './getLogCreateActionProcessor';
-import { getLogDisableEventHistoryActionProcessor } from './getLogDisableEventHistoryActionProcessor';
 import { getLogTemplateLiteralActionProcessor } from './getLogTemplateLiteralActionProcessor';
 
 export const getLogActionProcessor: ActionProcessorListResolver = async (

@@ -12,6 +12,13 @@ export const getSqsQueueEventProcessor =
     ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventMatchStoryActionProcessor(queueName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventMatchStoryActionProcessor(() => queueName)(qpqConfig, dynamicModuleLoader)),
     ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
   });
+
+// The dev server drains its local queues through the same matcher.
+export {
+  getQueueConfigSetting,
+  getEventMatchStoryActionProcessor as getSqsQueueEventMatchStoryActionProcessor,
+  ResolveQueueName,
+} from './getEventMatchStoryActionProcessor';

@@ -76,7 +76,11 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
     buildTestQpqConfig([defineQueue('q', { orderCreated: runtime }, { eventBusSubscriptions })]);
 
   it('matches a queue message type to its processor', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('q'), EventActionType.MatchStory, buildConfig());
+    const processor = await resolveEventProcessor(
+      getEventMatchStoryActionProcessor(() => 'q'),
+      EventActionType.MatchStory,
+      buildConfig(),
+    );
 
     const [match] = await processor({ qpqEventRecord: { message: { type: 'orderCreated' } } });
 
@@ -84,7 +88,11 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   });
 
   it('returns a NotFound error when no queue type matches and there are no subscriptions', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('q'), EventActionType.MatchStory, buildConfig());
+    const processor = await resolveEventProcessor(
+      getEventMatchStoryActionProcessor(() => 'q'),
+      EventActionType.MatchStory,
+      buildConfig(),
+    );
 
     const [, error] = await processor({ qpqEventRecord: { message: { type: 'unknown' } } });
 
@@ -92,7 +100,11 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   });
 
   it('exits gracefully with an empty match when there are event bus subscriptions', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('q'), EventActionType.MatchStory, buildConfig(['sub']));
+    const processor = await resolveEventProcessor(
+      getEventMatchStoryActionProcessor(() => 'q'),
+      EventActionType.MatchStory,
+      buildConfig(['sub']),
+    );
 
     const [match] = await processor({ qpqEventRecord: { message: { type: 'unknown' } } });
 
