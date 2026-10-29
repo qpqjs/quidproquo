@@ -11,14 +11,14 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { originalPositionFor, sourceContentFor, TraceMap } from '@jridgewell/trace-mapping';
 
-interface RawTraceStep {
+type RawTraceStep = {
   scriptId: string;
   line: number; // 0-based (CDP)
   column: number;
   functionName: string;
   locals: Record<string, QpqExecutionTraceValue>;
   returnValue?: QpqExecutionTraceValue;
-}
+};
 
 const scriptUrlToPath = (scriptUrl: string): string => (scriptUrl.startsWith('file://') ? fileURLToPath(scriptUrl) : scriptUrl);
 
@@ -95,10 +95,10 @@ export const getOwnCodeMarkersFromRoot = (root: string): string[] => {
   return tailSegments && tailSegments !== normalized ? [normalized, tailSegments] : [normalized];
 };
 
-export interface ResolvedTraceSteps {
+export type ResolvedTraceSteps = {
   sources: QpqExecutionTraceSource[];
   steps: QpqExecutionTraceStep[];
-}
+};
 
 export const resolveSourceMappedSteps = (rawSteps: RawTraceStep[], scriptUrlsById: Record<string, string>): ResolvedTraceSteps => {
   const traceMapsByScriptId = new Map<string, Nullable<TraceMap>>();

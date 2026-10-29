@@ -29,7 +29,7 @@ import { Nullable } from '@qpqjs/core';
 // parent before spawning): Runtime.evaluate -> [[FunctionLocation]] -> scriptId. Extra
 // scripts (other bundle chunks, dynamically loaded ones) are matched by scriptPatterns.
 
-export interface TraceControllerWorkerData {
+export type TraceControllerWorkerData = {
   // Regex sources matched against script urls; matching scripts are traced in addition
   // to the story function's own script.
   scriptPatterns: string[];
@@ -44,21 +44,21 @@ export interface TraceControllerWorkerData {
   maxProperties: number;
   maxValueDepth: number;
   maxSerializedLength: number;
-}
+};
 
-interface TraceRawValue {
+type TraceRawValue = {
   preview: string;
   json?: string;
-}
+};
 
-interface TraceRawStep {
+type TraceRawStep = {
   scriptId: string;
   line: number; // 0-based (CDP)
   column: number;
   functionName: string;
   locals: Record<string, TraceRawValue>;
   returnValue?: TraceRawValue;
-}
+};
 
 export function traceControllerWorkerMain(): void {
   // require, not import: this function body is the ENTIRE worker source (eval mode) ,
@@ -247,10 +247,10 @@ export function traceControllerWorkerMain(): void {
     return { captured, work };
   };
 
-  interface CapturedStepValues {
+  type CapturedStepValues = {
     locals: Record<string, TraceRawValue>;
     returnValue?: TraceRawValue;
-  }
+  };
 
   // Local + block scopes only, outermost first so inner scopes win name collisions.
   // At a return break position the frame also carries the value being returned.

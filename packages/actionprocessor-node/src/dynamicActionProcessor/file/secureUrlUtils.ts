@@ -4,12 +4,12 @@ import * as crypto from 'crypto';
 
 import { FileStorageConfig } from './types';
 
-export interface SecureUrlToken {
+export type SecureUrlToken = {
   fullFilepath: string;
   operation: 'download' | 'upload';
   expiresAt: number;
   contentType?: string;
-}
+};
 
 // Create a signed token for secure URLs
 export const createSecureUrlToken = (token: SecureUrlToken, secret: string): string => {

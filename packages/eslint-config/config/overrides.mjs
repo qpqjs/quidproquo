@@ -15,8 +15,7 @@ const consoleAllowed = [
 ];
 
 // Rules switched on by the code standards (H1). A rule is an error once every package is
-// clean under it; the rest warn until their cleanup lines land (B9 for no-console, G5 for
-// interface-to-type).
+// clean under it; the rest warn until their cleanup lines land (B9 for no-console).
 export const overrides = [
   {
     linterOptions: {
@@ -34,7 +33,7 @@ export const overrides = [
         'warn',
         { args: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
       ],
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
 
       // Off by decision: `any` is allowed at variance boundaries with a comment, and
       // `@ts-ignore` is allowed, not just `@ts-expect-error`.

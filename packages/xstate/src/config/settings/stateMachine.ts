@@ -16,7 +16,7 @@ import { QPQXStateConfigSettingType } from '../QPQConfig';
 /** Maps xstate action/guard names to the QPQ story runtimes that implement them. */
 export type StateMachineRuntimeMap = Record<string, QpqFunctionRuntime>;
 
-export interface QPQConfigAdvancedStateMachineSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedStateMachineSettings = {
   /** The xstate machine definition; action and guard names are resolved through the runtime maps below. */
   config: MachineConfig<MachineContext, EventObject>;
   actions?: StateMachineRuntimeMap;
@@ -24,16 +24,16 @@ export interface QPQConfigAdvancedStateMachineSettings extends QPQConfigAdvanced
   /** The entity field the machine snapshot is persisted under (default '__machineState'). */
   stateField?: string;
   owner?: CrossModuleOwner;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface StateMachineQPQConfigSetting extends QPQConfigSetting {
+export type StateMachineQPQConfigSetting = {
   stateMachineName: string;
   keyValueStoreName: string;
   config: MachineConfig<MachineContext, EventObject>;
   actions: StateMachineRuntimeMap;
   guards: StateMachineRuntimeMap;
   stateField: string;
-}
+} & QPQConfigSetting;
 
 /** Derives the name of the key value store that backs a state machine's entities. */
 export const getStateMachineStoreName = (stateMachineName: string): string => `qpq-sm-${stateMachineName}`;

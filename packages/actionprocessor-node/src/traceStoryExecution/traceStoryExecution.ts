@@ -17,7 +17,7 @@ import { Worker } from 'worker_threads';
 import { TraceControllerWorkerData, traceControllerWorkerMain } from './controllerWorker';
 import { filterOwnCodeLocations, resolveSourceMappedSteps } from './resolveSourceMaps';
 
-export interface TraceStoryExecutionOptions {
+export type TraceStoryExecutionOptions = {
   // Regex sources matched against script urls to trace IN ADDITION to the story
   // function's own script (auto-detected via [[FunctionLocation]]). Use for bundles
   // split across chunks, e.g. ['/tmp/qpq-federated-code/'].
@@ -48,14 +48,14 @@ export interface TraceStoryExecutionOptions {
   // Passed through to qpqExecuteLog, lets specific action types execute for real
   // instead of being answered from the log.
   overrides?: ActionProcessorList;
-}
+};
 
-export interface TraceStoryExecutionResult {
+export type TraceStoryExecutionResult = {
   trace: QpqExecutionTrace;
 
   // The replay's own StoryResult (result/error of re-running the story)
   replay: StoryResult<any>;
-}
+};
 
 // Ready covers domain enable + breakpoint installation across every traced chunk ,
 // generous because the service function running this has minutes of budget, and an
