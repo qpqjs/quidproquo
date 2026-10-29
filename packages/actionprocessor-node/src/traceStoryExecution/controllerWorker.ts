@@ -190,10 +190,12 @@ export function traceControllerWorkerMain(): void {
         result = {};
         const keys = Object.keys(value);
         for (let i = 0; i < keys.length && i < maxProps; i += 1) {
+          const key = keys[i];
+          if (key === undefined) continue;
           try {
-            result[keys[i]] = walk(value[keys[i]], depth + 1);
+            result[key] = walk(value[key], depth + 1);
           } catch {
-            result[keys[i]] = '«threw»';
+            result[key] = '«threw»';
           }
         }
         if (keys.length > maxProps) result['«more»'] = '+' + (keys.length - maxProps) + ' properties';

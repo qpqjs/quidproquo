@@ -27,7 +27,7 @@ const scriptUrlToPath = (scriptUrl: string): string => (scriptUrl.startsWith('fi
 const findSourceMappingUrl = (scriptText: string): Nullable<string> => {
   const matches = scriptText.match(/\/\/[#@] sourceMappingURL=(\S+)/g);
   if (!matches || matches.length === 0) return null;
-  return matches[matches.length - 1].replace(/\/\/[#@] sourceMappingURL=/, '');
+  return matches[matches.length - 1]?.replace(/\/\/[#@] sourceMappingURL=/, '') ?? null;
 };
 
 const loadTraceMap = (scriptPath: string): Nullable<TraceMap> => {
@@ -37,10 +37,9 @@ const loadTraceMap = (scriptPath: string): Nullable<TraceMap> => {
     if (!sourceMappingUrl) return null;
 
     if (sourceMappingUrl.startsWith('data:')) {
-      const base64Match = sourceMappingUrl.match(/^data:application\/json[^,]*;base64,(.*)$/);
-      const json = base64Match
-        ? Buffer.from(base64Match[1], 'base64').toString('utf8')
-        : decodeURIComponent(sourceMappingUrl.replace(/^data:[^,]*,/, ''));
+      const base64 = sourceMappingUrl.match(/^data:application\/json[^,]*;base64,(.*)$/)?.[1];
+      const json =
+        base64 !== undefined ? Buffer.from(base64, 'base64').toString('utf8') : decodeURIComponent(sourceMappingUrl.replace(/^data:[^,]*,/, ''));
       return new TraceMap(json);
     }
 
