@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createInitialTenantDocumentState } from '../createInitialTenantDocumentState';
+import { createInitialTenantDocumentState } from '../logic/createInitialTenantDocumentState';
 import { setBrand } from './setBrand';
 
 // Security regression: the brand fold is an allow-list merge of colours, logo asset ref and display name; any other key

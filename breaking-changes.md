@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Tenant fold effects follow the module layout: `TenantEffect.setBrand` is `TenantEffect.SetBrand` (same `SET_BRAND` value on the wire), `SetBrandEffect` is `TenantSetBrandEffect`, and `TenantEffects`, the enum and the effect live under `tenant/fold/effects/`; `createInitialTenantDocumentState` and `foldTenantDocument` under `tenant/fold/logic/` (E1/E2).
 - `defineDomainProxy` no longer takes `domainProxyViewerProtocolPolicy` and the webserver `DomainProxyViewerProtocolPolicy` enum is gone; on AWS declare `defineAwsDomainProxyViewerProtocolPolicy(domainProxyName, AwsDomainProxyViewerProtocolPolicy.httpsOnly | redirectToHttps | allowAll)` from `@qpqjs/config-aws` (default redirect-to-https, as before) (D3).
 - `defineQueue` no longer caps `ttRetryInSeconds` at 15 minutes; the deployed consumer's timeout is capped at lambda's ceiling and the queue's visibility timeout honours the full delay. `defineUserScriptRunner` only checks for whole positive numbers; lambda's timeout and memory ceilings are checked at synth (`assertLambdaTimeoutInSeconds`, `assertLambdaMemoryInMiB` in `@qpqjs/config-aws`) (D3).
 - `FileUploadSettings.maxFileSizeBytes` is optional and `defaultFileUploadSettings` no longer carries the 10MB API Gateway cap; the AWS runtime resolves it with `getAwsFileUploadSettings` (D3).

@@ -45,7 +45,7 @@ import {
   TENANT_RECORD_STORE,
   TENANT_SCOPE_RESOLVER_FN,
 } from './constants/tenantStoreNames';
-import { TenantEffect } from './fold/TenantEffect';
+import { TenantEffect } from './fold/effects/TenantEffect';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
 import { buildTenantRolesConfig } from './logic/roles/buildTenantRolesConfig';
@@ -319,7 +319,7 @@ describe('tenant feature', () => {
       appendEvent(
         httpEvent(
           {
-            type: TenantEffect.setBrand,
+            type: TenantEffect.SetBrand,
             payload: {
               data: {
                 brandColors: { primary: '#123456', secondary: '#abcdef' },

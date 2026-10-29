@@ -1,8 +1,9 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askApplyEventDocEvent } from '../../../eventDoc';
-import { TenantEffect } from '../../fold';
-import { TenantSetBrandData } from '../../models';
+import { askApplyEventDocEvent } from '../../../eventDoc/actions/askApplyEventDocEvent';
+import { TenantEffect } from '../../fold/effects/TenantEffect';
+import { TenantSetBrandEffect } from '../../fold/effects/TenantSetBrandEffect';
+import { TenantSetBrandData } from '../../models/TenantSetBrandData';
 
 // Append a SET_BRAND event, the editor stamps the schema version + provenance.
 //
@@ -11,5 +12,5 @@ import { TenantSetBrandData } from '../../models';
 // the fold merges partially, so a partial coalesced event would silently drop
 // earlier unsaved edits.
 export function* askTenantSetBrand(data: TenantSetBrandData): AskResponse<void> {
-  yield* askApplyEventDocEvent(TenantEffect.setBrand, data satisfies TenantSetBrandData);
+  yield* askApplyEventDocEvent<TenantSetBrandEffect>(TenantEffect.SetBrand, data);
 }

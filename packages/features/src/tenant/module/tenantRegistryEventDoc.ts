@@ -1,8 +1,8 @@
 import { createEventDocDefinition } from '../../eventDoc/definition/createEventDocDefinition';
 import { TENANT_DOC_TYPE, TENANT_EVENTDOC_STORE } from '../constants/tenantStoreNames';
-import { createInitialTenantDocumentState } from '../fold/createInitialTenantDocumentState';
+import { TenantEffect } from '../fold/effects/TenantEffect';
+import { createInitialTenantDocumentState } from '../fold/logic/createInitialTenantDocumentState';
 import { tenantDocumentFoldReducer } from '../fold/tenantDocumentFoldReducer';
-import { TenantEffect } from '../fold/TenantEffect';
 import { askTenantSetBrand } from './actionCreators/askTenantSetBrand';
 import { TENANT_VERSION } from './constants/tenantVersion';
 
@@ -28,7 +28,7 @@ export const tenantRegistryEventDoc = createEventDocDefinition({
       },
     },
   ],
-  coalesceEventTypes: [TenantEffect.setBrand],
+  coalesceEventTypes: [TenantEffect.SetBrand],
   api: {
     askTenantSetBrand,
   },
