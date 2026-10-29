@@ -29,9 +29,9 @@ const ev = (type: string, data: unknown = {}): EventDocEvent => ({
 
 const init = () => ev(InitState, { id: 'd1', code: 'C', name: 'N' });
 
-// A collection whose domain rule ALLOWS a specific event even on a published doc — proving a
+// A collection whose domain rule ALLOWS a specific event even on a published doc, proving a
 // domain entry can relax the reserved guard (no collection currently needs this, but the helper
-// must support it) — alongside a plain domain edit that carries no override and so inherits the
+// must support it), alongside a plain domain edit that carries no override and so inherits the
 // reserved lifecycle guard.
 const domainValidators: EventDocEventValidators = {
   ROTATE: () => null,

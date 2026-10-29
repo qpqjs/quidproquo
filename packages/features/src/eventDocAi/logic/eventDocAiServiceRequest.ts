@@ -15,7 +15,7 @@ type ResponseOf<R> = R extends ServiceRequester<any, infer T> ? T : never;
 // The eventDocAi handler wrapper (mirrors mincept's minceptServiceRequest):
 // gates on connection auth, strips the relayed docId off the wire payload and
 // re-provides the doc context (serviceName/type from the processor globals +
-// docId) around the handler — so handlers, nested logic, and TOOL RUNTIMES
+// docId) around the handler, so handlers, nested logic, and TOOL RUNTIMES
 // (which inherit the session context) all read the trusted docId from context
 // rather than from anything the caller or the model could fabricate.
 export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(

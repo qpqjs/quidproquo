@@ -50,7 +50,7 @@ const globals: Record<string, string> = {
 };
 
 // Generic evaluator for the operators this flow issues. Sort keys are the numeric event
-// ids, so ordering operators compare numerically — exactly the contract the real store
+// ids, so ordering operators compare numerically, exactly the contract the real store
 // honours.
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
 
@@ -279,7 +279,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     expect(page.items).toEqual([]);
   });
 
-  it('under a snapshot cache key, only rows filed under that key are a usable base — legacy rows are invisible', () => {
+  it('under a snapshot cache key, only rows filed under that key are a usable base, legacy rows are invisible', () => {
     const { mocks, tables } = buildMocks();
     const docId = seedDocWithEvents(mocks);
 

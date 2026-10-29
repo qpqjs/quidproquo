@@ -91,7 +91,6 @@ export const getDecodedAccessTokenFromGetStorySessionActionInStoryResult = (stor
 };
 
 export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: number): LogMetadata => {
-  // Add the generic text to the tag list
   const tags = [...(extractors[storyResult.runtimeType]?.(storyResult) || []), ...storyResult.tags];
 
   const decodedAccessToken =
@@ -121,12 +120,10 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
     metadata.ttl = undefined;
   }
 
-  // Return the metadata
   return metadata;
 };
 
 export function* askErrorReadingStoryResultToMetadata(correlation: string): AskResponse<LogMetadata> {
-  // Add the generic text to the tag list
   const errorText = 'Error loading story result';
   const tags = [errorText];
 
@@ -142,7 +139,6 @@ export function* askErrorReadingStoryResultToMetadata(correlation: string): AskR
     error: errorText,
   };
 
-  // Return the metadata
   return metadata;
 }
 

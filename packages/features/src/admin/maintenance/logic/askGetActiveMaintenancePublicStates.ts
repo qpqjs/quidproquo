@@ -9,10 +9,10 @@ import { MaintenancePublicState } from '../eventDoc/MaintenancePublicState';
 import { MaintenanceState } from '../eventDoc/v1/views/document/MaintenanceState';
 
 // Fold every publicly visible maintenance (open draft, has updates, not
-// Internal — see isMaintenancePubliclyVisible) to its public projection, newest
+// Internal, see isMaintenancePubliclyVisible) to its public projection, newest
 // first. Requires the maintenance store context (route globals or
 // askEventDocProvideStore). The summary's open-draft flag pre-filters so only
-// active docs pay the state read — which is snapshot-seeded (the registered
+// active docs pay the state read, which is snapshot-seeded (the registered
 // definition's foldDocumentState), so an active doc costs its burst since the
 // last snapshot, not its log.
 export function* askGetActiveMaintenancePublicStates(): AskResponse<MaintenancePublicState[]> {

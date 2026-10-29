@@ -79,7 +79,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
   const logRetentionDays = calculateLogRetentionDays(advancedSettings);
 
   return [
-    // Owner-stamped resources — materialise as owned on the admin deploy,
+    // Owner-stamped resources, materialise as owned on the admin deploy,
     // and as foreign refs elsewhere. Owner resolution runs at IAM-scoping time.
     defineEventBus('qpq-admin-wsq', {
       owner: { module: logServiceName },
@@ -109,7 +109,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
     defineGlobal(QPQ_ADMIN_SERVICE_NAME_GLOBAL, logServiceName),
 
     // The app websocket's connect-time maintenance sync (see
-    // defineWebSocketQueue's onConnected — pre-auth, maintenance is public).
+    // defineWebSocketQueue's onConnected, pre-auth, maintenance is public).
     // Registered unowned so it resolves inside whichever service owns the
     // websocket, not just the admin service.
     defineInlineFunction(
@@ -158,7 +158,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
       ],
     }),
 
-    // Admin-only resources — only flatten out when the deploying service is the log service.
+    // Admin-only resources, only flatten out when the deploying service is the log service.
     defineServiceSettings({
       [logServiceName]: [
         defineStorageDrive(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, {
@@ -258,7 +258,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           },
         ),
 
-        // The cross-service read of the active maintenance folds — the websocket
+        // The cross-service read of the active maintenance folds, the websocket
         // lambda's connect-time sync calls this.
         defineServiceFunction(
           getFeatureEntryQpqFunctionRuntime('admin/maintenance', 'serviceFunction', 'qpqGetActiveMaintenances::qpqGetActiveMaintenances'),
@@ -325,7 +325,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
       ],
     }),
 
-    // The admin UI's audited session event doc — one doc per login.
+    // The admin UI's audited session event doc, one doc per login.
     ...defineAdminSessionEventDoc(logServiceName),
   ];
 };

@@ -4,7 +4,7 @@ import { askApplyEventDocEvent } from '../../../eventDoc';
 import { TenantEffect } from '../../fold';
 import { TenantSetBrandData } from '../../models';
 
-// Append a SET_BRAND event — the editor stamps the schema version + provenance.
+// Append a SET_BRAND event, the editor stamps the schema version + provenance.
 //
 // Callers must ALWAYS pass the FULL brand payload ({ brandColors, logo, displayName }),
 // never a partial: SET_BRAND is coalesced while pending (last write wins) but

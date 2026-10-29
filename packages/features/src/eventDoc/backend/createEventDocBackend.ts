@@ -21,7 +21,7 @@ import { askEventDocPublishedVersionAsOf } from '../logic/askEventDocPublishedVe
 import { EventDocDocumentStateAtEvent, EventDocVersionState } from '../models';
 import { EventDocBackend } from './EventDocBackend';
 
-/** A functions surface that also carries a typed `document` view — what a definition is; how the state type is inferred. */
+/** A functions surface that also carries a typed `document` view, what a definition is; how the state type is inferred. */
 type EventDocFunctionsWithDocumentView<TState> = EventDocFunctions & {
   views: Record<typeof EVENT_DOC_PRIMARY_VIEW, EventDocView<TState>>;
 };
@@ -63,7 +63,7 @@ export function createEventDocBackend<TState>(functions: EventDocFunctions): Eve
       return yield* askProvideStore(askEventDocEventListAll(modelId, options));
     },
     // The log stories fold to `unknown`; the definition's `document` view is what they fold WITH, so these three are
-    // the one place the state is named as that view's type — every caller reads it typed from here.
+    // the one place the state is named as that view's type, every caller reads it typed from here.
     *askDocumentStateLatest(id) {
       return (yield* askProvideStore(askEventDocDocumentStateLatest(id))) as Nullable<EventDocDocumentStateAtEvent<TState>>;
     },

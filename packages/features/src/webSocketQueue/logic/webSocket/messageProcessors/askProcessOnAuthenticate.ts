@@ -141,7 +141,7 @@ function* askStoreAuthenticated(connection: Connection, accessToken: string, pri
 export function* askProcessOnAuthenticate(connectionId: string, accessToken: string, scope?: string): AskResponse<void> {
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
 
-  // No connection record (e.g. the connect event hasn't been processed yet) —
+  // No connection record (e.g. the connect event hasn't been processed yet) ,
   // tell the client rather than dropping the request silently, so it can
   // distinguish "not authenticated" from "no reply".
   if (!connection) {

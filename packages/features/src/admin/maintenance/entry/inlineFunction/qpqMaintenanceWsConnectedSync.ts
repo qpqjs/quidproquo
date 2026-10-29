@@ -10,8 +10,8 @@ import { MaintenanceServerEventMessage } from '../../models/MaintenanceServerEve
 
 // The websocket queue's onConnected hook (runs in the ws-owning lambda): pull
 // the active maintenance set from the admin service and push it to the fresh
-// connection — pre-auth on purpose, the maintenance state is public and even a
-// login screen should show the banner/lock. ALWAYS sends — an empty set clears
+// connection, pre-auth on purpose, the maintenance state is public and even a
+// login screen should show the banner/lock. ALWAYS sends, an empty set clears
 // any maintenance the client believes is still running (e.g. it reconnected
 // after a close).
 export function* qpqMaintenanceWsConnectedSync(input: WebSocketQueueOnConnectedInput): AskResponse<void> {

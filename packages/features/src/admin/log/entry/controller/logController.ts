@@ -128,13 +128,13 @@ export function* downloadUrl(
 // Replays the log against its service's real code under the execution tracer and
 // returns a signed url to the resulting QpqExecutionTrace json. The trace itself is
 // produced by the OWNING service (routed on the log's moduleName) so the story code
-// loads through that service's own module loader — see trace-replay-plan.md.
+// loads through that service's own module loader, see trace-replay-plan.md.
 // The replay input is the redacted log, so the stored trace (which records local
 // variables) never carries anything the admin could not already read.
 //
 // ASYNC: tracing re-executes the story and can far outlive an HTTP request, so this
 // never waits for it. Responses are { url } when a stored trace exists, otherwise
-// { pending: true } with the trace kicked off fire-and-forget — the owning service
+// { pending: true } with the trace kicked off fire-and-forget, the owning service
 // replies via qpqStoreTraceResult, which stores the trace and pushes a TraceDone
 // websocket message to admin clients. `check=true` only reports state (never triggers),
 // so clients can poll without stacking trace runs; `refresh=true` forces a re-run.

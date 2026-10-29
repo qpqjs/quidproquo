@@ -7,7 +7,7 @@ import { MaintenanceState } from '../v1/views/document/MaintenanceState';
 const MS_PER_MINUTE = 60_000;
 
 // The updates list IS the document: after every add/edit/remove the top-level
-// fields re-derive from the surviving list — the last update's status snapshot
+// fields re-derive from the surviving list, the last update's status snapshot
 // wins, and the eta carries over from the last update that ANNOUNCED one
 // (etaSetAt set), so an update without an announcement inherits the running
 // clock and deleting the newest update rolls everything back.

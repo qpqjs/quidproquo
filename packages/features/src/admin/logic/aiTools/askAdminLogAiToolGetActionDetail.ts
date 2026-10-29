@@ -7,7 +7,7 @@ export type AdminLogAiToolGetActionDetailInput = {
   index: number;
 };
 
-// See askAdminLogAiToolGetActions — same trusted-docId rule applies here.
+// See askAdminLogAiToolGetActions, same trusted-docId rule applies here.
 export function* askAdminLogAiToolGetActionDetail(input: AdminLogAiToolGetActionDetailInput): AskResponse<logsLogic.LogAiToolActionDetail> {
   const { docId } = yield* askEventDocAiContextRead();
 

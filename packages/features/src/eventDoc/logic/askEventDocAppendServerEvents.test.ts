@@ -41,7 +41,7 @@ const INPUTS: EventDocServerEventInput[] = [
   { type: 'RUN_COMPLETED', data: { at: '2026-08-03T00:00:00.300Z' }, version: 3 },
 ];
 
-// The log the head reads see: INIT, an edit, then a PUBLISH — so a batch whose base was
+// The log the head reads see: INIT, an edit, then a PUBLISH, so a batch whose base was
 // head 0 and which loses its slots to the publish must be re-judged against a published
 // document.
 const LOG_TYPES: Record<number, string> = { 0: EventDocEffect.InitState, 1: 'SET_X', 2: EventDocEffect.Publish };
@@ -100,7 +100,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
       counts.delays += 1;
       return undefined;
     },
-    // A registered definition whose fold tracks one fact — is the document published —
+    // A registered definition whose fold tracks one fact, is the document published ,
     // and whose validator refuses anything after a publish. Only reached with validate.
     [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: unknown[] } }) => {
       const { functionName, args } = action.payload;
@@ -178,7 +178,7 @@ describe('askEventDocAppendServerEvents', () => {
     expect(events.every((event) => event.payload.metadata.createdAt === NOW)).toBe(true);
     expect(events.map((event) => event.payload.metadata.clientMessageId)).toEqual(['cmid-0', 'cmid-1', 'cmid-2']);
 
-    // One clock read, one guid mint, one consistent head read, one write — the whole point of the batch.
+    // One clock read, one guid mint, one consistent head read, one write, the whole point of the batch.
     expect(counts).toEqual({ dateNow: 1, guidMints: 1, headReads: 1, delays: 0, functionCalls: {} });
     expect(upserts).toHaveLength(1);
     expect(upserts[0].keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));

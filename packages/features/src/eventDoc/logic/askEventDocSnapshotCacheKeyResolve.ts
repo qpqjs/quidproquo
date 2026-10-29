@@ -7,7 +7,7 @@ import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
 
 /**
  * The snapshot cache key the current collection files its snapshots under, read off its registered definition. A
- * collection with no registered definition (or one predating the member) resolves to '' — the legacy layout — so the
+ * collection with no registered definition (or one predating the member) resolves to '', the legacy layout, so the
  * readers that already tolerate a missing definition keep working unchanged. `functionsName` overrides the registry
  * name derived from the store context (the projector is handed its name by config).
  */

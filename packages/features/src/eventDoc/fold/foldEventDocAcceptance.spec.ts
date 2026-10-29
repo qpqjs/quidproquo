@@ -11,9 +11,8 @@ import { foldEventDocLog } from './foldEventDocLog';
 
 const eventId = (n: number): number => n;
 
-// The fold is the gate now: appends write unconditionally, so these rules are the ONLY
-// thing standing between a log and a document. Each one used to live in the append
-// handler as a tail read.
+// The fold is the gate: appends write unconditionally, so these rules are the ONLY
+// thing standing between a log and a document.
 
 type CounterState = EventDocDocument & { hits: string[] };
 
@@ -84,7 +83,7 @@ describe('foldEventDocLog acceptance', () => {
 
   it('does not let a FUTURE-version event inflate the floor past what the document folded to', () => {
     // latestVersion is 1, so the v2 event folds CLAMPED at v1 and the document stays at
-    // schema version 1 — a following v1 event still matches the state's shape and folds.
+    // schema version 1, a following v1 event still matches the state's shape and folds.
     // (The old loop-local floor recorded the raw claimed version and rejected it.)
     const state = foldCounting([event('a', 0, { version: 2 }), event('b', 1, { version: 1 })]);
 
@@ -94,7 +93,7 @@ describe('foldEventDocLog acceptance', () => {
   it('does not apply the version floor to a pristine latest-shaped seed', () => {
     // The workspace's initial view state is latest-shaped (schemaVersion at latest) with
     // no INIT_STATE behind it (empty id). A real old-version log folding onto it must not
-    // be rejected as "below the floor" — there is no floor until an event has folded.
+    // be rejected as "below the floor", there is no floor until an event has folded.
     const pristineLatestSeed: CounterState = { ...createEventDocInitialDocumentState(2), hits: [] };
 
     const state = foldEventDocLog<CounterState>([event('a', 0, { version: 1 })], {
@@ -146,7 +145,7 @@ describe('foldEventDocLog acceptance', () => {
 
   it('applies a duplicate that arrives after its original has left the rolling window', () => {
     // The documented trade of a bounded window: dedup protects against RETRIES, which land
-    // immediately — an id repeated more than a window later is treated as a new event.
+    // immediately, an id repeated more than a window later is treated as a new event.
     const log = [
       event('a', 0, { clientMessageId: 'dup' }),
       ...Array.from({ length: EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW }, (_, index) => event('filler', index + 1)),
@@ -180,7 +179,7 @@ describe('foldEventDocBase lifecycle guard', () => {
   });
 
   // Note on coverage: duplicate reserved LIFECYCLE events (a second PUBLISH, a second
-  // CREATE_DRAFT) need no guard here — the base reducer's own state updaters are already
+  // CREATE_DRAFT) need no guard here, the base reducer's own state updaters are already
   // idempotent for them, and fold identically with or without validators. The reserved
   // registry's real work under concurrency is its '*' rule, below.
   it('ignores a domain edit that lands after the document was published', () => {
@@ -245,9 +244,9 @@ describe('foldEventDocBase INIT handling', () => {
   });
 
   it('applies the log-opening INIT rather than dropping it', () => {
-    // Regression: forbidInit used to refuse every INIT, which is right at append time and
-    // wrong in a fold. Folds silently lost every document's identity, and the placeholders
-    // survived — visible only if you looked at id/code/name rather than status.
+    // forbidInit must refuse an INIT at append time but accept the log-opening one in a fold;
+    // otherwise folds silently lose every document's identity and the placeholders survive,
+    // visible only in id/code/name rather than status.
     const state = foldEventDocBase([init(0)]);
 
     expect(state.id).toBe('doc-1');

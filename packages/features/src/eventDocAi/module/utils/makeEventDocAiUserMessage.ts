@@ -1,6 +1,6 @@
 import type { EventDocAiAttachment, EventDocAiChatMessage } from '../../models';
 
-// Attachments lead, text follows — the same order the parts are presented to the
+// Attachments lead, text follows, the same order the parts are presented to the
 // model (documents first, then the question about them).
 export const makeEventDocAiUserMessage = (text: string, attachments: EventDocAiAttachment[] = []): EventDocAiChatMessage => ({
   role: 'user',

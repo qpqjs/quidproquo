@@ -118,19 +118,19 @@ export function* askEventDocAiStreamTurn(
   const turnContext = yield* askEventDocAiTurnContextResolve(docId, isContinuation);
   const usageVisible = yield* askEventDocAiUsageVisible();
 
-  // Attachments are doc assets — they live on the collection's storage drive
+  // Attachments are doc assets, they live on the collection's storage drive
   // (uploaded via the eventDoc asset routes), not the chat-history drive.
   const docStorageDrive = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
 
   // The collection's ambient storage scope (e.g. a tenant/personal partition set
   // on the ws connection). A scoped collection stores its assets under it, so the
-  // model's attachment reads must apply the same scope — undefined for unscoped
+  // model's attachment reads must apply the same scope, undefined for unscoped
   // collections. Read here, tenant-agnostic, exactly as chat-history storage reads it.
   const scope = yield* askEventDocResolveScope();
 
   const aiMessages = chatMessagesToAiMessages(history, docStorageDrive, docId, scope);
 
-  // Tools do NOT receive the docId from the model — executors inherit the
+  // Tools do NOT receive the docId from the model, executors inherit the
   // session context (provided around the handler) and read the trusted id there.
   const streamHandle = yield* askAiPromptStream(model, '', {
     system: systemPrompt,

@@ -33,7 +33,7 @@ const buildEvent = (index: number, createdAt: string): EventDocEvent => ({
   },
 });
 
-// A doc edited across four months. No PUBLISH event anywhere — the resolver deliberately
+// A doc edited across four months. No PUBLISH event anywhere, the resolver deliberately
 // never consults versions; only the time bound decides.
 const EVENTS: EventDocEvent[] = [
   buildEvent(0, '2026-02-01T00:00:00.000Z'),
@@ -56,7 +56,7 @@ const eventIdAsOf = (clock: string) =>
         throw new Error(`Unexpected store read: ${action.payload.keyValueStoreName}`);
       }
 
-      // The walk must be newest-first — an ascending read would find the OLDEST match.
+      // The walk must be newest-first, an ascending read would find the OLDEST match.
       expect(action.payload.options?.sortAscending).toBe(false);
 
       const descending = [...storedEvents].sort((a, b) => String(b.sk).localeCompare(String(a.sk)));

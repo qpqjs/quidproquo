@@ -42,7 +42,7 @@ const event = (index: number, version: number, type: string, data: unknown): Eve
 
 const initEvent = (version: number): EventDocEvent => event(0, version, EventDocEffect.InitState, { id: 'doc-1', code: 'doc', name: 'Doc' });
 
-// One reducer per version, each seeing its own shape. The BASE version seeds — a v1 log folds onto a
+// One reducer per version, each seeing its own shape. The BASE version seeds, a v1 log folds onto a
 // v1-shaped accumulator and only climbs to v2 through the migration, which is the whole arrangement
 // these tests exist to pin.
 const createInitialStyleDocV1 = (): StyleDocV1 => ({

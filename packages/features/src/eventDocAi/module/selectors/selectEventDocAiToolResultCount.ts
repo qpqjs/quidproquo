@@ -1,6 +1,6 @@
 import type { EventDocAiState } from '../EventDocAiState';
 
-// Total completed tool uses across the finalized messages — a change signals a
+// Total completed tool uses across the finalized messages, a change signals a
 // tool mutated something (e.g. the document), letting the host UI react
 // (refresh).
 export const selectEventDocAiToolResultCount = (state: EventDocAiState): number =>

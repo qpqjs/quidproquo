@@ -10,7 +10,7 @@ import {
 // The per-service trace entry (defineAdminSettings exposes it from EVERY service as the
 // qpqTraceLog service function). Runs ASYNC in the service that owns the log, so
 // askTraceStory's processor loads the story's real code through this service's own
-// module loader — the federated store on lambda. The result (trace or failure — a
+// module loader, the federated store on lambda. The result (trace or failure, a
 // failure must still notify, or the admin client waits forever) is sent back to the
 // log service's qpqTraceStore function, which stores it and pushes a TraceDone
 // websocket message. See trace-replay-plan.md.

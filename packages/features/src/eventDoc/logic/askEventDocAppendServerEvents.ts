@@ -25,15 +25,15 @@ import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
 import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
 import { isEventDocReservedEffect } from './isEventDocReservedEffect';
 
+const isSlotRaceError = (errorType: string): boolean =>
+  errorType === askKeyValueStoreUpsertManyBase.errorType.Conflict || errorType === askKeyValueStoreUpsertManyBase.errorType.WriteContention;
+
 /**
  * Append a burst of server-authored events as one conditional transaction claiming head + 1 .. head + n
  * (input order is log order); a Conflict re-laps on a fresh head. Runs no hooks and rejects stores that have them,
  * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt. A batch
  * holding a reserved lifecycle event brings the summary row up to its last event before returning.
  */
-const isSlotRaceError = (errorType: string): boolean =>
-  errorType === askKeyValueStoreUpsertManyBase.errorType.Conflict || errorType === askKeyValueStoreUpsertManyBase.errorType.WriteContention;
-
 export function* askEventDocAppendServerEvents(
   modelId: string,
   inputs: EventDocServerEventInput[],

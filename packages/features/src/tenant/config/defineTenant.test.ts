@@ -129,7 +129,7 @@ describe('defineTenant', () => {
     expect(registration).toBeDefined();
 
     // ...and the event log's stream projector wired to fold tenant snapshots through
-    // it (the map rides the stream runtime's globals — see defineEventDocSummary).
+    // it (the map rides the stream runtime's globals, see defineEventDocSummary).
     const snapshotMaps = ownerSettings
       .map((s) => s.onStream?.runtime.globals?.[EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL] as Record<string, string> | undefined)
       .filter(Boolean);
@@ -177,8 +177,8 @@ describe('defineTenant', () => {
   it('mounts no literal route that a tenant id could be mistaken for', () => {
     // The regression this layout exists to prevent: `{basePath}/{id}` matches any
     // single segment, so a sibling `{basePath}/<literal>` is ambiguous with that id
-    // and the router picks by path-length precedence, not by intent. ('/tenants/docs'
-    // used to resolve to the tenant record get with id='docs' -> Forbidden.)
+    // and the router picks by path-length precedence, not by intent ('/tenants/docs'
+    // would resolve to the tenant record get with id='docs' and come back Forbidden).
     const idRoutes = ownerRoutes().filter((r) => r.path.endsWith('/{id}'));
     expect(idRoutes.length).toBeGreaterThan(0);
 

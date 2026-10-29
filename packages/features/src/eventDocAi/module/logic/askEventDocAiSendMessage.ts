@@ -13,7 +13,7 @@ import { askEventDocAiNewChat } from './askEventDocAiNewChat';
 export function* askEventDocAiSendMessage(message: string, attachments: EventDocAiAttachment[] = []): AskResponse<void> {
   const { activeChatId } = yield* askStateRead<EventDocAiState>();
 
-  // First message with no chat selected — create one implicitly.
+  // First message with no chat selected, create one implicitly.
   let chatId = activeChatId;
   if (!chatId) {
     const chat = yield* askEventDocAiNewChat();

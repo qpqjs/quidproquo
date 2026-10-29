@@ -12,7 +12,7 @@ export type LogAiToolActionDetail = {
   finishedAt: string;
 };
 
-// The full breakdown for one action from askGetLogActionsForCorrelation's index —
+// The full breakdown for one action from askGetLogActionsForCorrelation's index ,
 // the action's own input payload plus its raw output (result or error).
 export function* askGetLogActionDetail(correlationId: string, index: number): AskResponse<LogAiToolActionDetail> {
   const log = yield* askGetRedactedByCorrelation(correlationId);
@@ -21,7 +21,7 @@ export function* askGetLogActionDetail(correlationId: string, index: number): As
   if (!entry) {
     return yield* askThrowError(
       ErrorTypeEnum.NotFound,
-      `No action at index ${index} — this log has ${log.history.length} action(s) (valid indexes: 0-${log.history.length - 1}).`,
+      `No action at index ${index}, this log has ${log.history.length} action(s) (valid indexes: 0-${log.history.length - 1}).`,
     );
   }
 

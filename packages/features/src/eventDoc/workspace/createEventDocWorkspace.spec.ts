@@ -104,7 +104,7 @@ function* askNoteCreateDraft(): AskResponse<void> {
   yield* askApplyEventDocEvent(EventDocEffect.CreateDraft, {});
 }
 
-// The doc's typed read verb — scope-blind like the writes: the enclosing bind decides
+// The doc's typed read verb, scope-blind like the writes: the enclosing bind decides
 // WHICH note it reads.
 const askReadNote = createEventDocStateReader<NoteState>();
 
@@ -115,7 +115,7 @@ function* askNoteAppendTitleLine(lineId: string): AskResponse<void> {
   yield* askApplyEventDocEvent(NoteEvent.AddLine, { lineId, text: `title: ${note.title}` });
 }
 
-// Commit then read, returning what the read saw — exercises read-your-own-writes.
+// Commit then read, returning what the read saw, exercises read-your-own-writes.
 function* askNoteCommitAndReadTitle(title: string): AskResponse<string> {
   yield* askApplyEventDocEvent(NoteEvent.SetTitle, { title });
   const note = yield* askReadNote();
@@ -198,7 +198,7 @@ const constantNow = '2026-07-16T00:00:00.000Z';
 
 // Deterministic guid/date providers; everything else a workspace yields is handled by
 // askReduceState (state) or the bind (ApplyEvent), so nothing real reaches the runtime.
-// `dates` are served in commit order then fall back to the constant — the transient
+// `dates` are served in commit order then fall back to the constant, the transient
 // specs need crafted, distinct createdAt values (transient ordering is by time), while
 // every other spec keeps its stable constant timestamp.
 const createActionMocks = (dates: string[] = []): ActionMockMap => {
@@ -216,7 +216,7 @@ type WorkspaceUnderTest = {
   reducer: QpqReducer<EventDocWorkspaceState, any>;
 };
 
-// The whole point: the workspace runs as pure story logic under askReduceState —
+// The whole point: the workspace runs as pure story logic under askReduceState ,
 // no React runtime, no processors, no network.
 const runWorkspaceStory = (workspace: WorkspaceUnderTest, story: () => AskResponse<void>, dates?: string[]): EventDocWorkspaceState =>
   runStory(askReduceState(workspace.createInitialState(), workspace.reducer, story), createActionMocks(dates));
@@ -255,7 +255,7 @@ const eventAtVersion = (event: EventDocEvent, version: number): EventDocEvent =>
 });
 
 // The reference full refold the incremental historyViews maintenance must match: the
-// raw ACCUMULATOR (seed + per-event steps), never final-migrated — that is the read
+// raw ACCUMULATOR (seed + per-event steps), never final-migrated, that is the read
 // side's job. Not foldEventDocLog, which climbs to the latest version at the end.
 const foldNoteHistory = (events: EventDocEvent[]): NoteState => {
   let state: EventDocDocument = createInitialNoteState();
@@ -300,7 +300,7 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   }
 
   // A single page for the history panel's newest-first walk: honours newestFirst, limit
-  // and a plain index cursor — enough to exercise paging without a real store.
+  // and a plain index cursor, enough to exercise paging without a real store.
   function* askFetchEventsPage(
     _identity: EventDocWorkspaceDocumentIdentity,
     request?: EventDocWorkspaceEventsPageRequest,
@@ -319,7 +319,7 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   }
 
   // The bootstrap read: the configured base plus the events after it (all events when
-  // no base is set — the fallback the real route serves as base: null). Logged into
+  // no base is set, the fallback the real route serves as base: null). Logged into
   // fetchCalls with the base's cursor so call sequences read the same either way.
   function* askFetchBootstrap(_identity: EventDocWorkspaceDocumentIdentity): AskResponse<EventDocWorkspaceBootstrap> {
     fetchCalls.push({ afterEventId: serverBase?.eventId });
@@ -659,7 +659,7 @@ describe('createEventDocWorkspace coalescing', () => {
     // Post-hot-swap shape: a restored v1 SetTitle sits in pending when the v2 module
     // commits a fresh SetTitle. The coalesce removes the v1 event and appends the v2
     // one at the END, so the buffer never interleaves a newer version before an
-    // older one — the live-view fold's non-decreasing rule holds by construction.
+    // older one, the live-view fold's non-decreasing rule holds by construction.
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
@@ -922,7 +922,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    // Both calls cursor from the base's event — never a full refetch.
+    // Both calls cursor from the base's event, never a full refetch.
     expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(1) }, { afterEventId: eventId(1) }]);
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(2));
@@ -1210,7 +1210,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, story));
 
-    // noteB was never initialised — documents without an identity don't snapshot.
+    // noteB was never initialised, documents without an identity don't snapshot.
     expect(Object.keys(snapshot.slots)).toEqual(['noteA']);
     expect(snapshot.slots.noteA.documentIdentity).toEqual(identityA);
     expect(snapshot.slots.noteA.pending).toHaveLength(1);
@@ -1280,7 +1280,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     expect(snapshot.slots.noteA.base?.eventId).toBe(eventId(0));
 
     // The server log grew between the runtimes (another editor appended): the
-    // restore must NOT full-fetch — only the tail after the snapshot's last event.
+    // restore must NOT full-fetch, only the tail after the snapshot's last event.
     fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
 
     function* swappedSession(): AskResponse<void> {
@@ -1325,7 +1325,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const state = runWorkspaceStory(workspace, swappedSession);
 
-    // Two FULL loads — no tail-pull.
+    // Two FULL loads, no tail-pull.
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: undefined }]);
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(0));
@@ -1540,10 +1540,9 @@ describe('createEventDocWorkspace historyViews', () => {
   });
 
   it('an all-old-version log stores the raw accumulator; refresh tails at that version fold fine; the view reads latest', () => {
-    // The regression this revision fixes: the whole saved log is authored at v1
-    // inside a slot whose latest is v2. Storing a latest-migrated view used to
-    // force the doc to v2 at init, and the (perfectly valid) v1 refresh tail then
-    // tripped the below-version guard. The accumulator folds it naturally.
+    // The whole saved log is authored at v1 inside a slot whose latest is v2. Storing a
+    // latest-migrated view would force the doc to v2 at init, and the (perfectly valid) v1
+    // refresh tail would then trip the below-version guard. The accumulator folds it naturally.
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
@@ -1743,7 +1742,7 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(state.transient.noteB['conn-1'][0].payload.data).toEqual({ title: 'b1' });
 
     // Same guid/date/schemaVersion stamping as the ordinary commit. Transient events hold
-    // no log position (they never save) — ordering is by createdAt at read time.
+    // no log position (they never save), ordering is by createdAt at read time.
     expect(state.transient.noteA['conn-1'][0].payload.metadata).toEqual({
       version: 1,
       clientMessageId: 'guid-1',
@@ -1935,7 +1934,7 @@ describe('createEventDocWorkspace transient streams', () => {
   it('a transient event below the already-folded version throws at view read', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
-    // Committed via the state effect directly to forge a stale version — the bind
+    // Committed via the state effect directly to forge a stale version, the bind
     // always stamps the slot's own schemaVersion, so this can't happen through it.
     // The transient tail reuses the pending fold, so it inherits the same
     // monotonic guard: once the folded doc is at v2, a v1 transient is corrupt.
@@ -1956,7 +1955,7 @@ describe('createEventDocWorkspace transient streams', () => {
 describe('createEventDocWorkspace history validation', () => {
   // The editor's live view folds history through the workspace's own incremental path, not
   // through definition.fold. Without the slot's validators reaching it, the editor showed
-  // events that every other reader rejects — an edit made after publish appeared to stick.
+  // events that every other reader rejects, an edit made after publish appeared to stick.
   it('ignores a history event that lands after PUBLISH', () => {
     const workspace = createTestWorkspace();
 

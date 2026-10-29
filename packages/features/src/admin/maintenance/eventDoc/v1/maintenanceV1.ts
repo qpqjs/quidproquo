@@ -7,7 +7,7 @@ import { maintenanceFoldReducer } from './views/document/maintenanceFoldReducer'
 import { createInitialMaintenanceState, MaintenanceState } from './views/document/MaintenanceState';
 
 // Version 1 of the maintenance doc type, as one self-contained bundle: what its events
-// look like (./events), how each view folds them (./views), and — for a base version —
+// look like (./events), how each view folds them (./views), and, for a base version ,
 // where each view starts.
 //
 // FROZEN. Once v2 exists this folder is never edited again: `cp -r v1 v2`, change what v2
@@ -16,7 +16,7 @@ import { createInitialMaintenanceState, MaintenanceState } from './views/documen
 // for the code that folds it to be somewhere nobody has a reason to touch.
 //
 // A later version's bundle looks the same minus `createInitialViewState` and plus
-// `migrateFromPrevious` — only the base can seed, because every log opens with an
+// `migrateFromPrevious`, only the base can seed, because every log opens with an
 // INIT_STATE stamped version 1 and climbs from there.
 export const maintenanceV1: EventDocBaseVersion<{ document: MaintenanceState }> = {
   version: MAINTENANCE_VERSION,

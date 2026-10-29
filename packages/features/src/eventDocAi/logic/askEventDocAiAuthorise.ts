@@ -9,7 +9,7 @@ import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissio
  * event to pass. Must run inside the connection's storage scope. A collection without an authoriser is ungated.
  */
 export function* askEventDocAiAuthorise(action: EventDocPermissionAction): AskResponse<void> {
-  // Handlers registered before the authoriser global existed have no global at all.
+  // A collection with no authoriser global is ungated.
   const authorise = yield* askCatch(askConfigGetGlobal<string>(EVENT_DOC_AUTHORISER_GLOBAL));
   if (!authorise.success || !authorise.result) {
     return;

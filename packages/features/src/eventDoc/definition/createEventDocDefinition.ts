@@ -90,7 +90,7 @@ export function createEventDocDefinition(
   Object.keys(versions[0].views).forEach((viewName) => {
     if (viewName === EVENT_DOC_SUMMARY_VIEW) {
       throw new Error(
-        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name — every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
+        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name, every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
       );
     }
 

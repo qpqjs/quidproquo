@@ -17,9 +17,9 @@ export function* askProcessOnConnect(id: string, requestTime: string, requestTim
   yield* webSocketConnectionData.askUpsert(newConnection);
 
   // Connect-time sync hook: let a configured feature push current PUBLIC state
-  // to the fresh connection (e.g. the active maintenance set) — deliberately
+  // to the fresh connection (e.g. the active maintenance set), deliberately
   // pre-auth, since a pre-login client must also see a "site is down" banner.
-  // Failures are swallowed — a sync problem must never break the connect.
+  // Failures are swallowed, a sync problem must never break the connect.
   const apiName = yield* askWebsocketReadApiNameOrThrow();
   const onConnected = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName));
   if (onConnected) {

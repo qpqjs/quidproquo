@@ -89,7 +89,7 @@ export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): 
     [owner.module]: [
       ...defineTenantStores(),
       // The registry definition's live functions, registered under the name the
-      // snapshot projector (and any other eventDocFunctionsName consumer) addresses —
+      // snapshot projector (and any other eventDocFunctionsName consumer) addresses ,
       // what makes tenant docs snapshot like every other collection.
       defineDynamicFunctions(eventDocFunctionsName(TENANT_EVENTDOC_STORE, TENANT_DOC_TYPE), {
         basePath: __dirname,

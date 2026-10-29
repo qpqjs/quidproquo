@@ -12,7 +12,7 @@ export type LogAiToolActionSummary = {
   error?: string;
 };
 
-// The compact index an AI chat scans first — one row per action in the log's history,
+// The compact index an AI chat scans first, one row per action in the log's history,
 // cheap enough to hand the model in full. Detail (input/output) is a separate lookup
 // via askGetLogActionDetail, so a large log doesn't get pasted whole into every turn.
 export function* askGetLogActionsForCorrelation(correlationId: string): AskResponse<LogAiToolActionSummary[]> {

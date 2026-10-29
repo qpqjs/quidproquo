@@ -4,7 +4,7 @@ import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
 import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
 import { MaintenanceType } from './v1/types/MaintenanceType';
 
-// One update as users may see it — the status line only, no internal notes, no author.
+// One update as users may see it, the status line only, no internal notes, no author.
 export type MaintenancePublicUpdate = {
   id: string;
   displayText: string;

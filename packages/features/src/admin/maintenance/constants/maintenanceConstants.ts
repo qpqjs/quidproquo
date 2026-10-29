@@ -6,12 +6,12 @@ export const maintenanceBasePath = '/maintenance';
 // Schema version maintenance events are authored at (fold migration target).
 export const MAINTENANCE_SCHEMA_VERSION = 1;
 
-// Inline function fired after every maintenance append — broadcasts the active
+// Inline function fired after every maintenance append, broadcasts the active
 // public folds over the application websocket.
 export const QPQ_MAINTENANCE_ON_APPEND_FN = 'qpqMaintenanceOnAppend';
 
 // Inline function the application websocket invokes as soon as a connection
-// opens (pre-auth — maintenance state is public) — syncs the active
+// opens (pre-auth, maintenance state is public), syncs the active
 // maintenance state to that connection.
 export const QPQ_MAINTENANCE_WS_SYNC_FN = 'qpqMaintenanceWsConnectedSync';
 

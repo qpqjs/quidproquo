@@ -34,7 +34,7 @@ import { listEvents } from './listEvents';
 // Proves the real create -> appendEvent -> listEvents story logic (the exact path
 // admin session docs use) actually round-trips through a key-value store, not just
 // that the client sends the right requests. This is the story logic underneath
-// `defineAdminSessionEventDoc` — no admin-specific wiring, just the generic eventDoc
+// `defineAdminSessionEventDoc`, no admin-specific wiring, just the generic eventDoc
 // storage path admin sessions depend on.
 
 const store = buildEventDocStore({ storeName: 'test-admin-sessions', type: 'adminSession' });
@@ -47,7 +47,7 @@ const globals: Record<string, string> = {
 };
 
 // Minimal generic evaluator for the operators this flow actually issues
-// (Equal / GreaterThan, optionally And'd together) — enough to prove the real
+// (Equal / GreaterThan, optionally And'd together), enough to prove the real
 // query conditions the eventDoc data layer builds actually select the right rows.
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
 
@@ -116,7 +116,7 @@ const buildMocks = ({ serverEventTypes }: SessionMocks = {}) => {
       const { keyValueStoreName, item, options } = action.payload;
       const table = (tables[keyValueStoreName] ??= []);
 
-      // The events store is keyed pk/sk; the summary store is keyed by id — match on
+      // The events store is keyed pk/sk; the summary store is keyed by id, match on
       // whichever identity fields the item actually carries.
       const sameRow = (row: Record<string, unknown>) =>
         'pk' in item && 'sk' in item ? row.pk === item.pk && row.sk === item.sk : row.id === item.id;
@@ -172,7 +172,7 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
   it('persists a created session doc and every appended event, and lists them back in order', () => {
     const mocks = buildMocks();
 
-    const createResponse = runStory(create(baseHttpEvent({ name: 'joe — 2026-07-11T00:00:00.000Z', code: 'guid-1' })), mocks);
+    const createResponse = runStory(create(baseHttpEvent({ name: 'joe, 2026-07-11T00:00:00.000Z', code: 'guid-1' })), mocks);
     expect(createResponse.status).toBe(200);
     const summary = JSON.parse(createResponse.body!);
     expect(summary.id).toBeTruthy();
@@ -192,8 +192,8 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     expect(appendedEvent.type).toBe('tabChanged');
     expect(appendedEvent.payload.metadata.eventId).toBe(1);
 
-    // A retried append (same clientMessageId) is WRITTEN — the append path does not read
-    // the log and so cannot dedup — and mints its own id. Dedup is the fold's job now: see
+    // A retried append (same clientMessageId) is WRITTEN, the append path does not read
+    // the log and so cannot dedup, and mints its own id. Dedup is the fold's job now: see
     // foldEventDocLog's acceptance rules, which drop the second occurrence so the document
     // is identical either way.
     const retryResponse = runStory(
@@ -212,7 +212,7 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     expect(listResponse.status).toBe(200);
     const page = JSON.parse(listResponse.body!);
 
-    // Ids are unique and sort in creation order — minted per event, never allocated.
+    // Ids are unique and sort in creation order, minted per event, never allocated.
     const ids = page.items.map((event: { payload: { metadata: { eventId: number } } }) => event.payload.metadata.eventId);
     expect(ids).toEqual([...ids].sort());
     expect(new Set(ids).size).toBe(ids.length);

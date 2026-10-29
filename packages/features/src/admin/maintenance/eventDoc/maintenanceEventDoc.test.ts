@@ -54,7 +54,7 @@ describe('maintenanceEventDoc', () => {
         T0,
         1,
       ),
-      // No eta on this one — the 30min clock anchored at T0 must carry over.
+      // No eta on this one, the 30min clock anchored at T0 must carry over.
       buildEvent(
         MaintenanceEffect.AddUpdate,
         update({ updateId: 'up2', reason: 'Fix deploying', level: MaintenanceLevel.Low, affectedServices: ['template'] }),
@@ -64,7 +64,7 @@ describe('maintenanceEventDoc', () => {
     ]);
 
     expect(state.reason).toBe('Fix deploying');
-    // No explicit banner text — the banner falls back to the newest reason.
+    // No explicit banner text, the banner falls back to the newest reason.
     expect(state.bannerText).toBe('Fix deploying');
     expect(state.level).toBe(MaintenanceLevel.Low);
     expect(state.affectedServices).toEqual(['template']);

@@ -14,7 +14,7 @@ const formatToolUse = (tool: { toolName: string; input: unknown; output?: unknow
 // history (tool calls/results rendered inline as text).
 export const segmentsToText = (segments: EventDocAiMessageSegment[]): string =>
   segments
-    // Reasoning is a live "thinking" view for the user — it never re-enters
+    // Reasoning is a live "thinking" view for the user, it never re-enters
     // the model's message history.
     .filter((segment): segment is Exclude<EventDocAiMessageSegment, { type: 'reasoning' }> => segment.type !== 'reasoning')
     .map((segment) => {

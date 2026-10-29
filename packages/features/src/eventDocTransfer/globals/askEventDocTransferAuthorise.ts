@@ -10,7 +10,7 @@ import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
  * own routes would. A transfer declared without an authoriser is gated by scope alone. Requires the store context.
  */
 export function* askEventDocTransferAuthorise(action: EventDocPermissionAction): AskResponse<void> {
-  // Routes registered before the global existed have none at all.
+  // A transfer with no authoriser global is gated by scope alone.
   const authorise = yield* askCatch(askConfigGetGlobal<string>(EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL));
   if (!authorise.success || !authorise.result) {
     return;

@@ -255,7 +255,7 @@ describe('eventDoc onPublish hook', () => {
     expect(inlineInvocations).toHaveLength(2);
 
     // The retry is written rather than deduped (the append reads nothing), so the hook
-    // fires again with the state as of the retried event — the duplicate is dropped by
+    // fires again with the state as of the retried event, the duplicate is dropped by
     // the fold's clientMessageId window, so the state is identical. Hooks must be
     // idempotent, and re-firing is exactly how a read model left stale by a failed first
     // hook gets repaired.

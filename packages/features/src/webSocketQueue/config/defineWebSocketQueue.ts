@@ -23,7 +23,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 
   // Registered inline-function name (see `defineInlineFunction`) invoked with
   // `{ connectionId }` (WebSocketQueueOnConnectedInput) as soon as a connection
-  // opens — BEFORE any authenticate, so only push PUBLIC state from it (e.g.
+  // opens, BEFORE any authenticate, so only push PUBLIC state from it (e.g.
   // the admin feature pushes the active maintenance set, which pre-login
   // clients must also see). Runs in the websocket-owning service; failures are
   // swallowed so a sync problem never breaks the connect.

@@ -11,7 +11,7 @@ export type EventDocAiOptions = {
   // The collection's `authorise` inline function name (the same one its routes declare), run for read before every
   // chat method. Omitted, chats are gated by scope alone.
   authorise?: string;
-  // The service the ws requests route through — must match the serviceName the
+  // The service the ws requests route through, must match the serviceName the
   // frontend passes to askEventDocAiInit.
   serviceName: string;
   // The websocket events bus the chat queue subscribes to (app-specific).

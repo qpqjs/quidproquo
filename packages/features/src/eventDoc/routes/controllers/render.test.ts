@@ -23,7 +23,7 @@ import { EventDocEvent, EventDocRenderInput, EventDocRenderKind, EventDocRenderM
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 import { render } from './render';
 
-// The route — not the renderer — is what applies renderMode/effectiveAt. It hands the
+// The route, not the renderer, is what applies renderMode/effectiveAt. It hands the
 // collection's registered render function an already-resolved log plus the version behind it,
 // because a renderer cannot derive the publish moment from events alone (it needs
 // version.publishedAt to resolve ITS links as of then). These pin that contract: the params are
@@ -60,7 +60,7 @@ const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   data: event,
 }));
 
-// v1 published 03-01 with head @1 — so a published render must cut events 2 and 3.
+// v1 published 03-01 with head @1, so a published render must cut events 2 and 3.
 const VERSION_1: EventDocVersion = {
   version: 1,
   eventId: eventId(1),
@@ -106,7 +106,7 @@ const skAtOrBefore = (keyCondition: KvsQueryOperation): number | undefined => {
   return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? Number(condition.valueA) : undefined;
 };
 
-// Captures what the route hands the renderer — the thing under test. The registered
+// Captures what the route hands the renderer, the thing under test. The registered
 // fold echoes the event ids it was handed (no snapshots exist, so the resolver folds
 // the prefix from scratch), so `state` in the render input identifies the exact prefix.
 const renderWith = (query: Record<string, string>, versions: EventDocVersion[] = [VERSION_1, VERSION_DRAFT]) => {
@@ -175,7 +175,7 @@ describe('render route', () => {
   it('hands the renderer the state at the version head and the version itself for a published render', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Published });
 
-    // Folded from the prefix truncated at v1's head — the draft edits (2, 3) must not
+    // Folded from the prefix truncated at v1's head, the draft edits (2, 3) must not
     // reach a published render.
     expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1)] });
     // The version is what carries publishedAt, the clock the renderer resolves its links at.
@@ -183,7 +183,7 @@ describe('render route', () => {
   });
 
   it('resolves the published version as of an explicit effectiveAt, not the request time', () => {
-    // v1 only takes effect 03-01, so as of 02-01 nothing is published — which can only be true if
+    // v1 only takes effect 03-01, so as of 02-01 nothing is published, which can only be true if
     // effectiveAt drove the selection rather than the request clock (07-15, where v1 IS effective).
     expect(() => renderWith({ renderMode: EventDocRenderMode.Published, effectiveAt: '2026-02-01T00:00:00.000Z' })).toThrow(
       'No published version is effective as of 2026-02-01T00:00:00.000Z',

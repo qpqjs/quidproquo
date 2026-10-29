@@ -46,15 +46,15 @@ export type EventDocEventAppendOptions = {
   origin?: EventDocEventOrigin;
 };
 
+const isSlotRaceError = (errorType: string): boolean =>
+  errorType === askKeyValueStoreUpsertBase.errorType.Conflict || errorType === askKeyValueStoreUpsertBase.errorType.WriteContention;
+
 /**
  * Append an event at head + 1 with a conditional write; a Conflict re-laps by advancing the held state past
  * the winners and validating again, up to EVENT_DOC_APPEND_MAX_RETRIES. Hooks run after the write, outside the retry.
  * A reserved lifecycle event brings the summary row up to date before this returns, so a reader that follows the
  * append sees it; a domain event leaves the row to the stream projector.
  */
-const isSlotRaceError = (errorType: string): boolean =>
-  errorType === askKeyValueStoreUpsertBase.errorType.Conflict || errorType === askKeyValueStoreUpsertBase.errorType.WriteContention;
-
 export function* askEventDocEventAppend(
   modelId: string,
   input: EventDocEventInput,

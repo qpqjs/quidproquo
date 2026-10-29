@@ -27,7 +27,7 @@ const describeKeys = (keys: Record<string, unknown>): string =>
  * document id returns every tenant's copy of that id with nothing to tell them apart.
  *
  * Reads the whole batch out of the GetRecords action rather than the story input, so all
- * records in an invocation are searchable — a stream delivers up to 100 at a time, and
+ * records in an invocation are searchable, a stream delivers up to 100 at a time, and
  * indexing only the first would leave the rest invisible.
  */
 export const kvsStreamEventGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {

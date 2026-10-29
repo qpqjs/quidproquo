@@ -6,7 +6,7 @@ import type { EventDocAiAttachment } from '../models';
 // assetIds are guid-shaped; anything else (slashes, dots) could path-traverse the drive.
 const VALID_ASSET_ID = /^[A-Za-z0-9-]+$/;
 
-// Attachments arrive from the client as bare assetIds — only ids that resolve to a
+// Attachments arrive from the client as bare assetIds, only ids that resolve to a
 // real asset under the session's trusted docId may reach the model (no path
 // traversal, no cross-doc or cross-drive reads).
 export function* askEventDocAiAttachmentsValidate(docStorageDrive: string, docId: string, attachments: EventDocAiAttachment[]): AskResponse<void> {

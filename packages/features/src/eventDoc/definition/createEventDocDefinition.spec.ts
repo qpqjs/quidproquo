@@ -45,7 +45,7 @@ function* askMemoAppendLine(line: string): AskResponse<void> {
 
 const memoApi = { askMemoSetBody, askMemoAppendLine };
 
-// The base version's document view — the one shape every memo log starts from.
+// The base version's document view, the one shape every memo log starts from.
 const memoDocumentV1 = {
   foldReducer: memoFoldReducer,
   createInitialViewState: createInitialMemoState,
@@ -174,14 +174,14 @@ describe('createEventDocDefinition', () => {
     ]);
 
     // The v1-authored log folds through the v1 reducer and the read-side migration
-    // carries it to v2 — the ONLY way any document ever reaches v2, since INIT_STATE is
+    // carries it to v2, the ONLY way any document ever reaches v2, since INIT_STATE is
     // always stamped v1 and only the base version can seed.
     expect(folded.body).toBe('from the log');
     expect(folded.schemaVersion).toBe(2);
     expect(folded.pinned).toBe(false);
   });
 
-  it('saved: false creates an unsaved doc — a local slot config, no fold, no generic verbs', () => {
+  it('saved: false creates an unsaved doc, a local slot config, no fold, no generic verbs', () => {
     const experienceDefinition = createEventDocDefinition({
       saved: false,
       foldReducer: ((state: { activeTab: string }) => [state, false]) as unknown as QpqReducer<{ activeTab: string }, EventDocEvent>,
@@ -324,7 +324,7 @@ describe('createEventDocDefinition secondary views', () => {
   });
 
   it('replays only the events the primary view ACCEPTED, so views cannot disagree', () => {
-    // The rejected event is in the log — nothing stopped it being written. If the summary
+    // The rejected event is in the log, nothing stopped it being written. If the summary
     // folded the raw log it would count an edit the document does not have, and no reader
     // downstream could tell which of the two was right.
     const definition = createTwoViewDefinition();
@@ -373,7 +373,7 @@ describe('createEventDocDefinition validators', () => {
   });
 
   it('IGNORES an event its rules reject, rather than folding it in', () => {
-    // The event is in the log — nothing stopped it being written — so the fold is the only
+    // The event is in the log, nothing stopped it being written, so the fold is the only
     // thing standing between a bad event and the document.
     const state = withValidators().views.document.fold([setBody('hello', 0), setBody('', 1)]);
 
@@ -398,13 +398,13 @@ describe('createEventDocDefinition validators', () => {
     const state = withValidators().views.document.fold([setBody('before', 0), published, setName]);
 
     // SET_NAME has no domain rule, so requireDraft applies and the rename after publish is
-    // dropped — the document keeps the name it had.
+    // dropped, the document keeps the name it had.
     expect(state.name).not.toBe('renamed');
   });
 
   it('lets a domain rule REPLACE the reserved guard for its own event type', () => {
     // Sharp edge, and deliberate: validateEventDocEvent resolves `validators[type] ?? '*'`, so
-    // naming a type takes full responsibility for it — the lifecycle guard no longer applies.
+    // naming a type takes full responsibility for it, the lifecycle guard no longer applies.
     // client-access depends on exactly this to allow secret rotation on a PUBLISHED client. The
     // cost is that a collection wanting the guard as well has to compose it in itself.
     const published: EventDocEvent = {
@@ -441,7 +441,7 @@ describe('createEventDocDefinition validators', () => {
 
   it('gives a doc with no rules an editor pre-flight too, so the edit is refused not ignored', () => {
     // Without this the editor accepts the edit, the fold drops it, and the UI just does
-    // nothing — the worst of the three outcomes.
+    // nothing, the worst of the three outcomes.
     const published: EventDocEvent = {
       ...setBody('x', 1),
       type: EventDocEffect.Publish,
@@ -556,10 +556,9 @@ describe('createEventDocDefinition summary view', () => {
     expect(summary.name).toBe('Renamed');
   });
 
-  it("carries no `type` — that is the store's partition key, not part of the view", () => {
-    // It used to be seeded into the fold, which is why foldEventDocSummary needed a `type`
-    // argument no reducer ever derived. Keeping it out is what lets this fold with the same
-    // fold(events) signature as every other view.
+  it("carries no `type`, that is the store's partition key, not part of the view", () => {
+    // Seeding it into the fold would need a `type` argument no reducer derives. Keeping it
+    // out is what lets this fold with the same fold(events) signature as every other view.
     const summary = createMemoDefinition().views.summary.fold([
       serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
     ]);
@@ -568,9 +567,9 @@ describe('createEventDocDefinition summary view', () => {
   });
 
   it('folds only the events the document ACCEPTED', () => {
-    // The divergence this closes: the summary used to reduce the raw log with no validators,
-    // so an edit made after publish was dropped by the document and applied by the summary —
-    // a list row whose "last modified" moved on a document that never changed.
+    // Guards the divergence where the summary reduces the raw log with no validators: an edit
+    // made after publish would be dropped by the document and applied by the summary, a list
+    // row whose "last modified" moved on a document that never changed.
     const log = [
       serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
       publishEvent(1),
@@ -633,7 +632,7 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
     serverEvent(MemoEvent.SetBody, { body: 'kept' }, 1),
   ];
 
-  it('folds EVERY view of the prefix — document, summary, and declared secondaries', () => {
+  it('folds EVERY view of the prefix, document, summary, and declared secondaries', () => {
     const snapshotViews = createTwoViewDefinition().foldSnapshotViews(log())!;
 
     expect((snapshotViews.document as MemoState).body).toBe('kept');
@@ -653,7 +652,7 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
   it('resumes from a seed exactly as a from-scratch fold of the whole prefix', () => {
     // The incremental path: seed = the snapshot at event 1, then fold only the gap. The
     // gap deliberately contains a validator-rejected event (empty body) and an accepted
-    // one — the gate must keep working mid-resume, seeded only by the stored state.
+    // one, the gate must keep working mid-resume, seeded only by the stored state.
     const definition = createTwoViewDefinition();
     const fullLog = [...log(), serverEvent(MemoEvent.SetBody, { body: '' }, 2), serverEvent(MemoEvent.SetBody, { body: 'final' }, 3)];
 
@@ -666,7 +665,7 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
   });
 
   it('rejects a duplicate clientMessageId across the seed boundary, like a from-scratch fold', () => {
-    // The dedup window rides INSIDE the seed state — that is the whole reason the
+    // The dedup window rides INSIDE the seed state, that is the whole reason the
     // bookkeeping moved onto the document. A retry of a pre-seed event arriving in the
     // gap must be dropped by the resumed fold too.
     const definition = createTwoViewDefinition();
@@ -719,7 +718,7 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
     const v1Log = log();
 
     // The live view is latest-shaped; the snapshot is what the document WAS when its last
-    // event landed — an immutable fact of the log that a later deploy cannot rewrite.
+    // event landed, an immutable fact of the log that a later deploy cannot rewrite.
     expect(memoV2Definition.views.document.fold(v1Log).schemaVersion).toBe(2);
 
     const snapshotDocument = memoV2Definition.foldSnapshotViews(v1Log)!.document as MemoV2State;

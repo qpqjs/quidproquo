@@ -113,7 +113,7 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
     },
 
     // A faithful mini key-value store: honours the pk equality, the sort-key conditions
-    // the data layer issues (equal, at-or-before, between), sort direction and limit —
+    // the data layer issues (equal, at-or-before, between), sort direction and limit ,
     // enough that the incremental read paths are exercised for real, not hand-waved.
     [KeyValueStoreActionType.Query]: (action: {
       payload: {
@@ -259,7 +259,7 @@ describe('projectEventDocSummary', () => {
 
 // The snapshot half of the projector: for a collection that registered a snapshot fold,
 // each delivery also stores the folded views as of the batch's newest event. Fragmentation
-// comes from the stream's own coalescing — one snapshot per document per batch — so there
+// comes from the stream's own coalescing, one snapshot per document per batch, so there
 // is nothing to test about WHEN beyond "at the record's own event id".
 describe('projectEventDocSummary snapshots', () => {
   const SNAPSHOTS_STORE = eventDocSnapshotsStoreName(STORE);
@@ -276,7 +276,7 @@ describe('projectEventDocSummary snapshots', () => {
 
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows.map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
-    // sk is the SAME numeric event id the log is ordered by — the snapshot addresses the
+    // sk is the SAME numeric event id the log is ordered by, the snapshot addresses the
     // exact event it captures.
     expect(rows.every((row) => row.sk === eventId(1))).toBe(true);
     expect(rows.every((row) => row.type === 'template')).toBe(true);
@@ -284,7 +284,7 @@ describe('projectEventDocSummary snapshots', () => {
     const documentRow = rows.find((row) => row.pk === 'doc-1#document')!;
     expect(documentRow.data).toEqual({ type: 'inline', snapshot: { foldedEvents: 2 }, views: ['document', 'summary'] });
 
-    // Only the document row carries the manifest, and it lands LAST — the set's commit
+    // Only the document row carries the manifest, and it lands LAST, the set's commit
     // marker, so a seed reader anchored on it never sees a partially written set.
     const summaryRow = rows.find((row) => row.pk === 'doc-1#summary')!;
     expect(summaryRow.data).toEqual({ type: 'inline', snapshot: expect.objectContaining({ name: 'from-fold' }) });
@@ -296,7 +296,7 @@ describe('projectEventDocSummary snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
-    // The fake fold's sentinel, NOT the log's 'Renamed' — one incremental fold now
+    // The fake fold's sentinel, NOT the log's 'Renamed', one incremental fold now
     // feeds both the snapshot set and the queryable record.
     expect(record!.name).toBe('from-fold');
   });
@@ -305,7 +305,7 @@ describe('projectEventDocSummary snapshots', () => {
     const { mocks, tables } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     // The record starts soft-deleted; the fold's summary view carries no deletedAt (a
-    // RESTORE landed), so the attribute must be REMOVED — the list read hides deleted
+    // RESTORE landed), so the attribute must be REMOVED, the list read hides deleted
     // rows by attribute existence, and a stale flag would hide the doc forever.
     tables[STORE] = [{ type: 'template', id: 'doc-1', name: 'old', deletedAt: '2026-07-01T00:00:00.000Z' }];
 
@@ -332,7 +332,7 @@ describe('projectEventDocSummary snapshots', () => {
   });
 
   it('folds the PREFIX up to the stream record, not the whole log', () => {
-    // The batch's newest event may not be the log's newest by the time the handler runs —
+    // The batch's newest event may not be the log's newest by the time the handler runs ,
     // a later append may already be in the table. The snapshot at THIS event must not
     // include it, or the row would claim a state the event id contradicts.
     const logWithLaterAppend = [...LOG, event(EventDocEffect.SetName, 2, { name: 'Renamed again' })];
@@ -356,7 +356,7 @@ describe('projectEventDocSummary snapshots', () => {
 
   it('does not snapshot on a Remove, and rebuilds the summary from the WHOLE log', () => {
     // A Remove means rows were deleted out from under the stream (a transfer rewrote the
-    // log) — a snapshot-seeded fold could resume from a snapshot of the OLD log, so the
+    // log), a snapshot-seeded fold could resume from a snapshot of the OLD log, so the
     // summary re-derives from scratch and no snapshot is written.
     const { mocks, tables, updates, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
@@ -431,7 +431,7 @@ describe('projectEventDocSummary snapshots', () => {
 });
 
 // The incremental path: seed from the newest complete snapshot at or before the target
-// event and fold only the gap — the reason snapshot cost tracks the burst, not the log.
+// event and fold only the gap, the reason snapshot cost tracks the burst, not the log.
 describe('projectEventDocSummary incremental snapshots', () => {
   const SNAPSHOTS_STORE = eventDocSnapshotsStoreName(STORE);
   const FOLD_FN = 'foldTemplateSnapshot';
@@ -508,7 +508,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
   it('skips the fold when a complete snapshot already exists at the target event, but still rewrites the summary from it', () => {
     // The document row is the set's last write, so its presence at the target means the
-    // snapshot work is done — but an earlier delivery may have died between the summary
+    // snapshot work is done, but an earlier delivery may have died between the summary
     // write and the snapshot writes, so the replay re-covers the summary row from the
     // seed's own summary view rather than trusting it landed.
     const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
