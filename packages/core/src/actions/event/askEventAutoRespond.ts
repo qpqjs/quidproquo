@@ -1,7 +1,8 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { Nullable } from '../../types/Nullable';
 import { AskResponse } from '../../types/StorySession';
-import { AnyMatchStoryResult, EventActionType } from './EventActionType';
+import { EventActionType } from './EventActionType';
+import { AnyMatchStoryResult } from './types';
 
 export const askEventAutoRespondBase = createActionRequester<unknown>()({
   actionType: EventActionType.AutoRespond,

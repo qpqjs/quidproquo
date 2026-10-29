@@ -1,5 +1,6 @@
 import { createActionRequester } from '../../logic/actions';
-import { AuthenticationDeliveryDetails, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticationDeliveryDetails } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryRequestEmailVerification = createActionRequester<AuthenticationDeliveryDetails>()({
   actionType: UserDirectoryActionType.RequestEmailVerification,

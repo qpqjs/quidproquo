@@ -1,5 +1,6 @@
 import { createActionRequester } from '../../logic/actions';
-import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryRefreshToken = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.RefreshToken,

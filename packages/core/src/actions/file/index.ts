@@ -12,4 +12,6 @@ export * from './askFileStreamOpen';
 export * from './askFileWriteBinaryContents';
 export * from './askFileWriteObjectJson';
 export * from './askFileWriteTextContents';
+export * from './constants';
 export * from './FileActionType';
+export * from './types';

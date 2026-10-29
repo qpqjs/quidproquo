@@ -1,6 +1,7 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { FileActionType } from './FileActionType';
+import { StorageDriveAdvancedWriteOptions } from './types';
 
 export const askFileWriteObjectJsonBase = createActionRequester<void>()({
   actionType: FileActionType.WriteObjectJson,

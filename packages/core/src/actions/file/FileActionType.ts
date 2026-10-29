@@ -1,5 +1,3 @@
-import { StorageDriveTier } from '../../config';
-
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
   WriteTextContents = '@quidproquo-core/File/WriteTextContents',
@@ -16,21 +14,3 @@ export enum FileActionType {
   IsColdStorage = '@quidproquo-core/File/IsColdStorage',
   StreamOpen = '@quidproquo-core/File/StreamOpen',
 }
-
-export const filePathDelimiter = `/`;
-
-export type FileInfo = {
-  filepath: string;
-  drive: string;
-  isDir: boolean;
-  hashMd5?: string;
-};
-
-export type DirectoryList = {
-  fileInfos: FileInfo[];
-  pageToken?: string;
-};
-
-export type StorageDriveAdvancedWriteOptions = {
-  storageDriveTier?: StorageDriveTier;
-};

@@ -1,7 +1,8 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
 import { askThrowError } from '../error/askThrowError';
-import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export type AuthenticateUserRequest = {
   email: string;

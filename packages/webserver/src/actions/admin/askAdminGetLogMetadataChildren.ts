@@ -1,7 +1,7 @@
 import { createActionRequester } from '@qpqjs/core';
 
 import { AdminActionType } from './AdminActionType';
-import { QpqLogList } from './AdminActionType';
+import { QpqLogList } from './types';
 
 export const askAdminGetLogMetadataChildren = createActionRequester<QpqLogList>()({
   actionType: AdminActionType.GetLogMetadataChildren,

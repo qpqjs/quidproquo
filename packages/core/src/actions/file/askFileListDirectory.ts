@@ -1,6 +1,7 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { DirectoryList, FileActionType, FileInfo } from './FileActionType';
+import { FileActionType } from './FileActionType';
+import { DirectoryList, FileInfo } from './types';
 
 export const askFileListDirectory = createActionRequester<DirectoryList>()({
   actionType: FileActionType.ListDirectory,

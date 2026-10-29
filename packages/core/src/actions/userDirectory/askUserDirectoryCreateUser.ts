@@ -1,5 +1,6 @@
 import { createActionRequester } from '../../logic/actions';
-import { AuthenticateUserResponse, UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse, UserAttributes } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export type CreateUserRequest = {
   email: string;

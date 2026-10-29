@@ -1,6 +1,7 @@
 import { createActionRequester } from '../../logic/actions';
 import { AnyAuthChallenge } from './types';
-import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryRespondToAuthChallenge = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.RespondToAuthChallenge,
