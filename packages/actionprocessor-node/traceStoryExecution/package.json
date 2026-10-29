@@ -1,0 +1,8 @@
+{
+  "name": "qpqjs-actionprocessor-node-trace-story-execution",
+  "description": "Subpath entry for resolvers that ignore exports maps: import from '@qpqjs/actionprocessor-node/traceStoryExecution' pulls only the tracer, not the processors the package root drags in.",
+  "main": "../lib/commonjs/traceStoryExecution/index.js",
+  "module": "../lib/esm/traceStoryExecution/index.js",
+  "types": "../lib/commonjs/traceStoryExecution/index.d.ts",
+  "sideEffects": false
+}
