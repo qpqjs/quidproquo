@@ -5,7 +5,7 @@ import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui
 import Box from '@mui/material/Box';
 
 import { useAdminApp, useSessionState } from '../../adminApp';
-import { authRuntime } from '../../Auth/logic';
+import { authRuntime } from '../../Auth/authRuntime';
 import { useTabs } from './hooks/useTabs';
 
 export function MainLayout() {

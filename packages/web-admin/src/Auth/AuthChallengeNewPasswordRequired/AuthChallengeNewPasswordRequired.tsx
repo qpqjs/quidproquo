@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
-import { AuthState } from '../logic';
+import { AuthState } from '../types/AuthState';
 import { authChallengeInitialState, authChallengeLogic, authChallengeReducer } from './logic';
 
 type AuthChallengeNewPasswordRequiredProps = {

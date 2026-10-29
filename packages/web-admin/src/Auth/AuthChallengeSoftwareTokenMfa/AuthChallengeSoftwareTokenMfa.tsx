@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
-import { AuthState } from '../logic';
+import { AuthState } from '../types/AuthState';
 import { authChallengeMfaInitialState, authChallengeMfaLogic, authChallengeMfaReducer } from './logic';
 
 type AuthChallengeSoftwareTokenMfaProps = {

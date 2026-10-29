@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../../../logic';
+import { askAuthUISetAuthInfo } from '../../../actionCreators/askAuthUISetAuthInfo';
 import { AuthChallengeMfaSetupState, AuthChallengeSendMfaSetupCodePayload } from '../authChallengeTypes';
 
 // Completes MFA_SETUP. Sends the first TOTP code together with the refreshed

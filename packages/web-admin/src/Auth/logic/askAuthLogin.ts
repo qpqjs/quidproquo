@@ -1,8 +1,10 @@
 import { AskResponse, askStateRead, AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
 
-import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
-import { askAuthUISetAuthInfo, askAuthUISetPassword } from '../authActionCreator';
-import { AuthLoginPayload, AuthState } from '../authTypes';
+import { askPlatformRequest, askSaveAuthToken } from '../../platformLogic';
+import { askAuthUISetAuthInfo } from '../actionCreators/askAuthUISetAuthInfo';
+import { askAuthUISetPassword } from '../actionCreators/askAuthUISetPassword';
+import { AuthLoginPayload } from '../types/AuthLoginPayload';
+import { AuthState } from '../types/AuthState';
 
 export function* askAuthLogin(): AskResponse<void> {
   const { username, password } = yield* askStateRead<AuthState>('');

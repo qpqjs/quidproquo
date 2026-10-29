@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../../../logic';
+import { askAuthUISetAuthInfo } from '../../../actionCreators/askAuthUISetAuthInfo';
 import { AuthChallengeMfaState, AuthChallengeSendMfaCodePayload } from '../authChallengeTypes';
 
 export function* askAuthChallengeSendMfaCode(challenge: string, session: string, email: string): AskResponse<void> {

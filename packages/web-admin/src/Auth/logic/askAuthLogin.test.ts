@@ -3,8 +3,8 @@ import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { clearInMemoryAuthToken, getInMemoryAuthToken } from '../../../platformLogic';
-import { AuthEffect } from '../authTypes';
+import { clearInMemoryAuthToken, getInMemoryAuthToken } from '../../platformLogic';
+import { AuthEffect } from '../effects/AuthEffect';
 import { askAuthLogin } from './askAuthLogin';
 
 const baseMocks = (dispatched: string[], networkResponse: unknown) => ({

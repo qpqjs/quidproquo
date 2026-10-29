@@ -7,7 +7,7 @@ import { AuthChallengeMfaSetup } from './AuthChallengeMfaSetup/AuthChallengeMfaS
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 import { AuthChallengeSoftwareTokenMfa } from './AuthChallengeSoftwareTokenMfa/AuthChallengeSoftwareTokenMfa';
 import { isLoggedOn } from './logic/isLoggedOn';
-import { authRuntime } from './logic';
+import { authRuntime } from './authRuntime';
 import { Login } from './Login';
 
 type AuthProps = {

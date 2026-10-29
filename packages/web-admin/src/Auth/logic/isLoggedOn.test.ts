@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { AuthState } from './authTypes';
+import { AuthState } from '../types/AuthState';
 import { isLoggedOn } from './isLoggedOn';
 
 const buildState = (accessToken?: string, expiresAt?: string): AuthState => ({

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { authInitialState, authReducer } from './authReducer';
-import { AuthEffect } from './authTypes';
+import { AuthEffect } from './effects/AuthEffect';
+import { createInitialAuthState } from './logic/createInitialAuthState';
+import { authReducer } from './authReducer';
+
+const authInitialState = createInitialAuthState();
 
 describe('authReducer', () => {
   it('sets the username', () => {

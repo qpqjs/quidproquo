@@ -1,7 +1,8 @@
 import { AskResponse, AuthenticateUserChallenge } from '@qpqjs/core';
 
-import { askSaveAuthToken } from '../../../platformLogic';
-import { askAuthUISetAuthInfo, askAuthUISetPassword } from '../authActionCreator';
+import { askSaveAuthToken } from '../../platformLogic';
+import { askAuthUISetAuthInfo } from '../actionCreators/askAuthUISetAuthInfo';
+import { askAuthUISetPassword } from '../actionCreators/askAuthUISetPassword';
 
 export function* askAuthLogout(): AskResponse<void> {
   yield* askSaveAuthToken({

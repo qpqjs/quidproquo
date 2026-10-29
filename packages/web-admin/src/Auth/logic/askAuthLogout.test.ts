@@ -3,8 +3,8 @@ import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { clearInMemoryAuthToken, getInMemoryAuthToken, setInMemoryAuthToken } from '../../../platformLogic';
-import { AuthEffect } from '../authTypes';
+import { clearInMemoryAuthToken, getInMemoryAuthToken, setInMemoryAuthToken } from '../../platformLogic';
+import { AuthEffect } from '../effects/AuthEffect';
 import { askAuthLogout } from './askAuthLogout';
 
 describe('askAuthLogout', () => {
