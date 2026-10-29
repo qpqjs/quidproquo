@@ -7,7 +7,7 @@ import { eventDocWorkspaceEventsEndpoint } from './eventDocWorkspaceEventsEndpoi
 
 /** First page of a document's log with includeBase. Only this page carries the base (null when the server has no usable snapshot). */
 export function* askEventDocWorkspaceApiFetchBootstrapPage(identity: EventDocWorkspaceDocumentIdentity): AskResponse<EventDocEventBootstrapPage> {
-  const response = yield* askApiRequest<void, EventDocEventBootstrapPage>(identity.serviceName, 'GET', eventDocWorkspaceEventsEndpoint(identity), {
+  const response = yield* askApiRequest<EventDocEventBootstrapPage, void>(identity.serviceName, 'GET', eventDocWorkspaceEventsEndpoint(identity), {
     params: { includeBase: 'true' },
   });
 

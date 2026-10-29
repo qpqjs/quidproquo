@@ -46,7 +46,7 @@ export function* askRunWebsiteBucketNotPublicTest(): AskResponse<void> {
   const statuses: number[] = [];
   for (const bucketName of bucketNames) {
     const url = `https://${bucketName}.s3.${WEBSITE_BUCKET_REGION}.amazonaws.com/index.html`;
-    const response = yield* askNetworkRequest<undefined, string>('GET', url, {
+    const response = yield* askNetworkRequest<string, undefined>('GET', url, {
       responseType: 'text',
     });
 

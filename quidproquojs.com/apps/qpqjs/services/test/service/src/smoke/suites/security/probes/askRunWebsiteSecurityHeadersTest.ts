@@ -28,7 +28,7 @@ export function* askRunWebsiteSecurityHeadersTest(): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
   const websiteUrl = toWebsiteUrl(baseUrl);
 
-  const index = yield* askNetworkRequest<undefined, string>(
+  const index = yield* askNetworkRequest<string, undefined>(
     'GET',
     `${websiteUrl}/`,
     { responseType: 'text' }

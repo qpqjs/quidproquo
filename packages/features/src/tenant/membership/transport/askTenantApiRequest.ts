@@ -11,7 +11,7 @@ export function* askTenantApiRequest<TBody, TResponse>(
   path: string,
   body?: TBody,
 ): AskResponse<TResponse> {
-  const response = yield* askApiRequest<TBody, TResponse>(target.service, method, tenantMyTenantsEndpoint(target, path), body ? { body } : undefined);
+  const response = yield* askApiRequest<TResponse, TBody>(target.service, method, tenantMyTenantsEndpoint(target, path), body ? { body } : undefined);
 
   if (response.status < 200 || response.status >= 300) {
     const message = (response.data as { message?: string } | undefined)?.message;

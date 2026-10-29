@@ -26,7 +26,7 @@ export function* askRunUnverifiedBearerNoExpiryTest(): AskResponse<void> {
     token_use: 'access',
   })}.forged`;
 
-  const response = yield* askNetworkRequest<undefined, WhoAmIBody>(
+  const response = yield* askNetworkRequest<WhoAmIBody, undefined>(
     'GET',
     `${baseUrl}/v1/security/who-am-i-lax`,
     {

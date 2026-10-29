@@ -3,7 +3,7 @@ import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from '@q
 import { CloudflareResponse, CloudflareZone } from '../types';
 
 export function* askCloudflareGetZoneId(apiKey: string, siteDomainName: string): AskResponse<string> {
-  const response = yield* askNetworkRequest<void, CloudflareResponse<CloudflareZone>>(
+  const response = yield* askNetworkRequest<CloudflareResponse<CloudflareZone>, void>(
     'GET',
     `https://api.cloudflare.com/client/v4/zones?name=${siteDomainName}`,
     {

@@ -22,7 +22,7 @@ export function* askRunAdminServicesRequireAuthTest(): AskResponse<void> {
   const baseUrl = document.servers[0]?.url;
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
 
-  const response = yield* askNetworkRequest<undefined, ServicesBody>(
+  const response = yield* askNetworkRequest<ServicesBody, undefined>(
     'GET',
     `${toAdminBaseUrl(baseUrl)}/admin/services`
   );

@@ -9,6 +9,6 @@ export const askInlineFunctionExecuteBase = createActionRequester<unknown>()({
 
 // The function's payload and result types are only known to the caller, so the base
 // takes and returns unknown and this story casts to what the caller declared.
-export function* askInlineFunctionExecute<R, T>(functionName: string, payload: T): AskResponse<R> {
-  return (yield* askInlineFunctionExecuteBase(functionName, payload)) as R;
+export function* askInlineFunctionExecute<TResult, TPayload = unknown>(functionName: string, payload: TPayload): AskResponse<TResult> {
+  return (yield* askInlineFunctionExecuteBase(functionName, payload)) as TResult;
 }

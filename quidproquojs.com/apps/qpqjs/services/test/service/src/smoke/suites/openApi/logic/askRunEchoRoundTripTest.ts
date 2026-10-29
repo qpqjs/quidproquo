@@ -17,7 +17,7 @@ export function* askRunEchoRoundTripTest(runId: string): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
 
   const valid: EchoRequest = { bodyValue: runId };
-  const ok = yield* askNetworkRequest<EchoRequest, EchoResponse>(
+  const ok = yield* askNetworkRequest<EchoResponse, EchoRequest>(
     'POST',
     `${baseUrl}/v1/echo/${runId}`,
     { body: valid }
@@ -32,7 +32,7 @@ export function* askRunEchoRoundTripTest(runId: string): AskResponse<void> {
   );
 
   // An empty bodyValue fails the min(1) on the schema; the route must 422, not 200
-  const invalid = yield* askNetworkRequest<EchoRequest, unknown>(
+  const invalid = yield* askNetworkRequest<unknown, EchoRequest>(
     'POST',
     `${baseUrl}/v1/echo/${runId}`,
     { body: { bodyValue: '' } }

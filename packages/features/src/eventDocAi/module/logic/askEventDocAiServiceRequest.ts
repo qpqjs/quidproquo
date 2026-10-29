@@ -14,7 +14,7 @@ import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 export function* askEventDocAiServiceRequest<TPayload, TResponse>(method: string, payload: TPayload): AskResponse<TResponse> {
   const { serviceName, type, docId } = yield* askEventDocAiContextRead();
 
-  return yield* askServiceRequest<TPayload & EventDocAiDocRef, TResponse>(serviceName, buildEventDocAiMethodName(type, method), {
+  return yield* askServiceRequest<TResponse, TPayload & EventDocAiDocRef>(serviceName, buildEventDocAiMethodName(type, method), {
     ...payload,
     docId,
   });

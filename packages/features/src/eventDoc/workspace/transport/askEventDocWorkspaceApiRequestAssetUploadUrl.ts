@@ -15,7 +15,7 @@ export function* askEventDocWorkspaceApiRequestAssetUploadUrl(
   identity: EventDocWorkspaceDocumentIdentity,
   contentType: string,
 ): AskResponse<EventDocAssetUploadUrl> {
-  const response = yield* askApiRequest<AssetUploadUrlRequest, EventDocAssetUploadUrl>(
+  const response = yield* askApiRequest<EventDocAssetUploadUrl, AssetUploadUrlRequest>(
     identity.serviceName,
     'POST',
     eventDocWorkspaceAssetsEndpoint(identity),

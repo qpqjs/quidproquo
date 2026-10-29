@@ -10,7 +10,7 @@ export function* askSessionApiRequest<TBody, TResponse>(method: HTTPMethod, url:
   const baseUrls = yield* askContextRead(baseUrlsContext);
   const authInfo = yield* askLoadAuthToken();
 
-  return yield* askNetworkRequest<TBody, TResponse>(method, url, {
+  return yield* askNetworkRequest<TResponse, TBody>(method, url, {
     body,
     headers: authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {},
     basePath: baseUrls.api,

@@ -36,11 +36,10 @@ export const askNetworkRequestBase = createActionRequester<HTTPNetworkResponse<u
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askNetworkRequest<T, R>(
+export function* askNetworkRequest<TResult, TPayload = unknown>(
   method: HTTPMethod,
   url: string,
-
-  httpRequestOptions?: HTTPRequestOptions<T>,
-): AskResponse<HTTPNetworkResponse<R>> {
-  return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<R>;
+  httpRequestOptions?: HTTPRequestOptions<TPayload>,
+): AskResponse<HTTPNetworkResponse<TResult>> {
+  return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<TResult>;
 }

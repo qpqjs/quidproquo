@@ -8,7 +8,7 @@ export function* askCloudflareGetDNSRecordId(apiKey: string, zoneId: string, cna
   let allRecords: CloudflareDNSRecord[] = [];
 
   do {
-    const response = yield* askNetworkRequest<void, CloudflareResponse<CloudflareDNSRecord>>(
+    const response = yield* askNetworkRequest<CloudflareResponse<CloudflareDNSRecord>, void>(
       'GET',
       `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${cnameName}&page=${page}`,
       {

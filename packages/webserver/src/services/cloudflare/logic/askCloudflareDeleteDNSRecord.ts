@@ -3,7 +3,7 @@ import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from '@q
 import { CloudflareResponse } from '../types';
 
 export function* askCloudflareDeleteDNSRecord(apiKey: string, zoneId: string, recordId: string): AskResponse<void> {
-  const response = yield* askNetworkRequest<void, CloudflareResponse<void>>(
+  const response = yield* askNetworkRequest<CloudflareResponse<void>, void>(
     'DELETE',
     `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${recordId}`,
     {

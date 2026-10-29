@@ -16,7 +16,7 @@ export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpR
     ...(authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {}),
   };
 
-  const response = yield* askNetworkRequest<T, R>(method, url, {
+  const response = yield* askNetworkRequest<R, T>(method, url, {
     ...httpRequestOptions,
     headers,
     basePath: baseUrls.api,

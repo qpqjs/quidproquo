@@ -14,6 +14,11 @@ export const askServiceFunctionExecuteBase = createActionRequester<unknown>()({
 
 // The remote function's payload and result types are only known to the caller, so the
 // base takes and returns unknown and this story casts to what the caller declared.
-export function* askServiceFunctionExecute<R, T>(service: string, functionName: string, payload: T, isAsync: boolean = false): AskResponse<R> {
-  return (yield* askServiceFunctionExecuteBase(service, functionName, payload, isAsync)) as R;
+export function* askServiceFunctionExecute<TResult, TPayload = unknown>(
+  service: string,
+  functionName: string,
+  payload: TPayload,
+  isAsync: boolean = false,
+): AskResponse<TResult> {
+  return (yield* askServiceFunctionExecuteBase(service, functionName, payload, isAsync)) as TResult;
 }

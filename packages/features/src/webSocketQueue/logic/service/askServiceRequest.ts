@@ -9,6 +9,6 @@ export const askServiceRequestBase = createActionRequester<unknown>()({
 
 // The request and response shapes are only known to the caller, so the base takes and
 // returns unknown and this story casts to what the caller declared.
-export function* askServiceRequest<TPayload, TResponse>(serviceName: string, method: string, payload: TPayload): AskResponse<TResponse> {
-  return (yield* askServiceRequestBase(serviceName, method, payload)) as TResponse;
+export function* askServiceRequest<TResult, TPayload = unknown>(serviceName: string, method: string, payload: TPayload): AskResponse<TResult> {
+  return (yield* askServiceRequestBase(serviceName, method, payload)) as TResult;
 }

@@ -27,7 +27,7 @@ export function* askRunSourceMapNotServedTest(): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
   const websiteUrl = toWebsiteUrl(baseUrl);
 
-  const index = yield* askNetworkRequest<undefined, string>(
+  const index = yield* askNetworkRequest<string, undefined>(
     'GET',
     `${websiteUrl}/`,
     { responseType: 'text' }
@@ -40,7 +40,7 @@ export function* askRunSourceMapNotServedTest(): AskResponse<void> {
   yield* askSmokeAssert(!!scriptSrc, 'website index names no script to check');
   const scriptUrl = new URL(scriptSrc!, `${websiteUrl}/`).toString();
 
-  const script = yield* askNetworkRequest<undefined, string>('GET', scriptUrl, {
+  const script = yield* askNetworkRequest<string, undefined>('GET', scriptUrl, {
     responseType: 'text',
   });
   yield* askSmokeAssert(
@@ -52,7 +52,7 @@ export function* askRunSourceMapNotServedTest(): AskResponse<void> {
     `production script links a source map: ${scriptUrl}`
   );
 
-  const map = yield* askNetworkRequest<undefined, string>(
+  const map = yield* askNetworkRequest<string, undefined>(
     'GET',
     `${scriptUrl}.map`,
     { responseType: 'text' }

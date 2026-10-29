@@ -15,14 +15,14 @@ export function* askCloudflareAddDNSRecord(apiKey: string, zoneId: string, cname
   yield* askLogCreate(LogLevelEnum.Info, `type of proxied: [${typeof dnsEntryValue.proxied}]`);
 
   const response = yield* askNetworkRequest<
+    CloudflareResponse<CloudflareDNSRecord>,
     {
       type: 'CNAME' | 'A';
       name: string;
       content: string;
       ttl: number;
       proxied: boolean;
-    },
-    CloudflareResponse<CloudflareDNSRecord>
+    }
   >('POST', `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
     headers: {
       Authorization: `Bearer ${apiKey}`,

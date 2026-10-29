@@ -27,7 +27,7 @@ export function* askRunUnverifiedBearerTest(): AskResponse<void> {
     exp: Math.floor(Date.now() / 1000) + 3600,
   })}.forged`;
 
-  const response = yield* askNetworkRequest<undefined, WhoAmIBody>(
+  const response = yield* askNetworkRequest<WhoAmIBody, undefined>(
     'GET',
     `${baseUrl}/v1/security/who-am-i`,
     {

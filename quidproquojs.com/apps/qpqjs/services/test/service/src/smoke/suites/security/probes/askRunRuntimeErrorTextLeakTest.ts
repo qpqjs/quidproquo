@@ -18,7 +18,7 @@ export function* askRunRuntimeErrorTextLeakTest(): AskResponse<void> {
   const baseUrl = document.servers[0]?.url;
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
 
-  const thrown = yield* askNetworkRequest<undefined, ErrorBody>(
+  const thrown = yield* askNetworkRequest<ErrorBody, undefined>(
     'GET',
     `${baseUrl}/v1/security/throw-raw`
   );
@@ -31,7 +31,7 @@ export function* askRunRuntimeErrorTextLeakTest(): AskResponse<void> {
     `throw-raw body carries the raw exception message: [${JSON.stringify(thrown.data)}]`
   );
 
-  const unknown = yield* askNetworkRequest<undefined, ErrorBody>(
+  const unknown = yield* askNetworkRequest<ErrorBody, undefined>(
     'GET',
     `${baseUrl}/v1/security/unknown-action`
   );

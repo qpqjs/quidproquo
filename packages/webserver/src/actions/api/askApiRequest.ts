@@ -34,11 +34,11 @@ export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unkno
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askApiRequest<T, R>(
+export function* askApiRequest<TResult, TPayload = unknown>(
   service: string,
   method: HTTPMethod,
   endpoint: string,
-  options?: ApiRequestOptions<T>,
-): AskResponse<HTTPNetworkResponse<R>> {
-  return (yield* askApiRequestBase(service, method, endpoint, options as ApiRequestOptions<unknown>)) as HTTPNetworkResponse<R>;
+  options?: ApiRequestOptions<TPayload>,
+): AskResponse<HTTPNetworkResponse<TResult>> {
+  return (yield* askApiRequestBase(service, method, endpoint, options as ApiRequestOptions<unknown>)) as HTTPNetworkResponse<TResult>;
 }

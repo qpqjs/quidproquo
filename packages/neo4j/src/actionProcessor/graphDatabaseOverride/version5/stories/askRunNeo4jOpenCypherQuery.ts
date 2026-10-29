@@ -31,7 +31,7 @@ export function* askRunNeo4jOpenCypherQuery({
   const instanceName = yield* askConfigGetParameter(`neo4j-${graphDatabaseName}-instance`);
   const password = yield* askConfigGetSecret(`neo4j-${graphDatabaseName}-password`);
 
-  const response = yield* askNetworkRequest<Neo4jCypherRequest, Neo4jCypherResponse>(
+  const response = yield* askNetworkRequest<Neo4jCypherResponse, Neo4jCypherRequest>(
     'POST',
     `HTTPS://${instanceName}.databases.neo4j.io:443/db/neo4j/query/v2`,
     {

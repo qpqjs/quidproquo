@@ -34,7 +34,7 @@ export function* askRunNeptuneOpenCypherQuery({
   const body = JSON.stringify(request);
   const signedHeaders = yield* askGraphDatabaseForNeptuneSignRequest(url, body);
 
-  const response = yield* askNetworkRequest<string, NeptuneCypherResponse>('POST', url, {
+  const response = yield* askNetworkRequest<NeptuneCypherResponse, string>('POST', url, {
     body,
     headers: signedHeaders,
   });

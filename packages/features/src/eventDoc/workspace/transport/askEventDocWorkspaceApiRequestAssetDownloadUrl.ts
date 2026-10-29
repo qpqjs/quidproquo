@@ -10,7 +10,7 @@ export function* askEventDocWorkspaceApiRequestAssetDownloadUrl(
   identity: EventDocWorkspaceDocumentIdentity,
   assetId: string,
 ): AskResponse<EventDocAssetDownloadUrl> {
-  const response = yield* askApiRequest<void, EventDocAssetDownloadUrl>(
+  const response = yield* askApiRequest<EventDocAssetDownloadUrl, void>(
     identity.serviceName,
     'GET',
     eventDocWorkspaceAssetDownloadEndpoint(identity, assetId),
