@@ -86,7 +86,8 @@ const stripCommonFolder = (names: string[]): number => {
   const firstSegments = new Set(names.map((name) => name.split('/')[0]));
   const allNested = names.every((name) => name.includes('/'));
 
-  return firstSegments.size === 1 && allNested ? [...firstSegments][0].length + 1 : 0;
+  const [firstSegment] = firstSegments;
+  return firstSegments.size === 1 && allNested && firstSegment !== undefined ? firstSegment.length + 1 : 0;
 };
 
 const planEntries = async (zip: Buffer): Promise<PlannedEntry[]> => {
