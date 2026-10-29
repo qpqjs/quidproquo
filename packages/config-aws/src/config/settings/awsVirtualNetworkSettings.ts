@@ -8,7 +8,7 @@ export enum AwsVpcFlowLogTrafficType {
   reject = 'reject',
 }
 
-export interface AwsVirtualNetworkFlowLogSettings {
+export type AwsVirtualNetworkFlowLogSettings = {
   // Flow logs are ON unless disabled. CloudWatch Logs ingestion is ~US$0.50/GB ,
   // typically cents-to-dollars per month for lambda-only VPCs.
   disable?: boolean;
@@ -19,9 +19,9 @@ export interface AwsVirtualNetworkFlowLogSettings {
 
   // Which traffic to record. Default all.
   trafficType?: AwsVpcFlowLogTrafficType;
-}
+};
 
-export interface QPQConfigAdvancedAwsVirtualNetworkSettings {
+export type QPQConfigAdvancedAwsVirtualNetworkSettings = {
   flowLogs?: AwsVirtualNetworkFlowLogSettings;
 
   // S3/DynamoDB gateway endpoints are free and reduce NAT data-processing
@@ -45,9 +45,9 @@ export interface QPQConfigAdvancedAwsVirtualNetworkSettings {
 
   // Default 2. Changing this on an already-deployed VPC replaces its subnets.
   maxAzs?: number;
-}
+};
 
-export interface AwsVirtualNetworkQPQConfigSetting extends QPQConfigSetting {
+export type AwsVirtualNetworkQPQConfigSetting = {
   virtualNetworkName: string;
 
   flowLogs: Required<AwsVirtualNetworkFlowLogSettings>;
@@ -59,7 +59,7 @@ export interface AwsVirtualNetworkQPQConfigSetting extends QPQConfigSetting {
 
   natGateways?: number;
   maxAzs: number;
-}
+} & QPQConfigSetting;
 
 /**
  * Hardens the VPC declared by core `defineVirtualNetwork(name)`. Defaults are

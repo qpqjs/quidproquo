@@ -2,16 +2,16 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
 
-export interface QPQConfigAdvancedAwsOrganizationSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedAwsOrganizationSettings = {} & QPQConfigAdvancedSettings;
 
-export interface AwsOrganizationQPQConfigSetting extends QPQConfigSetting {
+export type AwsOrganizationQPQConfigSetting = {
   organizationName: string;
   rootAwsOrganizationalUnitId: string;
   accountNames: string[];
   // userAccess: Record<string, string[]>;
   baseEmailAddress: string;
   // identityCenterInstanceId: string;
-}
+} & QPQConfigSetting;
 
 export const defineBootstrapAwsOrganization = (
   rootAwsOrganizationalUnitId: AwsOrganizationQPQConfigSetting['rootAwsOrganizationalUnitId'],

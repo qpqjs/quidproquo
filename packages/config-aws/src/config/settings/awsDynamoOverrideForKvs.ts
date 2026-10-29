@@ -2,15 +2,15 @@ import { CustomFullyQualifiedResource, FullyQualifiedResource, QPQConfigAdvanced
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedAwsDynamoOverrideForKvsSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedAwsDynamoOverrideForKvsSettings = {} & QPQConfigAdvancedSettings;
 
-export interface AwsDynamoOverrideForKvsQPQConfigSetting extends QPQConfigSetting {
+export type AwsDynamoOverrideForKvsQPQConfigSetting = {
   name: string;
 
   kvsStore: FullyQualifiedResource;
   dynamoTableName: string;
   deprecated: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineAwsDynamoOverrideForKvs = (
   name: string,

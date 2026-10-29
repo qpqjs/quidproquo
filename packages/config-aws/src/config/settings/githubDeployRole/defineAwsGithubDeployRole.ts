@@ -23,11 +23,11 @@ export type QPQConfigAdvancedAwsGithubDeployRoleSettings = {
   trustNameForm?: boolean;
 };
 
-export interface AwsGithubDeployRoleQPQConfigSetting extends QPQConfigSetting {
+export type AwsGithubDeployRoleQPQConfigSetting = {
   repository: GithubRepository;
   githubEnvironment?: string;
   trustNameForm: boolean;
-}
+} & QPQConfigSetting;
 
 /**
  * The IAM role GitHub Actions assumes (OIDC) to deploy this app's environment. One per

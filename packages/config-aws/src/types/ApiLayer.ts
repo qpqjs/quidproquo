@@ -1,4 +1,4 @@
-export interface ApiLayer {
+export type ApiLayer = {
   buildPath?: string;
   name: string;
   layerArn?: string;
@@ -6,4 +6,4 @@ export interface ApiLayer {
   // npm packages this layer provides at runtime, bundlers externalize them
   // on AWS builds; local runtimes resolve them from node_modules as normal.
   modules?: string[];
-}
+};

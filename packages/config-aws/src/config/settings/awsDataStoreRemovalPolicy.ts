@@ -7,9 +7,9 @@ export enum AwsDataStoreRemovalPolicy {
   destroy = 'destroy',
 }
 
-export interface AwsDataStoreRemovalPolicyQPQConfigSetting extends QPQConfigSetting {
+export type AwsDataStoreRemovalPolicyQPQConfigSetting = {
   removalPolicy: AwsDataStoreRemovalPolicy;
-}
+} & QPQConfigSetting;
 
 /**
  * Removal policy for this service's data stores (storage-drive S3 buckets,

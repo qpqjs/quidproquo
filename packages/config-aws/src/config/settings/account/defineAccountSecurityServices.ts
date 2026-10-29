@@ -2,14 +2,14 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
 
-export interface AccountAuthFailureAlert {
+export type AccountAuthFailureAlert = {
   emails: string[];
 
   /** Failed Cognito sign-ins per 5 minutes before alerting. Defaults to 10. */
   thresholdPer5Minutes?: number;
-}
+};
 
-export interface AccountSecurityServicesQPQConfigSetting extends QPQConfigSetting {
+export type AccountSecurityServicesQPQConfigSetting = {
   /**
    * Creates a GuardDuty detector. Opt-in: detectors are one-per-account+region and are
    * often managed outside the stack (e.g. an AWS Organizations delegated admin
@@ -31,7 +31,7 @@ export interface AccountSecurityServicesQPQConfigSetting extends QPQConfigSettin
    * `cloudWatchLogs` enabled.
    */
   cognitoAuthFailureAlert?: AccountAuthFailureAlert;
-}
+} & QPQConfigSetting;
 
 /**
  * Account-level AWS security services (GuardDuty threat detection, Security Hub),

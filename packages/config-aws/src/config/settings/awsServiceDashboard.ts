@@ -2,10 +2,10 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface AwsServiceDashboardQPQConfigSetting extends QPQConfigSetting {
+export type AwsServiceDashboardQPQConfigSetting = {
   /** Skip the anomaly detector models, anomaly band widgets and api latency anomaly alarms. */
   disableAnomalyDetection?: boolean;
-}
+} & QPQConfigSetting;
 
 /**
  * A default operational CloudWatch dashboard for this service (api traffic/errors/latency,

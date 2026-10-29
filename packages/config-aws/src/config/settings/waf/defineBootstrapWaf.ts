@@ -14,15 +14,15 @@ export enum WafRuleOverrideAction {
   count = 'count',
 }
 
-export interface WafManagedRuleOverride {
+export type WafManagedRuleOverride = {
   /** Rule name inside the managed group, e.g. 'SizeRestrictions_BODY'. */
   name: string;
 
   /** Action to force for this rule instead of the group's default. */
   action: WafRuleOverrideAction;
-}
+};
 
-export interface WafRateLimit {
+export type WafRateLimit = {
   name: string;
 
   /** Maximum requests per 5-minute window per source IP before the IP is blocked. */
@@ -30,9 +30,9 @@ export interface WafRateLimit {
 
   /** Scope the rate limit to uri paths with this prefix (e.g. '/auth'). Omit to rate limit all paths. */
   uriPathStartsWith?: string;
-}
+};
 
-export interface BootstrapWafQPQConfigSetting extends QPQConfigSetting {
+export type BootstrapWafQPQConfigSetting = {
   /** Managed rule groups to enable. Defaults to common, knownBadInputs and sqli. */
   managedRuleGroups?: WafManagedRuleGroup[];
 
@@ -44,7 +44,7 @@ export interface BootstrapWafQPQConfigSetting extends QPQConfigSetting {
    * common group to count so large request bodies pass through instead of being blocked.
    */
   managedRuleOverrides?: Partial<Record<WafManagedRuleGroup, WafManagedRuleOverride[]>>;
-}
+} & QPQConfigSetting;
 
 /**
  * Web application firewall for this app+environment, created once in the bootstrap phase:

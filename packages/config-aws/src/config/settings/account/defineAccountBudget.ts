@@ -7,20 +7,20 @@ export enum BudgetThresholdType {
   forecasted = 'forecasted',
 }
 
-export interface BudgetThreshold {
+export type BudgetThreshold = {
   thresholdPercent: number;
   type: BudgetThresholdType;
-}
+};
 
-export interface AccountBudgetAnomalyDetection {
+export type AccountBudgetAnomalyDetection = {
   /** Anomaly detection is created alongside the budget by default; set to opt out. */
   disabled?: boolean;
 
   /** Minimum total cost impact (USD) before an anomaly alert is sent. Defaults to 10. */
   minimumImpactUsd?: number;
-}
+};
 
-export interface AccountBudgetQPQConfigSetting extends QPQConfigSetting {
+export type AccountBudgetQPQConfigSetting = {
   name: string;
 
   /** Monthly account cost budget in USD that the threshold alerts are relative to. */
@@ -33,7 +33,7 @@ export interface AccountBudgetQPQConfigSetting extends QPQConfigSetting {
   thresholds?: BudgetThreshold[];
 
   anomalyDetection?: AccountBudgetAnomalyDetection;
-}
+} & QPQConfigSetting;
 
 /**
  * Account-level monthly cost budget with email threshold alerts, plus Cost Anomaly
