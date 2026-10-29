@@ -1,6 +1,5 @@
 export * from './apiPlugin';
 export * from './devServerPlugins';
-export * from './eventBusPlugin';
 export * from './fileStoragePlugin';
 export * from './fileWatcherPlugin';
 export * from './inFlightPlugin';

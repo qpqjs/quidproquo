@@ -35,3 +35,4 @@ cdk.context.json
 
 # Throwaway local benchmark scripts
 benchmarks/.triage-verdict
+.DS_Store
