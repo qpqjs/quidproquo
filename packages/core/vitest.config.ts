@@ -1,9 +1,3 @@
-import { defineConfig } from 'vitest/config';
+import { defineQpqVitestConfig } from '@qpqjs/testing/vitest-config';
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    pool: 'threads',
-  },
-});
+export default defineQpqVitestConfig(import.meta.url);
