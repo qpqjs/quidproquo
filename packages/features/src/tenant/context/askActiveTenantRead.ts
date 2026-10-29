@@ -1,3 +1,6 @@
-import { askStorageScopeRead } from '@qpqjs/core';
+import { createContextReader } from '@qpqjs/core';
 
-export const askActiveTenantRead = askStorageScopeRead;
+import { activeTenantContext } from './activeTenantContext';
+
+/** Reads the active tenant's typed storage scope, or null outside a tenant-aware request. */
+export const askActiveTenantRead = createContextReader(activeTenantContext);

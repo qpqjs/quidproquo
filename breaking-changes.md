@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askLogTemplateLiteral` is removed from `@qpqjs/core`; `askLog` is the requester itself (same action type, same payload `LogTemplateLiteralActionPayload`). Processors that referenced `askLogTemplateLiteral` use `askLog`. `GenericDataResourceActionTypeEnum` in `@qpqjs/webserver` no longer has a default export; use the named import.
 - Typo renames: `defineAwsDyanmoOverrideForKvs` / `QPQAwsConfigSettingType.awsDyanmoOverrideForKvs` (value `@quidproquo-aws/config/awsDynamoOverrideForKvs`) are now `defineAwsDynamoOverrideForKvs` / `awsDynamoOverrideForKvs`; `getDynamoTableNameOverrride` is `getDynamoTableNameOverride` (`@qpqjs/config-aws`); `getVirualNetworkConfigs` is `getVirtualNetworkConfigs` and `defineGraphDatabase`'s `virualNetworkName` is `virtualNetworkName` (`@qpqjs/core`); `getAllOwnedCertifcateConfigs` is `getAllOwnedCertificateConfigs` (`@qpqjs/webserver`).
 - `preformNetworkRequest` in `@qpqjs/webserver` is renamed `performNetworkRequest` (file `utils/performNetworkRequest.ts`). Update imports.
 - A setting under an application with no `environment` now counts as `production` when `flattenQpqConfig` resolves environment-scoped settings (it used to assume `development`), matching `getApplicationModuleEnvironment`. Set `environment` on the application if you relied on the old default.

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { askPutGenericDataResource } from './askPutGenericDataResource';
 import { askScanGenericDataResource } from './askScanGenericDataResource';
-import GenericDataResourceActionTypeEnum from './GenericDataResourceActionTypeEnum';
+import { GenericDataResourceActionTypeEnum } from './GenericDataResourceActionTypeEnum';
 
 describe('askPutGenericDataResource', () => {
   it('yields a Put action with the table name and item', () => {

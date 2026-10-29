@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { askLogTemplateLiteral } from './askLogTemplateLiteral';
+import { askLog } from './askLog';
 import { LogActionType } from './LogActionType';
 
-describe('askLogTemplateLiteral', () => {
+describe('askLog', () => {
   it('yields a TemplateLiteral action splitting strings and variables into messageParts', () => {
-    const { action } = captureRequester(askLogTemplateLiteral`user ${'alice'} did ${'login'}`);
+    const { action } = captureRequester(askLog`user ${'alice'} did ${'login'}`);
 
     expect(action).toEqual({
       type: LogActionType.TemplateLiteral,
@@ -20,7 +20,7 @@ describe('askLogTemplateLiteral', () => {
   });
 
   it('yields an empty variables list when there are no interpolations', () => {
-    const { action } = captureRequester(askLogTemplateLiteral`static message`);
+    const { action } = captureRequester(askLog`static message`);
 
     expect(action).toEqual({
       type: LogActionType.TemplateLiteral,
@@ -32,7 +32,7 @@ describe('askLogTemplateLiteral', () => {
 
   it('propagates a logging failure as a thrown error', () => {
     const run = () =>
-      runStory(askLogTemplateLiteral`boom`, {
+      runStory(askLog`boom`, {
         [LogActionType.TemplateLiteral]: throwsError('GenericError', 'log sink unavailable'),
       });
 
