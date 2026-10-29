@@ -16,7 +16,7 @@ import {
   QPQConfigAdvancedSettings,
   StorageDriveTier,
 } from '@qpqjs/core';
-import { defineServiceFunction } from '@qpqjs/webserver';
+import { AUTH_USER_DIRECTORY_GLOBAL_KEY, defineAuthServiceRoute, defineServiceFunction } from '@qpqjs/webserver';
 
 import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
@@ -36,7 +36,6 @@ import {
 } from '../constants';
 import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import {
-  defineAdminServiceAuthRoute,
   defineAdminServiceLogLogRoute,
   defineAdminServiceLogRoute,
   QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
@@ -216,9 +215,11 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           deprecated: advancedSettings?.deprecated,
         }),
 
-        defineAdminServiceAuthRoute('POST', '/login', 'login'),
-        defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
-        defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
+        // The login flow is the webserver auth controller pointed at the admin user pool.
+        defineGlobal(AUTH_USER_DIRECTORY_GLOBAL_KEY, ADMIN_USER_DIRECTORY_NAME),
+        defineAuthServiceRoute('POST', '/login', 'login'),
+        defineAuthServiceRoute('POST', '/refreshToken', 'refreshToken'),
+        defineAuthServiceRoute('POST', '/challenge', 'respondToAuthChallenge'),
 
         defineAdminServiceLogLogRoute('POST', '/loglog/list', 'getLogLogs', routeAuthSettings),
 
