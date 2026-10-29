@@ -116,7 +116,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       },
     });
 
-    // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distributionOrigin = aws_cloudfront_origins.S3BucketOrigin.withOriginAccessControl(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
@@ -153,7 +152,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     // Deploy-time artifact publishing: the build dir is packaged as a CDK
     // asset at synth time, unpacked into the origin bucket during deploy, then
     // the distribution is invalidated so the new content serves immediately.
-    // Note: prunes objects missing from the source — only safe on buckets this
+    // Note: prunes objects missing from the source, only safe on buckets this
     // web entry owns outright, not shared multi-service drives.
     if (props.webEntryConfig.storageDrive.autoUpload) {
       const webEntryBuildPath = qpqAwsCdkPathUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);

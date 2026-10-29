@@ -31,7 +31,7 @@ export class QpqConfigAwsAlarmConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     // The alarm is built entirely from the shared BaseAwsAlarmQPQConfigSetting
-    // fields, so it is namespace-agnostic — Lambda, ApiGateway, DynamoDb and Sqs
+    // fields, so it is namespace-agnostic, Lambda, ApiGateway, DynamoDb and Sqs
     // (and any future namespace) are all supported via the config's namespace +
     // metricName pair, no per-namespace branching required.
     const alarmSettings = props.alarmConfig.alarmSettings;

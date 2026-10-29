@@ -7,7 +7,7 @@ import path from 'path';
 import { QpqAppDeployContext } from './QpqAppDeployContext';
 
 // Loads an optional per-app config fragment (apps/<app>/account.qpq.ts or
-// bootstrap.qpq.ts) — a default-exported `(ctx) => QPQConfig` of app-specific
+// bootstrap.qpq.ts), a default-exported `(ctx) => QPQConfig` of app-specific
 // EXTRAS. The identity plumbing (defineApplication +
 // defineAwsServiceAccountInfo) is provided by the callers below, so fragments
 // must not declare their own. Requiring TS relies on the caller running with
@@ -25,7 +25,7 @@ const loadAppConfigFragment = (ctx: QpqAppDeployContext, fileName: string): QPQC
   return typeof fragment === 'function' ? fragment(ctx) : fragment;
 };
 
-// Account-level guardrails — one statically named stack per AWS account,
+// Account-level guardrails, one statically named stack per AWS account,
 // independent of any app. The app name / environment here only satisfy config
 // plumbing; account resources key on accountId/region.
 export const getWorkspaceAccountQpqConfig = (ctx: QpqAppDeployContext): QPQConfig => [
@@ -50,7 +50,7 @@ export const getWorkspaceBootstrapQpqConfig = (ctx: QpqAppDeployContext): QPQCon
 
 // A service's own QPQ config, loaded straight from its infrastructure.ts (its
 // @scope imports resolve through the workspace node_modules symlinks to built
-// dist — no tsconfig-paths registration needed under ts-node).
+// dist, no tsconfig-paths registration needed under ts-node).
 export const getWorkspaceServiceQpqConfig = (root: string, appName: string, serviceName: string): QPQConfig => {
   const infrastructurePath = path.join(root, 'apps', appName, 'services', serviceName, 'service', 'src', 'infrastructure');
 

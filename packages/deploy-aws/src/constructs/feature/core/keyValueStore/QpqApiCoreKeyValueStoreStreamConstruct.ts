@@ -33,7 +33,7 @@ const DEFAULT_STREAM_BATCHING_WINDOW_SECONDS = 5;
 
 /**
  * Wires a key-value store's stream to its handler. Created only for stores declaring
- * `onStream`, and only on the owning service's stack — attaching an event source to
+ * `onStream`, and only on the owning service's stack, attaching an event source to
  * another service's table would have two services processing the same records.
  */
 export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {

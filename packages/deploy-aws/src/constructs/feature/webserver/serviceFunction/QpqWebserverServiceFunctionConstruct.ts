@@ -23,7 +23,7 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
         })
       : undefined;
 
-    // The bootstrap-created workload group, not a CDK auto-created one — in-VPC
+    // The bootstrap-created workload group, not a CDK auto-created one, in-VPC
     // data stores allow ingress from this group only
     const securityGroups =
       vpc && props.serviceFunctionConfig.virtualNetworkName

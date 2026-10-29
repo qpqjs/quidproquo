@@ -71,7 +71,7 @@ export class WafCloudFrontWebAclStack extends Stack {
       };
 
       new AwsCustomResource(this, 'web-acl-arn-param-xregion', {
-        // Plain SSM put/deleteParameter — Lambda's built-in SDK is plenty; don't
+        // Plain SSM put/deleteParameter, Lambda's built-in SDK is plenty; don't
         // npm-install the latest SDK at runtime (slow cold starts, needs internet).
         installLatestAwsSdk: false,
         onCreate: sdkCall,

@@ -15,7 +15,6 @@ export class QpqCoreNotifyErrorConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreNotifyErrorConstructProps) {
     super(scope, id, props);
 
-    // Create CloudWatch alarm for Lambda
     const errorsAlarm = new aws_cloudwatch.Alarm(this, `${props.notifyErrorConfig.uniqueKey}-error`, {
       alarmName: this.resourceName(`${props.notifyErrorConfig.name}-error`),
       metric: new aws_cloudwatch.Metric({

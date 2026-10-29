@@ -33,7 +33,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: ApiQpqServiceStackProps) {
     super(scope, id, props);
 
-    // Add the inf stack as a dependency so it builds first
     if (props.infQpqServiceStack) {
       this.addDependency(props.infQpqServiceStack);
     }
@@ -155,7 +154,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    // Key value store streams — the projector lambda + event source for any store that
+    // Key value store streams, the projector lambda + event source for any store that
     // declares onStream. Lives here rather than on the Inf stack because that stack builds
     // no lambdas; the stream ARN crosses via SSM (see the construct).
     const keyValueStoreStreams = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(

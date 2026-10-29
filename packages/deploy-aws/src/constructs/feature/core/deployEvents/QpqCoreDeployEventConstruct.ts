@@ -34,7 +34,6 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    // Create a CloudWatch Event that triggers when CloudFormation stack deploys
     const rule = new aws_events.Rule(this, 'Rule', {
       eventPattern: {
         source: ['aws.cloudformation'],
@@ -42,7 +41,6 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       },
     });
 
-    // Add Lambda as the target of the CloudWatch Event
     rule.addTarget(new aws_events_targets.LambdaFunction(func.lambdaFunction));
   }
 }

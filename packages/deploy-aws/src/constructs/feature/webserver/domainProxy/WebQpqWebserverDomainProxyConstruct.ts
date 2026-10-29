@@ -53,7 +53,6 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
-    // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     let distributionOrigin = new aws_cloudfront_origins.HttpOrigin(props.domainProxyConfig.httpProxyDomain);
 

@@ -185,7 +185,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     // Account-scoped distribution/* (not the exact distribution ARN) is the ceiling
     // here: the consuming distribution lives in the web phase (its AWS-generated id
     // is unknowable at inf synth), and a bucket resource policy is a single document
-    // owned by this stack — the web stack can't append to it later the way it can an
+    // owned by this stack, the web stack can't append to it later the way it can an
     // IAM role policy.
     if (props.allowCloudFrontRead) {
       this.bucket.addToResourcePolicy(

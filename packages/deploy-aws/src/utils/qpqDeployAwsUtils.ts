@@ -48,11 +48,11 @@ export const getOwnedResourceTagConditions = (qpqConfig: QPQConfig): Record<stri
 };
 
 // A role's INLINE policies are capped at 10,240 bytes in aggregate, and the
-// resource-scoped grants (S3 drives, DynamoDB tables, SSM params, secrets — owned
+// resource-scoped grants (S3 drives, DynamoDB tables, SSM params, secrets, owned
 // + foreign, two exact ARNs apiece) blow that cap as a service accumulates stores
 // (every eventDoc collection adds several). Attach those grants as customer-managed
 // policies instead: managed policies are a separate budget (6,144 bytes each, many
-// attachable per role). Same actions + exact ARNs as before — just packaged off the
+// attachable per role). Same actions + exact ARNs as before, just packaged off the
 // inline DefaultPolicy. The ARN list is chunked so no single managed policy overflows
 // its own limit.
 //

@@ -15,7 +15,6 @@ export class WebQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: WebQpqServiceStackProps) {
     super(scope, id, props);
 
-    // Add the inf stack as a dependency so it builds first
     if (props.infQpqServiceStack) {
       this.addDependency(props.infQpqServiceStack);
     }

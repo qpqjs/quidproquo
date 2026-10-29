@@ -34,13 +34,13 @@ export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
       maxAzs: settings.maxAzs,
       vpcName: vpcName,
 
-      // undefined = CDK default (one per AZ) — must pass through untouched so
+      // undefined = CDK default (one per AZ), must pass through untouched so
       // already-deployed VPCs see no subnet/NAT churn
       natGateways: settings.natGateways,
     });
 
     // Every lambda qpq places in this network carries this group, and in-VPC
-    // data stores (e.g. Neptune) allow ingress from it only — membership is the
+    // data stores (e.g. Neptune) allow ingress from it only, membership is the
     // trust boundary, not "anything in the VPC". No ingress rules: lambdas
     // receive no inbound. Egress stays open: stories make arbitrary outbound
     // network calls. Later phases look it up by its deterministic name.
@@ -79,7 +79,7 @@ export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
     for (const serviceName of settings.interfaceEndpoints) {
       // CDK defaults are what we want: one ENI per AZ in the private subnets,
       // an auto-created security group allowing HTTPS from the VPC CIDR, and
-      // private DNS on — lambdas resolve the service to the endpoint with no
+      // private DNS on, lambdas resolve the service to the endpoint with no
       // code changes.
       this.vpc.addInterfaceEndpoint(`interface-endpoint-${serviceName}`, {
         service: new aws_ec2.InterfaceVpcEndpointAwsService(serviceName),

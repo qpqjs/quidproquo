@@ -47,7 +47,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       schedule: aws_events.Schedule.expression(`cron(${renderAwsCronExpression(resolveScheduleFields(props.scheduleConfig.recurrence))})`),
     });
 
-    // Set the target as lambda function.
     //
     // fromObject REPLACES the event payload rather than adding to it, so
     // anything the handler needs has to be listed here: without `time` the

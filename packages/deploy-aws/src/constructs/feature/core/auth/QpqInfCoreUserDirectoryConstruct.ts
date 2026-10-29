@@ -297,7 +297,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
   }
 
   // Grants admin Cognito actions for pools this service owns. Services that
-  // only reference a foreign user directory get only the read grant above —
+  // only reference a foreign user directory get only the read grant above:
   // token validation runs against the pool's public JWKs over HTTPS and needs
   // no IAM. Call sites must pass only owned directories (see
   // `qpqCoreUtils.getOwnedUserDirectories`).

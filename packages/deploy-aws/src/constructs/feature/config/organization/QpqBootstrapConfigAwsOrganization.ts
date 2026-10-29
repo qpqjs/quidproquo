@@ -23,13 +23,11 @@ export class QpqBootstrapConfigAwsOrganizationConstruct extends QpqConstructBloc
 
     const { organizationName, accountNames, baseEmailAddress } = props.awsOrganizationConfig;
 
-    // Create an Organizational Unit (OU) under the Organization
     const organizationalUnit = new aws_organizations.CfnOrganizationalUnit(this, 'OrganizationalUnit', {
       name: organizationName,
       parentId: props.awsOrganizationConfig.rootAwsOrganizationalUnitId,
     });
 
-    // Create AWS accounts and place them in the Organizational Unit (OU)
     const accounts: { [name: string]: aws_organizations.CfnAccount } = {};
     accountNames.forEach((accountName) => {
       accounts[accountName] = new aws_organizations.CfnAccount(this, accountName, {

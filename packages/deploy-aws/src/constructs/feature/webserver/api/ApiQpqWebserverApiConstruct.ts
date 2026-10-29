@@ -28,7 +28,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
         })
       : undefined;
 
-    // The bootstrap-created workload group, not a CDK auto-created one — in-VPC
+    // The bootstrap-created workload group, not a CDK auto-created one, in-VPC
     // data stores allow ingress from this group only
     const securityGroups =
       vpc && props.apiConfig.virtualNetworkName
@@ -48,7 +48,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       functionType: 'apiGatewayEventHandler',
       executorName: 'apiGatewayEventHandler',
 
-      // Match API Gateway's 29s integration cap — the (25s) Function default would kill
+      // Match API Gateway's 29s integration cap, the (25s) Function default would kill
       // slow requests as a 502 with 4s of the gateway window still unused
       timeoutInSeconds: 29,
 
@@ -69,7 +69,6 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
       handler: func.lambdaFunction,

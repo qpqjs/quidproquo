@@ -76,7 +76,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
     });
 
     // Only lambdas carrying the bootstrap-created workload security group can
-    // reach the cluster — not everything that lands in the shared VPC
+    // reach the cluster, not everything that lands in the shared VPC
     const workloadSecurityGroup = aws_ec2.SecurityGroup.fromLookupByName(
       this,
       'workload-sg-lookup',

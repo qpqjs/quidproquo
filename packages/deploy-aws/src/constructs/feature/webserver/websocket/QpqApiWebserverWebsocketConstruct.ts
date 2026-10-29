@@ -76,7 +76,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       integrationUri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${func.lambdaFunction.functionArn}/invocations`,
     });
 
-    // Create the route and associate it with the integration
     const connectRoute = new aws_apigatewayv2.CfnRoute(this, 'connect-route', {
       apiId,
       routeKey: '$connect',
@@ -86,7 +85,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       operationName: 'connect',
     });
 
-    // Create the route and associate it with the integration
     const disconnectRoute = new aws_apigatewayv2.CfnRoute(this, 'disconnect-route', {
       apiId,
       routeKey: '$disconnect',
@@ -96,7 +94,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       operationName: 'disconnect',
     });
 
-    // Create the route and associate it with the integration
     const defaultRoute = new aws_apigatewayv2.CfnRoute(this, 'default-route', {
       apiId,
       routeKey: '$default',

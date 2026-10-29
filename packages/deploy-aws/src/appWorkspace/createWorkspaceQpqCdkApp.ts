@@ -54,7 +54,7 @@ export const createWorkspaceQpqCdkApp = (): cdk.App => {
     qpqConfig: getWorkspaceAccountQpqConfig(ctx),
   });
 
-  // Bootstrapping stacks — deploy when their config changes.
+  // Bootstrapping stacks, deploy when their config changes.
   const bootstrapQpqConfig = getWorkspaceBootstrapQpqConfig(ctx);
 
   new DomainQpqServiceStack(app, qpqDeployAwsUtils.getDomainStackName(bootstrapQpqConfig), {

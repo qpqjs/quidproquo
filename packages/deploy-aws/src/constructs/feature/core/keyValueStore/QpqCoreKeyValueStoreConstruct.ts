@@ -100,7 +100,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: !props.keyValueStoreConfig.disablePointInTimeRecovery },
       encryption: tableEncryption,
       encryptionKey,
-      // Change data capture, only when a handler is configured — a stream on a table
+      // Change data capture, only when a handler is configured, a stream on a table
       // nothing consumes is pure cost. NEW_AND_OLD_IMAGES so a handler can see what a
       // change actually did, including on a delete, where the new image does not exist.
       stream: props.keyValueStoreConfig.onStream ? aws_dynamodb.StreamViewType.NEW_AND_OLD_IMAGES : undefined,
@@ -150,7 +150,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     // Publish the stream ARN for the API stack's handler to pick up.
     //
     // A DynamoDB stream ARN ends in a creation timestamp, so unlike every other resource
-    // here it CANNOT be recomputed from naming conventions — which is how the API stack
+    // here it CANNOT be recomputed from naming conventions, which is how the API stack
     // reaches every other table (fromOtherStack). Passing the table object across stacks
     // would work but creates a CloudFormation export, the coupling this codebase avoids
     // everywhere else. So it goes through SSM and is resolved at deploy time, the same
