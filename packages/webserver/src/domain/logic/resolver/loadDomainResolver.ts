@@ -1,4 +1,4 @@
-import { DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+import { DynamicModuleLoader, Nullable, QPQConfig } from '@qpqjs/core';
 
 import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
@@ -15,7 +15,7 @@ export const loadDomainResolver = async (qpqConfig: QPQConfig, dynamicModuleLoad
     return getDomainResolver(qpqConfig);
   }
 
-  const resolver = (await dynamicModuleLoader(pointer)) as DomainResolver | null;
+  const resolver = (await dynamicModuleLoader(pointer)) as Nullable<DomainResolver>;
   if (typeof resolver?.resolveHost !== 'function') {
     throw new Error(
       `Domain resolver [${pointer.functionName}] in [${pointer.basePath}/${pointer.relativePath}] must be a DomainResolver ({ resolveHost })`,

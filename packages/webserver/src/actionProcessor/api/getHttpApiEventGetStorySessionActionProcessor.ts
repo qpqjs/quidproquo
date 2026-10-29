@@ -3,21 +3,15 @@ import {
   actionResultError,
   askEventGetStorySessionBase,
   createActionProcessor,
-  EventActionType,
   generateUuid,
   getProcessCustomImplementation,
-  MatchStoryResult,
   mergeRuntimeActionProcessors,
   ProcessorFor,
   QPQConfig,
-  StorySession,
 } from '@qpqjs/core';
 
-import { RouteOptions } from '../../config/settings/route';
 import { askGetHttpApiEventStorySession, GetHttpApiEventStorySessionPayload } from '../../stories/askGetHttpApiEventStorySession';
 import { HTTPEvent } from '../../types/HTTPEvent';
-
-type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   const getSession = getProcessCustomImplementation<any>(

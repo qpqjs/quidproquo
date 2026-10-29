@@ -3,22 +3,17 @@ import {
   askEventAutoRespondBase,
   createActionProcessor,
   DynamicModuleLoader,
-  EventActionType,
   generateUuid,
   getProcessCustomImplementation,
-  MatchStoryResult,
   mergeRuntimeActionProcessors,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { RouteOptions } from '../../config/settings/route';
 import { loadDomainResolver } from '../../domain/logic/resolver/loadDomainResolver';
 import { askValidateRouteAuth, ValidateRouteAuthPayload } from '../../stories/askValidateRouteAuth';
-import { FileUploadErrorTypeEnum, HTTPEvent, HTTPEventResponse } from '../../types/HTTPEvent';
+import { FileUploadErrorTypeEnum, HTTPEvent } from '../../types/HTTPEvent';
 import { getCorsHeaders } from '../../utils/headerUtils';
-
-type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
 
 const fileUploadErrorHttpStatusMap: Record<FileUploadErrorTypeEnum, number> = {
   [FileUploadErrorTypeEnum.fileTooLarge]: 413,

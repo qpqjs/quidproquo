@@ -40,7 +40,7 @@ export function* askValidateRouteAuth({ event, routeAuthSettings }: ValidateRout
   }
 
   // Run here too, not only when seeding the session, so an override that rejects
-  // (say, a user no longer in the token's tenant) is a clean 401. Its context is
+  // (say, a user who has left the token's tenant) is a clean 401. Its context is
   // discarded; askGetHttpApiEventStorySession resolves it again for the session.
   const decodedAccessToken = decodeResult.outcome === RouteAuthDecodeOutcome.valid ? decodeResult.decodedAccessToken : null;
   yield* askRouteAuthValidationResolveContext(event, routeAuthSettings, decodedAccessToken);

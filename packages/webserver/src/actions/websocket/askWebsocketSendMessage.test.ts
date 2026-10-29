@@ -1,4 +1,4 @@
-import { askWebsocketSendMessageBase, captureRequester, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { askWebsocketSendMessageBase, captureRequester } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

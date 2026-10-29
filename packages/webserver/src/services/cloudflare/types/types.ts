@@ -1,3 +1,4 @@
+import { Nullable } from '@qpqjs/core';
 export type CloudflarePageInfo = {
   page: number;
   per_page: number;
@@ -29,7 +30,7 @@ export type CloudflareZone = {
   name_servers: string[];
   original_name_servers: string[];
   original_registrar: string;
-  original_dnshost: null | string; // assuming this can be a string or null
+  original_dnshost: Nullable<string>;
   modified_on: string;
   created_on: string;
   activated_on: string;

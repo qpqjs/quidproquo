@@ -1,6 +1,6 @@
 import { actionResult, createActionProcessor, generateUuid, getProcessCustomImplementation, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome, RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
+import { askRouteAuthValidationDecode, RouteAuthDecodeOutcome } from '../../actions/routeAuthValidation';
 import { askRouteAuthValidationDecodeDefault } from '../../stories/askRouteAuthValidationDecodeDefault';
 
 const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): ProcessorFor<typeof askRouteAuthValidationDecode> => {

@@ -1,4 +1,4 @@
-import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from '@qpqjs/core';
+import { askMap, AskResponse, askThrowError, ErrorTypeEnum, Nullable, QPQConfig } from '@qpqjs/core';
 
 import { RouteOptions } from '../config/settings/route';
 import { resolveHosts } from '../domain/logic/host/resolveHosts';
@@ -8,7 +8,7 @@ import { qpqHeaderIsBot, SeoEvent } from '../types';
 import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
 import { getDefaultRouteSettings } from './qpqConfigAccessorsUtils';
 
-export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
+export const getHeaderValue = (header: string, headers: HttpEventHeaders): Nullable<string> => {
   const headerAsLower = header.toLowerCase();
   const realHeaderKey = Object.keys(headers).find((k) => k.toLowerCase() === headerAsLower);
 
@@ -36,7 +36,7 @@ export function* askReadRequiredHeaders(event: HTTPEvent, requiredHeaders: strin
 
 export const getAccessTokenFromHeaders = (headers: HttpEventHeaders): string | undefined => {
   const authorizationHeader = getHeaderValue('authorization', headers) || '';
-  const [authType, authToken] = authorizationHeader.split(' ');
+  const [, authToken] = authorizationHeader.split(' ');
 
   return authToken;
 };

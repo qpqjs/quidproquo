@@ -1,4 +1,4 @@
-import { askEmailSendEmail, captureRequester, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { askEmailSendEmail, captureRequester } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

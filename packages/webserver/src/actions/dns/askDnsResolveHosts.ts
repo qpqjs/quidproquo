@@ -1,4 +1,4 @@
-import { Action, createActionRequester } from '@qpqjs/core';
+import { createActionRequester } from '@qpqjs/core';
 
 import { DomainTarget } from '../../domain/types/DomainTarget';
 import { DnsActionType } from './DnsActionType';

@@ -2,18 +2,11 @@ import { buildTestQpqConfig } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { defineApi } from '../../../config/settings/api';
 import { defineDns } from '../../../config/settings/dns';
-import { defineStorageDriveCorsSettings } from '../../../config/settings/storageDriveCorsSettings';
 import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
 import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
 import { defaultDomainResolver } from '../../../domain/resolvers/defaultDomainResolver';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
-import { getStorageDriveCorsAllowedOrigins } from '../origin/getStorageDriveCorsAllowedOrigins';
-import { resolveContentSecurityPolicyEntry } from '../origin/resolveContentSecurityPolicyEntry';
-import { resolveOrigins } from '../origin/resolveOrigins';
-import { resolveServiceScopedCorsAllowedOrigins } from '../origin/resolveServiceScopedCorsAllowedOrigins';
-import { getDomainResolver } from '../resolver/getDomainResolver';
 import { loadDomainResolver } from '../resolver/loadDomainResolver';
 import { findRootDomainForHost } from './findRootDomainForHost';
 import { resolveHostForRequestHost } from './resolveHostForRequestHost';
