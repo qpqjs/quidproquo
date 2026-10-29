@@ -1,6 +1,7 @@
 export * from './actionResult';
 export * from './actions';
 export * from './actionValidators';
+export * from './config';
 export * from './context';
 export * from './decomposedString';
 export * from './error';

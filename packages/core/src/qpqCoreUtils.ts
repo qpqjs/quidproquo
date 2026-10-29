@@ -1,3 +1,5 @@
+import { DEFAULT_ENVIRONMENT } from './logic/config/DEFAULT_ENVIRONMENT';
+import { flattenQpqConfig } from './logic/config/flattenQpqConfig';
 import { CrossModuleOwner } from './types/CrossModuleOwner';
 import {
   ActionProcessorsQPQConfigSetting,
@@ -53,74 +55,7 @@ import {
 } from './types';
 import { isQpqFunctionRuntimeAdvanced } from './utils';
 
-// The environment assumed when an application setting names none. flattenQpqConfig and
-// getApplicationModuleEnvironment must agree or environment-scoped settings resolve differently.
-const DEFAULT_ENVIRONMENT = 'production';
-
-/**
- * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
- * If a QPQConfigItem has a configSettingType of QPQCoreConfigSettingType.environmentSettings,
- * and its environment matches the current environment, its settings will be added to the flattened array.
- * @function
- * @param {QPQConfig} qpqConfig - The input QPQConfig array to be flattened.
- * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects
- */
-export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
-  let environment = DEFAULT_ENVIRONMENT;
-  let service: string | undefined;
-
-  /**
-   * A recursive helper function that flattens an array of QPQConfigItem objects.
-   * @function
-   * @param {QPQConfigItem[]} configItems - An array of QPQConfigItem objects to be flattened.
-   * @param {QPQConfigSetting[]} accumulator - An accumulator array for storing the flattened QPQConfigSetting objects.
-   * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
-   */
-  const flatten = (configItems: QPQConfigItem[], accumulator: QPQConfigSetting[] = []): QPQConfigSetting[] => {
-    return configItems.reduce<QPQConfigSetting[]>((acc, item) => {
-      if (Array.isArray(item)) {
-        return flatten(item, acc);
-      } else {
-        // If its a appName config item, update the environment variable
-        if (item.configSettingType === QPQCoreConfigSettingType.appName) {
-          environment = (item as ApplicationQPQConfigSetting).environment || DEFAULT_ENVIRONMENT;
-        }
-
-        // If its a moduleName config item, update the service variable
-        else if (item.configSettingType === QPQCoreConfigSettingType.moduleName) {
-          service = (item as ModuleQPQConfigSetting).moduleName;
-        }
-
-        // Otherwise if its an environmentSettings config item, flatten out the child settings
-        // for the current environment, falling back to the '*' key if present.
-        else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
-          const envSetting = item as EnvironmentSettingsQPQConfigSetting;
-          const settings = envSetting.settingsByEnvironment[environment] ?? envSetting.settingsByEnvironment['*'] ?? [];
-
-          return flatten(settings, acc);
-        }
-
-        // Otherwise if its a serviceSettings config item, flatten out the child settings
-        // for the current service, falling back to the '*' key if present.
-        else if (item.configSettingType === QPQCoreConfigSettingType.serviceSettings) {
-          if (!service) {
-            throw new Error('defineServiceSettings requires a module to be set first via defineModule (usually through defineApplicationModule)');
-          }
-
-          const svcSetting = item as ServiceSettingsQPQConfigSetting;
-          const settings = svcSetting.settingsByService[service] ?? svcSetting.settingsByService['*'] ?? [];
-
-          return flatten(settings, acc);
-        }
-
-        // Otherwise its just a regular config item, add it to the list
-        return [...acc, item];
-      }
-    }, accumulator);
-  };
-
-  return flatten(qpqConfig);
-};
+export { flattenQpqConfig } from './logic/config/flattenQpqConfig';
 
 /**
  * Filters and returns the config settings of a specific type from a QPQConfig array.
