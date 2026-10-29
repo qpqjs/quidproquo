@@ -33,7 +33,7 @@ export function getQpqMigrationQueueTypeFromQpqFunctionRuntime(qpqFunctionRuntim
     return `${qpqFunctionRuntime.basePath}/${removeLeadingSlashs(qpqFunctionRuntime.relativePath)}`;
   }
 
-  const [srcPath] = qpqFunctionRuntime.split('::');
+  const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return removeLeadingSlashs(srcPath);
 }
 

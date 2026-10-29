@@ -13,5 +13,10 @@ export const resolveHostForRoot = (qpqConfig: QPQConfig, rootDomain: string, tar
     throw new Error(`Root domain [${rootDomain}] is not declared in defineDns`);
   }
 
-  return resolveHosts(qpqConfig, target, resolver)[index];
+  const host = resolveHosts(qpqConfig, target, resolver)[index];
+  if (host === undefined) {
+    throw new Error(`Root domain [${rootDomain}] resolved to no host`);
+  }
+
+  return host;
 };

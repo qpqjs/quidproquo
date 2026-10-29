@@ -39,14 +39,14 @@ export function* askProcessCloudflareDnsDeployEvent(event: CloudflareDnsDeployEv
 
   // If its an update or create, add the new DNS entries
   if (event.RequestType === CloudflareDnsDeployEventEnum.Update || event.RequestType === CloudflareDnsDeployEventEnum.Create) {
-    for (const dnsEntry of Object.keys(event.dnsEntries)) {
+    for (const [dnsEntry, dnsEntryValue] of Object.entries(event.dnsEntries)) {
       const recordId = yield* askCloudflareGetDNSRecordId(apiKey, zoneId, getDnsEntryName(dnsEntry, event.siteDns));
 
       if (recordId) {
         yield* askCloudflareDeleteDNSRecord(apiKey, zoneId, recordId);
       }
 
-      yield* askCloudflareAddDNSRecord(apiKey, zoneId, getDnsEntryName(dnsEntry, event.siteDns), event.dnsEntries[dnsEntry]);
+      yield* askCloudflareAddDNSRecord(apiKey, zoneId, getDnsEntryName(dnsEntry, event.siteDns), dnsEntryValue);
     }
   }
 }
