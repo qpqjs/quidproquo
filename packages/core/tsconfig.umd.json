@@ -1,8 +1,0 @@
-{
-  "extends": "@qpqjs/tsconfig/tsconfig.umd.json",
-  "compilerOptions": {
-    "outDir": "./lib/umd"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
-}
