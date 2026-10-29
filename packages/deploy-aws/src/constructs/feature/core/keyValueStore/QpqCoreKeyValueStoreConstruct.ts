@@ -5,6 +5,7 @@ import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -181,42 +182,23 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
 
-    // Owned tables are granted as a single tag-conditioned statement instead of one ARN
-    // pair per table: applyEnvironmentTags stamps every owned table, and DynamoDB ABAC
-    // evaluates the table's tags for its index sub-resources too. This keeps the policy
-    // a fixed size no matter how many KVSs (eventDoc collections especially) the service
-    // accumulates. A table brought in via getDynamoTableNameOverride is imported, not
-    // created here, so it only matches if whoever created it applied the same tags.
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: kvsActions,
-        resources: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
-        conditions: {
-          StringEquals: qpqDeployAwsUtils.getOwnedResourceTagConditions(qpqConfig),
-        },
+    grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverKeyValueStoreAccess',
+      actions: kvsActions,
+      // applyEnvironmentTags stamps every owned table, and DynamoDB ABAC evaluates the table's
+      // tags for its index sub-resources too. A table brought in via getDynamoTableNameOverride
+      // is imported, not created here, so it only matches if whoever created it applied the same tags.
+      ownedResourceArns: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
+      ownedByTag: true,
+      // The same naming path as `getKvsDynamoTableNameFromConfig`, so no CDK cross-stack ref is created.
+      foreignArns: getForeignConfigs(qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+        const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
+        const owner = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
+        const tableArn = `arn:aws:dynamodb:${owner.awsRegion}:${owner.awsAccountId}:table/${tableName}`;
+
+        return [tableArn, `${tableArn}/index/*`];
       }),
-    );
-
-    // Deterministically-computed ARNs for KVSs declared in this service's
-    // config but owned by another service. Uses the same naming path as
-    // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
-    // Cross-service access stays as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig);
-    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStoreConfigs(qpqConfig);
-    const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
-
-    const foreignArns = foreignKvsConfigs.flatMap((cfg) => {
-      const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
-      const owner = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
-      const tableArn = `arn:aws:dynamodb:${owner.awsRegion}:${owner.awsAccountId}:table/${tableName}`;
-      return [tableArn, `${tableArn}/index/*`];
     });
-
-    if (foreignArns.length > 0) {
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverKeyValueStoreAccess', kvsActions, foreignArns);
-    }
 
     // KMS use for a store's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
     // which covers every crypto key declared in this config.

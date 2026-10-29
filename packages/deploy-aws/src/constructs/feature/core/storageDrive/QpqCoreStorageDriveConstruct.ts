@@ -13,6 +13,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqAwsCdkPathUtils } from '../../../../utils';
+import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
@@ -286,33 +287,18 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: driveActions,
-        resources: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
+    grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverStorageDriveAccess',
+      actions: driveActions,
+      ownedResourceArns: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
+      ownedByTag: false,
+      // The same naming path as `resolveStorageDriveBucketName`, so no CDK cross-stack ref is created.
+      foreignArns: getForeignConfigs(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+        const bucketArn = `arn:aws:s3:::${awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner)}`;
+
+        return [bucketArn, `${bucketArn}/*`];
       }),
-    );
-
-    // Deterministically-computed ARNs for drives declared in this service's
-    // config but owned by another service. Uses the same naming path as
-    // `resolveStorageDriveBucketName` so no CDK cross-stack ref is created.
-    // Cross-service access stays as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const allDriveConfigs = qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig);
-    const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDriveConfigs(qpqConfig);
-    const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
-
-    const foreignArns = foreignDriveConfigs.flatMap((cfg) => {
-      const bucketName = awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner);
-      const bucketArn = `arn:aws:s3:::${bucketName}`;
-      return [bucketArn, `${bucketArn}/*`];
     });
-
-    if (foreignArns.length > 0) {
-      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverStorageDriveAccess', driveActions, foreignArns);
-    }
 
     // KMS use for a drive's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
     // which covers every crypto key declared in this config.

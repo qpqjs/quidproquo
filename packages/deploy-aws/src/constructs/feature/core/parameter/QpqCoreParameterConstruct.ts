@@ -1,37 +1,26 @@
 import { awsNamingUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { ParameterQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 import { QpqResource } from '../../../base/QpqResource';
 
 export type QpqCoreParameterConstructProps = {
   parameterConfig: ParameterQPQConfigSetting;
 } & QpqConstructBlockProps;
 
-export abstract class QpqCoreParameterConstructBase extends QpqConstructBlock {
-  abstract stringParameter: aws_ssm.IStringParameter;
-
-  public override grantRead(grantee: aws_iam.IGrantable) {
-    this.stringParameter.grantRead(grantee);
-  }
-
-  public override grantWrite(grantee: aws_iam.IGrantable): void {
-    this.stringParameter.grantWrite(grantee);
-  }
-}
-
-export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
-  stringParameter: aws_ssm.IStringParameter;
+export class QpqCoreParameterConstruct extends QpqReadWriteResourceConstructBase<aws_ssm.IStringParameter> {
+  resource: aws_ssm.IStringParameter;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, parameterConfig: ParameterQPQConfigSetting): QpqResource {
     const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
-    class Import extends QpqCoreParameterConstructBase {
-      stringParameter = aws_ssm.StringParameter.fromStringParameterName(scope, `${id}-${parameterConfig.uniqueKey}`, paramName);
+    class Import extends QpqReadWriteResourceConstructBase<aws_ssm.IStringParameter> {
+      resource = aws_ssm.StringParameter.fromStringParameterName(scope, `${id}-${parameterConfig.uniqueKey}`, paramName);
     }
 
     return new Import(scope, id, { qpqConfig });
@@ -40,7 +29,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreParameterConstructProps) {
     super(scope, id, props);
 
-    this.stringParameter = new aws_ssm.StringParameter(this, 'param', {
+    this.resource = new aws_ssm.StringParameter(this, 'param', {
       parameterName: this.resourceName(props.parameterConfig.key),
       description: props.parameterConfig.key,
       stringValue: props.parameterConfig.value || 'Please set a value',
@@ -49,44 +38,24 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
       tier: aws_ssm.ParameterTier.STANDARD,
     });
 
-    qpqDeployAwsUtils.applyEnvironmentTags(this.stringParameter, props.qpqConfig);
+    qpqDeployAwsUtils.applyEnvironmentTags(this.resource, props.qpqConfig);
   }
 
   public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, parameterConfigs: ParameterQPQConfigSetting[], qpqConfig: QPQConfig) {
-    const parameterActions = ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'];
+    const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
 
-    // Owned parameters are granted as a single tag-conditioned statement instead of one
-    // ARN per parameter: applyEnvironmentTags stamps every owned parameter, so the
-    // policy stays a fixed size no matter how many parameters the service declares.
-    const { awsRegion: ownRegion, awsAccountId: ownAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
+    qpqDeployAwsUtils.grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverParameterAccess',
+      actions: ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
+      // applyEnvironmentTags stamps every owned parameter.
+      ownedResourceArns: [`arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/*`],
+      ownedByTag: true,
+      foreignArns: qpqDeployAwsUtils.getForeignConfigs(parameterConfigs, qpqConfig).map((parameterConfig) => {
+        const owner = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
+        const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: parameterActions,
-        resources: [`arn:aws:ssm:${ownRegion}:${ownAccountId}:parameter/*`],
-        conditions: {
-          StringEquals: qpqDeployAwsUtils.getOwnedResourceTagConditions(qpqConfig),
-        },
+        return `arn:aws:ssm:${owner.awsRegion}:${owner.awsAccountId}:parameter/${paramName}`;
       }),
-    );
-
-    // Cross-service parameters stay as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const ownedConfigs = qpqCoreUtils.getOwnedItems(parameterConfigs, qpqConfig);
-    const foreignConfigs = parameterConfigs.filter((cfg) => !ownedConfigs.includes(cfg));
-
-    const foreignArns = foreignConfigs.map((parameterConfig) => {
-      const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
-
-      const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
-
-      return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
     });
-
-    if (foreignArns.length > 0) {
-      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverParameterAccess', parameterActions, foreignArns);
-    }
   }
 }
