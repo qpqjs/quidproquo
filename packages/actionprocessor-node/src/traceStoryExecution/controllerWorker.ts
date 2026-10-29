@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 // The debug controller: runs on a WORKER THREAD and drives the V8 inspector against
 // the MAIN thread, which is executing the story replay (see traceStoryExecution).
 //
@@ -76,7 +78,7 @@ export function traceControllerWorkerMain(): void {
 
   const post = (method: string, params?: object): Promise<any> =>
     new Promise((resolve, reject) =>
-      session.post(method, params || {}, (error: Error | null, result: unknown) =>
+      session.post(method, params || {}, (error: Nullable<Error>, result: unknown) =>
         error ? reject(new Error(method + ': ' + error.message)) : resolve(result),
       ),
     );
@@ -153,7 +155,7 @@ export function traceControllerWorkerMain(): void {
   // object inspection in the viewer. Property reads are try/catch'd (getters can throw);
   // circular refs and overflow become «...» placeholder strings. Same serialization
   // constraints as this whole file: no async/generators/spread (it ships via toString).
-  function qpqSerializeValue(this: any, maxDepth: number, maxString: number, maxProps: number, maxTotal: number): string | null {
+  function qpqSerializeValue(this: any, maxDepth: number, maxString: number, maxProps: number, maxTotal: number): Nullable<string> {
     const seen: any[] = [];
 
     const walk = (value: any, depth: number): any => {
@@ -179,7 +181,7 @@ export function traceControllerWorkerMain(): void {
         for (let i = 0; i < value.length && i < maxProps; i += 1) {
           try {
             result.push(walk(value[i], depth + 1));
-          } catch (error) {
+          } catch {
             result.push('«threw»');
           }
         }
@@ -190,7 +192,7 @@ export function traceControllerWorkerMain(): void {
         for (let i = 0; i < keys.length && i < maxProps; i += 1) {
           try {
             result[keys[i]] = walk(value[keys[i]], depth + 1);
-          } catch (error) {
+          } catch {
             result[keys[i]] = '«threw»';
           }
         }
@@ -204,7 +206,7 @@ export function traceControllerWorkerMain(): void {
     try {
       const json = JSON.stringify(walk(this, 0));
       return json && json.length <= maxTotal ? json : null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -460,7 +462,7 @@ export function traceControllerWorkerMain(): void {
         return location ? location.scriptId : null;
       });
     })
-    .then((storyFunctionScriptId: string | null) => {
+    .then((storyFunctionScriptId: Nullable<string>) => {
       const targetScriptIds = new Set<string>();
       if (storyFunctionScriptId) {
         targetScriptIds.add(storyFunctionScriptId);

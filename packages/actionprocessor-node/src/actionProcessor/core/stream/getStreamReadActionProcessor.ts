@@ -1,4 +1,4 @@
-import { actionResult, askStreamReadBase, createActionProcessor, ProcessorFor, QPQConfig, StreamActionType } from '@qpqjs/core';
+import { actionResult, askStreamReadBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessStreamRead = (qpqConfig: QPQConfig): ProcessorFor<typeof askStreamReadBase> => {
   return async ({ streamId, noWait }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

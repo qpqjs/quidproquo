@@ -1,13 +1,4 @@
-import {
-  actionResult,
-  actionResultError,
-  askFileDelete,
-  createActionProcessor,
-  ErrorTypeEnum,
-  FileActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askFileDelete, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 

@@ -4,7 +4,7 @@
 // carries sourcesContent (the federated remote build embeds it), the original source
 // text is embedded in the trace so viewers need no access to the repo.
 
-import { QpqExecutionTraceSource, QpqExecutionTraceStep, QpqExecutionTraceValue } from '@qpqjs/core';
+import { Nullable, QpqExecutionTraceSource, QpqExecutionTraceStep, QpqExecutionTraceValue } from '@qpqjs/core';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -24,13 +24,13 @@ const scriptUrlToPath = (scriptUrl: string): string => (scriptUrl.startsWith('fi
 
 // The LAST sourceMappingURL comment wins (bundles can contain earlier ones from inlined
 // third-party code).
-const findSourceMappingUrl = (scriptText: string): string | null => {
+const findSourceMappingUrl = (scriptText: string): Nullable<string> => {
   const matches = scriptText.match(/\/\/[#@] sourceMappingURL=(\S+)/g);
   if (!matches || matches.length === 0) return null;
   return matches[matches.length - 1].replace(/\/\/[#@] sourceMappingURL=/, '');
 };
 
-const loadTraceMap = (scriptPath: string): TraceMap | null => {
+const loadTraceMap = (scriptPath: string): Nullable<TraceMap> => {
   try {
     const scriptText = fs.readFileSync(scriptPath, 'utf8');
     const sourceMappingUrl = findSourceMappingUrl(scriptText);
@@ -101,11 +101,11 @@ export interface ResolvedTraceSteps {
 }
 
 export const resolveSourceMappedSteps = (rawSteps: RawTraceStep[], scriptUrlsById: Record<string, string>): ResolvedTraceSteps => {
-  const traceMapsByScriptId = new Map<string, TraceMap | null>();
+  const traceMapsByScriptId = new Map<string, Nullable<TraceMap>>();
   const sourceIndexByPath = new Map<string, number>();
   const sources: QpqExecutionTraceSource[] = [];
 
-  const getTraceMap = (scriptId: string): TraceMap | null => {
+  const getTraceMap = (scriptId: string): Nullable<TraceMap> => {
     if (!traceMapsByScriptId.has(scriptId)) {
       const scriptUrl = scriptUrlsById[scriptId];
       traceMapsByScriptId.set(scriptId, scriptUrl ? loadTraceMap(scriptUrlToPath(scriptUrl)) : null);

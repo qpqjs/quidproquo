@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import * as crypto from 'crypto';
 
 import { FileStorageConfig } from './types';
@@ -21,7 +23,7 @@ export const createSecureUrlToken = (token: SecureUrlToken, secret: string): str
 };
 
 // Verify and decode a signed token
-export const verifySecureUrlToken = (tokenString: string, secret: string): SecureUrlToken | null => {
+export const verifySecureUrlToken = (tokenString: string, secret: string): Nullable<SecureUrlToken> => {
   try {
     const [payloadBase64, signature] = tokenString.split('.');
 
@@ -48,7 +50,7 @@ export const verifySecureUrlToken = (tokenString: string, secret: string): Secur
     }
 
     return token;
-  } catch (error) {
+  } catch {
     return null;
   }
 };

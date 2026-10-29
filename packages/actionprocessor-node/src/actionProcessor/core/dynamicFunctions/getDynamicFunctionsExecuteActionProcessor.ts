@@ -5,7 +5,6 @@ import {
   askDynamicFunctionExecuteBase,
   createActionProcessor,
   createNestedRuntime,
-  DynamicFunctionsActionType,
   DynamicFunctionsExecuteActionPayload,
   DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,

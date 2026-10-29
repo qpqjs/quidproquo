@@ -1,4 +1,4 @@
-import { actionResult, askStreamClose, createActionProcessor, ProcessorFor, QPQConfig, StreamActionType } from '@qpqjs/core';
+import { actionResult, askStreamClose, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessStreamClose = (qpqConfig: QPQConfig): ProcessorFor<typeof askStreamClose> => {
   return async ({ streamId }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

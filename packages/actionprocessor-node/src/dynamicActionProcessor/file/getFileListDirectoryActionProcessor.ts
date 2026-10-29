@@ -5,7 +5,6 @@ import {
   askFileListDirectory,
   createActionProcessor,
   DirectoryList,
-  FileActionType,
   FileInfo,
   ProcessorFor,
   QPQConfig,

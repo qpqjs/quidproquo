@@ -5,7 +5,6 @@ import {
   askFileIsColdStorage,
   assertStorageDriveScopeRequirementOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';

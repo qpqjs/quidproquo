@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askFileWriteBinaryContents,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
