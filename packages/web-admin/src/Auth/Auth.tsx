@@ -49,8 +49,8 @@ export function Auth({ children }: AuthProps) {
         <Login
           onLogin={api.authLogin}
           password={state.password}
-          setPassword={api.authUISetPassword}
-          setUsername={api.authUISetUsername}
+          setPassword={api.authSetPassword}
+          setUsername={api.authSetUsername}
           username={state.username}
         />
       )}
