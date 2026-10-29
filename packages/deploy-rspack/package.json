@@ -4,7 +4,15 @@
   "description": "Rspack bundling for quidproquo backends, views and federated remotes.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*",
@@ -60,5 +68,8 @@
   },
   "peerDependencies": {
     "@rspack/core": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
