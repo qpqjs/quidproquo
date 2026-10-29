@@ -41,7 +41,7 @@ describe('schedule event processors', () => {
     const processors = await getEventGetStorySessionActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const result = await invokeProcessor(processors[EventActionType.GetStorySession], { eventParams: [message] } as any);
 
-    expect(resolveActionResult(result)).toBeUndefined();
+    expect(resolveActionResult(result)).toBeNull();
   });
 
   it('never auto responds', async () => {

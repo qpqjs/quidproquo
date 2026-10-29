@@ -123,7 +123,7 @@ describe('dynamo/streamEvent getEventGetRecordsActionProcessor', () => {
 
       const [session] = await processor({ qpqEventRecord: record, eventParams: [{ Records: [] }, {}] });
 
-      expect(session).toBeUndefined();
+      expect(session).toBeNull();
     });
   });
 });

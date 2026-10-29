@@ -46,6 +46,6 @@ describe('sqs/queue getEventGetStorySessionActionProcessor', () => {
 
     const [result] = await processor({ qpqEventRecord: { id: 'missing' }, eventParams: [{ Records: [] }] });
 
-    expect(result).toBeUndefined();
+    expect(result).toBeNull();
   });
 });

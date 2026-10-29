@@ -34,10 +34,10 @@ const invoke = async (
 };
 
 describe('getHttpApiEventGetStorySessionActionProcessor', () => {
-  it('returns an undefined session when there is no access token', async () => {
+  it('returns a null session when there is no access token', async () => {
     const [session] = await invoke({ headers: {} }, {}, notApplicableDecode);
 
-    expect(session).toBeUndefined();
+    expect(session).toBeNull();
   });
 
   it('attaches the validated token to the session for an authenticated route', async () => {
