@@ -30,7 +30,6 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
   );
 
   if (serviceAccountInfos.length === 0) {
-    console.log(JSON.stringify(qpqConfig, null, 2));
     throw new Error('use defineAwsServiceAccountInfo to define aws deployment config');
   }
 

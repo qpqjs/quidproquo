@@ -166,7 +166,6 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     // we still want to keep the above table created.
     const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
     if (tableNameOverride) {
-      console.log('tableNameOverride', tableNameOverride);
       this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
   }

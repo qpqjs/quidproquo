@@ -26,8 +26,6 @@ export class QpqWebPlugin implements RspackPluginInstance {
       feature: feature,
     };
 
-    console.log('Applying QpqWebPlugin with config:', applicationConfigInfo);
-
     // From the compiler's own rspack instance - see QpqPlugin for why (npm link
     // can make this package's @rspack/core a different copy than the build's).
     new compiler.rspack.DefinePlugin({

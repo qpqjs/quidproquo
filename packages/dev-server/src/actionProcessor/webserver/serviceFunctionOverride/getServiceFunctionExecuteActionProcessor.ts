@@ -37,8 +37,6 @@ const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicMod
       return actionResultError(response.error.errorType, response.error.errorText, response.error.errorStack);
     }
 
-    console.log('Result', response.result);
-
     return actionResult(response.result);
   };
 };
