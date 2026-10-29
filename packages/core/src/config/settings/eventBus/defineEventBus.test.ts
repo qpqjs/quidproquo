@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineEventBus } from './eventBus';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineEventBus } from './defineEventBus';
 
 describe('defineEventBus', () => {
   it('builds an EventBus setting with the given name and defaults deprecated to false', () => {

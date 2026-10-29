@@ -52,7 +52,7 @@ import {
   getConfigSetting,
   getConfigSettings,
   getDeployEventConfigs,
-  getEventBusConfigByName,
+  getEventBusByName,
   getFullUrlFromConfigUrl,
   getFullyQualifiedResourceName,
   getGlobalConfigValue,
@@ -507,9 +507,9 @@ describe('qpqCoreUtils', () => {
     it('finds an event bus by local name or by resource name override', () => {
       const config = buildTestQpqConfig([defineEventBus('local', { owner: { eventBusName: 'sharedBus' } })]);
 
-      expect(getEventBusConfigByName('sharedBus', config)?.name).toBe('local');
-      expect(getEventBusConfigByName('local', config)?.name).toBe('local');
-      expect(getEventBusConfigByName('missing', config)).toBeUndefined();
+      expect(getEventBusByName('sharedBus', config)?.name).toBe('local');
+      expect(getEventBusByName('local', config)?.name).toBe('local');
+      expect(getEventBusByName('missing', config)).toBeNull();
     });
 
     it('returns only owned event buses', () => {

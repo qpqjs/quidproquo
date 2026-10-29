@@ -17,7 +17,7 @@ export type QpqCoreQueueConstructProps = {
 // The same owner-fallback derivation the runtime send processor and the service role use.
 const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string[] =>
   queueConfig.eventBusSubscriptions.map((eventBusName) => {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       throw new Error(`Queue [${queueConfig.name}] subscribes to an undefined event bus [${eventBusName}]`);
     }

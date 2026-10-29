@@ -43,7 +43,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
   topic: aws_sns.ITopic;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, eventBusSubscription: string): QpqCoreEventBusConstructBase {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusSubscription, qpqConfig);
 
     const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
       eventBusConfig?.owner?.resourceNameOverride || eventBusSubscription,

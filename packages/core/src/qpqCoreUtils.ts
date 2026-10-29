@@ -1,4 +1,6 @@
+import { getEventBusByName } from './config/settings/eventBus/logic';
 import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
+export { getAllEventBusConfigs, getEventBusByName, getOwnedEventBusConfigs, resolveEventBusOrThrow } from './config/settings/eventBus/logic';
 export {
   getAllStorageDriveConfigs,
   getOwnedStorageDriveConfigs,
@@ -32,7 +34,6 @@ import {
   DynamicFunctionsQPQConfigSetting,
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
-  EventBusQPQConfigSetting,
   FederatedModuleStoreQPQConfigSetting,
   FrontendBundleOptions,
   FrontendBundleOptionsQPQConfigSetting,
@@ -112,7 +113,7 @@ export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfi
     .filter((queue) => queue.isFifo)
     .flatMap((queue) =>
       queue.eventBusSubscriptions
-        .filter((eventBusName) => !getEventBusConfigByName(eventBusName, qpqConfig)?.isFifo)
+        .filter((eventBusName) => !getEventBusByName(eventBusName, qpqConfig)?.isFifo)
         .map((eventBusName) => `queue [${queue.name}] -> event bus [${eventBusName}]`),
     );
 
@@ -127,12 +128,6 @@ export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   return getAllStorageDriveConfigs(configs).map((sd) => sd.storageDrive);
 };
 
-export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
-  const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.eventBus);
-
-  return eventBuses;
-};
-
 export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
   return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
 };
@@ -140,24 +135,6 @@ export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
 // Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
 export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
   return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
-};
-
-export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
-  const ownedEventBusConfigs = getOwnedItems(getAllEventBusConfigs(qpqConfig), qpqConfig);
-
-  return ownedEventBusConfigs;
-};
-
-export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
-  const allConfigs = getAllEventBusConfigs(qpqConfig);
-
-  const eventBusConfig = allConfigs.find((eb) => eb.owner?.resourceNameOverride === eventBusName);
-
-  if (eventBusConfig) {
-    return eventBusConfig;
-  }
-
-  return allConfigs.find((eb) => eb.name === eventBusName);
 };
 
 /** The module a setting belongs to: its declared owner, or the executing module when it declares none. */

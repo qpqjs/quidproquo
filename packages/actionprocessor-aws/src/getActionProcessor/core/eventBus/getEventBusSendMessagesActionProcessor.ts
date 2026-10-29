@@ -26,7 +26,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
   return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
 
     if (!eventBusConfig) {
       return actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus ${eventBusName} not found`);

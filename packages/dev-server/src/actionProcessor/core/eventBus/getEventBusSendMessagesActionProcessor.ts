@@ -19,7 +19,7 @@ import { AnyEventBusMessageWithSession } from './types';
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventBusSendMessagesBase> => {
   return async ({ eventBusName, eventBusMessages }, session) => {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       return actionResultError(
         askEventBusSendMessagesBase.errorType.TopicNotFound,
