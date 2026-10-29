@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineStorageDrive } from './storageDrive';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineStorageDrive } from './defineStorageDrive';
 
 describe('defineStorageDrive', () => {
   it('builds a StorageDrive setting with the given name and defaults', () => {

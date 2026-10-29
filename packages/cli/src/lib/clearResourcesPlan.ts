@@ -34,7 +34,7 @@ const getClearableResources = (appName: string): ClearableResource[] => {
   for (const service of getServiceNames(appName)) {
     const qpqConfig = loadServiceQpqConfig(appName, service);
 
-    for (const drive of qpqCoreUtils.getOwnedStorageDrives(qpqConfig)) {
+    for (const drive of qpqCoreUtils.getOwnedStorageDriveConfigs(qpqConfig)) {
       resources.push({ service, kind: 'storageDrive', resourceName: drive.storageDrive });
     }
 

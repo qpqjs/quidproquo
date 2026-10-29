@@ -1,5 +1,12 @@
 import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
+export {
+  getAllStorageDriveConfigs,
+  getOwnedStorageDriveConfigs,
+  getStorageDriveByName,
+  resolveStorageDriveOrThrow,
+} from './config/settings/storageDrive/logic';
 import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
+import { getAllStorageDriveConfigs } from './config/settings/storageDrive/logic';
 import {
   getApplicationConfigSetting,
   getApplicationModuleEnvironment,
@@ -45,7 +52,6 @@ import {
   ScheduleQPQConfigSetting,
   ServiceSettingsQPQConfigSetting,
   SigningKeyQPQConfigSetting,
-  StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   UserScriptModuleQPQConfigSetting,
   UserScriptRunnerQPQConfigSetting,
@@ -90,14 +96,6 @@ export const getConfigRoot = (qpqConfig: QPQConfig): string => {
   return getApplicationConfigSetting(qpqConfig).configRoot;
 };
 
-export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
-  return getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive);
-};
-
-export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
-  return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
-};
-
 export const getFederatedModuleStore = (qpqConfig: QPQConfig): FederatedModuleStoreQPQConfigSetting | undefined => {
   return getConfigSetting<FederatedModuleStoreQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.federatedModuleStore);
 };
@@ -126,11 +124,7 @@ export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfi
 };
 
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
-  const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive).map(
-    (sd) => sd.storageDrive,
-  );
-
-  return storageDriveNames;
+  return getAllStorageDriveConfigs(configs).map((sd) => sd.storageDrive);
 };
 
 export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
@@ -191,10 +185,6 @@ export const getVirtualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQP
 
 export const getOwnedGraphDatabases = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   return getOwnedItems(getAllGraphDatabaseConfigs(qpqConfig), qpqConfig);
-};
-
-export const getOwnedStorageDrives = (qpqConfig: QPQConfig): StorageDriveQPQConfigSetting[] => {
-  return getOwnedItems(getStorageDrives(qpqConfig), qpqConfig);
 };
 
 export const resolveCrossServiceResourceName = (resourceName: ResourceName): CrossServiceResourceName => {
@@ -288,7 +278,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
     ...getDeployEventConfigs(qpqConfig).map((r) => r.runtime),
-    ...getStorageDrives(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
+    ...getAllStorageDriveConfigs(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
     // A store's change-stream handler. Missing here, the bundler never sees it: the lambda
     // zip omits it and the dev server's dynamic loader has nothing to resolve, so the handler
     // simply never runs, and since nothing throws, the only symptom is a projection that

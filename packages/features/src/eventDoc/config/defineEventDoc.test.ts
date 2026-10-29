@@ -51,10 +51,10 @@ describe('defineEventDoc', () => {
     const scopedStores = qpqCoreUtils.getAllKeyValueStoreConfigs(scoped);
     expect(scopedStores).toHaveLength(3);
     expect(scopedStores.every((kvs) => kvs.scoped === true)).toBe(true);
-    expect(qpqCoreUtils.getStorageDrives(scoped).map((drive) => drive.scoped)).toEqual([true]);
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(scoped).map((drive) => drive.scoped)).toEqual([true]);
 
     expect(qpqCoreUtils.getAllKeyValueStoreConfigs(unscoped).some((kvs) => kvs.scoped)).toBe(false);
-    expect(qpqCoreUtils.getStorageDrives(unscoped).some((drive) => drive.scoped)).toBe(false);
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(unscoped).some((drive) => drive.scoped)).toBe(false);
   });
 
   it('throws when the functions object carries no identity', () => {

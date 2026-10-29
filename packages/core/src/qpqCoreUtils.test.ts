@@ -40,6 +40,7 @@ import {
   getAllParameterConfigs,
   getAllSecretConfigs,
   getAllSrcEntries,
+  getAllStorageDriveConfigs,
   getAllUserScriptModules,
   getApiBuildPath,
   getApplicationConfigSetting,
@@ -66,7 +67,7 @@ import {
   getOwnedParameterConfigs,
   getOwnedScheduleEvents,
   getOwnedSecretConfigs,
-  getOwnedStorageDrives,
+  getOwnedStorageDriveConfigs,
   getOwnedUserDirectories,
   getParameterByName,
   getQueueQueueProcessors,
@@ -76,7 +77,6 @@ import {
   getSrcFilenameFromQpqFunctionRuntime,
   getStorageDriveByName,
   getStorageDriveNames,
-  getStorageDrives,
   getUniqueKeyForSetting,
   getUserDirectories,
   getUserDirectoryByName,
@@ -207,13 +207,13 @@ describe('qpqCoreUtils', () => {
     const config = buildTestQpqConfig([defineStorageDrive('uploads'), defineStorageDrive('cache')]);
 
     it('lists storage drives and their names', () => {
-      expect(getStorageDrives(config)).toHaveLength(2);
+      expect(getAllStorageDriveConfigs(config)).toHaveLength(2);
       expect(getStorageDriveNames(config)).toEqual(['uploads', 'cache']);
     });
 
     it('finds a storage drive by name', () => {
       expect(getStorageDriveByName('uploads', config)?.storageDrive).toBe('uploads');
-      expect(getStorageDriveByName('missing', config)).toBeUndefined();
+      expect(getStorageDriveByName('missing', config)).toBeNull();
     });
 
     it('returns only owned storage drives', () => {
@@ -222,7 +222,7 @@ describe('qpqCoreUtils', () => {
         defineStorageDrive('theirs', { owner: { module: 'other-module', storageDriveName: 'theirs' } }),
       ]);
 
-      expect(getOwnedStorageDrives(mixed).map((s) => s.storageDrive)).toEqual(['mine']);
+      expect(getOwnedStorageDriveConfigs(mixed).map((s) => s.storageDrive)).toEqual(['mine']);
     });
   });
 

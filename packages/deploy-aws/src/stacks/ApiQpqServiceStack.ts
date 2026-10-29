@@ -132,7 +132,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Storage Drives
-    qpqCoreUtils.getStorageDrives(props.qpqConfig).forEach(
+    qpqCoreUtils.getAllStorageDriveConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

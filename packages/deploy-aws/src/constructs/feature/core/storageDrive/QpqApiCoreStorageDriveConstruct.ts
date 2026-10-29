@@ -18,7 +18,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     // Event handlers live on the owner's API stack only. Skipping foreign drives
     // avoids attaching a bucket notification to another service's bucket
-    const isOwnedHere = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).some((d) => d.uniqueKey === props.storageDriveConfig.uniqueKey);
+    const isOwnedHere = qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).some((d) => d.uniqueKey === props.storageDriveConfig.uniqueKey);
 
     if (!isOwnedHere) {
       return;

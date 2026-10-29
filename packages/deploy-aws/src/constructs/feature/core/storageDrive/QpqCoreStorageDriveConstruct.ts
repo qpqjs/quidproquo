@@ -300,8 +300,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     // `resolveStorageDriveBucketName` so no CDK cross-stack ref is created.
     // Cross-service access stays as exact ARNs on purpose: this short list is
     // the part of the policy a human should be reviewing.
-    const allDriveConfigs = qpqCoreUtils.getStorageDrives(qpqConfig);
-    const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDrives(qpqConfig);
+    const allDriveConfigs = qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig);
+    const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDriveConfigs(qpqConfig);
     const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
 
     const foreignArns = foreignDriveConfigs.flatMap((cfg) => {

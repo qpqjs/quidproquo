@@ -16,7 +16,7 @@ describe('defineEventDocSummary', () => {
     expect(stores).toHaveLength(3);
     expect(stores.every((kvs) => kvs.disablePointInTimeRecovery === false)).toBe(true);
     expect(stores.every((kvs) => kvs.scoped === true)).toBe(true);
-    expect(qpqCoreUtils.getStorageDrives(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
   });
 
   it('hands the projector its store name and snapshot map as config globals', () => {

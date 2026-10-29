@@ -27,11 +27,7 @@ import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { isAwsCredentialsValid } from './awsCredentials';
 
 const resolveBucketName = (drive: string, qpqConfig: QPQConfig): string => {
-  const storageDriveConfig = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
-
-  if (!storageDriveConfig) {
-    throw new Error(`Could not find storage drive config for [${drive}]`);
-  }
+  const storageDriveConfig = qpqCoreUtils.resolveStorageDriveOrThrow(drive, qpqConfig);
 
   return awsNamingUtils.resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
 };

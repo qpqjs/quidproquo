@@ -63,7 +63,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
       qpqWebServerUtils.getEmailReceiversForStorageDrive(props.qpqConfig, storageDriveName).map((r) => emailReceiptRuleName(props.qpqConfig, r.name));
 
     // Build the storage drives
-    qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

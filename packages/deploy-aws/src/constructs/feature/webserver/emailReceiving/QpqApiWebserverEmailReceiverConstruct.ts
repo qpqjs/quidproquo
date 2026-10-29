@@ -31,7 +31,7 @@ export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
     }
 
     // defineEmailReceiver declares the drive beside the receiver, so it is always owned here.
-    if (!qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).some((drive) => drive.storageDrive === storageDriveName)) {
+    if (!qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).some((drive) => drive.storageDrive === storageDriveName)) {
       throw new Error(`Email receiver "${name}" has no storage drive "${storageDriveName}" in this service; declare it with defineEmailReceiver`);
     }
 

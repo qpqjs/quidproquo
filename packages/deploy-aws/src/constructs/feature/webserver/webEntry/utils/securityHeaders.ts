@@ -47,7 +47,7 @@ const convertStrictTransportSecurity = (
 // `QpqCoreStorageDriveConstruct.authorizeActionsForRole`. This replaces the previous
 // `https://*.amazonaws.com` wildcard, which allowed connections to any AWS endpoint.
 const getStorageDriveConnectSrcDomains = (qpqConfig: QPQConfig): string[] => {
-  const domains = qpqCoreUtils.getStorageDrives(qpqConfig).map((cfg) => {
+  const domains = qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig).map((cfg) => {
     const bucketName = awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner);
     const { awsRegion } = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
 
