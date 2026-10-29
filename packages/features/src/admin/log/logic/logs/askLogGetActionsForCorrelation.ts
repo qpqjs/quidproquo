@@ -1,4 +1,4 @@
-import { AskResponse, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
+import { AskResponse, getMillisecondsBetween, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import { askRedactedLogGetByCorrelation } from '../../data/redactedLogData';
 
@@ -26,7 +26,7 @@ export function* askLogGetActionsForCorrelation(correlationId: string): AskRespo
       actionType: entry.act.type,
       startedAt: entry.startedAt,
       finishedAt: entry.finishedAt,
-      executionTimeMs: new Date(entry.finishedAt).getTime() - new Date(entry.startedAt).getTime(),
+      executionTimeMs: getMillisecondsBetween(entry.startedAt, entry.finishedAt),
       success,
       error: success ? undefined : resolveActionResultError(entry.res).errorText,
     };

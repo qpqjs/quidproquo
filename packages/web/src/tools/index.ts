@@ -1,2 +1,2 @@
 export * from './timeAgo';
-export * from './uniqueBy';
+export { unique, uniqueBy } from '@qpqjs/core';

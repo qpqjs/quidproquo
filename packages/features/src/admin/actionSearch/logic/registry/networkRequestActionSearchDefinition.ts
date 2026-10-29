@@ -1,6 +1,7 @@
 import {
   ActionHistory,
   ActionProcessorResult,
+  getMillisecondsBetween,
   HTTPNetworkResponse,
   isErroredActionResult,
   NetworkActionType,
@@ -14,7 +15,7 @@ import { ActionSearchExtractedAction } from '../../domain/ActionSearchExtractedA
 import { ActionSearchFieldType } from '../../domain/ActionSearchFieldType';
 import { ActionSearchFilterOperator } from '../../domain/ActionSearchFilterOperator';
 
-const getEntryDurationMs = (entry: ActionHistory): number => new Date(entry.finishedAt).getTime() - new Date(entry.startedAt).getTime();
+const getEntryDurationMs = (entry: ActionHistory): number => getMillisecondsBetween(entry.startedAt, entry.finishedAt);
 
 const extractNetworkRequest = (entry: ActionHistory): Nullable<ActionSearchExtractedAction> => {
   const payload = entry.act.payload as NetworkRequestActionPayload<unknown> | undefined;

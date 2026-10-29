@@ -7,7 +7,6 @@ import { HTTPEvent } from '../types/HTTPEvent';
 import {
   askFromJsonEventRequest,
   askFromValidJsonEventRequest,
-  fromJsonEventRequest,
   rawFromJsonEventRequest,
   readUriQueryParamFromEvent,
   requireStringFields,
@@ -29,20 +28,6 @@ describe('rawFromJsonEventRequest', () => {
   it('decodes a base64 encoded body', () => {
     const body = Buffer.from('{"a":1}').toString('base64');
     expect(rawFromJsonEventRequest(buildEvent({ body, isBase64Encoded: true }))).toBe('{"a":1}');
-  });
-});
-
-describe('fromJsonEventRequest', () => {
-  it('parses the JSON body', () => {
-    expect(fromJsonEventRequest(buildEvent({ body: '{"a":1}' }))).toEqual({ a: 1 });
-  });
-
-  it('throws when the body is missing', () => {
-    expect(() => fromJsonEventRequest(buildEvent({}))).toThrow('Unable to parse undefined json body from event.');
-  });
-
-  it('throws when the body is not valid JSON', () => {
-    expect(() => fromJsonEventRequest(buildEvent({ body: 'nope' }))).toThrow('Unable to parse incoming json body from event.');
   });
 });
 

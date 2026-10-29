@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData } from '@qpqjs/core';
+import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData, unique } from '@qpqjs/core';
 import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
@@ -54,7 +54,7 @@ function* askListEntitiesViaLookup(
 
   const lookupRows = yield* entityLookupData.askEntityLookupListLinkKeys(lookupKey, startIsoDateTime, endIsoDateTime, nextPageKey);
 
-  const linkKeys = [...new Set(lookupRows.items.map((lookupRow) => lookupRow.linkKey))];
+  const linkKeys = unique(lookupRows.items.map((lookupRow) => lookupRow.linkKey));
   const entities = yield* entityRowData.askEntityRowGetByLinkKeys(linkKeys);
 
   // Any remaining filters apply in memory; the page is already lookup-sized

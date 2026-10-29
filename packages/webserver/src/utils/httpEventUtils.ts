@@ -9,23 +9,6 @@ export const rawFromJsonEventRequest = (httpJsonEvent: HTTPEvent): string | unde
   return json;
 };
 
-// TODO: @joe-coady: Make a generator version of this
-//       so we can throw errors with generators
-export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
-  const json = rawFromJsonEventRequest(httpJsonEvent);
-
-  if (!json) {
-    throw new Error('Unable to parse undefined json body from event.');
-  }
-
-  try {
-    const item: T = JSON.parse(json);
-    return item;
-  } catch {
-    throw new Error('Unable to parse incoming json body from event.');
-  }
-};
-
 export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskResponse<T> {
   const json = rawFromJsonEventRequest(httpJsonEvent);
 

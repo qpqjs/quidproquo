@@ -1,4 +1,4 @@
-import { StoryResult } from '@qpqjs/core';
+import { getMillisecondsBetween, StoryResult } from '@qpqjs/core';
 
 import { LogMetadata } from '../../../entry/domain';
 import { genericTextExtractorsByRuntimeType } from './genericTextExtractorsByRuntimeType';
@@ -21,7 +21,7 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
     runtimeType: storyResult.runtimeType,
     startedAt: storyResult.startedAt,
     generic: tags.filter((t) => !!t).join(', '),
-    executionTimeMs: new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime(),
+    executionTimeMs: getMillisecondsBetween(storyResult.startedAt, storyResult.finishedAt),
     ttl,
 
     userInfo: decodedAccessToken?.username || decodedAccessToken?.userId,

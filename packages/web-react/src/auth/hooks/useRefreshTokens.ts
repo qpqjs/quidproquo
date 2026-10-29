@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from '@qpqjs/core';
+import { AuthenticationInfo, getMillisecondsBetween } from '@qpqjs/core';
 
 import { useEffect } from 'react';
 
@@ -21,7 +21,7 @@ export const useRefreshTokens = (
   const refresh = useFastCallback(() => {
     if (authenticationInfo && authenticationInfo.refreshToken && authenticationInfo.expiresAt) {
       const now = new Date().toISOString();
-      const timeToExpire = new Date(authenticationInfo.expiresAt).getTime() - new Date(now).getTime();
+      const timeToExpire = getMillisecondsBetween(now, authenticationInfo.expiresAt);
 
       // Refresh `bufferMinutes` before expiry so there's margin for the refresh round-trip.
       const bufferTime = bufferMinutes * 60 * 1000;

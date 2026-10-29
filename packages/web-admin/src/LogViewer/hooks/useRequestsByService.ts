@@ -1,3 +1,5 @@
+import { unique } from '@qpqjs/core';
+
 import { useMemo } from 'react';
 
 import { SearchParams } from '../types';
@@ -8,7 +10,7 @@ export const useRequestsByService = (logs: any[], searchParams: SearchParams) =>
     const endTime = new Date(searchParams.endIsoDateTime).getTime();
     const interval = (endTime - startTime) / 10;
 
-    const services = [...new Set(logs.map((log) => log.moduleName))];
+    const services = unique(logs.map((log) => log.moduleName));
 
     const buckets = Array.from({ length: 10 }, (_, i) => ({
       time: new Date(startTime + i * interval).toLocaleString(),

@@ -1,3 +1,5 @@
+import { unique } from '@qpqjs/core';
+
 import { REDACTED_STRING } from './constants/REDACTED_STRING';
 import { REDACTION_MIN_SWEEP_LENGTH } from './constants/REDACTION_MIN_SWEEP_LENGTH';
 import { mapEncodedJson } from './mapEncodedJson';
@@ -11,7 +13,9 @@ const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/
  * contains another leaves no fragment behind.
  */
 export const sweepRedactions = <T>(value: T, redactions: string[]): T => {
-  const values = [...new Set(redactions)].filter((r) => r.length >= REDACTION_MIN_SWEEP_LENGTH).sort((a, b) => b.length - a.length);
+  const values = unique(redactions)
+    .filter((r) => r.length >= REDACTION_MIN_SWEEP_LENGTH)
+    .sort((a, b) => b.length - a.length);
 
   if (values.length === 0) {
     return value;
