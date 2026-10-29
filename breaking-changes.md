@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askEventGetStorySession` resolves `Nullable<StorySession>`: an event source with no session of its own (the js noop, an unscoped S3 object, an SQS record without one, an http route whose session story yields none) answers `null`, never `undefined`; `askProcessEvent` treats null as 'start a fresh session' (G5).
 - `EventBusActionType.SendMessages` and `QueueActionType.SendMessages` are `EventBusActionType.SendMessage` / `QueueActionType.SendMessage`, matching the last segment of their unchanged action ids (A2). The requesters keep their names (`askEventBusSendMessages`, `askQueueSendMessages`).
 - `@qpqjs/web-admin` and `@qpqjs/web-react` creators drop the `UI` infix (E3): `askAuthUISet*` is `askAuthSet*`, `askUISessionLog*` is `askSessionLog*`, `askUIVolatile*` is `askVolatile*`, `askUIShowError` / `askUIStartLoading` / `askUIStopLoading` are `askSystemShowError` / `askSystemStartLoading` / `askSystemStopLoading`, and `askSharedQueryParamsUISetParam` is `askSharedQueryParamsSetParam`.
 - `@qpqjs/features` creators drop their `UI` / `Chrome` infixes (E3): every `askUI<Module><Verb>` is `ask<Module><Verb>` (list, export and import UIs, tenant membership, event-doc AI, workspace), `askChrome<Verb>` is `askEventDocWorkspaceChrome<Verb>`, and the list logic story that collided is `askEventDocListChangePageSize` (the creator keeps `askEventDocListSetPageSize`).

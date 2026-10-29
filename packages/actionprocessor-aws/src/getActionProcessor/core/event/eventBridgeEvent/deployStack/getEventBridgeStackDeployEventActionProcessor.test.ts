@@ -14,6 +14,6 @@ describe('deployStack getEventBridgeStackDeployEventActionProcessor', () => {
   it('returns no story session', async () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession, config);
 
-    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([undefined]);
+    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([null]);
   });
 });

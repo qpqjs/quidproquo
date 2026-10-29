@@ -16,6 +16,6 @@ describe('the shared no-op event processors', () => {
   it('returns no story session', async () => {
     const processors = await getEventGetStorySessionNoopActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
 
-    expect(await invokeProcessor(processors[EventActionType.GetStorySession]!, { qpqEventRecord: {}, eventParams: [] })).toEqual([undefined]);
+    expect(await invokeProcessor(processors[EventActionType.GetStorySession]!, { qpqEventRecord: {}, eventParams: [] })).toEqual([null]);
   });
 });

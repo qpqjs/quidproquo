@@ -15,7 +15,7 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       });
     }
 
-    return actionResult(undefined);
+    return actionResult(null);
   };
 };
 

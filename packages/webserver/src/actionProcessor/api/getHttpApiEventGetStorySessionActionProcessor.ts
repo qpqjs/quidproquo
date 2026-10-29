@@ -50,7 +50,7 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       return actionResultError(error.errorType, error.errorText, error.errorStack);
     }
 
-    return actionResult(storySession);
+    return actionResult(storySession ?? null);
   };
 };
 

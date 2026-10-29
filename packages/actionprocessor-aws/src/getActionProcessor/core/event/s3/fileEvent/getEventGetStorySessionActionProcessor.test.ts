@@ -11,6 +11,6 @@ describe('fileEvent getEventGetStorySessionActionProcessor', () => {
   it('returns no story session for an unscoped record', async () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
 
-    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([undefined]);
+    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([null]);
   });
 });

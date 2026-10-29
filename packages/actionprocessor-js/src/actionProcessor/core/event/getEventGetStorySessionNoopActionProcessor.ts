@@ -1,7 +1,7 @@
 import { actionResult, askEventGetStorySessionBase, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
 const getProcessGetStorySession = (): ProcessorFor<typeof askEventGetStorySessionBase> => {
-  return async () => actionResult(undefined);
+  return async () => actionResult(null);
 };
 
 /** For event sources whose records carry no story session: every runtime spreads this one instead of keeping a copy. */

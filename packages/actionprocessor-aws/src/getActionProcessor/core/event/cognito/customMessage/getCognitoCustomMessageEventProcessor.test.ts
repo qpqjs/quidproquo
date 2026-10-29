@@ -25,6 +25,6 @@ describe('customMessage getCognitoCustomMessageEventProcessor', () => {
   it('returns no story session', async () => {
     const processor = await resolveEventProcessor(getEventGetStorySessionActionProcessor, EventActionType.GetStorySession);
 
-    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([undefined]);
+    expect(await processor({ qpqEventRecord: {}, eventParams: [] })).toEqual([null]);
   });
 });

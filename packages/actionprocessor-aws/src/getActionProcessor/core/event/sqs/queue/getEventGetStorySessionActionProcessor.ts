@@ -14,10 +14,10 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
     if (srcRecord) {
       const parsedInternalEventRecord = JSON.parse(srcRecord.body) as AnyQueueMessageWithSession;
       // The body is just bytes on a queue: never let it plant local context, globals or a raw token.
-      return actionResult(parsedInternalEventRecord.storySession && toCrossServiceSession(parsedInternalEventRecord.storySession));
+      return actionResult(parsedInternalEventRecord.storySession ? toCrossServiceSession(parsedInternalEventRecord.storySession) : null);
     }
 
-    return actionResult(undefined);
+    return actionResult(null);
   };
 };
 

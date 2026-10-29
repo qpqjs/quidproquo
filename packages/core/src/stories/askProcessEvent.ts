@@ -48,7 +48,8 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
       runtime,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
-      messageSession,
+      // An event source with no session of its own answers null; the story then starts a fresh one.
+      messageSession ?? undefined,
     ),
   );
 
