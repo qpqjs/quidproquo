@@ -1,8 +1,8 @@
 import * as crypto from 'crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { FileStorageConfig } from '../types';
 import { createSecureUrlToken, getSecureUrlBaseUrl, SecureUrlToken, verifySecureUrlToken } from './secureUrlUtils';
-import { FileStorageConfig } from './types';
 
 const secret = 'top-secret';
 

@@ -2,7 +2,9 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getResolveLoaderModules, getRspackBuildMode, setupRspackQPQRuntime } from './index';
+import { getResolveLoaderModules } from './getResolveLoaderModules';
+import { getRspackBuildMode } from './getRspackBuildMode';
+import { setupRspackQPQRuntime } from './setupRspackQPQRuntime';
 
 describe('getRspackBuildMode', () => {
   it.each([

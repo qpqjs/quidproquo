@@ -46,3 +46,6 @@ export type CloudWatchAlarmNotification = {
     EvaluateLowSampleCountPercentile: string;
   };
 };
+
+/** How a runtime learns which queue an event belongs to: the lambda knows from its environment, the dev server reads it off the message. */
+export type ResolveQueueName = (eventParams: unknown[]) => string;

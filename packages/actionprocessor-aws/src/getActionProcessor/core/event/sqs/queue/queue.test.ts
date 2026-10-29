@@ -6,8 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
-import { getEventMatchStoryActionProcessor, getQueueConfigSetting } from './getEventMatchStoryActionProcessor';
+import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
+import { getQueueConfigSetting } from './utils';
 
 const buildAlarm = (metricName: string): Record<string, unknown> => ({
   AlarmName: 'alarm',

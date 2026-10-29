@@ -3,7 +3,7 @@ import { FileActionType } from '@qpqjs/core';
 import { describe, expect, it } from 'vitest';
 
 import { fileConfig, resolveFileProcessors } from './__fixtures__/fileProcessorTestHelpers';
-import { getFileActionProcessor } from './index';
+import { getFileActionProcessor } from './getFileActionProcessor';
 
 describe('getFileActionProcessor', () => {
   it('registers a processor for every file action it supports', async () => {

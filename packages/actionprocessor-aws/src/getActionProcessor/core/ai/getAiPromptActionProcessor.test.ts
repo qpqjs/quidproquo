@@ -11,7 +11,7 @@ import {
   prepareAiPromptCall,
   toBedrockReasoningOptions,
   toCacheableSystem,
-} from './logic';
+} from './utils';
 
 // Echoes the payload so the order history -> turn context is observable in the SDK call.
 const { echoPromptInput } = vi.hoisted(() => ({
@@ -25,9 +25,9 @@ const { echoPromptInput } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('./logic', async () => ({
+vi.mock('./utils', async () => ({
   // The real check: a test that mocked it could not tell a guarded reply from an unguarded one.
-  generateAiOutputObject: ((await vi.importActual('./logic/generateAiOutputObject')) as typeof import('./logic/generateAiOutputObject'))
+  generateAiOutputObject: ((await vi.importActual('./utils/generateAiOutputObject')) as typeof import('./utils/generateAiOutputObject'))
     .generateAiOutputObject,
   prepareAiPromptCall: vi.fn(),
   createDriveFileResolver: vi.fn(() => vi.fn()),

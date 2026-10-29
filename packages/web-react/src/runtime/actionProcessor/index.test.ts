@@ -2,7 +2,7 @@ import { StateActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getStateActionProcessor } from './index';
+import { getStateActionProcessor } from './getStateActionProcessor';
 
 describe('getStateActionProcessor', () => {
   it('resolves both the Read and Dispatch processors', async () => {

@@ -1,5 +1,7 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+
 import { Dispatch } from 'react';
+
 import { getStateDispatchActionListResolver } from './getStateDispatchActionProcessor';
 import { getStateReadActionListResolver } from './getStateReadActionProcessor';
 

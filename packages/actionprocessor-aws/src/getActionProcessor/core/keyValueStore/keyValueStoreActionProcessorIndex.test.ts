@@ -4,7 +4,7 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getKeyValueStoreActionProcessor } from './index';
+import { getKeyValueStoreActionProcessor } from './getKeyValueStoreActionProcessor';
 
 describe('getKeyValueStoreActionProcessor (index)', () => {
   it('registers a processor for every key value store action type', async () => {

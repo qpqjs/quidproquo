@@ -11,22 +11,8 @@ import {
 } from '@qpqjs/core';
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
-import { InternalEventRecord, MatchResult } from './types';
-
-// Only the queue name travels via the lambda environment; the full setting lives in the bundled
-// qpqConfig (serializing it into env blows the lambda 4KB limit).
-export const getQueueConfigSetting = (qpqConfig: QPQConfig, queueName: string): QueueQPQConfigSetting => {
-  const queueQPQConfigSetting = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
-
-  if (!queueQPQConfigSetting) {
-    throw new Error(`No queue config setting found for queue [${queueName}]`);
-  }
-
-  return queueQPQConfigSetting;
-};
-
-/** How a runtime learns which queue an event belongs to: the lambda knows from its environment, the dev server reads it off the message. */
-export type ResolveQueueName = (eventParams: unknown[]) => string;
+import { InternalEventRecord, MatchResult, ResolveQueueName } from './types';
+import { getQueueConfigSetting } from './utils';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig, resolveQueueName: ResolveQueueName): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord: rawQpqEventRecord, eventParams }) => {

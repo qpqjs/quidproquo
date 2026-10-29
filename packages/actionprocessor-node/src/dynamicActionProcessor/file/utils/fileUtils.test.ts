@@ -5,8 +5,12 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fileConfig } from './__fixtures__/fileProcessorTestHelpers';
-import { ensureDirectoryExists, ensureParentDirectoryExists, isStorageDriveNameValid, resolveDriveServiceName, resolveFilePath } from './utils';
+import { fileConfig } from '../__fixtures__/fileProcessorTestHelpers';
+import { ensureDirectoryExists } from './ensureDirectoryExists';
+import { ensureParentDirectoryExists } from './ensureParentDirectoryExists';
+import { isStorageDriveNameValid } from './isStorageDriveNameValid';
+import { resolveDriveServiceName } from './resolveDriveServiceName';
+import { resolveFilePath } from './resolveFilePath';
 
 vi.mock('fs/promises');
 

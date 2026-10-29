@@ -23,7 +23,7 @@ import {
 } from '@qpqjs/core';
 
 import { ResolvedDevServerConfig } from '../../../../types';
-import { getUserScriptChildEnv } from '../getUserScriptChildEnv';
+import { getUserScriptChildEnv } from './getUserScriptChildEnv';
 
 /** The error names an action that goes through the child must carry; PayloadTooLarge only where the request carries args. */
 export type UserScriptChildErrorCatalog = {

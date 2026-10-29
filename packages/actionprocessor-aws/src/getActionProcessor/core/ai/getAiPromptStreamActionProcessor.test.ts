@@ -4,7 +4,7 @@ import { invokeProcessor } from '@qpqjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getAiPromptStreamActionProcessor } from './getAiPromptStreamActionProcessor';
-import { buildAiPromptInput, createCachePrepareStep, logAiCacheUsage, mapAiStreamPart, prepareAiPromptCall, toCacheableSystem } from './logic';
+import { buildAiPromptInput, createCachePrepareStep, logAiCacheUsage, mapAiStreamPart, prepareAiPromptCall, toCacheableSystem } from './utils';
 
 // Echoes the payload so the order history -> turn context is observable in the SDK call.
 const { echoPromptInput } = vi.hoisted(() => ({
@@ -18,7 +18,7 @@ const { echoPromptInput } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('./logic', () => ({
+vi.mock('./utils', () => ({
   prepareAiPromptCall: vi.fn(),
   createDriveFileResolver: vi.fn(() => vi.fn()),
   buildAiPromptInput: vi.fn(echoPromptInput),

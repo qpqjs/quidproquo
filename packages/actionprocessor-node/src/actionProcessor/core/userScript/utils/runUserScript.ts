@@ -7,7 +7,7 @@ import {
   storyResultToActionResult,
 } from '@qpqjs/core';
 
-import { isStoryIterator } from '../../logic/isStoryIterator';
+import { isStoryIterator } from '../../utils/isStoryIterator';
 import { isUserScriptModuleNotFoundError } from './isUserScriptModuleNotFoundError';
 import { loadUserScriptModule } from './loadUserScriptModule';
 import { UserScriptModuleMap } from './UserScriptModuleMap';

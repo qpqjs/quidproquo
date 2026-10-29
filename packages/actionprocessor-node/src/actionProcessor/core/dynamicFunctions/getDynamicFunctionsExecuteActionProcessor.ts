@@ -20,7 +20,7 @@ import {
   StreamRegistry,
 } from '@qpqjs/core';
 
-import { isStoryIterator } from '../logic/isStoryIterator';
+import { isStoryIterator } from '../utils/isStoryIterator';
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 

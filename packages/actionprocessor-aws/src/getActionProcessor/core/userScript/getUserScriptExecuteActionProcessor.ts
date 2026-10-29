@@ -13,7 +13,7 @@ import {
   UserScriptRunnerRequestKind,
 } from '@qpqjs/core';
 
-import { requestUserScriptRunner } from './logic/requestUserScriptRunner';
+import { requestUserScriptRunner } from './utils/requestUserScriptRunner';
 
 const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askUserScriptExecuteBase> => {
   return async (

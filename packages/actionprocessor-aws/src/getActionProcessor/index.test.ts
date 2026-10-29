@@ -4,7 +4,7 @@ import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getAwsActionProcessors } from './index';
+import { getAwsActionProcessors } from './getAwsActionProcessors';
 
 const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1')]);
 

@@ -1,2 +1,2 @@
 export * from './getEmailActionProcessor';
-export * from './parseEmailMessage';
+export * from './utils';

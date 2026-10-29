@@ -2,14 +2,7 @@ import { Nullable } from '@qpqjs/core';
 
 import * as crypto from 'crypto';
 
-import { FileStorageConfig } from './types';
-
-export type SecureUrlToken = {
-  fullFilepath: string;
-  operation: 'download' | 'upload';
-  expiresAt: number;
-  contentType?: string;
-};
+import { FileStorageConfig, SecureUrlToken } from '../types';
 
 // Create a signed token for secure URLs
 export const createSecureUrlToken = (token: SecureUrlToken, secret: string): string => {

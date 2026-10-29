@@ -15,17 +15,7 @@ import {
 
 import { eventBus } from '../../../logic/eventBus';
 import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';
-
-export type AnyEventBusMessageWithSession = QueueMessage<any> & {
-  storySession: StorySession;
-
-  eventBusName: string;
-
-  targetApplication: string;
-  targetEnvironment: string;
-  targetModule: string;
-  targetFeature?: string;
-};
+import { AnyEventBusMessageWithSession } from './types';
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventBusSendMessagesBase> => {
   return async ({ eventBusName, eventBusMessages }, session) => {

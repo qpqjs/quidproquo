@@ -1,28 +1,9 @@
-import { assertStorageDriveScopeRequirementOrThrow, QPQConfig, qpqCoreUtils, validateScopeSegment } from '@qpqjs/core';
+import { assertStorageDriveScopeRequirementOrThrow, QPQConfig, validateScopeSegment } from '@qpqjs/core';
 
-import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { FileStorageConfig } from './types';
-
-// Resolve a drive name to a filesystem path
-export const isStorageDriveNameValid = (drive: string, qpqConfig: QPQConfig): boolean => {
-  const storageDrive = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
-
-  if (!storageDrive) {
-    return false;
-  }
-
-  return true;
-};
-
-// Resolve the service that owns a drive's on-disk location. Drives declared with
-// `owner.module` are shared across services, so every caller reads and writes
-// under the owner's folder, mirroring how AWS resolves the bucket by owner.
-export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): string {
-  const storageDrive = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
-  return qpqCoreUtils.resolveOwnerModuleName(storageDrive?.owner, qpqConfig);
-}
+import { FileStorageConfig } from '../types';
+import { resolveDriveServiceName } from './resolveDriveServiceName';
 
 export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string, scope?: string): string {
   const service = resolveDriveServiceName(drive, qpqConfig);
@@ -63,14 +44,3 @@ export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig:
 
   throw new Error('Invalid file path: escapes drive root.');
 }
-
-// Ensure a directory exists
-export const ensureDirectoryExists = async (dirPath: string): Promise<void> => {
-  await fs.mkdir(dirPath, { recursive: true });
-};
-
-// Ensure the parent directory of a file exists
-export const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
-  const parentDir = path.dirname(filePath);
-  await ensureDirectoryExists(parentDir);
-};

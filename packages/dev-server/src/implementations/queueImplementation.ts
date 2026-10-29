@@ -11,7 +11,7 @@ import {
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
-import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
+import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/types';
 import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, trackInFlight } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';

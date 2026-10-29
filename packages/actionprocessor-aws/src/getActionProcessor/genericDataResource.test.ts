@@ -3,7 +3,7 @@ import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getAwsActionProcessors } from './index';
+import { getAwsActionProcessors } from './getAwsActionProcessors';
 
 // Security regression: the generic data resource requesters (an unscoped table put and scan) have no processor on the
 // deployed runtime, so a story that yields one fails as an unknown action instead of reaching a table.

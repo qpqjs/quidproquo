@@ -20,12 +20,12 @@ import {
 } from '@qpqjs/core';
 
 import { getUserScriptRunnerActionProcessor } from '../getUserScriptRunnerActionProcessor';
-import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
-import { isUserScriptModuleNotFoundError } from '../logic/isUserScriptModuleNotFoundError';
-import { listUserScriptExports } from '../logic/listUserScriptExports';
-import { loadUserScriptHostModules } from '../logic/loadUserScriptHostModules';
-import { runUserScript } from '../logic/runUserScript';
-import { UserScriptModuleMap } from '../logic/UserScriptModuleMap';
+import { getUserScriptModuleMap } from '../utils/getUserScriptModuleMap';
+import { isUserScriptModuleNotFoundError } from '../utils/isUserScriptModuleNotFoundError';
+import { listUserScriptExports } from '../utils/listUserScriptExports';
+import { loadUserScriptHostModules } from '../utils/loadUserScriptHostModules';
+import { runUserScript } from '../utils/runUserScript';
+import { UserScriptModuleMap } from '../utils/UserScriptModuleMap';
 import { fetchUserScriptSource } from './fetchUserScriptSource';
 
 const { errorType } = askUserScriptExecuteBase;

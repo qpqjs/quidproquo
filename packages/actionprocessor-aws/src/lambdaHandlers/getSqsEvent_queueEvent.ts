@@ -11,7 +11,7 @@ import {
 import { SQSEvent } from 'aws-lambda';
 
 import { getSqsQueueEventProcessor } from '../getActionProcessor';
-import { getQueueConfigSetting } from '../getActionProcessor/core/event/sqs/queue/getEventMatchStoryActionProcessor';
+import { getQueueConfigSetting } from '../getActionProcessor/core/event/sqs/queue/utils';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

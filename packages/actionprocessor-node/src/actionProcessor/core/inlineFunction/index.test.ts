@@ -3,7 +3,7 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getInlineFunctionActionProcessor } from './index';
+import { getInlineFunctionActionProcessor } from './getInlineFunctionActionProcessor';
 
 describe('getInlineFunctionActionProcessor', () => {
   it('registers the inline function execute processor', async () => {

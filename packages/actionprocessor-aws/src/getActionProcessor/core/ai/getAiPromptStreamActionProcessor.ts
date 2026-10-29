@@ -11,6 +11,7 @@ import {
 
 import { streamText } from 'ai';
 
+import { BedrockCacheSettings } from './types';
 import {
   buildAiPromptInput,
   buildAiStopConditions,
@@ -23,8 +24,7 @@ import {
   toBedrockReasoningOptions,
   toCacheableSystem,
   toErrorMessage,
-} from './logic';
-import { BedrockCacheSettings } from './types';
+} from './utils';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPromptStream> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

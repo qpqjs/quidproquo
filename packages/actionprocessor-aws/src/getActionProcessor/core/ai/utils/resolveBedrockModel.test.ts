@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { resolveBedrockModel } from './resolveBedrockModel';
 
-vi.mock('../utils/aiModelMap', () => ({
+vi.mock('./aiModelMap', () => ({
   bedrockModelMap: {
     [AiModel.ClaudeOpus55]: { [AiDataRegion.Global]: 'global.opus', [AiDataRegion.Australia]: 'au.opus' },
     [AiModel.ClaudeSonnet5]: { [AiDataRegion.Global]: 'global.sonnet' },

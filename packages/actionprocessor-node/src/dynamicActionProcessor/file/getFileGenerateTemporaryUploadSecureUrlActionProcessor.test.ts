@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
-import { verifySecureUrlToken } from './secureUrlUtils';
+import { verifySecureUrlToken } from './utils';
 
 const invoke = (filepath: string, expirationMs: number = 60_000) =>
   runFileAction(getFileGenerateTemporaryUploadSecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporaryUploadSecureUrl, {

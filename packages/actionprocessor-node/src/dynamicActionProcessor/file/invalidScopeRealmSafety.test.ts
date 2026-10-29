@@ -20,7 +20,8 @@ import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFil
 // keeping its explicit `.name`. These processors must map it by name (the
 // actionResultErrorFromCaughtError chokepoint), never by prototype, or a scope
 // violation degrades to GenericError.
-vi.mock('./utils', () => ({
+vi.mock('./utils', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<object>()),
   resolveFilePath: vi.fn(() => {
     throw Object.assign(new Error('Scope must not contain ":".'), { name: 'InvalidScopeError', code: 'unsafeCharacters' });
   }),

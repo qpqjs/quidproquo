@@ -12,6 +12,7 @@ import {
 import type { LanguageModelUsage, ModelMessage } from 'ai';
 import { generateText, jsonSchema, NoObjectGeneratedError, Output } from 'ai';
 
+import { BedrockCacheSettings } from './types';
 import {
   AiOutputObjectGenerate,
   AiOutputObjectReply,
@@ -25,8 +26,7 @@ import {
   toAiStreamUsage,
   toBedrockReasoningOptions,
   toCacheableSystem,
-} from './logic';
-import { BedrockCacheSettings } from './types';
+} from './utils';
 
 // One schema-shaped call. A reply the SDK cannot parse at all (prose, or JSON cut off at the token
 // limit) throws NoObjectGeneratedError from inside generateText; it comes back as a reply with no
