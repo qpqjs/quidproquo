@@ -13,7 +13,7 @@ const getProcessQueryParamsGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       if (key === '__proto__') {
         return;
       }
-      const existing = Object.prototype.hasOwnProperty.call(paramsObject, key) ? paramsObject[key] : [];
+      const existing = Object.prototype.hasOwnProperty.call(paramsObject, key) ? (paramsObject[key] ?? []) : [];
       paramsObject[key] = [...existing, value];
     });
 
