@@ -3,9 +3,9 @@ import { AskResponse } from '@qpqjs/core';
 import { askEventDocList } from '../../../eventDoc/data/askEventDocList';
 import { askEventDocDocumentStateLatest } from '../../../eventDoc/logic/askEventDocDocumentStateLatest';
 import { toEventDocListItem } from '../../../eventDoc/models/toEventDocListItem';
-import { isMaintenancePubliclyVisible } from '../eventDoc/isMaintenancePubliclyVisible';
+import { isMaintenancePubliclyVisible } from '../eventDoc/logic/isMaintenancePubliclyVisible';
 import { toMaintenancePublicState } from '../eventDoc/logic/toMaintenancePublicState';
-import { MaintenancePublicState } from '../eventDoc/MaintenancePublicState';
+import { MaintenancePublicState } from '../eventDoc/types/MaintenancePublicState';
 import { MaintenanceState } from '../eventDoc/v1/views/document/MaintenanceState';
 
 // Fold every publicly visible maintenance (open draft, has updates, not

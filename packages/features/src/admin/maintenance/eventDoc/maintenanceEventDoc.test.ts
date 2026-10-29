@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 
 import { EventDocEvent } from '../../../eventDoc/models/EventDocEvent';
 import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
+import { isMaintenancePubliclyVisible } from './logic/isMaintenancePubliclyVisible';
 import { toMaintenancePublicState } from './logic/toMaintenancePublicState';
 import { MaintenanceEffect } from './v1/events/effects/MaintenanceEffect';
 import { MaintenanceUpdateData } from './v1/events/effects/MaintenanceUpdateData';
 import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
 import { MaintenanceType } from './v1/types/MaintenanceType';
-import { isMaintenancePubliclyVisible } from './isMaintenancePubliclyVisible';
 import { maintenanceEventDoc } from './maintenanceEventDoc';
 
 const eventId = (n: number): number => n;

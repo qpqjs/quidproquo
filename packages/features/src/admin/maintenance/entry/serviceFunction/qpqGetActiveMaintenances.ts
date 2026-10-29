@@ -3,7 +3,7 @@ import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { askEventDocStoreProvide, buildEventDocStore } from '../../../../eventDoc/context';
 import { maintenanceStoreOptions } from '../../config/maintenanceStoreOptions';
-import { MaintenancePublicState } from '../../eventDoc/MaintenancePublicState';
+import { MaintenancePublicState } from '../../eventDoc/types/MaintenancePublicState';
 import { askMaintenanceGetActivePublicStates } from '../../logic/askMaintenanceGetActivePublicStates';
 
 // Admin-owned service function: the cross-service read of the active maintenance

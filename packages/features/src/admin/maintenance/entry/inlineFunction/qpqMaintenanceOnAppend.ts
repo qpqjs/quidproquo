@@ -1,7 +1,7 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { EventDocOnAppendInput } from '../../../../eventDoc/models/EventDocOnAppendInput';
-import { isMaintenancePubliclyVisible } from '../../eventDoc/isMaintenancePubliclyVisible';
+import { isMaintenancePubliclyVisible } from '../../eventDoc/logic/isMaintenancePubliclyVisible';
 import { MaintenanceState } from '../../eventDoc/v1/views/document/MaintenanceState';
 import { askBroadcastMaintenancePublicStates } from '../../logic/askBroadcastMaintenancePublicStates';
 import { askMaintenanceGetActivePublicStates } from '../../logic/askMaintenanceGetActivePublicStates';

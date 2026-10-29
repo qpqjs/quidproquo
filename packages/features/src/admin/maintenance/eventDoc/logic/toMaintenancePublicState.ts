@@ -1,4 +1,4 @@
-import { MaintenancePublicState } from '../MaintenancePublicState';
+import { MaintenancePublicState } from '../types/MaintenancePublicState';
 import { MaintenanceState } from '../v1/views/document/MaintenanceState';
 
 // The one place the public projection is built, internal notes and authoring

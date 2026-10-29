@@ -1,8 +1,8 @@
 import { Nullable, QpqIsoDateTime } from '@qpqjs/core';
 
-import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
-import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
-import { MaintenanceType } from './v1/types/MaintenanceType';
+import { EventDocStatus } from '../../../../eventDoc/models/EventDocStatus';
+import { MaintenanceLevel } from '../v1/types/MaintenanceLevel';
+import { MaintenanceType } from '../v1/types/MaintenanceType';
 
 // One update as users may see it, the status line only, no internal notes, no author.
 export type MaintenancePublicUpdate = {

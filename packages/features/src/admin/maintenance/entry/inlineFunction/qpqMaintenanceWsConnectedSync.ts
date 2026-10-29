@@ -5,7 +5,7 @@ import { askWebSocketQueueSendMessage } from '../../../../webSocketQueue/logic/w
 import { WebSocketQueueServerMessageEventType } from '../../../../webSocketQueue/types/serverMessages/WebSocketQueueServerMessageEventType';
 import { WebSocketQueueOnConnectedInput } from '../../../../webSocketQueue/types/WebSocketQueueOnConnectedInput';
 import { QPQ_ADMIN_SERVICE_NAME_GLOBAL, QPQ_GET_ACTIVE_MAINTENANCES_FUNCTION_NAME } from '../../constants/maintenanceConstants';
-import { MaintenancePublicState } from '../../eventDoc/MaintenancePublicState';
+import { MaintenancePublicState } from '../../eventDoc/types/MaintenancePublicState';
 import { MaintenanceServerEventMessage } from '../../models/MaintenanceServerEventMessage';
 
 // The websocket queue's onConnected hook (runs in the ws-owning lambda): pull

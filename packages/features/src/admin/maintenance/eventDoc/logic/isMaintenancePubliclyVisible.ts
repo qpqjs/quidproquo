@@ -1,6 +1,6 @@
-import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
-import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
-import { MaintenanceState } from './v1/views/document/MaintenanceState';
+import { EventDocStatus } from '../../../../eventDoc/models/EventDocStatus';
+import { MaintenanceLevel } from '../v1/types/MaintenanceLevel';
+import { MaintenanceState } from '../v1/views/document/MaintenanceState';
 
 // THE public-visibility rule, used by both the active-set builder (broadcast +
 // connect-time sync) and the onAppend broadcast-skip: users may know about a
