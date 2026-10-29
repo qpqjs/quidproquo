@@ -134,7 +134,10 @@ describe('useQpqRuntime', () => {
 
     renderHook(() => useQpqRuntime(definition), { wrapper: buildWrapper(store) });
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    // One event-loop turn is enough for an onInit the hook had scheduled to have run.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
     expect(initRuns).toBe(0);
   });
 

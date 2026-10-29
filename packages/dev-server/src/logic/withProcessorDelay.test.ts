@@ -39,8 +39,9 @@ describe('delayForAction', () => {
 
   it('resolves immediately when the delay is zero', async () => {
     vi.useFakeTimers();
-    await delayForAction(undefined, 'AnyAction');
-    await delayForAction(0, 'AnyAction');
+    // Fake timers never advance here, so either call hanging on a timer would time the test out.
+    await expect(delayForAction(undefined, 'AnyAction')).resolves.toBeUndefined();
+    await expect(delayForAction(0, 'AnyAction')).resolves.toBeUndefined();
   });
 });
 

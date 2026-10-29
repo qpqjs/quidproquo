@@ -9,7 +9,7 @@ import { QPQConfig } from '@qpqjs/core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { loadFederatedStory, resetFederatedModuleStoreCache } from './loadFederatedStory';
 
@@ -230,18 +230,15 @@ describe('loadFederatedStory', () => {
 
       // The warm loader re-probes and hot-swaps; the background refresh lands within a
       // couple of calls (this is what makes a redeploy-free code change visible).
-      let latest = 'VERSION_1';
-      for (let i = 0; i < 20 && latest !== 'VERSION_2'; i++) {
-        const story = await loadFederatedStory<() => Promise<string>>(qpqConfig, '/entry::run');
-        latest = await story!();
-        if (latest !== 'VERSION_2') {
-          // A real (macrotask) delay: the background probe needs several event-loop
-          // turns of fs promises to land; setImmediate spins can outrun it.
-          await new Promise((resolve) => setTimeout(resolve, 10));
-        }
-      }
-
-      expect(latest).toBe('VERSION_2');
+      // The background probe needs several event-loop turns of fs promises to land, so this
+      // polls the loader rather than spinning setImmediate.
+      await vi.waitFor(
+        async () => {
+          const story = await loadFederatedStory<() => Promise<string>>(qpqConfig, '/entry::run');
+          expect(await story!()).toBe('VERSION_2');
+        },
+        { timeout: 2000, interval: 10 },
+      );
     } finally {
       delete process.env.federatedCodeStoreRecheckMs;
     }

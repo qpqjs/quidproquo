@@ -41,13 +41,11 @@ describe('fileStorageImplementation secure upload (PUT)', () => {
     } as any;
     stop = await fileStorageImplementation(devServerConfig);
     // It starts listening in the background; wait until it answers.
-    for (let attempt = 0; attempt < 50; attempt++) {
-      const healthy = await fetch(`http://localhost:${port}/health`)
+    const isHealthy = () =>
+      fetch(`http://localhost:${port}/health`)
         .then((r) => r.ok)
         .catch(() => false);
-      if (healthy) break;
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
+    await vi.waitFor(async () => expect(await isHealthy()).toBe(true), { timeout: 2500, interval: 50 });
   });
 
   afterAll(async () => {

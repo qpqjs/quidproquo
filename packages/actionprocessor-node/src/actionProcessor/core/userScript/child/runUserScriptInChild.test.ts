@@ -1,7 +1,7 @@
 import { askUserScriptExecute, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
 
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { runUserScriptInChild } from './runUserScriptInChild';
 
@@ -27,13 +27,12 @@ const isAlive = (pid: number): boolean => {
 
 // Polls because the kill is delivered asynchronously and the grandchild is reaped by init.
 const waitUntilDead = async (pids: number[]): Promise<boolean> => {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    if (pids.every((pid) => !isAlive(pid))) {
-      return true;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 50));
+  try {
+    await vi.waitFor(() => expect(pids.every((pid) => !isAlive(pid))).toBe(true), { timeout: 2000, interval: 50 });
+    return true;
+  } catch {
+    return false;
   }
-  return false;
 };
 
 describe('runUserScriptInChild', () => {
