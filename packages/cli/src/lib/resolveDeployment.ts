@@ -29,9 +29,10 @@ const selectDeploymentName = async (argv: string[], appName: string, configuredN
     return requested;
   }
 
-  if (configuredNames.length === 1) {
-    console.log(`Using deployment: ${configuredNames[0]}`);
-    return configuredNames[0];
+  const [onlyName] = configuredNames;
+  if (configuredNames.length === 1 && onlyName !== undefined) {
+    console.log(`Using deployment: ${onlyName}`);
+    return onlyName;
   }
 
   if (process.stdin.isTTY) {
@@ -53,6 +54,9 @@ export const resolveDeployment = async (argv: string[], appName: string): Promis
   const { deployments } = getQpqAppDeployConfig(getRoot(), appName);
   const deploymentName = await selectDeploymentName(argv, appName, Object.keys(deployments));
   const deployment = deployments[deploymentName];
+  if (!deployment) {
+    throw new Error(`Deployment [${deploymentName}] is not in ${appName}'s deploy.config.json`);
+  }
 
   primeDeploymentEnv(appName, deploymentName, deployment);
   getPlatformDriver(deployment.platform).prepareDeployment(deploymentName, deployment);

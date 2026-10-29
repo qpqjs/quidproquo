@@ -56,7 +56,11 @@ export const destroyServiceStack = (serviceName: string, stackName: string, appN
   });
 
 export const deployDomainStack = async (appName: string): Promise<void> => {
-  const qpqConfig = loadServiceQpqConfig(appName, getServiceNames(appName)[0]);
+  const [firstService] = getServiceNames(appName);
+  if (firstService === undefined) {
+    throw new Error(`No services found for app ${appName}`);
+  }
+  const qpqConfig = loadServiceQpqConfig(appName, firstService);
   const stackName = qpqDeployAwsUtils.getDomainStackName(qpqConfig);
   console.log('Deploy Domain: ', stackName);
   await deployStack(stackName, {

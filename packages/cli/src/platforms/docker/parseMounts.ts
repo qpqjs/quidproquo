@@ -27,10 +27,11 @@ export const parseMounts = (value: string): Mount[] =>
         throw new Error(`Mount '${item}' must be host:container with both absolute, optionally ending :ro, e.g. /mnt/user/media:/media`);
       }
 
-      const container = trimTrailingSlashes(match[2]);
+      const [, host = '', containerPath = '', mode] = match;
+      const container = trimTrailingSlashes(containerPath);
       if (container === IMAGE_ROOT || container.startsWith(`${IMAGE_ROOT}/`) || container === '/') {
         throw new Error(`Mount '${item}' would cover the image's own files: mount it somewhere other than / or ${IMAGE_ROOT}`);
       }
 
-      return { host: trimTrailingSlashes(match[1]), container, readOnly: match[3] === 'ro' };
+      return { host: trimTrailingSlashes(host), container, readOnly: mode === 'ro' };
     });

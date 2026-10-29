@@ -25,14 +25,18 @@ const groupCycles = (cycles: ImportCycle[]): CycleGroup[] => {
   };
 
   for (const cycle of cycles) {
+    const [first] = cycle;
+    if (first === undefined) continue;
     for (const file of cycle) {
-      parent.set(find(file), find(cycle[0]));
+      parent.set(find(file), find(first));
     }
   }
 
   const groups = new Map<string, CycleGroup>();
   for (const cycle of cycles) {
-    const key = find(cycle[0]);
+    const [first] = cycle;
+    if (first === undefined) continue;
+    const key = find(first);
     const group = groups.get(key) ?? { files: [], chainCount: 0 };
     group.chainCount += 1;
     group.files = [...new Set([...group.files, ...cycle])];

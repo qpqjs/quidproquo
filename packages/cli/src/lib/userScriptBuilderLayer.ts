@@ -43,7 +43,7 @@ export const getBuilderLayerInstallArgs = ({ outDir, architecture, rspackVersion
   `@rspack/core@${rspackVersion}`,
 ];
 
-const parseMajor = (version: string): number => parseInt(version.split('.')[0], 10);
+const parseMajor = (version: string): number => parseInt(version.split('.')[0] ?? '', 10);
 
 export type BuilderLayerRunners = {
   getNpmVersion: () => string;

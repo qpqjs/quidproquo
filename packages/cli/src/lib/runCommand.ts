@@ -72,7 +72,7 @@ let colorIndex = 0;
 // Hand each concurrent task a distinct prefix color so interleaved output is
 // scannable.
 export const nextPrefixColor = (): number => {
-  const color = PREFIX_COLORS[colorIndex % PREFIX_COLORS.length];
+  const color = PREFIX_COLORS[colorIndex % PREFIX_COLORS.length] ?? 0;
   colorIndex += 1;
   return color;
 };

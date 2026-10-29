@@ -13,6 +13,7 @@ export const runTasks = async (tasks: Task[], limit: number): Promise<TaskFailur
       while (nextIndex < tasks.length) {
         const task = tasks[nextIndex];
         nextIndex += 1;
+        if (!task) continue;
         try {
           await task.run();
         } catch (error) {

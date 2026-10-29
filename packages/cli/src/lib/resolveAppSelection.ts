@@ -44,9 +44,10 @@ export const resolveAppSelection = async (options: ResolveAppOptions): Promise<s
     return requested;
   }
 
-  if (availableApps.length === 1) {
-    console.log(`Using app: ${availableApps[0]}`);
-    return availableApps[0];
+  const [onlyApp] = availableApps;
+  if (availableApps.length === 1 && onlyApp !== undefined) {
+    console.log(`Using app: ${onlyApp}`);
+    return onlyApp;
   }
 
   if (process.stdin.isTTY) {

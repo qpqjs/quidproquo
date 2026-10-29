@@ -103,6 +103,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
 
   const markStarted = (index: number): void => {
     const v = views[index];
+    if (!v) return;
     if (!process.stdout.isTTY) {
       logBelowList(`  ${v.service} started`);
       return;
@@ -118,7 +119,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
       const req = http.get(
         {
           host: 'localhost',
-          port: views[index].port,
+          port: views[index]?.port,
           path: '/',
           timeout: 1000,
         },
