@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { authChallengeMfaSetupInitialState, authChallengeMfaSetupReducer } from './authChallengeReducer';
-import { AuthChallengeMfaSetupEffect } from './authChallengeTypes';
+import { AuthChallengeMfaSetupEffect } from './effects/AuthChallengeMfaSetupEffect';
+import { createInitialAuthChallengeMfaSetupState } from './logic/createInitialAuthChallengeMfaSetupState';
+import { authChallengeMfaSetupReducer } from './authChallengeMfaSetupReducer';
+
+const authChallengeMfaSetupInitialState = createInitialAuthChallengeMfaSetupState();
 
 describe('authChallengeMfaSetupReducer', () => {
   it('sets the mfa code', () => {

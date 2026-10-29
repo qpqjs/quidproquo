@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { AuthChallengeMfaSetupEffect } from '../authChallengeTypes';
+import { AuthChallengeMfaSetupEffect } from '../effects/AuthChallengeMfaSetupEffect';
 import { askAuthChallengeAssociateSoftwareToken } from './askAuthChallengeAssociateSoftwareToken';
 
 const baseMocks = (dispatched: unknown[], networkRequest: unknown) => ({
