@@ -12,7 +12,7 @@ import {
 } from '@qpqjs/core';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
-import { writeTextFile } from '../../../logic/s3/s3Utils';
+import { writeTextFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteTextContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteTextContents> => {

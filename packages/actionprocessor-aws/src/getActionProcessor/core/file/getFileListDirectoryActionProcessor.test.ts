@@ -2,7 +2,7 @@ import { askFileListDirectory, buildTestQpqConfig, FileActionType } from '@qpqjs
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { listFiles } from '../../../logic/s3/s3Utils';
+import { listFiles } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 
@@ -10,7 +10,7 @@ vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ listFiles: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ listFiles: vi.fn() }));
 
 const invoke = async (payload: { drive: string; folderPath: string; maxFiles?: number; pageToken?: string }) => {
   const processor = (await getFileListDirectoryActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ListDirectory];

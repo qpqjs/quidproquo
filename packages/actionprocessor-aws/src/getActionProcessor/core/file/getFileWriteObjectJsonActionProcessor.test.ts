@@ -3,7 +3,7 @@ import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
-import { writeTextFile } from '../../../logic/s3/s3Utils';
+import { writeTextFile } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';
 
@@ -11,7 +11,7 @@ vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ writeTextFile: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ writeTextFile: vi.fn() }));
 vi.mock('../../../awsLambdaUtils', () => ({ getS3BucketStorageClassFromStorageDriveTier: vi.fn(() => 'STANDARD') }));
 
 const invoke = async (payload: Record<string, unknown>) => {

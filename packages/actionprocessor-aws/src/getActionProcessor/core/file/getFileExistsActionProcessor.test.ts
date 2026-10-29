@@ -2,7 +2,7 @@ import { askFileExists, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { objectExists } from '../../../logic/s3/s3Utils';
+import { objectExists } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
@@ -11,7 +11,7 @@ vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ objectExists: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ objectExists: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
   const processor = (await getFileExistsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Exists];

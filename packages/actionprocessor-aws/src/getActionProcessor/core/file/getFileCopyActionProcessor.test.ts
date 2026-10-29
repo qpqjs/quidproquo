@@ -2,7 +2,7 @@ import { askFileCopy, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { copyFile } from '../../../logic/s3/s3Utils';
+import { copyFile } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
@@ -11,7 +11,7 @@ vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn((drive: string) => `bucket-${drive}`) }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ copyFile: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ copyFile: vi.fn() }));
 
 const payload = { sourceDrive: 'renders', sourceFilepath: 'd1/assets/a', targetDrive: 'packs', targetFilepath: 'd2/assets/b' };
 

@@ -11,7 +11,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { readTextFile } from '../../../logic/s3/s3Utils';
+import { readTextFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadTextContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadTextContents> => {

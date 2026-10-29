@@ -11,7 +11,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { readBinaryFile } from '../../../logic/s3/s3Utils';
+import { readBinaryFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadBinaryContents> => {

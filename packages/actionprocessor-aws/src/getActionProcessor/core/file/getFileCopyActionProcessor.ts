@@ -11,7 +11,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { copyFile } from '../../../logic/s3/s3Utils';
+import { copyFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileCopy = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileCopy> => {

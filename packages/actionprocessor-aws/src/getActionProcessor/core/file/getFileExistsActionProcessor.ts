@@ -11,7 +11,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { objectExists } from '../../../logic/s3/s3Utils';
+import { objectExists } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileExists = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileExists> => {

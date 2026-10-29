@@ -2,7 +2,7 @@ import { askFileReadTextContents, buildTestQpqConfig, FileActionType } from '@qp
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { readTextFile } from '../../../logic/s3/s3Utils';
+import { readTextFile } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
 
@@ -10,7 +10,7 @@ vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
 }));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ readTextFile: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ readTextFile: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
   const processor = (await getFileReadTextContentsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ReadTextContents];

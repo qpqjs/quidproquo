@@ -12,7 +12,7 @@ import {
   stripScopedFilePath,
 } from '@qpqjs/core';
 
-import { listFiles } from '../../../logic/s3/s3Utils';
+import { listFiles } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileListDirectory = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileListDirectory> => {

@@ -1,7 +1,7 @@
 import { AnyAuthChallenge, askCatch, AskResponse, askThrowError, AuthenticateUserChallenge, ErrorTypeEnum } from '@qpqjs/core';
 
-import { qpqWebServerUtils } from '../../../../index';
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
+import { askFromValidJsonEventRequest, getAccessTokenFromHeaders, requireStringFields, toJsonEventResponse } from '../../../../utils';
 import { authLogic } from '../../logic';
 import {
   AnyChallengePayload,
@@ -53,25 +53,19 @@ function* askChallengePayloadToAuthChallenge(payload: AnyChallengePayload): AskR
 }
 
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { username, password } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<LoginPayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('username', 'password'),
-  );
+  const { username, password } = yield* askFromValidJsonEventRequest<LoginPayload>(event, requireStringFields('username', 'password'));
 
   const authResponse = yield* authLogic.askLogin(username, password);
 
-  return qpqWebServerUtils.toJsonEventResponse(authResponse);
+  return toJsonEventResponse(authResponse);
 }
 
 export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { refreshToken } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<RefreshPayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('refreshToken'),
-  );
+  const { refreshToken } = yield* askFromValidJsonEventRequest<RefreshPayload>(event, requireStringFields('refreshToken'));
 
   const refreshResponse = yield* authLogic.askRefreshToken(refreshToken);
 
-  return qpqWebServerUtils.toJsonEventResponse(refreshResponse);
+  return toJsonEventResponse(refreshResponse);
 }
 
 export function* logout(event: HTTPEvent): AskResponse<HTTPEventResponse> {
@@ -80,14 +74,11 @@ export function* logout(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   // body. Best-effort, logout must always succeed for the client (it clears local state
   // regardless), so an already-revoked/invalid token is swallowed rather than 4xx'd. Public
   // route: possessing the refresh token is the authorization (you can only revoke your own).
-  const { refreshToken } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<RefreshPayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('refreshToken'),
-  );
+  const { refreshToken } = yield* askFromValidJsonEventRequest<RefreshPayload>(event, requireStringFields('refreshToken'));
 
   yield* askCatch(authLogic.askRevokeSession(refreshToken));
 
-  return qpqWebServerUtils.toJsonEventResponse({ success: true });
+  return toJsonEventResponse({ success: true });
 }
 
 export function* logoutEverywhere(event: HTTPEvent): AskResponse<HTTPEventResponse> {
@@ -95,75 +86,66 @@ export function* logoutEverywhere(event: HTTPEvent): AskResponse<HTTPEventRespon
   // for a user-settings "sign out of all devices" action. Authorized by the access token in
   // the header (GlobalSignOut validates it at Cognito). Best-effort / always 200, same as
   // above, swallow an invalid/expired token rather than failing the client's logout.
-  const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
+  const accessToken = getAccessTokenFromHeaders(event.headers);
 
   if (accessToken) {
     yield* askCatch(authLogic.askSignOut(accessToken));
   }
 
-  return qpqWebServerUtils.toJsonEventResponse({ success: true });
+  return toJsonEventResponse({ success: true });
 }
 
 export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const payload = yield* qpqWebServerUtils.askFromValidJsonEventRequest<AnyChallengePayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('email', 'session', 'challenge'),
-  );
+  const payload = yield* askFromValidJsonEventRequest<AnyChallengePayload>(event, requireStringFields('email', 'session', 'challenge'));
 
   const authChallenge = yield* askChallengePayloadToAuthChallenge(payload);
 
   const response = yield* authLogic.askRespondToAuthChallenge(authChallenge);
 
-  return qpqWebServerUtils.toJsonEventResponse(response);
+  return toJsonEventResponse(response);
 }
 
 export function* associateSoftwareToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { session } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<AssociateSoftwareTokenPayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('session'),
-  );
+  const { session } = yield* askFromValidJsonEventRequest<AssociateSoftwareTokenPayload>(event, requireStringFields('session'));
 
   const response = yield* authLogic.askAssociateSoftwareToken(session);
 
-  return qpqWebServerUtils.toJsonEventResponse(response);
+  return toJsonEventResponse(response);
 }
 
 export function* forgotPassword(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { username } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<ForgotPasswordPayload>(
-    event,
-    qpqWebServerUtils.requireStringFields('username'),
-  );
+  const { username } = yield* askFromValidJsonEventRequest<ForgotPasswordPayload>(event, requireStringFields('username'));
 
   const deliveryDetails = yield* authLogic.askForgotPassword(username);
 
-  return qpqWebServerUtils.toJsonEventResponse(deliveryDetails);
+  return toJsonEventResponse(deliveryDetails);
 }
 
 export function* confirmForgotPassword(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { username, code, password } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<ConfirmForgotPasswordPayload>(
+  const { username, code, password } = yield* askFromValidJsonEventRequest<ConfirmForgotPasswordPayload>(
     event,
-    qpqWebServerUtils.requireStringFields('username', 'code', 'password'),
+    requireStringFields('username', 'code', 'password'),
   );
 
   const response = yield* authLogic.askConfirmForgotPassword(username, code, password);
 
-  return qpqWebServerUtils.toJsonEventResponse(response);
+  return toJsonEventResponse(response);
 }
 
 export function* changePassword(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { oldPassword, newPassword } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<ChangePasswordPayload>(
+  const { oldPassword, newPassword } = yield* askFromValidJsonEventRequest<ChangePasswordPayload>(
     event,
-    qpqWebServerUtils.requireStringFields('oldPassword', 'newPassword'),
+    requireStringFields('oldPassword', 'newPassword'),
   );
 
   // The route is authenticated, so the access token should always be present.
   // Guard anyway so a misconfigured route fails as a 401, not a directory error.
-  const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
+  const accessToken = getAccessTokenFromHeaders(event.headers);
   if (!accessToken) {
     return yield* askThrowError(ErrorTypeEnum.Unauthorized, 'Missing access token.');
   }
 
   yield* authLogic.askChangePassword(oldPassword, newPassword, accessToken);
 
-  return qpqWebServerUtils.toJsonEventResponse({ success: true });
+  return toJsonEventResponse({ success: true });
 }

@@ -11,7 +11,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { deleteFiles } from '../../../logic/s3/s3Utils';
+import { deleteFiles } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileDelete> => {

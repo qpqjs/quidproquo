@@ -8,7 +8,7 @@ import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
-vi.mock('../../../logic/s3/s3Utils', () => ({
+vi.mock('../../../logic/s3', () => ({
   deleteFiles: vi.fn(),
   writeTextFile: vi.fn(),
 }));

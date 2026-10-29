@@ -12,7 +12,7 @@ import {
 } from '@qpqjs/core';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
-import { writeBinaryFile } from '../../../logic/s3/s3Utils';
+import { writeBinaryFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteBinaryContents> => {
