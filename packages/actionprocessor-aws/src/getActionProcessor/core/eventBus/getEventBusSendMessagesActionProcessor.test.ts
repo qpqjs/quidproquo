@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { defineEventBus, ErrorTypeEnum, EventBusActionType } from '@qpqjs/core';
+import { askEventBusSendMessagesBase, defineEventBus, EventBusActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -27,7 +27,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { eventBusName: 'missing', eventBusMessages: [] }, { session: buildTestStorySession() });
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(askEventBusSendMessagesBase.errorType.TopicNotFound);
   });
 
   it('publishes each message to the resolved sns topic arn', async () => {

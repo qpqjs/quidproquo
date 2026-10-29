@@ -3,7 +3,6 @@ import {
   actionResultError,
   askQueueSendMessagesBase,
   createActionProcessor,
-  ErrorTypeEnum,
   generateUuid,
   ProcessorFor,
   QPQConfig,
@@ -20,7 +19,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
   return async ({ queueName, queueMessages }, session) => {
     const queueConfig = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
     if (!queueConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Queue ${queueName} not found`);
+      return actionResultError(askQueueSendMessagesBase.errorType.QueueNotFound, `Queue ${queueName} not found`);
     }
 
     for (const queueMessage of queueMessages) {

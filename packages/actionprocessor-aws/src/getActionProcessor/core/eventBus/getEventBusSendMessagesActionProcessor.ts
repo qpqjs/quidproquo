@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askEventBusSendMessagesBase,
   createActionProcessor,
-  ErrorTypeEnum,
   EventBusMessage,
   generateUuid,
   ProcessorFor,
@@ -30,7 +29,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
 
     if (!eventBusConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Event bus ${eventBusName} not found`);
+      return actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus ${eventBusName} not found`);
     }
 
     const topicArn = getEventBusSnsTopicArn(

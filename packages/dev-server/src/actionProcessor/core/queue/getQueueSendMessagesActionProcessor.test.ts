@@ -1,4 +1,11 @@
-import { defineQueue, ErrorTypeEnum, isErroredActionResult, QueueActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import {
+  askQueueSendMessagesBase,
+  defineQueue,
+  isErroredActionResult,
+  QueueActionType,
+  resolveActionResult,
+  resolveActionResultError,
+} from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,7 +33,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
     const result = await invokeProcessor(process, { queueName: 'missing', queueMessages: [] });
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askQueueSendMessagesBase.errorType.QueueNotFound);
     expect(eventBus.publish).not.toHaveBeenCalled();
   });
 

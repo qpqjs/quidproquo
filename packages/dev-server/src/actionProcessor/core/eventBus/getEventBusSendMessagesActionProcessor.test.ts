@@ -1,4 +1,11 @@
-import { defineEventBus, ErrorTypeEnum, EventBusActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import {
+  askEventBusSendMessagesBase,
+  defineEventBus,
+  EventBusActionType,
+  isErroredActionResult,
+  resolveActionResult,
+  resolveActionResultError,
+} from '@qpqjs/core';
 import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,7 +33,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
     const result = await invokeProcessor(process, { eventBusName: 'missing', eventBusMessages: [] });
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askEventBusSendMessagesBase.errorType.TopicNotFound);
     expect(eventBus.publish).not.toHaveBeenCalled();
   });
 
