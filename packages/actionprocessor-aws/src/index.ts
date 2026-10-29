@@ -13,4 +13,5 @@ export * from './logic/parametersManager/getParameters';
 
 // Log extension layer path + handler port. NOTE: never export the extension
 // entry (./lambdaExtensions/qpqLogExtension), it self-executes on import.
+export { resolveStorageDriveBucketName } from './getActionProcessor/core/file/utils/resolveStorageDriveBucketName';
 export * from './lambdaExtensions/getLogExtensionLayerPath';

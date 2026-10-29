@@ -10,6 +10,8 @@ import {
   UuidNamespace,
 } from '@qpqjs/core';
 
+import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
+
 /**
  * Dev server auth helpers.
  *
@@ -38,15 +40,13 @@ export type DevUserDirectory = {
   directoryName: string;
 };
 
-// Mirrors the AWS runtime's user pool resolution (getCFExportNameUserPoolIdFromConfig):
-// the owner module redirects to the owning service, resourceNameOverride renames the directory.
+// Owner handling is resolveOwnedStoreLocation's, as for the AWS user pool lookup.
 export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QPQConfig): DevUserDirectory => {
   const userDirectoryConfig = qpqCoreUtils.resolveUserDirectoryOrThrow(userDirectoryName, qpqConfig);
 
-  return {
-    serviceName: qpqCoreUtils.resolveOwnerModuleName(userDirectoryConfig.owner, qpqConfig),
-    directoryName: qpqCoreUtils.resolveOwnedResourceLocalName(userDirectoryName, userDirectoryConfig.owner),
-  };
+  const { serviceName, key } = resolveOwnedStoreLocation(userDirectoryName, userDirectoryConfig.owner, qpqConfig);
+
+  return { serviceName, directoryName: key };
 };
 
 // Fixed namespace so userIds stay stable across dev server restarts.

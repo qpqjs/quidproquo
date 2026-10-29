@@ -1,3 +1,4 @@
+import { resolveStorageDriveBucketName } from '@qpqjs/actionprocessor-aws';
 // AWS implementation of `qpq clear-resources`: empty (never delete) the
 // selected data resources. Storage drives are S3 buckets - emptied including
 // every object version and delete marker, so versioned buckets come out clean
@@ -24,12 +25,6 @@ import { DeleteObjectsCommand, ListObjectVersionsCommand, NoSuchBucket, ObjectId
 import { ClearableResource, ClearResourcesPlan } from '../../lib/clearResourcesPlan';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { isAwsCredentialsValid } from './awsCredentials';
-
-const resolveBucketName = (drive: string, qpqConfig: QPQConfig): string => {
-  const storageDriveConfig = qpqCoreUtils.resolveStorageDriveOrThrow(drive, qpqConfig);
-
-  return awsNamingUtils.resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
-};
 
 // Log a progress heartbeat roughly every this-many removals, so a large
 // resource visibly ticks along instead of looking hung.
@@ -131,7 +126,7 @@ const clearResource = async (appName: string, resource: ClearableResource): Prom
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
   if (resource.kind === 'storageDrive') {
-    const bucketName = resolveBucketName(resource.resourceName, qpqConfig);
+    const bucketName = resolveStorageDriveBucketName(resource.resourceName, qpqConfig);
     console.log(`  emptying s3://${bucketName} ...`);
     try {
       const removed = await emptyBucket(bucketName, region);

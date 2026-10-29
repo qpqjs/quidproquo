@@ -1,6 +1,7 @@
 import { generateUuid, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { resolveOwnedStoreLocation } from './resolveOwnedStoreLocation';
 
 // Offline stand-in for SSM Parameter Store / Secrets Manager. Values live in
 // hand-editable JSON files under the dev server runtime path, one file per
@@ -19,25 +20,18 @@ type ConfigStorageLocation = {
   key: string;
 };
 
-// Mirrors the AWS runtime's resolveParameterKey / resolveSecretResourceName:
-// a cross-module owner redirects storage to the owning service's file, and
-// resourceNameOverride renames the key within it.
+// Owner handling is resolveOwnedStoreLocation's: a cross-module owner redirects to the owning
+// service's file and its override renames the key within it, as the AWS runtime does.
 const resolveParameterStorageLocation = (parameterName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
   const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
-  return {
-    serviceName: qpqCoreUtils.resolveOwnerModuleName(parameterConfig.owner, qpqConfig),
-    key: qpqCoreUtils.resolveOwnedResourceLocalName(parameterName, parameterConfig.owner),
-  };
+  return resolveOwnedStoreLocation(parameterName, parameterConfig.owner, qpqConfig);
 };
 
 const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
   const secretConfig = qpqCoreUtils.resolveSecretOrThrow(secretName, qpqConfig);
 
-  return {
-    serviceName: qpqCoreUtils.resolveOwnerModuleName(secretConfig.owner, qpqConfig),
-    key: qpqCoreUtils.resolveOwnedResourceLocalName(secretName, secretConfig.owner),
-  };
+  return resolveOwnedStoreLocation(secretName, secretConfig.owner, qpqConfig);
 };
 
 export const readConfigStoreFile = async (
