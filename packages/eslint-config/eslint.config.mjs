@@ -12,7 +12,8 @@ import { testingConfigs } from './config/testing.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
 export default [
-  { ignores: ['**/dist/**', '**/lib/esm/**', '**/lib/commonjs/**', '**/node_modules/**', '**/*.d.ts'] },
+  // lib/ is always build output (esm, commonjs and the bundled lambda layers).
+  { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,
