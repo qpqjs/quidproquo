@@ -19,9 +19,7 @@ export function InstallChip() {
     <button className="install-chip" onClick={copyInstall} type="button">
       <span className="install-chip__prompt">$</span>
       <span className="install-chip__cmd">{INSTALL_COMMAND}</span>
-      <span className={`install-chip__copy${copied ? ' is-copied' : ''}`}>
-        {copied ? 'copied' : 'copy'}
-      </span>
+      <span className={`install-chip__copy${copied ? ' is-copied' : ''}`}>{copied ? 'copied' : 'copy'}</span>
     </button>
   );
 }

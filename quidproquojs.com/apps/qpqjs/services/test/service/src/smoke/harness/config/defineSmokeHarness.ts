@@ -1,25 +1,11 @@
 import { SMOKE_PROBE_DRIVE, SMOKE_PROBE_STORE } from '@qpqjs/constants';
-import {
-  SmokeProbeRecord,
-  SmokeRunStartedSchema,
-  SmokeRunWithSummarySchema,
-} from '@qpqjs/test-models';
-import {
-  defineKeyValueStore,
-  defineQueue,
-  defineRoute,
-  defineStorageDrive,
-  QPQConfig,
-  QpqFunctionRuntime,
-} from 'quidproquo';
+import { SmokeProbeRecord, SmokeRunStartedSchema, SmokeRunWithSummarySchema } from '@qpqjs/test-models';
+import { defineKeyValueStore, defineQueue, defineRoute, defineStorageDrive, QPQConfig, QpqFunctionRuntime } from 'quidproquo';
 
 import { z } from 'zod';
 
 import { SMOKE_RUNS_STORE } from '../constants/SMOKE_RUNS_STORE';
-import {
-  SMOKE_RUN_QUEUE,
-  SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
-} from '../constants/smokeRunQueue';
+import { SMOKE_RUN_QUEUE, SMOKE_TEST_REQUESTED_MESSAGE_TYPE } from '../constants/smokeRunQueue';
 
 /**
  * The part of the smoke feature every suite relies on: the run store, the
@@ -84,12 +70,11 @@ export const defineSmokeHarness = (): QPQConfig => {
       {
         schema: {
           summary: 'Start a smoke run',
-          description:
-            'Queues every registered smoke test and returns the run id to poll. Requires a GitHub Actions OIDC token for this repo.',
+          description: 'Queues every registered smoke test and returns the run id to poll. Requires a GitHub Actions OIDC token for this repo.',
           tags: ['smoke'],
           responseJsonSchema: z.toJSONSchema(SmokeRunStartedSchema),
         },
-      }
+      },
     ),
 
     defineRoute(
@@ -104,12 +89,11 @@ export const defineSmokeHarness = (): QPQConfig => {
       {
         schema: {
           summary: 'Get a smoke run',
-          description:
-            'The stored run plus pass/fail counts. Poll until status leaves running.',
+          description: 'The stored run plus pass/fail counts. Poll until status leaves running.',
           tags: ['smoke'],
           responseJsonSchema: z.toJSONSchema(SmokeRunWithSummarySchema),
         },
-      }
+      },
     ),
   ];
 };

@@ -1,8 +1,4 @@
-import {
-  askEventDocCreate,
-  askEventDocProvideStore,
-  askEventDocSoftDelete,
-} from '@qpqjs/features';
+import { askEventDocCreate, askEventDocProvideStore, askEventDocSoftDelete } from '@qpqjs/features';
 import { askQueueSendMessages, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
@@ -30,11 +26,7 @@ const WRITERS = SMOKE_PROBE_DOC_WINDOW;
 // per writer, ids 0..N with no hole and no duplicate, and the document folded through
 // the registered definition holds exactly the numbers 1..N.
 function* askRunInStore(runId: string): AskResponse<void> {
-  const doc = yield* askEventDocCreate(
-    `smoke-${runId}`,
-    `smoke-${runId}`,
-    SMOKE_EVENT_DOC_ACTOR
-  );
+  const doc = yield* askEventDocCreate(`smoke-${runId}`, `smoke-${runId}`, SMOKE_EVENT_DOC_ACTOR);
 
   const numbers = Array.from({ length: WRITERS }, (_, index) => index + 1);
 
@@ -54,29 +46,18 @@ function* askRunInStore(runId: string): AskResponse<void> {
 
   yield* askAssertContiguousEventIds(events);
 
-  const marks = events
-    .filter((event) => event.type === SMOKE_EVENT_DOC_MARK_EVENT)
-    .map((event) => event.payload.data as SmokeEventDocMark);
+  const marks = events.filter((event) => event.type === SMOKE_EVENT_DOC_MARK_EVENT).map((event) => event.payload.data as SmokeEventDocMark);
 
   yield* askSmokeAssert(
     marks.every((mark) => mark.runId === runId),
-    "a mark from another run is on this run's document"
+    "a mark from another run is on this run's document",
   );
 
   yield* askAssertSmokeProbeDocState(doc.id, numbers);
 
-  yield* askEventDocSoftDelete(
-    doc.id,
-    SMOKE_EVENT_DOC_ACTOR.userId,
-    SMOKE_EVENT_DOC_SCHEMA_VERSION
-  );
+  yield* askEventDocSoftDelete(doc.id, SMOKE_EVENT_DOC_ACTOR.userId, SMOKE_EVENT_DOC_SCHEMA_VERSION);
 }
 
-export function* askRunEventDocConcurrentAppendTest(
-  runId: string
-): AskResponse<void> {
-  yield* askEventDocProvideStore(
-    SMOKE_EVENT_DOC_STORE_OPTIONS,
-    askRunInStore(runId)
-  );
+export function* askRunEventDocConcurrentAppendTest(runId: string): AskResponse<void> {
+  yield* askEventDocProvideStore(SMOKE_EVENT_DOC_STORE_OPTIONS, askRunInStore(runId));
 }

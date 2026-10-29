@@ -9,10 +9,5 @@ import { SMOKE_SCOPED_PROBE_STORE } from '../constants/SMOKE_SCOPED_PROBE_STORE'
  * between two scopes, including through the category index.
  */
 export const defineScopedKeyValueStoreSmoke = (): QPQConfig => [
-  defineKeyValueStore<SmokeProbeRecord>(
-    SMOKE_SCOPED_PROBE_STORE,
-    'probeId',
-    [],
-    { indexes: ['category'], scoped: true }
-  ),
+  defineKeyValueStore<SmokeProbeRecord>(SMOKE_SCOPED_PROBE_STORE, 'probeId', [], { indexes: ['category'], scoped: true }),
 ];

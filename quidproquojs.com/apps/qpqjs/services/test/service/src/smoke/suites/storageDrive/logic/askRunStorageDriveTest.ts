@@ -27,16 +27,10 @@ export function* askRunStorageDriveTest(): AskResponse<void> {
   yield* askSmokeAssert(exists, 'file does not exist after write');
 
   const readBack = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, filepath);
-  yield* askSmokeAssert(
-    readBack === contents,
-    'file contents did not read back as written'
-  );
+  yield* askSmokeAssert(readBack === contents, 'file contents did not read back as written');
 
   const listing = yield* askFileListDirectory(SMOKE_PROBE_DRIVE, folder);
-  yield* askSmokeAssert(
-    listing.fileInfos.length > 0,
-    'directory listing is empty after write'
-  );
+  yield* askSmokeAssert(listing.fileInfos.length > 0, 'directory listing is empty after write');
 
   yield* askFileDelete(SMOKE_PROBE_DRIVE, [filepath]);
 

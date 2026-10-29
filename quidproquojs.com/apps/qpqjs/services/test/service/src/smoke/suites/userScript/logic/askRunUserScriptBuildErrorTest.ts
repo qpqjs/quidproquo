@@ -1,10 +1,5 @@
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import {
-  askCatch,
-  askNewGuid,
-  AskResponse,
-  askUserScriptBuild,
-} from 'quidproquo';
+import { askCatch, askNewGuid, AskResponse, askUserScriptBuild } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -15,17 +10,10 @@ export function* askRunUserScriptBuildErrorTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
   const directory = `smoke/userScript/missing-${scriptId}`;
 
-  const result = yield* askCatch(
-    askUserScriptBuild(
-      SMOKE_PROBE_DRIVE,
-      `${directory}/source`,
-      `${directory}/built.js`
-    )
-  );
+  const result = yield* askCatch(askUserScriptBuild(SMOKE_PROBE_DRIVE, `${directory}/source`, `${directory}/built.js`));
 
   yield* askSmokeAssert(
-    !result.success &&
-      result.error.errorType === askUserScriptBuild.errorType.SourceNotFound,
-    'building a missing source directory was not refused with SourceNotFound'
+    !result.success && result.error.errorType === askUserScriptBuild.errorType.SourceNotFound,
+    'building a missing source directory was not refused with SourceNotFound',
   );
 }

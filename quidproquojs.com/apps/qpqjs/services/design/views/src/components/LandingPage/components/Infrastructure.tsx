@@ -83,9 +83,8 @@ export function Infrastructure() {
         <p className="section__kicker">deploys</p>
         <h2 className="section__title">The config is the infrastructure</h2>
         <p className="section__sub">
-          You describe what the service has, not how to build it. The CDK
-          package turns that same config into real AWS resources. This is the
-          config that deployed the page you are reading.
+          You describe what the service has, not how to build it. The CDK package turns that same config into real AWS resources. This is the config
+          that deployed the page you are reading.
         </p>
       </div>
 

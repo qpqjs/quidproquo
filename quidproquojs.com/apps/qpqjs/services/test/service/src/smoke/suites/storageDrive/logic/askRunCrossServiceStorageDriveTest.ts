@@ -1,19 +1,6 @@
-import {
-  QpqjsServiceEnum,
-  SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME,
-  SMOKE_PROBE_DRIVE,
-} from '@qpqjs/constants';
-import {
-  CrossServiceProbePayload,
-  CrossServiceStorageDriveProbeResult,
-} from '@qpqjs/testa-models';
-import {
-  askFileDelete,
-  askFileReadTextContents,
-  askNewGuid,
-  AskResponse,
-  askServiceFunctionExecute,
-} from 'quidproquo';
+import { QpqjsServiceEnum, SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME, SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
+import { CrossServiceProbePayload, CrossServiceStorageDriveProbeResult } from '@qpqjs/testa-models';
+import { askFileDelete, askFileReadTextContents, askNewGuid, AskResponse, askServiceFunctionExecute } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -23,23 +10,14 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 export function* askRunCrossServiceStorageDriveTest(): AskResponse<void> {
   const probeId = yield* askNewGuid();
 
-  const result = yield* askServiceFunctionExecute<
-    CrossServiceStorageDriveProbeResult,
-    CrossServiceProbePayload
-  >(
+  const result = yield* askServiceFunctionExecute<CrossServiceStorageDriveProbeResult, CrossServiceProbePayload>(
     QpqjsServiceEnum.TestA,
     SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME,
-    { probeId }
+    { probeId },
   );
 
-  const fileContents = yield* askFileReadTextContents(
-    SMOKE_PROBE_DRIVE,
-    result.filepath
-  );
-  yield* askSmokeAssert(
-    fileContents === result.fileContents,
-    'file written by testa did not read back from our own drive'
-  );
+  const fileContents = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, result.filepath);
+  yield* askSmokeAssert(fileContents === result.fileContents, 'file written by testa did not read back from our own drive');
 
   yield* askFileDelete(SMOKE_PROBE_DRIVE, [result.filepath]);
 }

@@ -10,20 +10,15 @@ import { SMOKE_STREAM_PROBE_STORE } from '../constants/SMOKE_STREAM_PROBE_STORE'
  * not reach the handler.
  */
 export const defineKeyValueStoreStreamSmoke = (): QPQConfig => [
-  defineKeyValueStore<SmokeProbeRecord>(
-    SMOKE_STREAM_PROBE_STORE,
-    'probeId',
-    [],
-    {
-      indexes: ['category'],
-      scoped: true,
-      onStream: {
-        runtime: {
-          basePath: __dirname,
-          relativePath: '../entry/kvsStream/onSmokeStreamRecord',
-          functionName: 'onSmokeStreamRecord',
-        },
+  defineKeyValueStore<SmokeProbeRecord>(SMOKE_STREAM_PROBE_STORE, 'probeId', [], {
+    indexes: ['category'],
+    scoped: true,
+    onStream: {
+      runtime: {
+        basePath: __dirname,
+        relativePath: '../entry/kvsStream/onSmokeStreamRecord',
+        functionName: 'onSmokeStreamRecord',
       },
-    }
-  ),
+    },
+  }),
 ];

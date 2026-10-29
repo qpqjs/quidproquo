@@ -1,15 +1,10 @@
-import {
-  askNetworkRequest,
-  askOpenApiGetDocument,
-  AskResponse,
-} from 'quidproquo';
+import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
 type WhoAmIBody = { userId?: string; error?: string };
 
-const base64Url = (value: object): string =>
-  Buffer.from(JSON.stringify(value)).toString('base64url');
+const base64Url = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
 
 // Checklist item: the http story session. An unsigned bearer with no exp claim
 // decodes to exp 0, which is "expired" by every clock. A story that reads the
@@ -26,19 +21,12 @@ export function* askRunUnverifiedBearerNoExpiryTest(): AskResponse<void> {
     token_use: 'access',
   })}.forged`;
 
-  const response = yield* askNetworkRequest<WhoAmIBody, undefined>(
-    'GET',
-    `${baseUrl}/v1/security/who-am-i-lax`,
-    {
-      headers: { Authorization: `Bearer ${forged}` },
-    }
-  );
-  yield* askSmokeAssert(
-    response.status === 200,
-    `who-am-i-lax returned [${response.status}], expected 200`
-  );
+  const response = yield* askNetworkRequest<WhoAmIBody, undefined>('GET', `${baseUrl}/v1/security/who-am-i-lax`, {
+    headers: { Authorization: `Bearer ${forged}` },
+  });
+  yield* askSmokeAssert(response.status === 200, `who-am-i-lax returned [${response.status}], expected 200`);
   yield* askSmokeAssert(
     response.data.userId !== 'victim-user-id',
-    `a forged bearer token without an exp claim was handed to the story as the identity [${JSON.stringify(response.data)}]`
+    `a forged bearer token without an exp claim was handed to the story as the identity [${JSON.stringify(response.data)}]`,
   );
 }

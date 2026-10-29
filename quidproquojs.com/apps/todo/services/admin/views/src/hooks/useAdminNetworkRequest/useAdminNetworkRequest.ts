@@ -3,9 +3,7 @@ import { useAuthenticatedNetworkRequest } from '@qpqjs/web-react';
 import { getBaseUrlFromAdminWebHost } from './logic/getBaseUrlFromAdminWebHost';
 import { AdminNetworkRequestPayload } from './types/AdminNetworkRequestPayload';
 
-export function useAdminNetworkRequest<R>(
-  payload: AdminNetworkRequestPayload
-): ReturnType<typeof useAuthenticatedNetworkRequest<R>> {
+export function useAdminNetworkRequest<R>(payload: AdminNetworkRequestPayload): ReturnType<typeof useAuthenticatedNetworkRequest<R>> {
   return useAuthenticatedNetworkRequest<R>({
     ...payload,
     responseType: 'json',

@@ -5,7 +5,5 @@ import { askRunScopedKeyValueStoreTest } from './logic/askRunScopedKeyValueStore
 /** A scoped store's gate and partition isolation. */
 export const scopedKeyValueStoreSmokeSuite: SmokeSuite = {
   defineConfig: defineScopedKeyValueStoreSmoke,
-  tests: [
-    { name: 'scopedKeyValueStore', askRun: askRunScopedKeyValueStoreTest },
-  ],
+  tests: [{ name: 'scopedKeyValueStore', askRun: askRunScopedKeyValueStoreTest }],
 };

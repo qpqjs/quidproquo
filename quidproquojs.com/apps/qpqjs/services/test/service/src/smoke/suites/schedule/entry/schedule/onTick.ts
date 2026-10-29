@@ -1,11 +1,4 @@
-import {
-  askKeyValueStoreGet,
-  askKeyValueStoreUpsert,
-  askLogCreate,
-  AskResponse,
-  LogLevelEnum,
-  ScheduledEventParams,
-} from 'quidproquo';
+import { askKeyValueStoreGet, askKeyValueStoreUpsert, askLogCreate, AskResponse, LogLevelEnum, ScheduledEventParams } from 'quidproquo';
 
 import { SCHEDULE_TICK_NAME } from '../../constants/scheduleTickName';
 import { SCHEDULE_TICK_STORE } from '../../constants/scheduleTickStore';
@@ -24,15 +17,9 @@ import { ScheduleTickRecord } from '../../models/ScheduleTickRecord';
  * between the two runtimes is the thing worth proving.
  */
 export function* onTick(event: ScheduledEventParams): AskResponse<void> {
-  yield* askLogCreate(
-    LogLevelEnum.Info,
-    `tick ${event.time} (correlation ${event.correlation})`
-  );
+  yield* askLogCreate(LogLevelEnum.Info, `tick ${event.time} (correlation ${event.correlation})`);
 
-  const pending = yield* askKeyValueStoreGet<ScheduleTickRecord>(
-    SCHEDULE_TICK_STORE,
-    SCHEDULE_TICK_NAME
-  );
+  const pending = yield* askKeyValueStoreGet<ScheduleTickRecord>(SCHEDULE_TICK_STORE, SCHEDULE_TICK_NAME);
 
   if (!pending || pending.processedAt) {
     return;

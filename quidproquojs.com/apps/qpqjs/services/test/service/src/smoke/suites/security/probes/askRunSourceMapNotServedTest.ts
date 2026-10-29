@@ -1,8 +1,4 @@
-import {
-  askNetworkRequest,
-  askOpenApiGetDocument,
-  AskResponse,
-} from 'quidproquo';
+import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -13,8 +9,7 @@ const toWebsiteUrl = (apiBaseUrl: string): string => {
   return `https://${api.hostname.replace(/^api\./, '')}`;
 };
 
-const looksLikeSourceMap = (body: string): boolean =>
-  body.trimStart().startsWith('{') && body.includes('"mappings"');
+const looksLikeSourceMap = (body: string): boolean => body.trimStart().startsWith('{') && body.includes('"mappings"');
 
 // Checklist item: bundle options. A production frontend build must not ship its
 // source maps: a map next to the script hands anyone the whole views source tree,
@@ -27,15 +22,8 @@ export function* askRunSourceMapNotServedTest(): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
   const websiteUrl = toWebsiteUrl(baseUrl);
 
-  const index = yield* askNetworkRequest<string, undefined>(
-    'GET',
-    `${websiteUrl}/`,
-    { responseType: 'text' }
-  );
-  yield* askSmokeAssert(
-    index.status === 200,
-    `website index returned [${index.status}] from ${websiteUrl}`
-  );
+  const index = yield* askNetworkRequest<string, undefined>('GET', `${websiteUrl}/`, { responseType: 'text' });
+  yield* askSmokeAssert(index.status === 200, `website index returned [${index.status}] from ${websiteUrl}`);
   const scriptSrc = /<script[^>]*src="([^"]+\.js)"/.exec(index.data)?.[1];
   yield* askSmokeAssert(!!scriptSrc, 'website index names no script to check');
   const scriptUrl = new URL(scriptSrc!, `${websiteUrl}/`).toString();
@@ -43,22 +31,9 @@ export function* askRunSourceMapNotServedTest(): AskResponse<void> {
   const script = yield* askNetworkRequest<string, undefined>('GET', scriptUrl, {
     responseType: 'text',
   });
-  yield* askSmokeAssert(
-    script.status === 200,
-    `script returned [${script.status}] from ${scriptUrl}`
-  );
-  yield* askSmokeAssert(
-    !script.data.includes('sourceMappingURL='),
-    `production script links a source map: ${scriptUrl}`
-  );
+  yield* askSmokeAssert(script.status === 200, `script returned [${script.status}] from ${scriptUrl}`);
+  yield* askSmokeAssert(!script.data.includes('sourceMappingURL='), `production script links a source map: ${scriptUrl}`);
 
-  const map = yield* askNetworkRequest<string, undefined>(
-    'GET',
-    `${scriptUrl}.map`,
-    { responseType: 'text' }
-  );
-  yield* askSmokeAssert(
-    !(map.status === 200 && looksLikeSourceMap(map.data)),
-    `the website serves a source map at ${scriptUrl}.map`
-  );
+  const map = yield* askNetworkRequest<string, undefined>('GET', `${scriptUrl}.map`, { responseType: 'text' });
+  yield* askSmokeAssert(!(map.status === 200 && looksLikeSourceMap(map.data)), `the website serves a source map at ${scriptUrl}.map`);
 }

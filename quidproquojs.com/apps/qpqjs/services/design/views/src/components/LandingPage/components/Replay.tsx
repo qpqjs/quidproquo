@@ -51,8 +51,7 @@ const LINES: TraceLine[] = [
     code: (
       <>
         {'  '}
-        {kw('const')} plan = {kw('yield')}* {fn('askKeyValueStoreGet')}(
-        {str("'plans'")}, {str("'free'")});
+        {kw('const')} plan = {kw('yield')}* {fn('askKeyValueStoreGet')}({str("'plans'")}, {str("'free'")});
       </>
     ),
     note: "plan = { tier: 'free', seats: 1 }",
@@ -62,8 +61,7 @@ const LINES: TraceLine[] = [
     code: (
       <>
         {'  '}
-        {kw('const')} region = {kw('yield')}* {fn('askConfigGetParameter')}(
-        {str("'region'")});
+        {kw('const')} region = {kw('yield')}* {fn('askConfigGetParameter')}({str("'region'")});
       </>
     ),
     note: "region = 'ap-southeast-2'",
@@ -91,8 +89,7 @@ const LINES: TraceLine[] = [
     code: (
       <>
         {'  '}
-        {kw('yield')}* {fn('askQueueSendMessages')}({str("'welcome'")}, {'{'}{' '}
-        userId {'}'});
+        {kw('yield')}* {fn('askQueueSendMessages')}({str("'welcome'")}, {'{'} userId {'}'});
       </>
     ),
     effect: "1 message sent to 'welcome'",
@@ -140,7 +137,7 @@ export function Replay() {
           setStepCount(next);
           scheduleNext(next);
         },
-        done ? HOLD_MS : STEP_MS
+        done ? HOLD_MS : STEP_MS,
       );
     };
 
@@ -157,10 +154,8 @@ export function Replay() {
         <p className="section__kicker">replay</p>
         <h2 className="section__title">Every run is a recording</h2>
         <p className="section__sub">
-          A story only becomes impure by yielding an action, so the log of those
-          actions is enough to run it again exactly. qpq replays a production
-          log under the node inspector and hands you back the source, line by
-          line, with the variables.
+          A story only becomes impure by yielding an action, so the log of those actions is enough to run it again exactly. qpq replays a production
+          log under the node inspector and hands you back the source, line by line, with the variables.
         </p>
       </div>
 
@@ -176,29 +171,15 @@ export function Replay() {
         <pre className="replay__code">
           <code>
             {LINES.map((line, index) => {
-              const revealed =
-                line.revealAfter !== undefined && stepCount > line.revealAfter;
+              const revealed = line.revealAfter !== undefined && stepCount > line.revealAfter;
               const active = index === currentLine && !finished;
 
               return (
-                <span
-                  key={index}
-                  className={`replay-line${active ? ' is-active' : ''}`}
-                >
+                <span key={index} className={`replay-line${active ? ' is-active' : ''}`}>
                   <span className="replay-line__text">{line.code}</span>
-                  {revealed && line.note && (
-                    <span className="replay-line__note">{`// ${line.note}`}</span>
-                  )}
-                  {revealed && line.effect && (
-                    <span className="replay-line__note replay-line__note--effect">
-                      {`// ✓ ${line.effect}`}
-                    </span>
-                  )}
-                  {revealed && line.returns && (
-                    <span className="replay-line__note replay-line__note--return">
-                      {`→ ${line.returns}`}
-                    </span>
-                  )}
+                  {revealed && line.note && <span className="replay-line__note">{`// ${line.note}`}</span>}
+                  {revealed && line.effect && <span className="replay-line__note replay-line__note--effect">{`// ✓ ${line.effect}`}</span>}
+                  {revealed && line.returns && <span className="replay-line__note replay-line__note--return">{`→ ${line.returns}`}</span>}
                 </span>
               );
             })}
@@ -211,9 +192,7 @@ export function Replay() {
           </span>
           <span className="replay__stat">310ms replay</span>
           <span className="replay__stat">source-mapped to TS</span>
-          <span className="replay__foot-note">
-            no breakpoints, no reproduction, no guessing
-          </span>
+          <span className="replay__foot-note">no breakpoints, no reproduction, no guessing</span>
         </div>
       </div>
     </section>

@@ -1,32 +1,13 @@
-import {
-  SmokeRun,
-  SmokeRunStatus,
-  SmokeTestResult,
-  SmokeTestStatus,
-} from '@qpqjs/test-models';
-import {
-  askDateNow,
-  askNewGuid,
-  askPlatformGetName,
-  askQueueSendMessages,
-  AskResponse,
-  QueueMessage,
-} from 'quidproquo';
+import { SmokeRun, SmokeRunStatus, SmokeTestResult, SmokeTestStatus } from '@qpqjs/test-models';
+import { askDateNow, askNewGuid, askPlatformGetName, askQueueSendMessages, AskResponse, QueueMessage } from 'quidproquo';
 
-import {
-  SMOKE_RUN_QUEUE,
-  SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
-} from '../../constants/smokeRunQueue';
+import { SMOKE_RUN_QUEUE, SMOKE_TEST_REQUESTED_MESSAGE_TYPE } from '../../constants/smokeRunQueue';
 import { askSaveSmokeRun } from '../../data/askSaveSmokeRun';
 import { SmokeTestRequestedPayload } from '../../models/SmokeTestRequestedQueueEvent';
 import { SmokeTestDefinition } from '../../types/SmokeTestDefinition';
 import { listSmokeTests } from './listSmokeTests';
 
-const createInitialResult = (
-  test: SmokeTestDefinition,
-  index: number,
-  skip: boolean
-): SmokeTestResult => ({
+const createInitialResult = (test: SmokeTestDefinition, index: number, skip: boolean): SmokeTestResult => ({
   id: index + 1,
   name: test.name,
   status: skip ? SmokeTestStatus.skipped : SmokeTestStatus.pending,
@@ -35,10 +16,7 @@ const createInitialResult = (
   finishedAt: null,
 });
 
-const createTestRequestedMessage = (
-  runId: string,
-  test: SmokeTestDefinition
-): QueueMessage<SmokeTestRequestedPayload> => ({
+const createTestRequestedMessage = (runId: string, test: SmokeTestDefinition): QueueMessage<SmokeTestRequestedPayload> => ({
   type: SMOKE_TEST_REQUESTED_MESSAGE_TYPE,
   payload: { runId, testName: test.name },
 });
@@ -53,28 +31,22 @@ export function* askStartSmokeRun(): AskResponse<SmokeRun> {
   const startedAt = yield* askDateNow();
   const platformName = yield* askPlatformGetName();
 
-  const shouldSkip = (test: SmokeTestDefinition): boolean =>
-    !!test.deployedOnly && platformName === 'devServer';
+  const shouldSkip = (test: SmokeTestDefinition): boolean => !!test.deployedOnly && platformName === 'devServer';
 
   const smokeTests = listSmokeTests();
   const queued = smokeTests.filter((test) => !shouldSkip(test));
 
   const smokeRun: SmokeRun = {
     runId,
-    status:
-      queued.length === 0 ? SmokeRunStatus.passed : SmokeRunStatus.running,
+    status: queued.length === 0 ? SmokeRunStatus.passed : SmokeRunStatus.running,
     startedAt,
     finishedAt: queued.length === 0 ? startedAt : null,
-    tests: smokeTests.map((test, index) =>
-      createInitialResult(test, index, shouldSkip(test))
-    ),
+    tests: smokeTests.map((test, index) => createInitialResult(test, index, shouldSkip(test))),
   };
 
   yield* askSaveSmokeRun(smokeRun);
 
-  const messages = queued.map((test) =>
-    createTestRequestedMessage(runId, test)
-  );
+  const messages = queued.map((test) => createTestRequestedMessage(runId, test));
 
   if (messages.length > 0) {
     yield* askQueueSendMessages(SMOKE_RUN_QUEUE, ...messages);

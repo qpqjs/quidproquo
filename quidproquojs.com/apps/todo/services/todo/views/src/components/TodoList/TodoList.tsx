@@ -82,20 +82,13 @@ export const TodoList = () => {
   };
 
   const onToggle = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, done: !todo.done } : todo
-      )
-    );
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo)));
   };
 
   return (
     <div style={containerStyle}>
       <h1 style={{ fontSize: '2.5rem', margin: 0 }}>todo</h1>
-      <p style={{ fontSize: '1.1rem', color: '#51616f' }}>
-        An example quidproquo app — this view is the todo service&apos;s
-        microfrontend.
-      </p>
+      <p style={{ fontSize: '1.1rem', color: '#51616f' }}>An example quidproquo app — this view is the todo service&apos;s microfrontend.</p>
       <div style={formStyle}>
         <input
           onChange={(event) => setText(event.target.value)}
@@ -111,11 +104,7 @@ export const TodoList = () => {
       <ul style={listStyle}>
         {todos.map((todo) => (
           <li key={todo.id} style={itemStyle}>
-            <input
-              checked={todo.done}
-              onChange={() => onToggle(todo.id)}
-              type="checkbox"
-            />
+            <input checked={todo.done} onChange={() => onToggle(todo.id)} type="checkbox" />
             <span
               style={{
                 textDecoration: todo.done ? 'line-through' : 'none',

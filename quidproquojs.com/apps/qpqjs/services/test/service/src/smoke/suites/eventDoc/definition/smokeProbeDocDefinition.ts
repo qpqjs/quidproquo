@@ -9,11 +9,7 @@ import {
 } from '@qpqjs/features';
 import { AskResponse, Effect, QpqReducer } from 'quidproquo';
 
-import {
-  SMOKE_EVENT_DOC_MARK_EVENT,
-  SMOKE_EVENT_DOC_STORE,
-  SMOKE_EVENT_DOC_TYPE,
-} from '../constants/smokeEventDoc';
+import { SMOKE_EVENT_DOC_MARK_EVENT, SMOKE_EVENT_DOC_STORE, SMOKE_EVENT_DOC_TYPE } from '../constants/smokeEventDoc';
 import { SmokeEventDocMark } from '../models/SmokeEventDocMark';
 
 // How many numbers the document keeps: a rolling window, so the fold is a real
@@ -34,20 +30,12 @@ const createInitialSmokeProbeDocState = (): SmokeProbeDocState => ({
   numbers: [],
 });
 
-type SmokeProbeDocEffects = Effect<
-  typeof SMOKE_EVENT_DOC_MARK_EVENT,
-  EventDocEventPayload<SmokeEventDocMark>
->;
+type SmokeProbeDocEffects = Effect<typeof SMOKE_EVENT_DOC_MARK_EVENT, EventDocEventPayload<SmokeEventDocMark>>;
 
-const smokeProbeDocFoldReducer = buildEventDocFoldReducer<
-  SmokeProbeDocState,
-  SmokeProbeDocEffects
->(createInitialSmokeProbeDocState, {
+const smokeProbeDocFoldReducer = buildEventDocFoldReducer<SmokeProbeDocState, SmokeProbeDocEffects>(createInitialSmokeProbeDocState, {
   [SMOKE_EVENT_DOC_MARK_EVENT]: (state, payload) => ({
     ...state,
-    numbers: [...state.numbers, payload.data.value].slice(
-      -SMOKE_PROBE_DOC_WINDOW
-    ),
+    numbers: [...state.numbers, payload.data.value].slice(-SMOKE_PROBE_DOC_WINDOW),
   }),
 }) as QpqReducer<SmokeProbeDocState, EventDocEvent>;
 

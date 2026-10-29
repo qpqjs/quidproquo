@@ -7,6 +7,4 @@ export enum TodoServiceEnum {
 }
 
 export type TodoServiceEnumValues = `${TodoServiceEnum}`;
-export const todoServiceNames: TodoServiceEnum[] = Object.values(
-  TodoServiceEnum
-) as TodoServiceEnum[];
+export const todoServiceNames: TodoServiceEnum[] = Object.values(TodoServiceEnum) as TodoServiceEnum[];

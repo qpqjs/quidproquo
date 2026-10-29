@@ -9,5 +9,4 @@ import * as controllers from '../controller';
  * handler; this registers the controller module by its path under the
  * service's src root, so the literal must follow this folder if it moves.
  */
-export const defineOpenApiSmoke = (): QPQConfig =>
-  defineDynamicRoutes(controllers, '/smoke/suites/openApi/controller');
+export const defineOpenApiSmoke = (): QPQConfig => defineDynamicRoutes(controllers, '/smoke/suites/openApi/controller');

@@ -7,6 +7,4 @@ import { SMOKE_SCOPED_PROBE_DRIVE } from '../constants/SMOKE_SCOPED_PROBE_DRIVE'
  * call, the harness's unscoped probe drive refuses a scope) and partition
  * isolation between two scopes.
  */
-export const defineScopedStorageDriveSmoke = (): QPQConfig => [
-  defineStorageDrive(SMOKE_SCOPED_PROBE_DRIVE, { scoped: true }),
-];
+export const defineScopedStorageDriveSmoke = (): QPQConfig => [defineStorageDrive(SMOKE_SCOPED_PROBE_DRIVE, { scoped: true })];

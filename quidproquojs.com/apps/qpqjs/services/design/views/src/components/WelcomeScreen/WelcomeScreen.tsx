@@ -61,12 +61,10 @@ export const WelcomeScreen = () => {
     <div style={containerStyle}>
       <h1 style={{ fontSize: '3rem', margin: 0 }}>quidproquo</h1>
       <p style={{ fontSize: '1.25rem', color: '#51616f' }}>
-        A functional, action-based web framework — pure generator stories in,
-        serverless infrastructure out.
+        A functional, action-based web framework — pure generator stories in, serverless infrastructure out.
       </p>
       <p style={{ fontSize: '0.95rem', color: '#51616f' }}>
-        This page is built with quidproquo itself: a federated view served by
-        the shell service.
+        This page is built with quidproquo itself: a federated view served by the shell service.
       </p>
       <button onClick={onCheckHealth} style={buttonStyle} type="button">
         Check shell health

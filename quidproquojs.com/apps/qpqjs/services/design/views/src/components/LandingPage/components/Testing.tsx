@@ -67,12 +67,10 @@ const TEST_LINES: ReactNode[] = [
     (event), {'{'}
   </>,
   <>
-    {'    '}[{ty('UserDirectoryActionType')}.ReadAccessToken]: {'{'} userId:{' '}
-    {str("'u1'")} {'}'},
+    {'    '}[{ty('UserDirectoryActionType')}.ReadAccessToken]: {'{'} userId: {str("'u1'")} {'}'},
   </>,
   <>
-    {'    '}[{ty('KeyValueStoreActionType')}.Get]: {'{'} tenantIds: [
-    {str("'tenant-a'")}] {'}'},
+    {'    '}[{ty('KeyValueStoreActionType')}.Get]: {'{'} tenantIds: [{str("'tenant-a'")}] {'}'},
   </>,
   <>{'  });'}</>,
   <>&nbsp;</>,
@@ -97,9 +95,8 @@ export function Testing() {
         <p className="section__kicker">testing</p>
         <h2 className="section__title">Tests with nothing to mock</h2>
         <p className="section__sub">
-          Stories ask for results by action type, so a test answers by action
-          type. No stubbing modules, no dependency injection, no container to
-          spin up. The story cannot tell the difference.
+          Stories ask for results by action type, so a test answers by action type. No stubbing modules, no dependency injection, no container to spin
+          up. The story cannot tell the difference.
         </p>
       </div>
 

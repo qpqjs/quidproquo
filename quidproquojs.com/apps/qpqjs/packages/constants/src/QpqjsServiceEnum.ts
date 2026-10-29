@@ -8,6 +8,4 @@ export enum QpqjsServiceEnum {
 }
 
 export type QpqjsServiceEnumValues = `${QpqjsServiceEnum}`;
-export const qpqjsServiceNames: QpqjsServiceEnum[] = Object.values(
-  QpqjsServiceEnum
-) as QpqjsServiceEnum[];
+export const qpqjsServiceNames: QpqjsServiceEnum[] = Object.values(QpqjsServiceEnum) as QpqjsServiceEnum[];

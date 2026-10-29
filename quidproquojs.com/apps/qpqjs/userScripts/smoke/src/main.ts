@@ -1,10 +1,4 @@
-import {
-  askDateNow,
-  askFileWriteTextContents,
-  askNetworkRequest,
-  AskResponse,
-  HTTPNetworkResponse,
-} from '@qpqjs/core';
+import { askDateNow, askFileWriteTextContents, askNetworkRequest, AskResponse, HTTPNetworkResponse } from '@qpqjs/core';
 
 import { probeAws, probeSurvivor, spawnSurvivor } from 'smoke-probe';
 
@@ -26,25 +20,16 @@ export function* stampedGreeting(name: string): AskResponse<string> {
   return `${formatGreeting(name)} @ ${now}`;
 }
 
-export function* postJson(
-  url: string,
-  body: unknown
-): AskResponse<HTTPNetworkResponse<unknown>> {
+export function* postJson(url: string, body: unknown): AskResponse<HTTPNetworkResponse<unknown>> {
   return yield* askNetworkRequest<unknown, unknown>('POST', url, { body });
 }
 
-export function* writeFile(
-  drive: string,
-  filepath: string,
-  text: string
-): AskResponse<void> {
+export function* writeFile(drive: string, filepath: string, text: string): AskResponse<void> {
   yield* askFileWriteTextContents(drive, filepath, text);
 }
 
-export const probeAwsAccess = (bucket: string, key: string): Promise<unknown> =>
-  probeAws(bucket, key);
+export const probeAwsAccess = (bucket: string, key: string): Promise<unknown> => probeAws(bucket, key);
 
 export const startSurvivor = (port: number): number => spawnSurvivor(port);
 
-export const checkSurvivor = (port: number): Promise<unknown> =>
-  probeSurvivor(port);
+export const checkSurvivor = (port: number): Promise<unknown> => probeSurvivor(port);

@@ -10,9 +10,6 @@ export const SMOKE_PROBE_SIGNING_KEY = 'smokeProbe';
 
 // The testa service functions the cross-service smoke tests invoke, one per
 // foreign grant (the store and the drive are separate IAM statements).
-export const SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME =
-  'crossKvsProbe';
-export const SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME =
-  'crossDriveProbe';
-export const SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME =
-  'crossSigningKeyProbe';
+export const SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME = 'crossKvsProbe';
+export const SMOKE_CROSS_SERVICE_STORAGE_DRIVE_PROBE_FUNCTION_NAME = 'crossDriveProbe';
+export const SMOKE_CROSS_SERVICE_SIGNING_KEY_PROBE_FUNCTION_NAME = 'crossSigningKeyProbe';

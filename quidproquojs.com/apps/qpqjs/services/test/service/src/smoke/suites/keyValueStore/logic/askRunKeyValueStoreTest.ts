@@ -26,45 +26,23 @@ export function* askRunKeyValueStoreTest(): AskResponse<void> {
   const record: SmokeProbeRecord = { probeId, category, value: 1 };
   yield* askKeyValueStoreUpsert<SmokeProbeRecord>(SMOKE_PROBE_STORE, record);
 
-  const written = yield* askKeyValueStoreGet<SmokeProbeRecord>(
-    SMOKE_PROBE_STORE,
-    probeId
-  );
-  yield* askSmokeAssert(
-    written?.value === 1,
-    'get after upsert did not return the written record'
-  );
+  const written = yield* askKeyValueStoreGet<SmokeProbeRecord>(SMOKE_PROBE_STORE, probeId);
+  yield* askSmokeAssert(written?.value === 1, 'get after upsert did not return the written record');
 
-  yield* askKeyValueStoreUpdate(
-    SMOKE_PROBE_STORE,
-    kvsUpdate([kvsIncrement('value', 1)]),
-    probeId
-  );
+  yield* askKeyValueStoreUpdate(SMOKE_PROBE_STORE, kvsUpdate([kvsIncrement('value', 1)]), probeId);
 
-  const updated = yield* askKeyValueStoreGet<SmokeProbeRecord>(
-    SMOKE_PROBE_STORE,
-    probeId
-  );
-  yield* askSmokeAssert(
-    updated?.value === 2,
-    'get after update did not see the increment'
-  );
+  const updated = yield* askKeyValueStoreGet<SmokeProbeRecord>(SMOKE_PROBE_STORE, probeId);
+  yield* askSmokeAssert(updated?.value === 2, 'get after update did not see the increment');
 
   // `category` is the GSI partition key, so this query is answered by the index.
-  const byCategory = yield* askKeyValueStoreQuery<SmokeProbeRecord>(
-    SMOKE_PROBE_STORE,
-    kvsEqual('category', category)
-  );
+  const byCategory = yield* askKeyValueStoreQuery<SmokeProbeRecord>(SMOKE_PROBE_STORE, kvsEqual('category', category));
   yield* askSmokeAssert(
     byCategory.items.some((item) => item.probeId === probeId),
-    'index query by category did not return the record'
+    'index query by category did not return the record',
   );
 
   yield* askKeyValueStoreDelete(SMOKE_PROBE_STORE, probeId);
 
-  const deleted = yield* askKeyValueStoreGet<SmokeProbeRecord>(
-    SMOKE_PROBE_STORE,
-    probeId
-  );
+  const deleted = yield* askKeyValueStoreGet<SmokeProbeRecord>(SMOKE_PROBE_STORE, probeId);
   yield* askSmokeAssert(!deleted, 'record still present after delete');
 }

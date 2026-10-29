@@ -31,36 +31,19 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
     mimetype: 'application/zip',
   });
 
-  const built = yield* askUserScriptBuildFromZip(
-    SMOKE_PROBE_DRIVE,
-    zipPath,
-    builtPath,
-    undefined,
-    { sourceMap: true }
-  );
+  const built = yield* askUserScriptBuildFromZip(SMOKE_PROBE_DRIVE, zipPath, builtPath, undefined, { sourceMap: true });
   yield* askSmokeAssert(
     built.exports.includes('add') && built.exports.includes('greet'),
-    `zip build did not report the script's exports: [${built.exports.join(', ')}]`
+    `zip build did not report the script's exports: [${built.exports.join(', ')}]`,
   );
 
-  const builtSource = yield* askFileReadTextContents(
-    SMOKE_PROBE_DRIVE,
-    builtPath
-  );
+  const builtSource = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, builtPath);
   yield* askSmokeAssert(
-    builtSource.includes(
-      '//# sourceMappingURL=data:application/json;charset=utf-8;base64,'
-    ),
-    'zip build with sourceMap on did not embed the source map'
+    builtSource.includes('//# sourceMappingURL=data:application/json;charset=utf-8;base64,'),
+    'zip build with sourceMap on did not embed the source map',
   );
-  const separateMapExists = yield* askFileExists(
-    SMOKE_PROBE_DRIVE,
-    `${builtPath}.map`
-  );
-  yield* askSmokeAssert(
-    !separateMapExists,
-    'zip build wrote a separate .map file'
-  );
+  const separateMapExists = yield* askFileExists(SMOKE_PROBE_DRIVE, `${builtPath}.map`);
+  yield* askSmokeAssert(!separateMapExists, 'zip build wrote a separate .map file');
 
   yield* askRunSmokeUserScriptCalls(builtPath, outputPath, 'zip');
 

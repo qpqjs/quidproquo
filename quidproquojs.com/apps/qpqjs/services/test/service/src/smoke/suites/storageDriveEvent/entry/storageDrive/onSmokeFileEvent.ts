@@ -1,12 +1,6 @@
 import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import {
-  askKeyValueStoreUpsert,
-  AskResponse,
-  askStorageScopeRead,
-  StorageDriveEvent,
-  StorageDriveEventResponse,
-} from 'quidproquo';
+import { askKeyValueStoreUpsert, AskResponse, askStorageScopeRead, StorageDriveEvent, StorageDriveEventResponse } from 'quidproquo';
 
 import { smokeFileEventMarkerId } from '../../logic/smokeFileEventMarkerId';
 
@@ -15,9 +9,7 @@ import { smokeFileEventMarkerId } from '../../logic/smokeFileEventMarkerId';
 // carried and the scope the handler ran under, so the test can check that a
 // scoped drive's event arrives with its scope split off the path and the
 // handler re-entered that scope.
-export function* onSmokeFileEvent(
-  event: StorageDriveEvent
-): AskResponse<StorageDriveEventResponse> {
+export function* onSmokeFileEvent(event: StorageDriveEvent): AskResponse<StorageDriveEventResponse> {
   const ambientScope = yield* askStorageScopeRead();
 
   for (const filepath of event.filePaths) {

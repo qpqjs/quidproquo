@@ -18,17 +18,11 @@ import { verifyGithubOidcToken } from '../../logic/github/verifyGithubOidcToken'
 // Actions OIDC token pinned to our repo and this deployment's environment.
 // There is deliberately no notApplicable outcome here: a request either proves
 // it is our workflow or it is 401, including requests with no token at all.
-const getProcessGithubOidcDecode = (
-  qpqConfig: QPQConfig
-): ProcessorFor<typeof askRouteAuthValidationDecode> => {
-  const expectedEnvironment =
-    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+const getProcessGithubOidcDecode = (qpqConfig: QPQConfig): ProcessorFor<typeof askRouteAuthValidationDecode> => {
+  const expectedEnvironment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
   return async ({ event }) => {
-    const authHeader = qpqWebServerUtils.getHeaderValue(
-      'Authorization',
-      event.headers
-    );
+    const authHeader = qpqWebServerUtils.getHeaderValue('Authorization', event.headers);
     const [authType, accessToken] = (authHeader || '').split(' ');
 
     if (authType !== 'Bearer' || !accessToken) {
@@ -37,10 +31,7 @@ const getProcessGithubOidcDecode = (
       });
     }
 
-    const claims = await verifyGithubOidcToken(
-      accessToken,
-      expectedEnvironment
-    );
+    const claims = await verifyGithubOidcToken(accessToken, expectedEnvironment);
     if (!claims) {
       return actionResult<RouteAuthDecodeResult>({
         outcome: RouteAuthDecodeOutcome.invalid,
@@ -60,8 +51,6 @@ const getProcessGithubOidcDecode = (
   };
 };
 
-export const getGithubOidcAuthProcessors: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig
-): Promise<ActionProcessorList> => ({
+export const getGithubOidcAuthProcessors: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [RouteAuthValidationActionType.Decode]: getProcessGithubOidcDecode(qpqConfig),
 });

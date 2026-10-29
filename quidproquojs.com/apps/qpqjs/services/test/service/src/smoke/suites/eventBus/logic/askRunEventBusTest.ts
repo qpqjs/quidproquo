@@ -1,9 +1,4 @@
-import {
-  askEventBusSendMessages,
-  askNewGuid,
-  AskResponse,
-  EventBusMessage,
-} from 'quidproquo';
+import { askEventBusSendMessages, askNewGuid, AskResponse, EventBusMessage } from 'quidproquo';
 
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
 import { SMOKE_PROBE_EVENT_BUS } from '../constants/SMOKE_PROBE_EVENT_BUS';

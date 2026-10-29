@@ -1,9 +1,4 @@
-import {
-  askEventDocAppendServerEvent,
-  askEventDocAppendServerEvents,
-  askEventDocProvideStore,
-  EventDocServerEventInput,
-} from '@qpqjs/features';
+import { askEventDocAppendServerEvent, askEventDocAppendServerEvents, askEventDocProvideStore, EventDocServerEventInput } from '@qpqjs/features';
 import { AskResponse, QueueEventResponse } from 'quidproquo';
 
 import {
@@ -18,12 +13,7 @@ import { SmokeEventDocMark } from '../../models/SmokeEventDocMark';
 // One writer in the event-doc concurrency tests. Every message is its own invocation,
 // so the writers of a test race each other for the log's next slots for real - the
 // conditional-write loop in the append stories is what has to keep them contiguous.
-function* askAppendMarks(
-  docId: string,
-  runId: string,
-  writerId: number,
-  values: number[]
-): AskResponse<void> {
+function* askAppendMarks(docId: string, runId: string, writerId: number, values: number[]): AskResponse<void> {
   const mark = (value: number): SmokeEventDocMark => ({
     value,
     runId,
@@ -31,13 +21,7 @@ function* askAppendMarks(
   });
 
   if (values.length === 1) {
-    yield* askEventDocAppendServerEvent(
-      docId,
-      SMOKE_EVENT_DOC_MARK_EVENT,
-      mark(values[0]),
-      SMOKE_EVENT_DOC_SCHEMA_VERSION,
-      SMOKE_EVENT_DOC_ACTOR
-    );
+    yield* askEventDocAppendServerEvent(docId, SMOKE_EVENT_DOC_MARK_EVENT, mark(values[0]), SMOKE_EVENT_DOC_SCHEMA_VERSION, SMOKE_EVENT_DOC_ACTOR);
     return;
   }
 
@@ -50,15 +34,10 @@ function* askAppendMarks(
   yield* askEventDocAppendServerEvents(docId, inputs, SMOKE_EVENT_DOC_ACTOR);
 }
 
-export function* onSmokeEventDocAppend(
-  event: SmokeEventDocAppendQueueEvent
-): AskResponse<QueueEventResponse> {
+export function* onSmokeEventDocAppend(event: SmokeEventDocAppendQueueEvent): AskResponse<QueueEventResponse> {
   const { docId, runId, writerId, values } = event.message.payload;
 
-  yield* askEventDocProvideStore(
-    SMOKE_EVENT_DOC_STORE_OPTIONS,
-    askAppendMarks(docId, runId, writerId, values)
-  );
+  yield* askEventDocProvideStore(SMOKE_EVENT_DOC_STORE_OPTIONS, askAppendMarks(docId, runId, writerId, values));
 
   return true;
 }

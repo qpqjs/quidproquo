@@ -9,8 +9,4 @@ import { defineStorageDriveSmokeProbe } from '../suites/storageDrive/config/defi
  * suites/ mirrors the test service suite of the same name and exercises that
  * suite's foreign grant against a resource the test service owns.
  */
-export const defineSmokeProbes = (): QPQConfig => [
-  defineKeyValueStoreSmokeProbe(),
-  defineStorageDriveSmokeProbe(),
-  defineSigningKeySmokeProbe(),
-];
+export const defineSmokeProbes = (): QPQConfig => [defineKeyValueStoreSmokeProbe(), defineStorageDriveSmokeProbe(), defineSigningKeySmokeProbe()];

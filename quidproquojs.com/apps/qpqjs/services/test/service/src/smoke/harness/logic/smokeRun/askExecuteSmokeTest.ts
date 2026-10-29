@@ -1,16 +1,5 @@
-import {
-  SmokeRun,
-  SmokeRunStatus,
-  SmokeTestResult,
-  SmokeTestStatus,
-} from '@qpqjs/test-models';
-import {
-  askCatch,
-  askDateNow,
-  AskResponse,
-  askThrowError,
-  ErrorTypeEnum,
-} from 'quidproquo';
+import { SmokeRun, SmokeRunStatus, SmokeTestResult, SmokeTestStatus } from '@qpqjs/test-models';
+import { askCatch, askDateNow, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo';
 
 import { askGetSmokeRunById } from '../../data/askGetSmokeRunById';
 import { askRecordSmokeTestResult } from '../../data/askRecordSmokeTestResult';
@@ -19,11 +8,7 @@ import { SmokeTestDefinition } from '../../types/SmokeTestDefinition';
 import { listSmokeTests } from './listSmokeTests';
 
 // Runs one registered test, returning its completed result entry.
-function* askRunSmokeTest(
-  test: SmokeTestDefinition,
-  pending: SmokeTestResult,
-  runId: string
-): AskResponse<SmokeTestResult> {
+function* askRunSmokeTest(test: SmokeTestDefinition, pending: SmokeTestResult, runId: string): AskResponse<SmokeTestResult> {
   const startedAt = yield* askDateNow();
   const outcome = yield* askCatch(test.askRun(runId));
   const finishedAt = yield* askDateNow();
@@ -38,9 +23,7 @@ function* askRunSmokeTest(
 }
 
 const isTerminal = (result: SmokeTestResult): boolean =>
-  result.status === SmokeTestStatus.passed ||
-  result.status === SmokeTestStatus.failed ||
-  result.status === SmokeTestStatus.skipped;
+  result.status === SmokeTestStatus.passed || result.status === SmokeTestStatus.failed || result.status === SmokeTestStatus.skipped;
 
 // Executes one registered test for an existing run (created by
 // askStartSmokeRun) and records its result. Every test of a run executes
@@ -48,32 +31,20 @@ const isTerminal = (result: SmokeTestResult): boolean =>
 // finish: the write of each result returns the record as it stands, and
 // because writes to one record serialize, exactly one worker (whichever
 // lands last) sees every test terminal. That worker stamps the run's outcome.
-export function* askExecuteSmokeTest(
-  runId: string,
-  testName: string
-): AskResponse<SmokeRun> {
+export function* askExecuteSmokeTest(runId: string, testName: string): AskResponse<SmokeRun> {
   const test = listSmokeTests().find((t) => t.name === testName);
   if (!test) {
-    return yield* askThrowError(
-      ErrorTypeEnum.NotFound,
-      `no smoke test [${testName}] registered`
-    );
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `no smoke test [${testName}] registered`);
   }
 
   const smokeRun = yield* askGetSmokeRunById(runId);
   if (!smokeRun) {
-    return yield* askThrowError(
-      ErrorTypeEnum.NotFound,
-      `no smoke run [${runId}] to execute`
-    );
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `no smoke run [${runId}] to execute`);
   }
 
   const testIndex = smokeRun.tests.findIndex((t) => t.name === testName);
   if (testIndex < 0) {
-    return yield* askThrowError(
-      ErrorTypeEnum.NotFound,
-      `smoke run [${runId}] has no entry for test [${testName}]`
-    );
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `smoke run [${runId}] has no entry for test [${testName}]`);
   }
 
   const result = yield* askRunSmokeTest(test, smokeRun.tests[testIndex], runId);
@@ -85,13 +56,7 @@ export function* askExecuteSmokeTest(
   }
 
   const finishedAt = yield* askDateNow();
-  const anyFailed = recorded.tests.some(
-    (t) => t.status === SmokeTestStatus.failed
-  );
+  const anyFailed = recorded.tests.some((t) => t.status === SmokeTestStatus.failed);
 
-  return yield* askSetSmokeRunOutcome(
-    runId,
-    anyFailed ? SmokeRunStatus.failed : SmokeRunStatus.passed,
-    finishedAt
-  );
+  return yield* askSetSmokeRunOutcome(runId, anyFailed ? SmokeRunStatus.failed : SmokeRunStatus.passed, finishedAt);
 }

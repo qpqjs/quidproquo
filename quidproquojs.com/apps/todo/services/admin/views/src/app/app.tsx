@@ -6,11 +6,9 @@ import { TodoServiceEnum } from '@todo/constants';
 
 export const getApiBaseUrl = () => getApiUrl(TodoServiceEnum.Admin);
 
-export const getWsBaseUrl = () =>
-  getWebSocketUrl(TodoServiceEnum.Admin, 'qpqadmin');
+export const getWsBaseUrl = () => getWebSocketUrl(TodoServiceEnum.Admin, 'qpqadmin');
 
-export const getMFManifestBaseUrl = () =>
-  getFederatedViewsUrl(TodoServiceEnum.Admin);
+export const getMFManifestBaseUrl = () => getFederatedViewsUrl(TodoServiceEnum.Admin);
 
 const urlResolvers: BaseUrlResolvers = {
   getApiUrl: getApiBaseUrl,

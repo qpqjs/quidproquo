@@ -1,10 +1,5 @@
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import {
-  askCatch,
-  askNewGuid,
-  AskResponse,
-  askUserScriptExecute,
-} from 'quidproquo';
+import { askCatch, askNewGuid, AskResponse, askUserScriptExecute } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -13,17 +8,10 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 export function* askRunUserScriptErrorTest(): AskResponse<void> {
   const scriptId = yield* askNewGuid();
 
-  const result = yield* askCatch(
-    askUserScriptExecute(
-      SMOKE_PROBE_DRIVE,
-      `smoke/userScript/missing-${scriptId}.js`,
-      'anything'
-    )
-  );
+  const result = yield* askCatch(askUserScriptExecute(SMOKE_PROBE_DRIVE, `smoke/userScript/missing-${scriptId}.js`, 'anything'));
 
   yield* askSmokeAssert(
-    !result.success &&
-      result.error.errorType === askUserScriptExecute.errorType.ScriptNotFound,
-    'missing script was not refused with ScriptNotFound'
+    !result.success && result.error.errorType === askUserScriptExecute.errorType.ScriptNotFound,
+    'missing script was not refused with ScriptNotFound',
   );
 }

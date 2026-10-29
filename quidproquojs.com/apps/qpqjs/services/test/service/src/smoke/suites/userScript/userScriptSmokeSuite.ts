@@ -11,12 +11,7 @@ import { askRunUserScriptZipTest } from './logic/askRunUserScriptZipTest';
 
 /** A user script built on the platform from sources on the probe drive, loose or zipped, into one file, then called by export name inside the service's sandbox. The drive belongs to the harness and the builder and runner are registered on the service; the suite's own config is the probe module the lockdown test's script imports. */
 export const userScriptSmokeSuite: SmokeSuite = {
-  defineConfig: () => [
-    defineUserScriptModule(
-      SMOKE_PROBE_USER_SCRIPT_MODULE,
-      '/smoke/suites/userScript/probe/scriptModules::smokeProbeModule'
-    ),
-  ],
+  defineConfig: () => [defineUserScriptModule(SMOKE_PROBE_USER_SCRIPT_MODULE, '/smoke/suites/userScript/probe/scriptModules::smokeProbeModule')],
   tests: [
     { name: 'userScript', askRun: askRunUserScriptTest },
     { name: 'userScriptNotFound', askRun: askRunUserScriptErrorTest },

@@ -1,8 +1,4 @@
-import {
-  askNetworkRequest,
-  askOpenApiGetDocument,
-  AskResponse,
-} from 'quidproquo';
+import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -13,10 +9,7 @@ const toWebsiteUrl = (apiBaseUrl: string): string => {
   return `https://${api.hostname.replace(/^api\./, '')}`;
 };
 
-const header = (
-  headers: Record<string, string>,
-  name: string
-): string | undefined =>
+const header = (headers: Record<string, string>, name: string): string | undefined =>
   Object.entries(headers).find(([key]) => key.toLowerCase() === name)?.[1];
 
 // Checklist item: web entry security headers. Every web entry sends the baseline
@@ -28,15 +21,8 @@ export function* askRunWebsiteSecurityHeadersTest(): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
   const websiteUrl = toWebsiteUrl(baseUrl);
 
-  const index = yield* askNetworkRequest<string, undefined>(
-    'GET',
-    `${websiteUrl}/`,
-    { responseType: 'text' }
-  );
-  yield* askSmokeAssert(
-    index.status === 200,
-    `website index returned [${index.status}] from ${websiteUrl}`
-  );
+  const index = yield* askNetworkRequest<string, undefined>('GET', `${websiteUrl}/`, { responseType: 'text' });
+  yield* askSmokeAssert(index.status === 200, `website index returned [${index.status}] from ${websiteUrl}`);
 
   const expected: [string, RegExp][] = [
     ['strict-transport-security', /max-age=\d+/],
@@ -46,9 +32,6 @@ export function* askRunWebsiteSecurityHeadersTest(): AskResponse<void> {
   ];
   for (const [name, pattern] of expected) {
     const value = header(index.headers, name);
-    yield* askSmokeAssert(
-      !!value && pattern.test(value),
-      `website index is missing the ${name} header (got [${value ?? 'none'}])`
-    );
+    yield* askSmokeAssert(!!value && pattern.test(value), `website index is missing the ${name} header (got [${value ?? 'none'}])`);
   }
 }

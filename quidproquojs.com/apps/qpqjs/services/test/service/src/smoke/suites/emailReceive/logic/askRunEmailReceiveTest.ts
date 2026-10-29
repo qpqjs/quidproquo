@@ -24,18 +24,8 @@ export function* askRunEmailReceiveTest(runId: string): AskResponse<void> {
 
   // Mail delivery is the slowest path in the suite: SES receives, scans and
   // writes to S3 before the drive event fires.
-  const marker = yield* askSmokePollForMarker(
-    smokeEmailMarkerId(recipient),
-    'the inbound email path',
-    45
-  );
+  const marker = yield* askSmokePollForMarker(smokeEmailMarkerId(recipient), 'the inbound email path', 45);
 
-  yield* askSmokeAssert(
-    marker.path === subject,
-    `received subject [${marker.path}] did not match [${subject}]`
-  );
-  yield* askSmokeAssert(
-    marker.authentication === 'pass/pass',
-    `received message was not authenticated: spf/dkim [${marker.authentication}]`
-  );
+  yield* askSmokeAssert(marker.path === subject, `received subject [${marker.path}] did not match [${subject}]`);
+  yield* askSmokeAssert(marker.authentication === 'pass/pass', `received message was not authenticated: spf/dkim [${marker.authentication}]`);
 }

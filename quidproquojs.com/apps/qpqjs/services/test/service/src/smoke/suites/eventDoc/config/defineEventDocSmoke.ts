@@ -1,11 +1,7 @@
 import { defineEventDoc } from '@qpqjs/features';
 import { defineQueue, QPQConfig } from 'quidproquo';
 
-import {
-  SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE,
-  SMOKE_EVENT_DOC_APPEND_QUEUE,
-  SMOKE_EVENT_DOC_BASE_PATH,
-} from '../constants/smokeEventDoc';
+import { SMOKE_EVENT_DOC_APPEND_MESSAGE_TYPE, SMOKE_EVENT_DOC_APPEND_QUEUE, SMOKE_EVENT_DOC_BASE_PATH } from '../constants/smokeEventDoc';
 import { smokeProbeDocDefinition } from '../definition/smokeProbeDocDefinition';
 
 /**
@@ -25,7 +21,7 @@ export const defineEventDocSmoke = (): QPQConfig => [
       relativePath: '../definition/smokeProbeDocDefinition',
       functionName: 'smokeProbeDocDefinition',
     },
-    { basePath: SMOKE_EVENT_DOC_BASE_PATH }
+    { basePath: SMOKE_EVENT_DOC_BASE_PATH },
   ),
   // A writer that loses the slot race past the append retry cap fails its
   // message; a quick redelivery lets it land instead of vanishing, as a
@@ -39,6 +35,6 @@ export const defineEventDocSmoke = (): QPQConfig => [
         functionName: 'onSmokeEventDocAppend',
       },
     },
-    { maxTries: 3, ttRetryInSeconds: 10 }
+    { maxTries: 3, ttRetryInSeconds: 10 },
   ),
 ];

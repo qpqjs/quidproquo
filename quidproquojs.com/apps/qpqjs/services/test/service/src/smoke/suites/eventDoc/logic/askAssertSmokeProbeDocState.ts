@@ -9,24 +9,18 @@ import { SmokeProbeDocState } from '../definition/smokeProbeDocDefinition';
 // collection's REGISTERED fold. Proves the dynamic-functions registration resolves in
 // the deployed runtime and that the fold saw every event: the numbers it holds are
 // exactly `expectedNumbers`, no extras, none missing, none twice.
-export function* askAssertSmokeProbeDocState(
-  docId: string,
-  expectedNumbers: number[]
-): AskResponse<void> {
+export function* askAssertSmokeProbeDocState(docId: string, expectedNumbers: number[]): AskResponse<void> {
   const latest = yield* askEventDocDocumentStateLatest(docId, {
     consistentRead: true,
   });
-  const numbers =
-    (latest?.state as SmokeProbeDocState | undefined)?.numbers ?? [];
+  const numbers = (latest?.state as SmokeProbeDocState | undefined)?.numbers ?? [];
 
   const sorted = [...numbers].sort((a, b) => a - b);
   const expected = [...expectedNumbers].sort((a, b) => a - b);
-  const same =
-    sorted.length === expected.length &&
-    sorted.every((value, index) => value === expected[index]);
+  const same = sorted.length === expected.length && sorted.every((value, index) => value === expected[index]);
 
   yield* askSmokeAssert(
     same,
-    `folded state holds ${numbers.length} numbers, expected ${expected.length} (1..${expected.length}); got [${sorted.join(', ')}]`
+    `folded state holds ${numbers.length} numbers, expected ${expected.length} (1..${expected.length}); got [${sorted.join(', ')}]`,
   );
 }

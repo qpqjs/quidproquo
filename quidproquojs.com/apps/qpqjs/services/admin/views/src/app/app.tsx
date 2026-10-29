@@ -5,11 +5,9 @@ import { BaseUrlResolvers } from '@qpqjs/web-react';
 
 export const getApiBaseUrl = () => getApiUrl(QpqjsServiceEnum.Admin);
 
-export const getWsBaseUrl = () =>
-  getWebSocketUrl(QpqjsServiceEnum.Admin, 'qpqadmin');
+export const getWsBaseUrl = () => getWebSocketUrl(QpqjsServiceEnum.Admin, 'qpqadmin');
 
-export const getMFManifestBaseUrl = () =>
-  getFederatedViewsUrl(QpqjsServiceEnum.Admin);
+export const getMFManifestBaseUrl = () => getFederatedViewsUrl(QpqjsServiceEnum.Admin);
 
 const urlResolvers: BaseUrlResolvers = {
   getApiUrl: getApiBaseUrl,
