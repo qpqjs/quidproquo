@@ -7,7 +7,7 @@ import { askPendingMigrations, askRecordMigrationRan, getMigrationKey } from './
  *
  * The same two steps `askProcessOnDeployUpdate` performs, without the deploy event. Deployed,
  * a stack update is what triggers migrations; locally nothing ever does, which is why
- * `qpq migrate` exists — and why this goes through the SAME queue rather than invoking the
+ * `qpq migrate` exists, and why this goes through the SAME queue rather than invoking the
  * handlers directly. A migration that only works under the local runner is worse than no
  * local runner: the point is to rehearse the deployed path.
  *

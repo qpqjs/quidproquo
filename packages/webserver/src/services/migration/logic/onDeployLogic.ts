@@ -11,7 +11,6 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
   // we don't need to run any current migrations
   // because database should be ready with seed data.
   for (const migration of allMigrations) {
-    // We remove the leading slash for backward compatibility
     yield* migrationInfoData.askUpsert({
       deployType: migration.deployType,
       srcPath: getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime),

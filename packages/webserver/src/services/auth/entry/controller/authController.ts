@@ -78,7 +78,7 @@ export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> 
 export function* logout(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   // "Log out this device": revoke ONLY the caller's own refresh token (Cognito RevokeToken),
   // leaving the user's other sessions signed in. The client sends its refresh token in the
-  // body. Best-effort — logout must always succeed for the client (it clears local state
+  // body. Best-effort, logout must always succeed for the client (it clears local state
   // regardless), so an already-revoked/invalid token is swallowed rather than 4xx'd. Public
   // route: possessing the refresh token is the authorization (you can only revoke your own).
   const { refreshToken } = yield* qpqWebServerUtils.askFromValidJsonEventRequest<RefreshPayload>(
@@ -95,7 +95,7 @@ export function* logoutEverywhere(event: HTTPEvent): AskResponse<HTTPEventRespon
   // "Log out everywhere": revoke EVERY refresh token for the user (Cognito GlobalSignOut),
   // for a user-settings "sign out of all devices" action. Authorized by the access token in
   // the header (GlobalSignOut validates it at Cognito). Best-effort / always 200, same as
-  // above — swallow an invalid/expired token rather than failing the client's logout.
+  // above, swallow an invalid/expired token rather than failing the client's logout.
   const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
 
   if (accessToken) {

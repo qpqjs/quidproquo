@@ -28,7 +28,7 @@ export interface FileUploadSettingsQPQWebServerConfigSetting extends QPQConfigSe
 
 /**
  * Service-wide limits for multipart/form-data file uploads. Sensible defaults
- * apply even when this setting is not declared — declare it only to override them.
+ * apply even when this setting is not declared, declare it only to override them.
  */
 export const defineFileUploadSettings = (fileUploadSettings: Partial<FileUploadSettings>): FileUploadSettingsQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.FileUploadSettings,

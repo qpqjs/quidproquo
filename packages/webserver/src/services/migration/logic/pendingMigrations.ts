@@ -7,7 +7,7 @@ import * as migrationInfoData from '../data/migrationInfoData';
 export const getMigrationKey = (migration: Migration): string => getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime);
 
 // Has this migration already been recorded as run? Shared by the deploy path and the local
-// runner so the two can never disagree about what "pending" means — a runner that answered
+// runner so the two can never disagree about what "pending" means, a runner that answered
 // differently would either re-run a migration or skip one.
 export function* askIsMigrationPending(migration: Migration): AskResponse<boolean> {
   const migrationInfo = yield* migrationInfoData.askGetMigrationBySrcPath(getMigrationKey(migration));

@@ -18,7 +18,6 @@ export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
     throw new Error('Unable to parse undefined json body from event.');
   }
 
-  // Parse the json out here...
   try {
     const item: T = JSON.parse(json);
     return item;
@@ -34,7 +33,6 @@ export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskRespon
     return yield* askThrowError(ErrorTypeEnum.BadRequest, 'Unable to parse undefined json from HTTPEvent.');
   }
 
-  // Parse the json out here...
   try {
     const item: T = JSON.parse(json);
     return item;

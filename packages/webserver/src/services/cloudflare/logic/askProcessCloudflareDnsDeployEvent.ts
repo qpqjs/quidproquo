@@ -13,7 +13,6 @@ export function getDnsEntryName(dnsEntryName: string, rootDomain: string) {
 export function* askProcessCloudflareDnsDeployEvent(event: CloudflareDnsDeployEvent): AskResponse<CloudflareDnsDeployEventResponse> {
   const apiKey = yield* askConfigGetSecret(event.apiSecretName);
 
-  // Get the site zone id
   const zoneId = yield* askCloudflareGetZoneId(apiKey, event.siteDns);
 
   // If its an update, delete the old DNS entries

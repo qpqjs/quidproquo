@@ -102,7 +102,7 @@ describe('executeNetworkRequest', () => {
   it('passes a Blob body through untouched instead of JSON-stringifying it to "{}"', async () => {
     fetchMock.mockResolvedValue(fakeResponse({ body: '' }));
 
-    // A File would exercise the same path — File extends Blob.
+    // A File would exercise the same path, File extends Blob.
     const blob = new Blob(['\x89PNG fake binary'], { type: 'image/png' });
     await executeNetworkRequest(buildPayload({ method: 'PUT', headers: { 'Content-Type': 'image/png' }, body: blob, responseType: 'text' }));
 
