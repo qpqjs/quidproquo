@@ -37,7 +37,12 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
     throw new Error('max one entry of defineAwsServiceAccountInfo can be used');
   }
 
-  return serviceAccountInfos[0];
+  const [serviceAccountInfo] = serviceAccountInfos;
+  if (!serviceAccountInfo) {
+    throw new Error('defineAwsServiceAccountInfo is required');
+  }
+
+  return serviceAccountInfo;
 };
 
 /**
