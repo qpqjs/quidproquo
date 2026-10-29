@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqCoreUtils.getOwnedCryptoKeys` is `getOwnedCryptoKeyConfigs`; the crypto key setting and accessors live in `config/settings/cryptoKey/` (D5).
 - `qpqCoreUtils.getEventBusConfigByName` is `getEventBusByName(name, cfg)` (null when missing, same published-name-first lookup) with a new `resolveEventBusOrThrow`; the event bus setting lives in `config/settings/eventBus/` (D5).
 - `qpqCoreUtils` storage drive accessors follow D5: `getAllStorageDriveConfigs(cfg)`, `getOwnedStorageDriveConfigs(cfg)`, `getStorageDriveByName(name, cfg)` (null when missing) and new `resolveStorageDriveOrThrow(name, cfg)` replace `getStorageDrives`, `getOwnedStorageDrives` and the undefined-returning finder; `getStorageDriveNames` stays. The setting and its `StorageDrive*` types live in `config/settings/storageDrive/`.
 - `qpqCoreUtils` key value store accessors follow D5: `getAllKeyValueStoreConfigs(cfg)`, `getOwnedKeyValueStoreConfigs(cfg)`, `getKeyValueStoreByName(name, cfg)` (name first, null when missing) and new `resolveKeyValueStoreOrThrow(name, cfg)` replace `getAllKeyValueStores`, `getOwnedKeyValueStores` and `getKeyValueStoreByName(cfg, name)`; the setting and its `Kvs*` types live in `config/settings/keyValueStore/`.

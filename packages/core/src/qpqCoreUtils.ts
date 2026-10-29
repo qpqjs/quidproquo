@@ -1,5 +1,6 @@
 import { getEventBusByName } from './config/settings/eventBus/logic';
 import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
+export { getAllCryptoKeyConfigs, getCryptoKeyByName, getOwnedCryptoKeyConfigs, resolveCryptoKeyOrThrow } from './config/settings/cryptoKey/logic';
 export { getAllEventBusConfigs, getEventBusByName, getOwnedEventBusConfigs, resolveEventBusOrThrow } from './config/settings/eventBus/logic';
 export {
   getAllStorageDriveConfigs,
@@ -28,7 +29,6 @@ import {
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
   BundleEntriesQPQConfigSetting,
-  CryptoKeyQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
   DynamicFunctionsQPQConfigSetting,
@@ -290,31 +290,6 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
 
   const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
-};
-
-export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): Nullable<CryptoKeyQPQConfigSetting> =>
-  getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey).find((k) => k.keyName === cryptoKeyName) ?? null;
-
-export const resolveCryptoKeyOrThrow = (cryptoKeyName: string, qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting => {
-  const cryptoKey = getCryptoKeyByName(cryptoKeyName, qpqConfig);
-
-  if (!cryptoKey) {
-    throw new Error(`Can not find crypto key [${cryptoKeyName}]`);
-  }
-
-  return cryptoKey;
-};
-
-export const getAllCryptoKeyConfigs = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
-  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
-
-  return cryptoKeys;
-};
-
-export const getOwnedCryptoKeys = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
-  const cryptoKeys = getAllCryptoKeyConfigs(qpqConfig);
-
-  return getOwnedItems(cryptoKeys, qpqConfig);
 };
 
 export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): Nullable<SigningKeyQPQConfigSetting> =>

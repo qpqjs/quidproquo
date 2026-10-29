@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineCryptoKey } from './cryptoKey';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineCryptoKey } from './defineCryptoKey';
 
 describe('defineCryptoKey', () => {
   it('builds a CryptoKey setting with the given key name', () => {

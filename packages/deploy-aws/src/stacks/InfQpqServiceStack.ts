@@ -44,7 +44,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // name is two aliases on one string; refuse it here rather than in the change set.
     const signingKeyNames = new Set(qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).map((setting) => setting.keyName));
     const ownedCryptoKeys: OwnedCryptoKeys = {};
-    for (const setting of qpqCoreUtils.getOwnedCryptoKeys(props.qpqConfig)) {
+    for (const setting of qpqCoreUtils.getOwnedCryptoKeyConfigs(props.qpqConfig)) {
       if (signingKeyNames.has(setting.keyName)) {
         throw new Error(`Crypto key "${setting.keyName}" shares its name with a signing key; both are KMS aliases, so the names must differ`);
       }
