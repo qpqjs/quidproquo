@@ -10,7 +10,7 @@ import { defineWebsocket } from '@qpqjs/webserver';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 
-export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedWebsocketQueueSettings = {
   owner?: CrossModuleOwnerWithNoResourceOverride;
   userDirectoryName?: string;
 
@@ -42,7 +42,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // hold a token the owning service validates itself (a signing session, say).
   // Mutually exclusive with userDirectoryName.
   connectionAuthenticator?: string;
-}
+} & QPQConfigAdvancedSettings;
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
   return `qpq-wsq-eb-name-${apiName}`;

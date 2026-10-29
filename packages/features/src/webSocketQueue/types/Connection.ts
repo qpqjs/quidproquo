@@ -1,4 +1,4 @@
-export interface Connection {
+export type Connection = {
   id: string;
   requestTime: string;
   requestTimeEpoch: number;
@@ -10,4 +10,4 @@ export interface Connection {
   // Validated storage scope (e.g. active tenant) claimed at authenticate time.
   // Every message on this connection runs with it as the ambient storage scope.
   scope?: string;
-}
+};

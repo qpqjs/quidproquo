@@ -22,7 +22,7 @@ export const QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME = 'qpqTraceLog';
 // Exposed by the LOG service only, the reply channel for finished traces.
 export const QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME = 'qpqTraceStore';
 
-export interface QpqTraceLogExecutionPayload {
+export type QpqTraceLogExecutionPayload = {
   storyResult: StoryResult<any>;
 
   // The log service's module name, where the result gets sent back to
@@ -30,12 +30,12 @@ export interface QpqTraceLogExecutionPayload {
 
   // Only trace statements in the service's own code (no node_modules breakpoints)
   onlyOwnCode?: boolean;
-}
+};
 
-export interface QpqStoreTraceResultPayload {
+export type QpqStoreTraceResultPayload = {
   correlation: string;
 
   // Exactly one of these: the finished trace, or why there isn't one
   trace?: QpqExecutionTrace;
   errorText?: string;
-}
+};

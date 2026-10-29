@@ -21,10 +21,10 @@ export enum StorageScopeType {
 const TENANT_SCOPE_PREFIX = 'TENANT#';
 const PERSONAL_SCOPE_PREFIX = 'PERSONAL#';
 
-export interface ParsedStorageScope {
+export type ParsedStorageScope = {
   type: StorageScopeType;
   id: string;
-}
+};
 
 // The raw id is validated (not the composed value): the prefix characters are
 // safe by construction, and the core scope gates re-validate the full segment

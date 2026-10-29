@@ -1,4 +1,4 @@
-export interface Connection {
+export type Connection = {
   id: string;
   requestTime: string;
   requestTimeEpoch: number;
@@ -6,4 +6,4 @@ export interface Connection {
 
   userId?: string;
   accessToken?: string;
-}
+};

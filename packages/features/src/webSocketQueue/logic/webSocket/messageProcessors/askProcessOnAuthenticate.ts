@@ -37,10 +37,10 @@ export function isWebSocketAuthenticateMessage(
   return event.type === WebSocketQueueClientMessageEventType.Authenticate;
 }
 
-interface ConnectionScopeResolution {
+type ConnectionScopeResolution = {
   accepted: boolean;
   scope: string | undefined;
-}
+};
 
 // Resolve the connection's storage scope via the configured
 // connectionScopeResolver inline function, which runs on EVERY authenticate

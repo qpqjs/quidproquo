@@ -20,7 +20,7 @@ import { askToggleLogChecked } from '../../logic/logs';
 import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
 import { askEnsureRedactedLog, askGetRedactedByCorrelation } from '../data/redactedLogData';
 
-export interface GetLogsParams {
+export type GetLogsParams = {
   nextPageKey?: string;
 
   startIsoDateTime: string;
@@ -33,7 +33,7 @@ export interface GetLogsParams {
   userFilter: string;
   deep: string;
   onlyErrors: boolean;
-}
+};
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
   const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =

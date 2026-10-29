@@ -24,12 +24,12 @@ export type DynamicRouteRuntime<S extends string, TBody = undefined, TQuery = un
 ) => AskResponse<HTTPEventResponse>;
 
 // The route config carried alongside the handler, harvested by defineDynamicRoutes
-export interface DynamicRouteMeta {
+export type DynamicRouteMeta = {
   method: HTTPMethod;
   path: string;
   options?: RouteOptions;
   version: number;
-}
+};
 
 // A story handler branded with its own route config. The `S` param keeps the
 // path-param typing available to anyone calling the handler directly; the brand

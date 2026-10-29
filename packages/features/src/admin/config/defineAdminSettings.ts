@@ -56,7 +56,7 @@ import {
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
 
-export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedLogSettings = {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
@@ -65,7 +65,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   // The APPLICATION websocket api (defineWebSocketQueue apiName) maintenance
   // state broadcasts on. Unset = maintenance mutations skip broadcasting.
   maintenanceWebsocketApiName?: string;
-}
+} & QPQConfigAdvancedSettings;
 
 // Retention defaults to undefined (no expiry) unless `logRetentionDays` is set.
 // If `coldStorageAfterDays` is set, retention is padded by 180 days so logs
