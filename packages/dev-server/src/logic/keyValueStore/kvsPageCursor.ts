@@ -15,14 +15,8 @@ export type KvsPageCursor = {
   scope: string;
 };
 
-/**
- *
- */
 export const decodeKvsPageCursor = (nextPageKey: string): KvsPageCursor => JSON.parse(Buffer.from(nextPageKey, 'base64').toString());
 
-/**
- *
- */
 export const encodeKvsPageCursor = (
   item: any,
   storeConfig: KeyValueStoreQPQConfigSetting,

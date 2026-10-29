@@ -119,9 +119,6 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   }
 };
 
-/**
- *
- */
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   // Fail fast when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
   for (const qpqConfig of devServerConfig.qpqConfigs) {

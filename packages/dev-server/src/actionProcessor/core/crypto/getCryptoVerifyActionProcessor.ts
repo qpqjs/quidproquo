@@ -37,8 +37,5 @@ const getProcessCryptoVerify = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   };
 };
 
-/**
- *
- */
 export const getCryptoVerifyActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askCryptoVerify, (qpqConfig) => getProcessCryptoVerify(qpqConfig, devServerConfig));

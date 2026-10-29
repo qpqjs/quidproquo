@@ -5,9 +5,6 @@ import { AdminUpdateUserAttributesCommand, CognitoIdentityProviderClient } from 
 import { createAwsClient } from '../createAwsClient';
 import { getCognitoUserAttributesFromQpqUserAttributes } from './getCognitoUserAttributesFromQpqUserAttributes';
 
-/**
- *
- */
 export const setUserAttributes = async (userPoolId: string, region: string, username: string, userAttributes: UserAttributes): Promise<void> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

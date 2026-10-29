@@ -7,9 +7,6 @@ import { calculateSecretHash } from './utils/calculateSecretHash';
 import { cognitoCodeDeliveryDetailsToQpqDeliveryDetails } from './utils/cognitoCodeDeliveryDetailsToQpqDeliveryDetails';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
-/**
- *
- */
 export const forgotPassword = async (
   userPoolId: string,
   clientId: string,

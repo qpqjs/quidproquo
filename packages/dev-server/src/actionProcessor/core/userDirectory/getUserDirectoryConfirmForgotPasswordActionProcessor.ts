@@ -28,8 +28,5 @@ const getProcessConfirmForgotPassword = (
   };
 };
 
-/**
- *
- */
 export const getUserDirectoryConfirmForgotPasswordActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryConfirmForgotPassword, (qpqConfig) => getProcessConfirmForgotPassword(qpqConfig, devServerConfig));

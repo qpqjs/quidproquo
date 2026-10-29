@@ -13,9 +13,6 @@ import {
 import { matchUrl } from '../../../../../awsLambdaUtils';
 import { InternalEventRecord, MatchResult } from './types';
 
-/**
- *
- */
 export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetting => {
   // Only the queue name travels via the environment - the full setting lives in
   // the bundled qpqConfig (serializing it into env blows the lambda 4KB limit).

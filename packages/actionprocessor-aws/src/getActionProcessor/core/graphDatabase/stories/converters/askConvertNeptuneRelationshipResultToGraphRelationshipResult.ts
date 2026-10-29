@@ -2,9 +2,6 @@ import { AskResponse, GraphEntityType, GraphRelationshipResult } from '@qpqjs/co
 
 import { NeptuneRelationshipResult } from '../types';
 
-/**
- *
- */
 export function* askConvertNeptuneRelationshipResultToGraphRelationshipResult(
   neptuneRelationshipResult: NeptuneRelationshipResult,
 ): AskResponse<GraphRelationshipResult> {

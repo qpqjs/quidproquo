@@ -6,9 +6,6 @@ import {
 } from '@qpqjs/core';
 import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
-/**
- *
- */
 export function* runCypherQuery(
   event: ExecuteServiceFunctionEvent<GraphDatabaseExecuteOpenCypherQueryActionPayload>,
 ): AskResponse<GraphCypherResponse> {

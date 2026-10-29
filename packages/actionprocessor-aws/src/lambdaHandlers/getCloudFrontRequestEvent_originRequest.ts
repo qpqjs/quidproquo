@@ -6,9 +6,6 @@ import { getCloudFrontOriginRequestEventProcessor } from '../getActionProcessor'
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-/**
- *
- */
 export const getCloudFrontRequestEvent_originRequest = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<CloudFrontRequestEvent>(
     QpqRuntimeType.EVENT_SEO_OR,

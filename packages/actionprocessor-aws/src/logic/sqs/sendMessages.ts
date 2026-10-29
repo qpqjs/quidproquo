@@ -6,9 +6,6 @@ import { getQueueUrl } from './getQueueUrl';
 // SendMessageBatch accepts at most 10 entries per request
 const MAX_ENTRIES_PER_BATCH = 10;
 
-/**
- *
- */
 export type SqsQueueMessageEntry = {
   body: string;
 

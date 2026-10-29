@@ -3,22 +3,13 @@
 // The scope is stored by NAME rather than by position in the partition list. A folder can
 // appear between pages (another tenant gets its first write mid-scan), and an index would
 // then point at a different partition on resume, skipping or repeating one.
-/**
- *
- */
 export type ScanAllScopesPageKey = {
   scope?: string;
   inner?: string;
 };
 
-/**
- *
- */
 export const encodeScanAllScopesPageKey = (pageKey: ScanAllScopesPageKey): string => Buffer.from(JSON.stringify(pageKey), 'utf8').toString('base64');
 
-/**
- *
- */
 export const decodeScanAllScopesPageKey = (encoded?: string): ScanAllScopesPageKey => {
   if (!encoded) {
     return {};

@@ -33,9 +33,6 @@ const readOrSeed = async (runtimePath: string, serviceName: string, key: string)
   return keyPair;
 };
 
-/**
- *
- */
 export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyName: string, qpqConfig: QPQConfig): Promise<Rs256KeyPair> => {
   const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(signingKeyName, qpqConfig);
 

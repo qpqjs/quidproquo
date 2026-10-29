@@ -6,9 +6,6 @@ import { createAwsClient } from '../createAwsClient';
 import { buildDynamoKey } from './utils/buildDynamoKey';
 import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 
-/**
- *
- */
 export async function getItem(
   tableName: string,
   region: string,

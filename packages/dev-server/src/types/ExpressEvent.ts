@@ -1,8 +1,5 @@
 import { QPQBinaryData } from '@qpqjs/core';
 
-/**
- *
- */
 export type ExpressEvent = {
   protocol: string;
   host: string;
@@ -22,9 +19,6 @@ export type ExpressEvent = {
   files?: QPQBinaryData[];
 };
 
-/**
- *
- */
 export type ExpressEventResponse = {
   statusCode: number;
   body: string;

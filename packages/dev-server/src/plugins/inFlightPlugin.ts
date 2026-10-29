@@ -14,8 +14,5 @@ import { DevServerPlugin } from './types/DevServerPlugin';
 export const inFlightPlugin: DevServerPlugin = {
   name: 'in-flight work',
   stopPhase: DevServerShutdownPhase.Drain,
-  /**
-   *
-   */
   start: async () => awaitDevServerIdle,
 };

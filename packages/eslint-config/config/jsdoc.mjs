@@ -10,6 +10,8 @@ export const jsdocConfigs = [
       'jsdoc/require-jsdoc': [
         'warn',
         {
+          // The rule's fixer only inserts an empty `/** */` block, which is worse than no comment, so lint:fix never runs it.
+          enableFixer: false,
           publicOnly: true,
           require: { ArrowFunctionExpression: true, ClassDeclaration: true, FunctionDeclaration: true, FunctionExpression: true },
           contexts: ['TSTypeAliasDeclaration', 'TSInterfaceDeclaration', 'TSEnumDeclaration'],

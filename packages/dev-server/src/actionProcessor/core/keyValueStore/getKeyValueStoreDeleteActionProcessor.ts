@@ -60,8 +60,5 @@ const getProcessKeyValueStoreDelete = (
   };
 };
 
-/**
- *
- */
 export const getKeyValueStoreDeleteActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreDelete, (qpqConfig) => getProcessKeyValueStoreDelete(qpqConfig, devServerConfig));

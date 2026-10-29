@@ -7,9 +7,6 @@ import { WebSocket, WebSocketServer } from 'ws';
 // from here. Importing the implementation from the processor instead would close
 // an import cycle (implementation -> processEvent -> action processors ->
 // implementation).
-/**
- *
- */
 export type RegisteredWebSocketServer = {
   service: string;
   apiName: string;
@@ -21,27 +18,15 @@ const globals: { allServers: RegisteredWebSocketServer[] } = {
   allServers: [],
 };
 
-/**
- *
- */
 export const setRegisteredWebSocketServers = (servers: RegisteredWebSocketServer[]): void => {
   globals.allServers = servers;
 };
 
-/**
- *
- */
 export const getRegisteredWebSocketServers = (): RegisteredWebSocketServer[] => globals.allServers;
 
-/**
- *
- */
 export const findRegisteredWebSocketServer = (service: string, apiName: string): RegisteredWebSocketServer | undefined =>
   globals.allServers.find((s) => s.service === service && s.apiName === apiName);
 
-/**
- *
- */
 export const sendMessageToWebSocketConnection = async (
   service: string,
   websocketApiName: string,

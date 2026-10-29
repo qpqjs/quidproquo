@@ -26,8 +26,5 @@ const getProcessCreateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
   };
 };
 
-/**
- *
- */
 export const getUserDirectoryCreateUserActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryCreateUser, (qpqConfig) => getProcessCreateUser(qpqConfig, devServerConfig));

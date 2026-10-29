@@ -4,9 +4,6 @@ import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionR
 // deployed, a stream batches changes and the processor coalesces them, but locally a write is
 // its own batch, so a burst costs one handler run each. Slower, never wrong, since a
 // projection rebuild is idempotent either way.
-/**
- *
- */
 export type KvsStreamMessageWithSession = {
   storySession: StorySession;
 
@@ -15,26 +12,11 @@ export type KvsStreamMessageWithSession = {
 };
 
 // Externals - The ins and outs of the external event
-/**
- *
- */
 export type EventInput = [KvsStreamMessageWithSession];
-/**
- *
- */
 export type EventOutput = void;
 
 // Internals - the ins and outs of each record in the event
-/**
- *
- */
 export type InternalEventRecord = KvsStreamRecord;
-/**
- *
- */
 export type InternalEventOutput = KvsStreamEventResponse;
 
-/**
- *
- */
 export type MatchResult = MatchStoryResult<any, any>;

@@ -31,7 +31,4 @@ const viewerRequestEventHandler = async (event: CloudFrontRequestEvent, context:
   };
 };
 
-/**
- *
- */
 export const getCloudFrontRequestEvent_viewerRequest = () => viewerRequestEventHandler;

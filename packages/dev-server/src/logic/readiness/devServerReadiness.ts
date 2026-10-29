@@ -12,14 +12,8 @@ const state = {
   ready: false,
 };
 
-/**
- *
- */
 export const markDevServerReady = (): void => {
   state.ready = true;
 };
 
-/**
- *
- */
 export const isDevServerReady = (): boolean => state.ready;

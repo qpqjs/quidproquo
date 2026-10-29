@@ -41,8 +41,5 @@ const getProcessSetAccessToken = (
   };
 };
 
-/**
- *
- */
 export const getUserDirectorySetAccessTokenActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectorySetAccessToken, (qpqConfig) => getProcessSetAccessToken(qpqConfig, devServerConfig));

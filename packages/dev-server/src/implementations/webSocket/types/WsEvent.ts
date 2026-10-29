@@ -1,8 +1,5 @@
 import { WebSocketEventType } from '@qpqjs/webserver';
 
-/**
- *
- */
 export type WsEvent = {
   apiName: string;
   service: string;

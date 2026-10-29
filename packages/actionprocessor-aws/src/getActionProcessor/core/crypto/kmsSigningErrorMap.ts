@@ -7,9 +7,6 @@ type SigningErrorTypes = {
 
 // The KMS exceptions every signing-key processor maps the same way, keyed by
 // error.name as actionResultErrorFromCaughtError expects.
-/**
- *
- */
 export const kmsSigningErrorMap = (errorType: SigningErrorTypes, keyName: string) => ({
   NotFoundException: () => actionResultError(errorType.KeyUnavailable, `Signing key not found: [${keyName}]`),
   DisabledException: () => actionResultError(errorType.KeyUnavailable, `Signing key is disabled: [${keyName}]`),
@@ -18,7 +15,4 @@ export const kmsSigningErrorMap = (errorType: SigningErrorTypes, keyName: string
   ThrottlingException: () => actionResultError(errorType.Throttling, 'Throttling: Rate exceeded'),
 });
 
-/**
- *
- */
 export const signingKeyNotConfiguredMessage = (keyName: string) => `Signing key not configured: [${keyName}] - declare it with defineSigningKey`;

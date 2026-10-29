@@ -2,9 +2,6 @@ import { AskResponse, GraphEntityType, GraphNodeResult } from '@qpqjs/core';
 
 import { NeptuneNodeResult } from '../types';
 
-/**
- *
- */
 export function* askConvertNeptuneNodeResultToGraphNodeResult(neptuneNodeResult: NeptuneNodeResult): AskResponse<GraphNodeResult> {
   return {
     $entityType: GraphEntityType.Node,

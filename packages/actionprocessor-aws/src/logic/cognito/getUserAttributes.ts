@@ -6,9 +6,6 @@ import { createAwsClient } from '../createAwsClient';
 import { getValidCognitoUserAttributes } from './utils/getValidCognitoUserAttributes';
 import { getQpqAttributesFromCognitoUserAttributes } from './getQpqAttributesFromCognitoUserAttributes';
 
-/**
- *
- */
 export const getUserAttributes = async (userPoolId: string, region: string, username: string): Promise<UserAttributes> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

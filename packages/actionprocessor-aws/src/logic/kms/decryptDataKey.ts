@@ -8,9 +8,6 @@ import { toKmsEncryptionContext } from './toKmsEncryptionContext';
 // The wrapped key embeds the CMK id, so no KeyId is needed; the
 // EncryptionContext must match the one used at GenerateDataKey time (this is
 // also what puts the per-context decrypt entry in CloudTrail).
-/**
- *
- */
 export const decryptDataKey = async (wrappedKey: Buffer, context: CryptoContext, region: string): Promise<Buffer> => {
   const kmsClient = createAwsClient(KMSClient, {
     region,

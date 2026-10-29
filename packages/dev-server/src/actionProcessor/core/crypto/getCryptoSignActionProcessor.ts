@@ -39,8 +39,5 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
   };
 };
 
-/**
- *
- */
 export const getCryptoSignActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askCryptoSign, (qpqConfig) => getProcessCryptoSign(qpqConfig, devServerConfig));

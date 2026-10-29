@@ -12,9 +12,6 @@ const getFederatedCodeCachePattern = (): string => {
   return cacheRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
-/**
- *
- */
 export const getSystemTraceStoryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

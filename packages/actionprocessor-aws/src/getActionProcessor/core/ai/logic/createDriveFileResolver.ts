@@ -14,9 +14,6 @@ import { AiDriveFileResolver } from './toSdkMessages';
 
 // Reads drive-referenced files through the active file action processor, so the
 // same message works against S3 in production and local disk under the dev server.
-/**
- *
- */
 export const createDriveFileResolver = (
   qpqConfig: QPQConfig,
   session: StorySession,

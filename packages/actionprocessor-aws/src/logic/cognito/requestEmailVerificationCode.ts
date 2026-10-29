@@ -9,9 +9,6 @@ import {
 import { createAwsClient } from '../createAwsClient';
 import { cognitoCodeDeliveryDetailsToQpqDeliveryDetails } from './utils/cognitoCodeDeliveryDetailsToQpqDeliveryDetails';
 
-/**
- *
- */
 export const requestEmailVerificationCode = async (region: string, accessToken: string): Promise<AuthenticationDeliveryDetails> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

@@ -9,9 +9,6 @@ import * as path from 'path';
 const getStoreFilePath = (runtimePath: string, storeDirectory: string, fileName: string): string =>
   path.join(runtimePath, storeDirectory, `${fileName}.json`);
 
-/**
- *
- */
 export const readJsonFileStore = async <T>(runtimePath: string, storeDirectory: string, fileName: string): Promise<Record<string, T>> => {
   try {
     const raw = await fs.readFile(getStoreFilePath(runtimePath, storeDirectory, fileName), 'utf8');
@@ -24,9 +21,6 @@ export const readJsonFileStore = async <T>(runtimePath: string, storeDirectory: 
   }
 };
 
-/**
- *
- */
 export const writeJsonFileStore = async <T>(
   runtimePath: string,
   storeDirectory: string,

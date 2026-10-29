@@ -24,9 +24,6 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: any): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-/**
- *
- */
 export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, tinkerOptions?: TinkerOptions): TinkerInterface => {
   const availableServices = devServerConfig.qpqConfigs.map((config) => qpqCoreUtils.getApplicationModuleName(config));
 

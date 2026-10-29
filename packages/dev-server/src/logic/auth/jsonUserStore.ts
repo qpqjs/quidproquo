@@ -17,9 +17,6 @@ const readUsers = (runtimePath: string, userDirectory: DevUserDirectory): Promis
 
 // Creates or updates the entry for a login, keyed by its deterministic userId.
 // Passed attributes override stored ones; anything else already stored is kept.
-/**
- *
- */
 export const upsertDevUser = async (
   runtimePath: string,
   userDirectory: DevUserDirectory,
@@ -46,25 +43,16 @@ export const upsertDevUser = async (
   return user;
 };
 
-/**
- *
- */
 export const getDevUserByUserId = async (runtimePath: string, userDirectory: DevUserDirectory, userId: string): Promise<Nullable<UserAttributes>> => {
   const users = await readUsers(runtimePath, userDirectory);
 
   return users[userId] || null;
 };
 
-/**
- *
- */
 export const listDevUsers = async (runtimePath: string, userDirectory: DevUserDirectory): Promise<UserAttributes[]> => {
   return Object.values(await readUsers(runtimePath, userDirectory));
 };
 
-/**
- *
- */
 export const findDevUsersByAttribute = async (
   runtimePath: string,
   userDirectory: DevUserDirectory,

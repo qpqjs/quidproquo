@@ -5,9 +5,6 @@ import { DeleteItemCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { createAwsClient } from '../createAwsClient';
 import { buildDynamoKey } from './utils/buildDynamoKey';
 
-/**
- *
- */
 export async function deleteItem(
   tableName: string,
   region: string,

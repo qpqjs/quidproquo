@@ -23,9 +23,6 @@ const isInsideStoragePath = (storagePath: string, fullFilepath: string): boolean
   return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
-/**
- *
- */
 export const fileStorageImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const app: Express = express();
   const upload = multer({ storage: multer.memoryStorage() });

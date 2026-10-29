@@ -12,9 +12,6 @@ import {
 
 import type { AssistantModelMessage, ModelMessage, ToolModelMessage, UserModelMessage } from 'ai';
 
-/**
- *
- */
 export type AiDriveFileResolver = (drive: string, filepath: string, scope?: string) => Promise<QPQBinaryData>;
 
 const mapFilePart = async (part: AiFilePart, resolveDriveFile: AiDriveFileResolver) => {
@@ -105,9 +102,6 @@ const mapToolMessage = (message: AiToolMessage): ToolModelMessage => ({
   content: message.content.map(mapToolResult),
 });
 
-/**
- *
- */
 export const toSdkMessages = (messages: AiMessage[], resolveDriveFile: AiDriveFileResolver): Promise<ModelMessage[]> =>
   Promise.all(
     messages.map((message) => {

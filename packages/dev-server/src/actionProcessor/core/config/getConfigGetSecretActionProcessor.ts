@@ -14,8 +14,5 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: Resolv
   };
 };
 
-/**
- *
- */
 export const getConfigGetSecretActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askConfigGetSecret, (qpqConfig) => getProcessConfigGetSecret(qpqConfig, devServerConfig));

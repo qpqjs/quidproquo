@@ -25,8 +25,5 @@ const getProcessGetUsers = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevSe
   };
 };
 
-/**
- *
- */
 export const getUserDirectoryGetUsersActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryGetUsers, (qpqConfig) => getProcessGetUsers(qpqConfig, devServerConfig));

@@ -6,9 +6,6 @@ import { getEventBridgeStackDeployEventActionProcessor } from '../getActionProce
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-/**
- *
- */
 export const getEventBridgeEvent_stackDeploy = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<EventBridgeEvent<string, void>>(
     QpqRuntimeType.DEPLOY_EVENT,

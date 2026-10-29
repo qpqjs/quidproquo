@@ -17,9 +17,6 @@ type CachedPublicKey = {
 
 const cache = new Map<string, CachedPublicKey>();
 
-/**
- *
- */
 export const getCachedPublicKey = async (keyAlias: string, region: string): Promise<string> => {
   const cacheKey = `${region}|${keyAlias}`;
 

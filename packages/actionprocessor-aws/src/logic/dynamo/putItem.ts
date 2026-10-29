@@ -5,9 +5,6 @@ import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { createAwsClient } from '../createAwsClient';
 import { convertObjectToDynamoItem } from './qpqDynamoOrm';
 
-/**
- *
- */
 export type PutItemOptions = {
   // Requested TTL in seconds. Not currently applied: the table's ttlAttribute
   // name is not plumbed through to this call, so the value is silently
@@ -23,9 +20,6 @@ export type PutItemOptions = {
   ifNotExistsAttribute?: string;
 };
 
-/**
- *
- */
 export async function putItem(
   tableName: string,
   item: KvsObjectDataType,

@@ -28,8 +28,5 @@ const getProcessRespondToAuthChallenge = (
   };
 };
 
-/**
- *
- */
 export const getUserDirectoryRespondToAuthChallengeActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryRespondToAuthChallenge, (qpqConfig) => getProcessRespondToAuthChallenge(qpqConfig, devServerConfig));

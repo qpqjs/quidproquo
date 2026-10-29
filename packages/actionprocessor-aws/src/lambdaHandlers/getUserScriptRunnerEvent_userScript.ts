@@ -24,9 +24,6 @@ export const getRunnerChildModulePath = (env: NodeJS.ProcessEnv = process.env): 
   return path.join(env.LAMBDA_TASK_ROOT, 'child', 'index.js');
 };
 
-/**
- *
- */
 export type UserScriptRunnerHandlerOptions = {
   childModulePath?: string;
 };

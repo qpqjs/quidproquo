@@ -4,9 +4,6 @@ import { QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 import { DevServerPorts } from './DevServerPorts';
 
 // Optional file storage config for input
-/**
- *
- */
 export type OptionalFileStorageConfig = {
   storagePath?: string;
   secureUrlPort?: number;
@@ -16,15 +13,9 @@ export type OptionalFileStorageConfig = {
   secureUrlSecret?: string;
 };
 
-/**
- *
- */
 export type DevServerDelayConfig = number | { default?: number; [actionType: string]: number | undefined };
 
 // Input config with optional file storage
-/**
- *
- */
 export type DevServerConfig = {
   serverDomain: 'localhost';
   serverPort: number;
@@ -59,9 +50,6 @@ export type DevServerConfig = {
 };
 
 // Resolved config with required file storage
-/**
- *
- */
 export type ResolvedDevServerConfig = {
   serverDomain: 'localhost';
   serverPort: number;

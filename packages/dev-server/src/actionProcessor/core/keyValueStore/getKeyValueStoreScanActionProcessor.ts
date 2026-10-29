@@ -47,8 +47,5 @@ const getProcessKeyValueStoreScan = (
   };
 };
 
-/**
- *
- */
 export const getKeyValueStoreScanActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreScanBase, (qpqConfig) => getProcessKeyValueStoreScan(qpqConfig, devServerConfig));

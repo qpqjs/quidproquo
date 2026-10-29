@@ -8,9 +8,6 @@ import {
   Nullable,
 } from '@qpqjs/core';
 
-/**
- *
- */
 export type KvsKeyNarrowing = {
   sql: string;
   params: (string | number)[];
@@ -67,9 +64,6 @@ const buildSkClause = (condition: KvsQueryCondition): Nullable<KvsKeyNarrowing> 
   return { sql: comparisonSql, params: [condition.valueA] };
 };
 
-/**
- *
- */
 export const buildKvsKeyNarrowing = (keyCondition: KvsQueryOperation, storeConfig: KeyValueStoreQPQConfigSetting): KvsKeyNarrowing => {
   if (!('conditions' in keyCondition)) {
     const condition = keyCondition as KvsQueryCondition;

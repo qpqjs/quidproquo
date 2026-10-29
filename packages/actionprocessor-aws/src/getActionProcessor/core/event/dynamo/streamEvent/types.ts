@@ -16,26 +16,11 @@ export const GLOBAL_KVS_STREAM_COALESCE = process.env.kvsStreamCoalesceByPartiti
 export const GLOBAL_KVS_STREAM_PARTITION_KEY = process.env.kvsStreamPartitionKey || '';
 
 // Externals: the ins and outs of the external event
-/**
- *
- */
 export type EventInput = [DynamoDBStreamEvent, Context];
-/**
- *
- */
 export type EventOutput = void;
 
 // Internals: the ins and outs of each record in the event
-/**
- *
- */
 export type InternalEventRecord = KvsStreamRecord;
-/**
- *
- */
 export type InternalEventOutput = KvsStreamEventResponse;
 
-/**
- *
- */
 export type MatchResult = MatchStoryResult<any, any>;

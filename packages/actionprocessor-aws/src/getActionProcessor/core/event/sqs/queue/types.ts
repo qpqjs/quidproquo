@@ -2,42 +2,21 @@ import { MatchStoryResult, Nullable, QueueEvent, QueueEventResponse, QueueMessag
 
 import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 
-/**
- *
- */
 export type AnyQueueMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
 };
 
 // Externals - The ins and outs of the external event
-/**
- *
- */
 export type EventInput = [SQSEvent, Context];
-/**
- *
- */
 export type EventOutput = SQSBatchResponse;
 
 // Internals - the ins and outs of each record in the event
-/**
- *
- */
 export type InternalEventRecord = QueueEvent<QueueMessage<any>>;
-/**
- *
- */
 export type InternalEventOutput = QueueEventResponse;
 
-/**
- *
- */
 export type MatchResult = MatchStoryResult<any, any>;
 
 // Special types
-/**
- *
- */
 export type CloudWatchAlarmNotification = {
   AlarmName: string;
   AlarmDescription: Nullable<string>;

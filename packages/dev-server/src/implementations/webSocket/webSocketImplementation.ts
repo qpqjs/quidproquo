@@ -156,9 +156,6 @@ const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): Web
     );
 };
 
-/**
- *
- */
 export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   if (!devServerConfig.webSocketPort) {
     return null;

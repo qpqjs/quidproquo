@@ -5,9 +5,6 @@ const seenDeduplicationExpiryTimes: Map<string, number> = new Map();
 
 // Returns true when the key was already seen inside the dedup window; otherwise records
 // it and returns false. Keys should be namespaced by resource, e.g. `${queueName}:${dedupId}`.
-/**
- *
- */
 export const isDuplicateFifoMessage = (deduplicationKey: string): boolean => {
   const now = Date.now();
 

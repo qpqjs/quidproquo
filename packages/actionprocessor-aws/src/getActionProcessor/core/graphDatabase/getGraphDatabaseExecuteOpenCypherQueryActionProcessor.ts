@@ -12,9 +12,6 @@ import {
 import { getGraphDatabaseForNeptuneActionProcessor } from './customActions';
 import { askRunNeptuneOpenCypherQuery } from './stories';
 
-/**
- *
- */
 export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => ({

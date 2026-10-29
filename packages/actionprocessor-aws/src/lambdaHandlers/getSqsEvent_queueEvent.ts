@@ -26,9 +26,6 @@ const getProcessEventStory = (qpqConfig: QPQConfig): typeof askProcessEvent => {
   return askProcessEvent;
 };
 
-/**
- *
- */
 export const getSqsEvent_queueEvent = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<SQSEvent>(
     QpqRuntimeType.QUEUE_EVENT,

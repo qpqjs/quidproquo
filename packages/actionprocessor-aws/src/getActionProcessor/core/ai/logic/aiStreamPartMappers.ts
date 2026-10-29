@@ -28,9 +28,6 @@ import { mapAiStreamToolInputStart } from './mapAiStreamToolInputStart';
 import { mapAiStreamToolOutputDenied } from './mapAiStreamToolOutputDenied';
 import { mapAiStreamToolResult } from './mapAiStreamToolResult';
 
-/**
- *
- */
 export type AiStreamPartMappers = {
   [K in AiSdkStreamPart['type']]: (part: AiSdkStreamPartOfType<K>) => AiStreamPart;
 };

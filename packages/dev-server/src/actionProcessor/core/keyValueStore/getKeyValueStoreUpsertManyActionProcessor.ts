@@ -77,8 +77,5 @@ const getProcessKeyValueStoreUpsertMany = (
   };
 };
 
-/**
- *
- */
 export const getKeyValueStoreUpsertManyActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreUpsertManyBase, (qpqConfig) => getProcessKeyValueStoreUpsertMany(qpqConfig, devServerConfig));

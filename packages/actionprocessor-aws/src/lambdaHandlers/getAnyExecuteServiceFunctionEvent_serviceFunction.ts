@@ -10,9 +10,6 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<unk
   storySession: StorySession;
 };
 
-/**
- *
- */
 export const getAnyExecuteServiceFunctionEvent_serviceFunction = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<AnyExecuteServiceFunctionEventWithSession>(
     QpqRuntimeType.SERVICE_FUNCTION_EXE,

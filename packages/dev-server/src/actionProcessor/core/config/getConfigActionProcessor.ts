@@ -6,9 +6,6 @@ import { getConfigGetParametersActionProcessor } from './getConfigGetParametersA
 import { getConfigGetSecretActionProcessor } from './getConfigGetSecretActionProcessor';
 import { getConfigSetParameterActionProcessor } from './getConfigSetParameterActionProcessor';
 
-/**
- *
- */
 export const getConfigActionProcessor =
   (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
   async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => {

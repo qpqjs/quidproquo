@@ -11,9 +11,6 @@ const getInvalidationCallerReference = (paths: string[]): string => {
   return allPathHash + new Date().toISOString();
 };
 
-/**
- *
- */
 export const invalidateCache = async (distributionId: string, region: string, paths: string[]): Promise<void> => {
   const cloudFrontClient = createAwsClient(CloudFrontClient, { region });
 

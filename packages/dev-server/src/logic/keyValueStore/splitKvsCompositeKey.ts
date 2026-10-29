@@ -1,8 +1,5 @@
 import { KeyValueStoreQPQConfigSetting, Nullable } from '@qpqjs/core';
 
-/**
- *
- */
 export type KvsCompositeKeyParts = {
   pk: string;
   sk: Nullable<string>;

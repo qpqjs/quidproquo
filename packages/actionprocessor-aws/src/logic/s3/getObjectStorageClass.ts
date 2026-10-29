@@ -2,9 +2,6 @@ import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { createAwsClient } from '../createAwsClient';
 
-/**
- *
- */
 export const getObjectStorageClass = async (bucketName: string, key: string, region: string): Promise<'cold_storage' | 'standard'> => {
   const s3Client = createAwsClient(S3Client, { region });
 

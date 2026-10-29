@@ -7,9 +7,6 @@ import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 // The app client has a secret (same one the refresh flow uses), so it must be supplied.
 // Requires token revocation to be enabled on the app client (the CDK default), a disabled
 // client surfaces as UnsupportedOperationException/UnsupportedTokenTypeException.
-/**
- *
- */
 export const revokeRefreshToken = async (userPoolId: string, clientId: string, region: string, refreshToken: string): Promise<void> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

@@ -25,9 +25,6 @@ import { qpqConfig, qpqDynamicModuleLoader } from 'quidproquo-dynamic-loader';
 
 import { loadFederatedStory } from '../../logic/federatedModuleStore';
 
-/**
- *
- */
 export const dynamicModuleLoader = async <T = any>(qpqFunctionRuntime: QpqFunctionRuntime): Promise<T> => {
   // Tier 1: federated. undefined means "nothing published for this runtime" -> fall through.
   const federatedStory = await loadFederatedStory<T>(qpqConfig, qpqFunctionRuntime);

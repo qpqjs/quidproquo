@@ -1,17 +1,11 @@
 import { QPQConfig, QPQConfigAdvancedSettings } from '@qpqjs/core';
 import { defineServiceFunction } from '@qpqjs/webserver';
 
-/**
- *
- */
 export type QPQConfigAdvancedDevServerSettings = {
   onlyDeploySafe?: boolean;
   vpcList?: string[];
 } & QPQConfigAdvancedSettings;
 
-/**
- *
- */
 export const defineDevServerConfig = (advancedSettings?: QPQConfigAdvancedDevServerSettings): QPQConfig => {
   const onlyDeploySafe = advancedSettings?.onlyDeploySafe ?? true;
   const vpcList: string[] = advancedSettings?.vpcList || [];

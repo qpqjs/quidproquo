@@ -2,9 +2,6 @@ import { PutObjectCommand, S3Client, StorageClass } from '@aws-sdk/client-s3';
 
 import { createAwsClient } from '../createAwsClient';
 
-/**
- *
- */
 export const writeTextFile = async (
   bucketName: string,
   key: string,

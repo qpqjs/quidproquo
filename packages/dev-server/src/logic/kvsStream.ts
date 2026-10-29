@@ -6,9 +6,6 @@ import { eventBus } from './eventBus';
 // In-process channel between "a store was written" and "run its stream handler".
 export const KVS_STREAM_EVENT_TOPIC = 'qpq/devServer/kvsStream';
 
-/**
- *
- */
 export type KvsStreamEmission = {
   keyValueStoreName: string;
   eventType: KvsStreamEventType;

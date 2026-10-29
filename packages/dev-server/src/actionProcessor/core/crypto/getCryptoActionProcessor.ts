@@ -7,9 +7,6 @@ import { getCryptoGetPublicKeyActionProcessor } from './getCryptoGetPublicKeyAct
 import { getCryptoSignActionProcessor } from './getCryptoSignActionProcessor';
 import { getCryptoVerifyActionProcessor } from './getCryptoVerifyActionProcessor';
 
-/**
- *
- */
 export const getCryptoActionProcessor =
   (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
   async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({

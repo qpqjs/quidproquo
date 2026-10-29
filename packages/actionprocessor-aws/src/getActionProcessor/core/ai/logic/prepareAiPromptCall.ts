@@ -20,9 +20,6 @@ import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
 import { resolveBedrockModel } from './resolveBedrockModel';
 
-/**
- *
- */
 export type PrepareAiPromptCallPayload = {
   model: AiModel;
   aiName?: string;
@@ -31,15 +28,9 @@ export type PrepareAiPromptCallPayload = {
 type BedrockProvider = ReturnType<typeof createAmazonBedrock>;
 type BedrockLanguageModel = ReturnType<BedrockProvider>;
 
-/**
- *
- */
 export type PrepareAiPromptCallResult =
   { error: { type: ErrorTypeEnum; message: string } } | { model: BedrockLanguageModel; tools: ToolSet | undefined };
 
-/**
- *
- */
 export const prepareAiPromptCall = (
   qpqConfig: QPQConfig,
   payload: PrepareAiPromptCallPayload,

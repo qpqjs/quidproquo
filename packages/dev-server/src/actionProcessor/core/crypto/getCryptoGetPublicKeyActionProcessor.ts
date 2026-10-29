@@ -32,8 +32,5 @@ const getProcessCryptoGetPublicKey = (qpqConfig: QPQConfig, devServerConfig: Res
   };
 };
 
-/**
- *
- */
 export const getCryptoGetPublicKeyActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askCryptoGetPublicKey, (qpqConfig) => getProcessCryptoGetPublicKey(qpqConfig, devServerConfig));

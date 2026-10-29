@@ -17,9 +17,6 @@ import {
 import { eventBus } from '../../../logic/eventBus';
 import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';
 
-/**
- *
- */
 export type AnyEventBusMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
 

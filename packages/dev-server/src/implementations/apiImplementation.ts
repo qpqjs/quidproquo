@@ -64,9 +64,6 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-/**
- *
- */
 export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   // Already localised (dns base, cors) by resolveDevServerConfig, same copy every plugin uses
   const allServiceConfig = devServerConfig.qpqConfigs;

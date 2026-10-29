@@ -1,9 +1,6 @@
 // ListUsers filter strings are built by interpolation, so a value containing a
 // quote or backslash could break out of the quoted literal and alter the filter.
 // Cognito defines no escaping for these, so unsafe input is rejected outright.
-/**
- *
- */
 export class InvalidCognitoFilterError extends Error {
   readonly code = 'INVALID_COGNITO_FILTER';
 
