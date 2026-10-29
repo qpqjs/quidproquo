@@ -62,7 +62,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   table: aws_dynamodb.ITable;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, keyValueStoreName: string): QpqCoreKeyValueStoreConstructBase {
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqCoreKeyValueStoreConstructBase {
       table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
@@ -164,7 +164,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     // If we have an override, lets use it instead
     // we still want to keep the above table created.
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
     if (tableNameOverride) {
       this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
@@ -188,7 +188,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     // pair per table: applyEnvironmentTags stamps every owned table, and DynamoDB ABAC
     // evaluates the table's tags for its index sub-resources too. This keeps the policy
     // a fixed size no matter how many KVSs (eventDoc collections especially) the service
-    // accumulates. A table brought in via getDynamoTableNameOverrride is imported, not
+    // accumulates. A table brought in via getDynamoTableNameOverride is imported, not
     // created here, so it only matches if whoever created it applied the same tags.
     role.addToPrincipalPolicy(
       new aws_iam.PolicyStatement({

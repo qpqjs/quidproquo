@@ -9,7 +9,7 @@ describe('defineGraphDatabase', () => {
       configSettingType: QPQCoreConfigSettingType.graphDatabase,
       uniqueKey: 'Graph',
       name: 'Graph',
-      virualNetworkName: 'Vpc',
+      virtualNetworkName: 'Vpc',
       owner: undefined,
     });
   });

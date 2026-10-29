@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Typo renames: `defineAwsDyanmoOverrideForKvs` / `QPQAwsConfigSettingType.awsDyanmoOverrideForKvs` (value `@quidproquo-aws/config/awsDynamoOverrideForKvs`) are now `defineAwsDynamoOverrideForKvs` / `awsDynamoOverrideForKvs`; `getDynamoTableNameOverrride` is `getDynamoTableNameOverride` (`@qpqjs/config-aws`); `getVirualNetworkConfigs` is `getVirtualNetworkConfigs` and `defineGraphDatabase`'s `virualNetworkName` is `virtualNetworkName` (`@qpqjs/core`); `getAllOwnedCertifcateConfigs` is `getAllOwnedCertificateConfigs` (`@qpqjs/webserver`).
 - `preformNetworkRequest` in `@qpqjs/webserver` is renamed `performNetworkRequest` (file `utils/performNetworkRequest.ts`). Update imports.
 - A setting under an application with no `environment` now counts as `production` when `flattenQpqConfig` resolves environment-scoped settings (it used to assume `development`), matching `getApplicationModuleEnvironment`. Set `environment` on the application if you relied on the old default.
 - `defineStateMachine` from `@qpqjs/xstate` now returns a `QPQConfig` instead of `QPQConfigSetting[]`. Code typing the result as `QPQConfigSetting[]` should use `QPQConfig`.

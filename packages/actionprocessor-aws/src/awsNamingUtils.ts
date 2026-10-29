@@ -133,7 +133,7 @@ export const getQpqRuntimeResourceNameFromConfig = (resourceName: ResourceName, 
 // Note: only the owner's module is honoured here; an owner application/environment/feature on
 // a kvs config does not change the table name. Changing that now would orphan deployed tables.
 export const getKvsDynamoTableNameFromConfig = (resourceName: string, qpqConfig: QPQConfig, resourceType: string = '') => {
-  const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(resourceName, qpqConfig);
+  const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(resourceName, qpqConfig);
   if (tableNameOverride) {
     return tableNameOverride;
   }

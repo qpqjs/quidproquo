@@ -25,7 +25,7 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
       qpqConfig: props.qpqConfig,
     });
 
-    const virtualNetworks = qpqCoreUtils.getVirualNetworkConfigs(props.qpqConfig).map(
+    const virtualNetworks = qpqCoreUtils.getVirtualNetworkConfigs(props.qpqConfig).map(
       (setting) =>
         new BootstrapQpqCoreVirtualNetworkConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

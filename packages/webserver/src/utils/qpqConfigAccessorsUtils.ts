@@ -125,7 +125,7 @@ export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServer
   return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
 };
 
-export const getAllOwnedCertifcateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
+export const getAllOwnedCertificateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
   const certificateSettings = qpqCoreUtils.getConfigSettings<CertificateQPQWebServerConfigSetting>(
     qpqConfig,
     QPQWebServerConfigSettingType.Certificate,

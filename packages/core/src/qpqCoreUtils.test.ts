@@ -85,7 +85,7 @@ import {
   getUserDirectoryEmailTemplates,
   getUserDirectorySrcEntries,
   getUserScriptRunner,
-  getVirualNetworkConfigs,
+  getVirtualNetworkConfigs,
   isSameResource,
   resolveCrossServiceResourceName,
   resolveGlobalValue,
@@ -529,7 +529,7 @@ describe('qpqCoreUtils', () => {
       ]);
 
       expect(getAllAiConfigs(config).map((a) => a.aiName)).toEqual(['assistant']);
-      expect(getVirualNetworkConfigs(config).map((v) => v.name)).toEqual(['vpc']);
+      expect(getVirtualNetworkConfigs(config).map((v) => v.name)).toEqual(['vpc']);
       expect(getNotifyErrorConfigs(config).map((n) => n.name)).toEqual(['alarms']);
       expect(getDeployEventConfigs(config).map((d) => d.name)).toEqual(['postDeploy']);
     });

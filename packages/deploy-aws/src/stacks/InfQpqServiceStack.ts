@@ -240,8 +240,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    // Certifcates
-    const certifcates = qpqWebServerUtils.getAllOwnedCertifcateConfigs(props.qpqConfig).map(
+    // Certificates
+    const certifcates = qpqWebServerUtils.getAllOwnedCertificateConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverCertificateConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

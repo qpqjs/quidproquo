@@ -9,22 +9,22 @@ import {
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedAwsDyanmoOverrideForKvsSettings extends QPQConfigAdvancedSettings {}
+export interface QPQConfigAdvancedAwsDynamoOverrideForKvsSettings extends QPQConfigAdvancedSettings {}
 
-export interface AwsDyanmoOverrideForKvsQPQConfigSetting extends QPQConfigSetting {
+export interface AwsDynamoOverrideForKvsQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
   kvsStore: FullyQualifiedResource;
   dynamoTableName: string;
 }
 
-export const defineAwsDyanmoOverrideForKvs = (
+export const defineAwsDynamoOverrideForKvs = (
   name: string,
   kvsStore: CustomFullyQualifiedResource<'keyValueStoreName'>,
   dynamoTableName: string,
-  options?: QPQConfigAdvancedAwsDyanmoOverrideForKvsSettings,
-): AwsDyanmoOverrideForKvsQPQConfigSetting => ({
-  configSettingType: QPQAwsConfigSettingType.awsDyanmoOverrideForKvs,
+  options?: QPQConfigAdvancedAwsDynamoOverrideForKvsSettings,
+): AwsDynamoOverrideForKvsQPQConfigSetting => ({
+  configSettingType: QPQAwsConfigSettingType.awsDynamoOverrideForKvs,
   uniqueKey: name,
 
   name,

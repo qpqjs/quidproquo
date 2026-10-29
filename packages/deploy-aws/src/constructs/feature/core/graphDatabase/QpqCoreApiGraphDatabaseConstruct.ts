@@ -18,7 +18,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
   cluster: aws_neptune.IDatabaseCluster;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, keyValueStoreName: string): QpqConstructBlock {
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqConstructBlock {
       table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
@@ -31,7 +31,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const vpc = aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', {
-      vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.graphDatabaseConfig.virualNetworkName, props.qpqConfig),
+      vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.graphDatabaseConfig.virtualNetworkName, props.qpqConfig),
     });
 
     // const clusterParameterGroup = new aws_neptune.ClusterParameterGroup(this, 'ClusterParams', {
@@ -80,7 +80,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
     const workloadSecurityGroup = aws_ec2.SecurityGroup.fromLookupByName(
       this,
       'workload-sg-lookup',
-      getVirtualNetworkWorkloadSecurityGroupName(props.graphDatabaseConfig.virualNetworkName, props.qpqConfig),
+      getVirtualNetworkWorkloadSecurityGroupName(props.graphDatabaseConfig.virtualNetworkName, props.qpqConfig),
       vpc,
     );
     this.cluster.connections.allowDefaultPortFrom(workloadSecurityGroup, 'qpq workload lambdas');

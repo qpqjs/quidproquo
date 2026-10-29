@@ -7,7 +7,7 @@ import {
   AwsAlarmQPQConfigSetting,
   AwsDataStoreRemovalPolicy,
   AwsDataStoreRemovalPolicyQPQConfigSetting,
-  AwsDyanmoOverrideForKvsQPQConfigSetting,
+  AwsDynamoOverrideForKvsQPQConfigSetting,
   AwsGithubDeployRoleQPQConfigSetting,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
@@ -299,13 +299,13 @@ export const getDomainCertificateArnSsmParameterName = (region: string, qpqConfi
   return `/qpq/domain/certificate-arn/${region}/${[application, environment, feature].filter(Boolean).join('-')}`;
 };
 
-export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
+export const getDynamoTableNameOverride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
   const resource = qpqCoreUtils.getKeyValueStoreFullyQualifiedResourceName(srcKvsName, qpqConfig);
 
   // Grab all the overrides that do exist
-  const dynamoOverrides = qpqCoreUtils.getConfigSettings<AwsDyanmoOverrideForKvsQPQConfigSetting>(
+  const dynamoOverrides = qpqCoreUtils.getConfigSettings<AwsDynamoOverrideForKvsQPQConfigSetting>(
     qpqConfig,
-    QPQAwsConfigSettingType.awsDyanmoOverrideForKvs,
+    QPQAwsConfigSettingType.awsDynamoOverrideForKvs,
   );
 
   // Find an override that matches the resource

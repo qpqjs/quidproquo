@@ -35,7 +35,7 @@ const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
       );
     }
 
-    const functionName = `graphQuery${graphDatabaseConfig.virualNetworkName}`;
+    const functionName = `graphQuery${graphDatabaseConfig.virtualNetworkName}`;
 
     return yield* askServiceFunctionExecute<GraphCypherResponse, GraphDatabaseExecuteOpenCypherQueryActionPayload>(
       serviceName,

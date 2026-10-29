@@ -20,7 +20,7 @@ import {
   defaultFileUploadSettings,
   getAllApiKeyConfigs,
   getAllOwnedCacheConfigs,
-  getAllOwnedCertifcateConfigs,
+  getAllOwnedCertificateConfigs,
   getAllRoutes,
   getAllSeo,
   getAllServiceFunctions,
@@ -172,7 +172,7 @@ describe('getDefaultRouteSettings', () => {
 describe('certificate ownership selectors', () => {
   it('does not throw building a certificate config', () => {
     const config = buildTestQpqConfig([defineCertificate(true, 'example.com')]);
-    expect(getAllOwnedCertifcateConfigs(config)).toHaveLength(1);
+    expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });
 
@@ -204,6 +204,6 @@ describe('list and ownership selectors', () => {
     expect(getOwnedServiceFunctions(config)).toHaveLength(1);
     expect(getOwnedWebsocketSettings(config)).toHaveLength(1);
     expect(getAllOwnedCacheConfigs(config)).toHaveLength(1);
-    expect(getAllOwnedCertifcateConfigs(config)).toHaveLength(1);
+    expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });
