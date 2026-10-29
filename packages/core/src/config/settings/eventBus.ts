@@ -28,5 +28,5 @@ export const defineEventBus = (name: string, options?: QPQConfigAdvancedEventBus
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 
-  isFifo: options?.isFifo || false,
+  isFifo: options?.isFifo ?? false,
 });

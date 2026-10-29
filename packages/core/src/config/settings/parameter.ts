@@ -17,7 +17,7 @@ export const defineParameter = (key: string, options?: QPQConfigAdvancedParamete
   uniqueKey: key,
 
   key,
-  value: options?.value || '',
+  value: options?.value ?? '',
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

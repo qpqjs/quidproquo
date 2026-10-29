@@ -55,6 +55,7 @@ export const defineAwsServiceAccountInfo = (
   serviceInfoMap: serviceInfoMap ?? [],
   apiLayers: options?.apiLayers ?? [],
 
+  // Zero is not a valid memory size or retention period, so it means unset here, hence || rather than ??.
   lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024,
   cloudWatchLogRetentionDays: options?.cloudWatchLogRetentionDays || 7,
 

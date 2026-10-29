@@ -37,7 +37,7 @@ export interface BackendBundleOptionsQPQConfigSetting extends QPQConfigSetting {
 
 export const defineBackendBundleOptions = (options: BackendBundleOptions): BackendBundleOptionsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.backendBundleOptions,
-  uniqueKey: JSON.stringify(options),
+  uniqueKey: 'backendBundleOptions',
 
   externals: options.externals ?? [],
   ignoreModules: options.ignoreModules ?? [],
@@ -59,7 +59,7 @@ export interface FrontendBundleOptionsQPQConfigSetting extends QPQConfigSetting 
 
 export const defineFrontendBundleOptions = (options: FrontendBundleOptions): FrontendBundleOptionsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.frontendBundleOptions,
-  uniqueKey: JSON.stringify(options),
+  uniqueKey: 'frontendBundleOptions',
 
   sharedSingletons: options.sharedSingletons ?? [],
 });

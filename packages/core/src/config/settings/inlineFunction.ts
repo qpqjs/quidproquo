@@ -19,7 +19,7 @@ export const defineInlineFunction = (
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedInlineFunctionSettings,
 ): InlineFunctionQPQConfigSetting => {
-  const functionName = options?.functionName || getStoryNameFromQpqFunctionRuntime(runtime);
+  const functionName = options?.functionName ?? getStoryNameFromQpqFunctionRuntime(runtime);
 
   return {
     configSettingType: QPQCoreConfigSettingType.inlineFunction,

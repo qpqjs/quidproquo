@@ -33,11 +33,11 @@ export const defineApi = (apiName: string, options?: QPQConfigAdvancedApiSetting
     configSettingType: QPQWebServerConfigSettingType.Api,
     uniqueKey: apiName,
 
-    apiSubdomain: options?.subDomain || apiName,
+    apiSubdomain: options?.subDomain ?? apiName,
 
     apiName: apiName,
 
-    deprecated: options?.deprecated || false,
+    deprecated: options?.deprecated ?? false,
 
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 

@@ -31,7 +31,7 @@ export const defineAi = (aiName: string, options?: QPQConfigAdvancedAiSettings):
 
   aiName,
 
-  tools: options?.tools || [],
+  tools: options?.tools ?? [],
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

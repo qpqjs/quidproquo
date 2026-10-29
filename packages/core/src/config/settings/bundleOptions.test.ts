@@ -9,7 +9,7 @@ describe('defineBackendBundleOptions', () => {
   it('builds a BackendBundleOptions setting with defaults for omitted fields', () => {
     expect(defineBackendBundleOptions({ externals: ['sharp'] })).toEqual({
       configSettingType: QPQCoreConfigSettingType.backendBundleOptions,
-      uniqueKey: JSON.stringify({ externals: ['sharp'] }),
+      uniqueKey: 'backendBundleOptions',
       externals: ['sharp'],
       ignoreModules: [],
       ignoreWarnings: [],
@@ -21,7 +21,7 @@ describe('defineFrontendBundleOptions', () => {
   it('builds a FrontendBundleOptions setting', () => {
     expect(defineFrontendBundleOptions({ sharedSingletons: ['chakra', 'zod'] })).toEqual({
       configSettingType: QPQCoreConfigSettingType.frontendBundleOptions,
-      uniqueKey: JSON.stringify({ sharedSingletons: ['chakra', 'zod'] }),
+      uniqueKey: 'frontendBundleOptions',
       sharedSingletons: ['chakra', 'zod'],
     });
   });

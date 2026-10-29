@@ -58,10 +58,10 @@ export const defineWebsocket = (
     eventProcessors,
 
     // advanced
-    onRootDomain: options?.onRootDomain || false,
-    apiName: options?.apiName || 'api',
+    onRootDomain: options?.onRootDomain ?? false,
+    apiName: options?.apiName ?? 'api',
 
-    deprecated: options?.deprecated || false,
+    deprecated: options?.deprecated ?? false,
 
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 

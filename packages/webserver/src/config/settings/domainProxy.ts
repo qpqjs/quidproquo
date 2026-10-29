@@ -50,7 +50,7 @@ export const defineDomainProxy = (name: string, options: QPQConfigAdvancedDomain
 
   domain: options.domain,
 
-  ignoreCache: options.ignoreCache || [],
+  ignoreCache: options.ignoreCache ?? [],
 
   cacheSettingsName: options.cacheSettingsName,
 

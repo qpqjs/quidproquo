@@ -17,7 +17,7 @@ export const defineCertificate = (
   options?: QPQConfigAdvancedCertificateSettings,
 ): CertificateQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Certificate,
-  uniqueKey: `${onRootDomain}${subdomain}`,
+  uniqueKey: `${onRootDomain}:${subdomain ?? ''}`,
 
   onRootDomain,
   subdomain,

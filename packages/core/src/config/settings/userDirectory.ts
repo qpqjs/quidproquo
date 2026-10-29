@@ -75,7 +75,7 @@ export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUse
 
   name,
 
-  phoneRequired: options?.phoneRequired || false,
+  phoneRequired: options?.phoneRequired ?? false,
 
   selfSignUpEnabled: options?.selfSignUpEnabled ?? false,
 

@@ -27,7 +27,7 @@ export const defineServiceFunction = (
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedServiceFunctionSettings,
 ): ServiceFunctionQPQWebServerConfigSetting => {
-  const functionName = options?.functionName || qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
+  const functionName = options?.functionName ?? qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
 
   return {
     configSettingType: QPQWebServerConfigSettingType.ServiceFunction,

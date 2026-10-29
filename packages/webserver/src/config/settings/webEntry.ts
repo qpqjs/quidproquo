@@ -72,9 +72,9 @@ export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntryS
   uniqueKey: name,
 
   name,
-  indexRoot: options?.indexRoot || 'index.html',
+  indexRoot: options?.indexRoot ?? 'index.html',
 
-  storageDrive: options?.storageDrive || {
+  storageDrive: options?.storageDrive ?? {
     autoUpload: true,
   },
 
@@ -82,7 +82,7 @@ export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntryS
 
   buildPath: options?.buildPath,
 
-  ignoreCache: options?.ignoreCache || [],
+  ignoreCache: options?.ignoreCache ?? [],
 
   compressFiles: options?.compressFiles ?? true,
 

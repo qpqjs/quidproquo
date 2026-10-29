@@ -24,7 +24,7 @@ export const defineSeo = (path: string, runtime: QpqFunctionRuntime, options?: Q
   runtime,
 
   webEntry: options?.webEntry,
-  deprecated: options?.deprecated || false,
+  deprecated: options?.deprecated ?? false,
 
   cacheSettingsName: options?.cacheSettingsName,
 });

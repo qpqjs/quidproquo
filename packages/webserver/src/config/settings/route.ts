@@ -60,8 +60,8 @@ export const defineRoute = (
   runtime: QpqFunctionRuntime,
   options: GenericRouteOptions<ApiKeyReference | string> = {},
 ): RouteQPQWebServerConfigSetting => {
-  const routeAuthSettings = options.routeAuthSettings || {};
-  const apiKeys = routeAuthSettings.apiKeys || [];
+  const routeAuthSettings = options.routeAuthSettings ?? {};
+  const apiKeys = routeAuthSettings.apiKeys ?? [];
   const newOptions = {
     ...options,
     routeAuthSettings: {

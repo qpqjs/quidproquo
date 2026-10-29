@@ -60,7 +60,7 @@ export const defineRecurringSchedule = (
 
     recurrence,
 
-    metadata: options?.metadata || {},
+    metadata: options?.metadata ?? {},
 
     maxConcurrentExecutions: options?.maxConcurrentExecutions,
 

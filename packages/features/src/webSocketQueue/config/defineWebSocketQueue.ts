@@ -88,11 +88,11 @@ export const defineWebSocketQueue = (
   return [
     // User defined vars (stored in config)
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName), advancedSettings?.connectionAuthenticator || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName), advancedSettings?.connectionAuthenticator ?? ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {
