@@ -15,7 +15,7 @@ const getWebEntryTarget = (qpqConfig: QPQConfig, subDomainName: Nullable<string>
 
 const getApiAddresses = (qpqConfigs: QPQConfig[], resolve: WebAddressingResolver): ApiAddress[] =>
   qpqConfigs.flatMap((qpqConfig) =>
-    qpqWebServerUtils.getApiConfigs(qpqConfig).map((api) => ({
+    qpqWebServerUtils.getAllApiConfigs(qpqConfig).map((api) => ({
       service: qpqCoreUtils.getApplicationModuleName(qpqConfig),
       apiSubdomain: api.apiSubdomain,
       hosts: qpqWebServerUtils.resolveHosts(qpqConfig, { subdomain: api.apiSubdomain }, resolve(qpqConfig)),

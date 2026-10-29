@@ -27,7 +27,7 @@ export class DomainQpqServiceStack extends QpqServiceStack {
     });
 
     // Regional API Gateway custom DomainName + A record, one per defineApi entry.
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).map((setting) => {
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).map((setting) => {
       const api = new DomainQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
         qpqConfig: props.qpqConfig,
 

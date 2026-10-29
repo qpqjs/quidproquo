@@ -35,7 +35,7 @@ const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: Resolved
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   // Get apis
-  const apiConfigs = qpqWebServerUtils.getApiConfigs(qpqConfig);
+  const apiConfigs = qpqWebServerUtils.getAllApiConfigs(qpqConfig);
 
   const apiDomains = apiConfigs.map((apiConfig) => ({
     apiName: apiConfig.apiName,

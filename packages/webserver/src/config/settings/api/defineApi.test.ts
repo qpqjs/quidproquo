@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineApi } from './api';
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { defineApi } from './defineApi';
 
 describe('defineApi', () => {
   it('builds an Api setting defaulting the subdomain to the api name and deprecated to false', () => {

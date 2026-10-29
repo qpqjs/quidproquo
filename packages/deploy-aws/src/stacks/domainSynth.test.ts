@@ -45,7 +45,7 @@ const buildConfig = (roots: string | string[], extra: QPQConfig = [], resolver?:
 const synthApiDomain = (qpqConfig: QPQConfig) => {
   const app = new App();
   const stack = new Stack(app, 'domain', { env: { account: '123456789012', region: 'ap-southeast-2' } });
-  new DomainQpqWebserverApiConstruct(stack, 'api', { qpqConfig, apiConfig: qpqWebServerUtils.getApiConfigs(qpqConfig)[0] });
+  new DomainQpqWebserverApiConstruct(stack, 'api', { qpqConfig, apiConfig: qpqWebServerUtils.getAllApiConfigs(qpqConfig)[0] });
   return Template.fromStack(stack);
 };
 

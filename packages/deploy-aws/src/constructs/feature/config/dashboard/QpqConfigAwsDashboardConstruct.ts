@@ -24,7 +24,7 @@ const FIVE_MINUTES = Duration.minutes(5);
 // dashboard focused. All names are config-derived - no construct handles needed.
 const getServiceLambdaFunctionNames = (qpqConfig: QPQConfig): string[] => {
   const baseNames = [
-    ...qpqWebServerUtils.getApiConfigs(qpqConfig).map((api) => `${api.apiName}-route`),
+    ...qpqWebServerUtils.getAllApiConfigs(qpqConfig).map((api) => `${api.apiName}-route`),
     ...qpqWebServerUtils.getOwnedServiceFunctions(qpqConfig).map((serviceFunction) => `${serviceFunction.functionName}-sfunc`),
     ...qpqCoreUtils.getAllQueueConfigs(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
     ...qpqCoreUtils.getOwnedScheduleEvents(qpqConfig).map((schedule) => `${schedule.uniqueKey}-SE`),
@@ -60,7 +60,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
     });
 
     // Api row
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).forEach((apiConfig) => {
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).forEach((apiConfig) => {
       const apiName = this.resourceName(`${apiConfig.apiName}-rest-api`);
 
       const apiMetric = (metricName: string, statistic: string, label?: string): aws_cloudwatch.Metric =>

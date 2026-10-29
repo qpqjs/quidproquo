@@ -10,7 +10,7 @@ const buildDevServers = (qpqConfig: QPQConfig): { url: string }[] => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return qpqWebServerUtils
-    .getApiConfigs(qpqConfig)
+    .getAllApiConfigs(qpqConfig)
     .filter((api) => !api.deprecated)
     .map((api) => ({ url: `http://${baseDomain}/${api.apiSubdomain}/${serviceName}` }));
 };

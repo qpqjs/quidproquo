@@ -24,7 +24,6 @@ import {
   getAllSeo,
   getAllServiceFunctions,
   getAllSrcEntries,
-  getApiConfigs,
   getDefaultRouteSettings,
   getDomainProxyConfigs,
   getFileUploadSettings,
@@ -52,7 +51,6 @@ describe('config setting selectors', () => {
     expect(getAllApiKeyConfigs(config)).toHaveLength(1);
     expect(getAllSeo(config)).toHaveLength(1);
     expect(getAllServiceFunctions(config)).toHaveLength(1);
-    expect(getApiConfigs(config)).toHaveLength(1);
   });
 
   it('collects every buildable src entry', () => {

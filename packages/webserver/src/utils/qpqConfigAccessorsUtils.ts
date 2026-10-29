@@ -17,7 +17,7 @@ import {
   ServiceFunctionQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
 } from '../config';
-import { ApiQPQWebServerConfigSetting, WebEntryQPQWebServerConfigSetting } from '../config';
+import { WebEntryQPQWebServerConfigSetting } from '../config';
 import { getOwnedWebsocketConfigs } from '../config/settings/websocket/logic';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
@@ -92,10 +92,6 @@ export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQW
   );
 
   return subdomainRedirects;
-};
-
-export const getApiConfigs = (configs: QPQConfig): ApiQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Api);
 };
 
 export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConfigSetting[] => {

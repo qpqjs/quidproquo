@@ -54,7 +54,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Api - routes
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).forEach(
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).forEach(
       (setting) =>
         new ApiQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
