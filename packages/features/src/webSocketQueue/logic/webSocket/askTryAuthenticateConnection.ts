@@ -4,7 +4,7 @@ import {
   getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
 } from '../../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../context';
 import { webSocketConnectionData } from '../../data';
 import { Connection, WebSocketQueueAuthenticateInput, WebSocketQueueAuthenticateResult } from '../../types';
 
@@ -15,7 +15,7 @@ import { Connection, WebSocketQueueAuthenticateInput, WebSocketQueueAuthenticate
  * as an expired user-directory token does. Null when the queue authenticates nobody.
  */
 export function* askTryAuthenticateConnection(connectionId: string): AskResponse<Nullable<Connection>> {
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const connectionAuthenticator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName));
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 

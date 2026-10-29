@@ -1,7 +1,7 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 import { askWebsocketSendMessage, askWebsocketSendMessageBase } from '@qpqjs/webserver';
 
-import { askWebsocketReadApiNameOrThrow } from '../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../context';
 import { webSocketConnectionData } from '../../data/connectionData';
 import { webSocketSubscriptionData } from '../../data/subscriptionData';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
@@ -16,7 +16,7 @@ export function* askSendToConnectionCleaningUpStale(
   connectionId: string,
   payload: AnyWebSocketQueueEventMessageWithCorrelation,
 ): AskResponse<boolean> {
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const result = yield* askCatch(askWebsocketSendMessage(apiName, connectionId, payload));
 
   if (result.success) {

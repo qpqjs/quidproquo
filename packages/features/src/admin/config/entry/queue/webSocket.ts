@@ -8,7 +8,7 @@ import {
   QueueEventResponse,
 } from '@qpqjs/core';
 
-import { askWebsocketReadConnectionInfo } from '../../../../webSocketQueue/context';
+import { askWebsocketConnectionInfoRead } from '../../../../webSocketQueue/context';
 import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
 import { ADMIN_CONFIG_SYNC_BATCH_SIZE } from '../../../constants';
 import {
@@ -22,7 +22,7 @@ import {
 export function* onConfigSyncRequest(event: WebSocketQueueQpqAdminConfigSyncRequestQueueEvent): AskResponse<QueueEventResponse> {
   const [params, { connectionId, correlationId }, { module }] = yield* askRunParallel([
     askConfigListParameters(),
-    askWebsocketReadConnectionInfo(),
+    askWebsocketConnectionInfoRead(),
     askConfigGetApplicationInfo(),
   ]);
 

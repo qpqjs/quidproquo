@@ -11,11 +11,11 @@ import {
 } from '@qpqjs/core';
 
 import { getWebSocketQueueKeyValueStoreName } from '../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../context/websocketConnectionInfoContext';
+import { askWebsocketApiNameReadOrThrow } from '../context';
 import { Connection } from '../types/Connection';
 
 export function* askGetStoreName(apiNameOverride?: string): AskResponse<string> {
-  const apiName = apiNameOverride || (yield* askWebsocketReadApiNameOrThrow());
+  const apiName = apiNameOverride || (yield* askWebsocketApiNameReadOrThrow());
 
   return getWebSocketQueueKeyValueStoreName(apiName || 'UNKNOWN-API');
 }

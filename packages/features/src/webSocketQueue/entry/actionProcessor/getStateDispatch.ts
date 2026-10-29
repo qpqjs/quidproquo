@@ -10,13 +10,13 @@ import {
   StateDispatchActionPayload,
 } from '@qpqjs/core';
 
-import { askWebsocketReadConnectionInfo } from '../../context';
+import { askWebsocketConnectionInfoRead } from '../../context';
 import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
 import { WebSocketQueueServerEventMessageStateDispatch } from '../../types/serverMessages';
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages';
 
 export function* askStateDispatchToFrontend(payload: StateDispatchActionPayload<any>): AskResponse<void> {
-  const { connectionId, correlationId } = yield* askWebsocketReadConnectionInfo();
+  const { connectionId, correlationId } = yield* askWebsocketConnectionInfoRead();
 
   const response: WebSocketQueueServerEventMessageStateDispatch = {
     type: WebSocketQueueServerMessageEventType.StateDispatch,

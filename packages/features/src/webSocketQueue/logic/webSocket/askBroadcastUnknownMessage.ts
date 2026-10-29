@@ -1,7 +1,7 @@
 import { askConfigGetGlobal, askEventBusSendMessages, AskResponse, EventBusMessage } from '@qpqjs/core';
 
 import { getWebSocketQueueGlobalConfigKeyForEventBusName } from '../../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../context';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 
 export function* askBroadcastUnknownMessage({
@@ -9,7 +9,7 @@ export function* askBroadcastUnknownMessage({
   correlationId,
   ...anyWebSocketQueueEventMessage
 }: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<void> {
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const eventBusName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName));
 
   yield* askEventBusSendMessages({

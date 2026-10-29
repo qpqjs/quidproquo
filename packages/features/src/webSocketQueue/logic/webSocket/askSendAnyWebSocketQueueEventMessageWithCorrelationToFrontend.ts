@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askWebsocketReadConnectionInfo } from '../../context';
+import { askWebsocketConnectionInfoRead } from '../../context';
 import { webSocketConnectionData } from '../../data';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';
@@ -37,7 +37,7 @@ export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
   const payloadWithCorrelationId = { ...payload };
 
   if (!payloadWithCorrelationId.correlationId) {
-    const { correlationId } = yield* askWebsocketReadConnectionInfo();
+    const { correlationId } = yield* askWebsocketConnectionInfoRead();
 
     payloadWithCorrelationId.correlationId = correlationId;
   }

@@ -3,6 +3,7 @@ export * from './clientMessages';
 export * from './Connection';
 export * from './serverMessages';
 export * from './Subscription';
+export * from './WebsocketConnectionInfo';
 export * from './WebSocketQueueAuthenticateInput';
 export * from './WebSocketQueueAuthenticateResult';
 export * from './WebSocketQueueEvent';

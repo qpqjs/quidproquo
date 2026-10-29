@@ -1,7 +1,7 @@
 import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse, Nullable } from '@qpqjs/core';
 
 import { getWebSocketQueueGlobalConfigKeyForTopicAuthoriser } from '../../../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../../context';
 import { webSocketSubscriptionData } from '../../../data/subscriptionData';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
@@ -19,7 +19,7 @@ export function isWebSocketSubscribeMessage(event: AnyWebSocketQueueEventMessage
 // The configured authoriser throws to refuse; no authoriser means any authenticated connection may subscribe within
 // its own scope.
 function* askIsSubscriptionAllowed(connection: Connection, topic: string): AskResponse<boolean> {
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const topicAuthoriser = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName));
 
   if (!topicAuthoriser) {

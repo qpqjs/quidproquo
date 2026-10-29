@@ -13,7 +13,7 @@ import {
   getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
 } from '../../../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../../context';
 import { webSocketConnectionData } from '../../../data';
 import { webSocketSubscriptionData } from '../../../data/subscriptionData';
 import {
@@ -151,7 +151,7 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
     return;
   }
 
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const connectionAuthenticator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName));
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 

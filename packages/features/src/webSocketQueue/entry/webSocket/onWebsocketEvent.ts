@@ -1,12 +1,12 @@
 import { askDecodeJson, AskResponse, isString } from '@qpqjs/core';
 import { WebsocketEvent } from '@qpqjs/webserver';
 
-import { askWebsocketProvideConnectionInfo } from '../../context';
+import { askWebsocketConnectionInfoProvide } from '../../context';
 import { webSocketQueueLogic } from '../../logic';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 
 export function* onConnect(event: WebsocketEvent): AskResponse<void> {
-  yield* askWebsocketProvideConnectionInfo(
+  yield* askWebsocketConnectionInfoProvide(
     {
       apiName: event.apiName,
       connectionId: event.connectionId,
@@ -16,7 +16,7 @@ export function* onConnect(event: WebsocketEvent): AskResponse<void> {
 }
 
 export function* onDisconnect(event: WebsocketEvent): AskResponse<void> {
-  yield* askWebsocketProvideConnectionInfo(
+  yield* askWebsocketConnectionInfoProvide(
     {
       apiName: event.apiName,
       connectionId: event.connectionId,
@@ -32,7 +32,7 @@ export function* onMessage(event: WebsocketEvent): AskResponse<void> {
 
   const message = yield* askDecodeJson<AnyWebSocketQueueEventMessageWithCorrelation>(event.body);
 
-  yield* askWebsocketProvideConnectionInfo(
+  yield* askWebsocketConnectionInfoProvide(
     {
       apiName: event.apiName,
       connectionId: event.connectionId,

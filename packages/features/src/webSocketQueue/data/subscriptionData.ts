@@ -1,11 +1,11 @@
 import { askKeyValueStoreDelete, askKeyValueStoreQueryAll, askKeyValueStoreUpsertWithRetry, AskResponse, kvsEqual } from '@qpqjs/core';
 
 import { getWebSocketQueueSubscriptionsKeyValueStoreName } from '../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../context/websocketConnectionInfoContext';
+import { askWebsocketApiNameReadOrThrow } from '../context';
 import { Subscription } from '../types/Subscription';
 
 function* askGetStoreName(): AskResponse<string> {
-  return getWebSocketQueueSubscriptionsKeyValueStoreName(yield* askWebsocketReadApiNameOrThrow());
+  return getWebSocketQueueSubscriptionsKeyValueStoreName(yield* askWebsocketApiNameReadOrThrow());
 }
 
 function* askSubscribe(topic: string, connectionId: string): AskResponse<void> {

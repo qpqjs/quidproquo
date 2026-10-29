@@ -1,7 +1,7 @@
 import { askCatch, askConfigGetGlobal, askInlineFunctionExecute } from '@qpqjs/core';
 
 import { getWebSocketQueueGlobalConfigKeyForOnConnected } from '../../config/defineWebSocketQueue';
-import { askWebsocketReadApiNameOrThrow } from '../../context';
+import { askWebsocketApiNameReadOrThrow } from '../../context';
 import { webSocketConnectionData } from '../../data';
 import { Connection } from '../../types';
 import { WebSocketQueueOnConnectedInput } from '../../types/WebSocketQueueOnConnectedInput';
@@ -20,7 +20,7 @@ export function* askProcessOnConnect(id: string, requestTime: string, requestTim
   // to the fresh connection (e.g. the active maintenance set), deliberately
   // pre-auth, since a pre-login client must also see a "site is down" banner.
   // Failures are swallowed, a sync problem must never break the connect.
-  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const apiName = yield* askWebsocketApiNameReadOrThrow();
   const onConnected = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName));
   if (onConnected) {
     yield* askCatch(askInlineFunctionExecute<void, WebSocketQueueOnConnectedInput>(onConnected, { connectionId: id }));
