@@ -107,7 +107,7 @@ export const forceReloadFederatedRemote = (runtimeApi: FederationRuntimeApi, rem
   (globalThis as Record<string, unknown>)[`rspackChunk${remote.name}`] = undefined;
   (globalThis as Record<string, unknown>)[`webpackChunk${remote.name}`] = undefined;
 
-  const baseEntry = remote.entry.split('?')[0];
+  const baseEntry = remote.entry.split('?')[0] ?? remote.entry;
   const entryDir = baseEntry.slice(0, baseEntry.lastIndexOf('/'));
 
   // Layer 4: sweep ALL of this remote's script tags (entry AND chunks).
