@@ -47,4 +47,13 @@ describe('WebserverRole', () => {
 
     expect(actions.filter((action: string) => /TagResource|Tagging|TagsToResource|TagsFromResource|^tag:/.test(action))).toEqual([]);
   });
+
+  it("grants '*' only to the actions that have no resource-level permissions", () => {
+    const wildcardSids = policyStatements(synth())
+      .filter((statement: any) => statement.Effect === 'Allow' && [statement.Resource].flat().includes('*'))
+      .map((statement: any) => statement.Sid)
+      .sort();
+
+    expect(wildcardSids).toEqual(['ACMListCertificates', 'CloudFormationListExports', 'EC2NetworkInterfacePermissions']);
+  });
 });

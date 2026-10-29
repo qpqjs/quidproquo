@@ -201,7 +201,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end key value store
 
     // AI (Bedrock)
-    QpqCoreAiConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllAiConfigs(props.qpqConfig));
+    QpqCoreAiConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllAiConfigs(props.qpqConfig), props.qpqConfig);
     // end AI
 
     // Build websocket apis

@@ -1,5 +1,5 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
@@ -212,7 +212,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     const foreignArns = foreignKvsConfigs.flatMap((cfg) => {
       const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
-      const tableArn = `arn:aws:dynamodb:*:*:table/${tableName}`;
+      const owner = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
+      const tableArn = `arn:aws:dynamodb:${owner.awsRegion}:${owner.awsAccountId}:table/${tableName}`;
       return [tableArn, `${tableArn}/index/*`];
     });
 

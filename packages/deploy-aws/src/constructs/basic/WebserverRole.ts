@@ -58,7 +58,8 @@ export class WebserverRole extends QpqConstructBlock {
     );
 
     const policies: aws_iam.PolicyStatementProps[] = [
-      // Resolve cross-stack resource names at runtime via CloudFormation exports.
+      // Resolve cross-stack resource names at runtime via CloudFormation exports. ListExports
+      // has no resource-level permissions, so '*' is the only possible resource.
       {
         sid: 'CloudFormationListExports',
         actions: ['cloudformation:ListExports'],
@@ -102,11 +103,21 @@ export class WebserverRole extends QpqConstructBlock {
         ],
       },
 
-      // Look up ACM certs when wiring up custom domains at runtime.
+      // Look up ACM certs when wiring up custom domains at runtime. ListCertificates has no
+      // resource-level permissions; DescribeCertificate is pinned to this application's certs
+      // (DomainCertificateStack tags them with the application identity).
       {
-        sid: 'ACMCertificateOperations',
-        actions: ['acm:DescribeCertificate', 'acm:ListCertificates'],
+        sid: 'ACMListCertificates',
+        actions: ['acm:ListCertificates'],
         resources: ['*'],
+      },
+      {
+        sid: 'ACMDescribeCertificate',
+        actions: ['acm:DescribeCertificate'],
+        resources: [`arn:aws:acm:*:${accountId}:certificate/*`],
+        conditions: {
+          StringEquals: applicationResourceTagConditions,
+        },
       },
 
       // Standard Lambda logging, write only: story logs are read from the logs storage drive,
@@ -143,7 +154,8 @@ export class WebserverRole extends QpqConstructBlock {
       //   resources: ['*'],
       // },
 
-      // Required for VPC-attached Lambdas to manage their ENIs.
+      // Required for VPC-attached Lambdas to manage their ENIs. Lambda creates the interfaces
+      // on the service's behalf and the ids do not exist at synth, so this cannot be narrowed.
       {
         sid: 'EC2NetworkInterfacePermissions',
         actions: [
