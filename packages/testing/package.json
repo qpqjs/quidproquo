@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/testing",
   "version": "0.3.0",
-  "description": "",
+  "description": "Test helpers for quidproquo stories, requesters and config.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
@@ -38,7 +38,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/testing"
   },
   "keywords": [],
   "author": "",

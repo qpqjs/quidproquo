@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/deploy-aws",
   "version": "0.3.0",
-  "description": "",
+  "description": "CDK constructs and stacks that deploy a quidproquo app to AWS.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
@@ -27,7 +27,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/deploy-aws"
   },
   "keywords": [],
   "author": "",

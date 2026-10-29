@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/web",
   "version": "0.3.0",
-  "description": "",
+  "description": "Browser-side helpers for talking to a quidproquo backend.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
@@ -26,7 +26,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/web"
   },
   "keywords": [],
   "author": "",

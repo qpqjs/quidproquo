@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/tsconfig",
   "version": "0.3.0",
-  "description": "",
+  "description": "Shared TypeScript configs for quidproquo packages.",
   "main": "tsconfig.base.json",
   "publishConfig": {
     "access": "public"
@@ -17,7 +17,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/tsconfig"
   },
   "keywords": [],
   "author": "",

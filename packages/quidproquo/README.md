@@ -17,6 +17,8 @@
 
 ---
 
+# quidproquo
+
 Business logic in quidproquo is written as generator functions called **stories**. A story never calls the clock, the database, or the network directly. It yields a typed action describing what it wants, and the runtime hands that action to whichever implementation fits the platform it is running on.
 
 The same story runs on AWS Lambda, in a Node process, in a browser, or against fixtures in a test, with no changes to the code.

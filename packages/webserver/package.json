@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/webserver",
   "version": "0.3.0",
-  "description": "",
+  "description": "Routes, apis and web services on top of quidproquo core.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -26,7 +26,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/webserver"
   },
   "keywords": [],
   "author": "",

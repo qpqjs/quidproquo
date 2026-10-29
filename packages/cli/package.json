@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/cli",
   "version": "0.3.0",
-  "description": "The qpq CLI \u2014 build, dev and deploy orchestration for QPQ apps",
+  "description": "The qpq CLI: build, dev and deploy orchestration for quidproquo apps.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -28,7 +28,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/cli"
   },
   "keywords": [],
   "author": "",
