@@ -326,6 +326,6 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
     }),
 
     // The admin UI's audited session event doc, one doc per login.
-    ...defineAdminSessionEventDoc(logServiceName),
+    defineAdminSessionEventDoc(logServiceName),
   ];
 };

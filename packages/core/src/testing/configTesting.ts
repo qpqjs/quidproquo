@@ -34,5 +34,5 @@ export const buildTestQpqConfig = (settings: QPQConfigItem[] = [], appOptions: T
     feature,
   } = appOptions;
 
-  return [...defineApplicationModule(applicationName, moduleName, environment, configRoot, apiBuildPath, feature), ...settings];
+  return [defineApplicationModule(applicationName, moduleName, environment, configRoot, apiBuildPath, feature), ...settings];
 };
