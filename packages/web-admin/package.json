@@ -4,7 +4,15 @@
   "description": "The admin UI for a quidproquo app: logs, traces, config and maintenance.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -69,5 +77,8 @@
   },
   "peerDependencies": {
     "react": ">=18.3.1"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
