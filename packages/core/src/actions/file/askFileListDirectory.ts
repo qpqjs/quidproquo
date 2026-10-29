@@ -1,7 +1,6 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
-import { AskResponse } from '../../types/StorySession';
 import { FileActionType } from './FileActionType';
-import { DirectoryList, FileInfo } from './types';
+import { DirectoryList } from './types';
 
 export const askFileListDirectory = createActionRequester<DirectoryList>()({
   actionType: FileActionType.ListDirectory,
@@ -20,22 +19,3 @@ export const askFileListDirectory = createActionRequester<DirectoryList>()({
     scope,
   }),
 });
-
-export function* askFileListAllDirectory(drive: string, folderPath: string, scope?: string): AskResponse<FileInfo[]> {
-  let pageToken: string | undefined;
-  let fileInfos: FileInfo[] = [];
-
-  while (true) {
-    const directoryInfo = yield* askFileListDirectory(drive, folderPath, 1000, pageToken, scope);
-
-    fileInfos = [...fileInfos, ...directoryInfo.fileInfos];
-
-    if (!directoryInfo.pageToken) {
-      break;
-    }
-
-    pageToken = directoryInfo.pageToken;
-  }
-
-  return fileInfos;
-}

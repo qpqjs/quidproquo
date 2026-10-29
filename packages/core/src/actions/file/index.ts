@@ -4,6 +4,7 @@ export * from './askFileExists';
 export * from './askFileGenerateTemporarySecureUrl';
 export * from './askFileGenerateTemporaryUploadSecureUrl';
 export * from './askFileIsColdStorage';
+export * from './askFileListAllDirectory';
 export * from './askFileListDirectory';
 export * from './askFileReadBinaryContents';
 export * from './askFileReadObjectJson';
