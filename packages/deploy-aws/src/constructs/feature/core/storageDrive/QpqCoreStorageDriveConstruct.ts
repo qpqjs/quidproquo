@@ -65,11 +65,6 @@ export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock
   public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.bucket.grantWrite(grantee);
   }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
 }
 
 // Each tier's S3 class is the one its enum doc names. REGULAR is the class objects

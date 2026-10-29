@@ -37,11 +37,6 @@ export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
   public grantWrite(grantee: aws_iam.IGrantable): void {
     this.topic.grantPublish(grantee);
   }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
 }
 
 export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {

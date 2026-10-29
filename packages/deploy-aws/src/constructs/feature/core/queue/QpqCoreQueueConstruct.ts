@@ -50,11 +50,6 @@ export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
   public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.queue.grant(grantee, 'sqs:SendMessage');
   }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
 }
 
 export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {

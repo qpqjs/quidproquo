@@ -24,11 +24,6 @@ export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock imple
   public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.secret.grantWrite(grantee);
   }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
 }
 
 export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
