@@ -14,7 +14,7 @@ export interface AwsDataStoreRemovalPolicyQPQConfigSetting extends QPQConfigSett
 /**
  * Removal policy for this service's data stores (storage-drive S3 buckets,
  * key-value-store DynamoDB tables, Cognito user pools, and Neptune graph DB
- * clusters — Neptune retains via a final snapshot rather than a live cluster).
+ * clusters, Neptune retains via a final snapshot rather than a live cluster).
  * Defaults to `retain` when not declared, so production data survives a
  * `cdk destroy` / resource replacement; declare `destroy` in dev configs to
  * keep full-teardown behaviour.

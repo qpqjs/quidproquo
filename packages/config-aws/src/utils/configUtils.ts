@@ -300,7 +300,6 @@ export const getDomainCertificateArnSsmParameterName = (region: string, qpqConfi
 };
 
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
-  // Get the key value store config
   const resource = qpqCoreUtils.getKeyValueStoreFullyQualifiedResourceName(srcKvsName, qpqConfig);
 
   // Grab all the overrides that do exist

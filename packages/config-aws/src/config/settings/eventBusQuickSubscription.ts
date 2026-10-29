@@ -12,8 +12,8 @@ export enum EventBusQuickSubscriptionType {
  * an alert channel. `email` sends an email; `url` POSTs to an incident-tool
  * webhook (PagerDuty / Slack / OpsGenie), http/https auto-detected.
  *
- * This is an AWS-specific convenience — direct email/webhook delivery is an SNS
- * feature, not a portable event-bus concept — hence it lives in config-aws and
+ * This is an AWS-specific convenience, direct email/webhook delivery is an SNS
+ * feature, not a portable event-bus concept, hence it lives in config-aws and
  * not on core's platform-agnostic `defineEventBus`. For rich, in-band handling
  * use the normal bus -> queue -> function pattern instead.
  */

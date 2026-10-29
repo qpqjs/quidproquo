@@ -9,7 +9,7 @@ export enum AwsVpcFlowLogTrafficType {
 }
 
 export interface AwsVirtualNetworkFlowLogSettings {
-  // Flow logs are ON unless disabled. CloudWatch Logs ingestion is ~US$0.50/GB —
+  // Flow logs are ON unless disabled. CloudWatch Logs ingestion is ~US$0.50/GB ,
   // typically cents-to-dollars per month for lambda-only VPCs.
   disable?: boolean;
 
@@ -30,7 +30,7 @@ export interface QPQConfigAdvancedAwsVirtualNetworkSettings {
   disableDynamoDbGatewayEndpoint?: boolean;
 
   // Opt-in interface endpoints by AWS service short name, e.g.
-  // ['secretsmanager', 'kms'] — resolved to com.amazonaws.{region}.{name}.
+  // ['secretsmanager', 'kms'], resolved to com.amazonaws.{region}.{name}.
   // Each costs ~US$7.30/mo per AZ (~$14.60/mo at the default maxAzs 2) plus
   // $0.01/GB, in exchange for that service's traffic never leaving the VPC
   // (and not being billed through NAT).
@@ -65,7 +65,7 @@ export interface AwsVirtualNetworkQPQConfigSetting extends QPQConfigSetting {
  * Hardens the VPC declared by core `defineVirtualNetwork(name)`. Defaults are
  * secure-by-default: flow logs to CloudWatch (`/qpq/vpc-flow-logs/{vpcName}`)
  * and the free S3/DynamoDB gateway endpoints are enabled even when this
- * setting is never declared — declare it only to opt out or to add interface
+ * setting is never declared, declare it only to opt out or to add interface
  * endpoints / NAT and AZ overrides. Declare alongside `defineVirtualNetwork`
  * in the bootstrap config, keyed by the same name.
  */
