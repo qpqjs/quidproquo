@@ -4,7 +4,7 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { Migration } from '../../../config/settings/migration';
-import { askProcessOnDeployCreate, askProcessOnDeployUpdate, onDeploy } from './onDeployLogic';
+import { askMigrationProcessDeploy, askProcessOnDeployCreate, askProcessOnDeployUpdate } from './onDeployLogic';
 
 const apiMigration: Migration = { runtime: '/mig/api::run', deployType: DeployEventType.Api };
 const webMigration: Migration = { runtime: '/mig/web::run', deployType: DeployEventType.Web };
@@ -60,9 +60,9 @@ describe('askProcessOnDeployUpdate', () => {
   });
 });
 
-describe('onDeploy', () => {
+describe('askMigrationProcessDeploy', () => {
   it('runs the update path on an update status', () => {
-    const result = runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Update), {
+    const result = runStory(askMigrationProcessDeploy(DeployEventType.Api, DeployEventStatusType.Update), {
       [ConfigActionType.GetGlobal]: [],
     });
 
@@ -70,7 +70,7 @@ describe('onDeploy', () => {
   });
 
   it('runs the create path on a create status', () => {
-    const result = runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
+    const result = runStory(askMigrationProcessDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: [],
     });
 
@@ -78,6 +78,6 @@ describe('onDeploy', () => {
   });
 
   it('does nothing on other statuses', () => {
-    expect(runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Delete))).toBeUndefined();
+    expect(runStory(askMigrationProcessDeploy(DeployEventType.Api, DeployEventStatusType.Delete))).toBeUndefined();
   });
 });

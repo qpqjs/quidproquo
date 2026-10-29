@@ -64,7 +64,7 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
     return yield* runtime(event, params, input);
   }
 
-  const wrapper = function* wrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
+  const askDynamicRouteWrapper = function* askDynamicRouteWrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
     const res = yield* askCatch(askRunWithInput(event, params));
 
     if (!res.success) {
@@ -105,7 +105,7 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
     return res.result;
   };
 
-  return Object.assign(wrapper, {
+  return Object.assign(askDynamicRouteWrapper, {
     dynamicRoute: { method, path, options: withSchema(options, config), version: version || 1 },
   });
 };

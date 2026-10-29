@@ -19,7 +19,11 @@ import { useActionProcessors } from '../actionProcessor';
 import { useQpqContextValues } from '../qpqContext/useQpqContextValues';
 import { useEffectCallback } from './useEffectCallback';
 
-function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {
+function* askUseQpqWithVersionCheck<R>(
+  story: AskResponse<R>,
+  versionRef: React.RefObject<number>,
+  capturedVersion: number,
+): AskResponse<R | undefined> {
   let nextValue: any = undefined;
 
   while (true) {
@@ -93,7 +97,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
     function getStoryExecutor<S extends Story<any, any>>(story: S): (...args: Parameters<S>) => Promise<AskResponseReturnType<ReturnType<S>>> {
       return async (...args: Parameters<S>) => {
         const capturedVersion = versionRef.current;
-        const wrappedStory = (...storyArgs: Parameters<S>) => withVersionCheck(story(...storyArgs), versionRef, capturedVersion);
+        const wrappedStory = (...storyArgs: Parameters<S>) => askUseQpqWithVersionCheck(story(...storyArgs), versionRef, capturedVersion);
         const result = await resolveStory(wrappedStory, args);
 
         if (result.error) {

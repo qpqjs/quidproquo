@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnDeployCreate, onDeploy } from './onDeployLogic';
+import { askProcessOnDeployCreate, askSeedProcessDeploy } from './onDeployLogic';
 
 describe('askProcessOnDeployCreate', () => {
   it('queues a run message for every seed', () => {
@@ -24,11 +24,11 @@ describe('askProcessOnDeployCreate', () => {
   });
 });
 
-describe('onDeploy', () => {
+describe('askSeedProcessDeploy', () => {
   it('runs the create path on a create status', () => {
     const messages: any[] = [];
 
-    runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
+    runStory(askSeedProcessDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
       [QueueActionType.SendMessages]: (action: any) => {
         messages.push(action.payload.queueName);
@@ -40,14 +40,14 @@ describe('onDeploy', () => {
   });
 
   it('does nothing on other statuses', () => {
-    expect(runStory(onDeploy(DeployEventType.Api, DeployEventStatusType.Update))).toBeUndefined();
+    expect(runStory(askSeedProcessDeploy(DeployEventType.Api, DeployEventStatusType.Update))).toBeUndefined();
   });
 
   // The deploy rule hears every stack in the account; a stranger's CREATE_COMPLETE must not re-seed this service.
   it("does nothing when the created stack is not one of this service's own", () => {
     const messages: any[] = [];
 
-    runStory(onDeploy(DeployEventType.Unknown, DeployEventStatusType.Create), {
+    runStory(askSeedProcessDeploy(DeployEventType.Unknown, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
       [QueueActionType.SendMessages]: (action: any) => {
         messages.push(action.payload.queueName);
@@ -61,7 +61,7 @@ describe('onDeploy', () => {
   it('does not re-seed when the web stack is created after the api stack', () => {
     const messages: any[] = [];
 
-    runStory(onDeploy(DeployEventType.Web, DeployEventStatusType.Create), {
+    runStory(askSeedProcessDeploy(DeployEventType.Web, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
       [QueueActionType.SendMessages]: (action: any) => {
         messages.push(action.payload.queueName);

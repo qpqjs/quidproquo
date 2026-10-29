@@ -48,7 +48,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
   }
 }
 
-export function* onDeploy(deployEventType: DeployEventType, deployEventStatusType: DeployEventStatusType): AskResponse<void> {
+export function* askMigrationProcessDeploy(deployEventType: DeployEventType, deployEventStatusType: DeployEventStatusType): AskResponse<void> {
   if (deployEventStatusType === DeployEventStatusType.Update) {
     yield* askProcessOnDeployUpdate(deployEventType);
   } else if (deployEventStatusType === DeployEventStatusType.Create) {

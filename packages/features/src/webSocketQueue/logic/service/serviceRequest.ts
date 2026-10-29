@@ -14,7 +14,7 @@ export const serviceRequest = <R extends ServiceRequester<any, any>>(
 ) => {
   const { method } = requester.serviceRequest;
 
-  const wrapper = function* wrapper(event: QueueEvent<QueueMessage<any>>) {
+  const askServiceRequestWrapper = function* askServiceRequestWrapper(event: QueueEvent<QueueMessage<any>>) {
     const result = yield* askCatch(runtime(event.message.payload));
 
     // A deferred result means another execution owns the reply.
@@ -27,7 +27,7 @@ export const serviceRequest = <R extends ServiceRequester<any, any>>(
     return true as QueueEventResponse;
   };
 
-  wrapper.serviceRequest = { method };
+  askServiceRequestWrapper.serviceRequest = { method };
 
-  return wrapper;
+  return askServiceRequestWrapper;
 };

@@ -14,7 +14,7 @@ import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
 // Consumes the action, so an outer bind never sees an inner bind's commits: innermost wins.
 const getApplyEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideApplyEvent(action: ActionOf<typeof askApplyEventDocEventBase>): AskResponse<unknown> {
+  function* askWorkspaceSlotOverrideApplyEvent(action: ActionOf<typeof askApplyEventDocEventBase>): AskResponse<unknown> {
     // The requester always builds a payload; a missing one is a malformed action and safe to ignore.
     if (action.payload) {
       yield* askEventDocWorkspaceCommitEvent(binding, action.payload);
@@ -24,7 +24,7 @@ const getApplyEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
   };
 
 const getApplyTransientEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideApplyTransientEvent(action: ActionOf<typeof askApplyTransientEventDocEventBase>): AskResponse<unknown> {
+  function* askWorkspaceSlotOverrideApplyTransientEvent(action: ActionOf<typeof askApplyTransientEventDocEventBase>): AskResponse<unknown> {
     if (action.payload) {
       yield* askEventDocWorkspaceCommitTransientEvent(binding, action.payload);
     }
@@ -34,14 +34,14 @@ const getApplyTransientEventOverride = (binding: EventDocWorkspaceSlotBinding) =
 
 // The apply override dispatches before returning, so a read after a commit in the same story sees its own write.
 const getReadStateOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideReadState(action: ActionOf<typeof askEventDocReadState>): AskResponse<unknown> {
+  function* askWorkspaceSlotOverrideReadState(action: ActionOf<typeof askEventDocReadState>): AskResponse<unknown> {
     const state = yield* askEventDocWorkspaceReadState();
 
     return getSuccessfulEitherActionResultIfRequired(binding.getView(state), action.returnErrors);
   };
 
 const getReadIdentityOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideReadIdentity(action: ActionOf<typeof askEventDocReadIdentity>): AskResponse<unknown> {
+  function* askWorkspaceSlotOverrideReadIdentity(action: ActionOf<typeof askEventDocReadIdentity>): AskResponse<unknown> {
     const state = yield* askEventDocWorkspaceReadState();
 
     return getSuccessfulEitherActionResultIfRequired(state.slots[binding.slotKey]?.documentIdentity ?? null, action.returnErrors);
