@@ -1,11 +1,4 @@
-import {
-  CrossModuleOwner,
-  CustomFullyQualifiedResource,
-  FullyQualifiedResource,
-  QPQConfigAdvancedSettings,
-  QPQConfigSetting,
-  qpqCoreUtils,
-} from '@qpqjs/core';
+import { CustomFullyQualifiedResource, FullyQualifiedResource, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 

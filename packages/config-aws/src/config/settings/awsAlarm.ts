@@ -1,6 +1,5 @@
 import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
-import { ApiLayer, ServiceAccountInfo } from '../../types';
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
 export enum AwsAlarmOperator {

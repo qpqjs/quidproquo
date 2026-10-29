@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, defineKeyValueStore, defineStorageDrive } from '@qpqjs/core';
+import { buildTestQpqConfig, defineKeyValueStore } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 

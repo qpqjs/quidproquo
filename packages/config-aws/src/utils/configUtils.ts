@@ -1,4 +1,4 @@
-import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { CrossModuleOwner, Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import {
   AccountBudgetQPQConfigSetting,
@@ -21,7 +21,7 @@ import {
   EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
-import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
+import { LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
 export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
