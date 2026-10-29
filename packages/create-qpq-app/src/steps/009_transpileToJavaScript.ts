@@ -8,7 +8,7 @@ import { AppLanguage, CreateQpqAppStep } from '../types';
 
 // Convert the scaffolded TypeScript app to JavaScript: per-file type
 // stripping (JSX preserved, comments kept), then remove the TypeScript
-// build plumbing the app no longer needs.
+// build plumbing a JavaScript app does not need.
 //
 // The qpq toolchain runs the result as-is: the CLI's ts-node require hook
 // compiles the app's ESM-syntax .js at load time (allowJs, added below), and
@@ -64,7 +64,7 @@ export const transpileToJavaScript: CreateQpqAppStep = {
     }
 
     // TypeScript build plumbing: tsconfigs, the ambient types/ dir, and the
-    // per-package tsc scripts all go. Lib packages no longer build; their
+    // per-package tsc scripts all go. Lib packages do not build; their
     // package.json main points straight at src.
     let libsRepointed = 0;
     for (const filePath of listFilesRecursive(targetDirectory)) {
