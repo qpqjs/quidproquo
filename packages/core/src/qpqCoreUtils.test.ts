@@ -41,6 +41,7 @@ import {
   getAllSecretConfigs,
   getAllSrcEntries,
   getAllStorageDriveConfigs,
+  getAllUserDirectoryConfigs,
   getAllUserScriptModules,
   getApiBuildPath,
   getApplicationConfigSetting,
@@ -68,7 +69,7 @@ import {
   getOwnedScheduleEvents,
   getOwnedSecretConfigs,
   getOwnedStorageDriveConfigs,
-  getOwnedUserDirectories,
+  getOwnedUserDirectoryConfigs,
   getParameterByName,
   getQueueQueueProcessors,
   getQueueSrcEntries,
@@ -78,7 +79,6 @@ import {
   getStorageDriveByName,
   getStorageDriveNames,
   getUniqueKeyForSetting,
-  getUserDirectories,
   getUserDirectoryByName,
   getUserDirectoryEmailTemplates,
   getUserDirectorySrcEntries,
@@ -471,7 +471,7 @@ describe('qpqCoreUtils', () => {
     ]);
 
     it('lists directories and finds one by name', () => {
-      expect(getUserDirectories(config)).toHaveLength(2);
+      expect(getAllUserDirectoryConfigs(config)).toHaveLength(2);
       expect(resolveUserDirectoryOrThrow('main', config).name).toBe('main');
     });
 
@@ -485,7 +485,7 @@ describe('qpqCoreUtils', () => {
     });
 
     it('returns only owned directories', () => {
-      expect(getOwnedUserDirectories(config).map((u) => u.name)).toEqual(['main']);
+      expect(getOwnedUserDirectoryConfigs(config).map((u) => u.name)).toEqual(['main']);
     });
 
     it('maps email templates keyed by directory name', () => {

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineUserDirectory, UserDirectoryMfaMode, UserDirectoryMfaSecondFactor } from './userDirectory';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineUserDirectory } from './defineUserDirectory';
+import { UserDirectoryMfaMode, UserDirectoryMfaSecondFactor } from './types';
 
 describe('defineUserDirectory', () => {
   it('builds a UserDirectory setting with the given name and defaults', () => {

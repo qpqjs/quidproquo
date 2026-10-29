@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqCoreUtils.getUserDirectories` and `getOwnedUserDirectories` are `getAllUserDirectoryConfigs` and `getOwnedUserDirectoryConfigs`; the user directory setting, its MFA enums and types live in `config/settings/userDirectory/` (D5).
 - `qpqCoreUtils.getOwnedSigningKeys` is `getOwnedSigningKeyConfigs`; the signing key setting and accessors live in `config/settings/signingKey/` (D5).
 - `qpqCoreUtils.getOwnedCryptoKeys` is `getOwnedCryptoKeyConfigs`; the crypto key setting and accessors live in `config/settings/cryptoKey/` (D5).
 - `qpqCoreUtils.getEventBusConfigByName` is `getEventBusByName(name, cfg)` (null when missing, same published-name-first lookup) with a new `resolveEventBusOrThrow`; the event bus setting lives in `config/settings/eventBus/` (D5).

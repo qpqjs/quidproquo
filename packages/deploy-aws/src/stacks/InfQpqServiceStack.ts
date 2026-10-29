@@ -135,7 +135,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end queues
 
     // User Directories
-    const ownedUserDirectoriesConfigs = qpqCoreUtils.getOwnedUserDirectories(props.qpqConfig);
+    const ownedUserDirectoriesConfigs = qpqCoreUtils.getOwnedUserDirectoryConfigs(props.qpqConfig);
     const userDirectories = ownedUserDirectoriesConfigs.map(
       (setting) =>
         new QpqInfCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
@@ -148,7 +148,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
     // Directories this service references but doesn't own: read-only user lookups.
     const referencedUserDirectoriesConfigs = qpqCoreUtils
-      .getUserDirectories(props.qpqConfig)
+      .getAllUserDirectoryConfigs(props.qpqConfig)
       .filter((setting) => !ownedUserDirectoriesConfigs.includes(setting));
     QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole(webserverRole, referencedUserDirectoriesConfigs, props.qpqConfig);
 

@@ -14,8 +14,15 @@ export {
   getStorageDriveByName,
   resolveStorageDriveOrThrow,
 } from './config/settings/storageDrive/logic';
+export {
+  getAllUserDirectoryConfigs,
+  getOwnedUserDirectoryConfigs,
+  getUserDirectoryByName,
+  resolveUserDirectoryOrThrow,
+} from './config/settings/userDirectory/logic';
 import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
 import { getAllStorageDriveConfigs } from './config/settings/storageDrive/logic';
+import { getAllUserDirectoryConfigs, getOwnedUserDirectoryConfigs } from './config/settings/userDirectory/logic';
 import {
   getApplicationConfigSetting,
   getApplicationModuleEnvironment,
@@ -186,9 +193,7 @@ export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntim
 };
 
 export const getUserDirectoryEmailTemplates = (qpqConfig: QPQConfig): Record<string, EmailTemplates> => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userDirectory);
-
-  const record = userDirectories.reduce(
+  const record = getAllUserDirectoryConfigs(qpqConfig).reduce(
     (acc, ud) => ({
       ...acc,
       [ud.name]: ud.emailTemplates,
@@ -213,7 +218,7 @@ export const getQueueSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => 
 
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   // We just want the ones this service owns.
-  const userConfigs = getOwnedUserDirectories(qpqConfig);
+  const userConfigs = getOwnedUserDirectoryConfigs(qpqConfig);
 
   return userConfigs
     .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates), ...Object.values(ud.customAuthRuntime || {})], [] as QpqFunctionRuntime[])
@@ -316,31 +321,6 @@ export const resolveGlobalValue = <T>(qpqConfig: QPQConfig, functionGlobals: Rec
   }
 
   return getGlobalConfigValue<T>(qpqConfig, name);
-};
-
-export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(configs, QPQCoreConfigSettingType.userDirectory);
-
-  return userDirectories;
-};
-
-export const getOwnedUserDirectories = (qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting[] => {
-  const userDirectories = getUserDirectories(qpqConifg);
-
-  return getOwnedItems(userDirectories, qpqConifg);
-};
-
-export const getUserDirectoryByName = (userDirectoryName: string, qpqConfig: QPQConfig): Nullable<UserDirectoryQPQConfigSetting> =>
-  getUserDirectories(qpqConfig).find((ud) => ud.name === userDirectoryName) ?? null;
-
-export const resolveUserDirectoryOrThrow = (userDirectoryName: string, qpqConfig: QPQConfig): UserDirectoryQPQConfigSetting => {
-  const userDirectory = getUserDirectoryByName(userDirectoryName, qpqConfig);
-
-  if (!userDirectory) {
-    throw new Error(`UserDirectory not found: ${userDirectoryName}`);
-  }
-
-  return userDirectory;
 };
 
 /**
