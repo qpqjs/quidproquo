@@ -47,10 +47,8 @@
     "@qpqjs/web": "0.3.0",
     "@qpqjs/web-react": "0.3.0",
     "@qpqjs/webserver": "0.3.0",
-    "@types/react": "^18.3.3",
     "date-fns": "^2.30.0",
     "javascript-time-ago": "^2.5.9",
-    "react": ">=18.3.1",
     "react-d3-tree": "^3.6.6",
     "react-dom": "18.3.1",
     "react-inspector": "^6.0.2",
@@ -63,6 +61,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.13.13",
+    "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"

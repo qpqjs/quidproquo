@@ -36,9 +36,11 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@qpqjs/core": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
-    "@qpqjs/webserver": "0.3.0",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@qpqjs/core": "0.3.0",
+    "@qpqjs/webserver": "0.3.0"
   }
 }
