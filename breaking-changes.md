@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/web-react` shared query params: `sharedQueryParamsLogic` is `frontendSharedQueryParamsApi` and `sharedQueryParamsInitialState` is `createInitialSharedQueryParamsState()`; the module is laid out as `types/`, `effects/` (`SharedQueryParamsSetParamPayload` named), `actionCreators/`, `stateUpdaters/` and `logic/` (E1).
 - `@qpqjs/web-admin` admin app session effects follow the module layout: `AdminSessionEventType` is `AdminSessionEffect` (PascalCase members, same stored values), `AdminSessionEvents` is `AdminSessionEffects`, and each `<Verb>Event` / `<Verb>Data` pair is `AdminSession<Verb>Effect` / `AdminSession<Verb>Data` (`SessionStarted`/`SessionEnded` collapse to `AdminSessionStarted…`/`AdminSessionEnded…`); the state types live in `types/` and the `createInitial*State` factories in `logic/` (E1).
 - Tenant fold effects follow the module layout: `TenantEffect.setBrand` is `TenantEffect.SetBrand` (same `SET_BRAND` value on the wire), `SetBrandEffect` is `TenantSetBrandEffect`, and `TenantEffects`, the enum and the effect live under `tenant/fold/effects/`; `createInitialTenantDocumentState` and `foldTenantDocument` under `tenant/fold/logic/` (E1/E2).
 - `defineDomainProxy` no longer takes `domainProxyViewerProtocolPolicy` and the webserver `DomainProxyViewerProtocolPolicy` enum is gone; on AWS declare `defineAwsDomainProxyViewerProtocolPolicy(domainProxyName, AwsDomainProxyViewerProtocolPolicy.httpsOnly | redirectToHttps | allowAll)` from `@qpqjs/config-aws` (default redirect-to-https, as before) (D3).

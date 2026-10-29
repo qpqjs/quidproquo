@@ -4,7 +4,7 @@ import { QueryParamsActionType, QueryParamsSetAction } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 
-import { SharedQueryParamsEffect } from '../sharedQueryParamsTypes';
+import { SharedQueryParamsEffect } from '../effects/SharedQueryParamsEffect';
 import { askSetParam } from './askSetParam';
 
 describe('askSetParam', () => {

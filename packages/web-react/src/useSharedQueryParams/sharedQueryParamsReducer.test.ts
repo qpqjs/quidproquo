@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { sharedQueryParamsInitialState, sharedQueryParamsReducer } from './sharedQueryParamsReducer';
-import { SharedQueryParamsEffect, SharedQueryParamsSetParamEffect } from './sharedQueryParamsTypes';
+import { SharedQueryParamsEffect } from './effects/SharedQueryParamsEffect';
+import { SharedQueryParamsSetParamEffect } from './effects/SharedQueryParamsSetParamEffect';
+import { createInitialSharedQueryParamsState } from './logic/createInitialSharedQueryParamsState';
+import { sharedQueryParamsReducer } from './sharedQueryParamsReducer';
+
+const sharedQueryParamsInitialState = createInitialSharedQueryParamsState();
 
 describe('sharedQueryParamsReducer', () => {
   it('stores the values under the key on SetParam', () => {

@@ -4,7 +4,7 @@ import { QueryParamsActionType } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 
-import { SharedQueryParamsEffect } from '../sharedQueryParamsTypes';
+import { SharedQueryParamsEffect } from '../effects/SharedQueryParamsEffect';
 import { askSyncParams } from './askSyncParams';
 
 describe('askSyncParams', () => {

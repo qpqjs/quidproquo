@@ -1,7 +1,7 @@
 import { AskResponse } from '@qpqjs/core';
 import { askQueryParamsGetAll } from '@qpqjs/web';
 
-import { askSharedQueryParamsUISetParam } from '../sharedQueryParamsActionCreator';
+import { askSharedQueryParamsUISetParam } from '../actionCreators/askSharedQueryParamsUISetParam';
 
 export function* askSyncParams(): AskResponse<void> {
   const params = yield* askQueryParamsGetAll();

@@ -3,8 +3,8 @@ import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askSharedQueryParamsUISetParam } from './sharedQueryParamsActionCreator';
-import { SharedQueryParamsEffect } from './sharedQueryParamsTypes';
+import { SharedQueryParamsEffect } from '../effects/SharedQueryParamsEffect';
+import { askSharedQueryParamsUISetParam } from './askSharedQueryParamsUISetParam';
 
 describe('askSharedQueryParamsUISetParam', () => {
   it('yields a state dispatch carrying the SetParam effect', () => {
