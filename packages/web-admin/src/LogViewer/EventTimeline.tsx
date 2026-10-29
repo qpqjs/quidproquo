@@ -5,12 +5,12 @@ import { Box, CircularProgress } from '@mui/material';
 
 import { TreeApi } from './hooks';
 
-interface EventTimelineProps {
+type EventTimelineProps = {
   logCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
   treeApi: TreeApi;
-}
+};
 
 const EVENT_HEIGHT = 30;
 const EVENT_COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8c00', '#ff0080'];

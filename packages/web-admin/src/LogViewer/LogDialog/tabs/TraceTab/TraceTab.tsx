@@ -11,10 +11,10 @@ import { TraceViewer } from '../../../TraceViewer';
 import { AsyncStoryState } from '../../hooks';
 import { MovedToColdStorage } from '../../MovedToColdStorage';
 
-interface TraceTabProps {
+type TraceTabProps = {
   log: AsyncStoryState;
   isVisible: boolean;
-}
+};
 
 // Backstop for a missed TraceDone websocket message (reconnect gaps, dev servers
 // without the admin socket). checkOnly polls never trigger trace runs.

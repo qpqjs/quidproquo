@@ -10,9 +10,9 @@ import { AsyncButton } from '../../components';
 import { AuthState } from '../logic';
 import { authChallengeMfaInitialState, authChallengeMfaLogic, authChallengeMfaReducer } from './logic';
 
-interface AuthChallengeSoftwareTokenMfaProps {
+type AuthChallengeSoftwareTokenMfaProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeSoftwareTokenMfa',

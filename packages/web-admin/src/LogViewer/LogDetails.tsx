@@ -9,11 +9,11 @@ import { processLog } from './logic';
 import { LogSummaryDetails } from './LogSummaryDetails';
 import { LogSummaryReturn } from './LogSummaryReturn';
 
-interface LogDetailsProps {
+type LogDetailsProps = {
   log: StoryResult<any>;
   hideFastActions: boolean;
   orderByDuration: boolean;
-}
+};
 
 const leftTableCell = {
   width: '200px',

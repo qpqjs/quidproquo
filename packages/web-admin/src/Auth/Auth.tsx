@@ -10,9 +10,9 @@ import { isLoggedOn } from './logic/isLoggedOn';
 import { authRuntime } from './logic';
 import { Login } from './Login';
 
-interface AuthProps {
+type AuthProps = {
   children?: ReactNode;
-}
+};
 
 export function Auth({ children }: AuthProps) {
   const [api, state] = useQpqRuntime(authRuntime);

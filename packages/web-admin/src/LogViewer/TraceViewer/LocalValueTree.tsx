@@ -6,10 +6,10 @@ import React, { useMemo } from 'react';
 // a collapsible tree (native <details>, so state survives without bookkeeping); values
 // without one fall back to their preview string.
 
-interface LocalValueTreeProps {
+type LocalValueTreeProps = {
   name: string;
   value: QpqExecutionTraceValue;
-}
+};
 
 const primitiveStyle: React.CSSProperties = { color: 'rgba(70, 140, 200, 1)' };
 const markerStyle: React.CSSProperties = { color: 'rgba(150, 150, 150, 1)', fontStyle: 'italic' };

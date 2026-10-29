@@ -2,9 +2,9 @@ import React from 'react';
 
 import { LoadingApiContext, LoadingContext, useLoadingManager } from './private';
 
-interface LoadingProviderProps {
+type LoadingProviderProps = {
   children: React.ReactNode;
-}
+};
 
 export const LoadingProvider: React.FC<LoadingProviderProps> = ({ children }) => {
   const [isLoading, api] = useLoadingManager();

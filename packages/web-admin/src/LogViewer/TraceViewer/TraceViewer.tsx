@@ -28,7 +28,7 @@ import {
   searchStepValues,
 } from './traceViewerLogic';
 
-interface TraceViewerProps {
+type TraceViewerProps = {
   trace: QpqExecutionTrace;
 
   // "My code only" lives with the tab (not here) so Re-run Trace can send it to the
@@ -39,7 +39,7 @@ interface TraceViewerProps {
   // Tab-owned controls (the Re-run Trace button) rendered at the end of the header row
   // so they don't need a row of their own
   actions?: React.ReactNode;
-}
+};
 
 // Layout notes (deliberate, don't regress):
 // - the slider row contains ONLY the prev/slider/next controls, any text that changes

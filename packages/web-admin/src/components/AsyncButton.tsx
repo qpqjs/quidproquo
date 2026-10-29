@@ -2,12 +2,12 @@ import React, { ReactNode, useState } from 'react';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 
-interface AsyncButtonProps {
+type AsyncButtonProps = {
   onClick: (event: any) => Promise<void>;
   children?: ReactNode;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
 export function AsyncButton({ onClick, children, disabled, type }: AsyncButtonProps) {
   const [loading, setLoading] = useState(false);

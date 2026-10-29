@@ -8,13 +8,13 @@ import { TreeApi } from './hooks';
 
 const BACKGROUND_COLOR = '#c1c1c1';
 
-interface LogCorrelationTreeProps {
+type LogCorrelationTreeProps = {
   correlationId: string;
   highlightCorrelationId: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
   treeApi: TreeApi;
-}
+};
 
 // Here we're using `renderCustomNodeElement` to represent each node
 // as an SVG `rect` instead of the default `circle`.

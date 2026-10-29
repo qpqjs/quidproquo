@@ -25,7 +25,7 @@ const getHoursSinceStartOfDay = (): number => {
   return now.getHours();
 };
 
-interface DashboardProps {}
+type DashboardProps = {};
 
 export const Dashboard: React.FC<DashboardProps> = () => {
   const [api] = useAdminApp();

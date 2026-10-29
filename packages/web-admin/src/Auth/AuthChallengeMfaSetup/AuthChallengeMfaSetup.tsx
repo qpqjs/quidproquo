@@ -11,9 +11,9 @@ import { AsyncButton } from '../../components';
 import { AuthState } from '../logic';
 import { authChallengeMfaSetupInitialState, authChallengeMfaSetupLogic, authChallengeMfaSetupReducer } from './logic';
 
-interface AuthChallengeMfaSetupProps {
+type AuthChallengeMfaSetupProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeMfaSetup',

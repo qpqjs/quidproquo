@@ -10,9 +10,9 @@ import { AsyncButton } from '../../components';
 import { AuthState } from '../logic';
 import { authChallengeInitialState, authChallengeLogic, authChallengeReducer } from './logic';
 
-interface AuthChallengeNewPasswordRequiredProps {
+type AuthChallengeNewPasswordRequiredProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeNewPasswordRequired',

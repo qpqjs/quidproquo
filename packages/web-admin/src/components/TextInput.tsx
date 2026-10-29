@@ -1,11 +1,11 @@
 import React from 'react';
 import { FormControl, TextField } from '@mui/material';
 
-interface TextInputProps {
+type TextInputProps = {
   label: string;
   value?: string;
   onChange: (value: string) => void;
-}
+};
 
 export const TextInput: React.FC<TextInputProps> = ({ label, value, onChange }: TextInputProps) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

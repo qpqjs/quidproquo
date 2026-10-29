@@ -2,7 +2,7 @@ import { QpqExecutionTrace, QpqExecutionTraceValue } from '@qpqjs/core';
 
 // Per-line rollup of a trace for one source file: how many times the line executed, and
 // which locals changed as a result of executing it.
-export interface TraceLineAnnotation {
+export type TraceLineAnnotation = {
   visitCount: number;
 
   // Preview strings of values PRODUCED by executing this line, last visit wins. A
@@ -13,7 +13,7 @@ export interface TraceLineAnnotation {
 
   // Preview of the value returned at this line (return break positions), last visit wins
   returned?: string;
-}
+};
 
 // Change detection compares the deepest capture available, previews can collide
 // (nested objects render as 'Object') where the json still differs.
@@ -92,10 +92,10 @@ export const getDisplaySourceNames = (paths: string[]): string[] => {
 
 // One step whose captured values matched a search, with the locals that matched;
 // RETURNS_MATCH_NAME stands in for a matching return value.
-export interface TraceValueMatch {
+export type TraceValueMatch = {
   stepIndex: number;
   matchedNames: string[];
-}
+};
 
 export const RETURNS_MATCH_NAME = '→ returns';
 

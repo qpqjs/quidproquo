@@ -4,14 +4,14 @@ import { EventTimeline } from '../../../EventTimeline';
 import { TreeApi } from '../../../hooks';
 import { AsyncStoryState } from '../../hooks';
 
-interface TimelineTabProps {
+type TimelineTabProps = {
   log: AsyncStoryState;
 
   isVisible: boolean;
   setSelectedLogCorrelation: (correlation: string) => void;
 
   treeApi: TreeApi;
-}
+};
 
 export const TimelineTab: React.FC<TimelineTabProps> = ({
   log,

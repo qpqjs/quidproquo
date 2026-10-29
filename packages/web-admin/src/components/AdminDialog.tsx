@@ -17,7 +17,7 @@ export const useAdminDialog = (tabs: string[], defaultTab: string) => {
   };
 };
 
-interface AdminDialogProps {
+type AdminDialogProps = {
   open: boolean;
   handleClose: () => void;
 
@@ -34,7 +34,7 @@ interface AdminDialogProps {
   }[];
 
   children: React.ReactNode;
-}
+};
 
 export const AdminDialog = ({ open, handleClose, title, selectedTab, onSelectTab, tabs, buttons, children }: AdminDialogProps) => {
   const selectedTabIndex = tabs.findIndex((t) => t === selectedTab);

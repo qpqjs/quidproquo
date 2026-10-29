@@ -14,9 +14,9 @@ import { Box, Checkbox, CircularProgress, FormControlLabel, Typography } from '@
 
 import { useAdminApp } from '../adminApp';
 
-interface LogSummaryProps {
+type LogSummaryProps = {
   log: StoryResult<any>;
-}
+};
 
 export const LogSummary = ({ log }: LogSummaryProps) => {
   const [checkedLoading, setCheckedLoading] = useState(true);

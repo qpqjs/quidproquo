@@ -17,9 +17,9 @@ import { useSearchFields } from '../../../adminApp';
 import { AsyncButton } from '../../../components/AsyncButton';
 import { useServiceNames } from '../../hooks';
 
-export interface AdminLogSearchBarProps {
+export type AdminLogSearchBarProps = {
   onSearch: () => Promise<any>;
-}
+};
 
 export function AdminLogSearchBar({ onSearch }: AdminLogSearchBarProps) {
   const serviceOptions = useServiceNames();

@@ -2,7 +2,7 @@ import { QpqExecutionTrace } from '@qpqjs/core';
 
 import { apiRequestPost, externalRequestGet } from '../../logic';
 
-export interface LogTraceRequestOptions {
+export type LogTraceRequestOptions = {
   // Force a fresh trace run even when one is stored
   refresh?: boolean;
 
@@ -12,15 +12,15 @@ export interface LogTraceRequestOptions {
   // Trace only the service's own code, no breakpoints in node_modules, so the whole
   // step budget goes to user statements
   onlyOwnCode?: boolean;
-}
+};
 
-export interface LogTraceResult {
+export type LogTraceResult = {
   trace?: QpqExecutionTrace;
 
   // The trace is running in the owning service, a TraceDone websocket message (or a
   // checkOnly poll finding the stored trace) says when to ask again.
   pending: boolean;
-}
+};
 
 // Asks the log service for a trace. A stored trace comes back as a signed url (fetched
 // here); otherwise the service starts one fire-and-forget and reports pending, see

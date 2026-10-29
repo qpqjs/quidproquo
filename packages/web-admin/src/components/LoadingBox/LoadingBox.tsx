@@ -7,11 +7,11 @@ import { useIsLoading } from '../../view';
 import { LoadingProvider } from '../../view';
 import { usePlatformDataFromPath } from './hooks';
 
-interface LoadingBoxProps<T> {
+type LoadingBoxProps<T> = {
   path: string;
   renderItem: (item: T) => React.ReactNode;
   renderLoading?: () => React.ReactNode;
-}
+};
 
 const LoadingBoxInternal = <T,>({ path, renderItem, renderLoading }: LoadingBoxProps<T>) => {
   const isLoading = useIsLoading();

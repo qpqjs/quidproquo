@@ -7,9 +7,9 @@ import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from './actionComponents/genericActionRenderer/AnyVariableView';
 
-interface LogSummaryDetailsProps {
+type LogSummaryDetailsProps = {
   log: StoryResult<any>;
-}
+};
 
 const runtimeTypeToCamelCase = (runtimeType: string): string => runtimeType.toLowerCase().replace(/_(\w)/g, (_, char) => char.toUpperCase());
 

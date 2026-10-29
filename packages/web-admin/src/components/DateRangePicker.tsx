@@ -6,12 +6,12 @@ import { Box, FormControl, Grid, IconButton, Menu, MenuItem } from '@mui/materia
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-interface DateRangePickerProps {
+type DateRangePickerProps = {
   startIsoDateTime: string;
   endIsoDateTime: string;
   setStartIsoDateTime: (isoString: string) => void;
   setEndIsoDateTime: (isoString: string) => void;
-}
+};
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({ startIsoDateTime, endIsoDateTime, setStartIsoDateTime, setEndIsoDateTime }) => {
   const [anchorEl, setAnchorEl] = useState<Nullable<HTMLElement>>(null);

@@ -10,10 +10,10 @@ import { useAdminApp } from '../../adminApp';
 import { eventDocAiLogChatRuntime } from './eventDocAiLogChatRuntime';
 import { EventDocAiSegments } from './EventDocAiSegments';
 
-interface LogChatProps {
+type LogChatProps = {
   logServiceName: string;
   logCorrelation: string;
-}
+};
 
 const LogChatConversation: React.FC<{ logCorrelation: string }> = ({ logCorrelation }) => {
   const [inputMessage, setInputMessage] = useState('');

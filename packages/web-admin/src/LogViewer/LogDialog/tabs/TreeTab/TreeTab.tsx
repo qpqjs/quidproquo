@@ -4,14 +4,14 @@ import { TreeApi } from '../../../hooks';
 import { LogCorrelations } from '../../../LogCorrelations';
 import { AsyncStoryState } from '../../hooks';
 
-interface TreeTabProps {
+type TreeTabProps = {
   log: AsyncStoryState;
 
   isVisible: boolean;
   setSelectedLogCorrelation: (correlation: string) => void;
 
   treeApi: TreeApi;
-}
+};
 
 export const TreeTab: React.FC<TreeTabProps> = ({
   log,

@@ -4,9 +4,9 @@ import { useVolatileState } from '../../../../adminApp';
 import { LogChat } from '../../../LogChat';
 import { AsyncStoryState } from '../../hooks';
 
-interface HelpTabProps {
+type HelpTabProps = {
   log: AsyncStoryState;
-}
+};
 
 export const HelpTab: React.FC<HelpTabProps> = ({ log }) => {
   const volatile = useVolatileState();

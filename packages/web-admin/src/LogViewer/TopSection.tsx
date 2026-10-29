@@ -18,9 +18,9 @@ import { AsyncButton } from '../components/AsyncButton';
 import { RuntimeTypes } from './constants';
 import { useServiceNames } from './hooks';
 
-export interface TopSectionProps {
+export type TopSectionProps = {
   onSearch: () => Promise<any>;
-}
+};
 
 export function TopSection({ onSearch }: TopSectionProps) {
   const serviceOptions = useServiceNames();
