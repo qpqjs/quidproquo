@@ -6,13 +6,7 @@ import { buildTestQpqConfig } from '../testing/configTesting';
 import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '../testing/runtimeTesting';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { AskResponse } from '../types/StorySession';
-import {
-  getDateNow,
-  getRun,
-  getSystemExecuteStoryActionProcessor,
-  qpqPromisify,
-  QpqPromisifyActionError,
-} from './getSystemExecuteStoryActionProcessor';
+import { getRun, getSystemExecuteStoryActionProcessor, qpqPromisify, QpqPromisifyActionError } from './getSystemExecuteStoryActionProcessor';
 
 const buildRuntimeInfo = (processors: any, payload: any = {}): any => [
   payload,
@@ -23,15 +17,6 @@ const buildRuntimeInfo = (processors: any, payload: any = {}): any => [
   noopDynamicModuleLoader,
   {} as any,
 ];
-
-describe('getDateNow', () => {
-  it('returns the current time as an ISO string that round-trips', () => {
-    const now = getDateNow();
-
-    expect(now).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    expect(new Date(now).toISOString()).toBe(now);
-  });
-});
 
 describe('qpqPromisify', () => {
   it('threads successful action results through the story', async () => {

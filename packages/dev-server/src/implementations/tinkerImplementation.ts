@@ -1,4 +1,4 @@
-import { createRuntime, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from '@qpqjs/core';
+import { createRuntime, getDateNow, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from '@qpqjs/core';
 import * as qpqCore from '@qpqjs/core';
 import * as qpqWebserver from '@qpqjs/webserver';
 
@@ -19,8 +19,6 @@ import { getDevServerLogger } from './logger';
 const tinkerPrint = (line: string): void => {
   console.log(line);
 };
-
-const getDateNow = () => new Date().toISOString();
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);

@@ -4,8 +4,7 @@ import { actionResult, actionResultError, isErroredActionResult, resolveActionRe
 import { processAction } from '../runtime';
 import { askRunParallel } from '../stories';
 import { ActionProcessor, AskResponse, AskResponseReturnType, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQError, Story } from '../types';
-
-export const getDateNow = () => new Date().toISOString();
+import { getDateNow } from '../utils/dateTime/getDateNow';
 
 // Thrown when an action inside a promisified story fails without returnErrors.
 // Carries the structured action error so the ExecuteStory processor can

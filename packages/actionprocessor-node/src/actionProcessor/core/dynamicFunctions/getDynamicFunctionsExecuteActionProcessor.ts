@@ -9,6 +9,7 @@ import {
   DynamicFunctionsExecuteActionPayload,
   DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -23,8 +24,6 @@ import {
 import { randomUUID } from 'crypto';
 
 import { isStoryIterator } from '../logic/isStoryIterator';
-
-const getDateNow = () => new Date().toISOString();
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 

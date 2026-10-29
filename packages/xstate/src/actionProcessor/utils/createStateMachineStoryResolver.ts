@@ -2,6 +2,8 @@ import {
   ActionProcessorList,
   createImplementationRuntime,
   DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
   QPQConfig,
   QpqLogger,
   StorySession,
@@ -10,13 +12,6 @@ import {
 
 /** Resolves a story to a StoryResult; every state machine processor runs its KVS, guard and side-effect stories through one. */
 export type StateMachineStoryResolver = ReturnType<typeof createImplementationRuntime>;
-
-// Processors are platform code: wall-clock time is allowed here, stories stay
-// deterministic because they receive time through actions.
-const getDateNow = (): string => new Date().toISOString();
-
-// Runtime correlation ids only need uniqueness within logs, not crypto randomness.
-const getNewGuid = (): string => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 /** Builds the shared implementation runtime the state machine processors resolve stories with. */
 export const createStateMachineStoryResolver = (
@@ -28,4 +23,4 @@ export const createStateMachineStoryResolver = (
   dynamicModuleLoader: DynamicModuleLoader,
   streamRegistry: StreamRegistry,
 ): StateMachineStoryResolver =>
-  createImplementationRuntime(qpqConfig, [tag], getDateNow, getNewGuid, session, actionProcessors, logger, dynamicModuleLoader, streamRegistry);
+  createImplementationRuntime(qpqConfig, [tag], getDateNow, generateUuid, session, actionProcessors, logger, dynamicModuleLoader, streamRegistry);

@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   createNestedRuntime,
   DynamicModuleLoader,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   QpqLogger,
@@ -31,8 +32,6 @@ import { USER_SCRIPT_SOURCE_LIMITS } from './logic/USER_SCRIPT_SOURCE_LIMITS';
 import { UserScriptArchiveError } from './logic/UserScriptArchiveError';
 
 const { errorType } = askUserScriptBuildFromZip;
-
-const getDateNow = () => new Date().toISOString();
 
 // Drive failures while reading the zip, re-labelled into this action's catalog; any other
 // failure passes through with its own type.

@@ -1,8 +1,16 @@
-import { actionResult, actionResultError, askAiPromptStream, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  askAiPromptStream,
+  createActionProcessor,
+  ErrorTypeEnum,
+  generateUuid,
+  ProcessorFor,
+  QPQConfig,
+} from '@qpqjs/core';
 
 import { streamText } from 'ai';
 
-import { randomGuid } from '../../../awsLambdaUtils';
 import {
   buildAiPromptInput,
   buildAiStopConditions,
@@ -51,7 +59,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         },
       });
 
-      const streamId = `ai-prompt-${Date.now()}-${randomGuid()}`;
+      const streamId = `ai-prompt-${Date.now()}-${generateUuid()}`;
 
       async function* aiStreamIterator(): AsyncIterableIterator<string> {
         for await (const part of stream) {

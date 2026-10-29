@@ -5,6 +5,8 @@ import {
   AskResponseReturnType,
   createRuntime,
   defineModule,
+  generateUuid,
+  getDateNow,
   QpqFunctionRuntime,
   QpqRuntimeType,
   Story,
@@ -76,9 +78,9 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
           ...(await stableContextGetActionProcessors(qpqConfig, dynamicModuleLoader)),
           ...(await stableGetActionProcessors(qpqConfig, dynamicModuleLoader)),
         }),
-        () => new Date().toISOString(),
+        getDateNow,
         logger,
-        `frontend::${'uuid'}`,
+        `frontend::${generateUuid()}`,
         QpqRuntimeType.UI,
         async (_runtime: QpqFunctionRuntime) => {
           // noop

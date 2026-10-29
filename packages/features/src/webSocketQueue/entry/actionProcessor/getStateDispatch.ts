@@ -2,14 +2,14 @@ import {
   askLog,
   AskResponse,
   askStateDispatchBase,
+  generateUuid,
+  getDateNow,
   getProcessCustomImplementation,
   ProcessorFor,
   QPQConfig,
   StateActionType,
   StateDispatchActionPayload,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { askWebsocketReadConnectionInfo } from '../../context';
 import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
@@ -33,7 +33,7 @@ export const getStateDispatch = (qpqConfig: QPQConfig) => ({
     askStateDispatchToFrontend,
     'Send state dispatch to UI',
     null,
-    () => new Date().toISOString(),
-    randomUUID,
+    getDateNow,
+    generateUuid,
   ),
 });

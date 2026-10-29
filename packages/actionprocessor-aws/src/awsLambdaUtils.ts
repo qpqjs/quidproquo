@@ -1,13 +1,8 @@
 import { HTTPMethod, Nullable, StorageDriveTier } from '@qpqjs/core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
 import { StorageClass } from '@aws-sdk/client-s3';
-
-export const randomGuid = () => {
-  return randomUUID();
-};
 
 export type UrlMatch = {
   didMatch: boolean;

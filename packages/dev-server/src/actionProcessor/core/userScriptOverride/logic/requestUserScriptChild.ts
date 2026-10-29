@@ -7,6 +7,7 @@ import {
   askFileGenerateTemporarySecureUrl,
   createNestedRuntime,
   DynamicModuleLoader,
+  getDateNow,
   QPQConfig,
   qpqCoreUtils,
   QpqLogger,
@@ -24,8 +25,6 @@ import { randomUUID } from 'crypto';
 
 import { ResolvedDevServerConfig } from '../../../../types';
 import { getUserScriptChildEnv } from '../getUserScriptChildEnv';
-
-const getDateNow = () => new Date().toISOString();
 
 /** The error names an action that goes through the child must carry; PayloadTooLarge only where the request carries args. */
 export type UserScriptChildErrorCatalog = {

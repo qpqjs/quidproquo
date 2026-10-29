@@ -4,6 +4,7 @@ import {
   askProcessEvent,
   createRuntime,
   DynamicModuleLoader,
+  getDateNow,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
@@ -17,9 +18,6 @@ import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '
 import { getDevServerLogger } from '../implementations/logger';
 import { ResolvedDevServerConfig } from '../types';
 import { withProcessorDelay } from './withProcessorDelay';
-
-// TODO: @joe-coady: Make this a util or something based on server time or something..
-const getDateNow = () => new Date().toISOString();
 
 export const processEvent = async <E, ER>(
   expressEvent: E,

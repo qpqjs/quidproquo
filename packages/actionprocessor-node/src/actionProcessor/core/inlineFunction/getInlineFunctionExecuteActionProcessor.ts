@@ -4,6 +4,7 @@ import {
   createActionProcessor,
   createNestedRuntime,
   ErrorTypeEnum,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -12,8 +13,6 @@ import {
 } from '@qpqjs/core';
 
 import { randomUUID } from 'crypto';
-
-const getDateNow = () => new Date().toISOString();
 
 const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askInlineFunctionExecuteBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

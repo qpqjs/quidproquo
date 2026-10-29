@@ -6,6 +6,7 @@ import {
   createImplementationRuntime,
   DynamicModuleLoader,
   ErrorTypeEnum,
+  generateUuid,
   QPQConfig,
   qpqCoreUtils,
   QpqLogger,
@@ -17,7 +18,6 @@ import type { ToolSet } from 'ai';
 import { jsonSchema } from 'ai';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
-import { randomGuid } from '../../../../awsLambdaUtils';
 import { resolveBedrockModel } from './resolveBedrockModel';
 
 export type PrepareAiPromptCallPayload = {
@@ -64,7 +64,7 @@ export const prepareAiPromptCall = (
         qpqConfig,
         [`AI Tool: ${toolName}`],
         () => new Date().toISOString(),
-        randomGuid,
+        generateUuid,
         session,
         actionProcessorList,
         logger,

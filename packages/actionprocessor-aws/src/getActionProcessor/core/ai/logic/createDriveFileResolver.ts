@@ -3,13 +3,13 @@ import {
   askFileReadBinaryContents,
   createImplementationRuntime,
   DynamicModuleLoader,
+  generateUuid,
   QPQConfig,
   QpqLogger,
   StorySession,
   StreamRegistry,
 } from '@qpqjs/core';
 
-import { randomGuid } from '../../../../awsLambdaUtils';
 import { AiDriveFileResolver } from './toSdkMessages';
 
 // Reads drive-referenced files through the active file action processor, so the
@@ -27,7 +27,7 @@ export const createDriveFileResolver = (
       qpqConfig,
       [`AI File: ${drive}/${filepath}`],
       () => new Date().toISOString(),
-      randomGuid,
+      generateUuid,
       session,
       actionProcessorList,
       logger,

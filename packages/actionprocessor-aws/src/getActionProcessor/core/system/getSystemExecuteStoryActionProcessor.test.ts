@@ -8,6 +8,7 @@ import {
   createStubLogger,
   DecodedAccessToken,
   ErrorTypeEnum,
+  getDateNow,
   StorySession,
   StreamRegistry,
   SystemActionType,
@@ -16,7 +17,6 @@ import {
 import { describe, expect, it, vi } from 'vitest';
 
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
-import { getDateNow } from './getDateNow';
 import { getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
 
 const PROBE = 'Test/Probe';

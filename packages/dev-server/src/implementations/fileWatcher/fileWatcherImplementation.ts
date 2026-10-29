@@ -3,6 +3,7 @@ import {
   askExecuteStory,
   createRuntime,
   DynamicModuleLoader,
+  getDateNow,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
@@ -23,8 +24,6 @@ import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerLogger } from '../logger';
 import { FileEventPayload } from './FileEventPayload';
 import { toStorageDriveEvent } from './toStorageDriveEvent';
-
-const getDateNow = () => new Date().toISOString();
 
 export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const storagePath = devServerConfig.fileStorageConfig.storagePath;

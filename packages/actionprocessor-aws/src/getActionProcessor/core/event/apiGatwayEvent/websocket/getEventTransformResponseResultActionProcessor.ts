@@ -6,13 +6,13 @@ import {
   createActionProcessor,
   EventActionType,
   EventTransformResponseResultActionPayload,
+  generateUuid,
   getProcessCustomImplementation,
   LogLevelEnum,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { randomGuid } from '../../../../../awsLambdaUtils';
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 
 export function* askTransformResponseStory({
@@ -36,7 +36,7 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
     'Transform Errored Websocket Response',
     null,
     () => new Date().toISOString(),
-    randomGuid,
+    generateUuid,
   );
 
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

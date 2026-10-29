@@ -7,6 +7,7 @@ import {
   askFileGenerateTemporarySecureUrl,
   createNestedRuntime,
   DynamicModuleLoader,
+  getDateNow,
   QPQConfig,
   qpqCoreUtils,
   QpqLogger,
@@ -28,8 +29,6 @@ import { getConfigRuntimeResourceNameFromConfig } from '../../../../awsNamingUti
 import { executeLambdaByName } from '../../../../logic/lambda/executeLambdaByName';
 import { UserScriptRunnerErrorCatalog } from './UserScriptRunnerErrorCatalog';
 import { UserScriptRunnerSource } from './UserScriptRunnerSource';
-
-const getDateNow = () => new Date().toISOString();
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 

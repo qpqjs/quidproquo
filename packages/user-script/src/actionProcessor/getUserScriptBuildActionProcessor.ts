@@ -9,6 +9,7 @@ import {
   createActionProcessor,
   createNestedRuntime,
   DynamicModuleLoader,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   QpqLogger,
@@ -31,8 +32,6 @@ import { getUserScriptBuildErrorType } from './logic/getUserScriptBuildErrorType
 import { materialiseUserScriptSource } from './logic/materialiseUserScriptSource';
 
 const { errorType } = askUserScriptBuild;
-
-const getDateNow = () => new Date().toISOString();
 
 // Drive failures while collecting the source, re-labelled into this action's catalog; any
 // other failure passes through with its own type.

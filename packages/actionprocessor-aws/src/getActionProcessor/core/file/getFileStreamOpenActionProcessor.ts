@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ErrorTypeEnum,
   FileActionType,
+  generateUuid,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -15,7 +16,6 @@ import {
 import { Readable } from 'stream';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-import { randomGuid } from '../../../awsLambdaUtils';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
@@ -65,7 +65,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         return actionResultError(ErrorTypeEnum.GenericError, `Empty response body for: ${filepath}`);
       }
 
-      const streamId = `s3-${randomGuid()}`;
+      const streamId = `s3-${generateUuid()}`;
       const isText = encoding === 'text';
       const size = chunkSize ?? 65536;
       const transform = isText ? (buf: Buffer) => buf.toString('utf8') : (buf: Buffer) => buf.toString('base64');

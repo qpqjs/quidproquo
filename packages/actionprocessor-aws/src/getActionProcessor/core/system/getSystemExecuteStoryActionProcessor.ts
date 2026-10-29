@@ -4,6 +4,8 @@ import {
   createActionProcessor,
   createNestedRuntime,
   ErrorTypeEnum,
+  generateUuid,
+  getDateNow,
   getUniqueKeyFromQpqFunctionRuntime,
   ProcessorFor,
   QPQConfig,
@@ -11,9 +13,6 @@ import {
   storyResultToActionResult,
   StorySession,
 } from '@qpqjs/core';
-
-import { randomGuid } from '../../../awsLambdaUtils';
-import { getDateNow } from './getDateNow';
 
 const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askExecuteStoryBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -40,7 +39,7 @@ const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEx
       actionProcessors,
       getDateNow,
       logger,
-      randomGuid,
+      generateUuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       payload.runtime,
