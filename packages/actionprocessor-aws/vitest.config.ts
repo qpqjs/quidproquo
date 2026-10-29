@@ -15,9 +15,8 @@ export default defineConfig({
       '@qpqjs/actionprocessor-js': fileURLToPath(new URL('../actionprocessor-js/src/index.ts', import.meta.url)),
       '@qpqjs/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
       '@qpqjs/webserver': fileURLToPath(new URL('../webserver/src/index.ts', import.meta.url)),
-      // The tracer is deep-imported as lib/commonjs/traceStoryExecution (so lambda
-      // bundles skip the node package's root index); map it to its source too.
-      '@qpqjs/actionprocessor-node/lib/commonjs/traceStoryExecution': fileURLToPath(
+      // The tracer subpath (so lambda bundles skip the node package's root index) maps to its source too.
+      '@qpqjs/actionprocessor-node/traceStoryExecution': fileURLToPath(
         new URL('../actionprocessor-node/src/traceStoryExecution/index.ts', import.meta.url),
       ),
       '@qpqjs/actionprocessor-node': fileURLToPath(new URL('../actionprocessor-node/src/index.ts', import.meta.url)),
