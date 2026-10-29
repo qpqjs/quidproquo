@@ -21,6 +21,7 @@
     "lint": "npx tsx ./scripts/runWorkspaces.ts lint --all",
     "lint:fix": "npx tsx ./scripts/runWorkspaces.ts lint:fix --all",
     "lint:fix:lite": "npx tsx ./scripts/runWorkspaces.ts lint:fix --changed",
+    "check:deps": "npx tsx ./scripts/checkSiblingDeclarations.ts",
     "format": "npm run format --ws",
     "test": "vitest run",
     "test:lite": "vitest run --changed",

@@ -29,7 +29,8 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      # Lint needs no build and fails fast.
+      # Neither needs a build; both fail fast.
+      - run: npm run check:deps
       - run: npm run lint
       # Cross-package imports resolve to each package's built lib/, so the
       # suite needs the monorepo built before vitest can load the test files.
