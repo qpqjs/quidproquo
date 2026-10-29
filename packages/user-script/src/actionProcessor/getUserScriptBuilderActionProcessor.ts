@@ -3,8 +3,8 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 import { getUserScriptBuildActionProcessor } from './getUserScriptBuildActionProcessor';
 import { getUserScriptBuildFromZipActionProcessor } from './getUserScriptBuildFromZipActionProcessor';
 
-/** The resolver defineUserScriptBuilder points a service at: both build actions, from a directory and from a zip. */
-export const getUserScriptBuildActionProcessors: ActionProcessorListResolver = async (
+/** The composer defineUserScriptBuilder points a service at: both build actions, from a directory and from a zip. */
+export const getUserScriptBuilderActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({

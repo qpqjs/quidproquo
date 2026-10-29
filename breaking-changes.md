@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Composers are singular (B2): `getUserScriptBuildActionProcessors` in `@qpqjs/user-script` is `getUserScriptBuilderActionProcessor` (its file moved with it, which is the runtime pointer `defineUserScriptBuilder` sets), and `getUserScriptRunnerActionProcessors` in `@qpqjs/actionprocessor-node` is `getUserScriptRunnerActionProcessor`.
 - `qpqCoreUtils` config lookups follow B4: `getSecretByName`, `getCryptoKeyByName`, `getSigningKeyByName`, `getUserDirectoryByName` and the new `getParameterByName` return `null` when the setting is missing; the throwing forms are `resolveSecretOrThrow`, `resolveCryptoKeyOrThrow`, `resolveSigningKeyOrThrow`, `resolveUserDirectoryOrThrow` and `resolveParameterOrThrow` (was `getParameterConfig`).
 - Error catalog entries are renamed to the standard names (A5): `Throttling` (config, crypto) and `ServiceUnavailable` (key value store, event bus, queue) are `Throttled`; `TimedOut` (user script) is `Timeout`; and `ErrorTypeEnum.TimeOut` is `ErrorTypeEnum.Timeout` (value `'Timeout'`). Code matching on `askX.errorType.Throttling`, `.ServiceUnavailable`, `.TimedOut` or `ErrorTypeEnum.TimeOut` changes to the new member.
 - `DynamicFunctionsExecuteErrorTypeEnum` is gone (A5): the four entries live on `askDynamicFunctionExecute.errorType` (`DynamicFunctionsNotFound`, `ModuleLoadFailed`, `FunctionNotFound`, `FunctionThrew`) and the values are now action-scoped strings.

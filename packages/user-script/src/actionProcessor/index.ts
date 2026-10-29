@@ -1,4 +1,4 @@
 export * from './getUserScriptBuildActionProcessor';
-export * from './getUserScriptBuildActionProcessors';
+export * from './getUserScriptBuilderActionProcessor';
 export * from './getUserScriptBuildFromZipActionProcessor';
 export * from './logic';

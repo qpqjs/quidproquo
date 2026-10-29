@@ -15,7 +15,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
  * processor and fails, which is the sandbox's first wall; the runner's empty IAM role is
  * the second. Never merged into a host runtime's list.
  */
-export const getUserScriptRunnerActionProcessors: ActionProcessorListResolver = async (
+export const getUserScriptRunnerActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({

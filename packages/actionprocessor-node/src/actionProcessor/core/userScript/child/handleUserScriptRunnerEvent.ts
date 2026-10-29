@@ -19,7 +19,7 @@ import {
   UserScriptRunnerResult,
 } from '@qpqjs/core';
 
-import { getUserScriptRunnerActionProcessors } from '../getUserScriptRunnerActionProcessors';
+import { getUserScriptRunnerActionProcessor } from '../getUserScriptRunnerActionProcessor';
 import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
 import { isUserScriptModuleNotFoundError } from '../logic/isUserScriptModuleNotFoundError';
 import { listUserScriptExports } from '../logic/listUserScriptExports';
@@ -93,7 +93,7 @@ export const handleUserScriptRunnerEvent = async (
           resolveStory: createRuntime(
             qpqConfig,
             event.storySession,
-            getUserScriptRunnerActionProcessors,
+            getUserScriptRunnerActionProcessor,
             () => new Date().toISOString(),
             silentLogger,
             `${event.filename}::${generateUuid()}`,

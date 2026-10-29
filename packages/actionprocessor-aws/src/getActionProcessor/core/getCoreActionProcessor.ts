@@ -6,7 +6,6 @@ import { getAiActionProcessor } from './ai';
 import { getApiKeyValidationActionProcessor } from './apiKeyValidation';
 import { getConfigActionProcessor } from './config';
 import { getCryptoActionProcessor } from './crypto';
-import { getApiGatewayApiEventEventProcessor } from './event';
 import { getEventBusActionProcessor } from './eventBus';
 import { getFileActionProcessor } from './file';
 import { getGraphDatabaseActionProcessor } from './graphDatabase';
@@ -33,7 +32,6 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getCryptoActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
   // Overrides the node package's in-process execute: on lambda a script only ever runs in the runner.
