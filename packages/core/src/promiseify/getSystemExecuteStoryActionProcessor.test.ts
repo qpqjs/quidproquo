@@ -3,7 +3,7 @@ import { buildActionProcessorList, buildTestStorySession, createStubLogger, noop
 
 import { describe, expect, it } from 'vitest';
 
-import { SystemActionType } from '../actions';
+import { askExecuteStoryBase, SystemActionType } from '../actions';
 import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { AskResponse } from '../types/StorySession';
@@ -162,6 +162,6 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     );
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askExecuteStoryBase.errorType.NotFound);
   });
 });

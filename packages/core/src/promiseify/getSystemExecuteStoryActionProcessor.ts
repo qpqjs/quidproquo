@@ -82,7 +82,7 @@ const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEx
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const story = await dynamicModuleLoader(payload.runtime);
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
+      return actionResultError(askExecuteStoryBase.errorType.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
     try {

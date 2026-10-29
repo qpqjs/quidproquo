@@ -17,5 +17,9 @@ export type SystemTraceStoryActionPayload = {
 
 export const askTraceStory = createActionRequester<QpqExecutionTrace>()({
   actionType: SystemActionType.TraceStory,
+  errorTypes: [
+    'BadRequest', // the story result carries no runtime info, so its code cannot be located
+    'NotFound', // the story's runtime could not be dynamically loaded
+  ],
   getPayload: (storyResult: StoryResult<any>, scriptPatterns?: string[], onlyOwnCode?: boolean) => ({ storyResult, scriptPatterns, onlyOwnCode }),
 });

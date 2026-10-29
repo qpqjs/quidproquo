@@ -3,7 +3,6 @@ import {
   askExecuteStoryBase,
   createActionProcessor,
   createNestedRuntime,
-  ErrorTypeEnum,
   generateUuid,
   getDateNow,
   getUniqueKeyFromQpqFunctionRuntime,
@@ -19,7 +18,7 @@ const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEx
     const story = await dynamicModuleLoader(payload.runtime);
 
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
+      return actionResultError(askExecuteStoryBase.errorType.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
     // A payload session can come off the wire (askProcessEvent passes the incoming message's session).

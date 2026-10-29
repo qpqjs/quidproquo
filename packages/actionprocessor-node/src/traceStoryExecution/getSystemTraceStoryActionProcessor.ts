@@ -46,14 +46,14 @@ const getProcessTraceStory = (
 
     if (!storyResult.qpqFunctionRuntimeInfo) {
       return actionResultError(
-        ErrorTypeEnum.BadRequest,
+        askTraceStory.errorType.BadRequest,
         `Story [${storyResult.correlation}] has no qpqFunctionRuntimeInfo - cannot locate its code to trace`,
       );
     }
 
     const story = await dynamicModuleLoader(storyResult.qpqFunctionRuntimeInfo);
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load story for [${storyResult.correlation}]`);
+      return actionResultError(askTraceStory.errorType.NotFound, `Unable to dynamically load story for [${storyResult.correlation}]`);
     }
 
     try {

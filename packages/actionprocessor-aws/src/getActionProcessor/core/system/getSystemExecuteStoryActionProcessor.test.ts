@@ -2,9 +2,9 @@ import {
   Action,
   ActionProcessor,
   actionResult,
+  askExecuteStoryBase,
   createStreamRegistry,
   DecodedAccessToken,
-  ErrorTypeEnum,
   getDateNow,
   StorySession,
   StreamRegistry,
@@ -59,7 +59,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
       { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
     );
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(askExecuteStoryBase.errorType.NotFound);
   });
 
   it('runs the loaded story and returns its result', async () => {
