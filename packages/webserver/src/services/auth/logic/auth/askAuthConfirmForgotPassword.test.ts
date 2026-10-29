@@ -3,14 +3,14 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askConfirmForgotPassword } from './askConfirmForgotPassword';
+import { askAuthConfirmForgotPassword } from './askAuthConfirmForgotPassword';
 
-describe('askConfirmForgotPassword', () => {
+describe('askAuthConfirmForgotPassword', () => {
   it('confirms the reset against the resolved directory and returns the response', () => {
     const authResponse = { challenge: 'NONE' } as unknown as AuthenticateUserResponse;
     let captured: Action<any> | undefined;
 
-    const result = runStory(askConfirmForgotPassword('a@b.com', 'code-1', 'new-pw'), {
+    const result = runStory(askAuthConfirmForgotPassword('a@b.com', 'code-1', 'new-pw'), {
       [ConfigActionType.GetGlobal]: 'my-directory',
       [UserDirectoryActionType.ConfirmForgotPassword]: (action: Action<any>) => {
         captured = action;

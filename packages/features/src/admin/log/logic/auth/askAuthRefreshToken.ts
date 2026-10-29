@@ -2,7 +2,7 @@ import { AskResponse, askUserDirectoryRefreshToken, AuthenticateUserResponse } f
 
 import { ADMIN_USER_DIRECTORY_NAME } from '../../../constants';
 
-export function* askRefreshToken(refreshToken: string): AskResponse<AuthenticateUserResponse> {
+export function* askAuthRefreshToken(refreshToken: string): AskResponse<AuthenticateUserResponse> {
   const authResponse = yield* askUserDirectoryRefreshToken(ADMIN_USER_DIRECTORY_NAME, refreshToken);
 
   return authResponse;

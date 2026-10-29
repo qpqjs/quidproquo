@@ -4,11 +4,11 @@ import { captureRequester } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { AUTH_USER_DIRECTORY_GLOBAL_KEY } from '../../config';
-import { askGetAuthUserDirectoryName } from './askGetAuthUserDirectoryName';
+import { askAuthGetUserDirectoryName } from './askAuthGetUserDirectoryName';
 
-describe('askGetAuthUserDirectoryName', () => {
+describe('askAuthGetUserDirectoryName', () => {
   it('reads the auth user directory global', () => {
-    const { action } = captureRequester(askGetAuthUserDirectoryName());
+    const { action } = captureRequester(askAuthGetUserDirectoryName());
 
     expect(action).toEqual({
       type: ConfigActionType.GetGlobal,
@@ -17,7 +17,7 @@ describe('askGetAuthUserDirectoryName', () => {
   });
 
   it('returns the resolved directory name', () => {
-    const { returned } = captureRequester(askGetAuthUserDirectoryName(), 'my-directory');
+    const { returned } = captureRequester(askAuthGetUserDirectoryName(), 'my-directory');
 
     expect(returned).toBe('my-directory');
   });

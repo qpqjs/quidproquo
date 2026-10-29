@@ -2,7 +2,7 @@ import { AskResponse, askUserDirectoryRespondToAuthChallenge, AuthenticateUserCh
 
 import { ADMIN_USER_DIRECTORY_NAME } from '../../../constants';
 
-export function* askRespondToAuthChallenge(
+export function* askAuthRespondToChallenge(
   username: string,
   challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
   session: string,

@@ -3,7 +3,7 @@ import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatu
 import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
-import { askIsMigrationPending, getMigrationKey } from './pendingMigrations';
+import { askMigrationIsPending, getMigrationKey } from './pendingMigrations';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allMigrations = yield* askConfigGetGlobal<Migration[]>(QPQ_MIGRATIONS_RESOURCE_NAME);
@@ -12,7 +12,7 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
   // we don't need to run any current migrations
   // because database should be ready with seed data.
   for (const migration of allMigrations) {
-    yield* migrationInfoData.askUpsert({
+    yield* migrationInfoData.askMigrationInfoUpsert({
       deployType: migration.deployType,
       srcPath: getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime),
     });
@@ -28,7 +28,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
 
     // Ignore if we have already run it. Shared with the local runner (qpq migrate) so both
     // agree on what pending means.
-    if (!(yield* askIsMigrationPending(migration))) {
+    if (!(yield* askMigrationIsPending(migration))) {
       continue;
     }
 
@@ -41,7 +41,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
     yield* askQueueSendMessages(QPQ_MIGRATIONS_RESOURCE_NAME, message);
 
     // Insert the migration into into the database
-    yield* migrationInfoData.askUpsert({
+    yield* migrationInfoData.askMigrationInfoUpsert({
       deployType: migration.deployType,
       srcPath: srcPathType,
     });

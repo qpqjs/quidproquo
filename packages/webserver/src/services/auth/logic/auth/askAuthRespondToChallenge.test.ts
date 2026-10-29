@@ -10,9 +10,9 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askRespondToAuthChallenge } from './askRespondToAuthChallenge';
+import { askAuthRespondToChallenge } from './askAuthRespondToChallenge';
 
-describe('askRespondToAuthChallenge', () => {
+describe('askAuthRespondToChallenge', () => {
   it('responds against the resolved directory and returns the response', () => {
     const challenge: AnyAuthChallenge = {
       challenge: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
@@ -23,7 +23,7 @@ describe('askRespondToAuthChallenge', () => {
     const authResponse = { challenge: AuthenticateUserChallenge.NONE } as AuthenticateUserResponse;
     let captured: Action<any> | undefined;
 
-    const result = runStory(askRespondToAuthChallenge(challenge), {
+    const result = runStory(askAuthRespondToChallenge(challenge), {
       [ConfigActionType.GetGlobal]: 'my-directory',
       [UserDirectoryActionType.RespondToAuthChallenge]: (action: Action<any>) => {
         captured = action;

@@ -3,14 +3,14 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askAssociateSoftwareToken } from './askAssociateSoftwareToken';
+import { askAuthAssociateSoftwareToken } from './askAuthAssociateSoftwareToken';
 
-describe('askAssociateSoftwareToken', () => {
+describe('askAuthAssociateSoftwareToken', () => {
   it('associates a token against the resolved directory and returns the result', () => {
     const tokenResult = { secretCode: 'abc123' } as AssociateSoftwareTokenResult;
     let captured: Action<any> | undefined;
 
-    const result = runStory(askAssociateSoftwareToken('session-1'), {
+    const result = runStory(askAuthAssociateSoftwareToken('session-1'), {
       [ConfigActionType.GetGlobal]: 'my-directory',
       [UserDirectoryActionType.AssociateSoftwareToken]: (action: Action<any>) => {
         captured = action;

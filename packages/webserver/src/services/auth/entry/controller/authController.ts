@@ -55,7 +55,7 @@ function* askChallengePayloadToAuthChallenge(payload: AnyChallengePayload): AskR
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { username, password } = yield* askFromValidJsonEventRequest<LoginPayload>(event, requireStringFields('username', 'password'));
 
-  const authResponse = yield* authLogic.askLogin(username, password);
+  const authResponse = yield* authLogic.askAuthLogin(username, password);
 
   return toJsonEventResponse(authResponse);
 }
@@ -63,7 +63,7 @@ export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
 export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { refreshToken } = yield* askFromValidJsonEventRequest<RefreshPayload>(event, requireStringFields('refreshToken'));
 
-  const refreshResponse = yield* authLogic.askRefreshToken(refreshToken);
+  const refreshResponse = yield* authLogic.askAuthRefreshToken(refreshToken);
 
   return toJsonEventResponse(refreshResponse);
 }
@@ -76,7 +76,7 @@ export function* logout(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   // route: possessing the refresh token is the authorization (you can only revoke your own).
   const { refreshToken } = yield* askFromValidJsonEventRequest<RefreshPayload>(event, requireStringFields('refreshToken'));
 
-  yield* askCatch(authLogic.askRevokeSession(refreshToken));
+  yield* askCatch(authLogic.askAuthRevokeSession(refreshToken));
 
   return toJsonEventResponse({ success: true });
 }
@@ -89,7 +89,7 @@ export function* logoutEverywhere(event: HTTPEvent): AskResponse<HTTPEventRespon
   const accessToken = getAccessTokenFromHeaders(event.headers);
 
   if (accessToken) {
-    yield* askCatch(authLogic.askSignOut(accessToken));
+    yield* askCatch(authLogic.askAuthSignOut(accessToken));
   }
 
   return toJsonEventResponse({ success: true });
@@ -100,7 +100,7 @@ export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEvent
 
   const authChallenge = yield* askChallengePayloadToAuthChallenge(payload);
 
-  const response = yield* authLogic.askRespondToAuthChallenge(authChallenge);
+  const response = yield* authLogic.askAuthRespondToChallenge(authChallenge);
 
   return toJsonEventResponse(response);
 }
@@ -108,7 +108,7 @@ export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEvent
 export function* associateSoftwareToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { session } = yield* askFromValidJsonEventRequest<AssociateSoftwareTokenPayload>(event, requireStringFields('session'));
 
-  const response = yield* authLogic.askAssociateSoftwareToken(session);
+  const response = yield* authLogic.askAuthAssociateSoftwareToken(session);
 
   return toJsonEventResponse(response);
 }
@@ -116,7 +116,7 @@ export function* associateSoftwareToken(event: HTTPEvent): AskResponse<HTTPEvent
 export function* forgotPassword(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { username } = yield* askFromValidJsonEventRequest<ForgotPasswordPayload>(event, requireStringFields('username'));
 
-  const deliveryDetails = yield* authLogic.askForgotPassword(username);
+  const deliveryDetails = yield* authLogic.askAuthForgotPassword(username);
 
   return toJsonEventResponse(deliveryDetails);
 }
@@ -127,7 +127,7 @@ export function* confirmForgotPassword(event: HTTPEvent): AskResponse<HTTPEventR
     requireStringFields('username', 'code', 'password'),
   );
 
-  const response = yield* authLogic.askConfirmForgotPassword(username, code, password);
+  const response = yield* authLogic.askAuthConfirmForgotPassword(username, code, password);
 
   return toJsonEventResponse(response);
 }
@@ -145,7 +145,7 @@ export function* changePassword(event: HTTPEvent): AskResponse<HTTPEventResponse
     return yield* askThrowError(ErrorTypeEnum.Unauthorized, 'Missing access token.');
   }
 
-  yield* authLogic.askChangePassword(oldPassword, newPassword, accessToken);
+  yield* authLogic.askAuthChangePassword(oldPassword, newPassword, accessToken);
 
   return toJsonEventResponse({ success: true });
 }

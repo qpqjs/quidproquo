@@ -2,7 +2,7 @@ import { AskResponse, askUserDirectoryAuthenticateUser, AuthenticateUserResponse
 
 import { ADMIN_USER_DIRECTORY_NAME } from '../../../constants';
 
-export function* askLogin(email: string, password: string): AskResponse<AuthenticateUserResponse> {
+export function* askAuthLogin(email: string, password: string): AskResponse<AuthenticateUserResponse> {
   const authResponse = yield* askUserDirectoryAuthenticateUser(ADMIN_USER_DIRECTORY_NAME, false, email, password);
 
   return authResponse;

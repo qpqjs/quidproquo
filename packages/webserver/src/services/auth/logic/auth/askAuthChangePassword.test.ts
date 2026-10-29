@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askChangePassword } from './askChangePassword';
+import { askAuthChangePassword } from './askAuthChangePassword';
 
-describe('askChangePassword', () => {
+describe('askAuthChangePassword', () => {
   it('changes the password via the access token without resolving a directory', () => {
     let captured: Action<any> | undefined;
 
-    runStory(askChangePassword('old-pw', 'new-pw', 'access-tok'), {
+    runStory(askAuthChangePassword('old-pw', 'new-pw', 'access-tok'), {
       [UserDirectoryActionType.ChangePassword]: (action: Action<any>) => {
         captured = action;
         return undefined;

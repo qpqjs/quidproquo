@@ -33,7 +33,7 @@ export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
     qpqWebServerUtils.requireStringFields('username', 'password'),
   );
 
-  const authResponse = yield* authLogic.askLogin(username, password);
+  const authResponse = yield* authLogic.askAuthLogin(username, password);
 
   return qpqWebServerUtils.toJsonEventResponse(authResponse);
 }
@@ -44,7 +44,7 @@ export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> 
     qpqWebServerUtils.requireStringFields('refreshToken'),
   );
 
-  const refreshResponse = yield* authLogic.askRefreshToken(refreshToken);
+  const refreshResponse = yield* authLogic.askAuthRefreshToken(refreshToken);
 
   return qpqWebServerUtils.toJsonEventResponse(refreshResponse);
 }
@@ -56,7 +56,7 @@ export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEvent
   );
 
   // TODO: @joe-coady: Make this more generic ~ Currently we only support one challenge
-  const response = yield* authLogic.askRespondToAuthChallenge(
+  const response = yield* authLogic.askAuthRespondToChallenge(
     authChallenge.email,
     AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
     authChallenge.session,

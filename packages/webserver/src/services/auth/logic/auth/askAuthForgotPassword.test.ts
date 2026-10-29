@@ -3,9 +3,9 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askForgotPassword } from './askForgotPassword';
+import { askAuthForgotPassword } from './askAuthForgotPassword';
 
-describe('askForgotPassword', () => {
+describe('askAuthForgotPassword', () => {
   it('starts a reset against the resolved directory and returns delivery details', () => {
     const deliveryDetails: AuthenticationDeliveryDetails = {
       attributeName: 'email',
@@ -14,7 +14,7 @@ describe('askForgotPassword', () => {
     };
     let captured: Action<any> | undefined;
 
-    const result = runStory(askForgotPassword('a@b.com'), {
+    const result = runStory(askAuthForgotPassword('a@b.com'), {
       [ConfigActionType.GetGlobal]: 'my-directory',
       [UserDirectoryActionType.ForgotPassword]: (action: Action<any>) => {
         captured = action;

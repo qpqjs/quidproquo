@@ -1,5 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-import { askRunPendingMigrations } from '@qpqjs/webserver';
+import { askMigrationRunPending } from '@qpqjs/webserver';
 
 import * as crypto from 'crypto';
 import path from 'path';
@@ -128,7 +128,7 @@ export const runMigrations = async (
   for (const serviceName of tinker.getServices()) {
     tinker.switchService(serviceName);
 
-    const result = await tinker.run(askRunPendingMigrations);
+    const result = await tinker.run(askMigrationRunPending);
 
     if (result.error) {
       throw new Error(`Migration failed for service [${serviceName}]: ${result.error.errorText}`);

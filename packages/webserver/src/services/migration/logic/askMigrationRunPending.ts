@@ -1,7 +1,7 @@
 import { askLogCreate, askQueueSendMessages, AskResponse, LogLevelEnum, QueueMessage } from '@qpqjs/core';
 
 import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
-import { askPendingMigrations, askRecordMigrationRan, getMigrationKey } from './pendingMigrations';
+import { askMigrationListPending, askMigrationRecordRan, getMigrationKey } from './pendingMigrations';
 
 /**
  * Enqueue every migration that has not run yet, and record it as run.
@@ -19,8 +19,8 @@ import { askPendingMigrations, askRecordMigrationRan, getMigrationKey } from './
  * migration is marked run before its handler necessarily finishes: a crash mid-run leaves it
  * recorded and unfinished, so migrations have to be safe to write as idempotent anyway.
  */
-export function* askRunPendingMigrations(): AskResponse<string[]> {
-  const pending = yield* askPendingMigrations();
+export function* askMigrationRunPending(): AskResponse<string[]> {
+  const pending = yield* askMigrationListPending();
 
   for (const migration of pending) {
     const key = getMigrationKey(migration);
@@ -30,7 +30,7 @@ export function* askRunPendingMigrations(): AskResponse<string[]> {
     const message: QueueMessage<undefined> = { type: key, payload: undefined };
     yield* askQueueSendMessages(QPQ_MIGRATIONS_RESOURCE_NAME, message);
 
-    yield* askRecordMigrationRan(migration);
+    yield* askMigrationRecordRan(migration);
   }
 
   return pending.map(getMigrationKey);

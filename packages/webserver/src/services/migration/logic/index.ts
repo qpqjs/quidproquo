@@ -1,3 +1,3 @@
-export * from './askRunPendingMigrations';
+export * from './askMigrationRunPending';
 export * from './onDeployLogic';
 export * from './pendingMigrations';

@@ -3,14 +3,14 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askRefreshToken } from './askRefreshToken';
+import { askAuthRefreshToken } from './askAuthRefreshToken';
 
-describe('askRefreshToken', () => {
+describe('askAuthRefreshToken', () => {
   it('refreshes against the resolved directory and returns the response', () => {
     const authResponse = { authenticationInfo: { accessToken: 'fresh' } } as AuthenticateUserResponse;
     let captured: Action<any> | undefined;
 
-    const result = runStory(askRefreshToken('refresh-tok'), {
+    const result = runStory(askAuthRefreshToken('refresh-tok'), {
       [ConfigActionType.GetGlobal]: 'my-directory',
       [UserDirectoryActionType.RefreshToken]: (action: Action<any>) => {
         captured = action;
