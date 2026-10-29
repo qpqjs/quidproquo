@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import express from 'express';
 import fs from 'fs';
 import { Server } from 'http';
@@ -32,7 +34,7 @@ export const startHost = (host: WebEntryHost, dir: string): Server => {
  * Hosts every web entry that has a port, each on its own listener, from the pre-built web root.
  * An entry whose files are missing from the image is reported and skipped rather than served empty.
  */
-export const webEntryHostsImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop | null> => {
+export const webEntryHostsImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   const { webRoot } = devServerConfig;
   if (!webRoot) {
     return null;

@@ -1,4 +1,4 @@
-import { actionResult, askUserDirectoryForgotPassword, createActionProcessor, ProcessorFor, QPQConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { actionResult, askUserDirectoryForgotPassword, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { resolveDevUsername } from '../../../logic/auth/devAuth';
 

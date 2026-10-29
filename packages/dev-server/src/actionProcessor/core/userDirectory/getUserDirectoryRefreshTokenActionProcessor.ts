@@ -5,7 +5,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 

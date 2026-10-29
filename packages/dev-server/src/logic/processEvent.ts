@@ -13,7 +13,7 @@ import {
   StorySession,
 } from '@qpqjs/core';
 
-import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
+import { getDevServerActionProcessors } from '../actionProcessor';
 import { getDevServerLogger } from '../implementations/logger';
 import { ResolvedDevServerConfig } from '../types';
 import { withProcessorDelay } from './withProcessorDelay';

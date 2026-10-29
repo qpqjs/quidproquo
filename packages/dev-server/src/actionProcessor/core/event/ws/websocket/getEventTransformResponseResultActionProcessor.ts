@@ -1,14 +1,6 @@
-import {
-  actionResult,
-  actionResultError,
-  askEventTransformResponseResultBase,
-  createActionProcessor,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askEventTransformResponseResultBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { EventInput, EventOutput, InternalEventOutput } from './types';
+import { EventOutput } from './types';
 
 const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   return async ({ eventParams, qpqEventRecordResponses }) => {

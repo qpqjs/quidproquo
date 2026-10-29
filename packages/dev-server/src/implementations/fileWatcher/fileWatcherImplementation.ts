@@ -5,6 +5,7 @@ import {
   DynamicModuleLoader,
   generateUuid,
   getDateNow,
+  Nullable,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
@@ -58,7 +59,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
   });
 
   // Parse file path to extract service, drive, and relative filepath
-  const parseFilePath = (fullPath: string): FileEventPayload | null => {
+  const parseFilePath = (fullPath: string): Nullable<FileEventPayload> => {
     try {
       const relativePath = path.relative(storagePath, fullPath);
       const parts = relativePath.split(path.sep);
@@ -213,7 +214,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       if (stats.isFile()) {
         await handleFileCreate(filePath);
       }
-    } catch (error) {
+    } catch {
       // File might have been deleted already
       console.debug('Could not stat file:', filePath);
     }

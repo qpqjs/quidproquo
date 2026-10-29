@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 // SIGHUP is in the list because closing the terminal a dev server was started
 // from sends it, and that is a perfectly ordinary way to stop one.
 //
@@ -20,7 +22,7 @@ const DUPLICATE_SIGNAL_WINDOW_MS = 500;
 // a non-signal exit path (tinker's REPL) run the same thing without having to
 // be handed the task list.
 const state: {
-  shutdown: (() => Promise<void>) | null;
+  shutdown: Nullable<() => Promise<void>>;
   shuttingDown: boolean;
   startedAt: number;
 } = {

@@ -1,7 +1,6 @@
 import {
   askKeyValueStoreDelete,
   buildTestQpqConfig,
-  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
@@ -9,7 +8,6 @@ import {
   kvsKey,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';

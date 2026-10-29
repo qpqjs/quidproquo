@@ -1,11 +1,4 @@
-import {
-  actionResult,
-  askUserDirectoryConfirmEmailVerification,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { actionResult, askUserDirectoryConfirmEmailVerification, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
   return async () => {

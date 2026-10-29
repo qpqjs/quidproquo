@@ -1,8 +1,6 @@
 import { QPQConfig, QPQConfigAdvancedSettings } from '@qpqjs/core';
 import { defineServiceFunction } from '@qpqjs/webserver';
 
-import path from 'path';
-
 export interface QPQConfigAdvancedDevServerSettings extends QPQConfigAdvancedSettings {
   onlyDeploySafe?: boolean;
   vpcList?: string[];

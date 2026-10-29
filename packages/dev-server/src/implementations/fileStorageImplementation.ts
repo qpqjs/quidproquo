@@ -1,4 +1,4 @@
-import { resolveFilePath, verifySecureUrlToken } from '@qpqjs/actionprocessor-node';
+import { verifySecureUrlToken } from '@qpqjs/actionprocessor-node';
 import { FileActionType } from '@qpqjs/core';
 
 import express, { Express, Request, Response } from 'express';

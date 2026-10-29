@@ -1,11 +1,4 @@
-import {
-  actionResult,
-  askUserDirectoryAssociateSoftwareToken,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { actionResult, askUserDirectoryAssociateSoftwareToken, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessAssociateSoftwareToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
   return async ({ session }) => {

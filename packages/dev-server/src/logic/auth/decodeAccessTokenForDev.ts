@@ -1,4 +1,4 @@
-import { DecodedAccessToken } from '@qpqjs/core';
+import { DecodedAccessToken, Nullable } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 /**
@@ -18,7 +18,7 @@ export const decodeAccessTokenForDev = (
   userDirectoryName: string,
   accessToken?: string,
   ignoreExpiration: boolean = false,
-): DecodedAccessToken | null => {
+): Nullable<DecodedAccessToken> => {
   if (!accessToken) {
     return null;
   }

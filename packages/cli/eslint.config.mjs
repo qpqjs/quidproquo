@@ -1,3 +1,4 @@
 import qpqESLintConfig from '@qpqjs/eslint-config';
 
-export default qpqESLintConfig;
+// B9 exception: the CLI talks to the developer through the console.
+export default [...qpqESLintConfig, { rules: { 'no-console': 'off' } }];

@@ -136,12 +136,12 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
               const asyncWrapper = `(async () => { return ${cmd} })()`;
               const result = await vm.runInContext(asyncWrapper, context);
               callback(null, result);
-            } catch (innerError: any) {
+            } catch {
               // Last resort: try as plain expression
               try {
                 const result = vm.runInContext(cmd, context);
                 callback(null, result);
-              } catch (finalError) {
+              } catch {
                 callback(error, undefined);
               }
             }

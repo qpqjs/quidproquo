@@ -1,5 +1,5 @@
 import { actionResult, createActionProcessor, generateUuid, ProcessorFor } from '@qpqjs/core';
-import { askEmailSendEmail, EmailActionType } from '@qpqjs/webserver';
+import { askEmailSendEmail } from '@qpqjs/webserver';
 
 // Local dev sends nothing: log what would have gone out and hand back a fake message id
 const getProcessSendEmail = (): ProcessorFor<typeof askEmailSendEmail> => {

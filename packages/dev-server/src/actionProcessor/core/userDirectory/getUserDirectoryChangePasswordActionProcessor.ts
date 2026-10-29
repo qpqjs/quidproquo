@@ -1,4 +1,4 @@
-import { actionResult, askUserDirectoryChangePassword, createActionProcessor, ProcessorFor, QPQConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { actionResult, askUserDirectoryChangePassword, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessChangePassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryChangePassword> => {
   return async () => {

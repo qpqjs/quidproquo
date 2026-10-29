@@ -5,7 +5,6 @@ import {
   askKeyValueStoreScanBase,
   assertKvsScopeRequirementOrThrow,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveScopedPkAttributeOrThrow,

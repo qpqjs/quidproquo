@@ -1,11 +1,4 @@
-import {
-  actionResult,
-  askUserDirectoryRequestEmailVerification,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { actionResult, askUserDirectoryRequestEmailVerification, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { resolveDevUsername } from '../../../logic/auth/devAuth';

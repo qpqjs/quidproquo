@@ -157,7 +157,7 @@ export class SqliteKvsRepository implements KvsRepository {
     return row?.data ?? null;
   }
 
-  async get(keyValueStoreName: string, key: string, scope?: string): Promise<any | null> {
+  async get(keyValueStoreName: string, key: string, scope?: string): Promise<Nullable<any>> {
     const access = this.accessStore(keyValueStoreName);
     const scopeValue = scope ?? '';
     const { pk, sk } = this.toKeyBindValues(key, access.storeConfig);

@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertManyBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   KvsStreamEventType,
   ProcessorFor,
   QPQConfig,

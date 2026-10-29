@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreDelete,
   createActionProcessor,
-  KeyValueStoreActionType,
   KvsStreamEventType,
   ProcessorFor,
   QPQConfig,
@@ -34,7 +33,7 @@ const getProcessKeyValueStoreDelete = (
 
       const compositeKey = sortKey !== undefined ? `${key}#${sortKey}` : String(key);
 
-      // Grab it before it goes: a Remove record's only payload is what used to be there.
+      // Grab it before it goes: a Remove record's only payload is the item as it was before the delete.
       const removed = await repository.get(keyValueStoreName, compositeKey, scope);
       const result = await repository.delete(keyValueStoreName, compositeKey, scope);
 

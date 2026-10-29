@@ -6,7 +6,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';

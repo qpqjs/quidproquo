@@ -6,7 +6,6 @@ import {
   DynamicModuleLoader,
   EitherActionResult,
   ErrorTypeEnum,
-  EventActionType,
   HTTPMethod,
   ProcessorFor,
   QPQConfig,
