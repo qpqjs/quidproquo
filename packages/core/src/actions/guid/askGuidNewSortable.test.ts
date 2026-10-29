@@ -2,25 +2,25 @@ import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/test
 
 import { describe, expect, it } from 'vitest';
 
-import { askNewSortableGuid } from './askNewSortableGuid';
+import { askGuidNewSortable } from './askGuidNewSortable';
 import { GuidActionType } from './GuidActionType';
 
-describe('askNewSortableGuid', () => {
+describe('askGuidNewSortable', () => {
   it('yields a NewSortable action', () => {
-    const { action } = captureRequester(askNewSortableGuid());
+    const { action } = captureRequester(askGuidNewSortable());
 
     expect(action).toEqual({ type: GuidActionType.NewSortable });
   });
 
   it('returns the sortable guid the runtime resolves', () => {
-    const { returned } = captureRequester(askNewSortableGuid(), '01-sortable');
+    const { returned } = captureRequester(askGuidNewSortable(), '01-sortable');
 
     expect(returned).toBe('01-sortable');
   });
 
   it('propagates a guid generation failure as a thrown error', () => {
     const run = () =>
-      runStory(askNewSortableGuid(), {
+      runStory(askGuidNewSortable(), {
         [GuidActionType.NewSortable]: throwsError('GenericError', 'guid service down'),
       });
 

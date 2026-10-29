@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askNewSortableGuid` is `askGuidNewSortable` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askNewGuid` is `askGuidNew` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `actionResultErrorFromCaughtError` no longer classifies throttles and transient failures on its own: an unmapped name is a GenericError. The classification is the error-map entry `transientErrorMap(errorType?)` (core, `logic/actionResult/`, with `TRANSIENT_ERROR_NAMES` and `isTransientErrorName` moved beside it from `logic/transientErrorNames`), which every AWS processor now spreads ahead of its own map, so AWS behaviour is unchanged; a custom processor that relied on the hidden fallback spreads it too (B3).
 - `@qpqjs/actionprocessor-aws` event processors no longer read `process.env` at module load (B10): `getS3FileEventEventProcessor(storageDriveName, storageDriveRuntime)`, `getDynamoKvsStreamEventProcessor(kvsStreamLambdaSettings)` and `getApiGatewayWebsocketEventEventProcessor(websocketApiName)` take what their lambda handler reads through `getLambdaEnvironment()`, which now also carries `storageDriveName`, `storageDriveRuntime`, `keyValueStoreName`, `kvsStream` and `websocketApiName`; the `GLOBAL_*` constants are gone.

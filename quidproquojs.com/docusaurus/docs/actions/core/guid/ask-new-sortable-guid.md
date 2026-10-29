@@ -1,9 +1,9 @@
 ---
-title: askNewSortableGuid
+title: askGuidNewSortable
 description: Generate a new time-ordered, lexicographically sortable UUID.
 ---
 
-# askNewSortableGuid
+# askGuidNewSortable
 
 Generates a new globally-unique identifier that is **sortable** — ids minted later sort after ids minted earlier — and returns it as a string.
 
@@ -15,11 +15,11 @@ Like [askGuidNew](./ask-new-guid.md), minting an id is non-deterministic, so it 
 **What "sortable" means:** because the timestamp is in the most-significant bits, a lexicographic (alphabetical / byte-order) sort of these ids matches their creation order. That makes them a good primary/sort key in a key-value store when you want "newest last" (or "newest first" reversed) without storing a separate timestamp column, while still being globally unique.
 
 ```typescript
-import { askNewSortableGuid } from '@qpqjs/core';
+import { askGuidNewSortable } from '@qpqjs/core';
 
 export function* askAppendEvent(kind: string) {
   // Later events get larger ids, so a range scan returns them in order.
-  const eventId = yield* askNewSortableGuid();
+  const eventId = yield* askGuidNewSortable();
   return { eventId, kind };
 }
 ```
@@ -27,7 +27,7 @@ export function* askAppendEvent(kind: string) {
 ## Signature
 
 ```typescript
-function* askNewSortableGuid(): AskResponse<string>;
+function* askGuidNewSortable(): AskResponse<string>;
 ```
 
 ## Parameters

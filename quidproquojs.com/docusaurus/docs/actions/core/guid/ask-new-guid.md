@@ -37,9 +37,9 @@ None.
 
 ## Notes
 
-- The id is fully random. It carries no ordering information, so rows keyed by it are not naturally sorted by creation time — use [askNewSortableGuid](./ask-new-sortable-guid.md) when you want that.
+- The id is fully random. It carries no ordering information, so rows keyed by it are not naturally sorted by creation time — use [askGuidNewSortable](./ask-new-sortable-guid.md) when you want that.
 
 ## Related
 
-- [askNewSortableGuid](./ask-new-sortable-guid.md) — a time-ordered, lexicographically sortable id.
+- [askGuidNewSortable](./ask-new-sortable-guid.md) — a time-ordered, lexicographically sortable id.
 - [askEventDocCreate](../../features/event-doc/ask-event-doc-create.md) — uses this to mint a new event document's id.
