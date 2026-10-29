@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { webSocketConnectionData } from '../../data/connectionData';
+import { webSocketConnectionData } from '../../data';
 import { webSocketSubscriptionData } from '../../data/subscriptionData';
 
 /** Drops the connection record and every subscription filed for it. */

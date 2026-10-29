@@ -1,7 +1,9 @@
 import { askLogCreate, askQueueSendMessages, AskResponse, LogLevelEnum, QueueMessage } from '@qpqjs/core';
 
 import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
-import { askMigrationListPending, askMigrationRecordRan, getMigrationKey } from './pendingMigrations';
+import { getMigrationKey } from '../utils/getMigrationKey';
+import { askMigrationListPending } from './askMigrationListPending';
+import { askMigrationRecordRan } from './askMigrationRecordRan';
 
 /**
  * Enqueue every migration that has not run yet, and record it as run.

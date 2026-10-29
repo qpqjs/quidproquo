@@ -19,7 +19,7 @@ import {
   askLogMetadataGetByCorrelation,
   askLogMetadataGetByFromCorrelation,
   askLogMetadataGetHierarchiesByCorrelation,
-} from '../../data/logMetadataData';
+} from '../../data/logMetadata';
 import { askEnsureRedactedLog, askRedactedLogGetByCorrelation } from '../../data/redactedLogData';
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';

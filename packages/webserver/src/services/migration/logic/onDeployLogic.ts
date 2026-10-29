@@ -3,7 +3,8 @@ import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatu
 import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
-import { askMigrationIsPending, getMigrationKey } from './pendingMigrations';
+import { getMigrationKey } from '../utils/getMigrationKey';
+import { askMigrationIsPending } from './askMigrationIsPending';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allMigrations = yield* askConfigGetGlobal<Migration[]>(QPQ_MIGRATIONS_RESOURCE_NAME);

@@ -2,7 +2,7 @@ import { askCatch, AskResponse } from '@qpqjs/core';
 import { askWebsocketSendMessage, askWebsocketSendMessageBase } from '@qpqjs/webserver';
 
 import { askWebsocketApiNameReadOrThrow } from '../../context';
-import { webSocketConnectionData } from '../../data/connectionData';
+import { webSocketConnectionData } from '../../data';
 import { webSocketSubscriptionData } from '../../data/subscriptionData';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 

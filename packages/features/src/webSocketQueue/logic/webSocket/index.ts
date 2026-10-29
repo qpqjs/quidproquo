@@ -4,4 +4,5 @@ export * from './askWebSocketQueueGetConnections';
 export * from './askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 export * from './askWebSocketQueueSendToConnectionCleaningUpStale';
 export * from './askWebSocketQueueSendToTopic';
+export * from './askWebSocketQueueStateDispatchToFrontend';
 export * from './webSocketQueueLogic';

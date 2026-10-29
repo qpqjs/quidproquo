@@ -13,7 +13,7 @@ import {
 } from '@qpqjs/core';
 
 import { ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, ADMIN_LOG_SEARCH_MAX_ITEMS, ADMIN_LOG_SEARCH_TIMEOUT_SECONDS } from '../../../constants';
-import { askLogMetadataList } from '../../data/logMetadataData';
+import { askLogMetadataList } from '../../data/logMetadata';
 import { LogMetadata } from '../../entry/domain';
 import { redactStoryResult } from '../redaction/redactStoryResult';
 
