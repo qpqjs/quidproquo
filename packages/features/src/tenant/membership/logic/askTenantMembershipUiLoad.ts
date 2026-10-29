@@ -1,5 +1,6 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
 import { askUITenantMembershipSetError } from '../actionCreators/askUITenantMembershipSetError';
@@ -19,12 +20,5 @@ function* askFetchStanding(target: TenantClientTarget, tenantId: TenantId): AskR
 
 /** Load the caller's standing in a tenant (selecting it). Call from the selection handler; the roster is loaded separately. */
 export function* askTenantMembershipUiLoad(target: TenantClientTarget, tenantId: TenantId): AskResponse<void> {
-  yield* askUITenantMembershipSetLoading(true);
-  yield* askUITenantMembershipSetError(null);
-
-  const result = yield* askCatch(askFetchStanding(target, tenantId), askUITenantMembershipSetLoading(false));
-
-  if (!result.success) {
-    yield* askUITenantMembershipSetError(result.error.errorText);
-  }
+  yield* askUiCatch(askFetchStanding(target, tenantId), { askSetError: askUITenantMembershipSetError, askSetBusy: askUITenantMembershipSetLoading });
 }

@@ -1,5 +1,6 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { EventDocTransferPlanResult } from '../../models';
 import { askUIEventDocImportSetError } from '../actionCreators/askUIEventDocImportSetError';
 import { askUIEventDocImportSetLoading } from '../actionCreators/askUIEventDocImportSetLoading';
@@ -25,13 +26,13 @@ function* askEventDocImportUiUploadAndPlan(serviceName: string, file: File): Ask
 
 /** Uploads the chosen bundle file and stores its plan. Writes nothing. */
 export function* askEventDocImportUiLoad(serviceName: string, file: File): AskResponse<void> {
-  yield* askUIEventDocImportSetLoading(true);
-  yield* askUIEventDocImportSetError(null);
-
-  const loaded = yield* askCatch(askEventDocImportUiUploadAndPlan(serviceName, file), askUIEventDocImportSetLoading(false));
+  const loaded = yield* askUiCatch(askEventDocImportUiUploadAndPlan(serviceName, file), {
+    askSetError: askUIEventDocImportSetError,
+    askSetBusy: askUIEventDocImportSetLoading,
+    errorText: 'Could not read that bundle. Is it a file exported from this app?',
+  });
 
   if (!loaded.success) {
-    yield* askUIEventDocImportSetError('Could not read that bundle. Is it a file exported from this app?');
     return;
   }
 

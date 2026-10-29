@@ -1,6 +1,7 @@
 import type { Nullable } from '@qpqjs/core';
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../ui/logic/askUiCatch';
 import type { EventDocAiChatSummary } from '../models';
 import { askUIEventDocAiClearStream } from '../module/actionCreators/askUIEventDocAiClearStream';
 import { askUIEventDocAiSetActiveChat } from '../module/actionCreators/askUIEventDocAiSetActiveChat';
@@ -10,10 +11,9 @@ import { askUIEventDocAiUpsertChat } from '../module/actionCreators/askUIEventDo
 import { askEventDocAiChatCreateRequest } from '../transport/askEventDocAiChatCreateRequest';
 
 export function* askEventDocAiNewChat(): AskResponse<Nullable<EventDocAiChatSummary>> {
-  const result = yield* askCatch(askEventDocAiChatCreateRequest());
+  const result = yield* askUiCatch(askEventDocAiChatCreateRequest(), { askSetError: askUIEventDocAiSetError });
 
   if (!result.success) {
-    yield* askUIEventDocAiSetError(result.error.errorText);
     return null;
   }
 

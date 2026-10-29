@@ -1,6 +1,7 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
 import { askEventDocListFetchAll } from '../../../eventDoc/list/transport/askEventDocListFetchAll';
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { askUIEventDocExportOpen } from '../actionCreators/askUIEventDocExportOpen';
 import { askUIEventDocExportSetCandidates } from '../actionCreators/askUIEventDocExportSetCandidates';
 import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExportSetError';
@@ -9,10 +10,12 @@ import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExpo
 export function* askEventDocExportUiOpen(serviceName: string, basePath: string): AskResponse<void> {
   yield* askUIEventDocExportOpen();
 
-  const result = yield* askCatch(askEventDocListFetchAll(serviceName, basePath));
+  const result = yield* askUiCatch(askEventDocListFetchAll(serviceName, basePath), {
+    askSetError: askUIEventDocExportSetError,
+    errorText: 'Could not load the documents to choose from.',
+  });
 
   if (!result.success) {
-    yield* askUIEventDocExportSetError('Could not load the documents to choose from.');
     return;
   }
 

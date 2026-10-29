@@ -1,5 +1,6 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
 import { askUITenantMembershipSetError } from '../actionCreators/askUITenantMembershipSetError';
@@ -8,12 +9,9 @@ import { askTenantMembershipUiLoadMembers } from './askTenantMembershipUiLoadMem
 
 /** Remove a member. Reloads the roster on success; a refusal lands in `error` and the roster is left as it was. Returns whether it succeeded. */
 export function* askTenantMembershipUiRemoveMember(target: TenantClientTarget, tenantId: TenantId, userId: string): AskResponse<boolean> {
-  yield* askUITenantMembershipSetError(null);
-
-  const result = yield* askCatch(askTenantMemberRemoveDelete(target, tenantId, userId));
+  const result = yield* askUiCatch(askTenantMemberRemoveDelete(target, tenantId, userId), { askSetError: askUITenantMembershipSetError });
 
   if (!result.success) {
-    yield* askUITenantMembershipSetError(result.error.errorText);
     return false;
   }
 

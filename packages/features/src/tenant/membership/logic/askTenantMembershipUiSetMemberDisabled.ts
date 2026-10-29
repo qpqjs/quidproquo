@@ -1,5 +1,6 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
 import { askUITenantMembershipSetError } from '../actionCreators/askUITenantMembershipSetError';
@@ -13,12 +14,9 @@ export function* askTenantMembershipUiSetMemberDisabled(
   userId: string,
   disabled: boolean,
 ): AskResponse<boolean> {
-  yield* askUITenantMembershipSetError(null);
-
-  const result = yield* askCatch(askTenantMemberDisabledPatch(target, tenantId, userId, disabled));
+  const result = yield* askUiCatch(askTenantMemberDisabledPatch(target, tenantId, userId, disabled), { askSetError: askUITenantMembershipSetError });
 
   if (!result.success) {
-    yield* askUITenantMembershipSetError(result.error.errorText);
     return false;
   }
 
