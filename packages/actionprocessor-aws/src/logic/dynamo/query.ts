@@ -31,7 +31,7 @@ export async function query<Item>(
     Limit: limit,
     ScanIndexForward: sortAscending,
     // Only set when asked. A strongly consistent read costs twice the RCU and cannot be served from a
-    // global secondary index, so it must stay opt-in — but without it a caller cannot read back what it
+    // global secondary index, so it must stay opt-in, but without it a caller cannot read back what it
     // just wrote, which some callers genuinely need.
     ConsistentRead: consistentRead,
   };

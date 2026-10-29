@@ -22,7 +22,7 @@ const toObject = (image?: Record<string, unknown>) =>
 
 // Switch on the closed union aws-lambda declares, not on `string`. Exhausting it means a
 // stream event type we do not handle is a COMPILE error here, rather than a `default` branch
-// quietly folding it into Modify — which for a REMOVE would report a delete as an edit.
+// quietly folding it into Modify, which for a REMOVE would report a delete as an edit.
 const toEventType = (eventName: DynamoDBRecord['eventName']): KvsStreamEventType => {
   switch (eventName) {
     case 'INSERT':

@@ -36,7 +36,7 @@ const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): R
         SOFTWARE_TOKEN_MFA_CODE: authChallenge.mfaCode,
       };
 
-    // MFA_SETUP completes with just USERNAME/SESSION — the TOTP code is consumed
+    // MFA_SETUP completes with just USERNAME/SESSION, the TOTP code is consumed
     // by the preceding VerifySoftwareToken call, not by RespondToAuthChallenge.
     case AuthenticateUserChallenge.MFA_SETUP:
       return {};

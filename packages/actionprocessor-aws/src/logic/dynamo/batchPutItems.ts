@@ -15,7 +15,7 @@ const MAX_UNPROCESSED_RETRIES = 8;
 const RETRY_BASE_DELAY_MS = 50;
 
 // Errors are matched by NAME in the processors' error tables, so the name is
-// the API. Exhausted retries mean sustained throttle — a transient fault the
+// the API. Exhausted retries mean sustained throttle, a transient fault the
 // processor must classify as ServiceUnavailable, never a generic (permanent)
 // failure.
 export class BatchWriteUnprocessedItemsError extends Error {
@@ -28,7 +28,7 @@ export class BatchWriteUnprocessedItemsError extends Error {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Unconditional batched puts. No ConditionExpression exists on BatchWriteItem,
-// so unlike putItem there is no ifNotExists — callers must only batch items
+// so unlike putItem there is no ifNotExists, callers must only batch items
 // whose keys are unique by construction (see askKeyValueStoreUpsertMany).
 export async function batchPutItems(tableName: string, items: KvsObjectDataType[], region: string): Promise<void> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });

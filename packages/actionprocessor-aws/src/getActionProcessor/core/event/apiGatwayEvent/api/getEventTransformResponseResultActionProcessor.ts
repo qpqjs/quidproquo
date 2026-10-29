@@ -79,10 +79,8 @@ const getProcessTransformResponseResult = async (
     const [apiGatewayEvent] = eventParams;
     const [record] = qpqEventRecordResponses;
 
-    // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
     let successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
 
-    // Return an error if the body is the wrong type.
     if (successRecord.body && typeof successRecord.body !== 'string') {
       successRecord = getResponseFromErrorResult({
         errorText: 'Response body must be a string',
@@ -90,7 +88,6 @@ const getProcessTransformResponseResult = async (
       });
     }
 
-    // Add the cors headers
     const currentHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
       ...qpqWebServerUtils.getCorsHeaders(qpqConfig, getMatchedRouteOptions(apiGatewayEvent), apiGatewayEvent.headers, domainResolver),

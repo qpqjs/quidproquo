@@ -11,7 +11,7 @@ import {
 
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 
-// Throwing here fails the whole batch, which makes Lambda retry it and — by default —
+// Throwing here fails the whole batch, which makes Lambda retry it and, by default,
 // stall the shard until it succeeds or the records expire. That is the correct default for
 // a projection (falling behind loudly beats silently skipping a change), but it is exactly
 // why the event source mapping must be given a retry bound and a failure destination; see

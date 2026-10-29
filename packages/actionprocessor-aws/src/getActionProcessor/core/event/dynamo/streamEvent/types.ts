@@ -2,7 +2,7 @@ import { KvsStreamEventResponse, KvsStreamRecord, MatchStoryResult, QpqFunctionR
 
 import { Context, DynamoDBStreamEvent } from 'aws-lambda';
 
-// Customs — the CDK stamps these onto the projector lambda, the same way the storage drive
+// Customs: the CDK stamps these onto the projector lambda, the same way the storage drive
 // event lambda is told which drive it serves.
 export const GLOBAL_KVS_STREAM_STORE_NAME = process.env.keyValueStoreName!;
 export const GLOBAL_KVS_STREAM_RUNTIME = JSON.parse(process.env.kvsStreamEntry || '"/::"') as QpqFunctionRuntime;
@@ -15,11 +15,11 @@ export const GLOBAL_KVS_STREAM_COALESCE = process.env.kvsStreamCoalesceByPartiti
 // ordering group).
 export const GLOBAL_KVS_STREAM_PARTITION_KEY = process.env.kvsStreamPartitionKey || '';
 
-// Externals — the ins and outs of the external event
+// Externals: the ins and outs of the external event
 export type EventInput = [DynamoDBStreamEvent, Context];
 export type EventOutput = void;
 
-// Internals — the ins and outs of each record in the event
+// Internals: the ins and outs of each record in the event
 export type InternalEventRecord = KvsStreamRecord;
 export type InternalEventOutput = KvsStreamEventResponse;
 

@@ -31,7 +31,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
 
       // Same-key duplicates are rejected UP FRONT, before anything is written.
       // Dynamo itself only rejects them when both land in the same 25-item
-      // chunk — across chunks the later write silently wins — so left to the
+      // chunk. Across chunks the later write silently wins, so left to the
       // service the outcome would depend on item position.
       const seenKeys = new Set<string>();
       for (const item of items) {
@@ -62,7 +62,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
-        // Retries exhausted on UnprocessedItems — sustained throttle, a transient
+        // Retries exhausted on UnprocessedItems, sustained throttle, a transient
         // fault: callers must see ServiceUnavailable, not a permanent failure.
         BatchWriteUnprocessedItemsError: () =>
           actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),

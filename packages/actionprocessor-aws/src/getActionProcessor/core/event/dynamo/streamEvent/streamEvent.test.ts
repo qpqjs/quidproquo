@@ -90,7 +90,7 @@ describe('dynamo/streamEvent getEventGetRecordsActionProcessor', () => {
 
   it('collapses within each scope while keeping scopes apart, in one batch', async () => {
     // The realistic shape: several tenants, several documents, several changes each, all
-    // arriving together. Coalescing has to be per (scope, document) — one rebuild each,
+    // arriving together. Coalescing has to be per (scope, document), one rebuild each,
     // carrying that pair's LATEST change, and nobody's change lost to a neighbour's.
     const records = await getRecords([
       buildStreamRecord('INSERT', `tenant-a${SCOPE_DELIMITER}doc-1`, '0001', { marker: { S: 'a1-first' } }),
