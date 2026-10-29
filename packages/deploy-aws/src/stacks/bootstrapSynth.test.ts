@@ -127,7 +127,7 @@ describe('BootstrapQpqServiceStack email receiving domain', () => {
     for (const cname of cnames) {
       const name = JSON.stringify(cname.Properties.Name);
       expect(name).toMatch(/DkimDNSTokenName/);
-      expect(name).toMatch(/\.\"\]\]\}$/);
+      expect(name).toMatch(/\."\]\]\}$/);
       expect(name).not.toMatch(/development\.example/);
     }
   });
