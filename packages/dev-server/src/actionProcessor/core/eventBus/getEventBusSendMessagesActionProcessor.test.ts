@@ -21,7 +21,7 @@ const buildConfig = () => buildTestQpqConfig([defineEventBus('myBus')]);
 
 const getProcessor = async (config = buildConfig()) => {
   const processors = await getEventBusSendMessagesActionProcessor(config, noopDynamicModuleLoader);
-  return processors[EventBusActionType.SendMessages];
+  return processors[EventBusActionType.SendMessage];
 };
 
 describe('getEventBusSendMessagesActionProcessor', () => {
@@ -51,7 +51,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
     expect(resolveActionResult(result)).toBeUndefined();
     expect(eventBus.publish).toHaveBeenCalledTimes(2);
     expect(eventBus.publish).toHaveBeenCalledWith(
-      EventBusActionType.SendMessages,
+      EventBusActionType.SendMessage,
       expect.objectContaining({
         payload: { a: 1 },
         type: 'x',

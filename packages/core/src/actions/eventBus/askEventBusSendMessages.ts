@@ -17,7 +17,7 @@ export type EventBusSendMessageOptions<T> = {
 };
 
 export const askEventBusSendMessagesBase = createActionRequester<void>()({
-  actionType: EventBusActionType.SendMessages,
+  actionType: EventBusActionType.SendMessage,
   errorTypes: [
     'AccessDenied', // caller lacks permission to publish to the topic
     'TopicNotFound', // the bus's topic does not exist

@@ -12,7 +12,7 @@ export type QueueMessage<T> = CrossModuleMessage<T> & {
 };
 
 export const askQueueSendMessagesBase = createActionRequester<void>()({
-  actionType: QueueActionType.SendMessages,
+  actionType: QueueActionType.SendMessage,
   errorTypes: [
     'AccessDenied', // caller lacks permission to send to the queue
     'QueueNotFound', // the queue does not exist

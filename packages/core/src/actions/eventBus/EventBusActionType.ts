@@ -1,3 +1,3 @@
 export enum EventBusActionType {
-  SendMessages = '@quidproquo-core/EventBus/SendMessage',
+  SendMessage = '@quidproquo-core/EventBus/SendMessage',
 }

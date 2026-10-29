@@ -17,7 +17,7 @@ describe('askMigrationProcessDeployUpdate', () => {
     runStory(askMigrationProcessDeployUpdate(DeployEventType.Api), {
       [ConfigActionType.GetGlobal]: [apiMigration, webMigration],
       [KeyValueStoreActionType.Query]: { items: [] },
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },

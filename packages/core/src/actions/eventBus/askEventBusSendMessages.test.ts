@@ -16,7 +16,7 @@ describe('askEventBusSendMessages', () => {
     const { action } = captureRequester(askEventBusSendMessages(options));
 
     expect(action).toEqual({
-      type: EventBusActionType.SendMessages,
+      type: EventBusActionType.SendMessage,
       payload: options,
     });
   });
@@ -35,7 +35,7 @@ describe('askEventBusSendMessages', () => {
   it('propagates a processor failure as a thrown StoryError', () => {
     const runFailingStory = () =>
       runStory(askEventBusSendMessages({ eventBusName: 'missing-bus', eventBusMessages: [{ type: 'thing.happened', payload: {} }] }), {
-        [EventBusActionType.SendMessages]: throwsError(askEventBusSendMessagesBase.errorType.TopicNotFound, 'Topic does not exist'),
+        [EventBusActionType.SendMessage]: throwsError(askEventBusSendMessagesBase.errorType.TopicNotFound, 'Topic does not exist'),
       });
 
     expect(runFailingStory).toThrow(StoryError);
@@ -46,9 +46,9 @@ describe('askEventBusSendMessages', () => {
 describe('askEventBusSendMessagesBase.errorType', () => {
   it('lists every error the processor can produce, namespaced by the action type', () => {
     expect(askEventBusSendMessagesBase.errorType).toEqual({
-      AccessDenied: `${EventBusActionType.SendMessages}-AccessDenied`,
-      TopicNotFound: `${EventBusActionType.SendMessages}-TopicNotFound`,
-      Throttled: `${EventBusActionType.SendMessages}-Throttled`,
+      AccessDenied: `${EventBusActionType.SendMessage}-AccessDenied`,
+      TopicNotFound: `${EventBusActionType.SendMessage}-TopicNotFound`,
+      Throttled: `${EventBusActionType.SendMessage}-Throttled`,
     });
   });
 });

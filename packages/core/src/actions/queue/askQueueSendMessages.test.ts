@@ -13,7 +13,7 @@ describe('askQueueSendMessages', () => {
     const { action } = captureRequester(askQueueSendMessages('my-queue', m1, m2));
 
     expect(action).toEqual({
-      type: QueueActionType.SendMessages,
+      type: QueueActionType.SendMessage,
       payload: {
         queueName: 'my-queue',
         queueMessages: [m1, m2],
@@ -33,7 +33,7 @@ describe('askQueueSendMessages', () => {
     const { action } = captureRequester(askQueueSendMessages('my-queue'));
 
     expect(action).toEqual({
-      type: QueueActionType.SendMessages,
+      type: QueueActionType.SendMessage,
       payload: {
         queueName: 'my-queue',
         queueMessages: [],

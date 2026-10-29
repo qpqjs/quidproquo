@@ -42,8 +42,8 @@ describe('getCoreActionProcessor', () => {
     const processors = await getCoreActionProcessor(config, noopDynamicModuleLoader, devServerConfig);
 
     expect(processors[KeyValueStoreActionType.Get]).toBeDefined();
-    expect(processors[EventBusActionType.SendMessages]).toBeDefined();
-    expect(processors[QueueActionType.SendMessages]).toBeDefined();
+    expect(processors[EventBusActionType.SendMessage]).toBeDefined();
+    expect(processors[QueueActionType.SendMessage]).toBeDefined();
     expect(processors[LogActionType.Create]).toBeDefined();
     expect(processors[UserDirectoryActionType.DecodeAccessToken]).toBeDefined();
   });

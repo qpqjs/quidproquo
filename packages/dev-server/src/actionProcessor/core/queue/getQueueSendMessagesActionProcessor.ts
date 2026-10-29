@@ -52,7 +52,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
         targetModule: target.module,
       };
 
-      eventBus.publish(QueueActionType.SendMessages, queueEvent);
+      eventBus.publish(QueueActionType.SendMessage, queueEvent);
     }
 
     return actionResult(undefined);

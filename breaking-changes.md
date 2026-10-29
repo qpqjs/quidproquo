@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `EventBusActionType.SendMessages` and `QueueActionType.SendMessages` are `EventBusActionType.SendMessage` / `QueueActionType.SendMessage`, matching the last segment of their unchanged action ids (A2). The requesters keep their names (`askEventBusSendMessages`, `askQueueSendMessages`).
 - `@qpqjs/web-admin` and `@qpqjs/web-react` creators drop the `UI` infix (E3): `askAuthUISet*` is `askAuthSet*`, `askUISessionLog*` is `askSessionLog*`, `askUIVolatile*` is `askVolatile*`, `askUIShowError` / `askUIStartLoading` / `askUIStopLoading` are `askSystemShowError` / `askSystemStartLoading` / `askSystemStopLoading`, and `askSharedQueryParamsUISetParam` is `askSharedQueryParamsSetParam`.
 - `@qpqjs/features` creators drop their `UI` / `Chrome` infixes (E3): every `askUI<Module><Verb>` is `ask<Module><Verb>` (list, export and import UIs, tenant membership, event-doc AI, workspace), `askChrome<Verb>` is `askEventDocWorkspaceChrome<Verb>`, and the list logic story that collided is `askEventDocListChangePageSize` (the creator keeps `askEventDocListSetPageSize`).
 - `@qpqjs/web-react` shared query params: `sharedQueryParamsLogic` is `frontendSharedQueryParamsApi` and `sharedQueryParamsInitialState` is `createInitialSharedQueryParamsState()`; the module is laid out as `types/`, `effects/` (`SharedQueryParamsSetParamPayload` named), `actionCreators/`, `stateUpdaters/` and `logic/` (E1).

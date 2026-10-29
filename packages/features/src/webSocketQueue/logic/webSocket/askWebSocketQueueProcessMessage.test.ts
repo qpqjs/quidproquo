@@ -75,7 +75,7 @@ describe('askWebSocketQueueProcessMessage', () => {
         }),
         [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
         [KeyValueStoreActionType.Upsert]: undefined,
-        [EventBusActionType.SendMessages]: undefined,
+        [EventBusActionType.SendMessage]: undefined,
         [WebsocketActionType.SendMessage]: (action: any) => {
           sends.push(action.payload.payload.type);
           return undefined;
@@ -92,7 +92,7 @@ describe('askWebSocketQueueProcessMessage', () => {
     runStory(askWebSocketQueueProcessMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-eb-name-demo': 'event-bus' }),
-      [EventBusActionType.SendMessages]: (action: any) => {
+      [EventBusActionType.SendMessage]: (action: any) => {
         broadcast = action;
         return undefined;
       },
@@ -114,7 +114,7 @@ describe('askWebSocketQueueProcessMessage', () => {
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
       }),
-      [EventBusActionType.SendMessages]: () => {
+      [EventBusActionType.SendMessage]: () => {
         broadcast = true;
         return undefined;
       },
@@ -139,7 +139,7 @@ describe('askWebSocketQueueProcessMessage', () => {
         'qpq-wsq-eb-name-demo': 'event-bus',
       }),
       [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
-      [EventBusActionType.SendMessages]: (action: any) => {
+      [EventBusActionType.SendMessage]: (action: any) => {
         broadcast = action;
         return undefined;
       },

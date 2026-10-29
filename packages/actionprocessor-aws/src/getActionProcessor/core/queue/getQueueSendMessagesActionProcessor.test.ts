@@ -14,7 +14,7 @@ vi.mock('../../../logic/sqs/sendMessages', () => ({
 const resolveProcessor = async (extraSettings: QPQConfigItem[] = []) => {
   const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), ...extraSettings]);
   const processors = await getQueueSendMessagesActionProcessor(config, {} as any);
-  return processors[QueueActionType.SendMessages];
+  return processors[QueueActionType.SendMessage];
 };
 
 describe('getQueueSendMessagesActionProcessor', () => {

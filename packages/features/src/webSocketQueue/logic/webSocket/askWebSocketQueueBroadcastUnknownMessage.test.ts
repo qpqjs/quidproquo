@@ -12,7 +12,7 @@ describe('askWebSocketQueueBroadcastUnknownMessage', () => {
     runStory(askWebSocketQueueBroadcastUnknownMessage({ type: 'some-event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: 'event-bus',
-      [EventBusActionType.SendMessages]: (action: any) => {
+      [EventBusActionType.SendMessage]: (action: any) => {
         captured = action;
         return undefined;
       },
@@ -33,7 +33,7 @@ describe('askWebSocketQueueBroadcastUnknownMessage', () => {
         capturedKey = action.payload.globalName;
         return 'event-bus';
       },
-      [EventBusActionType.SendMessages]: undefined,
+      [EventBusActionType.SendMessage]: undefined,
     });
 
     expect(capturedKey).toBe('qpq-wsq-eb-name-demo');

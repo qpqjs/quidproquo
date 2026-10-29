@@ -11,7 +11,7 @@ describe('askSeedProcessDeployCreate', () => {
 
     runStory(askSeedProcessDeployCreate(), {
       [ConfigActionType.GetGlobal]: ['seed/a::run', 'seed/b::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },

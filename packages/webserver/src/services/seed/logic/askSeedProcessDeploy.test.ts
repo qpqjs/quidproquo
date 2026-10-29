@@ -11,7 +11,7 @@ describe('askSeedProcessDeploy', () => {
 
     runStory(askSeedProcessDeploy(DeployEventType.Api, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload.queueName);
         return undefined;
       },
@@ -30,7 +30,7 @@ describe('askSeedProcessDeploy', () => {
 
     runStory(askSeedProcessDeploy(DeployEventType.Unknown, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload.queueName);
         return undefined;
       },
@@ -44,7 +44,7 @@ describe('askSeedProcessDeploy', () => {
 
     runStory(askSeedProcessDeploy(DeployEventType.Web, DeployEventStatusType.Create), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload.queueName);
         return undefined;
       },

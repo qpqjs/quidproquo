@@ -115,7 +115,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         sends.push(action.payload.payload.type);
         return undefined;
       },
-      [EventBusActionType.SendMessages]: (action: any) => {
+      [EventBusActionType.SendMessage]: (action: any) => {
         broadcast = action;
         return undefined;
       },
@@ -153,7 +153,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         sends.push(action.payload.payload.type);
         return undefined;
       },
-      [EventBusActionType.SendMessages]: undefined,
+      [EventBusActionType.SendMessage]: undefined,
     });
 
     expect(resolverCall).toEqual({ functionName: 'resolveTenantScope', payload: { userId: 'u1', requestedScope: 'tenant-a' } });
@@ -183,7 +183,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         return undefined;
       },
       [WebsocketActionType.SendMessage]: undefined,
-      [EventBusActionType.SendMessages]: undefined,
+      [EventBusActionType.SendMessage]: undefined,
     });
 
     expect(resolverCall).toEqual({ functionName: 'resolveTenantScope', payload: { userId: 'u1', requestedScope: null } });
@@ -258,7 +258,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         return undefined;
       },
       [WebsocketActionType.SendMessage]: undefined,
-      [EventBusActionType.SendMessages]: undefined,
+      [EventBusActionType.SendMessage]: undefined,
     });
 
     expect(upsert.payload.item.scope).toBeUndefined();
@@ -277,7 +277,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         return undefined;
       },
       [WebsocketActionType.SendMessage]: undefined,
-      [EventBusActionType.SendMessages]: undefined,
+      [EventBusActionType.SendMessage]: undefined,
     });
 
     expect(deletes).toEqual([['qpq-wsq-subs-demo', 'TENANT#old#eventDoc#docs#1', 'c1']]);
@@ -312,7 +312,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
           sends.push(action.payload.payload.type);
           return undefined;
         },
-        [EventBusActionType.SendMessages]: undefined,
+        [EventBusActionType.SendMessage]: undefined,
       });
 
       expect(setAccessTokenCalled).toBe(false);
@@ -334,7 +334,7 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
         },
         [KeyValueStoreActionType.Upsert]: undefined,
         [WebsocketActionType.SendMessage]: undefined,
-        [EventBusActionType.SendMessages]: undefined,
+        [EventBusActionType.SendMessage]: undefined,
       });
 
       expect(input).toEqual({ accessToken: 'session-1', requestedScope: 'TENANT#t1' });

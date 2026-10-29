@@ -114,7 +114,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       messageId: generateUuid(),
     };
 
-    eventBus.publish(QueueActionType.SendMessages, queueMessage);
+    eventBus.publish(QueueActionType.SendMessage, queueMessage);
   }
 };
 
@@ -149,7 +149,7 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     return gate;
   };
 
-  eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
+  eventBus.on(QueueActionType.SendMessage, async (payload: AnyQueueMessageWithSession, correlation: string) => {
     // One delivery: the first failure (a thrown error or a failed story) is what a retry answers.
     const processOnce = async (): Promise<Nullable<unknown>> => {
       try {
@@ -209,7 +209,7 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     }
   });
 
-  eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
+  eventBus.on(EventBusActionType.SendMessage, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
     for (const qpqConfig of devServerConfig.qpqConfigs) {
       await processQueueEventBusSubscriptions(qpqConfig, payload);
     }

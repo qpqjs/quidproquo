@@ -22,7 +22,7 @@ const buildDevServerConfig = (settings: any[] = []): any => ({
 });
 
 // Registers the implementation (it never resolves) and returns the handler for the action type
-const startImplementation = (actionType: string = QueueActionType.SendMessages, settings: any[] = []) => {
+const startImplementation = (actionType: string = QueueActionType.SendMessage, settings: any[] = []) => {
   queueImplementation(buildDevServerConfig(settings));
 
   const call = vi.mocked(eventBus.on).mock.calls.find(([type]: any[]) => type === actionType)!;
@@ -118,7 +118,7 @@ describe('queueImplementation FIFO group serialization', () => {
   });
 
   it('serialises ungrouped messages on a queue capped at one concurrent execution', async () => {
-    const handler = startImplementation(QueueActionType.SendMessages, [defineQueue('serialQueue', {}, { maxConcurrentExecutions: 1 })]);
+    const handler = startImplementation(QueueActionType.SendMessage, [defineQueue('serialQueue', {}, { maxConcurrentExecutions: 1 })]);
 
     const first = handler(buildPayload({ messageId: 'm1', queueName: 'serialQueue' }), 'corr');
     const second = handler(buildPayload({ messageId: 'm2', queueName: 'serialQueue' }), 'corr');
@@ -170,7 +170,7 @@ describe('queueImplementation retries', () => {
       return {} as any;
     });
 
-    const handler = startImplementation(QueueActionType.SendMessages, retrySettings);
+    const handler = startImplementation(QueueActionType.SendMessage, retrySettings);
     await handler(buildPayload({ messageId: 'r1', queueName: 'retryQueue' }), 'corr');
 
     expect(tries).toBe(3);
@@ -183,7 +183,7 @@ describe('queueImplementation retries', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(processEvent).mockResolvedValue({ error: { errorType: 'GenericError', errorText: 'story failed' } } as any);
 
-    const handler = startImplementation(QueueActionType.SendMessages, retrySettings);
+    const handler = startImplementation(QueueActionType.SendMessage, retrySettings);
     await handler(buildPayload({ messageId: 'r2', queueName: 'retryQueue' }), 'corr');
 
     expect(processEvent).toHaveBeenCalledTimes(3);
@@ -224,12 +224,12 @@ describe('queueImplementation event bus fan-out', () => {
   });
 
   it('carries the bus message groupId through to a subscribed FIFO queue', async () => {
-    const handler = startImplementation(EventBusActionType.SendMessages, fifoSettings);
+    const handler = startImplementation(EventBusActionType.SendMessage, fifoSettings);
 
     await handler(buildBusMessage({ groupId: 'user-42' }), 'corr');
 
     expect(eventBus.publish).toHaveBeenCalledWith(
-      QueueActionType.SendMessages,
+      QueueActionType.SendMessage,
       expect.objectContaining({
         queueName: 'fifoQueue',
         groupId: 'user-42',
@@ -238,7 +238,7 @@ describe('queueImplementation event bus fan-out', () => {
   });
 
   it('leaves groupId unset when the subscribed queue is not FIFO', async () => {
-    const handler = startImplementation(EventBusActionType.SendMessages, [
+    const handler = startImplementation(EventBusActionType.SendMessage, [
       defineEventBus('bus'),
       defineQueue('plainQueue', {}, { eventBusSubscriptions: ['bus'] }),
     ]);
@@ -246,7 +246,7 @@ describe('queueImplementation event bus fan-out', () => {
     await handler(buildBusMessage({ eventBusName: 'bus' }), 'corr');
 
     expect(eventBus.publish).toHaveBeenCalledWith(
-      QueueActionType.SendMessages,
+      QueueActionType.SendMessage,
       expect.objectContaining({
         queueName: 'plainQueue',
         groupId: undefined,

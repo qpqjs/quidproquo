@@ -13,7 +13,7 @@ describe('seed deployEvent onDeploy', () => {
 
     runStory(onDeploy(event), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },
@@ -29,7 +29,7 @@ describe('seed deployEvent onDeploy', () => {
 
     runStory(onDeploy(event), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },

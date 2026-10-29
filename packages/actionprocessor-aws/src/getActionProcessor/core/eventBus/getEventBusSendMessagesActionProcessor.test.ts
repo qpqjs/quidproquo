@@ -14,7 +14,7 @@ vi.mock('../../../logic/sns/publishMessage', () => ({
 const resolveProcessor = async (extraSettings: any[] = []) => {
   const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), ...extraSettings]);
   const processors = await getEventBusSendMessagesActionProcessor(config, {} as any);
-  return processors[EventBusActionType.SendMessages];
+  return processors[EventBusActionType.SendMessage];
 };
 
 describe('getEventBusSendMessagesActionProcessor', () => {
