@@ -1,70 +1,96 @@
-# Testing Standard
+# Testing
 
-Tests run on [Vitest](https://vitest.dev): `npm run test` (watch: `npm run test:watch`).
-Each test file sits next to the source it covers as `<name>.test.ts`.
+Tests run on [Vitest](https://vitest.dev): `npm test` at the root runs every package, `npm run test -w @qpqjs/<pkg>` runs one, `npm run test:watch`
+watches. A test file sits beside the code it covers as `<name>.test.ts` (rule T1 in `docs/code-standards.md`). Every helper named below comes from
+`@qpqjs/testing`, which each package lists as a devDependency. Nothing test-related is exported from a runtime package (T2).
 
-QPQ business logic is written as **stories** — generator functions that `yield*` actions and
-receive their results back. There are two complementary ways to test them.
+Each package's `vitest.config.ts` is one line, `defineQpqVitestConfig(import.meta.url)`, which aliases every sibling package to its `src`, so tests
+never run against a stale build (T6).
 
-## 1. Story-level tests with `runStory` (the default)
+## Requesters: `captureRequester`
 
-`runStory` (from `@qpqjs/testing`) runs a story to completion, answering every action it
-asks for from a mock map. It is built on `askOverrideActions`, so batches (`askRunParallel`),
-nested stories, and `askCatch` all work transparently. This is the pattern to reach for when a
-story composes several actions.
+An action requester yields exactly one action and returns whatever the runtime answers. `captureRequester` drives that single round-trip and hands
+back both the action and the returned value.
 
 ```ts
-import { runStory, throwsError, expectError } from '@qpqjs/testing';
+import { captureRequester } from '@qpqjs/testing';
+
+const { action, returned } = captureRequester(askConfigGetParameter('name'), 'value');
+
+expect(action).toEqual({ type: ConfigActionType.GetParameter, payload: { parameterName: 'name' } });
+expect(returned).toBe('value');
+```
+
+It throws if the generator yields nothing or yields twice, so a story that is not a plain requester fails loudly instead of passing by accident.
+
+## Stories: `runStory`
+
+`runStory` runs a story to completion, answering each action from a map keyed by action type. It is built on `askOverrideActions`, so
+`askRunParallel`, nested stories and `askCatch` all behave as they do at runtime.
+
+```ts
+import { expectError, runStory, throwsError } from '@qpqjs/testing';
 
 const result = runStory(askKeyValueStoreQueryAll('items', keyCondition), {
-  // a literal value…
+  // a literal value...
   [KeyValueStoreActionType.Query]: { items: ['a', 'b'] },
-  // …or a function of the action (also doubles as a spy)
+  // ...or a function of the action, which also works as a spy
   [DateActionType.Now]: (action) => '2024-01-01T00:00:00.000Z',
 });
 
 expect(result).toEqual(['a', 'b']);
 ```
 
-Rules of thumb:
+- A mock is the raw success value. `askCatch` wrapping is applied for you, so the same mock works whether or not the story catches.
+- Simulate a failure with `throwsError(errorType, errorText)`. Under `askCatch` it comes back as a failed `EitherActionResult`; otherwise it
+  propagates as a thrown `StoryError`.
+- Every action must be mocked. Anything that reaches the runtime throws a descriptive error, so a test cannot silently pass against an unstubbed
+  dependency.
+- Narrow an `EitherActionResult` with `expectError(result)` rather than a hand-written `if (result.success)` guard.
+- Assert on requests with the function form of a mock (or a `vi.fn`) and check the action it received.
 
-- **A mock is the raw success value.** `askCatch`/`returnErrors` wrapping is applied for you, so
-  the same mock works whether or not the story wraps the action in `askCatch`.
-- **Simulate failures** with `throwsError(errorType, errorText)`. Under `askCatch` it comes back
-  as a failed `EitherActionResult`; otherwise it propagates as a thrown `StoryError`.
-- **Every action must be mocked.** Anything that reaches the runtime throws a descriptive error,
-  so tests can never silently pass against an un-stubbed dependency.
-- **Narrow `EitherActionResult`s** with `expectSuccess(result)` / `expectError(result)` instead of
-  hand-written `if (result.success)` guards.
-- **Assert on requests** by using the function form of a mock (or a `vi.fn`) and checking the
-  action it received.
+`packages/testing/src/storyTesting.test.ts` shows the full surface; `packages/core/src/stories/askRetry.test.ts` is a representative composed-story
+test.
 
-See `packages/core/src/testing/storyTesting.test.ts` for the full surface and
-`packages/core/src/stories/askRetry.test.ts` for a representative composed-story test.
+## Config: `buildTestQpqConfig`
 
-## 2. Action-requester tests with `expectGenerator`
-
-For a single action requester, `expectGenerator` (from `@qpqjs/testing`) asserts the exact
-action that is yielded and the value fed back — no runtime needed.
+Most config selectors need an application module before they can resolve names. `buildTestQpqConfig` prepends a default one (`test-app`,
+`test-module`, `development`) and takes just the settings the test is about, plus optional app overrides.
 
 ```ts
-import { expectGenerator } from '@qpqjs/testing';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
-expectGenerator(askConfigGetSecret('my-secret'))
-  .toYield({ type: ConfigActionType.GetSecret, payload: { secretName: 'my-secret' } })
-  .whenGiven('resolved-value')
-  .thenReturn('resolved-value');
+const qpqConfig = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
 ```
 
-## 3. Pure functions
+## State logic: `askReduceState`
 
-Reducers, validators, lookups, and date math are plain functions — test them directly with
-`expect`. Prefer `it.each` for table-driven cases (see
-`packages/core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts`).
+State-driven logic (a reducer plus the story that dispatches into it) is tested by running `askReduceState` through `runStory`: the reducer and the
+story are real, the actions they ask for are mocked, and the assertion is on the final state.
 
-## Keep tests clean
+```ts
+import { runStory } from '@qpqjs/testing';
 
-A good test is a few lines of mocks, one invocation, then a block of `expect`s. Push shared
-setup and repeated assertions into small helpers (`runStory`, `expectError`, fixtures) rather
-than repeating them — the test should read as *what* is being verified, not *how* the runtime
-is driven.
+const state = runStory(askReduceState(createInitialState(), reducer, story), {
+  [DateActionType.Now]: '2024-01-01T00:00:00.000Z',
+});
+
+expect(state.pending).toEqual([]);
+```
+
+## Action processors: `invokeProcessor` and `resolveEventProcessor`
+
+A processor test calls the processor with a payload and inert runtime arguments. `invokeProcessor(processor, payload, overrides?)` supplies a default
+test story session, a no-op session updater and a module loader that finds nothing; pass `{ session }`, `{ logger }` and so on when a test needs a
+real one. `resolveEventProcessor(resolver, actionType, qpqConfig?)` picks the one processor an event resolver returns for an action type. Mocks belong
+at I/O boundaries only (an SDK client, `fs`, `fetch` inside its own wrapper), never on a sibling `@qpqjs` package or a pure helper (T3).
+
+## Pure functions
+
+Reducers, validators, lookups and date math are plain functions: call them and `expect`. Prefer `it.each` for table-driven cases
+(`packages/core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts`).
+
+## Keep tests short
+
+A good test is a few lines of mocks, one call, then a block of `expect`s. Shared setup goes into small helpers or a typed builder in `@qpqjs/testing`
+once the same shape is cast in three or more files (T4). Timers are faked, never slept (T5).
