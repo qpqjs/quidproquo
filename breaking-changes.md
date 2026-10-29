@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Exported `interface`s across `@qpqjs/core`, `webserver`, `features`, `config-aws`, `deploy-aws`, `actionprocessor-aws`, `dev-server`, `web-admin` and `cli` are now `type` aliases (G5). Code that extended them with `interface X extends Y` still works through intersection; declaration merging into them no longer does.
 - `adminUserDirectoryResourceName` (`@qpqjs/features`) is renamed `ADMIN_USER_DIRECTORY_NAME` and lives in the admin constants; the value (`qpq-admin`) is unchanged.
 - `InvalidBatchSizeError` / `InvalidBatchSizeErrorCode` (askMapParallelBatch) and `InvalidKvsPartialPropertyError` / `InvalidKvsPartialPropertyErrorCode` (askKeyValueStoreUpdatePartialProperties) are removed from `@qpqjs/core`; both stories now throw a qpq `Invalid` error through `askThrowError` with the same message.
 - `askTenantApiRequest`, `askEventDocAiServiceRequest` (`@qpqjs/features`) and `askSessionApiRequest`, `askSessionApiRequestOrThrow`, `askPlatformRequest` (`@qpqjs/web-admin`) now take `<TResult, TPayload = unknown>`; callers passing two type arguments must swap them.
