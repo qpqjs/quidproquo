@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { GuidActionType } from './GuidActionType';
 
 // Mint `count` sortable ids in ONE action. The processor generates them in

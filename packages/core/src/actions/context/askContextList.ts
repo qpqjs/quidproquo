@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqContext } from '../../types';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { ContextActionType } from './ContextActionType';
 
 // Reads the whole serializable context stack. Stories reach for askContextRead with a

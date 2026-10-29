@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { GuidActionType } from './GuidActionType';
 
 export const askNewGuid = createActionRequester<string>()({

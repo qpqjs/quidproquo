@@ -1,5 +1,5 @@
-import { Action, ActionRequester } from '../Action';
-import { ActionRequesterDefinition, ActionRequesterFunction } from '../ActionRequesterFunction';
+import { Action, ActionRequester } from '../../types/Action';
+import { ActionRequesterDefinition, ActionRequesterFunction } from '../../types/ActionRequesterFunction';
 import { createErrorEnumForAction } from './createErrorEnumForAction';
 
 // Curried because TypeScript has no partial type inference: the outer call pins the

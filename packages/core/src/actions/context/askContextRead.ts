@@ -1,7 +1,7 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqContextIdentifier } from '../../types';
 import { Action } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { ContextActionType } from './ContextActionType';
 
 export type ContextReadActionPayload<T> = {

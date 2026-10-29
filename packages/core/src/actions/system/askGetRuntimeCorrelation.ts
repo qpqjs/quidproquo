@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { SystemActionType } from './SystemActionType';
 
 // Returns the correlation guid for the currently executing story. The correlation

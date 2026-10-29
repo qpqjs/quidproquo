@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QPQError } from '../../types/ErrorTypeEnum';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { ErrorActionType } from './ErrorActionType';
 
 export const askThrowErrorBase = createActionRequester<never>()({

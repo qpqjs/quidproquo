@@ -1,7 +1,7 @@
 import { QPQConfig } from '../../config';
-import { ActionProcessorListResolver } from '../Action';
-import { AnyActionRequesterFunction, ProcessorFor } from '../ActionRequesterFunction';
-import { DynamicModuleLoader } from '../DynamicModuleLoader';
+import { ActionProcessorListResolver } from '../../types/Action';
+import { AnyActionRequesterFunction, ProcessorFor } from '../../types/ActionRequesterFunction';
+import { DynamicModuleLoader } from '../../types/DynamicModuleLoader';
 
 // Builds the single-entry processor map from the requester itself, so the registration
 // key can never drift from the action type the requester yields, and the processor's

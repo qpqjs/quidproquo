@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqExecutionTrace, StoryResult } from '../../types';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { SystemActionType } from './SystemActionType';
 
 export type SystemTraceStoryActionPayload = {

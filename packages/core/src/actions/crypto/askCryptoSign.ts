@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { CryptoActionType } from './CryptoActionType';
 
 // Signs `message` with the private half of a signing key (RS256: RSASSA-PKCS1-v1_5

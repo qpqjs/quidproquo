@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { ConfigActionType } from './ConfigActionType';
 
 export const askConfigGetParameters = createActionRequester<string[]>()({

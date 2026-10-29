@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
 import { StreamEncoding, StreamHandle } from '../../types/StreamRegistry';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { FileActionType } from './FileActionType';
 
 export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({

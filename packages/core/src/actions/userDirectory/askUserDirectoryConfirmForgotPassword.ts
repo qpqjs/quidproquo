@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryConfirmForgotPassword = createActionRequester<AuthenticateUserResponse>()({

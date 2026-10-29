@@ -35,4 +35,3 @@ export * from './StorySession';
 export * from './StreamRegistry';
 export * from './UnboundLogicStory';
 export * from './UnionToIntersection';
-export * from './utils';

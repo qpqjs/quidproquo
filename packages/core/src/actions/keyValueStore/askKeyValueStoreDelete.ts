@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types/utils/createActionRequester';
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsCoreDataType } from './types';
 

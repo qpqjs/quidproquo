@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
 import { LogActionType } from './LogActionType';
 

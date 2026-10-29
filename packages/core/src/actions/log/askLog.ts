@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { DecomposedString, DecomposedStringPrimitive } from '../../types';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { LogActionType } from './LogActionType';
 
 export type LogTemplateLiteralActionPayload = {

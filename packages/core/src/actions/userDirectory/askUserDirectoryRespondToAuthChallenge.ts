@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { AnyAuthChallenge } from './types';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 

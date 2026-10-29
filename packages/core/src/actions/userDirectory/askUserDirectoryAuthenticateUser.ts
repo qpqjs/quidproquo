@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { askThrowError } from '../error/askThrowError';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 

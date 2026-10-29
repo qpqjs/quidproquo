@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
 

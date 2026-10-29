@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { AnyMatchStoryResult, EventActionType } from './EventActionType';
 
 export const askEventMatchStoryBase = createActionRequester<AnyMatchStoryResult>()({

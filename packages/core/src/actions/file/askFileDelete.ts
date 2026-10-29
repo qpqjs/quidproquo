@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { FileActionType } from './FileActionType';
 
 export const askFileDelete = createActionRequester<string[]>()({

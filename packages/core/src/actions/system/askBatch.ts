@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { Action } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { SystemActionType } from './SystemActionType';
 
 export type SystemBatchActionPayload = {

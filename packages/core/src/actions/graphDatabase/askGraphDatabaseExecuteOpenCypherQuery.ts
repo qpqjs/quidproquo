@@ -1,5 +1,5 @@
 import { GraphCypherResponse } from '../../config';
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 
 export enum GraphDatabaseInstanceType {

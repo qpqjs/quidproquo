@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QPQError } from '../../types';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { EventActionType } from './EventActionType';
 
 export const askEventResolveCaughtErrorBase = createActionRequester<unknown>()({

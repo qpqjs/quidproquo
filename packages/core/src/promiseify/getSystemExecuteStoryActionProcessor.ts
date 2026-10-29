@@ -1,9 +1,10 @@
 import { askExecuteStoryBase } from '../actions';
 import { QPQConfig } from '../config';
 import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { createActionProcessor } from '../logic/actions';
 import { processAction } from '../runtime';
 import { askRunParallel } from '../stories';
-import { ActionProcessor, AskResponse, AskResponseReturnType, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQError, Story } from '../types';
+import { ActionProcessor, AskResponse, AskResponseReturnType, ErrorTypeEnum, ProcessorFor, QPQError, Story } from '../types';
 
 // Thrown when an action inside a promisified story fails without returnErrors.
 // Carries the structured action error so the ExecuteStory processor can

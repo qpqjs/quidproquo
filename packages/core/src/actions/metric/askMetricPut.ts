@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { MetricActionType } from './MetricActionType';
 import { MetricUnit } from './MetricUnit';
 

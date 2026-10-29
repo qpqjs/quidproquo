@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { ConfigActionType } from './ConfigActionType';
 
 export type ApplicationConfigInfo = {

@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { AiStreamUsage } from './types/AiStreamUsage';
 import { AiActionType } from './AiActionType';
 import { AiCacheTtl } from './AiCacheTtl';

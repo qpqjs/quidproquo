@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, NetworkActionType, ResponseType } from './NetworkActionType';
 
 // Named because the processor layer (executeNetworkRequest) and the web-react hooks

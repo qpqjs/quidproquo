@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { CryptoActionType } from './CryptoActionType';
 
 // Returns the public half of a signing key as an SPKI PEM string. Not sensitive:

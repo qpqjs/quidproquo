@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { CrossModuleMessage } from '../../types';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { EventBusActionType } from './EventBusActionType';
 
 export type EventBusMessage<T> = CrossModuleMessage<T> & {

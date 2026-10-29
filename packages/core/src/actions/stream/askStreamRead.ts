@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
 import { StreamChunk, StreamDataType, StreamEncoding, StreamHandle } from '../../types/StreamRegistry';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { StreamActionType } from './StreamActionType';
 
 const decodeBase64ToUint8Array = (base64: string): Uint8Array => {
