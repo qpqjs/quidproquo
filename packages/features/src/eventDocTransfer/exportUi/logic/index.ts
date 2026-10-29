@@ -3,3 +3,4 @@ export * from './askEventDocExportUiClose';
 export * from './askEventDocExportUiConfirm';
 export * from './askEventDocExportUiOpen';
 export * from './askEventDocExportUiPreview';
+export * from './createInitialEventDocExportUiState';
