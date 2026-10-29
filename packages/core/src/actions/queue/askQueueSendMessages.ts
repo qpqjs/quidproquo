@@ -15,8 +15,8 @@ export const askQueueSendMessagesBase = createActionRequester<void>()({
   actionType: QueueActionType.SendMessages,
   errorTypes: [
     'AccessDenied', // caller lacks permission to send to the queue
-    'QueueNotFound', // the SQS queue does not exist
-    'ServiceUnavailable', // SQS internal error / throttling
+    'QueueNotFound', // the queue does not exist
+    'ServiceUnavailable', // the queue is throttling or failed internally; transient
   ],
   getPayload: (queueName: string, queueMessages: QueueMessage<any>[]) => ({ queueMessages, queueName }),
 });

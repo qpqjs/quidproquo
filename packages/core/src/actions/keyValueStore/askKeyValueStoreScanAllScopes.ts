@@ -22,7 +22,7 @@ export type KeyValueStoreScanAllScopesOptions = {
 export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedData<KvsScopedItem<unknown>>>()({
   actionType: KeyValueStoreActionType.ScanAllScopes,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'ServiceUnavailable', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
   ],

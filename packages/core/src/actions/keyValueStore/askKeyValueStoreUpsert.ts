@@ -19,7 +19,7 @@ export type KeyValueStoreUpsertOptions = {
 export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
   actionType: KeyValueStoreActionType.Upsert,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'ServiceUnavailable', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     // A conditional (ifNotExists) write lost to an existing item. Final: the slot is taken.
     // Namespaced, not ErrorTypeEnum.Conflict, so retry logic can target the write race

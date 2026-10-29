@@ -11,7 +11,7 @@ export type KeyValueStoreDeleteOptions = {
 export const askKeyValueStoreDelete = createActionRequester<void>()({
   actionType: KeyValueStoreActionType.Delete,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'ServiceUnavailable', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)

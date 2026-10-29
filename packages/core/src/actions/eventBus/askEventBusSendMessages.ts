@@ -20,8 +20,8 @@ export const askEventBusSendMessagesBase = createActionRequester<void>()({
   actionType: EventBusActionType.SendMessages,
   errorTypes: [
     'AccessDenied', // caller lacks permission to publish to the topic
-    'TopicNotFound', // the SNS topic does not exist
-    'ServiceUnavailable', // SNS internal error / throttling
+    'TopicNotFound', // the bus's topic does not exist
+    'ServiceUnavailable', // the bus is throttling or failed internally; transient
   ],
   getPayload: (eventBusSendMessageOptions: EventBusSendMessageOptions<unknown>) => eventBusSendMessageOptions,
 });

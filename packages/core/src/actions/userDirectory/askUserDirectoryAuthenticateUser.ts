@@ -18,7 +18,10 @@ export type AuthenticateUserRequest = {
 
 export const askUserDirectoryAuthenticateUserBase = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.AuthenticateUser,
-  errorTypes: ['UserNotFound', 'InvalidPassword'],
+  errorTypes: [
+    'UserNotFound', // no user with that username or email in the directory
+    'InvalidPassword', // the password does not match
+  ],
   getPayload: (userDirectoryName: string, authenticateUserRequest: AuthenticateUserRequest) => ({ userDirectoryName, authenticateUserRequest }),
 });
 

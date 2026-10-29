@@ -34,7 +34,7 @@ export type KeyValueStoreQueryOptions = {
 export const askKeyValueStoreQueryBase = createActionRequester<QpqPagedData<unknown>>()({
   actionType: KeyValueStoreActionType.Query,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'ServiceUnavailable', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)

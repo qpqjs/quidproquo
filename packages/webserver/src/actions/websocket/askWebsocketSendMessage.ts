@@ -4,7 +4,10 @@ import { WebsocketActionType } from './WebsocketActionType';
 
 export const askWebsocketSendMessageBase = createActionRequester<void>()({
   actionType: WebsocketActionType.SendMessage,
-  errorTypes: ['Throttled', 'Disconnected'],
+  errorTypes: [
+    'Throttled', // the websocket service is rate limiting sends
+    'Disconnected', // the connection is gone, the message was not delivered
+  ],
   getPayload: (websocketApiName: string, connectionId: string, payload: unknown) => ({ websocketApiName, connectionId, payload }),
 });
 

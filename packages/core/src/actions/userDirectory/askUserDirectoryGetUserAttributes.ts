@@ -3,6 +3,8 @@ import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionTy
 
 export const askUserDirectoryGetUserAttributes = createActionRequester<UserAttributes>()({
   actionType: UserDirectoryActionType.GetUserAttributes,
-  errorTypes: ['UserNotFound'],
+  errorTypes: [
+    'UserNotFound', // no user with that id in the directory
+  ],
   getPayload: (userDirectoryName: string, username: string) => ({ userDirectoryName, username }),
 });
