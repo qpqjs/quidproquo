@@ -20,8 +20,9 @@ export function* askBatch<TReturn extends Array<any> = any[]>(actions: Action<an
 
   // If we only have one action, just execute it directly
   // No need to batch it
-  if (actions.length === 1) {
-    return [yield actions[0]] as TReturn;
+  const only = actions[0];
+  if (actions.length === 1 && only) {
+    return [yield only] as TReturn;
   }
 
   // Otherwise, batch the actions

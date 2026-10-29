@@ -463,7 +463,7 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
     return qpqFunctionRuntime.relativePath.split('/').pop() || '';
   }
 
-  const [srcPath] = qpqFunctionRuntime.split('::');
+  const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
 };
 

@@ -20,8 +20,7 @@ export function* askRunParallel<T extends Array<AskResponse<any>>>(
     const actionResults = yield* askBatch(batchActions);
 
     // continue each story with that new value
-    for (let i = 0; i < activeStoryProgress.length; i++) {
-      const storyIterator = activeStoryProgress[i];
+    for (const [i, storyIterator] of activeStoryProgress.entries()) {
       storyIterator.iteratorResult = storyIterator.iterator.next(actionResults[i]);
     }
   }

@@ -70,8 +70,8 @@ export function generateUuidV5(name: string, namespace: string): string {
   const bytes = sha1(input).slice(0, 16);
 
   // RFC 4122: the high nibble of byte 6 carries the version, the top bits of byte 8 the variant.
-  bytes[6] = (bytes[6] & 0x0f) | 0x50;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x50;
+  bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
 
   return bytesToUuid(bytes);
 }

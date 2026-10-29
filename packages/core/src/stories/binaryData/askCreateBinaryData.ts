@@ -33,8 +33,8 @@ const encodeUtf8ToBase64 = (textData: string): string => {
   const utf8Bytes = new TextEncoder().encode(textData);
 
   let binary = '';
-  for (let i = 0; i < utf8Bytes.length; i++) {
-    binary += String.fromCharCode(utf8Bytes[i]);
+  for (const byte of utf8Bytes) {
+    binary += String.fromCharCode(byte);
   }
 
   return btoa(binary);

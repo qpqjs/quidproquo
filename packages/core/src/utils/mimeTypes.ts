@@ -39,9 +39,9 @@ export const getExtensionForMimeType = (mimeType: string): string => {
 
   // Own-property check so header-controlled values like "constructor" or
   // "__proto__" can't hit the prototype chain and leak an object instead of a string.
-  return Object.prototype.hasOwnProperty.call(MIME_TO_EXTENSION, key) ? MIME_TO_EXTENSION[key] : 'bin';
+  return Object.prototype.hasOwnProperty.call(MIME_TO_EXTENSION, key) ? (MIME_TO_EXTENSION[key] ?? 'bin') : 'bin';
 };
 
 // Strips parameters off a Content-Type header value, leaving just the MIME type
 // (e.g. "text/plain; charset=utf-8" -> "text/plain").
-export const getMimeTypeFromContentType = (contentType: string): string => contentType.split(';')[0].trim();
+export const getMimeTypeFromContentType = (contentType: string): string => (contentType.split(';')[0] ?? '').trim();

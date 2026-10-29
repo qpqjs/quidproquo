@@ -30,5 +30,5 @@ export function* askKeyValueStoreQuerySingle<T>(
 
   // Return the first collected item: the last fetched page can be empty (or hold a
   // later match) even when an earlier page already produced the item we want.
-  return allData.length > 0 ? allData[0] : null;
+  return allData[0] ?? null;
 }
