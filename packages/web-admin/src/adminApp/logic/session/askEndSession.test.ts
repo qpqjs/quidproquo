@@ -5,8 +5,8 @@ import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
-import { createInitialAdminAppState } from '../../AdminAppState';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { createInitialAdminAppState } from '../../logic/createInitialAdminAppState';
 import { makeSessionEvent } from '../../testHelpers/makeSessionEvent';
 import { SessionEndReason } from '../../types/SessionEndReason';
 import { askEndSession } from './askEndSession';
@@ -25,7 +25,7 @@ describe('askEndSession', () => {
       },
     });
 
-    expect(applied).toEqual([{ type: AdminSessionEventType.sessionEnded, data: { reason: SessionEndReason.logout } }]);
+    expect(applied).toEqual([{ type: AdminSessionEffect.SessionEnded, data: { reason: SessionEndReason.logout } }]);
   });
 
   it('does nothing when no session doc exists', () => {
@@ -48,7 +48,7 @@ describe('askEndSession', () => {
     state.sessionLog = {
       ...state.sessionLog,
       docId: 'doc-1',
-      events: [makeSessionEvent(AdminSessionEventType.sessionEnded, { reason: SessionEndReason.logout }, 0)],
+      events: [makeSessionEvent(AdminSessionEffect.SessionEnded, { reason: SessionEndReason.logout }, 0)],
     };
 
     runStory(askEndSession(), {

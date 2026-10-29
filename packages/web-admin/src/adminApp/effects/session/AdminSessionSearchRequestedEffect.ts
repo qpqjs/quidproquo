@@ -3,12 +3,12 @@ import { EventDocEventPayload } from '@qpqjs/features';
 
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 import { SearchOrigin } from '../../types/SearchOrigin';
-import { AdminSessionEventType } from './AdminSessionEventType';
+import { AdminSessionEffect } from './AdminSessionEffect';
 
-export type SearchRequestedData = {
+export type AdminSessionSearchRequestedData = {
   search: AdminSearchParams;
   requestId: string;
   origin: SearchOrigin;
 };
 
-export type SearchRequestedEvent = Effect<AdminSessionEventType.searchRequested, EventDocEventPayload<SearchRequestedData>>;
+export type AdminSessionSearchRequestedEffect = Effect<AdminSessionEffect.SearchRequested, EventDocEventPayload<AdminSessionSearchRequestedData>>;

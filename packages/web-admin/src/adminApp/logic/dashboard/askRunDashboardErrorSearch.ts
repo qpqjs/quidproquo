@@ -3,10 +3,10 @@ import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } f
 import { askUIVolatileLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogSearchCompleted';
 import { askUIVolatileLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { createDefaultAdminSearchParams } from '../../AdminSessionState';
 import { dashboardErrorsSearchKey } from '../../constants/dashboardErrorsSearchKey';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SearchRequestedData } from '../../effects/session/SearchRequestedEvent';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionSearchRequestedData } from '../../effects/session/AdminSessionSearchRequestedEffect';
+import { createDefaultAdminSearchParams } from '../../logic/createDefaultAdminSearchParams';
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 import { SearchOrigin } from '../../types/SearchOrigin';
 import { askFetchLogSearchPart } from '../search/askFetchLogSearchPart';
@@ -28,7 +28,11 @@ export function* askRunDashboardErrorSearch(): AskResponse<void> {
   };
 
   const requestId = yield* askNewGuid();
-  yield* askApplySessionEvent<SearchRequestedData>(AdminSessionEventType.searchRequested, { search, requestId, origin: SearchOrigin.dashboard });
+  yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, {
+    search,
+    requestId,
+    origin: SearchOrigin.dashboard,
+  });
 
   const runtimeTypes = Object.keys(QpqRuntimeType).sort();
   yield* askUIVolatileLogSearchStarted(dashboardErrorsSearchKey, runtimeTypes.length);

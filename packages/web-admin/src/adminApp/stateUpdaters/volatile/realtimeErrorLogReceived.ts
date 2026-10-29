@@ -1,6 +1,6 @@
 import { StoryResultMetadata } from '@qpqjs/core';
 
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 export const realtimeErrorLogReceived = (state: VolatileState, log: StoryResultMetadata): VolatileState => ({
   ...state,

@@ -1,8 +1,8 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { ChatMessageSentData } from '../../effects/session/ChatMessageSentEvent';
+import { AdminSessionChatMessageSentData } from '../../effects/session/AdminSessionChatMessageSentEffect';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 
 // Records that the user asked the log chat something, audit trail only. The
 // message itself, the AI's reply, and their storage are the EventDocAi log
@@ -12,5 +12,5 @@ export function* askSendChatMessage(correlationId: string, message: string): Ask
     return;
   }
 
-  yield* askApplySessionEvent<ChatMessageSentData>(AdminSessionEventType.chatMessageSent, { correlationId, message });
+  yield* askApplySessionEvent<AdminSessionChatMessageSentData>(AdminSessionEffect.ChatMessageSent, { correlationId, message });
 }

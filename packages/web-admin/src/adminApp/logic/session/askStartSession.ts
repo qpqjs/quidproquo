@@ -4,9 +4,9 @@ import { askQueryParamsGetAll } from '@qpqjs/web';
 import { askUISessionLogDocCreated } from '../../actionCreators/sessionLog/askUISessionLogDocCreated';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { askAdminUserRead } from '../../context';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { CorrelationOpenedData } from '../../effects/session/CorrelationOpenedEvent';
-import { SessionStartedData } from '../../effects/session/SessionStartedEvent';
+import { AdminSessionCorrelationOpenedData } from '../../effects/session/AdminSessionCorrelationOpenedEffect';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionStartedData } from '../../effects/session/AdminSessionStartedEffect';
 import { CorrelationOpenSource } from '../../types/CorrelationOpenSource';
 import { seededParamsFromQueryParams } from '../url/seededParamsFromQueryParams';
 import { askSessionApiCreate } from './askSessionApiCreate';
@@ -29,10 +29,10 @@ export function* askStartSession(): AskResponse<void> {
 
   yield* askUISessionLogDocCreated(summary.id, ackedEvents);
 
-  yield* askApplySessionEvent<SessionStartedData>(AdminSessionEventType.sessionStarted, { username, seededParams });
+  yield* askApplySessionEvent<AdminSessionStartedData>(AdminSessionEffect.SessionStarted, { username, seededParams });
 
   if (seededParams.correlation) {
-    yield* askApplySessionEvent<CorrelationOpenedData>(AdminSessionEventType.correlationOpened, {
+    yield* askApplySessionEvent<AdminSessionCorrelationOpenedData>(AdminSessionEffect.CorrelationOpened, {
       correlationId: seededParams.correlation,
       source: CorrelationOpenSource.deepLink,
     });

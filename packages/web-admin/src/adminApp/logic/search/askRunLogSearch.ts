@@ -3,9 +3,9 @@ import { askDateNow, askNewGuid, AskResponse, askRunParallel, askStateRead, QpqR
 import { askUIVolatileLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogSearchCompleted';
 import { askUIVolatileLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminAppState } from '../../AdminAppState';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SearchRequestedData } from '../../effects/session/SearchRequestedEvent';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionSearchRequestedData } from '../../effects/session/AdminSessionSearchRequestedEffect';
+import { AdminAppState } from '../../types/AdminAppState';
 import { SearchOrigin } from '../../types/SearchOrigin';
 import { selectSearchParams } from '../selectors/selectSearchParams';
 import { askFetchLogSearchPart } from './askFetchLogSearchPart';
@@ -19,7 +19,11 @@ export function* askRunLogSearch(): AskResponse<void> {
   const search = selectSearchParams(state);
 
   const requestId = yield* askNewGuid();
-  yield* askApplySessionEvent<SearchRequestedData>(AdminSessionEventType.searchRequested, { search, requestId, origin: SearchOrigin.events });
+  yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, {
+    search,
+    requestId,
+    origin: SearchOrigin.events,
+  });
 
   const runtimeType = effectiveRuntimeType(search);
   const runtimeTypes = runtimeType === 'ALL' ? Object.keys(QpqRuntimeType).sort() : [runtimeType];

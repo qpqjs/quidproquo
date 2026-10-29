@@ -7,7 +7,7 @@ import { eventAppended } from './stateUpdaters/sessionLog/eventAppended';
 import { eventSaved } from './stateUpdaters/sessionLog/eventSaved';
 import { flushFailed } from './stateUpdaters/sessionLog/flushFailed';
 import { flushStarted } from './stateUpdaters/sessionLog/flushStarted';
-import { SessionLogState } from './SessionLogState';
+import { SessionLogState } from './types/SessionLogState';
 
 export const sessionLogReducer = buildEffectReducer<SessionLogState, SessionLogEffects>({
   [SessionLogEffect.docCreated]: docCreated,

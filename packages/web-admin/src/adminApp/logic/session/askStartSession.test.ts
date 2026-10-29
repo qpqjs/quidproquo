@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
 import { adminUserContext } from '../../context';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { makeInitStateEvent } from '../../testHelpers/makeSessionEvent';
 import { askStartSession } from './askStartSession';
 
@@ -55,12 +55,12 @@ describe('askStartSession', () => {
     expect(dispatched).toContainEqual(expect.objectContaining({ payload: { docId: 'doc-1', events: [initEvent] } }));
 
     expect(applied[0]).toEqual({
-      type: AdminSessionEventType.sessionStarted,
+      type: AdminSessionEffect.SessionStarted,
       data: { username: 'joe', seededParams: { tab: 2, correlation: 'corr-7', service: 'billing' } },
     });
 
     expect(applied[1]).toEqual({
-      type: AdminSessionEventType.correlationOpened,
+      type: AdminSessionEffect.CorrelationOpened,
       data: { correlationId: 'corr-7', source: 'deepLink' },
     });
   });
@@ -74,6 +74,6 @@ describe('askStartSession', () => {
     });
 
     expect(applied).toHaveLength(1);
-    expect(applied[0].type).toBe(AdminSessionEventType.sessionStarted);
+    expect(applied[0].type).toBe(AdminSessionEffect.SessionStarted);
   });
 });

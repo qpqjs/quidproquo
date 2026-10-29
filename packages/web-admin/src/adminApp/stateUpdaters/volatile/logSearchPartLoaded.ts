@@ -1,7 +1,7 @@
 import { StoryResultMetadata } from '@qpqjs/core';
 
 import { VolatileLogSearchPartLoadedPayload } from '../../effects/volatile/VolatileLogSearchPartLoadedEffect';
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 const byStartedAtDesc = (a: StoryResultMetadata, b: StoryResultMetadata): number => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
 

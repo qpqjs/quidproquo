@@ -1,7 +1,7 @@
 import { createQpqRuntimeComputed, useQpqRuntimeComputed } from '@qpqjs/web-react';
 
 import { adminAppRuntime } from '../adminAppRuntime';
-import { VolatileState } from '../VolatileState';
+import { VolatileState } from '../types/VolatileState';
 
 const volatileStateComputed = createQpqRuntimeComputed(adminAppRuntime, (state) => state.volatile);
 

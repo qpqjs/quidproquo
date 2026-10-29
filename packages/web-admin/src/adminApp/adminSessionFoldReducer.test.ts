@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'vitest';
 
-import { AdminSessionEventType } from './effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from './effects/session/AdminSessionEffect';
+import { createDefaultAdminSearchParams } from './logic/createDefaultAdminSearchParams';
 import { makeInitStateEvent, makeSessionEvent } from './testHelpers/makeSessionEvent';
 import { CorrelationOpenSource } from './types/CorrelationOpenSource';
 import { SearchOrigin } from './types/SearchOrigin';
 import { SessionEndReason } from './types/SessionEndReason';
 import { foldAdminSessionLog } from './adminSessionFoldReducer';
-import { createDefaultAdminSearchParams } from './AdminSessionState';
 
 const sampleLog = () => {
   const search = { ...createDefaultAdminSearchParams(), service: 'billing', info: 'checkout' };
 
   return [
     makeInitStateEvent('doc-1', 'joe — 2026-07-07T00:00:00.000Z'),
-    makeSessionEvent(AdminSessionEventType.sessionStarted, { username: 'joe', seededParams: { tab: 2, service: 'billing' } }, 1),
-    makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 0, tabName: 'Events' }, 2),
-    makeSessionEvent(AdminSessionEventType.searchParamsChanged, { search }, 3),
-    makeSessionEvent(AdminSessionEventType.searchRequested, { search, requestId: 'req-1', origin: SearchOrigin.events }, 4),
-    makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'corr-9', source: CorrelationOpenSource.grid }, 5),
-    makeSessionEvent(AdminSessionEventType.logCheckToggled, { correlationId: 'corr-9', checked: true }, 6),
-    makeSessionEvent(AdminSessionEventType.correlationClosed, { correlationId: 'corr-9' }, 7),
-    makeSessionEvent(AdminSessionEventType.sessionEnded, { reason: SessionEndReason.logout }, 8),
+    makeSessionEvent(AdminSessionEffect.SessionStarted, { username: 'joe', seededParams: { tab: 2, service: 'billing' } }, 1),
+    makeSessionEvent(AdminSessionEffect.TabChanged, { tab: 0, tabName: 'Events' }, 2),
+    makeSessionEvent(AdminSessionEffect.SearchParamsChanged, { search }, 3),
+    makeSessionEvent(AdminSessionEffect.SearchRequested, { search, requestId: 'req-1', origin: SearchOrigin.events }, 4),
+    makeSessionEvent(AdminSessionEffect.CorrelationOpened, { correlationId: 'corr-9', source: CorrelationOpenSource.grid }, 5),
+    makeSessionEvent(AdminSessionEffect.LogCheckToggled, { correlationId: 'corr-9', checked: true }, 6),
+    makeSessionEvent(AdminSessionEffect.CorrelationClosed, { correlationId: 'corr-9' }, 7),
+    makeSessionEvent(AdminSessionEffect.SessionEnded, { reason: SessionEndReason.logout }, 8),
   ];
 };
 
@@ -60,7 +60,7 @@ describe('adminSessionFoldReducer', () => {
   it('seeds tab, search and correlation from the sessionStarted deep link', () => {
     const state = foldAdminSessionLog([
       makeInitStateEvent('doc-1', 'joe'),
-      makeSessionEvent(AdminSessionEventType.sessionStarted, { username: 'joe', seededParams: { tab: 3, correlation: 'corr-1', msg: 'boom' } }, 1),
+      makeSessionEvent(AdminSessionEffect.SessionStarted, { username: 'joe', seededParams: { tab: 3, correlation: 'corr-1', msg: 'boom' } }, 1),
     ]);
 
     expect(state.tab).toBe(3);
@@ -74,8 +74,8 @@ describe('adminSessionFoldReducer', () => {
 
     const state = foldAdminSessionLog([
       makeInitStateEvent('doc-1', 'joe'),
-      makeSessionEvent(AdminSessionEventType.searchParamsChanged, { search: userSearch }, 1),
-      makeSessionEvent(AdminSessionEventType.searchRequested, { search: dashboardSearch, requestId: 'req-d', origin: SearchOrigin.dashboard }, 2),
+      makeSessionEvent(AdminSessionEffect.SearchParamsChanged, { search: userSearch }, 1),
+      makeSessionEvent(AdminSessionEffect.SearchRequested, { search: dashboardSearch, requestId: 'req-d', origin: SearchOrigin.dashboard }, 2),
     ]);
 
     expect(state.search.info).toBe('mine');

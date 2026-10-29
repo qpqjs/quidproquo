@@ -1,13 +1,13 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { CorrelationOpenedData } from '../../effects/session/CorrelationOpenedEvent';
+import { AdminSessionCorrelationOpenedData } from '../../effects/session/AdminSessionCorrelationOpenedEffect';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { CorrelationOpenSource } from '../../types/CorrelationOpenSource';
 import { askProjectSessionToUrl } from '../url/askProjectSessionToUrl';
 
 export function* askApplyCorrelationOpened(correlationId: string, source: CorrelationOpenSource): AskResponse<void> {
-  yield* askApplySessionEvent<CorrelationOpenedData>(AdminSessionEventType.correlationOpened, { correlationId, source });
+  yield* askApplySessionEvent<AdminSessionCorrelationOpenedData>(AdminSessionEffect.CorrelationOpened, { correlationId, source });
 
   yield* askProjectSessionToUrl();
 }

@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead } from '@qpqjs/core';
 import { askQueryParamsGetAll, askQueryParamsSet } from '@qpqjs/web';
 
-import { AdminAppState } from '../../AdminAppState';
+import { AdminAppState } from '../../types/AdminAppState';
 import { selectUrlProjection } from '../selectors/selectUrlProjection';
 
 // Pushes the session state's URL projection into the address bar (replaceState;

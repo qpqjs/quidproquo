@@ -4,8 +4,8 @@ import { EventDocEventInput } from '@qpqjs/features';
 import { askUISessionLogEventSaved } from '../../actionCreators/sessionLog/askUISessionLogEventSaved';
 import { askUISessionLogFlushFailed } from '../../actionCreators/sessionLog/askUISessionLogFlushFailed';
 import { askUISessionLogFlushStarted } from '../../actionCreators/sessionLog/askUISessionLogFlushStarted';
-import { AdminAppState } from '../../AdminAppState';
 import { sessionFlushTiming } from '../../constants/sessionFlushTiming';
+import { AdminAppState } from '../../types/AdminAppState';
 import { askSessionApiAppendEvent } from './askSessionApiAppendEvent';
 
 // Drains pending session events to the backend STRICTLY SERIALLY, one POST at

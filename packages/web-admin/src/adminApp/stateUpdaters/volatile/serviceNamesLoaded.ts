@@ -1,5 +1,5 @@
 import { VolatileServiceNamesLoadedPayload } from '../../effects/volatile/VolatileServiceNamesLoadedEffect';
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 export const serviceNamesLoaded = (state: VolatileState, payload: VolatileServiceNamesLoadedPayload): VolatileState => ({
   ...state,

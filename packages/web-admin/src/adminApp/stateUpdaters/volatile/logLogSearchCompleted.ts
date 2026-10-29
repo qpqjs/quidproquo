@@ -1,5 +1,5 @@
 import { VolatileSearchCompletedPayload } from '../../effects/volatile/VolatileSearchCompletedPayload';
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 export const logLogSearchCompleted = (state: VolatileState, payload: VolatileSearchCompletedPayload): VolatileState => {
   const current = state.logLogResults[payload.searchKey];

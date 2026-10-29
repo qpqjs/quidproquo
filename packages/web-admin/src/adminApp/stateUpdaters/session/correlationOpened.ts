@@ -1,9 +1,12 @@
 import { EventDocEventPayload } from '@qpqjs/features';
 
-import { AdminSessionState } from '../../AdminSessionState';
-import { CorrelationOpenedData } from '../../effects/session/CorrelationOpenedEvent';
+import { AdminSessionCorrelationOpenedData } from '../../effects/session/AdminSessionCorrelationOpenedEffect';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
-export const correlationOpened = (state: AdminSessionState, { data }: EventDocEventPayload<CorrelationOpenedData>): AdminSessionState => ({
+export const correlationOpened = (
+  state: AdminSessionState,
+  { data }: EventDocEventPayload<AdminSessionCorrelationOpenedData>,
+): AdminSessionState => ({
   ...state,
   openCorrelation: data.correlationId,
 });

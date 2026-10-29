@@ -1,9 +1,9 @@
 import { Nullable } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
 
-import { AdminAppState } from '../../AdminAppState';
 import { foldAdminSessionLog } from '../../adminSessionFoldReducer';
-import { AdminSessionState } from '../../AdminSessionState';
+import { AdminAppState } from '../../types/AdminAppState';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
 // The session state IS the fold of the log (acked + pending). Memoized on log
 // identity, the arrays are replaced immutably, so reference equality is exact.

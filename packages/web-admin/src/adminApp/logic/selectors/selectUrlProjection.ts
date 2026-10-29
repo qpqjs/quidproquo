@@ -1,4 +1,4 @@
-import { AdminAppState } from '../../AdminAppState';
+import { AdminAppState } from '../../types/AdminAppState';
 import { selectSessionState } from './selectSessionState';
 
 // The URL is a projection of session state, never a source of truth after

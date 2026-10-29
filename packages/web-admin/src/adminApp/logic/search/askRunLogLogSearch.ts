@@ -19,9 +19,9 @@ import { askUIVolatileLogLogSearchCompleted } from '../../actionCreators/volatil
 import { askUIVolatileLogLogSearchPartLoaded } from '../../actionCreators/volatile/askUIVolatileLogLogSearchPartLoaded';
 import { askUIVolatileLogLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminAppState } from '../../AdminAppState';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SearchRequestedData } from '../../effects/session/SearchRequestedEvent';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionSearchRequestedData } from '../../effects/session/AdminSessionSearchRequestedEffect';
+import { AdminAppState } from '../../types/AdminAppState';
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 import { SearchOrigin } from '../../types/SearchOrigin';
 import { selectSearchParams } from '../selectors/selectSearchParams';
@@ -65,7 +65,7 @@ export function* askRunLogLogSearch(): AskResponse<void> {
   const search = selectSearchParams(state);
 
   const requestId = yield* askNewGuid();
-  yield* askApplySessionEvent<SearchRequestedData>(AdminSessionEventType.searchRequested, { search, requestId, origin: SearchOrigin.logs });
+  yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, { search, requestId, origin: SearchOrigin.logs });
 
   const logLevels = resolveLookupValues([effectiveLogLevelLookup(search) as LogLevelEnumLookup], LogLevelEnum);
 

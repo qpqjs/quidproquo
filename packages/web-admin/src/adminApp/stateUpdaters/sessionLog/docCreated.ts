@@ -1,5 +1,5 @@
 import { SessionLogDocCreatedPayload } from '../../effects/sessionLog/SessionLogDocCreatedEffect';
-import { SessionLogState } from '../../SessionLogState';
+import { SessionLogState } from '../../types/SessionLogState';
 
 // The backend doc exists (INIT_STATE seeded server-side); its acked events
 // become the base of the local log.

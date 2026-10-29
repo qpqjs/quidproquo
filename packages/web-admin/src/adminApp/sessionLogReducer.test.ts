@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { AdminSessionEventType } from './effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from './effects/session/AdminSessionEffect';
 import { SessionLogEffect } from './effects/sessionLog/SessionLogEffect';
+import { createDefaultAdminSearchParams } from './logic/createDefaultAdminSearchParams';
+import { createInitialSessionLogState } from './logic/createInitialSessionLogState';
 import { makeSessionEvent } from './testHelpers/makeSessionEvent';
-import { createDefaultAdminSearchParams } from './AdminSessionState';
+import { SessionLogState } from './types/SessionLogState';
 import { sessionLogReducer } from './sessionLogReducer';
-import { createInitialSessionLogState, SessionLogState } from './SessionLogState';
 
 const searchEvent = (info: string, clientMessageId: string) =>
-  makeSessionEvent(AdminSessionEventType.searchParamsChanged, { search: { ...createDefaultAdminSearchParams(), info } }, 0, { clientMessageId });
+  makeSessionEvent(AdminSessionEffect.SearchParamsChanged, { search: { ...createDefaultAdminSearchParams(), info } }, 0, { clientMessageId });
 
 const appended = (state: SessionLogState, event: ReturnType<typeof searchEvent>): SessionLogState => {
   const [next, handled] = sessionLogReducer(state, { type: SessionLogEffect.eventAppended, payload: event });
@@ -20,8 +21,8 @@ describe('sessionLogReducer', () => {
   it('assigns consecutive local event ids on append', () => {
     let state = createInitialSessionLogState();
 
-    state = appended(state, makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
-    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
+    state = appended(state, makeSessionEvent(AdminSessionEffect.TabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
+    state = appended(state, makeSessionEvent(AdminSessionEffect.CorrelationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
 
     expect(state.pendingEvents.map((event) => event.payload.metadata.eventId)).toEqual([0, 1]);
   });
@@ -52,11 +53,11 @@ describe('sessionLogReducer', () => {
   it('moves the acked event to the log and renumbers the remaining pending events', () => {
     let state = createInitialSessionLogState();
 
-    state = appended(state, makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
-    state = appended(state, makeSessionEvent(AdminSessionEventType.correlationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
+    state = appended(state, makeSessionEvent(AdminSessionEffect.TabChanged, { tab: 1, tabName: 'Logs' }, 0, { clientMessageId: 'a' }));
+    state = appended(state, makeSessionEvent(AdminSessionEffect.CorrelationOpened, { correlationId: 'c' }, 0, { clientMessageId: 'b' }));
 
     // Server assigned a later event id than our optimistic 0 (someone else appended too).
-    const storedEvent = makeSessionEvent(AdminSessionEventType.tabChanged, { tab: 1, tabName: 'Logs' }, 4, { clientMessageId: 'a' });
+    const storedEvent = makeSessionEvent(AdminSessionEffect.TabChanged, { tab: 1, tabName: 'Logs' }, 4, { clientMessageId: 'a' });
 
     const [next] = sessionLogReducer(state, {
       type: SessionLogEffect.eventSaved,

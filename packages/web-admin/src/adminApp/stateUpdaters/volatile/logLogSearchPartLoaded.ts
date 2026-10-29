@@ -1,7 +1,7 @@
 import { LogLog } from '@qpqjs/features';
 
 import { VolatileLogLogSearchPartLoadedPayload } from '../../effects/volatile/VolatileLogLogSearchPartLoadedEffect';
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 const byTimestampDesc = (a: LogLog, b: LogLog): number => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
 

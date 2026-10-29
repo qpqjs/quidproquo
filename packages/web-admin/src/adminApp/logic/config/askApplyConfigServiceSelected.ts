@@ -1,9 +1,9 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { ConfigServiceSelectedData } from '../../effects/session/ConfigServiceSelectedEvent';
+import { AdminSessionConfigServiceSelectedData } from '../../effects/session/AdminSessionConfigServiceSelectedEffect';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 
 export function* askApplyConfigServiceSelected(service: string): AskResponse<void> {
-  yield* askApplySessionEvent<ConfigServiceSelectedData>(AdminSessionEventType.configServiceSelected, { service });
+  yield* askApplySessionEvent<AdminSessionConfigServiceSelectedData>(AdminSessionEffect.ConfigServiceSelected, { service });
 }

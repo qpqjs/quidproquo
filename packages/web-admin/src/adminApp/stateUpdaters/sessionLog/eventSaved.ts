@@ -1,7 +1,7 @@
 import { EventDocEvent } from '@qpqjs/features';
 
 import { SessionLogEventSavedPayload } from '../../effects/sessionLog/SessionLogEventSavedEffect';
-import { SessionLogState } from '../../SessionLogState';
+import { SessionLogState } from '../../types/SessionLogState';
 
 // Server ack: the pending event moves to the acked log with its server-stamped
 // metadata, and the remaining pending events renumber onto consecutive event ids

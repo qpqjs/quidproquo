@@ -1,8 +1,8 @@
 import { EventDocEvent } from '@qpqjs/features';
 
 import { coalesceEventTypes } from '../../constants/coalesceEventTypes';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SessionLogState } from '../../SessionLogState';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { SessionLogState } from '../../types/SessionLogState';
 
 // Event ids are contiguous positions in the log, so an optimistic append has to
 // guess the next one: head + 1, or 0 for the first event of a fresh doc.
@@ -19,8 +19,7 @@ export const eventAppended = (state: SessionLogState, event: EventDocEvent): Ses
   const last = state.pendingEvents[state.pendingEvents.length - 1];
 
   const lastIsInFlightHead = state.pendingEvents.length === 1 && state.flush.inFlight;
-  const shouldCoalesce =
-    !!last && !lastIsInFlightHead && last.type === event.type && coalesceEventTypes.includes(event.type as AdminSessionEventType);
+  const shouldCoalesce = !!last && !lastIsInFlightHead && last.type === event.type && coalesceEventTypes.includes(event.type as AdminSessionEffect);
 
   if (shouldCoalesce) {
     const coalesced: EventDocEvent = {

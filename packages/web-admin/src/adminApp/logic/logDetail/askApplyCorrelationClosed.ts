@@ -1,9 +1,9 @@
 import { AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminAppState } from '../../AdminAppState';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { CorrelationClosedData } from '../../effects/session/CorrelationClosedEvent';
+import { AdminSessionCorrelationClosedData } from '../../effects/session/AdminSessionCorrelationClosedEffect';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminAppState } from '../../types/AdminAppState';
 import { selectOpenCorrelation } from '../selectors/selectOpenCorrelation';
 import { askProjectSessionToUrl } from '../url/askProjectSessionToUrl';
 
@@ -15,7 +15,7 @@ export function* askApplyCorrelationClosed(): AskResponse<void> {
     return;
   }
 
-  yield* askApplySessionEvent<CorrelationClosedData>(AdminSessionEventType.correlationClosed, { correlationId: openCorrelation });
+  yield* askApplySessionEvent<AdminSessionCorrelationClosedData>(AdminSessionEffect.CorrelationClosed, { correlationId: openCorrelation });
 
   yield* askProjectSessionToUrl();
 }

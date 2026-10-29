@@ -1,8 +1,8 @@
 import { createQpqRuntimeComputed, useQpqRuntimeComputed } from '@qpqjs/web-react';
 
 import { adminAppRuntime } from '../adminAppRuntime';
-import { AdminSessionState } from '../AdminSessionState';
 import { selectSessionState } from '../logic/selectors/selectSessionState';
+import { AdminSessionState } from '../types/AdminSessionState';
 
 const sessionStateComputed = createQpqRuntimeComputed(adminAppRuntime, selectSessionState);
 

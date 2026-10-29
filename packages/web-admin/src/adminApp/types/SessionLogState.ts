@@ -14,14 +14,3 @@ export type SessionLogState = {
     retryCount: number;
   };
 };
-
-export const createInitialSessionLogState = (): SessionLogState => ({
-  docId: null,
-  events: [],
-  pendingEvents: [],
-  flush: {
-    inFlight: false,
-    lastError: null,
-    retryCount: 0,
-  },
-});

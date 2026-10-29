@@ -1,5 +1,5 @@
 import { SessionLogFlushFailedPayload } from '../../effects/sessionLog/SessionLogFlushFailedEffect';
-import { SessionLogState } from '../../SessionLogState';
+import { SessionLogState } from '../../types/SessionLogState';
 
 export const flushFailed = (state: SessionLogState, payload: SessionLogFlushFailedPayload): SessionLogState => ({
   ...state,
