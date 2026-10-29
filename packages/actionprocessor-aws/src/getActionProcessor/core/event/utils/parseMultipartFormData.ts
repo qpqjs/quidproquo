@@ -4,19 +4,19 @@ import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
 import { APIGatewayEvent } from 'aws-lambda';
 import Busboy from 'busboy';
 
-interface MultipartFile {
+type MultipartFile = {
   name: string;
   filename: string;
   content: Buffer;
   contentType: string;
   encoding: string;
-}
+};
 
-interface BusboyInfo {
+type BusboyInfo = {
   filename: string;
   encoding: string;
   mimeType: string;
-}
+};
 
 type MultipartRequest = {
   fields: Record<string, string>;

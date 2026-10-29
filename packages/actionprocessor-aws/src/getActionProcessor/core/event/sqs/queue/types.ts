@@ -17,7 +17,7 @@ export type InternalEventOutput = QueueEventResponse;
 export type MatchResult = MatchStoryResult<any, any>;
 
 // Special types
-export interface CloudWatchAlarmNotification {
+export type CloudWatchAlarmNotification = {
   AlarmName: string;
   AlarmDescription: Nullable<string>;
   AWSAccountId: string;
@@ -45,4 +45,4 @@ export interface CloudWatchAlarmNotification {
     TreatMissingData: string;
     EvaluateLowSampleCountPercentile: string;
   };
-}
+};
