@@ -1,4 +1,4 @@
-import { DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { defineDeployEvent, DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -61,7 +61,7 @@ describe('eventBridgeEvent/deployStack getEventGetRecordsActionProcessor', () =>
 
 describe('eventBridgeEvent/deployStack getEventMatchStoryActionProcessor', () => {
   it('returns a NotFound error when no deploy event config matches', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('deploy'), EventActionType.MatchStory, config);
 
     const [, error] = await processor({ qpqEventRecord: {} });
 
@@ -69,10 +69,9 @@ describe('eventBridgeEvent/deployStack getEventMatchStoryActionProcessor', () =>
   });
 
   it('returns the configured deploy event runtime', async () => {
-    const runtime = { src: 'onDeploy' };
-    // GLOBAL_DEPLOY_EVENT_NAME is read from process.env at import time (undefined in tests).
-    const withDeploy = buildTestQpqConfig([{ configSettingType: QPQCoreConfigSettingType.deployEvent, name: undefined, runtime } as any]);
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, withDeploy);
+    const runtime: QpqFunctionRuntime = '/entry/deploy::onDeploy';
+    const withDeploy = buildTestQpqConfig([defineDeployEvent('deploy', runtime)]);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('deploy'), EventActionType.MatchStory, withDeploy);
 
     const [match] = await processor({ qpqEventRecord: {} });
 

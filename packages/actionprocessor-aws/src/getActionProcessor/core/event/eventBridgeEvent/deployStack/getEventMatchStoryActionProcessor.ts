@@ -11,14 +11,12 @@ import {
 
 import { MatchResult } from './types';
 
-const GLOBAL_DEPLOY_EVENT_NAME = process.env.deployEventConfigName!;
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const deployConfig = qpqCoreUtils.getDeployEventByName(GLOBAL_DEPLOY_EVENT_NAME, qpqConfig);
+const getProcessMatchStory = (qpqConfig: QPQConfig, deployEventConfigName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const deployConfig = qpqCoreUtils.getDeployEventByName(deployEventConfigName, qpqConfig);
 
   return async ({ qpqEventRecord }) => {
     if (!deployConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Could not find deploy event config ${GLOBAL_DEPLOY_EVENT_NAME}`);
+      return actionResultError(ErrorTypeEnum.NotFound, `Could not find deploy event config ${deployEventConfigName}`);
     }
 
     return actionResult<MatchResult>({
@@ -27,4 +25,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The deploy event the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (deployEventConfigName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, deployEventConfigName));

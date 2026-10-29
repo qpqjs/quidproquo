@@ -10,10 +10,10 @@ import {
 } from '@qpqjs/core';
 import { EmailSendEventType } from '@qpqjs/webserver';
 
-import { GLOBAL_USER_DIRECTORY_NAME, InternalEventRecord } from './types';
+import { InternalEventRecord } from './types';
 
-const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(GLOBAL_USER_DIRECTORY_NAME, qpqConfig);
+const getProcessAutoRespond = (qpqConfig: QPQConfig, userDirectoryName: string): ProcessorFor<typeof askEventAutoRespondBase> => {
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
@@ -49,4 +49,6 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEve
   };
 };
 
-export const getEventAutoRespondActionProcessor = createActionProcessor(askEventAutoRespondBase, getProcessAutoRespond);
+/** The user directory the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventAutoRespondActionProcessor = (userDirectoryName: string) =>
+  createActionProcessor(askEventAutoRespondBase, (qpqConfig) => getProcessAutoRespond(qpqConfig, userDirectoryName));

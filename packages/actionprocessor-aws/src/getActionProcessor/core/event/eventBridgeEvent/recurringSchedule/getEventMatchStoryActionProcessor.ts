@@ -3,9 +3,7 @@ import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorF
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/LambdaRuntimeConfig';
 import { MatchResult } from './types';
 
-const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRuntimeConfig || '{}');
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig, lambdaRuntimeConfig: LambdaRuntimeConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord }) => {
     return actionResult<MatchResult>({
       runtime: lambdaRuntimeConfig.runtime,
@@ -14,4 +12,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The schedule's story comes from the handler, which reads the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (lambdaRuntimeConfig: LambdaRuntimeConfig) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, lambdaRuntimeConfig));

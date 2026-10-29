@@ -2,8 +2,6 @@ import { MatchStoryResult, VerifyAuthChallengeEvent, VerifyAuthChallengeEventRes
 
 import { Context, VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 
-export const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
 // Externals - The ins and outs of the external event
 export type EventInput = [VerifyAuthChallengeResponseTriggerEvent, Context];
 export type EventOutput = VerifyAuthChallengeResponseTriggerEvent;

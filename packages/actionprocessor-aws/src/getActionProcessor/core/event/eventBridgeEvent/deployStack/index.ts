@@ -6,13 +6,12 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-export const getEventBridgeStackDeployEventActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-  dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => ({
-  ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventMatchStoryActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
-});
+export const getEventBridgeStackDeployEventActionProcessor =
+  (deployEventConfigName: string): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
+    ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventMatchStoryActionProcessor(deployEventConfigName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
+  });

@@ -3,8 +3,6 @@ import { EmailSendEvent, EmailSendEventResponse } from '@qpqjs/webserver';
 
 import { Context, CustomMessageTriggerEvent } from 'aws-lambda';
 
-export const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
 // Externals - The ins and outs of the external event
 export type EventInput = [CustomMessageTriggerEvent, Context];
 export type EventOutput = CustomMessageTriggerEvent;

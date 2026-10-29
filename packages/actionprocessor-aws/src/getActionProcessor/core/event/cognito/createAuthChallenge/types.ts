@@ -2,8 +2,6 @@ import { CreateAuthChallengeEvent, CreateAuthChallengeEventResponse, MatchStoryR
 
 import { Context, CreateAuthChallengeTriggerEvent } from 'aws-lambda';
 
-export const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
 // Externals - The ins and outs of the external event
 export type EventInput = [CreateAuthChallengeTriggerEvent, Context];
 export type EventOutput = CreateAuthChallengeTriggerEvent;

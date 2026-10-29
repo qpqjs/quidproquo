@@ -4,6 +4,7 @@ import { EventBridgeEvent } from 'aws-lambda';
 
 import { getEventBridgeEventActionProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
+import { getLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 export const getEventBridgeEvent_recurringSchedule = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
@@ -11,7 +12,7 @@ export const getEventBridgeEvent_recurringSchedule = (dynamicModuleLoader: Dynam
     QpqRuntimeType.RECURRING_SCHEDULE,
     getBlankStorySession,
     // TODO: @joe-coady: rename this to something recurring-schedule specific.
-    getEventBridgeEventActionProcessor,
+    getEventBridgeEventActionProcessor(getLambdaEnvironment().lambdaRuntimeConfig),
     dynamicModuleLoader,
     qpqConfig,
   );

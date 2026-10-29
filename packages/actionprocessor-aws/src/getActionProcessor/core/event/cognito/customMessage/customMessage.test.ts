@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { defineUserDirectory, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 import { EmailSendEventType } from '@qpqjs/webserver';
 
@@ -10,14 +10,9 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-// GLOBAL_USER_DIRECTORY_NAME is read from process.env at import time (undefined in tests).
-const runtime = { src: 'emailTemplate' };
+const runtime: QpqFunctionRuntime = '/entry/email::emailTemplate';
 const configWithTemplates = buildTestQpqConfig([
-  {
-    configSettingType: QPQCoreConfigSettingType.userDirectory,
-    name: undefined,
-    emailTemplates: { resetPassword: runtime, resetPasswordAdmin: runtime, verifyEmail: runtime },
-  } as any,
+  defineUserDirectory('ud', { emailTemplates: { resetPassword: runtime, resetPasswordAdmin: runtime, verifyEmail: runtime } }),
 ]);
 
 const buildTriggerEvent = (triggerSource: string, clientMetadata?: Record<string, string>): any => ({
@@ -58,7 +53,7 @@ describe('cognito/customMessage getEventGetRecordsActionProcessor', () => {
 
 describe('cognito/customMessage getEventMatchStoryActionProcessor', () => {
   it('returns the configured template runtime for a known event type', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, configWithTemplates);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ud'), EventActionType.MatchStory, configWithTemplates);
 
     const [match] = await processor({ qpqEventRecord: { eventType: EmailSendEventType.ResetPassword } });
 
@@ -66,7 +61,7 @@ describe('cognito/customMessage getEventMatchStoryActionProcessor', () => {
   });
 
   it('returns a NotFound error for an unknown event type', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, configWithTemplates);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ud'), EventActionType.MatchStory, configWithTemplates);
 
     const [, error] = await processor({ qpqEventRecord: { eventType: 'OTHER' } });
 
@@ -98,13 +93,13 @@ describe('cognito/customMessage getEventTransformResponseResultActionProcessor',
 
 describe('cognito/customMessage getEventAutoRespondActionProcessor', () => {
   it('responds with null when the email template exists', async () => {
-    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor, EventActionType.AutoRespond, configWithTemplates);
+    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor('ud'), EventActionType.AutoRespond, configWithTemplates);
 
     expect(await processor({ qpqEventRecord: { eventType: EmailSendEventType.ResetPassword }, matchResult: {} })).toEqual([null]);
   });
 
   it('returns a NotFound error when the email template is missing', async () => {
-    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor, EventActionType.AutoRespond);
+    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor('ud'), EventActionType.AutoRespond);
 
     const [, error] = await processor({ qpqEventRecord: { eventType: EmailSendEventType.ResetPassword }, matchResult: {} });
 
@@ -112,7 +107,7 @@ describe('cognito/customMessage getEventAutoRespondActionProcessor', () => {
   });
 
   it('returns a NotFound error for an unknown event type', async () => {
-    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor, EventActionType.AutoRespond, configWithTemplates);
+    const processor = await resolveEventProcessor(getEventAutoRespondActionProcessor('ud'), EventActionType.AutoRespond, configWithTemplates);
 
     const [, error] = await processor({ qpqEventRecord: { eventType: 'OTHER' }, matchResult: {} });
 

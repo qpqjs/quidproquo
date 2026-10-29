@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { defineUserDirectory, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -9,11 +9,8 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-// GLOBAL_USER_DIRECTORY_NAME is read from process.env at import time (undefined in tests).
-const userDirectoryConfig = (runtime: unknown) =>
-  buildTestQpqConfig([
-    { configSettingType: QPQCoreConfigSettingType.userDirectory, name: undefined, customAuthRuntime: { defineAuthChallenge: runtime } } as any,
-  ]);
+const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
+  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { defineAuthChallenge: runtime } })]);
 
 describe('cognito/defineAuthChallenge getEventGetRecordsActionProcessor', () => {
   it('maps the trigger event session and user attributes', async () => {
@@ -28,7 +25,7 @@ describe('cognito/defineAuthChallenge getEventGetRecordsActionProcessor', () => 
 
 describe('cognito/defineAuthChallenge getEventMatchStoryActionProcessor', () => {
   it('returns a NotFound error when no defineAuthChallenge runtime is configured', async () => {
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory);
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ud'), EventActionType.MatchStory);
 
     const [, error] = await processor({ qpqEventRecord: {} });
 
@@ -36,8 +33,8 @@ describe('cognito/defineAuthChallenge getEventMatchStoryActionProcessor', () => 
   });
 
   it('returns the configured defineAuthChallenge runtime', async () => {
-    const runtime = { src: 'defineChallenge' };
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, userDirectoryConfig(runtime));
+    const runtime: QpqFunctionRuntime = '/entry/auth::defineChallenge';
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor('ud'), EventActionType.MatchStory, userDirectoryConfig(runtime));
 
     const [match] = await processor({ qpqEventRecord: {} });
 

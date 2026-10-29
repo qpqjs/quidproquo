@@ -11,14 +11,12 @@ import {
 
 import { MatchResult } from './types';
 
-const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(GLOBAL_USER_DIRECTORY_NAME, qpqConfig);
+const getProcessMatchStory = (qpqConfig: QPQConfig, userDirectoryName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
   return async ({ qpqEventRecord }) => {
     if (!userDirectoryConfig?.customAuthRuntime?.createAuthChallenge) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.createAuthChallenge in [${GLOBAL_USER_DIRECTORY_NAME}]`);
+      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.createAuthChallenge in [${userDirectoryName}]`);
     }
 
     return actionResult<MatchResult>({
@@ -27,4 +25,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The user directory the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (userDirectoryName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, userDirectoryName));

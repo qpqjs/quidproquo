@@ -13,10 +13,9 @@ import {
 import { matchUrl } from '../../../../../awsLambdaUtils';
 import { InternalEventRecord, MatchResult } from './types';
 
-export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetting => {
-  // Only the queue name travels via the environment - the full setting lives in
-  // the bundled qpqConfig (serializing it into env blows the lambda 4KB limit).
-  const queueName = process.env.queueName as string;
+// Only the queue name travels via the lambda environment; the full setting lives in the bundled
+// qpqConfig (serializing it into env blows the lambda 4KB limit).
+export const getQueueConfigSetting = (qpqConfig: QPQConfig, queueName: string): QueueQPQConfigSetting => {
   const queueQPQConfigSetting = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
 
   if (!queueQPQConfigSetting) {
@@ -26,8 +25,8 @@ export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetti
   return queueQPQConfigSetting;
 };
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig);
+const getProcessMatchStory = (qpqConfig: QPQConfig, queueName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig, queueName);
   const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
   const queueTypes = Object.keys(queueQueueProcessors).sort();
 
@@ -64,4 +63,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The queue the lambda drains comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (queueName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, queueName));
