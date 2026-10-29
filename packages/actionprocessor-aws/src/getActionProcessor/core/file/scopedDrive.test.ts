@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askFileListDirectory, askFileWriteTextContents, defineStorageDrive, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
@@ -7,13 +8,10 @@ import { listFiles, writeTextFile } from '../../../logic/s3';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('../../../logic/s3', () => ({ listFiles: vi.fn(), writeTextFile: vi.fn() }));
 
-const qpqConfig = buildTestQpqConfig([defineStorageDrive('tenantFiles', { scoped: true })]);
+const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1'), defineStorageDrive('tenantFiles', { scoped: true })]);
 
 describe('scoped drive on s3', () => {
   it('refuses an unscoped write and never reaches s3', async () => {

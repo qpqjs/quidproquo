@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { AiModel, defineAi, ErrorTypeEnum } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
@@ -7,10 +8,6 @@ import { prepareAiPromptCall } from './prepareAiPromptCall';
 
 const bedrockFactory = vi.fn((modelId: string) => ({ __model: modelId }));
 const createAmazonBedrock = vi.fn(() => bedrockFactory);
-
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 
 vi.mock('@ai-sdk/amazon-bedrock', () => ({
   createAmazonBedrock: (opts: unknown) => createAmazonBedrock(opts),
@@ -26,7 +23,7 @@ const collaborators = [{} as never, {}, {} as never, {} as never, {} as never] a
 
 describe('prepareAiPromptCall', () => {
   it('creates the bedrock provider for the deploy region', () => {
-    const config = buildTestQpqConfig();
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
 
     prepareAiPromptCall(config, { model: AiModel.ClaudeHaiku35 }, ...collaborators);
 
@@ -34,7 +31,7 @@ describe('prepareAiPromptCall', () => {
   });
 
   it('returns the resolved model and no tools when aiName is omitted', () => {
-    const config = buildTestQpqConfig();
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
 
     const result = prepareAiPromptCall(config, { model: AiModel.ClaudeSonnet45 }, ...collaborators);
 
@@ -42,7 +39,7 @@ describe('prepareAiPromptCall', () => {
   });
 
   it('errors with NotImplemented for an unsupported model', () => {
-    const config = buildTestQpqConfig();
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
 
     const result = prepareAiPromptCall(config, { model: 'nope' as AiModel }, ...collaborators);
 
@@ -50,7 +47,7 @@ describe('prepareAiPromptCall', () => {
   });
 
   it('errors with NotFound when the named ai config is missing', () => {
-    const config = buildTestQpqConfig();
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
 
     const result = prepareAiPromptCall(config, { model: AiModel.ClaudeHaiku35, aiName: 'missing' }, ...collaborators);
 
@@ -59,6 +56,7 @@ describe('prepareAiPromptCall', () => {
 
   it('builds tools from the named ai config', () => {
     const config = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('123456789012', 'us-test-1'),
       defineAi('myAi', {
         tools: [{ name: 'lookup', description: 'looks up', executor: 'mod#fn', inputSchema: { type: 'object' } }],
       }),

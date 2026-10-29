@@ -1,5 +1,6 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { ErrorTypeEnum } from '@qpqjs/core';
-import { invokeProcessor } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -8,16 +9,15 @@ import { getNeptuneEndpoints } from '../../../../../logic/neptune';
 import { GraphDatabaseForNeptuneActionType } from '../actions';
 import { getGraphDatabaseForNeptuneGetEndpointsActionProcessor } from './getGraphDatabaseForNeptuneGetEndpointsActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('../../../../../awsNamingUtils', () => ({
   getConfigRuntimeResourceNameFromConfig: vi.fn(() => 'graph-db-name'),
 }));
 vi.mock('../../../../../logic/neptune', () => ({ getNeptuneEndpoints: vi.fn() }));
 
+const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
+
 const invoke = async (payload: { graphDatabaseName: string }) => {
-  const processor = (await getGraphDatabaseForNeptuneGetEndpointsActionProcessor({} as never, null as any))[
+  const processor = (await getGraphDatabaseForNeptuneGetEndpointsActionProcessor(qpqConfig, null as any))[
     GraphDatabaseForNeptuneActionType.GetEndpoints
   ];
   return invokeProcessor(processor, payload);
@@ -31,7 +31,7 @@ describe('getProcessGetEndpoints', () => {
     const [result] = await invoke({ graphDatabaseName: 'graph' });
 
     expect(result).toBe(endpoints);
-    expect(getConfigRuntimeResourceNameFromConfig).toHaveBeenCalledWith('graph', {});
+    expect(getConfigRuntimeResourceNameFromConfig).toHaveBeenCalledWith('graph', qpqConfig);
     expect(getNeptuneEndpoints).toHaveBeenCalledWith('graph-db-name', 'us-test-1');
   });
 

@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
@@ -7,15 +8,14 @@ import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaU
 import { writeBinaryFile } from '../../../logic/s3';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('../../../logic/s3', () => ({ writeBinaryFile: vi.fn() }));
 vi.mock('../../../awsLambdaUtils', () => ({ getS3BucketStorageClassFromStorageDriveTier: vi.fn(() => 'STANDARD') }));
 
 const invoke = async (payload: Record<string, unknown>) => {
-  const processor = (await getFileWriteBinaryContentsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.WriteBinaryContents];
+  const processor = (
+    await getFileWriteBinaryContentsActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.WriteBinaryContents];
   return invokeProcessor(processor, payload);
 };
 

@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askFileDelete, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
@@ -7,14 +8,13 @@ import { deleteFiles } from '../../../logic/s3';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('../../../logic/s3', () => ({ deleteFiles: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepaths: string[] }) => {
-  const processor = (await getFileDeleteActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Delete];
+  const processor = (await getFileDeleteActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any))[
+    FileActionType.Delete
+  ];
   return invokeProcessor(processor, payload);
 };
 

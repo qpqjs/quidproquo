@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { ErrorTypeEnum, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
@@ -7,9 +8,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: class {},
@@ -22,7 +20,9 @@ vi.mock('../../../logic/createAwsClient', () => ({ createAwsClient: vi.fn() }));
 const send = vi.fn();
 
 const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown) => {
-  const processor = (await getFileStreamOpenActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.StreamOpen];
+  const processor = (
+    await getFileStreamOpenActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.StreamOpen];
   return invokeProcessor(processor, payload, { streamRegistry });
 };
 

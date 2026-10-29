@@ -1,3 +1,4 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askFileCopy, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
@@ -7,16 +8,15 @@ import { copyFile } from '../../../logic/s3';
 import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn((drive: string) => `bucket-${drive}`) }));
 vi.mock('../../../logic/s3', () => ({ copyFile: vi.fn() }));
 
 const payload = { sourceDrive: 'renders', sourceFilepath: 'd1/assets/a', targetDrive: 'packs', targetFilepath: 'd2/assets/b' };
 
 const invoke = async (extra: Record<string, unknown> = {}) => {
-  const processor = (await getFileCopyActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.Copy];
+  const processor = (await getFileCopyActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any))[
+    FileActionType.Copy
+  ];
   return invokeProcessor(processor, { ...payload, ...extra });
 };
 
