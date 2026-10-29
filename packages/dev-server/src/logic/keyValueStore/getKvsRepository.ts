@@ -10,6 +10,9 @@ import { SqliteKvsRepository } from './SqliteKvsRepository';
 // processor from opening its own database handle.
 const repositoryInstances = new Map<string, KvsRepository>();
 
+/**
+ *
+ */
 export const getKvsRepository = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KvsRepository => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 

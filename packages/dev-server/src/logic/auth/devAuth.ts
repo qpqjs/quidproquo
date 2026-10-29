@@ -28,11 +28,17 @@ const DEV_REFRESH_TOKEN_EXPIRY_SECONDS = 30 * 24 * 60 * 60;
 
 const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
 
+/**
+ *
+ */
 export const resolveDevUsername = (username?: Nullable<string>): string => username || DEV_USER_EMAIL;
 
 // The identity of a user directory once cross-module ownership is applied. Two
 // services declaring the same directory name resolve to different identities;
 // a directory referenced via `owner` resolves to the owning service's identity.
+/**
+ *
+ */
 export type DevUserDirectory = {
   serviceName: string;
   directoryName: string;
@@ -40,6 +46,9 @@ export type DevUserDirectory = {
 
 // Mirrors the AWS runtime's user pool resolution (getCFExportNameUserPoolIdFromConfig):
 // the owner module redirects to the owning service, resourceNameOverride renames the directory.
+/**
+ *
+ */
 export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QPQConfig): DevUserDirectory => {
   const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
@@ -56,12 +65,18 @@ const devUserIdNamespace = generateUuidV5('@qpqjs/dev-server/user-id', UuidNames
 // same email is always the same user in dev ~ and, like Cognito user pools, the same
 // email in two different directories is two different users. Emails are compared
 // case-insensitively, hence the lowercase.
+/**
+ *
+ */
 export const createDevUserId = (userDirectory: DevUserDirectory, username?: Nullable<string>): string => {
   const resolvedUsername = resolveDevUsername(username);
 
   return generateUuidV5(`${userDirectory.serviceName}/${userDirectory.directoryName}/${resolvedUsername.trim().toLowerCase()}`, devUserIdNamespace);
 };
 
+/**
+ *
+ */
 export const createDevJwt = (
   userDirectory: DevUserDirectory,
   username?: Nullable<string>,
@@ -83,6 +98,9 @@ export const createDevJwt = (
   return `${base64UrlEncode(header)}.${base64UrlEncode(payload)}.dev-signature`;
 };
 
+/**
+ *
+ */
 export const createDevAuthResponse = (userDirectory: DevUserDirectory, username?: Nullable<string>): AuthenticateUserResponse => {
   const authenticationInfo: AuthenticationInfo = {
     accessToken: createDevJwt(userDirectory, username),

@@ -21,6 +21,9 @@ import { DevServerPlugin } from './types/DevServerPlugin';
 export const kvsPlugin: DevServerPlugin = {
   name: 'kvs repositories',
   stopPhase: DevServerShutdownPhase.Persist,
+  /**
+   *
+   */
   start: async (devServerConfig) => {
     warnIfLegacyJsonKvsStores(devServerConfig.runtimePath);
 

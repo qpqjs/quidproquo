@@ -22,6 +22,9 @@ const isServiceLoggingDisabled = (qpqConfig: QPQConfig): boolean =>
     .getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAccountInfo)
     .some((setting) => setting.disableLogs);
 
+/**
+ *
+ */
 export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig, storySession?: StorySession): QpqLogger => {
   // Check if we're processing a storage event from the qpq-logs drive
   const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === QPQ_LOGS_STORAGE_DRIVE_NAME;

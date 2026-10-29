@@ -152,10 +152,13 @@ const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): Web
       });
     })
     .filter(
-      (item, index, arr) => arr[index].apiName !== item.apiName || !item.setting.owner?.module || arr[index].service === item.setting.owner?.module,
+      (item, index, arr) => arr[index]?.apiName !== item.apiName || !item.setting.owner?.module || arr[index]?.service === item.setting.owner?.module,
     );
 };
 
+/**
+ *
+ */
 export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   if (!devServerConfig.webSocketPort) {
     return null;

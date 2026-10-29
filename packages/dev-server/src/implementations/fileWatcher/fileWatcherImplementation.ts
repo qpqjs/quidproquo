@@ -26,6 +26,9 @@ import { getDevServerLogger } from '../logger';
 import { FileEventPayload } from './FileEventPayload';
 import { toStorageDriveEvent } from './toStorageDriveEvent';
 
+/**
+ *
+ */
 export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const storagePath = devServerConfig.fileStorageConfig.storagePath;
 
@@ -70,6 +73,9 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       }
 
       const [service, drive, ...filePathParts] = parts;
+      if (service === undefined || drive === undefined) {
+        return null;
+      }
       const filepath = filePathParts.join(path.sep);
 
       return {

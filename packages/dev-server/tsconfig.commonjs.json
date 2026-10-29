@@ -2,8 +2,17 @@
   "extends": "@qpqjs/tsconfig/tsconfig.commonjs.json",
   "compilerOptions": {
     "skipLibCheck": true,
-    "outDir": "./lib/commonjs"
+    "outDir": "./lib/commonjs",
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "src/testing", "**/*.test.ts", "**/*.spec.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/testing",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

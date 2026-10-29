@@ -42,6 +42,9 @@ const toLocalSecureUrl = (url: string, devServerConfig: ResolvedDevServerConfig)
   return local.toString();
 };
 
+/**
+ *
+ */
 export type RequestUserScriptChildInput = {
   devServerConfig: ResolvedDevServerConfig;
   qpqConfig: QPQConfig;

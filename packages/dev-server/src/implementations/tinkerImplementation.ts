@@ -24,10 +24,13 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: any): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
+/**
+ *
+ */
 export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, tinkerOptions?: TinkerOptions): TinkerInterface => {
   const availableServices = devServerConfig.qpqConfigs.map((config) => qpqCoreUtils.getApplicationModuleName(config));
 
-  let currentServiceName = tinkerOptions?.initialService || availableServices[0];
+  let currentServiceName = tinkerOptions?.initialService || availableServices[0] || '';
 
   const getServiceConfig = (): QPQConfig => {
     const config = devServerConfig.qpqConfigs.find((c) => qpqCoreUtils.getApplicationModuleName(c) === currentServiceName);

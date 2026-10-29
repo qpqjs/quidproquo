@@ -81,5 +81,8 @@ const getProcessKeyValueStoreScanAllScopes = (
   };
 };
 
+/**
+ *
+ */
 export const getKeyValueStoreScanAllScopesActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreScanAllScopesBase, (qpqConfig) => getProcessKeyValueStoreScanAllScopes(qpqConfig, devServerConfig));

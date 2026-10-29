@@ -1,14 +1,23 @@
 import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
+/**
+ *
+ */
 export enum QPQDevServerConfigSettingType {
   devServerOptions = '@quidproquo-dev-server/config/DevServerOptions',
 }
 
+/**
+ *
+ */
 export type DevServerViewsOptions = {
   // Port the service's views project listens on under `qpq go:dev:web`.
   port?: number;
 };
 
+/**
+ *
+ */
 export type DevServerWebEntryOptions = {
   // Port the entry is hosted on when the dev server serves pre-built web (the docker image).
   port: number;
@@ -27,8 +36,14 @@ export type DevServerOptions = {
   webEntries?: Record<string, DevServerWebEntryOptions>;
 };
 
+/**
+ *
+ */
 export type DevServerOptionsQPQConfigSetting = QPQConfigSetting & DevServerOptions;
 
+/**
+ *
+ */
 export const defineDevServerOptions = (options: DevServerOptions): DevServerOptionsQPQConfigSetting => ({
   configSettingType: QPQDevServerConfigSettingType.devServerOptions,
   uniqueKey: 'DevServerOptions',
@@ -36,6 +51,9 @@ export const defineDevServerOptions = (options: DevServerOptions): DevServerOpti
   ...options,
 });
 
+/**
+ *
+ */
 export const getDevServerOptions = (qpqConfig: QPQConfig): DevServerOptions => {
   const settings = qpqCoreUtils.getConfigSettings<DevServerOptionsQPQConfigSetting>(qpqConfig, QPQDevServerConfigSettingType.devServerOptions);
 

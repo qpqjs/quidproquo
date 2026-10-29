@@ -29,5 +29,8 @@ const getProcessGetUsersByAttribute = (
   };
 };
 
+/**
+ *
+ */
 export const getUserDirectoryGetUsersByAttributeActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryGetUsersByAttribute, (qpqConfig) => getProcessGetUsersByAttribute(qpqConfig, devServerConfig));

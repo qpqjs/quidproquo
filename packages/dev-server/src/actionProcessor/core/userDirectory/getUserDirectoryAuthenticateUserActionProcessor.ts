@@ -28,5 +28,8 @@ const getProcessAuthenticateUser = (
   };
 };
 
+/**
+ *
+ */
 export const getUserDirectoryAuthenticateUserActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectoryAuthenticateUserBase, (qpqConfig) => getProcessAuthenticateUser(qpqConfig, devServerConfig));

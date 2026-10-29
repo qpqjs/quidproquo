@@ -44,6 +44,9 @@ const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
   };
 };
 
+/**
+ *
+ */
 export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => {

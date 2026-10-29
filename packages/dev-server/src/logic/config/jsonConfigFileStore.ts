@@ -9,6 +9,9 @@ import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 //   <runtimePath>/parameters/<serviceName>.json   { "myParam": "value" }
 //   <runtimePath>/secrets/<serviceName>.json      { "myApiKey": "<guid>" }
 
+/**
+ *
+ */
 export enum ConfigStoreDirectory {
   parameters = 'parameters',
   secrets = 'secrets',
@@ -40,6 +43,9 @@ const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig):
   };
 };
 
+/**
+ *
+ */
 export const readConfigStoreFile = async (
   runtimePath: string,
   storeDirectory: ConfigStoreDirectory,
@@ -48,6 +54,9 @@ export const readConfigStoreFile = async (
   return readJsonFileStore<string>(runtimePath, storeDirectory, serviceName);
 };
 
+/**
+ *
+ */
 export const writeConfigStoreValue = async (
   runtimePath: string,
   storeDirectory: ConfigStoreDirectory,
@@ -69,8 +78,9 @@ const getOrSeedConfigStoreValue = async (
 ): Promise<string> => {
   const values = await readConfigStoreFile(runtimePath, storeDirectory, serviceName);
 
-  if (key in values) {
-    return values[key];
+  const existing = values[key];
+  if (existing !== undefined) {
+    return existing;
   }
 
   const seededValue = buildSeedValue();
@@ -81,6 +91,9 @@ const getOrSeedConfigStoreValue = async (
 
 // First read seeds the file with the parameter's config default so every
 // available parameter becomes visible and editable on disk.
+/**
+ *
+ */
 export const getOrSeedParameterValue = async (runtimePath: string, parameterName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveParameterStorageLocation(parameterName, qpqConfig);
 
@@ -93,6 +106,9 @@ export const getOrSeedParameterValue = async (runtimePath: string, parameterName
   );
 };
 
+/**
+ *
+ */
 export const setParameterValue = async (runtimePath: string, parameterName: string, qpqConfig: QPQConfig, parameterValue: string): Promise<void> => {
   const { serviceName, key } = resolveParameterStorageLocation(parameterName, qpqConfig);
 
@@ -101,6 +117,9 @@ export const setParameterValue = async (runtimePath: string, parameterName: stri
 
 // Secrets have no config default: the first read generates a guid and
 // persists it so subsequent reads (from any service) get the same value.
+/**
+ *
+ */
 export const getOrSeedSecretValue = async (runtimePath: string, secretName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveSecretStorageLocation(secretName, qpqConfig);
 

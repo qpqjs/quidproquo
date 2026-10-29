@@ -7,12 +7,18 @@ const getPathArray = (path: KvsAttributePath): string[] => {
   return path.map((p: string | number) => String(p));
 };
 
+/**
+ *
+ */
 export const getNestedValue = (obj: any, path: string[]): any => {
   return path.reduce((current, key) => current?.[key], obj);
 };
 
 const setNestedValue = (obj: any, path: string[], value: any): void => {
   const lastKey = path[path.length - 1];
+  if (lastKey === undefined) {
+    return;
+  }
   const parentPath = path.slice(0, -1);
 
   const parent = parentPath.reduce((current, key) => {
@@ -27,6 +33,9 @@ const setNestedValue = (obj: any, path: string[], value: any): void => {
 
 const removeNestedValue = (obj: any, path: string[]): void => {
   const lastKey = path[path.length - 1];
+  if (lastKey === undefined) {
+    return;
+  }
   const parentPath = path.slice(0, -1);
 
   const parent = getNestedValue(obj, parentPath);
@@ -37,6 +46,9 @@ const removeNestedValue = (obj: any, path: string[]): void => {
 
 // Pure DynamoDB-style update engine shared by every KVS storage engine. Given an
 // item and a list of updates, returns a new item with all updates applied.
+/**
+ *
+ */
 export const applyUpdateToItem = (item: any, updates: KvsUpdate): any => {
   const updatedItem = { ...item };
 

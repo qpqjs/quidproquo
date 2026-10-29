@@ -18,6 +18,9 @@ import { getDevServerLogger } from '../implementations/logger';
 import { ResolvedDevServerConfig } from '../types';
 import { withProcessorDelay } from './withProcessorDelay';
 
+/**
+ *
+ */
 export const processEvent = async <E, ER>(
   expressEvent: E,
   qpqConfig: QPQConfig,

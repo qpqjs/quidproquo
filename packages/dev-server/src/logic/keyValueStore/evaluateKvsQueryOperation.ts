@@ -18,7 +18,8 @@ const getConditionValue = (item: any, key: string, storeConfig: KeyValueStoreQPQ
     return item[storeConfig.partitionKey.key];
   }
   if (key === 'sk') {
-    return storeConfig.sortKeys.length > 0 ? item[storeConfig.sortKeys[0].key] : undefined;
+    const sortKey = storeConfig.sortKeys[0];
+    return sortKey ? item[sortKey.key] : undefined;
   }
   return getNestedValue(item, key.split('.'));
 };
@@ -74,6 +75,9 @@ const evaluateCondition = (item: any, condition: KvsQueryCondition, storeConfig:
 // Throws eagerly on an unsupported operation type, independent of what data
 // (if any) is in the store, so a bad query fails loudly even against an empty
 // store.
+/**
+ *
+ */
 export const validateKvsQueryOperation = (operation: KvsQueryOperation): void => {
   if ('conditions' in operation) {
     (operation as KvsLogicalOperator).conditions.forEach(validateKvsQueryOperation);
@@ -89,6 +93,9 @@ export const validateKvsQueryOperation = (operation: KvsQueryOperation): void =>
 // The query-semantics authority: every candidate row passes through here,
 // whatever SQL narrowing ran first, so there is exactly one implementation of
 // the operators to keep correct (see buildKvsKeyNarrowing).
+/**
+ *
+ */
 export const evaluateKvsQueryOperation = (item: any, operation: KvsQueryOperation, storeConfig: KeyValueStoreQPQConfigSetting): boolean => {
   if ('conditions' in operation) {
     const logicalOp = operation as KvsLogicalOperator;

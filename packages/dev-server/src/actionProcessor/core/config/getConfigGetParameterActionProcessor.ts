@@ -14,5 +14,8 @@ const getProcessConfigGetParameter = (qpqConfig: QPQConfig, devServerConfig: Res
   };
 };
 
+/**
+ *
+ */
 export const getConfigGetParameterActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askConfigGetParameter, (qpqConfig) => getProcessConfigGetParameter(qpqConfig, devServerConfig));

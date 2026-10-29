@@ -7,10 +7,16 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { KvsRepository } from './KvsRepository';
 
+/**
+ *
+ */
 export type MakeKvsRepository = (runtimePath: string, settings: QPQConfig) => KvsRepository;
 
 // Shared behavioral contract for every KvsRepository implementation (sqlite, json, ...).
 // Run against a fresh implementation with `runKvsRepositoryContractTests(name, makeRepo)`.
+/**
+ *
+ */
 export function runKvsRepositoryContractTests(name: string, makeRepo: MakeKvsRepository): void {
   describe(name, () => {
     const openRepos: KvsRepository[] = [];

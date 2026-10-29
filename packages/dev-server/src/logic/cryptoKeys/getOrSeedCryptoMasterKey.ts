@@ -14,6 +14,9 @@ import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
 const CRYPTO_KEYS_STORE_DIRECTORY = 'cryptoKeys';
 
+/**
+ *
+ */
 export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyName: string, qpqConfig: QPQConfig): Promise<Buffer> => {
   const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
 
@@ -24,8 +27,9 @@ export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyNam
 
   const keys = await readJsonFileStore<string>(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName);
 
-  if (key in keys) {
-    return Buffer.from(keys[key], 'base64');
+  const existing = keys[key];
+  if (existing !== undefined) {
+    return Buffer.from(existing, 'base64');
   }
 
   const masterKey = randomBytes(32);

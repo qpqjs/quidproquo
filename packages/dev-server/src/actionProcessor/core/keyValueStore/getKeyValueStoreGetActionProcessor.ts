@@ -35,5 +35,8 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: Resol
   };
 };
 
+/**
+ *
+ */
 export const getKeyValueStoreGetActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreGetBase, (qpqConfig) => getProcessKeyValueStoreGet(qpqConfig, devServerConfig));

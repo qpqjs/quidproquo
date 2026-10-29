@@ -34,5 +34,8 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: Resolved
   };
 };
 
+/**
+ *
+ */
 export const getCryptoEncryptActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askCryptoEncrypt, (qpqConfig) => getProcessCryptoEncrypt(qpqConfig, devServerConfig));

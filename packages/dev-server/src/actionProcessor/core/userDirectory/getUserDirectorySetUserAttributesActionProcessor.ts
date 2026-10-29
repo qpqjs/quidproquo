@@ -27,5 +27,8 @@ const getProcessSetUserAttributes = (
   };
 };
 
+/**
+ *
+ */
 export const getUserDirectorySetUserAttributesActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askUserDirectorySetUserAttributes, (qpqConfig) => getProcessSetUserAttributes(qpqConfig, devServerConfig));

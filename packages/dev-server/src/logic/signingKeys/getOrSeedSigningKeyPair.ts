@@ -22,8 +22,9 @@ const inFlightSeeds = new Map<string, Promise<Rs256KeyPair>>();
 const readOrSeed = async (runtimePath: string, serviceName: string, key: string): Promise<Rs256KeyPair> => {
   const keys = await readJsonFileStore<Rs256KeyPair>(runtimePath, SIGNING_KEYS_STORE_DIRECTORY, serviceName);
 
-  if (key in keys) {
-    return keys[key];
+  const existing = keys[key];
+  if (existing !== undefined) {
+    return existing;
   }
 
   const keyPair = generateRs256KeyPair();
@@ -32,6 +33,9 @@ const readOrSeed = async (runtimePath: string, serviceName: string, key: string)
   return keyPair;
 };
 
+/**
+ *
+ */
 export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyName: string, qpqConfig: QPQConfig): Promise<Rs256KeyPair> => {
   const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(signingKeyName, qpqConfig);
 

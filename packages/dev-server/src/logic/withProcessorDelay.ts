@@ -2,6 +2,9 @@ import { ActionProcessorList } from '@qpqjs/core';
 
 import { DevServerDelayConfig } from '../types';
 
+/**
+ *
+ */
 export const resolveDelayMs = (delay: DevServerDelayConfig | undefined, actionType: string): number => {
   if (delay === undefined) return 0;
   if (typeof delay === 'number') return delay;
@@ -10,11 +13,17 @@ export const resolveDelayMs = (delay: DevServerDelayConfig | undefined, actionTy
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+/**
+ *
+ */
 export const delayForAction = async (delay: DevServerDelayConfig | undefined, actionType: string): Promise<void> => {
   const ms = resolveDelayMs(delay, actionType);
   if (ms > 0) await sleep(ms);
 };
 
+/**
+ *
+ */
 export const withProcessorDelay = (processors: ActionProcessorList, delay: DevServerDelayConfig | undefined): ActionProcessorList => {
   if (delay === undefined) return processors;
 

@@ -42,5 +42,8 @@ const getProcessKeyValueStoreGetAll = (
   };
 };
 
+/**
+ *
+ */
 export const getKeyValueStoreGetAllActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
   createActionProcessor(askKeyValueStoreGetAllBase, (qpqConfig) => getProcessKeyValueStoreGetAll(qpqConfig, devServerConfig));

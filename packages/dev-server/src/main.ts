@@ -14,6 +14,9 @@ export * from './implementations';
 export * from './logic/inFlight';
 export * from './plugins';
 
+/**
+ *
+ */
 export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?: DevServerConfigOverrides): QPQConfig[] => {
   return qpqConfigs.map((qpqConfig) => {
     return [
@@ -29,6 +32,9 @@ export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?
   });
 };
 
+/**
+ *
+ */
 export const resolveDevServerConfig = (
   devServerConfig: DevServerConfig,
   devServerConfigOverrides?: DevServerConfigOverrides,
@@ -86,6 +92,9 @@ const startPluginsWithShutdown = async (plugins: DevServerPlugin[], resolvedDevS
   markDevServerReady();
 };
 
+/**
+ *
+ */
 export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
   console.log('Starting QPQ Dev Server');
 
@@ -149,6 +158,9 @@ export const runMigrations = async (
   return ran;
 };
 
+/**
+ *
+ */
 export const startTinker = async (
   devServerConfig: DevServerConfig,
   devServerConfigOverrides?: DevServerConfigOverrides,

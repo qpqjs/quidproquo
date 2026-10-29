@@ -35,6 +35,9 @@ const resolveDevServerOwnCodeMarkers = (qpqFunctionRuntimeInfo: QpqFunctionRunti
   }
 };
 
+/**
+ *
+ */
 export const getCoreActionProcessor = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

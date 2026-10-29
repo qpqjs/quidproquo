@@ -1,6 +1,7 @@
 import { awsLambdaUtils } from '@qpqjs/actionprocessor-aws';
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   DynamicModuleLoader,
@@ -64,6 +65,10 @@ const getProcessTransformResponseResult = async (
     const eventParams = rawEventParams as EventInput;
 
     const [record] = qpqEventRecordResponses as EitherActionResult<InternalEventOutput>[];
+
+    if (!record) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
     const [expressEvent] = eventParams;
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
