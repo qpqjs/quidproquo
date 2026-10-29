@@ -23,11 +23,12 @@ import {
 } from '../config';
 import { LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
+/** Every defineAwsServiceAccountInfo in the config: one for an AWS service, none for a config that never deploys there. */
+export const getAllAwsServiceAccountInfoConfigs = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAccountInfo);
+
 export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
-  const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsServiceAccountInfo,
-  );
+  const serviceAccountInfos = getAllAwsServiceAccountInfoConfigs(qpqConfig);
 
   if (serviceAccountInfos.length === 0) {
     throw new Error('use defineAwsServiceAccountInfo to define aws deployment config');
@@ -52,12 +53,9 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
  * still be bundled.
  */
 export const getLayerProvidedModules = (qpqConfig: QPQConfig): string[] => {
-  const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsServiceAccountInfo,
+  return getAllAwsServiceAccountInfoConfigs(qpqConfig).flatMap((serviceAccountInfo) =>
+    serviceAccountInfo.apiLayers.flatMap((layer) => layer.modules ?? []),
   );
-
-  return serviceAccountInfos.flatMap((serviceAccountInfo) => serviceAccountInfo.apiLayers.flatMap((layer) => layer.modules ?? []));
 };
 
 /**

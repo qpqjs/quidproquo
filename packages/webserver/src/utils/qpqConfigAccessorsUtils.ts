@@ -4,7 +4,6 @@ import {
   ApiKeyQPQWebServerConfigSetting,
   CertificateQPQWebServerConfigSetting,
   DefaultRouteOptionsQPQWebServerConfigSetting,
-  DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
   EmailReceivingDomainQPQWebServerConfigSetting,
   FileUploadSettings,
@@ -16,6 +15,7 @@ import {
   SubdomainRedirectQPQWebServerConfigSetting,
 } from '../config';
 import { WebEntryQPQWebServerConfigSetting } from '../config';
+import { getDnsConfig } from '../config/settings/dns/logic/getDnsConfig';
 import { getOwnedWebsocketConfigs } from '../config/settings/websocket/logic';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
@@ -62,7 +62,7 @@ const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] =
 export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   // The domain resolver pointer is a QpqPureFunction, structurally an advanced runtime, so
   // the same loader bundles and serves it.
-  const domainResolver = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns)?.resolver;
+  const domainResolver = getDnsConfig(configs)?.resolver;
 
   return qpqCoreUtils.expandSrcEntriesWithActionProcessors([
     ...getAllRoutes(configs).map((r) => r.runtime),

@@ -1,4 +1,4 @@
-import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '@qpqjs/config-aws';
+import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   filterLogHistoryByActionTypes,
   LogActionType,
@@ -18,9 +18,7 @@ import { ResolvedDevServerConfig } from '../types';
 // A service turns its logs off with defineAwsServiceAccountInfo's `disableLogs`. Honoured here as on
 // Lambda, so the one switch works on both; a service without that setting keeps logging.
 const isServiceLoggingDisabled = (qpqConfig: QPQConfig): boolean =>
-  qpqCoreUtils
-    .getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAccountInfo)
-    .some((setting) => setting.disableLogs);
+  qpqConfigAwsUtils.getAllAwsServiceAccountInfoConfigs(qpqConfig).some((setting) => setting.disableLogs);
 
 export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig, storySession?: StorySession): QpqLogger => {
   // Check if we're processing a storage event from the qpq-logs drive

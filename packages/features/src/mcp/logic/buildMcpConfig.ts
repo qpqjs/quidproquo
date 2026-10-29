@@ -1,13 +1,12 @@
-import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { Nullable, QPQConfig } from '@qpqjs/core';
 
-import { MCP_SERVER_CONFIG_SETTING_TYPE } from '../constants/mcpServerConfigSettingType';
+import { getMcpServerConfig } from '../config/logic/getMcpServerConfig';
 import { McpConfig } from '../models/McpConfig';
-import { McpServerQPQConfigSetting } from '../types/McpServerQPQConfigSetting';
 import { buildMcpToolsets } from './buildMcpToolsets';
 
 /** defineMcpServer's setting plus every defineMcpToolset in the service. Null without defineMcpServer. */
 export const buildMcpConfig = (qpqConfig: QPQConfig): Nullable<McpConfig> => {
-  const server = qpqCoreUtils.getConfigSetting<McpServerQPQConfigSetting>(qpqConfig, MCP_SERVER_CONFIG_SETTING_TYPE);
+  const server = getMcpServerConfig(qpqConfig);
   if (!server) {
     return null;
   }
