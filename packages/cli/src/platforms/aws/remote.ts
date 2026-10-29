@@ -18,7 +18,7 @@ import { awsNamingUtils } from '@qpqjs/config-aws';
 //   deployRemoteManifest - upload manifest.json, atomically flipping lambdas over
 // Version files always land before the manifest that references them, so a reading
 // lambda never sees a manifest whose files aren't all present yet.
-import { qpqCoreUtils } from '@qpqjs/core';
+import { getServiceRemotePublishedDistPath, qpqCoreUtils } from '@qpqjs/core';
 import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from '@qpqjs/deploy-rspack';
 
 import fs from 'fs';
@@ -39,8 +39,7 @@ export type RemotePublishTarget = {
   servicePrefix: string;
 };
 
-const getPublishPath = (appName: string, serviceName: string): string =>
-  path.join(getRoot(), 'dist', 'apps', appName, 'services', serviceName, 'service-remote-published');
+const getPublishPath = (appName: string, serviceName: string): string => getServiceRemotePublishedDistPath(getRoot(), appName, serviceName);
 
 // Resolve the shared store bucket from the service's defineFederatedModuleStore
 // setting (same derivation the lambda env var uses) and the per-service prefix

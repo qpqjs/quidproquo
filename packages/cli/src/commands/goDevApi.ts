@@ -10,7 +10,7 @@
 // infrastructure.ts is evaluated once at launch and baked into the
 // `quidproquo-dynamic-loader` virtual module, config changes need a full
 // `go:dev:api` restart.
-import { Nullable } from '@qpqjs/core';
+import { getDevServerDistPath, Nullable } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
@@ -30,7 +30,7 @@ import { resolveDeployment } from '../lib/resolveDeployment';
 // 8080/8888 are set in the generated entry; 3001 is the @qpqjs/dev-server
 // file-storage (secure URL) default port.
 const getDevServerPortList = (appName: string): number[] => Object.values(readDevServerPorts(appName));
-const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
+const getDevServerBundlePath = (root: string): string => path.join(getDevServerDistPath(root), 'main.js');
 
 export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
@@ -52,14 +52,14 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     // child already exited (see killOtherQpqDevProcesses), then the usual
     // port-based sweep for anything else still bound to our ports.
     killOtherQpqDevProcesses(root);
-    killStaleListeners(getDevServerPortList(appName), (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
+    killStaleListeners(getDevServerPortList(appName), (command) => command.includes(getDevServerBundlePath(root)));
   }
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);
   const userScriptChildEntry = writeUserScriptChildEntry(root);
   const rspackConfig = getDevServerRspackConfig({ root, entry, userScriptChildEntry, qpqConfigs });
-  const bundlePath = path.join(root, DEV_SERVER_BUNDLE_PATH);
+  const bundlePath = getDevServerBundlePath(root);
   const env = { ...process.env, QPQ_DEV_APP: appName };
 
   // The long-lived server process (HTTP 8080 / WS 8888), restarted per rebuild.

@@ -4,7 +4,7 @@
 // Runs with ts-node hooks registered (see runCli), which transpiles each
 // service's infrastructure.ts on require. Cross-package `@scope/*` imports
 // resolve through the workspace node_modules symlinks to already-built dist.
-import { qpqCoreUtils, QpqDeployEnvVar } from '@qpqjs/core';
+import { getInfrastructureConfigPath, qpqCoreUtils, QpqDeployEnvVar } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
@@ -20,7 +20,7 @@ const processConfig = (folderName: string, appName: string): void => {
   const qpqConfig = loadServiceQpqConfig(appName, folderName);
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  const directoryPath = path.join(getRoot(), 'dist', 'apps', appName, 'infrastructure');
+  const directoryPath = getInfrastructureConfigPath(getRoot(), appName);
   fs.mkdirSync(directoryPath, { recursive: true });
   fs.writeFileSync(path.join(directoryPath, `${moduleName}-config.json`), JSON.stringify(qpqConfig, null, 2));
   console.log(`  -> ${appName}/infrastructure/${moduleName}-config.json`);

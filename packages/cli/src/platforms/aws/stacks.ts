@@ -4,7 +4,7 @@ import { awsNamingUtils } from '@qpqjs/config-aws';
 // (bin/qpq-cdk-app.js) under ts-node hooks. The child inherits the primed
 // deployment env (DEPLOY_APP_NAME / DEPLOY_NAME and everything resolveDeployment
 // set); only the per-invocation service is added here.
-import { QpqDeployEnvVar } from '@qpqjs/core';
+import { getCdkOutPath, QpqDeployEnvVar } from '@qpqjs/core';
 import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import path from 'path';
@@ -20,7 +20,7 @@ export const deployStack = async (stackName: string, env: Record<string, string>
   logTimeStart(stackName);
   await runCommand(
     'npx',
-    ['cdk', 'deploy', stackName, '--require-approval', 'never', '--app', `'${getCdkAppCommand()}'`, '--output', path.join('dist', 'qpq', 'cdk.out')],
+    ['cdk', 'deploy', stackName, '--require-approval', 'never', '--app', `'${getCdkAppCommand()}'`, '--output', getCdkOutPath(getRoot())],
     {
       cwd: getRoot(),
       env,
@@ -37,14 +37,10 @@ export const deployServiceStack = (serviceName: string, stackName: string, appNa
 // service bundles under dist/ must exist for asset resolution to succeed.
 const destroyStack = async (stackName: string, env: Record<string, string> = {}): Promise<void> => {
   logTimeStart(stackName);
-  await runCommand(
-    'npx',
-    ['cdk', 'destroy', stackName, '--force', '--app', `'${getCdkAppCommand()}'`, '--output', path.join('dist', 'qpq', 'cdk.out')],
-    {
-      cwd: getRoot(),
-      env,
-    },
-  );
+  await runCommand('npx', ['cdk', 'destroy', stackName, '--force', '--app', `'${getCdkAppCommand()}'`, '--output', getCdkOutPath(getRoot())], {
+    cwd: getRoot(),
+    env,
+  });
   logTimeEnd(stackName);
 };
 

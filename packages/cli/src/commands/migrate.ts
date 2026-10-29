@@ -1,3 +1,4 @@
+import { getDevServerDistPath } from '@qpqjs/core';
 // `qpq migrate`, run every pending migration against the LOCAL dev store, once, then exit.
 //
 // Deployed, migrations are triggered by a stack update. Nothing locally ever deploys, so
@@ -18,8 +19,6 @@ import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 
-const MIGRATE_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'migrate.js');
-
 export const migrateCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
@@ -34,7 +33,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
 
   // Same bundle shape as the dev server, different output name so a running `go:dev:api`
   // watcher does not fight over the file.
-  const bundlePath = path.join(root, MIGRATE_BUNDLE_PATH);
+  const bundlePath = path.join(getDevServerDistPath(root), 'migrate.js');
   const migrateConfig = {
     ...rspackConfig,
     output: { ...rspackConfig.output, filename: 'migrate.js' },

@@ -12,7 +12,7 @@
 // @qpqjs/core/webserver shared), and chunked output. On top we add the same
 // swc-loader getServiceRspackConfig uses. We deliberately do NOT copy its
 // splitChunks:false / eager-import settings: federation NEEDS async chunks.
-import { QPQConfig } from '@qpqjs/core';
+import { getServiceRemoteDistPath, QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration } from '@rspack/core';
@@ -26,7 +26,7 @@ export const getServiceRemoteRspackConfig = (qpqConfig: QPQConfig, serviceDir: s
 
   // Output goes to a `service-remote` sibling of the static `service` build so
   // the two never clobber each other.
-  const remoteBuildPath = path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service-remote');
+  const remoteBuildPath = getServiceRemoteDistPath(root, appName, serviceName);
 
   const qpqRemote = getRspackConfigForQpqRemote(qpqConfig, remoteBuildPath);
 

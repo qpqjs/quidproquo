@@ -15,7 +15,7 @@
 // Not production-grade (single process, sqlite KVS, in-memory queues):
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from '@qpqjs/config-aws';
-import { isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
+import { getDevServerDistPath, getDockerImageContextPath, isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig, listInstalledQpqPackageNames, runRspack } from '@qpqjs/deploy-rspack';
 import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from '@qpqjs/dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
@@ -41,7 +41,7 @@ import { getImageName } from './getImageName';
 import { resolvePortMappings } from './resolvePortMappings';
 import { writeComposeFile } from './writeComposeFile';
 
-const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
+const getImageContextDir = (root: string, appName: string): string => getDockerImageContextPath(root, appName);
 
 // Every web entry's files go where the runtime looks for them. The federated views entry
 // is assembled from every service's views build (one folder per service, as on AWS);
@@ -225,7 +225,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const vendored = vendorQuidproquoPackages(root, contextDir);
   console.log(`Vendored ${vendored} quidproquo packages`);
 
-  fs.cpSync(path.join(root, 'dist', 'qpq', 'dev-server'), path.join(contextDir, 'server'), { recursive: true });
+  fs.cpSync(getDevServerDistPath(root), path.join(contextDir, 'server'), { recursive: true });
 
   for (const entry of [...webEntryRoutes, ...webEntryHosts]) {
     copyWebEntryContent(appName, contextDir, entry, viewServices);

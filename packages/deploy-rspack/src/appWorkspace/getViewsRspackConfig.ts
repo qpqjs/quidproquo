@@ -3,7 +3,7 @@
 // markers at config-eval time; remotes are discovered from sibling views
 // packages. Dev-only remotes: everything points at
 // http://localhost:<port>/mf-manifest.json.
-import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { getViewsDistPath, Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { requireDomainResolver } from '@qpqjs/deploy-aws';
 import { getWebAddressing } from '@qpqjs/dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN, qpqWebServerUtils } from '@qpqjs/webserver';
@@ -178,7 +178,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     devtool: getViewsDevtool(isDev),
 
     output: {
-      path: path.join(root, 'dist', 'apps', self.appName, 'services', self.service, 'views'),
+      path: getViewsDistPath(root, self.appName, self.service),
       publicPath: 'auto',
       uniqueName: self.mfName,
       clean: true,
