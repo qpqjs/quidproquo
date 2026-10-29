@@ -3,18 +3,18 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnThrottle } from './askProcessOnThrottle';
+import { askNotifyErrorProcessThrottle } from './askNotifyErrorProcessThrottle';
 
 const TIMESTAMP = '2026-06-26T00:00:00.000Z';
 
-describe('askProcessOnThrottle', () => {
+describe('askNotifyErrorProcessThrottle', () => {
   it.each([
     [true, 'Throttle (Start) - hit'],
     [false, 'Throttle (End) - hit'],
   ])('always upserts a warn log (inAlarm=%s)', (newStateInAlarm: boolean, reason: string) => {
     let captured: Action<any> | undefined;
 
-    runStory(askProcessOnThrottle({ newStateInAlarm, newStateReason: 'hit' } as any), {
+    runStory(askNotifyErrorProcessThrottle({ newStateInAlarm, newStateReason: 'hit' } as any), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         captured = action;

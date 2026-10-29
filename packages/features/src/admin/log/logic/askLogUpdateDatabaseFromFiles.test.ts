@@ -18,13 +18,13 @@ import { describe, expect, it } from 'vitest';
 import { REDACTED_STRING } from './redaction/constants/REDACTED_STRING';
 import {
   askErrorReadingStoryResultToMetadata,
-  askGetLogInfosFromStoryResult,
-  askUpdateDatabaseFromLogFile,
-  askUpdateDatabaseFromLogFiles,
+  askLogGetInfosFromStoryResult,
+  askLogUpdateDatabaseFromFile,
+  askLogUpdateDatabaseFromFiles,
   getDecodedAccessTokenFromGetStorySessionActionInStoryResult,
   getDecodedAccessTokenFromSetAccessTokenActionInStoryResult,
   storyResultToMetadata,
-} from './askUpdateDatabaseFromLogFiles';
+} from './askLogUpdateDatabaseFromFiles';
 
 const baseStoryResult = buildStoryResult({
   correlation: 'mod::abc',
@@ -115,7 +115,7 @@ describe('askErrorReadingStoryResultToMetadata', () => {
   });
 });
 
-describe('askGetLogInfosFromStoryResult', () => {
+describe('askLogGetInfosFromStoryResult', () => {
   it('maps create and template-literal log actions to log infos', () => {
     const result = {
       history: [
@@ -124,18 +124,18 @@ describe('askGetLogInfosFromStoryResult', () => {
       ],
     } as any;
 
-    expect(runStory(askGetLogInfosFromStoryResult(result))).toEqual([
+    expect(runStory(askLogGetInfosFromStoryResult(result))).toEqual([
       { logLevel: LogLevelEnum.Error, msg: 'boom', startedAt: 't1' },
       { logLevel: LogLevelEnum.Info, msg: 'a x b', startedAt: 't2' },
     ]);
   });
 });
 
-describe('askUpdateDatabaseFromLogFile', () => {
+describe('askLogUpdateDatabaseFromFile', () => {
   it('upserts the metadata for a readable log without notifying admins', () => {
     let upserted: any;
 
-    runStory(askUpdateDatabaseFromLogFile('drive', 'mod::abc.json'), {
+    runStory(askLogUpdateDatabaseFromFile('drive', 'mod::abc.json'), {
       [FileActionType.ReadObjectJson]: baseStoryResult,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         upserted = action.payload.item;
@@ -152,7 +152,7 @@ describe('askUpdateDatabaseFromLogFile', () => {
     const leaky = { ...baseStoryResult, session: { accessToken: 'tok-123' }, tags: ['issued tok-123'] };
     let upserted: any;
 
-    runStory(askUpdateDatabaseFromLogFile('drive', 'mod::abc.json'), {
+    runStory(askLogUpdateDatabaseFromFile('drive', 'mod::abc.json'), {
       [FileActionType.ReadObjectJson]: leaky,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         upserted = action.payload.item;
@@ -167,7 +167,7 @@ describe('askUpdateDatabaseFromLogFile', () => {
     let scanned = false;
     let upserted: any;
 
-    runStory(askUpdateDatabaseFromLogFile('drive', 'mod::abc.json'), {
+    runStory(askLogUpdateDatabaseFromFile('drive', 'mod::abc.json'), {
       [FileActionType.ReadObjectJson]: throwsError('NotFound', 'missing'),
       [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
@@ -184,11 +184,11 @@ describe('askUpdateDatabaseFromLogFile', () => {
   });
 });
 
-describe('askUpdateDatabaseFromLogFiles', () => {
+describe('askLogUpdateDatabaseFromFiles', () => {
   it('processes each file path with no ttl when retention is unset', () => {
     const upsertedCorrelations: string[] = [];
 
-    runStory(askUpdateDatabaseFromLogFiles('drive', ['mod::abc.json']), {
+    runStory(askLogUpdateDatabaseFromFiles('drive', ['mod::abc.json']), {
       [ConfigActionType.GetGlobal]: undefined,
       [FileActionType.ReadObjectJson]: baseStoryResult,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {

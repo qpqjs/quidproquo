@@ -9,5 +9,5 @@ import { logsLogic } from '../../log/logic';
 export function* askAdminLogAiToolGetActions(): AskResponse<logsLogic.LogAiToolActionSummary[]> {
   const { docId } = yield* askEventDocAiRead();
 
-  return yield* logsLogic.askGetLogActionsForCorrelation(docId);
+  return yield* logsLogic.askLogGetActionsForCorrelation(docId);
 }

@@ -21,11 +21,11 @@ import { LogLog } from '../domain';
 
 const storeName = `${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`;
 
-export function* askUpsert(logLog: LogLog): AskResponse<void> {
+export function* askLogLogUpsert(logLog: LogLog): AskResponse<void> {
   yield* askKeyValueStoreUpsert(storeName, logLog);
 }
 
-export function* askListLogLogs(
+export function* askLogLogList(
   logLevel: LogLevelEnum,
   startDateTime: string,
   endDateTime: string,
@@ -55,7 +55,7 @@ export function* askListLogLogs(
   return logs;
 }
 
-export function* askGetLogLog(errorType: ErrorTypeEnum, timestamp: string): AskResponse<Nullable<LogLog>> {
+export function* askLogLogGet(errorType: ErrorTypeEnum, timestamp: string): AskResponse<Nullable<LogLog>> {
   const log = yield* askKeyValueStoreQuerySingle<LogLog>(storeName, kvsAnd([kvsEqual('type', errorType), kvsEqual('timestamp', timestamp)]));
 
   return log;

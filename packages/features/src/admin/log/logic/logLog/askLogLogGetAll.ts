@@ -1,9 +1,9 @@
 import { askDateNow, AskResponse, askSecondsElapsedFrom, LogLevelEnum, QpqPagedData } from '@qpqjs/core';
 
-import { askListLogLogs } from '../../entry/data/logLogData';
+import { askLogLogList } from '../../entry/data/logLogData';
 import { LogLog } from '../../entry/domain';
 
-export function* askGetLogLogs(
+export function* askLogLogGetAll(
   logLevel: LogLevelEnum,
   startIsoDateTime: string,
   endIsoDateTime: string,
@@ -19,7 +19,7 @@ export function* askGetLogLogs(
   const startTime = yield* askDateNow();
 
   do {
-    const logPage = yield* askListLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, result.nextPageKey);
+    const logPage = yield* askLogLogList(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, result.nextPageKey);
 
     result.items.push(...logPage.items);
     result.nextPageKey = logPage.nextPageKey;

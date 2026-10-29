@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askGetLoggedInUsername } from './askGetLoggedInUsername';
+import { askAuthGetLoggedInUsername } from './askAuthGetLoggedInUsername';
 
-describe('askGetLoggedInUsername', () => {
+describe('askAuthGetLoggedInUsername', () => {
   it('reads the admin access token and returns its username', () => {
     let captured: Action<any> | undefined;
 
-    const result = runStory(askGetLoggedInUsername(), {
+    const result = runStory(askAuthGetLoggedInUsername(), {
       [UserDirectoryActionType.ReadAccessToken]: (action: Action<any>) => {
         captured = action;
         return { username: 'joe' };

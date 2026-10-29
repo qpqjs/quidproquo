@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askGetLogs } from './askGetLogs';
+import { askLogGetAll } from './askLogGetAll';
 
 const TIMESTAMP = '2026-06-26T00:00:00.000Z';
 
@@ -22,11 +22,11 @@ const storyResultText = (msg: string): string =>
 
 const args = (deep: string, onlyErrors = false) => [QpqRuntimeType.API, 'start', 'end', '', '', '', '', deep, onlyErrors] as const;
 
-describe('askGetLogs', () => {
+describe('askLogGetAll', () => {
   it('returns the page items unfiltered when not searching deep', () => {
     const items = [{ correlation: 'a' }, { correlation: 'b' }];
 
-    const result = runStory(askGetLogs(...args('')), {
+    const result = runStory(askLogGetAll(...args('')), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Query]: { items, nextPageKey: undefined },
     });
@@ -37,7 +37,7 @@ describe('askGetLogs', () => {
   it('keeps only logs whose file contents include the deep search term', () => {
     const items = [{ correlation: 'a' }, { correlation: 'b' }];
 
-    const result = runStory(askGetLogs(...args('needle')), {
+    const result = runStory(askLogGetAll(...args('needle')), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Query]: { items, nextPageKey: undefined },
       [FileActionType.ReadTextContents]: (action: Action<any>) =>
@@ -53,7 +53,7 @@ describe('askGetLogs', () => {
     const items = [{ correlation: 'a' }];
     const rawLog = JSON.stringify({ ...JSON.parse(storyResultText('hello')), session: { depth: 0, context: {}, accessToken: 'tok-secret-abc' } });
 
-    const result = runStory(askGetLogs(...args('tok-secret-abc')), {
+    const result = runStory(askLogGetAll(...args('tok-secret-abc')), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Query]: { items, nextPageKey: undefined },
       [FileActionType.ReadTextContents]: rawLog,

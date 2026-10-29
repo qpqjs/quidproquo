@@ -3,7 +3,7 @@ import { buildStoryResult, runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEnsureRedactedLog, askGetRedactedByCorrelation } from './redactedLogData';
+import { askEnsureRedactedLog, askRedactedLogGetByCorrelation } from './redactedLogData';
 
 const rawLog = buildStoryResult({ correlation: 'abc' });
 
@@ -69,11 +69,11 @@ describe('askEnsureRedactedLog', () => {
   });
 });
 
-describe('askGetRedactedByCorrelation', () => {
+describe('askRedactedLogGetByCorrelation', () => {
   it('reads the redacted copy from the reports drive', () => {
     let read: Action<any> | undefined;
 
-    const result = runStory(askGetRedactedByCorrelation('abc'), {
+    const result = runStory(askRedactedLogGetByCorrelation('abc'), {
       [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: (action: Action<any>) => {
         read = action;
@@ -87,7 +87,7 @@ describe('askGetRedactedByCorrelation', () => {
 
   it('throws Invalid when the log is cold with no cached copy', () => {
     const run = () =>
-      runStory(askGetRedactedByCorrelation('abc'), {
+      runStory(askRedactedLogGetByCorrelation('abc'), {
         [FileActionType.Exists]: false,
         [FileActionType.IsColdStorage]: true,
       });

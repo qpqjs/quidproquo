@@ -4,13 +4,13 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { askSendMessage } from './askSendMessage';
+import { askAdminWebSocketSendMessage } from './askAdminWebSocketSendMessage';
 
-describe('askSendMessage', () => {
+describe('askAdminWebSocketSendMessage', () => {
   it('sends the payload to the admin api on the given connection', () => {
     let captured: Action<any> | undefined;
 
-    runStory(askSendMessage('conn-1', { type: 'hello' } as any), {
+    runStory(askAdminWebSocketSendMessage('conn-1', { type: 'hello' } as any), {
       [WebsocketActionType.SendMessage]: (action: Action<any>) => {
         captured = action;
       },
@@ -25,7 +25,7 @@ describe('askSendMessage', () => {
 
   it('swallows send failures via askCatch', () => {
     expect(() =>
-      runStory(askSendMessage('conn-1', { type: 'hello' } as any), {
+      runStory(askAdminWebSocketSendMessage('conn-1', { type: 'hello' } as any), {
         [WebsocketActionType.SendMessage]: throwsError('Disconnected', 'gone'),
       }),
     ).not.toThrow();

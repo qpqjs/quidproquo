@@ -13,7 +13,7 @@ import {
 } from '@qpqjs/core';
 
 import { ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, ADMIN_LOG_SEARCH_MAX_ITEMS, ADMIN_LOG_SEARCH_TIMEOUT_SECONDS } from '../../../constants';
-import { askListLogs } from '../../entry/data/logMetadataData';
+import { askLogMetadataList } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';
 import { redactStoryResult } from '../redaction/redactStoryResult';
 
@@ -27,7 +27,7 @@ const toSearchableLogText = (rawLogText: string): string => {
   }
 };
 
-export function* askGetLogs(
+export function* askLogGetAll(
   runtimeType: QpqRuntimeType,
   startIsoDateTime: string,
   endIsoDateTime: string,
@@ -47,7 +47,7 @@ export function* askGetLogs(
   const startTime = yield* askDateNow();
 
   do {
-    const logPage = yield* askListLogs(
+    const logPage = yield* askLogMetadataList(
       runtimeType,
       startIsoDateTime,
       endIsoDateTime,

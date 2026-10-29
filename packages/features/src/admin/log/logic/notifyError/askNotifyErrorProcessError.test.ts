@@ -3,15 +3,15 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnError } from './askProcessOnError';
+import { askNotifyErrorProcessError } from './askNotifyErrorProcessError';
 
 const TIMESTAMP = '2026-06-26T00:00:00.000Z';
 
-describe('askProcessOnError', () => {
+describe('askNotifyErrorProcessError', () => {
   it('upserts a fatal log when entering the alarm state', () => {
     let captured: Action<any> | undefined;
 
-    runStory(askProcessOnError({ newStateInAlarm: true, newStateReason: 'boom' } as any), {
+    runStory(askNotifyErrorProcessError({ newStateInAlarm: true, newStateReason: 'boom' } as any), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         captured = action;
@@ -28,7 +28,7 @@ describe('askProcessOnError', () => {
   it('upserts an info log when leaving the alarm state', () => {
     let captured: Action<any> | undefined;
 
-    runStory(askProcessOnError({ newStateInAlarm: false, newStateReason: 'recovered' } as any), {
+    runStory(askNotifyErrorProcessError({ newStateInAlarm: false, newStateReason: 'recovered' } as any), {
       [DateActionType.Now]: TIMESTAMP,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         captured = action;

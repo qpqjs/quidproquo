@@ -20,7 +20,7 @@ export function* getLogLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEvent
   const { nextPageKey, logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter } =
     yield* askFromJsonEventRequest<GetLogLogSearchParams>(event);
 
-  const logs = yield* logLogLogic.askGetLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, nextPageKey);
+  const logs = yield* logLogLogic.askLogLogGetAll(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, nextPageKey);
 
   return toJsonEventResponse(logs);
 }

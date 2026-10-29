@@ -4,7 +4,7 @@ import { EventDocOnAppendInput } from '../../../../eventDoc/models/EventDocOnApp
 import { isMaintenancePubliclyVisible } from '../../eventDoc/isMaintenancePubliclyVisible';
 import { MaintenanceState } from '../../eventDoc/v1/views/document/MaintenanceState';
 import { askBroadcastMaintenancePublicStates } from '../../logic/askBroadcastMaintenancePublicStates';
-import { askGetActiveMaintenancePublicStates } from '../../logic/askGetActiveMaintenancePublicStates';
+import { askMaintenanceGetActivePublicStates } from '../../logic/askMaintenanceGetActivePublicStates';
 
 // Fired after EVERY maintenance append (the collection's onAppend hook), inside
 // the append's store context. An Internal maintenance must be COMPLETELY silent
@@ -23,7 +23,7 @@ export function* qpqMaintenanceOnAppend(input: EventDocOnAppendInput): AskRespon
     return;
   }
 
-  const maintenances = yield* askGetActiveMaintenancePublicStates();
+  const maintenances = yield* askMaintenanceGetActivePublicStates();
 
   yield* askCatch(askBroadcastMaintenancePublicStates(maintenances));
 }

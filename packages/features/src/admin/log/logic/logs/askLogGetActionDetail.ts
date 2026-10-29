@@ -1,6 +1,6 @@
 import { AskResponse, askThrowError, ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
-import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
+import { askRedactedLogGetByCorrelation } from '../../entry/data/redactedLogData';
 
 export type LogAiToolActionDetail = {
   index: number;
@@ -12,10 +12,10 @@ export type LogAiToolActionDetail = {
   finishedAt: string;
 };
 
-// The full breakdown for one action from askGetLogActionsForCorrelation's index ,
+// The full breakdown for one action from askLogGetActionsForCorrelation's index ,
 // the action's own input payload plus its raw output (result or error).
-export function* askGetLogActionDetail(correlationId: string, index: number): AskResponse<LogAiToolActionDetail> {
-  const log = yield* askGetRedactedByCorrelation(correlationId);
+export function* askLogGetActionDetail(correlationId: string, index: number): AskResponse<LogAiToolActionDetail> {
+  const log = yield* askRedactedLogGetByCorrelation(correlationId);
   const entry = log.history[index];
 
   if (!entry) {

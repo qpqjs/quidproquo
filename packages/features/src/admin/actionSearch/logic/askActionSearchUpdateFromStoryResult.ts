@@ -86,7 +86,7 @@ function* askRefoldEntity(
   batchRows: ActionSearchActionRow[],
   ttl?: number,
 ): AskResponse<void> {
-  const storedRows = yield* actionRowData.askListAllByLinkKey(linkKey);
+  const storedRows = yield* actionRowData.askActionRowListAllByLinkKey(linkKey);
 
   // Union with this batch's rows: the linkKey index may not reflect the upserts above yet
   const rowsByKey = new Map<string, ActionSearchActionRow>();
@@ -107,7 +107,7 @@ function* askRefoldEntity(
     ttl,
   };
 
-  yield* entityRowData.askUpsert(entityRow);
+  yield* entityRowData.askEntityRowUpsert(entityRow);
 
   const buildLookupRow = (localKey: string): ActionSearchLookupRow => ({
     lookupKey: toLookupKey(entityDefinition.entityType, localKey),
@@ -118,16 +118,16 @@ function* askRefoldEntity(
 
   const lookupRows = entityDefinition.lookupKeys(entityRow).map(buildLookupRow);
 
-  yield* askMap(lookupRows, entityLookupData.askUpsert);
+  yield* askMap(lookupRows, entityLookupData.askEntityLookupUpsert);
 }
 
-export function* askUpdateActionSearchFromStoryResult(storyResult: StoryResult<any>, ttl?: number): AskResponse<void> {
+export function* askActionSearchUpdateFromStoryResult(storyResult: StoryResult<any>, ttl?: number): AskResponse<void> {
   const actionRows = buildActionRows(storyResult, ttl);
   if (actionRows.length === 0) {
     return;
   }
 
-  yield* askMap(actionRows, actionRowData.askUpsert);
+  yield* askMap(actionRows, actionRowData.askActionRowUpsert);
 
   for (const [linkKey, entityDefinition] of getEntityDefinitionsByLinkKey(actionRows)) {
     yield* askRefoldEntity(linkKey, entityDefinition, actionRows, ttl);

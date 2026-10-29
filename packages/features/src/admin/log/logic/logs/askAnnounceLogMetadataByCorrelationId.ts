@@ -1,12 +1,12 @@
 import { AskResponse } from '@qpqjs/core';
 
 import * as logMetadataData from '../../entry/data/logMetadataData';
-import { askSendLogToAdmins } from '../webSocket';
+import { askLogSendToAdmins } from '../webSocket';
 
 export function* askAnnounceLogMetadataByCorrelationId(correlationId: string): AskResponse<void> {
-  const logMetadata = yield* logMetadataData.askGetByCorrelation(correlationId);
+  const logMetadata = yield* logMetadataData.askLogMetadataGetByCorrelation(correlationId);
 
   if (logMetadata) {
-    yield* askSendLogToAdmins(logMetadata);
+    yield* askLogSendToAdmins(logMetadata);
   }
 }

@@ -1,9 +1,9 @@
 import { askDateNow, AskResponse, LogLevelEnum, NotifyErrorQueueTimeoutEventPayload } from '@qpqjs/core';
 
 import { LogLog } from '../../entry';
-import { askUpsert } from '../../entry/data/logLogData';
+import { askLogLogUpsert } from '../../entry/data/logLogData';
 
-export function* askProcessOnTimeout(error: NotifyErrorQueueTimeoutEventPayload): AskResponse<void> {
+export function* askNotifyErrorProcessTimeout(error: NotifyErrorQueueTimeoutEventPayload): AskResponse<void> {
   const inError = error.newStateInAlarm;
   const startEnd = inError ? '(Start)' : '(End)';
   const message = `Timeout ${startEnd} - ${error.newStateReason}`;
@@ -15,5 +15,5 @@ export function* askProcessOnTimeout(error: NotifyErrorQueueTimeoutEventPayload)
     timestamp: yield* askDateNow(),
   };
 
-  yield* askUpsert(logLog);
+  yield* askLogLogUpsert(logLog);
 }

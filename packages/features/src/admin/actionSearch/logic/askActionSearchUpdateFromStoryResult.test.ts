@@ -17,7 +17,7 @@ import { QPQ_LOG_ACTIONS_KVS_NAME } from '../constants/qpqLogActionsKvsName';
 import { QPQ_LOG_ENTITIES_KVS_NAME } from '../constants/qpqLogEntitiesKvsName';
 import { QPQ_LOG_ENTITY_LOOKUP_KVS_NAME } from '../constants/qpqLogEntityLookupKvsName';
 import { ActionSearchActionRow } from '../domain/ActionSearchActionRow';
-import { askUpdateActionSearchFromStoryResult } from './askUpdateActionSearchFromStoryResult';
+import { askActionSearchUpdateFromStoryResult } from './askActionSearchUpdateFromStoryResult';
 
 const networkEntry: ActionHistory = {
   act: {
@@ -75,11 +75,11 @@ const buildMocks = (storedLinkKeyRows: ActionSearchActionRow[] = []) => {
   return { mocks, upserts };
 };
 
-describe('askUpdateActionSearchFromStoryResult', () => {
+describe('askActionSearchUpdateFromStoryResult', () => {
   it('writes rows only for registered action types', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([networkEntry, emailEntry, unindexedEntry])), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([networkEntry, emailEntry, unindexedEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
@@ -109,7 +109,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
   it('folds the entity from the batch rows and writes prefixed lookup rows', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry]), 12345), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry]), 12345), mocks);
 
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
@@ -147,7 +147,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
 
     const { mocks, upserts } = buildMocks([storedFailedRow]);
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
       deliveryStatus: EmailDeliveryStatus.dropped,
@@ -160,13 +160,13 @@ describe('askUpdateActionSearchFromStoryResult', () => {
     const { mocks, upserts } = buildMocks();
 
     // First ingestion primes nothing; re-run with the stored copy visible in the query
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
     const firstEntity = upserts[QPQ_LOG_ENTITIES_KVS_NAME][0];
 
     const storedCopy = upserts[QPQ_LOG_ACTIONS_KVS_NAME][0] as ActionSearchActionRow;
     const { mocks: rerunMocks, upserts: rerunUpserts } = buildMocks([storedCopy]);
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([emailEntry])), rerunMocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), rerunMocks);
 
     expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
     expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toEqual(firstEntity);
@@ -197,7 +197,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
 
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([batchEntry])), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([batchEntry])), mocks);
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
@@ -210,7 +210,7 @@ describe('askUpdateActionSearchFromStoryResult', () => {
   it('does nothing for a story with no registered actions', () => {
     const { mocks, upserts } = buildMocks();
 
-    runStory(askUpdateActionSearchFromStoryResult(buildTestStoryResult([unindexedEntry])), mocks);
+    runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([unindexedEntry])), mocks);
 
     expect(upserts).toEqual({});
   });

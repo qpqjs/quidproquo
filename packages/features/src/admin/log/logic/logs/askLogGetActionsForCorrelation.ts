@@ -1,6 +1,6 @@
 import { AskResponse, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
 
-import { askGetRedactedByCorrelation } from '../../entry/data/redactedLogData';
+import { askRedactedLogGetByCorrelation } from '../../entry/data/redactedLogData';
 
 export type LogAiToolActionSummary = {
   index: number;
@@ -14,9 +14,9 @@ export type LogAiToolActionSummary = {
 
 // The compact index an AI chat scans first, one row per action in the log's history,
 // cheap enough to hand the model in full. Detail (input/output) is a separate lookup
-// via askGetLogActionDetail, so a large log doesn't get pasted whole into every turn.
-export function* askGetLogActionsForCorrelation(correlationId: string): AskResponse<LogAiToolActionSummary[]> {
-  const log = yield* askGetRedactedByCorrelation(correlationId);
+// via askLogGetActionDetail, so a large log doesn't get pasted whole into every turn.
+export function* askLogGetActionsForCorrelation(correlationId: string): AskResponse<LogAiToolActionSummary[]> {
+  const log = yield* askRedactedLogGetByCorrelation(correlationId);
 
   return log.history.map((entry, index) => {
     const success = !isErroredActionResult(entry.res);

@@ -4,17 +4,17 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { askSendLogToAdmins } from './askSendLogToAdmins';
+import { askLogSendToAdmins } from './askLogSendToAdmins';
 import { WebSocketQueueQpqAdminServerMessageEventType } from './serverMessages';
 
 const log = { correlation: 'abc' } as StoryResultMetadata;
 
-describe('askSendLogToAdmins', () => {
+describe('askLogSendToAdmins', () => {
   it('sends the log only to authorized (userId) connections', () => {
     const sentTo: string[] = [];
     let sentMessage: any;
 
-    runStory(askSendLogToAdmins(log), {
+    runStory(askLogSendToAdmins(log), {
       [KeyValueStoreActionType.Scan]: {
         items: [{ id: 'c1', userId: 'u1' }, { id: 'c2' }],
         nextPageKey: undefined,
@@ -35,7 +35,7 @@ describe('askSendLogToAdmins', () => {
   it('sends nothing when there are no connections', () => {
     let sent = false;
 
-    runStory(askSendLogToAdmins(log), {
+    runStory(askLogSendToAdmins(log), {
       [KeyValueStoreActionType.Scan]: { items: [], nextPageKey: undefined },
       [WebsocketActionType.SendMessage]: () => {
         sent = true;
@@ -49,7 +49,7 @@ describe('askSendLogToAdmins', () => {
     const sentTo: string[] = [];
     const scanKeys: Array<string | undefined> = [];
 
-    runStory(askSendLogToAdmins(log), {
+    runStory(askLogSendToAdmins(log), {
       [KeyValueStoreActionType.Scan]: (action: Action<any>) => {
         scanKeys.push(action.payload.nextPageKey);
         return scanKeys.length === 1

@@ -44,7 +44,7 @@ export function* askEnsureRedactedLog(correlation: string): AskResponse<Nullable
  * The only way admin-facing code reads a log body. Throws Invalid when the log is in cold storage
  * with no cached copy.
  */
-export function* askGetRedactedByCorrelation(correlation: string): AskResponse<StoryResult<any>> {
+export function* askRedactedLogGetByCorrelation(correlation: string): AskResponse<StoryResult<any>> {
   const redactedPath = yield* askEnsureRedactedLog(correlation);
   if (!redactedPath) {
     return yield* askThrowError(ErrorTypeEnum.Invalid, 'Log is in cold storage');

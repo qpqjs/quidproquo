@@ -25,11 +25,11 @@ import {
 import { LogMetadata } from '../domain/LogMetadata';
 
 const metadataStoreName = QPQ_LOGS_STORAGE_DRIVE_NAME;
-export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {
+export function* askLogMetadataUpsert(logMetadata: LogMetadata): AskResponse<void> {
   yield* askKeyValueStoreUpsert(metadataStoreName, logMetadata);
 }
 
-export function* askSetChecked(correlation: string, checked: boolean, checkedBy: string): AskResponse<LogMetadata> {
+export function* askLogMetadataSetChecked(correlation: string, checked: boolean, checkedBy: string): AskResponse<LogMetadata> {
   return yield* askKeyValueStoreUpdatePartialProperties<LogMetadata, 'correlation'>(metadataStoreName, 'correlation', {
     correlation,
     checked,
@@ -37,7 +37,7 @@ export function* askSetChecked(correlation: string, checked: boolean, checkedBy:
   });
 }
 
-export function* askListLogs(
+export function* askLogMetadataList(
   runtimeType: QpqRuntimeType,
   startDateTime: string,
   endDateTime: string,
@@ -82,19 +82,19 @@ export function* askListLogs(
   return logs;
 }
 
-export function* askGetByCorrelation(correlation: string): AskResponse<LogMetadata | undefined> {
+export function* askLogMetadataGetByCorrelation(correlation: string): AskResponse<LogMetadata | undefined> {
   const logs = yield* askKeyValueStoreQuery<LogMetadata>(metadataStoreName, kvsEqual('correlation', correlation));
 
   return logs.items[0];
 }
 
-export function* askGetByFromCorrelation(fromCorrelation: string): AskResponse<QpqPagedData<LogMetadata>> {
+export function* askLogMetadataGetByFromCorrelation(fromCorrelation: string): AskResponse<QpqPagedData<LogMetadata>> {
   const logs = yield* askKeyValueStoreQuery<LogMetadata>(metadataStoreName, kvsEqual('fromCorrelation', fromCorrelation));
 
   return logs;
 }
 
-export function* askGetAllByFromCorrelation(fromCorrelation: string): AskResponse<LogMetadata[]> {
+export function* askLogMetadataGetAllByFromCorrelation(fromCorrelation: string): AskResponse<LogMetadata[]> {
   return yield* askKeyValueStoreQueryAll<LogMetadata>(metadataStoreName, kvsEqual('fromCorrelation', fromCorrelation));
 }
 
@@ -103,12 +103,12 @@ function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetadata | un
     return;
   }
 
-  const parentLog = yield* askGetByCorrelation(fromCorrelation);
+  const parentLog = yield* askLogMetadataGetByCorrelation(fromCorrelation);
   return (yield* askFindRootLog(parentLog?.fromCorrelation)) || parentLog;
 }
 
 function* askCreateHierarchy(rootStoryResultMetadata: StoryResultMetadata): AskResponse<StoryResultMetadataWithChildren> {
-  const childrenLogs: StoryResultMetadata[] = yield* askGetAllByFromCorrelation(rootStoryResultMetadata.correlation);
+  const childrenLogs: StoryResultMetadata[] = yield* askLogMetadataGetAllByFromCorrelation(rootStoryResultMetadata.correlation);
 
   const sortedChildren = childrenLogs.sort((a, b) => {
     return a.startedAt < b.startedAt ? -1 : 1;
@@ -121,7 +121,7 @@ function* askCreateHierarchy(rootStoryResultMetadata: StoryResultMetadata): AskR
   };
 }
 
-export function* askGetHierarchiesByCorrelation(correlation: string, forceRefresh: boolean): AskResponse<string | undefined> {
+export function* askLogMetadataGetHierarchiesByCorrelation(correlation: string, forceRefresh: boolean): AskResponse<string | undefined> {
   const root = yield* askFindRootLog(correlation);
   if (root) {
     const rootReportFilename = `${root.correlation}-tree.json`;

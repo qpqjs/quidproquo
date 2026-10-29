@@ -3,7 +3,7 @@ import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askGetLogActionDetail } from './askGetLogActionDetail';
+import { askLogGetActionDetail } from './askLogGetActionDetail';
 
 const okResult = (result: unknown): ActionProcessorResult<unknown> => [result, undefined];
 const erroredResult = (): ActionProcessorResult<unknown> => [undefined, { errorType: 'NotFound', errorText: 'nope', errorStack: 'stack' }];
@@ -26,9 +26,9 @@ const log = {
   ],
 };
 
-describe('askGetLogActionDetail', () => {
+describe('askLogGetActionDetail', () => {
   it('returns the full input/output breakdown for a successful action', () => {
-    const result = runStory(askGetLogActionDetail('corr-1', 0), {
+    const result = runStory(askLogGetActionDetail('corr-1', 0), {
       [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
@@ -45,7 +45,7 @@ describe('askGetLogActionDetail', () => {
   });
 
   it('returns the error instead of output for a failed action', () => {
-    const result = runStory(askGetLogActionDetail('corr-1', 1), {
+    const result = runStory(askLogGetActionDetail('corr-1', 1), {
       [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
@@ -63,7 +63,7 @@ describe('askGetLogActionDetail', () => {
 
   it('throws NotFound for an out-of-range index', () => {
     expect(() =>
-      runStory(askGetLogActionDetail('corr-1', 99), {
+      runStory(askLogGetActionDetail('corr-1', 99), {
         [FileActionType.Exists]: true,
         [FileActionType.ReadObjectJson]: log,
       }),

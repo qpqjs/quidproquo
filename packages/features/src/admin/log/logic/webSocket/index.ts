@@ -1,4 +1,4 @@
-export * from './askSendLogToAdmins';
-export * from './askSendTraceDoneToAdmins';
+export * from './askLogSendToAdmins';
+export * from './askLogSendTraceDoneToAdmins';
 export * from './clientMessages';
 export * from './serverMessages';

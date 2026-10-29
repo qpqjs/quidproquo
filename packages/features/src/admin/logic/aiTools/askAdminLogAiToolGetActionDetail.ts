@@ -11,5 +11,5 @@ export type AdminLogAiToolGetActionDetailInput = {
 export function* askAdminLogAiToolGetActionDetail(input: AdminLogAiToolGetActionDetailInput): AskResponse<logsLogic.LogAiToolActionDetail> {
   const { docId } = yield* askEventDocAiRead();
 
-  return yield* logsLogic.askGetLogActionDetail(docId, input.index);
+  return yield* logsLogic.askLogGetActionDetail(docId, input.index);
 }

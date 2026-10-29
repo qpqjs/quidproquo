@@ -17,8 +17,12 @@ import { ADMIN_LOG_SERVICE_NAME_GLOBAL, ADMIN_SERVICE_NAMES_GLOBAL } from '../..
 import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
-import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
-import { askEnsureRedactedLog, askGetRedactedByCorrelation } from '../data/redactedLogData';
+import {
+  askLogMetadataGetByCorrelation,
+  askLogMetadataGetByFromCorrelation,
+  askLogMetadataGetHierarchiesByCorrelation,
+} from '../data/logMetadataData';
+import { askEnsureRedactedLog, askRedactedLogGetByCorrelation } from '../data/redactedLogData';
 
 export type GetLogsParams = {
   nextPageKey?: string;
@@ -39,7 +43,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
   const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =
     yield* askFromJsonEventRequest<GetLogsParams>(event);
 
-  const logs = yield* logsLogic.askGetLogs(
+  const logs = yield* logsLogic.askLogGetAll(
     runtimeType,
     startIsoDateTime,
     endIsoDateTime,
@@ -61,7 +65,7 @@ export function* getLog(
     correlationId: string;
   },
 ) {
-  const log = yield* askGetByCorrelation(params.correlationId);
+  const log = yield* askLogMetadataGetByCorrelation(params.correlationId);
   if (!log) {
     return yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
   }
@@ -93,7 +97,7 @@ export function* getHierarchies(
     correlationId: string;
   },
 ) {
-  const reportUrl = yield* askGetHierarchiesByCorrelation(params.correlationId, event.query.refresh === 'true');
+  const reportUrl = yield* askLogMetadataGetHierarchiesByCorrelation(params.correlationId, event.query.refresh === 'true');
 
   return toJsonEventResponse({ url: reportUrl });
 }
@@ -104,7 +108,7 @@ export function* getChildren(
     fromCorrelation: string;
   },
 ) {
-  const log = yield* askGetByFromCorrelation(params.fromCorrelation);
+  const log = yield* askLogMetadataGetByFromCorrelation(params.fromCorrelation);
 
   return toJsonEventResponse(log);
 }
@@ -163,7 +167,7 @@ export function* traceLog(
     return toJsonEventResponse({ pending: true });
   }
 
-  const storyResult = yield* askGetRedactedByCorrelation(params.correlationId);
+  const storyResult = yield* askRedactedLogGetByCorrelation(params.correlationId);
   const applicationInfo = yield* askConfigGetApplicationInfo();
 
   const traceLogPayload: QpqTraceLogExecutionPayload = {

@@ -1,2 +1,2 @@
 export * from './askBroadcastMaintenancePublicStates';
-export * from './askGetActiveMaintenancePublicStates';
+export * from './askMaintenanceGetActivePublicStates';

@@ -5,11 +5,11 @@ import { ActionSearchLookupRow } from '../../domain/ActionSearchLookupRow';
 
 const lookupStoreName = QPQ_LOG_ENTITY_LOOKUP_KVS_NAME;
 
-export function* askUpsert(lookupRow: ActionSearchLookupRow): AskResponse<void> {
+export function* askEntityLookupUpsert(lookupRow: ActionSearchLookupRow): AskResponse<void> {
   yield* askKeyValueStoreUpsert(lookupStoreName, lookupRow);
 }
 
-export function* askListLinkKeys(
+export function* askEntityLookupListLinkKeys(
   lookupKey: string,
   startIsoDateTime: string,
   endIsoDateTime: string,

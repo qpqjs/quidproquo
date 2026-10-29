@@ -3,10 +3,10 @@ import { askMapParallelBatch, AskResponse, QpqPagedData, StoryResultMetadata } f
 import { askWebSocketQueueGetConnections } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueGetConnections';
 import { Connection } from '../../../../webSocketQueue/types';
 import { ADMIN_WEBSOCKET_API_NAME, ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE } from '../../../constants';
-import { askSendMessage } from './askSendMessage';
+import { askAdminWebSocketSendMessage } from './askAdminWebSocketSendMessage';
 import { WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from './serverMessages';
 
-export function* askSendLogToAdmins(log: StoryResultMetadata) {
+export function* askLogSendToAdmins(log: StoryResultMetadata) {
   const logMessage: WebSocketQueueQpqAdminServerEventMessageLogMetadata = {
     type: WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
     payload: {
@@ -23,7 +23,7 @@ export function* askSendLogToAdmins(log: StoryResultMetadata) {
       ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE,
       function* askSendLogOnConnection(connection): AskResponse<void> {
         if (connection.userId) {
-          yield* askSendMessage(connection.id, logMessage);
+          yield* askAdminWebSocketSendMessage(connection.id, logMessage);
         }
       },
     );

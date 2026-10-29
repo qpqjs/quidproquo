@@ -3,12 +3,12 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askGetLogActionsForCorrelation } from './askGetLogActionsForCorrelation';
+import { askLogGetActionsForCorrelation } from './askLogGetActionsForCorrelation';
 
 const okResult = (result: unknown): ActionProcessorResult<unknown> => [result, undefined];
 const erroredResult = (): ActionProcessorResult<unknown> => [undefined, { errorType: 'NotFound', errorText: 'nope' }];
 
-describe('askGetLogActionsForCorrelation', () => {
+describe('askLogGetActionsForCorrelation', () => {
   it('summarizes every history entry with type, timings, and error status', () => {
     const log = {
       correlation: 'corr-1',
@@ -28,7 +28,7 @@ describe('askGetLogActionsForCorrelation', () => {
       ],
     };
 
-    const result = runStory(askGetLogActionsForCorrelation('corr-1'), {
+    const result = runStory(askLogGetActionsForCorrelation('corr-1'), {
       [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: log,
     });
@@ -56,7 +56,7 @@ describe('askGetLogActionsForCorrelation', () => {
   });
 
   it('returns an empty list for a log with no actions', () => {
-    const result = runStory(askGetLogActionsForCorrelation('corr-empty'), {
+    const result = runStory(askLogGetActionsForCorrelation('corr-empty'), {
       [FileActionType.Exists]: true,
       [FileActionType.ReadObjectJson]: { correlation: 'corr-empty', history: [] },
     });

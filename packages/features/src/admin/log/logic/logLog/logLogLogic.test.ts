@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { askGetLogLogs } from './askGetLogLogs';
+import { askLogLogGetAll } from './askLogLogGetAll';
 import { logLogLogic } from './logLogLogic';
 
 describe('logLogLogic', () => {
-  it('exposes askGetLogLogs', () => {
-    expect(logLogLogic.askGetLogLogs).toBe(askGetLogLogs);
+  it('exposes askLogLogGetAll', () => {
+    expect(logLogLogic.askLogLogGetAll).toBe(askLogLogGetAll);
   });
 });

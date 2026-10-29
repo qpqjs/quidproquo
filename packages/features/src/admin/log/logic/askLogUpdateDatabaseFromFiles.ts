@@ -22,9 +22,9 @@ import {
   UserDirectorySetAccessTokenActionPayload,
 } from '@qpqjs/core';
 
-import { askUpdateActionSearchFromStoryResult } from '../../actionSearch/logic/askUpdateActionSearchFromStoryResult';
+import { askActionSearchUpdateFromStoryResult } from '../../actionSearch/logic/askActionSearchUpdateFromStoryResult';
 import { ADMIN_LOG_RETENTION_DAYS_GLOBAL } from '../../constants';
-import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';
+import { askLogLogUpsert } from '../entry/data/logLogData';
 import * as logMetadataData from '../entry/data/logMetadataData';
 import { LogLog, LogMetadata } from '../entry/domain';
 import { redactStoryResult } from './redaction/redactStoryResult';
@@ -41,7 +41,7 @@ import {
   unknownGenericTextExtractor,
   webSocketEventGenericTextExtractor,
 } from './genericTextExtractors';
-import { askSendLogToAdmins } from './webSocket';
+import { askLogSendToAdmins } from './webSocket';
 
 const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string[]> = {
   [QpqRuntimeType.API]: apiGenericTextExtractor,
@@ -143,7 +143,7 @@ export function* askErrorReadingStoryResultToMetadata(correlation: string): AskR
   return metadata;
 }
 
-export function* askGetLogInfosFromStoryResult(result: StoryResult<any>): AskResponse<
+export function* askLogGetInfosFromStoryResult(result: StoryResult<any>): AskResponse<
   {
     logLevel: LogLevelEnum;
     msg: string;
@@ -169,7 +169,7 @@ export function* askGetLogInfosFromStoryResult(result: StoryResult<any>): AskRes
   });
 }
 
-export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
+export function* askLogUpdateDatabaseFromFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
   const logObj = yield* askCatch(askFileReadObjectJson<StoryResult<any>>(storageDriveName, filesPath));
 
   // Every row derived below is admin-visible, so only the redacted object is indexed.
@@ -179,18 +179,18 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
     ? storyResultToMetadata(storyResult, ttl)
     : yield* askErrorReadingStoryResultToMetadata(filesPath.split('.').slice(0, -1).join('.'));
 
-  yield* logMetadataData.askUpsert(metadata);
+  yield* logMetadataData.askLogMetadataUpsert(metadata);
 
   // Send errors to admins
   if (metadata.error || !storyResult) {
-    yield* askSendLogToAdmins(metadata);
+    yield* askLogSendToAdmins(metadata);
   }
 
   if (!storyResult) {
     return;
   }
 
-  const logActionHistories = yield* askGetLogInfosFromStoryResult(storyResult);
+  const logActionHistories = yield* askLogGetInfosFromStoryResult(storyResult);
   let currentTime: string = yield* askGetEpochStartTime();
   const logLogs = logActionHistories.map((lac, logIndex) => {
     const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
@@ -209,17 +209,17 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
     return logLog;
   });
 
-  yield* askMap(logLogs, askUpsertLogLog);
+  yield* askMap(logLogs, askLogLogUpsert);
 
-  yield* askUpdateActionSearchFromStoryResult(storyResult, ttl);
+  yield* askActionSearchUpdateFromStoryResult(storyResult, ttl);
 }
 
-export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
+export function* askLogUpdateDatabaseFromFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
   const logRetentionDays = yield* askConfigGetGlobal<number | undefined>(ADMIN_LOG_RETENTION_DAYS_GLOBAL);
 
   const ttl = logRetentionDays ? Math.floor((yield* askGetCurrentEpoch()) + logRetentionDays * 24 * 60 * 60) : undefined;
 
   yield* askMap(filesPaths, function* (filePath: string) {
-    yield* askUpdateDatabaseFromLogFile(storageDriveName, filePath, ttl);
+    yield* askLogUpdateDatabaseFromFile(storageDriveName, filePath, ttl);
   });
 }

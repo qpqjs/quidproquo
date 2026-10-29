@@ -15,7 +15,7 @@ import { MaintenanceState } from '../eventDoc/v1/views/document/MaintenanceState
 // active docs pay the state read, which is snapshot-seeded (the registered
 // definition's foldDocumentState), so an active doc costs its burst since the
 // last snapshot, not its log.
-export function* askGetActiveMaintenancePublicStates(): AskResponse<MaintenancePublicState[]> {
+export function* askMaintenanceGetActivePublicStates(): AskResponse<MaintenancePublicState[]> {
   const summaries = yield* askEventDocList();
 
   const activeSummaries = summaries.filter((summary) => toEventDocListItem(summary).hasDraft);

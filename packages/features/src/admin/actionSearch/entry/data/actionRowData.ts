@@ -15,11 +15,11 @@ import { ActionSearchActionRow } from '../../domain/ActionSearchActionRow';
 
 const actionRowStoreName = QPQ_LOG_ACTIONS_KVS_NAME;
 
-export function* askUpsert(actionRow: ActionSearchActionRow): AskResponse<void> {
+export function* askActionRowUpsert(actionRow: ActionSearchActionRow): AskResponse<void> {
   yield* askKeyValueStoreUpsert(actionRowStoreName, actionRow);
 }
 
-export function* askListByActionType(
+export function* askActionRowListByActionType(
   actionType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
@@ -36,6 +36,6 @@ export function* askListByActionType(
   );
 }
 
-export function* askListAllByLinkKey(linkKey: string): AskResponse<ActionSearchActionRow[]> {
+export function* askActionRowListAllByLinkKey(linkKey: string): AskResponse<ActionSearchActionRow[]> {
   return yield* askKeyValueStoreQueryAll<ActionSearchActionRow>(actionRowStoreName, kvsEqual('linkKey', linkKey));
 }

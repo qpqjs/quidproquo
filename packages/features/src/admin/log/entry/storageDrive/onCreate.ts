@@ -1,7 +1,7 @@
 import { StorageDriveEvent } from '@qpqjs/webserver';
 
-import { askUpdateDatabaseFromLogFiles } from '../../logic/askUpdateDatabaseFromLogFiles';
+import { askLogUpdateDatabaseFromFiles } from '../../logic/askLogUpdateDatabaseFromFiles';
 
 export function* onCreate(event: StorageDriveEvent) {
-  yield* askUpdateDatabaseFromLogFiles(event.driveName, event.filePaths);
+  yield* askLogUpdateDatabaseFromFiles(event.driveName, event.filePaths);
 }

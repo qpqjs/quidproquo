@@ -16,11 +16,11 @@ import { ActionSearchEntityRow } from '../../domain/ActionSearchEntityRow';
 
 const entityRowStoreName = QPQ_LOG_ENTITIES_KVS_NAME;
 
-export function* askUpsert(entityRow: ActionSearchEntityRow): AskResponse<void> {
+export function* askEntityRowUpsert(entityRow: ActionSearchEntityRow): AskResponse<void> {
   yield* askKeyValueStoreUpsert(entityRowStoreName, entityRow);
 }
 
-export function* askListByEntityType(
+export function* askEntityRowListByEntityType(
   entityType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
@@ -37,14 +37,14 @@ export function* askListByEntityType(
   );
 }
 
-export function* askGetByLinkKey(linkKey: string): AskResponse<Nullable<ActionSearchEntityRow>> {
+export function* askEntityRowGetByLinkKey(linkKey: string): AskResponse<Nullable<ActionSearchEntityRow>> {
   const entities = yield* askKeyValueStoreQuery<ActionSearchEntityRow>(entityRowStoreName, kvsEqual('linkKey', linkKey));
 
   return entities.items[0] ?? null;
 }
 
-export function* askGetByLinkKeys(linkKeys: string[]): AskResponse<ActionSearchEntityRow[]> {
-  const entities = yield* askMapParallel(linkKeys, askGetByLinkKey);
+export function* askEntityRowGetByLinkKeys(linkKeys: string[]): AskResponse<ActionSearchEntityRow[]> {
+  const entities = yield* askMapParallel(linkKeys, askEntityRowGetByLinkKey);
 
   return entities.filter((entity): entity is ActionSearchEntityRow => !!entity);
 }
