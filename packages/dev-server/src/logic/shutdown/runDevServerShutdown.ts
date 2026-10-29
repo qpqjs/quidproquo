@@ -40,8 +40,8 @@ const runShutdownTask = async (task: DevServerShutdownTask): Promise<void> => {
 };
 
 // Resolves true if the work finished inside the budget, false if the budget
-// expired first. The work is NOT cancelled on expiry - nothing here is
-// cancellable - it is simply no longer waited on.
+// expired first. The work is NOT cancelled on expiry (nothing here is
+// cancellable); the caller simply stops waiting for it.
 const settleWithinBudget = (work: Promise<unknown>, budgetMs: number): Promise<boolean> => {
   return new Promise((resolve) => {
     const timer = setTimeout(() => resolve(false), budgetMs);

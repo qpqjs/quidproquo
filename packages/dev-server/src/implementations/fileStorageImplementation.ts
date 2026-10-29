@@ -189,7 +189,7 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     });
   };
 
-  // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract). S3 takes the body
+  // Secure upload endpoint: PUT with raw body (matches S3 presigned PUT contract). S3 takes the body
   // as-is whatever the Content-Type says, including when there is none, so read it raw for every
   // request: a type pattern such as '*/*' would skip a PUT that sends no Content-Type and leave
   // req.body as an empty object.
@@ -206,7 +206,7 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     }
   });
 
-  // Secure upload endpoint — legacy POST + multipart (kept for backwards compatibility)
+  // Secure upload endpoint: POST with a multipart body, kept for clients that cannot send a raw PUT.
   app.post('/secure-upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
     try {
       if (!req.file) {

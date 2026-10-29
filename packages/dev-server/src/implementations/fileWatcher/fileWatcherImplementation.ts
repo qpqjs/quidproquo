@@ -38,7 +38,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
 
   // Create a watcher for the storage directory. Requires chokidar v3: on macOS
   // v3 watches via FSEvents (one fd for the whole tree), while v4 dropped
-  // FSEvents and holds a kqueue fd PER FILE — high-churn drives (qpq-logs
+  // FSEvents and holds a kqueue fd PER FILE, so high-churn drives (qpq-logs
   // writes a file per story execution) then grow the fd table until
   // child_process.spawn fails with EBADF (~80k fds), killing anything that
   // launches a subprocess (e.g. puppeteer).

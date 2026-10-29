@@ -95,10 +95,9 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
 
   // Park forever. Every plugin's start resolves once it is up, so there is
   // nothing left to await; the process ends through the signal handlers
-  // installed above. This is the ONE place that blocks - it used to be four
-  // implementations each ending in the same trick to stop a Promise.all
-  // resolving, which is what stranded their handles and made shutdown
-  // impossible in the first place.
+  // installed above. This is the ONE place that blocks: a never-resolving
+  // promise anywhere else strands that implementation's handles and makes
+  // shutdown impossible.
   await new Promise<void>(() => {});
 };
 
@@ -106,7 +105,7 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
  * Run every pending migration once, then resolve. The engine behind `qpq migrate`.
  *
  * Migrations are triggered by a deploy event, and nothing locally ever deploys, so without
- * this they simply never run on a dev machine — you find out what a migration does the first
+ * this they simply never run on a dev machine: you find out what a migration does the first
  * time you ship it. This runs them through the SAME queue the deployed path uses, so a local
  * run rehearses the real thing rather than a convenient approximation.
  *

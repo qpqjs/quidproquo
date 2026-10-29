@@ -15,7 +15,7 @@ import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStore
 
 // The point of this action is that it sees what an ordinary scan deliberately cannot. If it
 // ever quietly stops crossing scopes, or stops short, a migration would report success having
-// skipped data — so completeness is what these pin down.
+// skipped data, so completeness is what these pin down.
 
 const { repo } = vi.hoisted(() => ({
   repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn(), getAll: vi.fn(), listScopes: vi.fn() },

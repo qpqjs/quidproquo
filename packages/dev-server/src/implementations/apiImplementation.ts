@@ -205,7 +205,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
         }
       }
     } else if (rootRoute && req.method === 'GET' && req.accepts('html')) {
-      // SPA fallback — client-side routes resolve to the root entry's index.
+      // SPA fallback: client-side routes resolve to the root entry's index.
       res.sendFile(path.resolve(rootRoute.dir, rootRoute.route.webEntry.indexRoot));
     } else {
       console.log(`NotFound::[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);

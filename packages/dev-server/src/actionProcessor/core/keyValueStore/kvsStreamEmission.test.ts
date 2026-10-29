@@ -7,7 +7,7 @@ import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteA
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
 // The dev server stands in for a change stream, and the thing worth pinning is that a write
-// actually reaches the handler — otherwise `go:dev` silently stops projecting and everything
+// actually reaches the handler, otherwise `go:dev` silently stops projecting and everything
 // looks healthy right up until someone reads a stale summary.
 
 const { repo } = vi.hoisted(() => ({

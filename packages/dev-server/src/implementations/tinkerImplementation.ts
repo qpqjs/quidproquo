@@ -204,9 +204,9 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         replServer.context[key] = (qpqConxtext as any)[key];
       });
 
-      // `.exit` and ctrl+d used to call process.exit outright, which dropped
-      // whatever the session had just written and any projection it triggered
-      // - the same data-loss bug as an unhandled SIGTERM, in a second place.
+      // `.exit` and ctrl+d go through the shutdown sequence: exiting outright
+      // would drop whatever the session had just written and any projection it
+      // triggered, the same data loss as an unhandled SIGTERM.
       const handleReplExit = async (): Promise<void> => {
         tinkerPrint('\n👋 Goodbye from QPQ Tinker!');
         await requestDevServerShutdown();

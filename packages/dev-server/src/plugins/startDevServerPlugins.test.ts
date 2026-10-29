@@ -9,8 +9,7 @@ const devServerConfig = { runtimePath: '.qpq-runtime' } as ResolvedDevServerConf
 
 describe('startDevServerPlugins', () => {
   it('starts plugins in order, waiting for each', async () => {
-    // The property the 100ms sleeps used to stand in for: a plugin that
-    // publishes cannot run before a plugin that listens has registered.
+    // A plugin that publishes cannot run before a plugin that listens has registered.
     const order: string[] = [];
 
     const settleOnNextTurn = (label: string): DevServerPlugin => ({

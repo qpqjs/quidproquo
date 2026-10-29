@@ -2,7 +2,7 @@ import { MatchStoryResult } from '@qpqjs/core';
 import { WebsocketEvent, WebsocketEventResponse } from '@qpqjs/webserver';
 
 // Deep import (not the implementations/webSocket barrel): that barrel exports
-// webSocketImplementation, which imports these websocket processors back — going
+// webSocketImplementation, which imports these websocket processors back, so going
 // through it would close an import cycle. The type file itself is leaf-only.
 import { WsEvent } from '../../../../../implementations/webSocket/types/WsEvent';
 
