@@ -1,4 +1,4 @@
-import { EventDocEvent, EventDocSummaryView } from '../models';
+import { EventDocEvent, EventDocSummaryView } from '../../models';
 import { applyEventDocSummaryEvent } from './applyEventDocSummaryEvent';
 import { createEventDocSummarySeed } from './createEventDocSummarySeed';
 

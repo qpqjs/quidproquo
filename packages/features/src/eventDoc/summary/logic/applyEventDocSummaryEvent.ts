@@ -1,5 +1,5 @@
-import { EventDocEvent, EventDocSummaryView } from '../models';
-import { eventDocSummaryReducer } from './eventDocSummaryReducer';
+import { EventDocEvent, EventDocSummaryView } from '../../models';
+import { eventDocSummaryReducer } from '../eventDocSummaryReducer';
 
 /**
  * Apply one event to the summary: fold the reserved handlers, stamp updatedAt/updatedBy, advance `eventId` to this

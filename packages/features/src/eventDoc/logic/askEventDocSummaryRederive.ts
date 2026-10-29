@@ -4,7 +4,7 @@ import { askEventDocDelete } from '../data/askEventDocDelete';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite';
 import { EventDocSummaryView } from '../models';
-import { foldEventDocSummary } from '../summary/foldEventDocSummary';
+import { foldEventDocSummary } from '../summary/logic/foldEventDocSummary';
 
 /**
  * Re-derive the summary row from the whole log and return the view written. The projector's fallback for when the

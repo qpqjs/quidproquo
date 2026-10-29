@@ -1,4 +1,4 @@
-import { EventDocSummaryView } from '../models';
+import { EventDocSummaryView } from '../../models';
 
 /**
  * Where the summary starts; INIT_STATE overlays the real identity. No `type`: that is the summary store's partition

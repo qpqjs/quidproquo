@@ -5,8 +5,8 @@ import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite';
 import { EventDocSummary, EventDocSummaryView } from '../models';
-import { applyEventDocSummaryEvent } from '../summary/applyEventDocSummaryEvent';
-import { foldEventDocSummary } from '../summary/foldEventDocSummary';
+import { applyEventDocSummaryEvent } from '../summary/logic/applyEventDocSummaryEvent';
+import { foldEventDocSummary } from '../summary/logic/foldEventDocSummary';
 
 // The stored row carried through the events after it, up to `eventId`. From the whole log when there is no row to carry,
 // or one from before the view said where it was up to. A row already at or past the event is returned as it is.
