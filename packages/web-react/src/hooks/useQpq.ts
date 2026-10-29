@@ -58,7 +58,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
   }, []);
 
   // Stable identities so the runtime memo can list them as dependencies
-  // without being recreated every render — the runtime always calls the
+  // without being recreated every render; the runtime always calls the
   // latest processors through these wrappers.
   const stableContextGetActionProcessors = useEffectCallback(contextGetActionProcessors);
   const stableGetActionProcessors = useEffectCallback(getActionProcessors);

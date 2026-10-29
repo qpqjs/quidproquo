@@ -52,7 +52,7 @@ export const useRefreshTokens = (
     // Key on the stable primitives that actually drive a refresh, not the
     // authenticationInfo object itself. Callers commonly derive that object
     // fresh on every render (e.g. an unmemoized selector), so depending on its
-    // reference would re-run this effect every render — and when the token is
+    // reference would re-run this effect every render, and when the token is
     // expired/near-expiry the "refresh immediately" branch would then fire a
     // network refresh on every render, an unbounded loop.
   }, [refresh, authenticationInfo?.expiresAt, authenticationInfo?.refreshToken, bufferMinutes]);

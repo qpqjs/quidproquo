@@ -11,10 +11,8 @@ type QpqContextProviderProps<T> = {
 };
 
 export const QpqContextProvider = <T,>({ contextIdentifier, value, children }: QpqContextProviderProps<T>) => {
-  // Get the parent context value
   const parentContext = useContext(qpqReactContext);
 
-  // Merge parent and current value
   const mergedContext = useMemo(
     () => ({ ...parentContext, [contextIdentifier.uniqueName]: value }),
     [parentContext, contextIdentifier.uniqueName, value],
