@@ -30,7 +30,7 @@ const urlProcessors = {
 const invoke = async (config = withRunner) => {
   const processors = await getUserScriptListExportsActionProcessor(config, async () => null);
   return invokeProcessor(
-    processors[UserScriptActionType.ListExports],
+    processors![UserScriptActionType.ListExports]!,
     { drive: 'scripts', filepath: 'a/main.js', scope: 'tenant-a' },
     {
       session: buildTestStorySession(),

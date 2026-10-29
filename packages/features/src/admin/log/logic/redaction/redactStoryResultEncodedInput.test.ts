@@ -35,8 +35,8 @@ describe('redactStoryResult with a base64 json input body', () => {
     const redacted = redactStoryResult(story);
 
     expect(fromBase64Json(redacted.input[0].body)).toEqual({ hidden: REDACTED_STRING, other: 'plain' });
-    expect(redacted.history[0].res).toEqual([REDACTED_STRING, undefined]);
-    expect(redacted.history[0].act.payload).toEqual({ secretName: 'hidden-thing' });
+    expect(redacted!.history[0]!.res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted!.history[0]!.act.payload).toEqual({ secretName: 'hidden-thing' });
   });
 
   it('redacts a login body by key alone, with no secret read involved', () => {

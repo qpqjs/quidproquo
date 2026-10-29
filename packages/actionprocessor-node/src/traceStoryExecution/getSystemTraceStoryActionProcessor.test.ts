@@ -46,7 +46,7 @@ const runProcessor = async (storyResult: StoryResult<any>, dynamicModuleLoader: 
   const processors = await getSystemTraceStoryActionProcessor()({} as any, dynamicModuleLoader);
   const processor = processors[SystemActionType.TraceStory];
 
-  return processor(
+  return processor!(
     { storyResult } as any,
     { depth: 0, context: {} } as any,
     processors,

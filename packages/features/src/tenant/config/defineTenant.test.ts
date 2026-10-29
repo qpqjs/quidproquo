@@ -37,9 +37,9 @@ const ownerRoutes = (): { method: string; path: string }[] => {
     settingsByService: Record<string, unknown[]>;
   };
 
-  return serviceSettings.settingsByService['owner-svc']
-    .flat(Infinity)
-    .filter((s) => (s as { configSettingType: string }).configSettingType === QPQWebServerConfigSettingType.Route) as {
+  return serviceSettings!.settingsByService['owner-svc']!.flat(Infinity).filter(
+    (s) => (s as { configSettingType: string }).configSettingType === QPQWebServerConfigSettingType.Route,
+  ) as {
     method: string;
     path: string;
   }[];
@@ -54,7 +54,7 @@ describe('defineTenant', () => {
     ) as unknown as { value: { catalog: Record<string, { permissions: string[] }>; creatorRoles: string[] } };
 
     expect(Object.keys(rolesGlobal.value.catalog).sort()).toEqual(['approver', TENANT_ADMIN_ROLE]);
-    expect(rolesGlobal.value.catalog[TENANT_ADMIN_ROLE].permissions).toContain('tenant:roles:assign');
+    expect(rolesGlobal!.value.catalog[TENANT_ADMIN_ROLE]!.permissions).toContain('tenant:roles:assign');
     expect(rolesGlobal.value.creatorRoles).toEqual([TENANT_ADMIN_ROLE, 'approver']);
   });
 
@@ -116,7 +116,7 @@ describe('defineTenant', () => {
       (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
     ) as unknown as { settingsByService: Record<string, unknown[]> };
 
-    const ownerSettings = serviceSettings.settingsByService['owner-svc'].flat(Infinity) as {
+    const ownerSettings = serviceSettings!.settingsByService['owner-svc']!.flat(Infinity) as {
       configSettingType: string;
       dynamicFunctionsName?: string;
       onStream?: { runtime: { globals?: Record<string, unknown> } };

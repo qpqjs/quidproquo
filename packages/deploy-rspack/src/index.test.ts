@@ -22,7 +22,7 @@ describe('getResolveLoaderModules', () => {
     const modules = getResolveLoaderModules();
 
     expect(modules).toHaveLength(2);
-    expect(modules[0].endsWith('loaders')).toBe(true);
+    expect(modules![0]!.endsWith('loaders')).toBe(true);
     expect(modules[1]).toBe('node_modules');
   });
 });

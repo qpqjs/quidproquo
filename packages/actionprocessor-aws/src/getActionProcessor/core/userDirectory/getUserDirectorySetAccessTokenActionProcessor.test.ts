@@ -33,7 +33,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const updateSession = vi.fn();
     const processor = await resolveProcessor();
 
-    const [returned, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' }, { updateSession });
+    const [returned, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'tok' }, { updateSession });
 
     expect(error).toBeUndefined();
     expect(returned).toEqual(decodedToken);
@@ -45,7 +45,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const updateSession = vi.fn();
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'forged' }, { updateSession });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'forged' }, { updateSession });
 
     expect(error?.errorType).toBe(ErrorTypeEnum.Unauthorized);
     expect(updateSession).not.toHaveBeenCalled();

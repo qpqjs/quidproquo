@@ -45,7 +45,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     repo.update.mockResolvedValue({ id: 1 });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, sortKey: 2, updates: { name: 'x' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, sortKey: 2, updates: { name: 'x' } });
 
     expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' }, undefined, { condition: undefined });
     expect(resolveActionResult(result)).toEqual({ id: 1 });
@@ -55,7 +55,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     repo.update.mockResolvedValue({});
     const process = await getProcessor();
 
-    await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' } });
+    await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' } });
 
     expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined, { condition: undefined });
   });
@@ -65,7 +65,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     const process = await getProcessor();
 
     const condition = kvsOr([kvsNotExists('headEventId'), kvsLessThan('headEventId', 7)]);
-    await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' }, options: { condition } });
+    await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' }, options: { condition } });
 
     expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined, { condition });
   });
@@ -74,7 +74,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     repo.update.mockRejectedValue(Object.assign(new Error('condition failed'), { name: 'ConditionalCheckFailedException' }));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, updates: {} });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpdateBase.errorType.ConditionFailed);
   });
@@ -83,7 +83,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     repo.update.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, updates: {} });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpdateBase.errorType.StoreNotFound);
   });
@@ -92,7 +92,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     repo.update.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 1, updates: {} });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

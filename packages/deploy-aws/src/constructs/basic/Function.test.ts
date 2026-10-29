@@ -13,8 +13,8 @@ import { Function } from './Function';
 
 // The log extension layer is produced by the aws package build; a synth in a unit test only needs a directory to package.
 const extensionLayer = vi.hoisted(() => ({ path: '' }));
-vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@qpqjs/actionprocessor-aws')>()),
+vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
+  ...((await importOriginal()) as typeof import('@qpqjs/actionprocessor-aws')),
   getLogExtensionLayerPath: () => extensionLayer.path,
 }));
 

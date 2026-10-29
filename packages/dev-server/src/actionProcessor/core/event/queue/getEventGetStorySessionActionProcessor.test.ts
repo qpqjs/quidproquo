@@ -8,7 +8,7 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 const invoke = async (eventStorySession: any, sessionCorrelation: string) => {
   const processors = await getEventGetStorySessionActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.GetStorySession];
-  return process(
+  return process!(
     { eventParams: [{ storySession: eventStorySession }] } as any,
     buildTestStorySession({ correlation: sessionCorrelation }),
     {},

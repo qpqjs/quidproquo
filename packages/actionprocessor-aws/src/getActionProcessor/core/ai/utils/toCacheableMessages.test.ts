@@ -96,9 +96,9 @@ describe('toCacheableMessages', () => {
     const result = toCacheableMessages(messages, true, { ...cache, durableCount: 3, markTail: false });
 
     expect(countCachePoints(result)).toBe(1);
-    expect(result[2].providerOptions).toEqual(cachePoint);
-    expect(result[3].providerOptions).toBeUndefined();
-    expect(result[4].providerOptions).toBeUndefined();
+    expect(result![2]!.providerOptions).toEqual(cachePoint);
+    expect(result![3]!.providerOptions).toBeUndefined();
+    expect(result![4]!.providerOptions).toBeUndefined();
   });
 
   it('also marks the newest tool message when asked to mark the tail', () => {
@@ -114,10 +114,10 @@ describe('toCacheableMessages', () => {
     const result = toCacheableMessages(messages, true, { ...cache, durableCount: 3, markTail: true });
 
     expect(countCachePoints(result)).toBe(2);
-    expect(result[2].providerOptions).toEqual(cachePoint);
-    expect(result[3].providerOptions).toBeUndefined();
-    expect(result[4].providerOptions).toBeUndefined();
-    expect(result[5].providerOptions).toEqual(cachePoint);
+    expect(result![2]!.providerOptions).toEqual(cachePoint);
+    expect(result![3]!.providerOptions).toBeUndefined();
+    expect(result![4]!.providerOptions).toBeUndefined();
+    expect(result![5]!.providerOptions).toEqual(cachePoint);
   });
 
   it('does not mark the tail while the list is only the saved conversation', () => {
@@ -129,7 +129,7 @@ describe('toCacheableMessages', () => {
     const result = toCacheableMessages(messages, true, { ...cache, durableCount: 2, markTail: true });
 
     expect(countCachePoints(result)).toBe(1);
-    expect(result[1].providerOptions).toEqual(cachePoint);
+    expect(result![1]!.providerOptions).toEqual(cachePoint);
   });
 
   it('marks nothing when every message is turn context', () => {
@@ -148,9 +148,9 @@ describe('toCacheableMessages', () => {
 
     const result = toCacheableMessages(messages, true, { model: AiModel.ClaudeSonnet46, durableCount: 1, markTail: true });
 
-    expect(result[0].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(result[1].providerOptions).toBeUndefined();
-    expect(result[3].providerOptions).toEqual(cachePoint);
+    expect(result![0]!.providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result![1]!.providerOptions).toBeUndefined();
+    expect(result![3]!.providerOptions).toEqual(cachePoint);
   });
 
   it('keeps the anchor for an hour when asked, never the tail, and omits the ttl otherwise', () => {
@@ -161,11 +161,11 @@ describe('toCacheableMessages', () => {
     ];
 
     const oneHour = toCacheableMessages(messages, true, { ...cache, cacheTtl: AiCacheTtl.OneHour, durableCount: 1, markTail: true });
-    expect(oneHour[0].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(oneHour[2].providerOptions).toEqual(cachePoint);
+    expect(oneHour![0]!.providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(oneHour![2]!.providerOptions).toEqual(cachePoint);
 
     const fiveMinutes = toCacheableMessages(messages, true, { ...cache, cacheTtl: AiCacheTtl.FiveMinutes, durableCount: 1, markTail: true });
-    expect(fiveMinutes[0].providerOptions).toEqual(cachePoint);
-    expect(fiveMinutes[2].providerOptions).toEqual(cachePoint);
+    expect(fiveMinutes![0]!.providerOptions).toEqual(cachePoint);
+    expect(fiveMinutes![2]!.providerOptions).toEqual(cachePoint);
   });
 });

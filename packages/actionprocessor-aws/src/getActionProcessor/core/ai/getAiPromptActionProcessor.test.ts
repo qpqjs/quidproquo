@@ -68,7 +68,7 @@ const loanSchema = {
 
 const invoke = async (payload: Record<string, unknown>) => {
   const processor = (await getAiPromptActionProcessor({} as never, null as any))[AiActionType.Prompt];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 const totalUsage = { inputTokens: 24281, inputTokenDetails: { noCacheTokens: 12, cacheReadTokens: 24112, cacheWriteTokens: 157 } };

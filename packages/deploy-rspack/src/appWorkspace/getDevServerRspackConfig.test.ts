@@ -58,7 +58,7 @@ describe('getDevServerRspackConfig', () => {
       const config = getDevServerRspackConfig({ root, entry: './entry.ts', qpqConfigs: [buildTestQpqConfig()], portableExternals });
       const [externalise] = config.externals as unknown as ((data: any, callback: (err?: Error, result?: string) => void) => void)[];
       return new Promise<string | undefined>((resolve, reject) => {
-        externalise({ request: 'immer', context: root }, (error?: Error, result?: string) => (error ? reject(error) : resolve(result)));
+        externalise!({ request: 'immer', context: root }, (error?: Error, result?: string) => (error ? reject(error) : resolve(result)));
       });
     };
 
@@ -97,13 +97,13 @@ describe('getDevServerRspackConfig', () => {
     ) => void)[];
 
     let bundledResult: string | undefined = 'sentinel';
-    externalise({ request: 'quidproquo-dynamic-loader', context: root }, (_err, result) => {
+    externalise!({ request: 'quidproquo-dynamic-loader', context: root }, (_err, result) => {
       bundledResult = result;
     });
     expect(bundledResult).toBeUndefined();
 
     let externalResult: string | undefined;
-    externalise({ request: 'some-unresolvable-package', context: root }, (_err, result) => {
+    externalise!({ request: 'some-unresolvable-package', context: root }, (_err, result) => {
       externalResult = result;
     });
     // Unresolvable optional deps stay a plain bare require.

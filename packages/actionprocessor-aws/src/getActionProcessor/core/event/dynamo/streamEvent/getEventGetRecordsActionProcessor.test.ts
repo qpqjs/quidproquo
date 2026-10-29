@@ -1,12 +1,17 @@
 import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionActionProcessor } from '@qpqjs/actionprocessor-js';
-import { EventActionType, KvsStreamEventType } from '@qpqjs/core';
+import { EventActionType, KvsStreamEventType, QpqFunctionRuntime } from '@qpqjs/core';
 import { resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
-const settings = { keyValueStoreName: 'test-events', runtime: '/entry/kvs::onStream', coalesceByPartitionKey: true, partitionKey: 'pk' };
+const settings = {
+  keyValueStoreName: 'test-events',
+  runtime: '/entry/kvs::onStream' as QpqFunctionRuntime,
+  coalesceByPartitionKey: true,
+  partitionKey: 'pk',
+};
 
 const SCOPE_DELIMITER = '@@QPQSCOPE@@';
 

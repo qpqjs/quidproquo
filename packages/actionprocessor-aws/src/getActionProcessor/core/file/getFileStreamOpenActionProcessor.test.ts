@@ -23,7 +23,7 @@ const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown)
   const processor = (
     await getFileStreamOpenActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
   )[FileActionType.StreamOpen];
-  return invokeProcessor(processor, payload, { streamRegistry });
+  return invokeProcessor(processor!, payload, { streamRegistry });
 };
 
 const drain = async (iterator: AsyncIterableIterator<string>) => {
@@ -53,7 +53,7 @@ describe('getProcessFileStreamOpen', () => {
 
   // Security regression: a chunk size of zero or less must never spin the iterator forever (a hung lambda until its
   // timeout); the stream still terminates and yields every byte.
-  it.each([0, -5, Number.NaN])('terminates and yields the whole content for the chunk size %s', async (chunkSize) => {
+  it.each([0, -5, Number.NaN])('terminates and yields the whole content for the chunk size %s', async (chunkSize: any) => {
     send.mockResolvedValue({ Body: Readable.from(['hello']) });
     const registry = { register: vi.fn() };
 

@@ -19,7 +19,7 @@ describe('buildMcpEventDocAis', () => {
 
     expect(eventDocAis).toHaveLength(1);
     expect(eventDocAis[0]).toMatchObject({ aiName: 'mimirPlans-ai', serviceName: 'mimir', type: 'plan', tools: [tool], isCollection: true });
-    expect(eventDocAis[0].store).toMatchObject({ storeName: 'mimirPlans', type: 'plan', authorise: 'authoriseFn', scopeResolver: 'scopeFn' });
+    expect(eventDocAis![0]!.store).toMatchObject({ storeName: 'mimirPlans', type: 'plan', authorise: 'authoriseFn', scopeResolver: 'scopeFn' });
   });
 
   it('falls back to a hookless store when the collection has no routes registered', () => {
@@ -28,7 +28,7 @@ describe('buildMcpEventDocAis', () => {
       defineAi('unrelated'),
     ]);
 
-    expect(eventDocAis[0].store).toMatchObject({ storeName: 'notes', type: 'note', authorise: undefined });
-    expect(eventDocAis[0].isCollection).toBe(false);
+    expect(eventDocAis![0]!.store).toMatchObject({ storeName: 'notes', type: 'note', authorise: undefined });
+    expect(eventDocAis![0]!.isCollection).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ const invoke = async (payload: { drive: string; filepath: string; expirationMs: 
       null as any,
     )
   )[FileActionType.GenerateTemporarySecureUrl];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileGenerateTemporarySecureUrl', () => {

@@ -40,7 +40,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     vi.mocked(getCachedUnwrappedDataKey).mockResolvedValue(dataKey);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-a' } });
+    const result = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-a' } });
 
     expect(result).toEqual(['shhh']);
     expect(getCachedUnwrappedDataKey).toHaveBeenCalledWith(Buffer.from('wrapped-key-bytes'), { tenantId: 'tenant-a' }, 'eu-west-1');
@@ -50,7 +50,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     const ciphertext = await buildCiphertext('shhh', { tenantId: 'tenant-a' }, randomBytes(32));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.ContextMismatch);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('getCryptoDecryptActionProcessor', () => {
   it('returns MalformedCiphertext for a non-blob input', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext: 'not-a-blob' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext: 'not-a-blob' });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.MalformedCiphertext);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('getCryptoDecryptActionProcessor', () => {
   it('returns KeyNotConfigured when the key is not in config', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', ciphertext: 'anything' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'unknown-key', ciphertext: 'anything' });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.KeyNotConfigured);
   });
@@ -86,7 +86,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     vi.mocked(getCachedUnwrappedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext });
 
     expect(error?.errorType).toBe(expectedType);
   });

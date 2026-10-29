@@ -27,7 +27,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
       )
     )[FileActionType.GenerateTemporarySecureUrl];
 
-    const [, error] = await invokeProcessor(processor, { drive: 'assets', filepath: 'a.txt', expirationMs: 1000, scope: 'bad' });
+    const [, error] = await invokeProcessor(processor!, { drive: 'assets', filepath: 'a.txt', expirationMs: 1000, scope: 'bad' });
 
     expect(error?.errorType).toBe(askFileGenerateTemporarySecureUrl.errorType.InvalidScope);
   });
@@ -41,7 +41,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
     )[FileActionType.GenerateTemporaryUploadSecureUrl];
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { drive: 'assets', filepath: 'a.txt', expirationMs: 1000, contentType: 'text/plain', scope: 'bad' },
       { session: { correlation: 'corr-1' } },
     );

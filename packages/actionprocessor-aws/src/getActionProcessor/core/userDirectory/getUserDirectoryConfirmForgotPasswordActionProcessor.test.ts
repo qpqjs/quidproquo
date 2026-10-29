@@ -26,7 +26,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     vi.mocked(getExportedValue).mockReset().mockResolvedValue('POOL');
     vi.mocked(resolveUsernameByPreferredUsername)
       .mockReset()
-      .mockImplementation(async (_pool, _region, username) => username);
+      .mockImplementation(async (_pool: any, _region: any, username: any) => username);
     vi.mocked(confirmForgotPassword).mockReset();
   });
 
@@ -34,7 +34,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(confirmForgotPassword).mockResolvedValue({ challenge: 'NONE' } as any);
 
-    const [result, error] = await invokeProcessor(processor, {
+    const [result, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       code: '123456',
       username: 'joe@example.com',
@@ -50,7 +50,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(confirmForgotPassword).mockRejectedValue(cognitoError('CodeMismatchException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       code: '123456',
       username: 'joe@example.com',
@@ -64,7 +64,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(confirmForgotPassword).mockRejectedValue(cognitoError('ExpiredCodeException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       code: '123456',
       username: 'joe@example.com',
@@ -78,7 +78,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(confirmForgotPassword).mockRejectedValue(cognitoError('InvalidPasswordException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       code: '123456',
       username: 'joe@example.com',
@@ -92,7 +92,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(confirmForgotPassword).mockRejectedValue(cognitoError('LimitExceededException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       code: '123456',
       username: 'joe@example.com',

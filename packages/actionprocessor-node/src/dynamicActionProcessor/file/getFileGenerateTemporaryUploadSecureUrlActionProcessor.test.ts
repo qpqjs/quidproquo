@@ -29,7 +29,7 @@ describe('getFileGenerateTemporaryUploadSecureUrlActionProcessor', () => {
     expect(url.startsWith('http://localhost:4000/secure-upload?token=')).toBe(true);
 
     const token = url.split('token=')[1];
-    const decoded = verifySecureUrlToken(token, fileConfig.secureUrlSecret);
+    const decoded = verifySecureUrlToken(token!, fileConfig.secureUrlSecret);
     expect(decoded?.operation).toBe('upload');
     expect(decoded?.contentType).toBe('image/png');
   });

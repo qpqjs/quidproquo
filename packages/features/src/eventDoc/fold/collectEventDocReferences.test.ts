@@ -96,7 +96,7 @@ const definition = createEventDocDefinition({
   schemaVersion: LATEST_VERSION,
   versions: [
     { version: 1, views: { document: styleDocumentV1 } },
-    { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as EventDocMigration } } },
+    { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as unknown as EventDocMigration } } },
   ],
   references: (view) => view.styles,
   api: {},
@@ -141,7 +141,10 @@ describe('collectEventDocReferences', () => {
         {
           version: 2,
           views: {
-            document: { foldReducer: reducerV2, migrateFromPrevious: ((state: StyleDocV1) => ({ ...state, styles: [] })) as EventDocMigration },
+            document: {
+              foldReducer: reducerV2,
+              migrateFromPrevious: ((state: StyleDocV1) => ({ ...state, styles: [] })) as unknown as EventDocMigration,
+            },
           },
         },
       ],
@@ -159,7 +162,7 @@ describe('collectEventDocReferences', () => {
       schemaVersion: LATEST_VERSION,
       versions: [
         { version: 1, views: { document: styleDocumentV1 } },
-        { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as EventDocMigration } } },
+        { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as unknown as EventDocMigration } } },
       ],
       api: {},
     });

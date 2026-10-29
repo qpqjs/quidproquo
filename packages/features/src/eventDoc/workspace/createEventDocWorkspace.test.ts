@@ -403,11 +403,11 @@ describe('createEventDocWorkspace scoped state', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'A title' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'A title' });
 
     expect(state.pending.noteB).toHaveLength(2);
-    expect(state.pending.noteB[0].payload.data).toEqual({ title: 'B title' });
-    expect(state.pending.noteB[1].payload.data).toEqual({ lineId: 'l1', text: 'first line' });
+    expect(state!.pending.noteB![0]!.payload.data).toEqual({ title: 'B title' });
+    expect(state!.pending.noteB![1]!.payload.data).toEqual({ lineId: 'l1', text: 'first line' });
 
     // Document commits buffer as pending; nothing lands in history without a save.
     expect(state.history.noteA).toHaveLength(0);
@@ -423,7 +423,7 @@ describe('createEventDocWorkspace scoped state', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.noteA[0].payload.metadata).toEqual({
+    expect(state!.pending.noteA![0]!.payload.metadata).toEqual({
       version: 1,
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
@@ -459,9 +459,9 @@ describe('createEventDocWorkspace scoped state', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'outer title' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'outer title' });
     expect(state.pending.noteB).toHaveLength(1);
-    expect(state.pending.noteB[0].payload.data).toEqual({ title: 'inner title' });
+    expect(state!.pending.noteB![0]!.payload.data).toEqual({ title: 'inner title' });
   });
 
   it('routes parallel commits (askRunParallel batches) without losing events', () => {
@@ -480,8 +480,8 @@ describe('createEventDocWorkspace scoped state', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(2);
-    expect(state.pending.noteA.map((event) => (event.payload.data as NoteLine).lineId).sort()).toEqual(['l1', 'l2']);
-    expectStrictlyIncreasing(state.pending.noteA);
+    expect(state!.pending.noteA!.map((event) => (event.payload.data as NoteLine).lineId).sort()).toEqual(['l1', 'l2']);
+    expectStrictlyIncreasing(state!.pending.noteA!);
   });
 
   it('fails loudly when a document verb runs outside any workspace bind', () => {
@@ -511,7 +511,7 @@ describe('createEventDocWorkspace declarative reads', () => {
     // The verb's read saw the fold of the SAVED history, and its derived write landed
     // in its own slot's pending buffer.
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l1', text: 'title: Saved title' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ lineId: 'l1', text: 'title: Saved title' });
   });
 
   it('routes the SAME read verb to each slot via its binding', () => {
@@ -526,8 +526,8 @@ describe('createEventDocWorkspace declarative reads', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.noteA.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: A title' });
-    expect(state.pending.noteB.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: B title' });
+    expect(state!.pending.noteA!.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: A title' });
+    expect(state!.pending.noteB!.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: B title' });
   });
 
   it('read-your-own-writes: a commit earlier in the story is visible to the read', () => {
@@ -597,7 +597,7 @@ describe('createEventDocWorkspace coalescing', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'three' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'three' });
   });
 
   it('coalesces per item for { type, key } rules', () => {
@@ -613,8 +613,8 @@ describe('createEventDocWorkspace coalescing', () => {
 
     // l1's earlier edit is superseded; l2's is untouched.
     expect(state.pending.noteA).toHaveLength(2);
-    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l2', text: 'other line' });
-    expect(state.pending.noteA[1].payload.data).toEqual({ lineId: 'l1', text: 'final' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ lineId: 'l2', text: 'other line' });
+    expect(state!.pending.noteA![1]!.payload.data).toEqual({ lineId: 'l1', text: 'final' });
   });
 
   it('keeps pending events ordered after the saved log without renumbering', () => {
@@ -629,7 +629,7 @@ describe('createEventDocWorkspace coalescing', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expectStrictlyIncreasing(state.pending.noteA);
+    expectStrictlyIncreasing(state!.pending.noteA!);
   });
 
   it('local slots default to last-write-wins per type, buffered in pending', () => {
@@ -647,7 +647,7 @@ describe('createEventDocWorkspace coalescing', () => {
     // history stays strictly server truth: empty. One pending event per type.
     expect(state.history.chrome).toHaveLength(0);
     expect(state.pending.chrome).toHaveLength(2);
-    expectStrictlyIncreasing(state.pending.chrome);
+    expectStrictlyIncreasing(state!.pending.chrome!);
 
     const chromeView = workspace.docs.chrome.view(state);
     expect(chromeView.historyOpen).toBe(false);
@@ -672,9 +672,9 @@ describe('createEventDocWorkspace coalescing', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.noteA.map((event) => event.payload.metadata.version)).toEqual([1, 2]);
-    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l1', text: 'restored v1 line' });
-    expect(state.pending.noteA[1].payload.data).toEqual({ title: 'fresh v2 title' });
+    expect(state!.pending.noteA!.map((event) => event.payload.metadata.version)).toEqual([1, 2]);
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ lineId: 'l1', text: 'restored v1 line' });
+    expect(state!.pending.noteA![1]!.payload.data).toEqual({ title: 'fresh v2 title' });
 
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('fresh v2 title');
@@ -696,8 +696,8 @@ describe('createEventDocWorkspace validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.validation);
-    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.validation);
+    expect(state!.slots.noteA!.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
   });
 
   it('allows CREATE_DRAFT on a published document and clears the error', () => {
@@ -712,9 +712,9 @@ describe('createEventDocWorkspace validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].type).toBe(EventDocEffect.CreateDraft);
+    expect(state!.pending.noteA![0]!.type).toBe(EventDocEffect.CreateDraft);
     // The successful commit wipes the earlier rejection via the ClearError effect.
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.error).toBeNull();
   });
 
   it('runs a configured domain validator instead of the default', () => {
@@ -734,7 +734,7 @@ describe('createEventDocWorkspace validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error).toEqual({
+    expect(state!.slots.noteA!.error).toEqual({
       operation: EventDocWorkspaceSlotOperation.validation,
       error: { errorType: ErrorTypeEnum.Invalid, errorText: 'Title required' },
     });
@@ -756,13 +756,13 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(0));
-    expect(state.slots.noteA.documentIdentity).toEqual(identityA);
-    expect(state.slots.noteA.isLoading).toBe(false);
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.documentIdentity).toEqual(identityA);
+    expect(state!.slots.noteA!.isLoading).toBe(false);
+    expect(state!.slots.noteA!.error).toBeNull();
 
     // noteB was not initialised; untouched.
     expect(state.history.noteB).toHaveLength(0);
-    expect(state.slots.noteB.documentIdentity).toBeNull();
+    expect(state!.slots.noteB!.documentIdentity).toBeNull();
   });
 
   it('init failure surfaces as slot error state', () => {
@@ -777,10 +777,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const state = runWorkspaceStory(workspace, story);
 
     // The caught transport error passes through untouched: typed, not flattened.
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
-    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
-    expect(state.slots.noteA.error?.error.errorText).toBe('fetch boom');
-    expect(state.slots.noteA.isLoading).toBe(false);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
+    expect(state!.slots.noteA!.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(state!.slots.noteA!.error?.error.errorText).toBe('fetch boom');
+    expect(state!.slots.noteA!.isLoading).toBe(false);
     expect(state.history.noteA).toHaveLength(0);
   });
 
@@ -799,14 +799,14 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     expect(fake.appended).toHaveLength(2);
     // Only the client-owned fields go over the wire.
-    expect(fake.appended[0].payload.metadata).toEqual({ version: 1, clientMessageId: 'guid-1' });
+    expect(fake!.appended[0]!.payload.metadata).toEqual({ version: 1, clientMessageId: 'guid-1' });
 
     expect(state.pending.noteA).toHaveLength(0);
     // Each landing is folded then compacted: the slot holds the state at head and no history.
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(2));
     expect(workspace.docs.noteA.view(state).lines.map((line) => line.lineId)).toEqual(['l1', 'l2']);
-    expect(state.slots.noteA.isSaving).toBe(false);
+    expect(state!.slots.noteA!.isSaving).toBe(false);
   });
 
   it('an interrupted save leaves exactly the unsaved tail pending', () => {
@@ -826,11 +826,11 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(1)); // init + first line landed
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l2', text: 'two' });
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
-    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
-    expect(state.slots.noteA.error?.error.errorText).toBe('boom');
-    expect(state.slots.noteA.isSaving).toBe(false);
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ lineId: 'l2', text: 'two' });
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
+    expect(state!.slots.noteA!.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(state!.slots.noteA!.error?.error.errorText).toBe('boom');
+    expect(state!.slots.noteA!.isSaving).toBe(false);
   });
 
   it('a save failure preserves the transport error type', () => {
@@ -847,8 +847,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const state = runWorkspaceStory(workspace, story);
 
     // The original errorType survives the channel; consumers can branch on it.
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
-    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
+    expect(state!.slots.noteA!.error?.error.errorType).toBe(ErrorTypeEnum.NotFound);
     expect(state.pending.noteA).toHaveLength(1);
   });
 
@@ -951,7 +951,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(3));
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.error).toBeNull();
 
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('from elsewhere');
@@ -975,7 +975,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }, { afterEventId: undefined }]);
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(2));
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.error).toBeNull();
   });
 
   it('a head-moved push past the held head tail-pulls the new events', () => {
@@ -1006,8 +1006,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
       // Our own save: the push arrives before the ack, naming the pending event's clientMessageId.
       yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'mine');
-      const pending = (yield* askEventDocWorkspaceReadState()).pending.noteA[0];
-      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), pending.payload.metadata.clientMessageId);
+      const pending = (yield* askEventDocWorkspaceReadState())!.pending.noteA![0];
+      yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), pending!.payload.metadata.clientMessageId);
 
       // Mid-save, the ack path owns gap handling.
       yield* askEventDocWorkspaceSetSaving('noteA', true);
@@ -1088,8 +1088,8 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     // Compaction folded the tail into the base, so the snapshot carries the base at head and no history.
     const compactedBase: EventDocSnapshotBase = { eventId: eventId(1), state: foldNoteHistory(allEvents) };
-    expect(snapshot.slots.noteA.history).toHaveLength(0);
-    expect(snapshot.slots.noteA.base).toEqual(compactedBase);
+    expect(snapshot!.slots.noteA!.history).toHaveLength(0);
+    expect(snapshot!.slots.noteA!.base).toEqual(compactedBase);
 
     function* swappedSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA }, snapshot);
@@ -1122,7 +1122,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     expect(firstPageOnly.events).toHaveLength(50);
     // Newest first: the panel shows the latest change at the top without reversing.
-    expect(firstPageOnly.events[0].payload.metadata.eventId).toBe(eventId(59));
+    expect(firstPageOnly!.events[0]!.payload.metadata.eventId).toBe(eventId(59));
     expect(firstPageOnly.nextPageKey).toBeDefined();
 
     const walkedOlder = (() => {
@@ -1141,7 +1141,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     })();
 
     expect(walkedOlder.events).toHaveLength(60);
-    expect(walkedOlder.events[59].payload.metadata.eventId).toBe(eventId(0));
+    expect(walkedOlder!.events[59]!.payload.metadata.eventId).toBe(eventId(0));
     expect(walkedOlder.nextPageKey).toBeUndefined();
   });
 
@@ -1160,7 +1160,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.pending.noteA).toHaveLength(0);
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(0));
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.error).toBeNull();
   });
 
   it('cancel clears document slots only; chrome pending survives', () => {
@@ -1211,9 +1211,9 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     // noteB was never initialised, documents without an identity don't snapshot.
     expect(Object.keys(snapshot.slots)).toEqual(['noteA']);
-    expect(snapshot.slots.noteA.documentIdentity).toEqual(identityA);
-    expect(snapshot.slots.noteA.pending).toHaveLength(1);
-    expect(snapshot.slots.noteA.pending[0].payload.data).toEqual({ title: 'unsaved' });
+    expect(snapshot!.slots.noteA!.documentIdentity).toEqual(identityA);
+    expect(snapshot!.slots.noteA!.pending).toHaveLength(1);
+    expect(snapshot!.slots.noteA!.pending[0]!.payload.data).toEqual({ title: 'unsaved' });
 
     // chrome is local: its pending stream IS its session state, carried wholesale.
     expect(Object.keys(snapshot.localSlots ?? {})).toEqual(['chrome']);
@@ -1275,8 +1275,8 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
-    expect(snapshot.slots.noteA.history).toHaveLength(0);
-    expect(snapshot.slots.noteA.base?.eventId).toBe(eventId(0));
+    expect(snapshot!.slots.noteA!.history).toHaveLength(0);
+    expect(snapshot!.slots.noteA!.base?.eventId).toBe(eventId(0));
 
     // The server log grew between the runtimes (another editor appended): the
     // restore must NOT full-fetch, only the tail after the snapshot's last event.
@@ -1290,13 +1290,13 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     // First call is the edit session's full load; the restore adds ONLY a tail-pull.
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
-    expect(state.slots.noteA.isLoading).toBe(false);
+    expect(state!.slots.noteA!.isLoading).toBe(false);
 
     // The synced tail was folded in and compacted away.
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(1));
     expect(state.pending.noteA).toHaveLength(2);
-    expectStrictlyIncreasing(state.pending.noteA);
+    expectStrictlyIncreasing(state!.pending.noteA!);
     expect(workspace.selectors.isDirty(state)).toBe(true);
 
     // The unsaved SetTitle still folds after the synced tail: client intent wins.
@@ -1316,7 +1316,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
     // The caller's force-refetch knob (also the shape older bundles export).
-    const { history: _stripped, ...slotWithoutHistory } = snapshot.slots.noteA;
+    const { history: _stripped, ...slotWithoutHistory } = snapshot.slots.noteA!;
 
     function* swappedSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA }, { slots: { noteA: slotWithoutHistory } });
@@ -1329,7 +1329,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     expect(state.history.noteA).toHaveLength(0);
     expect(state.bases.noteA?.eventId).toBe(eventId(0));
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'carried' });
   });
 
   it('a snapshot base filed under another snapshot cache key is stale fold output: blocking full load, pending kept', () => {
@@ -1364,7 +1364,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(0) }]);
     expect(state.bases.noteA?.snapshotCacheKey).toBe('k2');
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'carried' });
   });
 
   it('a snapshot base filed under the slot snapshot cache key restores instantly', () => {
@@ -1383,7 +1383,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
     // The tail after the server base was folded in and the compacted base keeps the slot's key.
-    expect(snapshot.slots.noteA.base).toEqual({ eventId: eventId(1), state: foldNoteHistory(allEvents), snapshotCacheKey: 'k2' });
+    expect(snapshot!.slots.noteA!.base).toEqual({ eventId: eventId(1), state: foldNoteHistory(allEvents), snapshotCacheKey: 'k2' });
 
     function* swappedSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA }, snapshot);
@@ -1465,9 +1465,9 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const state = runWorkspaceStory(swappedWorkspace, swappedSession);
 
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'precious' });
+    expect(state!.pending.noteA![0]!.payload.data).toEqual({ title: 'precious' });
   });
 });
 
@@ -1734,15 +1734,15 @@ describe('createEventDocWorkspace transient streams', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(Object.keys(state.transient.noteA).sort()).toEqual(['conn-1', 'conn-2']);
-    expect(state.transient.noteA['conn-1']).toHaveLength(1);
-    expect(state.transient.noteA['conn-1'][0].payload.data).toEqual({ title: 'a1' });
-    expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ lineId: 'l1', text: 'from conn-2' });
-    expect(state.transient.noteB['conn-1'][0].payload.data).toEqual({ title: 'b1' });
+    expect(Object.keys(state!.transient.noteA!).sort()).toEqual(['conn-1', 'conn-2']);
+    expect(state!.transient.noteA!['conn-1']).toHaveLength(1);
+    expect(state!.transient.noteA!['conn-1']![0]!.payload.data).toEqual({ title: 'a1' });
+    expect(state!.transient.noteA!['conn-2']![0]!.payload.data).toEqual({ lineId: 'l1', text: 'from conn-2' });
+    expect(state!.transient.noteB!['conn-1']![0]!.payload.data).toEqual({ title: 'b1' });
 
     // Same guid/date/schemaVersion stamping as the ordinary commit. Transient events hold
     // no log position (they never save), ordering is by createdAt at read time.
-    expect(state.transient.noteA['conn-1'][0].payload.metadata).toEqual({
+    expect(state!.transient.noteA!['conn-1']![0]!.payload.metadata).toEqual({
       version: 1,
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
@@ -1766,8 +1766,8 @@ describe('createEventDocWorkspace transient streams', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.transient.noteA['conn-1']).toHaveLength(1);
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.transient.noteA!['conn-1']).toHaveLength(1);
+    expect(state!.slots.noteA!.error).toBeNull();
   });
 
   it('folds base + pending + transient, transient ordered by createdAt across keys', () => {
@@ -1828,11 +1828,11 @@ describe('createEventDocWorkspace transient streams', () => {
     const state = runWorkspaceStory(workspace, story);
 
     // The one-per-type SetTitle rule collapses conn-1's burst to its latest ...
-    expect(state.transient.noteA['conn-1']).toHaveLength(1);
-    expect(state.transient.noteA['conn-1'][0].payload.data).toEqual({ title: 'three' });
+    expect(state!.transient.noteA!['conn-1']).toHaveLength(1);
+    expect(state!.transient.noteA!['conn-1']![0]!.payload.data).toEqual({ title: 'three' });
     // ... without reaching into conn-2's group.
-    expect(state.transient.noteA['conn-2']).toHaveLength(1);
-    expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ title: 'other' });
+    expect(state!.transient.noteA!['conn-2']).toHaveLength(1);
+    expect(state!.transient.noteA!['conn-2']![0]!.payload.data).toEqual({ title: 'other' });
   });
 
   it('drop clears the key across ALL slots and the folded view reverts', () => {
@@ -1857,9 +1857,9 @@ describe('createEventDocWorkspace transient streams', () => {
     const after = runWorkspaceStory(workspace, dropStory);
 
     // conn-1 is gone from EVERY slot; conn-2 and the pending buffer are untouched.
-    expect(after.transient.noteA['conn-1']).toBeUndefined();
+    expect(after!.transient.noteA!['conn-1']).toBeUndefined();
     expect(after.transient.noteB).toEqual({});
-    expect(after.transient.noteA['conn-2']).toHaveLength(1);
+    expect(after!.transient.noteA!['conn-2']).toHaveLength(1);
     expect(workspace.docs.noteA.view(after).title).toBe('pending title');
     expect(workspace.docs.noteA.view(after).lines).toEqual([{ lineId: 'l9', text: 'other connection' }]);
     expect(workspace.docs.noteB.view(after).lines).toEqual([]);
@@ -1896,9 +1896,9 @@ describe('createEventDocWorkspace transient streams', () => {
 
     // Save streamed only the pending line; nothing transient touched the wire.
     expect(fake.appended).toHaveLength(1);
-    expect(fake.appended[0].payload.data).toEqual({ lineId: 'l1', text: 'saved line' });
+    expect(fake!.appended[0]!.payload.data).toEqual({ lineId: 'l1', text: 'saved line' });
     // Cancel drained nothing transient either: both of conn-1's events survive.
-    expect(state.transient.noteA['conn-1']).toHaveLength(2);
+    expect(state!.transient.noteA!['conn-1']).toHaveLength(2);
     // Pending is drained and only transient remains: the workspace is not dirty.
     expect(workspace.selectors.isDirty(state)).toBe(false);
     expect(state.pending.noteA).toHaveLength(0);
@@ -2011,9 +2011,9 @@ describe('createEventDocWorkspace pending rebase', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
-    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
-    expect(state.slots.noteA.error?.error.errorText).toMatch(/^2 unsaved changes were discarded because the document changed: /);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(state!.slots.noteA!.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(state!.slots.noteA!.error?.error.errorText).toMatch(/^2 unsaved changes were discarded because the document changed: /);
 
     const view = workspace.docs.noteA.view(state);
     expect(view.status).toBe(EventDocStatus.Published);
@@ -2039,11 +2039,11 @@ describe('createEventDocWorkspace pending rebase', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.noteA.map((event) => event.payload.data)).toEqual([
+    expect(state!.pending.noteA!.map((event) => event.payload.data)).toEqual([
       { lineId: 'l1', text: 'a' },
       { lineId: 'l3', text: 'b' },
     ]);
-    expect(state.slots.noteA.error?.error.errorText).toBe('1 unsaved change was discarded because the document changed: Duplicate line');
+    expect(state!.slots.noteA!.error?.error.errorText).toBe('1 unsaved change was discarded because the document changed: Duplicate line');
     expect(workspace.docs.noteA.view(state).lines.map((line) => line.lineId)).toEqual(['srv', 'l1', 'l3']);
   });
 
@@ -2061,7 +2061,7 @@ describe('createEventDocWorkspace pending rebase', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(1);
-    expect(state.slots.noteA.error).toBeNull();
+    expect(state!.slots.noteA!.error).toBeNull();
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('theirs');
     expect(view.lines.map((line) => line.lineId)).toEqual(['l1']);
@@ -2086,8 +2086,8 @@ describe('createEventDocWorkspace pending rebase', () => {
     // The first append went out; the resync found the document published, so the second never did.
     expect(fake.appended.map((input) => input.payload.data)).toEqual([{ lineId: 'l1', text: 'one' }]);
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
-    expect(state.slots.noteA.isSaving).toBe(false);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(state!.slots.noteA!.isSaving).toBe(false);
     expect(state.bases.noteA?.eventId).toBe(eventId(2));
   });
 
@@ -2110,14 +2110,14 @@ describe('createEventDocWorkspace pending rebase', () => {
     const state = runWorkspaceStory(workspace, swappedSession);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
+    expect(state!.slots.noteA!.error?.operation).toBe(EventDocWorkspaceSlotOperation.rebase);
     expect(workspace.docs.noteA.view(state).status).toBe(EventDocStatus.Published);
   });
 
   it('rebaseSlotPending keeps everything on a slot with no validator', () => {
     const localSlot: EventDocWorkspaceLocalSlotFoldConfig<{ count: number }> = {
       kind: EventDocWorkspaceSlotKind.local,
-      foldReducer: (state) => [{ count: state.count + 1 }],
+      foldReducer: (state) => [{ count: state.count + 1 }, true],
       createInitialViewState: () => ({ count: 0 }),
     };
     const pending = [serverEvent('TICK', {}, 0), serverEvent('TICK', {}, 1)];

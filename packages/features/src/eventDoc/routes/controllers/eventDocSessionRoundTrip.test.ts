@@ -225,7 +225,7 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     const mocks = buildMocks({ serverEventTypes: ['buildRecorded'] });
 
     const summary = JSON.parse(runStory(create(baseHttpEvent({ name: 'session', code: 'guid-1' })), mocks).body!);
-    const logRows = () => mocks.tables[store.eventsStoreName].filter((row) => row.pk === summary.id);
+    const logRows = () => mocks!.tables[store.eventsStoreName]!.filter((row) => row.pk === summary.id);
 
     const forbidden = () =>
       runStory(

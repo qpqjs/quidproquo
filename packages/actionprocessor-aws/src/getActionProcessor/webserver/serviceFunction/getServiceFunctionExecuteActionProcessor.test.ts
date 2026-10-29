@@ -47,11 +47,11 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
       functionGlobals: { apiKey: 'k' },
     } as any;
 
-    await invokeProcessor(processor, { functionName: 'doThing', service: 'auth', payload: [1], isAsync: false }, { session });
+    await invokeProcessor(processor!, { functionName: 'doThing', service: 'auth', payload: [1], isAsync: false }, { session });
 
     const payload = vi
       .mocked(executeLambdaByName)
-      .mock.calls[0].find((arg) => arg && typeof arg === 'object' && 'storySession' in (arg as any)) as any;
+      .mock.calls[0].find((arg: any) => arg && typeof arg === 'object' && 'storySession' in (arg as any)) as any;
     expect(payload.storySession.accessToken).toBeUndefined();
     expect(payload.storySession.localContext).toBeUndefined();
     expect(payload.storySession.functionGlobals).toBeUndefined();

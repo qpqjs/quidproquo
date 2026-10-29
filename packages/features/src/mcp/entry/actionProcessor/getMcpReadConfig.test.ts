@@ -22,7 +22,7 @@ describe('getMcpReadConfig', () => {
       loader,
     );
 
-    const result = await runProcessor(processors[McpActionType.ReadConfig]);
+    const result = await runProcessor(processors![McpActionType.ReadConfig]!);
 
     expect(result).toMatchObject([{ serverName: 'kiln', toolsets: [{ name: 'docs' }] }]);
   });
@@ -30,7 +30,7 @@ describe('getMcpReadConfig', () => {
   it('fails with NotFound when the service has no defineMcpServer', async () => {
     const processors = await getMcpReadConfig([], loader);
 
-    const result = await runProcessor(processors[McpActionType.ReadConfig]);
+    const result = await runProcessor(processors![McpActionType.ReadConfig]!);
 
     expect(result).toMatchObject([undefined, { errorType: 'NotFound' }]);
   });

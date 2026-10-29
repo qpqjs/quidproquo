@@ -15,7 +15,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
   it('answers a simulated email delivery to the given login; nothing is sent', async () => {
     const process = await getProcessor();
 
-    const [result, error] = await invokeProcessor(process, { userDirectoryName: 'directory', username: 'joe@example.com' });
+    const [result, error] = await invokeProcessor(process!, { userDirectoryName: 'directory', username: 'joe@example.com' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'joe@example.com' });
@@ -24,7 +24,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
   it('falls back to the dev user when no login is given', async () => {
     const process = await getProcessor();
 
-    const [result] = await invokeProcessor(process, { userDirectoryName: 'directory', username: '' });
+    const [result] = await invokeProcessor(process!, { userDirectoryName: 'directory', username: '' });
 
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: DEV_USER_EMAIL });
   });

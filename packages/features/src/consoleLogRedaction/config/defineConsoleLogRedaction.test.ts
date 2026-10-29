@@ -8,8 +8,8 @@ describe('defineConsoleLogRedaction', () => {
   it('registers the redacted log processors entry as an action processor source', () => {
     const [setting] = defineConsoleLogRedaction() as ActionProcessorsQPQConfigSetting[];
 
-    expect(setting.configSettingType).toBe(QPQCoreConfigSettingType.actionProcessors);
-    expect(setting.runtime as QpqFunctionRuntimeAdvanced).toMatchObject({
+    expect(setting!.configSettingType).toBe(QPQCoreConfigSettingType.actionProcessors);
+    expect(setting!.runtime as QpqFunctionRuntimeAdvanced).toMatchObject({
       relativePath: 'consoleLogRedaction/entry/actionProcessor/getConsoleLogRedactionActionProcessors',
       functionName: 'getConsoleLogRedactionActionProcessors',
     });

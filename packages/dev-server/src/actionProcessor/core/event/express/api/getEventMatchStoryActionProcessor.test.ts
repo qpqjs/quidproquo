@@ -13,7 +13,7 @@ const buildConfigWithRoute = () => buildTestQpqConfig([defineRoute('GET', '/user
 const invoke = async (qpqConfig: any, qpqEventRecord: any) => {
   const processors = await getEventMatchStoryActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const process = processors[EventActionType.MatchStory];
-  return invokeProcessor(process, { qpqEventRecord, eventParams: [{ headers: {} }] } as any);
+  return invokeProcessor(process!, { qpqEventRecord, eventParams: [{ headers: {} }] } as any);
 };
 
 describe('getEventMatchStoryActionProcessor (express)', () => {

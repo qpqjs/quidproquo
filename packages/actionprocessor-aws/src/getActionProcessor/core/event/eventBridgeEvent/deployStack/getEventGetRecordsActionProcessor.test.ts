@@ -36,7 +36,7 @@ describe('eventBridgeEvent/deployStack getEventGetRecordsActionProcessor', () =>
     ['another environment', buildTestQpqConfig([], { environment: 'production' })],
     ['a feature deployment', buildTestQpqConfig([], { feature: 'joe' })],
     ['another module', buildTestQpqConfig([], { moduleName: 'other-module' })],
-  ])('classifies the api and web stacks of %s as unknown', async (_label, sibling) => {
+  ])('classifies the api and web stacks of %s as unknown', async (_label: any, sibling: any) => {
     const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
 
     const [apiRecords] = await processor({ eventParams: [buildEvent(awsNamingUtils.getApiStackName(sibling), 'UPDATE_COMPLETE'), {}] });

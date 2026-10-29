@@ -43,7 +43,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
       { session: buildTestStorySession({ decodedAccessToken }) },
     );
@@ -56,7 +56,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
       { session: buildTestStorySession({ decodedAccessToken }) },
     );
@@ -70,7 +70,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
       { session: buildTestStorySession({ decodedAccessToken }) },
     );
@@ -84,7 +84,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: true },
       { session: buildTestStorySession({ decodedAccessToken }) },
     );
@@ -97,7 +97,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
       { session: buildTestStorySession({ decodedAccessToken }) },
     );
@@ -110,7 +110,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
       { session: buildTestStorySession({ accessToken }) },
     );
@@ -121,7 +121,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
   it('returns Unauthorized when the session carries no token at all', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', ignoreExpiration: false }, { session: buildTestStorySession() });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', ignoreExpiration: false }, { session: buildTestStorySession() });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);

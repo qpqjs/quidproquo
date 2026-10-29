@@ -25,7 +25,7 @@ describe('getUserDirectoryChangePasswordActionProcessor', () => {
   it('changes the password using the access token', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { oldPassword: 'old', newPassword: 'new', accessToken: 'tok' });
+    const result = await invokeProcessor(processor!, { oldPassword: 'old', newPassword: 'new', accessToken: 'tok' });
 
     expect(result).toEqual([undefined]);
     expect(changePassword).toHaveBeenCalledWith('tok', 'old', 'new', 'eu-west-1');

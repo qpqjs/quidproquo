@@ -33,7 +33,7 @@ describe('getEmailSendEmailActionProcessor', () => {
   it('keeps the raw message in the outbox, delivers it to the local receivers (bcc included) and answers a unique id', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       from: 'noreply@app.example',
       to: ['help@inbox.app.example'],
       bcc: ['audit@inbox.app.example'],
@@ -56,7 +56,7 @@ describe('getEmailSendEmailActionProcessor', () => {
   it('answers BadRequest for a message with no recipient, as the provider would', async () => {
     const process = await getProcessor();
 
-    const [, error] = await invokeProcessor(process, { from: 'noreply@app.example', to: [], subject: 'hi', bodyText: 'body' });
+    const [, error] = await invokeProcessor(process!, { from: 'noreply@app.example', to: [], subject: 'hi', bodyText: 'body' });
 
     expect(error?.errorType).toBe(askEmailSendEmail.errorType.BadRequest);
     expect(email.writeLocalEmailOutbox).not.toHaveBeenCalled();

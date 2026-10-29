@@ -17,7 +17,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = signDevJwt('test-secret', { sub: 'user-1', email: 'joe@example.com' });
 
-    const [result, error] = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken });
+    const [result, error] = await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'joe@example.com' });
@@ -26,7 +26,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
   it('falls back to the dev user when the token names nobody', async () => {
     const process = await getProcessor();
 
-    const [result] = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken: signDevJwt('test-secret', {}) });
+    const [result] = await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken: signDevJwt('test-secret', {}) });
 
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: DEV_USER_EMAIL });
   });

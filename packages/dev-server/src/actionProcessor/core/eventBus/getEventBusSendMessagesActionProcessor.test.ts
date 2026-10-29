@@ -30,7 +30,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('returns NotFound when the event bus is unknown', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { eventBusName: 'missing', eventBusMessages: [] });
+    const result = await invokeProcessor(process!, { eventBusName: 'missing', eventBusMessages: [] });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askEventBusSendMessagesBase.errorType.TopicNotFound);
@@ -40,7 +40,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('publishes one event per message and returns success', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       eventBusName: 'myBus',
       eventBusMessages: [
         { payload: { a: 1 }, type: 'x' },
@@ -75,7 +75,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
       context: { tenant: 't1' },
     } as any;
 
-    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] }, { session: session });
+    await invokeProcessor(process!, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] }, { session: session });
 
     const published = (eventBus.publish as any).mock.calls[0][1];
     expect(published.storySession.accessToken).toBeUndefined();
@@ -88,7 +88,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('leaves groupId unset for non-FIFO buses', async () => {
     const process = await getProcessor();
 
-    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] });
+    await invokeProcessor(process!, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] });
 
     expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBeUndefined();
   });
@@ -96,7 +96,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('defaults groupId to the bus name for FIFO buses', async () => {
     const process = await getProcessor(buildTestQpqConfig([defineEventBus('fifoBus', { isFifo: true })]));
 
-    await invokeProcessor(process, {
+    await invokeProcessor(process!, {
       eventBusName: 'fifoBus',
       eventBusMessages: [
         { payload: {}, type: 'x' },
@@ -111,7 +111,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('drops FIFO messages with a deduplicationId seen within the dedup window', async () => {
     const process = await getProcessor(buildTestQpqConfig([defineEventBus('fifoBus', { isFifo: true })]));
 
-    await invokeProcessor(process, {
+    await invokeProcessor(process!, {
       eventBusName: 'fifoBus',
       eventBusMessages: [
         { payload: { a: 1 }, type: 'x', deduplicationId: 'bus-dedup-1' },

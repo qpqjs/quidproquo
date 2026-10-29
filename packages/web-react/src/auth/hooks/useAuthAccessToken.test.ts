@@ -20,7 +20,7 @@ describe('useAuthAccessToken', () => {
 
   it('returns the access token from the auth context', () => {
     const { result } = renderHook(() => useAuthAccessToken(), {
-      wrapper: wrapperFor({ username: '', password: '', authenticationInfo: { accessToken: 'token-123' } as any }),
+      wrapper: wrapperFor({ username: '', authenticationInfo: { accessToken: 'token-123' } as any }),
     });
 
     expect(result.current).toBe('token-123');

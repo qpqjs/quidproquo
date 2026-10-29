@@ -35,7 +35,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(resolveActionResult(result).userId).toBe('user-1');
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
@@ -46,7 +46,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
+    await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(userStore.upsertDevUser).not.toHaveBeenCalled();
   });

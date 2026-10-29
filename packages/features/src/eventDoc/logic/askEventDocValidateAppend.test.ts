@@ -40,7 +40,7 @@ const buildMocks = ({ verdict = null as string | null } = {}) => {
       }
       if (functionName === 'foldDocumentState') {
         const [events, seed] = args as [EventDocEvent[], { body: string }];
-        const { version } = events[0].payload.metadata;
+        const { version } = events![0]!.payload.metadata;
         if (version !== 1 && version !== 2) {
           return throwsError(ErrorTypeEnum.GenericError, `No event-doc fold reducer for schema version ${version} (registered: 1, 2).`);
         }

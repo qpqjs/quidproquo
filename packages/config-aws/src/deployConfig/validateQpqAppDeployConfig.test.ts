@@ -19,14 +19,14 @@ describe('validateQpqAppDeployConfig', () => {
       deployments: { 'feature-dev': { ...awsDeployment, feature: 'sample', settings: { PAGE_TITLE: 'Example', MAX_ITEMS: '10' } } },
     });
 
-    expect(config.deployments['feature-dev'].platform).toBe('aws');
-    expect(config.deployments['feature-dev'].settings).toEqual({ PAGE_TITLE: 'Example', MAX_ITEMS: '10' });
+    expect(config!.deployments['feature-dev']!.platform).toBe('aws');
+    expect(config!.deployments['feature-dev']!.settings).toEqual({ PAGE_TITLE: 'Example', MAX_ITEMS: '10' });
   });
 
   it('accepts a docker deployment with no platform settings', () => {
     const config = validate({ deployments: { local: { platform: 'docker', name: 'example', environment: 'local' } } });
 
-    expect(config.deployments.local.platform).toBe('docker');
+    expect(config!.deployments.local!.platform).toBe('docker');
   });
 
   it('rejects a file without a deployments map', () => {
@@ -69,7 +69,7 @@ describe('validateQpqAppDeployConfig', () => {
 
   // Security regression: a settings key becomes the suffix of an env var, so anything that could break
   // out of one name (spaces, `=`, lower case, a leading digit, a traversal) is refused rather than exported.
-  it.each(['page title', 'PAGE=TITLE', 'pageTitle', '1PAGE', '../PAGE', 'PAGE\nTITLE', ''])('rejects the setting key %j', (key) => {
+  it.each(['page title', 'PAGE=TITLE', 'pageTitle', '1PAGE', '../PAGE', 'PAGE\nTITLE', ''])('rejects the setting key %j', (key: any) => {
     expect(() => validate({ deployments: { dev: { ...awsDeployment, settings: { [key]: 'x' } } } })).toThrow('must be UPPER_SNAKE_CASE');
   });
 

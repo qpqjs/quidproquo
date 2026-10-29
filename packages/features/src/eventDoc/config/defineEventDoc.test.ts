@@ -36,8 +36,8 @@ describe('defineEventDoc', () => {
 
     const dynamicFunctions = qpqCoreUtils.getAllDynamicFunctions(config);
     expect(dynamicFunctions).toHaveLength(1);
-    expect(dynamicFunctions[0].dynamicFunctionsName).toBe(eventDocFunctionsName('memos', 'memo'));
-    expect(dynamicFunctions[0].runtime).toBe(FUNCTIONS_RUNTIME);
+    expect(dynamicFunctions![0]!.dynamicFunctionsName).toBe(eventDocFunctionsName('memos', 'memo'));
+    expect(dynamicFunctions![0]!.runtime).toBe(FUNCTIONS_RUNTIME);
 
     expect(snapshotFunctionsGlobalOf(config)).toEqual({ memo: eventDocFunctionsName('memos', 'memo') });
   });

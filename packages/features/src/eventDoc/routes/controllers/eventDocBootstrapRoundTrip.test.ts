@@ -211,7 +211,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     const docId = seedDocWithEvents(mocks);
 
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
-    const snapshotAt = eventIdOf(fullLog[2]);
+    const snapshotAt = eventIdOf(fullLog![2]!);
     const snapshotState = { id: docId, folded: 'up-to-third-event' };
 
     tables[store.snapshotsStoreName] = [
@@ -257,7 +257,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     tables[store.snapshotsStoreName] = [
       {
         pk: eventDocSnapshotPk(docId, 'document', ''),
-        sk: eventIdOf(fullLog[2]),
+        sk: eventIdOf(fullLog![2]!),
         type: store.type,
         data: { type: 'storageDrive', views: ['document'] },
       },
@@ -283,13 +283,13 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     const docId = seedDocWithEvents(mocks);
 
     // The collection's registered definition files snapshots under 'k2'; nothing else is registered.
-    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: { functionName: string } }) =>
+    mocks[DynamicFunctionsActionType.Execute] = ((action: { payload: { functionName: string } }) =>
       action.payload.functionName === 'getSnapshotCacheKey'
         ? 'k2'
-        : throwsError(askDynamicFunctionExecute.errorType.FunctionNotFound, 'only getSnapshotCacheKey is registered');
+        : throwsError(askDynamicFunctionExecute.errorType.FunctionNotFound, 'only getSnapshotCacheKey is registered')) as any;
 
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
-    const snapshotAt = eventIdOf(fullLog[2]);
+    const snapshotAt = eventIdOf(fullLog![2]!);
 
     // A legacy row (written before the key changed) is stale fold output: not found under the new pk.
     tables[store.snapshotsStoreName] = [
@@ -307,7 +307,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
 
     // A row filed under the current key is the base, and says which key it was filed under.
     const keyedState = { id: docId, folded: 'under-k2' };
-    tables[store.snapshotsStoreName].push({
+    tables![store.snapshotsStoreName]!.push({
       pk: eventDocSnapshotPk(docId, 'document', 'k2'),
       sk: snapshotAt,
       type: store.type,

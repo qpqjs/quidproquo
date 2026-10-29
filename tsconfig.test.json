@@ -7,6 +7,8 @@
     "strict": true,
     "jsx": "react-jsx",
     "types": ["node"],
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
     "moduleResolution": "node",
     "baseUrl": ".",
     // Resolve @qpqjs/web-react to its source for type-checking so the suite type-checks

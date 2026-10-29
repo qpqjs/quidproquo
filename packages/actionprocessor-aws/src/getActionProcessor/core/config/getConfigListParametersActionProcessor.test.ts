@@ -14,7 +14,7 @@ describe('getConfigListParametersActionProcessor', () => {
   it('returns the keys of the owned parameter configs', async () => {
     const processor = await resolveProcessor(buildTestQpqConfig([defineParameter('a'), defineParameter('b')]));
 
-    const result = await invokeProcessor(processor, {});
+    const result = await invokeProcessor(processor!, {});
 
     expect(result).toEqual([['a', 'b']]);
   });
@@ -22,7 +22,7 @@ describe('getConfigListParametersActionProcessor', () => {
   it('returns an empty list when no parameters are defined', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, {});
+    const result = await invokeProcessor(processor!, {});
 
     expect(result).toEqual([[]]);
   });

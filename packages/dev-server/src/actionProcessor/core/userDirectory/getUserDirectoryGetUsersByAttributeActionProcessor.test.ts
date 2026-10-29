@@ -31,7 +31,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     userStore.findDevUsersByAttribute.mockResolvedValue(users);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', attribueName: 'email', attribueValue: 'joe@example.com' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', attribueName: 'email', attribueValue: 'joe@example.com' });
 
     expect(userStore.findDevUsersByAttribute).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'email', 'joe@example.com');
     expect(resolveActionResult(result)).toEqual({ items: users });
@@ -41,7 +41,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     userStore.findDevUsersByAttribute.mockResolvedValue([{ userId: 'a' }, { userId: 'b' }, { userId: 'c' }]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       attribueName: 'emailVerified',
       attribueValue: 'true',

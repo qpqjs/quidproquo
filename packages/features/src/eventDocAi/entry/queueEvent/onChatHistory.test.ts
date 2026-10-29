@@ -55,7 +55,7 @@ const serveHistory = (sendUsageToFrontend: boolean): EventDocAiChatMessage[] => 
 
   expect(sentMessages).toHaveLength(1);
 
-  return sentMessages[0].payload.result;
+  return sentMessages![0]!.payload.result;
 };
 
 describe('onChatHistory', () => {

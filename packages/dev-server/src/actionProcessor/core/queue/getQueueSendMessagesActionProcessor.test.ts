@@ -30,7 +30,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('returns NotFound when the queue is unknown', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { queueName: 'missing', queueMessages: [] });
+    const result = await invokeProcessor(process!, { queueName: 'missing', queueMessages: [] });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askQueueSendMessagesBase.errorType.QueueNotFound);
@@ -40,7 +40,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('publishes one message per queue message with a messageId', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       queueName: 'myQueue',
       queueMessages: [
         { payload: { a: 1 }, type: 'x' },
@@ -64,7 +64,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('leaves groupId unset for non-FIFO queues', async () => {
     const process = await getProcessor();
 
-    await invokeProcessor(process, { queueName: 'myQueue', queueMessages: [{ payload: {}, type: 'x' }] });
+    await invokeProcessor(process!, { queueName: 'myQueue', queueMessages: [{ payload: {}, type: 'x' }] });
 
     expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBeUndefined();
   });
@@ -72,7 +72,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('defaults groupId to the queue name for FIFO queues', async () => {
     const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
 
-    await invokeProcessor(process, {
+    await invokeProcessor(process!, {
       queueName: 'fifoQueue',
       queueMessages: [
         { payload: {}, type: 'x' },
@@ -87,7 +87,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('drops FIFO messages with a deduplicationId seen within the dedup window', async () => {
     const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
 
-    await invokeProcessor(process, {
+    await invokeProcessor(process!, {
       queueName: 'fifoQueue',
       queueMessages: [
         { payload: { a: 1 }, type: 'x', deduplicationId: 'dedup-1' },
@@ -104,7 +104,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('does not dedup FIFO messages without an explicit deduplicationId', async () => {
     const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
 
-    await invokeProcessor(process, {
+    await invokeProcessor(process!, {
       queueName: 'fifoQueue',
       queueMessages: [
         { payload: { a: 1 }, type: 'x' },

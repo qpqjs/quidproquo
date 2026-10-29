@@ -31,7 +31,7 @@ describe('getUserDirectoryCreateUserActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       createUserRequest: { email: 'joe@example.com', password: 'S3cret!', phone: '+61' } as any,
     });

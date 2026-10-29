@@ -174,7 +174,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
   // Security regression: a caller names the member, so Object.prototype names must never resolve to callables.
   it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty', 'valueOf'])(
     'returns FunctionNotFound for the prototype name %s',
-    async (functionName) => {
+    async (functionName: any) => {
       const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName, args: [] }, {}, async () => ({ real() {} }));
 
       expect(resolveActionResultError(result).errorType).toBe(askDynamicFunctionExecute.errorType.FunctionNotFound);

@@ -14,7 +14,7 @@ describe('getUserDirectoryChangePasswordActionProcessor', () => {
   it('accepts any change, since dev stores no passwords', async () => {
     const process = await getProcessor();
 
-    const [result, error] = await invokeProcessor(process, {
+    const [result, error] = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       accessToken: 'token',
       previousPassword: 'old',

@@ -39,7 +39,10 @@ describe('getWebAddressing', () => {
 
     const addressing = getWebAddressing([shell], null, () => resolver);
 
-    expect(addressing.mode === WebAddressingMode.subdomain && addressing.apis[0].hosts).toEqual(['api-custom.example.com', 'api-custom.example.org']);
+    expect(addressing.mode === WebAddressingMode.subdomain && addressing!.apis[0]!.hosts).toEqual([
+      'api-custom.example.com',
+      'api-custom.example.org',
+    ]);
   });
 
   it('is port mode with host-side ports mapped and no hosts', () => {

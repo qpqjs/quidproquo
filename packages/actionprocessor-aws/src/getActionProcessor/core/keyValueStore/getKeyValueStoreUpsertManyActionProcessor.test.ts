@@ -32,7 +32,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
   it('batch writes the items unconditionally', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', items });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', items });
 
     expect(result).toEqual([undefined]);
     expect(batchPutItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', items, 'eu-west-1');
@@ -42,7 +42,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
   it('writes conditionally in one transaction when ifNotExists is asked for', async () => {
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, { keyValueStoreName: 'users', items, options: { ifNotExists: true } });
+    await invokeProcessor(processor!, { keyValueStoreName: 'users', items, options: { ifNotExists: true } });
 
     expect(transactPutItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', items, 'pk', 'eu-west-1');
     expect(batchPutItems).not.toHaveBeenCalled();
@@ -52,7 +52,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
   it('rejects a batch with two items of the same key before writing anything', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       keyValueStoreName: 'users',
       items: [
         { pk: '1', sk: 'a' },
@@ -67,7 +67,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
   it('returns the typed StoreNotFound error when the store is not configured', async () => {
     const processor = await resolveProcessor(false);
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', items });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'users', items });
 
     expect(error?.errorType).toBe(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound);
   });
@@ -82,7 +82,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     vi.mocked(batchPutItems).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', items });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'users', items });
 
     expect(error?.errorType).toBe(expectedType);
   });

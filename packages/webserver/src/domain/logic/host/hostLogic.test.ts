@@ -59,7 +59,7 @@ describe('resolveHosts', () => {
   // contains or starts with the root (a takeover-shaped host) is refused, as is an empty host.
   it.each(['example.com.evil.com', 'evilexample.com', 'example.com-evil.com', 'example.comm', ''])(
     'rejects the lookalike host %j from a resolver',
-    (host) => {
+    (host: any) => {
       const rogue: DomainResolver = { resolveHost: () => host };
       expect(() => resolveHosts(twoRoots(), {}, rogue)).toThrow('must be the root or end with .example.com');
     },

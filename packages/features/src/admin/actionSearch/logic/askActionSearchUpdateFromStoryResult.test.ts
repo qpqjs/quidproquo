@@ -83,7 +83,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
-    const [networkRow, emailRow] = upserts[QPQ_LOG_ACTIONS_KVS_NAME];
+    const [networkRow, emailRow] = upserts[QPQ_LOG_ACTIONS_KVS_NAME]!;
 
     expect(networkRow).toMatchObject({
       correlation: 'corr-1',
@@ -96,7 +96,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
       method: 'GET',
       status: 200,
     });
-    expect(networkRow.linkKey).toBeUndefined();
+    expect(networkRow!.linkKey).toBeUndefined();
 
     expect(emailRow).toMatchObject({
       actionIndex: 1,
@@ -112,7 +112,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
     runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry]), 12345), mocks);
 
     expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
-    expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
+    expect(upserts![QPQ_LOG_ENTITIES_KVS_NAME]![0]).toMatchObject({
       linkKey: 'email#msg-123',
       entityType: 'email',
       createdAt: '2026-07-24T00:00:02.000Z',
@@ -124,7 +124,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
 
     const lookupKeys = (upserts[QPQ_LOG_ENTITY_LOOKUP_KVS_NAME] ?? []).map((row) => row.lookupKey);
     expect(lookupKeys).toEqual(['email#recipient#joe@x.com', 'email#recipient#ops@x.com']);
-    expect(upserts[QPQ_LOG_ENTITY_LOOKUP_KVS_NAME][0]).toMatchObject({
+    expect(upserts![QPQ_LOG_ENTITY_LOOKUP_KVS_NAME]![0]).toMatchObject({
       sortValue: '2026-07-24T00:00:02.000Z#email#msg-123',
       linkKey: 'email#msg-123',
       ttl: 12345,
@@ -149,7 +149,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
 
     runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
 
-    expect(upserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toMatchObject({
+    expect(upserts![QPQ_LOG_ENTITIES_KVS_NAME]![0]).toMatchObject({
       deliveryStatus: EmailDeliveryStatus.dropped,
       createdAt: '2026-07-24T00:00:00.500Z',
       sentAt: '2026-07-24T00:00:00.500Z',
@@ -161,15 +161,15 @@ describe('askActionSearchUpdateFromStoryResult', () => {
 
     // First ingestion primes nothing; re-run with the stored copy visible in the query
     runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), mocks);
-    const firstEntity = upserts[QPQ_LOG_ENTITIES_KVS_NAME][0];
+    const firstEntity = upserts![QPQ_LOG_ENTITIES_KVS_NAME]![0];
 
-    const storedCopy = upserts[QPQ_LOG_ACTIONS_KVS_NAME][0] as ActionSearchActionRow;
+    const storedCopy = upserts![QPQ_LOG_ACTIONS_KVS_NAME]![0] as ActionSearchActionRow;
     const { mocks: rerunMocks, upserts: rerunUpserts } = buildMocks([storedCopy]);
 
     runStory(askActionSearchUpdateFromStoryResult(buildTestStoryResult([emailEntry])), rerunMocks);
 
     expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME]).toHaveLength(1);
-    expect(rerunUpserts[QPQ_LOG_ENTITIES_KVS_NAME][0]).toEqual(firstEntity);
+    expect(rerunUpserts![QPQ_LOG_ENTITIES_KVS_NAME]![0]).toEqual(firstEntity);
   });
 
   it('extracts actions nested inside batches, including nested batches', () => {
@@ -201,7 +201,7 @@ describe('askActionSearchUpdateFromStoryResult', () => {
 
     expect(upserts[QPQ_LOG_ACTIONS_KVS_NAME]).toHaveLength(2);
 
-    const [networkRow, emailRow] = upserts[QPQ_LOG_ACTIONS_KVS_NAME];
+    const [networkRow, emailRow] = upserts[QPQ_LOG_ACTIONS_KVS_NAME]!;
 
     expect(networkRow).toMatchObject({ actionIndex: 0, actionType: NetworkActionType.Request, status: 404 });
     expect(emailRow).toMatchObject({ actionIndex: 1, actionType: EmailActionType.SendEmail, linkKey: 'email#msg-456' });

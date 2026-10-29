@@ -27,7 +27,7 @@ describe('getConfigGetParameterActionProcessor', () => {
     vi.mocked(getParameter).mockResolvedValue('value');
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterName: 'flag' });
+    const result = await invokeProcessor(processor!, { parameterName: 'flag' });
 
     expect(result).toEqual(['value']);
     expect(getParameter).toHaveBeenCalledWith('flag-test-app-test-module-development', 'eu-west-1');
@@ -37,7 +37,7 @@ describe('getConfigGetParameterActionProcessor', () => {
     vi.mocked(getParameter).mockRejectedValue(Object.assign(new Error('rate'), { name: 'ThrottlingException' }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterName: 'flag' });
+    const [, error] = await invokeProcessor(processor!, { parameterName: 'flag' });
 
     expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttled);
   });
@@ -46,7 +46,7 @@ describe('getConfigGetParameterActionProcessor', () => {
   it('refuses an undeclared parameter before touching SSM', async () => {
     const processor = await resolveProcessor();
 
-    await expect(invokeProcessor(processor, { parameterName: '/aws/reference/secretsmanager/other-app-secret' })).rejects.toThrow('not found');
+    await expect(invokeProcessor(processor!, { parameterName: '/aws/reference/secretsmanager/other-app-secret' })).rejects.toThrow('not found');
     expect(getParameter).not.toHaveBeenCalled();
   });
 });

@@ -104,7 +104,7 @@ describe('extractUserScriptZip', () => {
     expect((await extractUserScriptZip(zip, projectDir)).sort()).toEqual(['README.md', 'src/main.ts']);
   });
 
-  it.each(['../escape.ts', '/etc/passwd', 'src\\main.ts', 'src//main.ts'])('refuses the zip-slip path %j', async (name) => {
+  it.each(['../escape.ts', '/etc/passwd', 'src\\main.ts', 'src//main.ts'])('refuses the zip-slip path %j', async (name: any) => {
     const zip = makeZip({ [name]: text('x') });
 
     await expectArchiveError(extractUserScriptZip(zip, projectDir), UserScriptArchiveErrorCode.UnsafeArchiveEntry, 'not a plain relative path');

@@ -33,7 +33,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: false },
       { session: { decodedAccessToken: decodedToken } },
     );
@@ -46,7 +46,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: false },
       { session: { decodedAccessToken: { ...decodedToken, wasValid: false } } },
     );
@@ -58,7 +58,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
   it('returns Unauthorized for an unverified session token with no exp claim, even when expiry is ignored', async () => {
     const processor = await resolveProcessor();
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: true },
       { session: { decodedAccessToken: { ...decodedToken, wasValid: false, exp: 0 } } },
     );
@@ -70,7 +70,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: false },
       { session: { decodedAccessToken: { ...decodedToken, exp: 1 } } },
     );
@@ -83,7 +83,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const expiredToken = { ...decodedToken, exp: 1 };
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: true },
       { session: { decodedAccessToken: expiredToken } },
     );
@@ -95,7 +95,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     vi.mocked(decodeAccessToken).mockResolvedValue(decodedToken);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { userDirectoryName: 'users', ignoreExpiration: false }, { session: { accessToken: 'tok' } });
+    const result = await invokeProcessor(processor!, { userDirectoryName: 'users', ignoreExpiration: false }, { session: { accessToken: 'tok' } });
 
     expect(result).toEqual([decodedToken]);
   });
@@ -108,7 +108,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', ignoreExpiration: false },
       { session: { accessToken: 'forged' } },
     );

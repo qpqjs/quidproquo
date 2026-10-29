@@ -31,7 +31,7 @@ describe('getWebEntryInvalidateCacheActionProcessor', () => {
     vi.mocked(getExportedValue).mockResolvedValue('DIST123');
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { webEntryName: 'web', paths: ['/*'] });
+    const result = await invokeProcessor(processor!, { webEntryName: 'web', paths: ['/*'] });
 
     expect(result).toEqual([undefined]);
     expect(getExportedValue).toHaveBeenCalledWith('web-test-app-test-module-development-qpqdistribution-id-export', 'eu-west-1');

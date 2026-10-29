@@ -73,6 +73,6 @@ describe('askEventDocWorkspaceSaveSlot', () => {
 
     const errors = dispatched.filter((effect) => effect.type === EventDocWorkspaceEffect.SetError);
     expect(errors).toHaveLength(1);
-    expect(errors[0].payload.error.operation).toBe('save');
+    expect(errors![0]!.payload.error.operation).toBe('save');
   });
 });

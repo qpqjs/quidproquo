@@ -44,7 +44,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     vi.mocked(query).mockResolvedValue({ items: [{ id: '1' }], nextPageKey: undefined } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', keyCondition: equal('pk', '1'), options: { limit: 10 } });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', keyCondition: equal('pk', '1'), options: { limit: 10 } });
 
     expect(result).toEqual([{ items: [{ id: '1' }], nextPageKey: undefined }]);
     expect(vi.mocked(query).mock.calls[0][0]).toBe('users-test-app-test-module-development-qpqkvs');
@@ -58,7 +58,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     } as any);
     const processor = await resolveProcessor();
 
-    const [result] = await invokeProcessor(processor, {
+    const [result] = await invokeProcessor(processor!, {
       keyValueStoreName: 'orders',
       keyCondition: equal('customerId', 'c-9'),
       options: { scope: 'acme' },
@@ -73,8 +73,8 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     const processor = await resolveProcessor();
     const keyCondition = equal('type', 'doc');
 
-    await invokeProcessor(processor, { keyValueStoreName: 'summaries', keyCondition, options: { scope: 'acme' } });
-    await invokeProcessor(processor, { keyValueStoreName: 'summaries', keyCondition, options: { scope: 'acme', indexName: 'type' } });
+    await invokeProcessor(processor!, { keyValueStoreName: 'summaries', keyCondition, options: { scope: 'acme' } });
+    await invokeProcessor(processor!, { keyValueStoreName: 'summaries', keyCondition, options: { scope: 'acme', indexName: 'type' } });
 
     expect(vi.mocked(query).mock.calls[0][5]).toBeUndefined();
     expect(vi.mocked(query).mock.calls[1][5]).toBe('type');
@@ -84,7 +84,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
   it('queries an explicitly named index by its name, still rewriting its partition key onto the hidden copy', async () => {
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, {
+    await invokeProcessor(processor!, {
       keyValueStoreName: 'orders',
       keyCondition: equal('customerId', 'c-9'),
       options: { scope: 'acme', indexName: 'customerByTotal' },
@@ -98,12 +98,12 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     const processor = await resolveProcessor();
     const pageKeyFor = (scope: string) => lastEvaluatedKeyToString({ id: { S: `${scope}@@QPQSCOPE@@o-1` } });
 
-    await invokeProcessor(processor, {
+    await invokeProcessor(processor!, {
       keyValueStoreName: 'orders',
       keyCondition: equal('id', 'o-1'),
       options: { scope: 'acme', nextPageKey: pageKeyFor('acme') },
     });
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       keyValueStoreName: 'orders',
       keyCondition: equal('id', 'o-1'),
       options: { scope: 'acme', nextPageKey: pageKeyFor('bobco') },
@@ -117,7 +117,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
   it('returns the typed IndexNotFound error for an undeclared index', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       keyValueStoreName: 'users',
       keyCondition: equal('pk', '1'),
       options: { indexName: 'missing' },
@@ -130,7 +130,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
   it('returns the typed StoreNotFound error when the store is not configured', async () => {
     const processor = await resolveProcessor(false);
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', keyCondition: {} });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'users', keyCondition: {} });
 
     expect(error?.errorType).toBe(askKeyValueStoreQueryBase.errorType.StoreNotFound);
   });

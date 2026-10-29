@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
 const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
-  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { defineAuthChallenge: runtime } })]);
+  buildTestQpqConfig([
+    defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime, defineAuthChallenge: runtime, verifyAuthChallenge: runtime } }),
+  ]);
 
 describe('cognito/defineAuthChallenge getEventTransformResponseResultActionProcessor', () => {
   it('issues a custom challenge when runCreateAuthChallenge is set', async () => {

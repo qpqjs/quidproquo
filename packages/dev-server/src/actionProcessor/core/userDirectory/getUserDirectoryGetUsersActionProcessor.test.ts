@@ -30,7 +30,7 @@ describe('getUserDirectoryGetUsersActionProcessor', () => {
     userStore.listDevUsers.mockResolvedValue([{ userId: 'user-1', email: 'joe@example.com' }]);
     const process = await getProcessor();
 
-    const [result, error] = await invokeProcessor(process, { userDirectoryName: 'directory', nextPageKey: undefined });
+    const [result, error] = await invokeProcessor(process!, { userDirectoryName: 'directory', nextPageKey: undefined });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ items: [{ userId: 'user-1', email: 'joe@example.com' }] });

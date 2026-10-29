@@ -26,6 +26,6 @@ describe('useErrorsByType', () => {
 
     const { result } = renderHook(() => useErrorsByType([log(longError)]));
 
-    expect(result.current[0].errorText).toBe('x'.repeat(100) + '...');
+    expect(result!.current[0]!.errorText).toBe('x'.repeat(100) + '...');
   });
 });

@@ -30,7 +30,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       username: 'joe@example.com',
       userAttributes: { givenName: 'Joe' },

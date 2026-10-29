@@ -27,12 +27,12 @@ describe('toSdkMessages', () => {
       failingResolver,
     );
 
-    expect(message.role).toBe('user');
-    const content = message.content as Array<Record<string, unknown>>;
+    expect(message!.role).toBe('user');
+    const content = message!.content as Array<Record<string, unknown>>;
     expect(content[0]).toEqual({ type: 'text', text: 'look' });
-    expect(content[1].type).toBe('file');
-    expect(content[1].mediaType).toBe('image/png');
-    expect((content[1].data as URL).href).toBe('https://x/y.png');
+    expect(content![1]!.type).toBe('file');
+    expect(content![1]!.mediaType).toBe('image/png');
+    expect((content![1]!.data as URL).href).toBe('https://x/y.png');
   });
 
   it('resolves drive file parts through the resolver', async () => {
@@ -49,7 +49,7 @@ describe('toSdkMessages', () => {
     );
 
     expect(resolver).toHaveBeenCalledWith('chat-drive', 'doc-1/assets/a1', undefined);
-    const content = message.content as Array<Record<string, unknown>>;
+    const content = message!.content as Array<Record<string, unknown>>;
     expect(content[0]).toEqual({ type: 'file', data: 'AAECAw==', mediaType: 'application/pdf', filename: 'stored.pdf' });
   });
 
@@ -82,8 +82,8 @@ describe('toSdkMessages', () => {
       resolver,
     );
 
-    const content = message.content as Array<Record<string, unknown>>;
-    expect(content[0].filename).toBe('quote.pdf');
+    const content = message!.content as Array<Record<string, unknown>>;
+    expect(content![0]!.filename).toBe('quote.pdf');
   });
 
   it('passes a string assistant message through', async () => {
@@ -108,10 +108,10 @@ describe('toSdkMessages', () => {
       failingResolver,
     );
 
-    const content = message.content as Array<Record<string, unknown>>;
+    const content = message!.content as Array<Record<string, unknown>>;
     expect(content[0]).toEqual({ type: 'text', text: 'sure' });
-    expect(content[1].type).toBe('file');
-    expect((content[1].data as URL).href).toBe('https://x/a.pdf');
+    expect(content![1]!.type).toBe('file');
+    expect((content![1]!.data as URL).href).toBe('https://x/a.pdf');
     expect(content[2]).toEqual({ type: 'tool-call', toolCallId: 'c1', toolName: 'calc', input: { a: 1 } });
     expect(content[3]).toEqual({ type: 'reasoning', text: 'because', providerOptions: { foo: 'bar' } });
   });
@@ -127,8 +127,8 @@ describe('toSdkMessages', () => {
       failingResolver,
     );
 
-    expect(message.role).toBe('tool');
-    expect((message.content as Array<Record<string, unknown>>)[0]).toEqual({
+    expect(message!.role).toBe('tool');
+    expect((message!.content as Array<Record<string, unknown>>)[0]).toEqual({
       type: 'tool-result',
       toolCallId: 'c1',
       toolName: 'calc',

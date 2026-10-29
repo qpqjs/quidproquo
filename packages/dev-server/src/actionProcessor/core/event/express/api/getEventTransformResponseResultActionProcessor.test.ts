@@ -9,7 +9,7 @@ import { getEventTransformResponseResultActionProcessor } from './getEventTransf
 const invoke = async (qpqEventRecordResponses: any) => {
   const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.TransformResponseResult];
-  return invokeProcessor(process, { eventParams: [{ headers: {} }], qpqEventRecordResponses } as any);
+  return invokeProcessor(process!, { eventParams: [{ headers: {} }], qpqEventRecordResponses } as any);
 };
 
 describe('getEventTransformResponseResultActionProcessor (express)', () => {
@@ -31,7 +31,7 @@ describe('getEventTransformResponseResultActionProcessor (express)', () => {
     const processors = await getEventTransformResponseResultActionProcessor(config, noopDynamicModuleLoader);
     const fromSigningSite = async (path: string) =>
       resolveActionResult(
-        await invokeProcessor(processors[EventActionType.TransformResponseResult], {
+        await invokeProcessor(processors![EventActionType.TransformResponseResult]!, {
           eventParams: [{ path, method: 'POST', headers: { origin: 'http://localhost:3082' } }],
           qpqEventRecordResponses: [{ success: true, result: { status: 200, body: 'ok', isBase64Encoded: false } }],
         } as any),

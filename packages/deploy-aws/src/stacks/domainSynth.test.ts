@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
-import { QPQConfig } from '@qpqjs/core';
+import { QPQConfig, QpqPureFunction } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineApi, defineDns, defineWebEntry, qpqWebServerUtils } from '@qpqjs/webserver';
 
@@ -45,7 +45,7 @@ const buildConfig = (roots: string | string[], extra: QPQConfig = [], resolver?:
 const synthApiDomain = (qpqConfig: QPQConfig) => {
   const app = new App();
   const stack = new Stack(app, 'domain', { env: { account: '123456789012', region: 'ap-southeast-2' } });
-  new DomainQpqWebserverApiConstruct(stack, 'api', { qpqConfig, apiConfig: qpqWebServerUtils.getAllApiConfigs(qpqConfig)[0] });
+  new DomainQpqWebserverApiConstruct(stack, 'api', { qpqConfig, apiConfig: qpqWebServerUtils.getAllApiConfigs(qpqConfig)[0]! });
   return Template.fromStack(stack);
 };
 
@@ -55,14 +55,14 @@ describe('DomainCertificateStack', () => {
     const stacks = createDomainCertificateStacks(app, buildConfig(['example.com', 'example.org']), 'test');
 
     expect(stacks.map((stack) => stack.stackName)).toEqual(['test-cert', 'test-cert']);
-    expect(stacks[0].domainNames).toEqual([
+    expect(stacks![0]!.domainNames).toEqual([
       'development.example.com',
       'development.example.org',
       'www.development.example.com',
       'www.development.example.org',
     ]);
 
-    const template = Template.fromStack(stacks[1]);
+    const template = Template.fromStack(stacks![1]!);
     template.hasResourceProperties('AWS::CertificateManager::Certificate', {
       DomainName: 'api.development.example.com',
       SubjectAlternativeNames: ['api.development.example.org', 'ws.ws.development.example.com', 'ws.ws.development.example.org'],
@@ -80,7 +80,7 @@ describe('DomainCertificateStack', () => {
   it('resolves certificate names with the resolver the config points at', () => {
     const stacks = createDomainCertificateStacks(new App(), buildConfig('example.com', [], hyphenatedPointer), 'test');
 
-    expect(stacks[1].domainNames).toEqual(['development-api.example.com', 'development-ws-ws.example.com']);
+    expect(stacks![1]!.domainNames).toEqual(['development-api.example.com', 'development-ws-ws.example.com']);
   });
 
   it('fails synth above the ACM name quota', () => {

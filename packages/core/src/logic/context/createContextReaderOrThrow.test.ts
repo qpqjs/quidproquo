@@ -19,7 +19,7 @@ describe('createContextReaderOrThrow', () => {
     expect(result).toBe('TENANT#1');
   });
 
-  it.each([undefined, null])('throws the given error when the read yields %s', (value) => {
+  it.each([undefined, null])('throws the given error when the read yields %s', (value: any) => {
     let thrown: unknown;
     try {
       runStory(readScopeOrThrow(), { [ContextActionType.Read]: value });

@@ -13,7 +13,7 @@ const buildConfig = () => buildTestQpqConfig([defineServiceFunction(runtime, { f
 const invoke = async (qpqConfig: any, qpqEventRecord: any) => {
   const processors = await getEventMatchStoryActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const process = processors[EventActionType.MatchStory];
-  return invokeProcessor(process, { qpqEventRecord } as any);
+  return invokeProcessor(process!, { qpqEventRecord } as any);
 };
 
 describe('getEventMatchStoryActionProcessor (node service function)', () => {

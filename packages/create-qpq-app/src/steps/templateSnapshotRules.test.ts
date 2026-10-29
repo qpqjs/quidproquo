@@ -18,7 +18,7 @@ const excludedFileNames = /EXCLUDED_FILE_NAMES = new Set\(\[([^\]]*)\]/.exec(sna
 // Security regression: a scaffold must never ship local state, credentials or lockfiles, and a new app
 // must ignore env files, dev secrets and keys, and CDK output from its first commit.
 describe('create-qpq-app template snapshot rules', () => {
-  it.each(['node_modules', 'dist', '.git', 'cdk.out', '.qpq-runtime'])('excludes every %s directory from the snapshot', (name) => {
+  it.each(['node_modules', 'dist', '.git', 'cdk.out', '.qpq-runtime'])('excludes every %s directory from the snapshot', (name: any) => {
     expect(excludedDirNames).toContain(`'${name}'`);
   });
 

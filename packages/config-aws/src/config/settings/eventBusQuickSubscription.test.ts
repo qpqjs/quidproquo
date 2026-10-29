@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
-import { defineEventBusQuickSubscription, EventBusQuickSubscriptionType } from './eventBusQuickSubscription';
+import { defineEventBusQuickSubscription, EventBusQuickSubscription, EventBusQuickSubscriptionType } from './eventBusQuickSubscription';
 
 describe('defineEventBusQuickSubscription', () => {
   it('builds a subscription setting keyed by the bus, owned by this service by default', () => {
-    const subscriptions = [{ type: EventBusQuickSubscriptionType.email, email: 'ops@example.com' }];
+    const subscriptions: EventBusQuickSubscription[] = [{ type: EventBusQuickSubscriptionType.email, email: 'ops@example.com' }];
 
     expect(defineEventBusQuickSubscription('alerts', subscriptions)).toEqual({
       configSettingType: QPQAwsConfigSettingType.awsEventBusQuickSubscription,

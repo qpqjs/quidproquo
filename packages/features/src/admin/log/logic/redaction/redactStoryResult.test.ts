@@ -38,13 +38,15 @@ describe('redactStoryResult', () => {
       apiKey: REDACTED_STRING,
     });
     expect(redacted.session).toEqual({ accessToken: REDACTED_STRING });
-    expect(redacted.history[0].act.payload).toEqual({ url: `https://x?token=${REDACTED_STRING}`, headers: { cookie: REDACTED_STRING } });
-    expect(redacted.history[0].res).toEqual([{ body: `echo ${REDACTED_STRING}` }, undefined]);
-    expect(redacted.history[1].act.payload.msg).toBe(`user joe typed hunter2 with ${REDACTED_STRING} and ${REDACTED_STRING} and ${REDACTED_STRING}`);
-    expect(redacted.history[2].act.payload).toEqual({ keyName: REDACTED_STRING, plaintext: REDACTED_STRING });
-    expect(redacted.history[2].res).toEqual(['cipher', undefined]);
-    expect(redacted.history[3].res).toEqual([REDACTED_STRING, undefined]);
-    expect(redacted.history[4].act.payload.url).toBe(`postgres://${REDACTED_STRING}:${REDACTED_STRING}@host`);
+    expect(redacted!.history[0]!.act.payload).toEqual({ url: `https://x?token=${REDACTED_STRING}`, headers: { cookie: REDACTED_STRING } });
+    expect(redacted!.history[0]!.res).toEqual([{ body: `echo ${REDACTED_STRING}` }, undefined]);
+    expect(redacted!.history[1]!.act.payload.msg).toBe(
+      `user joe typed hunter2 with ${REDACTED_STRING} and ${REDACTED_STRING} and ${REDACTED_STRING}`,
+    );
+    expect(redacted!.history[2]!.act.payload).toEqual({ keyName: REDACTED_STRING, plaintext: REDACTED_STRING });
+    expect(redacted!.history[2]!.res).toEqual(['cipher', undefined]);
+    expect(redacted!.history[3]!.res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted!.history[4]!.act.payload.url).toBe(`postgres://${REDACTED_STRING}:${REDACTED_STRING}@host`);
   });
 
   it('sweeps a Basic auth password from the whole log, keeping the client id', () => {
@@ -56,7 +58,7 @@ describe('redactStoryResult', () => {
     });
 
     expect(redacted.input[0].headers.Authorization).toBe(REDACTED_STRING);
-    expect(redacted.history[0].act.payload.msg).toBe(`client-1 sent ${REDACTED_STRING}`);
+    expect(redacted!.history[0]!.act.payload.msg).toBe(`client-1 sent ${REDACTED_STRING}`);
   });
 
   // Security regression: the custom auth challenge answer sits in the createAuthChallenge result
@@ -82,7 +84,7 @@ describe('redactStoryResult', () => {
       privateChallengeParameters: { answer: REDACTED_STRING },
       userAttributes: { email: 'a@b.com' },
     });
-    expect(redacted.history[0].res[0]).toEqual({
+    expect(redacted!.history[0]!.res[0]).toEqual({
       challengeName: 'emailCode',
       privateChallengeParameters: { answer: REDACTED_STRING },
       publicChallengeParameters: { hint: 'check your inbox' },

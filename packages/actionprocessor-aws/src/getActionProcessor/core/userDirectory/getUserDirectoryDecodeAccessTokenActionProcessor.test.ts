@@ -29,7 +29,7 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(decodeValidJwt).mockResolvedValue({ userId: 'user-1', username: 'joe@example.com', exp: 1, wasValid: true } as any);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'token', ignoreExpiration: false });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'token', ignoreExpiration: false });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ userId: 'user-1', username: 'joe@example.com', exp: 1, wasValid: true, userDirectory: 'users' });
@@ -40,7 +40,7 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(decodeValidJwt).mockResolvedValue(null as any);
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'bad', ignoreExpiration: false });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'bad', ignoreExpiration: false });
 
     expect(error?.errorType).toBe(askUserDirectoryDecodeAccessToken.errorType.Unauthorized);
   });

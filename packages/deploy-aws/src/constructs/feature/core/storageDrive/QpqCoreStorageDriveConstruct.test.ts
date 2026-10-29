@@ -97,7 +97,7 @@ describe('QpqCoreStorageDriveConstruct transport', () => {
   it.each([
     ['plain drive', defineStorageDrive('uploads')],
     ['lockedDown drive', defineStorageDrive('logs', { lockedDown: true })],
-  ])('denies plain http on a %s', (_name, drive) => {
+  ])('denies plain http on a %s', (_name: any, drive: any) => {
     synth(drive).hasResourceProperties('AWS::S3::BucketPolicy', {
       PolicyDocument: {
         Statement: Match.arrayWith([

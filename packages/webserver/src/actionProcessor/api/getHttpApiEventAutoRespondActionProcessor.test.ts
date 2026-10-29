@@ -29,7 +29,7 @@ const invoke = async (
   const map = await getHttpApiEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader);
   const processor = map[EventActionType.AutoRespond];
 
-  return processor(
+  return processor!(
     { qpqEventRecord, matchResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
     buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),

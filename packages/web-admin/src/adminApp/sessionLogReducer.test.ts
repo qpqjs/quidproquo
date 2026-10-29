@@ -35,8 +35,8 @@ describe('sessionLogReducer', () => {
     state = appended(state, searchEvent('abc', 'cm-3'));
 
     expect(state.pendingEvents).toHaveLength(1);
-    expect((state.pendingEvents[0].payload.data as { search: { info: string } }).search.info).toBe('abc');
-    expect(state.pendingEvents[0].payload.metadata.clientMessageId).toBe('cm-3');
+    expect((state!.pendingEvents[0]!.payload.data as { search: { info: string } }).search.info).toBe('abc');
+    expect(state!.pendingEvents[0]!.payload.metadata.clientMessageId).toBe('cm-3');
   });
 
   it('never coalesces into the head while the flush has it in flight', () => {
@@ -47,7 +47,7 @@ describe('sessionLogReducer', () => {
     state = appended(state, searchEvent('ab', 'cm-2'));
 
     expect(state.pendingEvents).toHaveLength(2);
-    expect(state.pendingEvents[0].payload.metadata.clientMessageId).toBe('cm-1');
+    expect(state!.pendingEvents[0]!.payload.metadata.clientMessageId).toBe('cm-1');
   });
 
   it('moves the acked event to the log and renumbers the remaining pending events', () => {
@@ -66,8 +66,8 @@ describe('sessionLogReducer', () => {
 
     expect(next.events).toEqual([storedEvent]);
     expect(next.pendingEvents).toHaveLength(1);
-    expect(next.pendingEvents[0].payload.metadata.clientMessageId).toBe('b');
-    expect(next.pendingEvents[0].payload.metadata.eventId).toBe(5);
+    expect(next!.pendingEvents[0]!.payload.metadata.clientMessageId).toBe('b');
+    expect(next!.pendingEvents[0]!.payload.metadata.eventId).toBe(5);
     expect(next.flush).toEqual({ inFlight: false, lastError: null, retryCount: 0 });
   });
 

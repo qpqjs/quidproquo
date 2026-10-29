@@ -26,7 +26,7 @@ describe('KVS store-not-found error shape', () => {
   it('returns the typed StoreNotFound error from Get', async () => {
     const processor = (await getKeyValueStoreGetActionProcessor(config, {} as any))[KeyValueStoreActionType.Get];
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'missing-store', key: 'k' });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'missing-store', key: 'k' });
 
     expect(error?.errorType).toBe(askKeyValueStoreGetBase.errorType.StoreNotFound);
   });
@@ -34,7 +34,7 @@ describe('KVS store-not-found error shape', () => {
   it('returns the typed StoreNotFound error from Delete', async () => {
     const processor = (await getKeyValueStoreDeleteActionProcessor(config, {} as any))[KeyValueStoreActionType.Delete];
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'missing-store', key: 'k' });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'missing-store', key: 'k' });
 
     expect(error?.errorType).toBe(askKeyValueStoreDelete.errorType.StoreNotFound);
   });
@@ -42,7 +42,7 @@ describe('KVS store-not-found error shape', () => {
   it('returns the typed StoreNotFound error from a scoped Query', async () => {
     const processor = (await getKeyValueStoreQueryActionProcessor(config, {} as any))[KeyValueStoreActionType.Query];
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       keyValueStoreName: 'missing-store',
       keyCondition: { key: 'id', operation: 'Equal', valueA: 'a' },
       options: { scope: 'tenant-a' },

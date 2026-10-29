@@ -32,7 +32,7 @@ describe('getCryptoEncryptActionProcessor', () => {
     });
     const processor = await resolveProcessor();
 
-    const [ciphertext, error] = await invokeProcessor(processor, { keyName: 'my-key', plaintext: 'shhh', context: { tenantId: 'tenant-a' } });
+    const [ciphertext, error] = await invokeProcessor(processor!, { keyName: 'my-key', plaintext: 'shhh', context: { tenantId: 'tenant-a' } });
 
     expect(error).toBeUndefined();
     expect(ciphertext!.startsWith(CRYPTO_BLOB_PREFIX_V1)).toBe(true);
@@ -43,7 +43,7 @@ describe('getCryptoEncryptActionProcessor', () => {
   it('returns KeyNotConfigured without touching KMS when the key is not in config', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', plaintext: 'shhh' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'unknown-key', plaintext: 'shhh' });
 
     expect(error?.errorType).toBe(askCryptoEncrypt.errorType.KeyNotConfigured);
     expect(getCachedGeneratedDataKey).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('getCryptoEncryptActionProcessor', () => {
     vi.mocked(getCachedGeneratedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', plaintext: 'shhh' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', plaintext: 'shhh' });
 
     expect(error?.errorType).toBe(expectedType);
   });

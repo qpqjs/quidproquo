@@ -40,7 +40,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     repo.scan.mockResolvedValue({ items: [{ id: 'a' }] });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', filterCondition: 'active = true', nextPageKey: 'np' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', filterCondition: 'active = true', nextPageKey: 'np' });
 
     expect(repo.scan).toHaveBeenCalledWith('store', 'active = true', 'np', undefined, undefined);
     expect(resolveActionResult(result)).toEqual({ items: [{ id: 'a' }] });
@@ -50,7 +50,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     repo.scan.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreScanBase.errorType.StoreNotFound);
   });
@@ -59,7 +59,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     repo.scan.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

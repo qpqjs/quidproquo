@@ -40,19 +40,22 @@ describe('action ids', () => {
     expect(enums.length).toBeGreaterThan(30);
   });
 
-  it.each(enums)('%s: every id is @quidproquo-<pkg>/<Domain>/<Verb> with the member named after the verb', (_name, actionType) => {
-    for (const [member, id] of Object.entries(actionType)) {
-      const match = ACTION_ID.exec(id);
+  it.each(enums)(
+    '%s: every id is @quidproquo-<pkg>/<Domain>/<Verb> with the member named after the verb',
+    (_name: string, actionType: ActionTypeEnum) => {
+      for (const [member, id] of Object.entries(actionType)) {
+        const match = ACTION_ID.exec(id);
 
-      expect(match, `${member} = '${id}'`).not.toBeNull();
-      expect(match![3], `${member} = '${id}'`).toBe(member);
+        expect(match, `${member} = '${id}'`).not.toBeNull();
+        expect(match![3], `${member} = '${id}'`).toBe(member);
 
-      const domain = match![2];
-      if (!LOWER_CASE_DOMAINS.includes(domain)) {
-        expect(domain, `${member} = '${id}'`).toMatch(/^[A-Z]/);
+        const domain = match![2];
+        if (!LOWER_CASE_DOMAINS.includes(domain!)) {
+          expect(domain, `${member} = '${id}'`).toMatch(/^[A-Z]/);
+        }
       }
-    }
-  });
+    },
+  );
 
   it('mints every id once across the framework', () => {
     const ids = enums.flatMap(([, actionType]) => Object.values(actionType));

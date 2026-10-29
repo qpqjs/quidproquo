@@ -25,7 +25,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
   it('deletes the item using the store partition and sort keys', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1' });
 
     expect(result).toEqual([undefined]);
     expect(deleteItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', 'k1', 'pk', 's1', 'sk');

@@ -21,8 +21,8 @@ describe('getCryptoActionProcessor (dev server)', () => {
     const qpqConfig = buildTestQpqConfig([defineCryptoKey('my-key')]);
     const processors = await getCryptoActionProcessor({ runtimePath } as any)(qpqConfig, (() => null) as any);
 
-    encrypt = processors[CryptoActionType.Encrypt];
-    decrypt = processors[CryptoActionType.Decrypt];
+    encrypt! = processors[CryptoActionType.Encrypt]!;
+    decrypt! = processors[CryptoActionType.Decrypt]!;
   });
 
   afterEach(async () => {
@@ -74,7 +74,7 @@ describe('getCryptoActionProcessor (dev server)', () => {
     const qpqConfig = buildTestQpqConfig([defineCryptoKey('my-key')]);
     const rebuilt = await getCryptoActionProcessor({ runtimePath } as any)(qpqConfig, (() => null) as any);
 
-    const [plaintext] = await invokeProcessor(rebuilt[CryptoActionType.Decrypt], { keyName: 'my-key', ciphertext });
+    const [plaintext] = await invokeProcessor(rebuilt![CryptoActionType.Decrypt]!, { keyName: 'my-key', ciphertext });
     expect(plaintext).toBe('shhh');
   });
 });

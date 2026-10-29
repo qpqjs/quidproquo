@@ -88,7 +88,7 @@ describe('traceStoryExecution', () => {
 
     // No source map on the fixture -> the generated script itself is the source
     expect(trace.sources.some((source) => source.path.includes(storyPath))).toBe(true);
-    expect(trace.sources[0].content).toContain('askOnboardUsers');
+    expect(trace!.sources[0]!.content).toContain('askOnboardUsers');
 
     // Locals captured with real names and values (strings are JSON stringified)
     const idStep = trace.steps.find((step) => step.locals.id?.preview === '"guid-123"');
@@ -101,7 +101,7 @@ describe('traceStoryExecution', () => {
     // Object values also carry a deep json serialization for expandable inspection
     const userStep = trace.steps.find((step) => step.locals.user?.json !== undefined);
     expect(userStep).toBeDefined();
-    expect(JSON.parse(userStep!.locals.user.json!)).toEqual({ first: ' First0 ', last: 'Last0' });
+    expect(JSON.parse(userStep!.locals.user!.json!)).toEqual({ first: ' First0 ', last: 'Last0' });
 
     // Helper functions in the same script are traced too
     expect(trace.steps.some((step) => step.functionName === 'formatName')).toBe(true);
@@ -261,7 +261,7 @@ module.exports = { askBuried, fillers: [${fillerRefs}] };
     // Steps resolve to the ORIGINAL .ts source, with its content embedded from the map
     const tsSourceIndex = trace.sources.findIndex((source) => source.path.endsWith('mappedStory.ts'));
     expect(tsSourceIndex).toBeGreaterThanOrEqual(0);
-    expect(trace.sources[tsSourceIndex].content).toContain('const total = seed * 2 + bonus;');
+    expect(trace!.sources[tsSourceIndex]!.content).toContain('const total = seed * 2 + bonus;');
 
     // `const total = ...` is line 3 (1-based) of the original TS
     const totalLine = 3;

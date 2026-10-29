@@ -49,7 +49,7 @@ describe('filterLogHistoryByActionTypes', () => {
 
     const [logEntry] = filterLogHistoryByActionTypes([batch], ['Log/Create']);
 
-    expect(logEntry.res).toEqual([undefined]);
+    expect(logEntry!.res).toEqual([undefined]);
     expect(JSON.stringify(logEntry)).not.toContain('sibling data');
   });
 
@@ -76,8 +76,8 @@ describe('filterLogHistoryByActionTypes', () => {
 
     const [ok, broken] = filterLogHistoryByActionTypes([batch], []);
 
-    expect(ok.res).toEqual(['fine']);
-    expect(broken.res).toEqual([undefined, { errorType: 'NotFound', errorText: 'missing', errorStack: undefined }]);
+    expect(ok!.res).toEqual(['fine']);
+    expect(broken!.res).toEqual([undefined, { errorType: 'NotFound', errorText: 'missing', errorStack: undefined }]);
   });
 
   it('keeps the batch error on every flattened entry when the batch itself failed', () => {
@@ -92,7 +92,7 @@ describe('filterLogHistoryByActionTypes', () => {
     const result = filterLogHistoryByActionTypes([batch], []);
 
     expect(result).toHaveLength(2);
-    expect(result[0].res).toEqual([undefined, error]);
-    expect(result[1].res).toEqual([undefined, error]);
+    expect(result![0]!.res).toEqual([undefined, error]);
+    expect(result![1]!.res).toEqual([undefined, error]);
   });
 });

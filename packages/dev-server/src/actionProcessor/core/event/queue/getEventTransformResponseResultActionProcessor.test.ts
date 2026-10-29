@@ -10,7 +10,7 @@ describe('getEventTransformResponseResultActionProcessor (queue)', () => {
     const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[EventActionType.TransformResponseResult];
 
-    const result = await invokeProcessor(process, { eventParams: [], qpqEventRecordResponses: [] } as any);
+    const result = await invokeProcessor(process!, { eventParams: [], qpqEventRecordResponses: [] } as any);
 
     expect(resolveActionResult(result)).toBeUndefined();
   });

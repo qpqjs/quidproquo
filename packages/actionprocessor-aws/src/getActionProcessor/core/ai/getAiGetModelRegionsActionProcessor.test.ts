@@ -9,7 +9,7 @@ describe('getAiGetModelRegionsActionProcessor', () => {
   it('returns the regions every AiModel is offered in', async () => {
     const processor = (await getAiGetModelRegionsActionProcessor({} as never, null as never))[AiActionType.GetModelRegions];
 
-    const [result, error] = await invokeProcessor<Record<AiModel, AiDataRegion[]>>(processor, undefined);
+    const [result, error] = await invokeProcessor<Record<AiModel, AiDataRegion[]>>(processor!, undefined);
 
     expect(error).toBeUndefined();
     expect(Object.keys(result!).sort()).toEqual(Object.values(AiModel).sort());

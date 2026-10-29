@@ -26,7 +26,7 @@ describe('getUserDirectoryAssociateSoftwareTokenActionProcessor', () => {
     vi.mocked(associateSoftwareToken).mockResolvedValue({ secretCode: 'abc' } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { session: 'sess' });
+    const result = await invokeProcessor(processor!, { session: 'sess' });
 
     expect(result).toEqual([{ secretCode: 'abc' }]);
     expect(associateSoftwareToken).toHaveBeenCalledWith('eu-west-1', 'sess');

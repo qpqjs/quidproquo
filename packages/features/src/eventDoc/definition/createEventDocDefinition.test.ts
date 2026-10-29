@@ -105,7 +105,7 @@ describe('createEventDocDefinition', () => {
     // The one-per-type coalesce default doesn't apply to a saved doc's domain events,
     // so both commits buffer; the second READ the first through the bind.
     expect(state.pending.memo).toHaveLength(2);
-    expect(state.pending.memo[1].payload.data).toEqual({ body: 'hello\nworld' });
+    expect(state!.pending.memo![1]!.payload.data).toEqual({ body: 'hello\nworld' });
   });
 
   it('files snapshots under the legacy layout by default: the cache key is empty', () => {
@@ -136,7 +136,7 @@ describe('createEventDocDefinition', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.memo.map((event) => event.type)).toEqual([EventDocEffect.SetCode, EventDocEffect.SetName]);
+    expect(state!.pending.memo!.map((event) => event.type)).toEqual([EventDocEffect.SetCode, EventDocEffect.SetName]);
   });
 
   it('throws when a domain api redefines a built-in verb', () => {
@@ -503,7 +503,7 @@ describe('createEventDocDefinition serverEventTypes', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.memo).toHaveLength(0);
-    expect(state.slots.memo.error?.error.errorText).toMatch(/server-only/);
+    expect(state!.slots.memo!.error?.error.errorText).toMatch(/server-only/);
   });
 
   it('the fold still accepts a server-only event that reached the log', () => {

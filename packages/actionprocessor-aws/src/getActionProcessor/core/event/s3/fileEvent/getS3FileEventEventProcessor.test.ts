@@ -1,5 +1,5 @@
 import { getEventAutoRespondNoopActionProcessor as getEventAutoRespondActionProcessor } from '@qpqjs/actionprocessor-js';
-import { EventActionType, storageScopeContext } from '@qpqjs/core';
+import { EventActionType, QpqFunctionRuntime, storageScopeContext } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -28,7 +28,10 @@ describe('fileEvent getS3FileEventEventProcessor', () => {
 
 describe('fileEvent getS3FileEventEventProcessor composition', () => {
   it('composes a processor for every event action for the drive the handler names', async () => {
-    const processors = await getS3FileEventEventProcessor('uploads', '/entry/drive::onEvent')(buildTestQpqConfig(), null as any);
+    const processors = await getS3FileEventEventProcessor('uploads', '/entry/drive::onEvent' as QpqFunctionRuntime)(
+      buildTestQpqConfig(),
+      null as any,
+    );
 
     expect(Object.keys(processors).sort()).toEqual(
       [

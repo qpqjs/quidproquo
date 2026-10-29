@@ -38,10 +38,10 @@ describe('signing key action processors (aws)', () => {
 
   describe('askCryptoSign', () => {
     it('resolves the alias, signs via KMS and returns the signature as base64url', async () => {
-      vi.mocked(signWithKey).mockImplementation(async (_alias, message) => Buffer.from(rs256Sign(privateKeyPem, message), 'base64url'));
+      vi.mocked(signWithKey).mockImplementation(async (_alias: any, message: any) => Buffer.from(rs256Sign(privateKeyPem, message), 'base64url'));
       const { sign } = await resolveProcessors();
 
-      const [signature, error] = await invokeProcessor(sign, { keyName: 'my-key', message: 'header.payload' });
+      const [signature, error] = await invokeProcessor(sign!, { keyName: 'my-key', message: 'header.payload' });
 
       expect(error).toBeUndefined();
       expect(signature).toMatch(/^[A-Za-z0-9_-]+$/);
@@ -52,7 +52,7 @@ describe('signing key action processors (aws)', () => {
     it('returns KeyNotConfigured without touching KMS when the key is not in config', async () => {
       const { sign } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(sign, { keyName: 'unknown-key', message: 'x' });
+      const [, error] = await invokeProcessor(sign!, { keyName: 'unknown-key', message: 'x' });
 
       expect(error?.errorType).toBe(askCryptoSign.errorType.KeyNotConfigured);
       expect(signWithKey).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('signing key action processors (aws)', () => {
       vi.mocked(signWithKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
       const { sign } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(sign, { keyName: 'my-key', message: 'x' });
+      const [, error] = await invokeProcessor(sign!, { keyName: 'my-key', message: 'x' });
 
       expect(error?.errorType).toBe(expectedType);
     });
@@ -80,8 +80,8 @@ describe('signing key action processors (aws)', () => {
       const { verify } = await resolveProcessors();
       const signature = rs256Sign(privateKeyPem, 'header.payload');
 
-      expect(await invokeProcessor(verify, { keyName: 'my-key', message: 'header.payload', signature })).toEqual([true]);
-      expect(await invokeProcessor(verify, { keyName: 'my-key', message: 'header.tampered', signature })).toEqual([false]);
+      expect(await invokeProcessor(verify!, { keyName: 'my-key', message: 'header.payload', signature })).toEqual([true]);
+      expect(await invokeProcessor(verify!, { keyName: 'my-key', message: 'header.tampered', signature })).toEqual([false]);
       expect(getCachedPublicKey).toHaveBeenCalledWith(EXPECTED_ALIAS, 'eu-west-1');
     });
 
@@ -89,7 +89,7 @@ describe('signing key action processors (aws)', () => {
       vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
       const { verify } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(verify, { keyName: 'my-key', message: 'x', signature: 'not base64url!' });
+      const [, error] = await invokeProcessor(verify!, { keyName: 'my-key', message: 'x', signature: 'not base64url!' });
 
       expect(error?.errorType).toBe(askCryptoVerify.errorType.MalformedSignature);
     });
@@ -97,7 +97,7 @@ describe('signing key action processors (aws)', () => {
     it('returns KeyNotConfigured for an undeclared key', async () => {
       const { verify } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(verify, { keyName: 'unknown-key', message: 'x', signature: 'c2ln' });
+      const [, error] = await invokeProcessor(verify!, { keyName: 'unknown-key', message: 'x', signature: 'c2ln' });
 
       expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyNotConfigured);
       expect(getCachedPublicKey).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe('signing key action processors (aws)', () => {
       vi.mocked(getCachedPublicKey).mockRejectedValue(Object.assign(new Error('boom'), { name: 'AccessDeniedException' }));
       const { verify } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(verify, { keyName: 'my-key', message: 'x', signature: 'c2ln' });
+      const [, error] = await invokeProcessor(verify!, { keyName: 'my-key', message: 'x', signature: 'c2ln' });
 
       expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyUnavailable);
     });
@@ -118,14 +118,14 @@ describe('signing key action processors (aws)', () => {
       vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
       const { getPublicKey } = await resolveProcessors();
 
-      expect(await invokeProcessor(getPublicKey, { keyName: 'my-key' })).toEqual([publicKeyPem]);
+      expect(await invokeProcessor(getPublicKey!, { keyName: 'my-key' })).toEqual([publicKeyPem]);
       expect(getCachedPublicKey).toHaveBeenCalledWith(EXPECTED_ALIAS, 'eu-west-1');
     });
 
     it('returns KeyNotConfigured for an undeclared key', async () => {
       const { getPublicKey } = await resolveProcessors();
 
-      const [, error] = await invokeProcessor(getPublicKey, { keyName: 'unknown-key' });
+      const [, error] = await invokeProcessor(getPublicKey!, { keyName: 'unknown-key' });
 
       expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.KeyNotConfigured);
     });

@@ -231,7 +231,7 @@ describe('projectEventDocSummary', () => {
     runStory(projectEventDocSummary(streamRecord('tenant-a')), mocks);
 
     expect(updates).toHaveLength(1);
-    expect(updates[0].scope).toBe('tenant-a');
+    expect(updates![0]!.scope).toBe('tenant-a');
 
     const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
     expect(record!.name).toBe('Renamed');
@@ -243,7 +243,7 @@ describe('projectEventDocSummary', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined, 'layout')), mocks);
 
-    expect(updates[0].key).toBe('layout');
+    expect(updates![0]!.key).toBe('layout');
   });
 
   it('skips a record with no collection type rather than guessing one', () => {
@@ -270,8 +270,8 @@ describe('projectEventDocSummary snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(1);
-    expect(foldCalls[0].dynamicFunctionsName).toBe(FOLD_FN);
-    expect(foldCalls[0].member).toBe('foldSnapshotViews');
+    expect(foldCalls![0]!.dynamicFunctionsName).toBe(FOLD_FN);
+    expect(foldCalls![0]!.member).toBe('foldSnapshotViews');
 
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows.map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
@@ -323,7 +323,7 @@ describe('projectEventDocSummary snapshots', () => {
             summary: { ...foldEventDocSummary(action.payload.args[0]), name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
           };
     // A fresh event id so the seed-at-event replay skip doesn't short-circuit the fold.
-    tables[eventDocEventsStoreName(STORE)].push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
+    tables![eventDocEventsStoreName(STORE)]!.push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
     runStory(projectEventDocSummary({ ...streamRecord(undefined), keys: { pk: 'doc-1', sk: eventId(2) } }), mocks);
 
     const deleted = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
@@ -339,7 +339,7 @@ describe('projectEventDocSummary snapshots', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
   });
 
   it('writes no snapshot when the collection registered no fold', () => {
@@ -397,13 +397,13 @@ describe('projectEventDocSummary snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(fileWrites).toHaveLength(1);
-    expect(fileWrites[0].filepath).toBe(`doc-1/snapshots/document/${eventId(1)}`);
-    expect(JSON.parse(fileWrites[0].data)).toEqual({ huge: 'x'.repeat(301 * 1024) });
+    expect(fileWrites![0]!.filepath).toBe(`doc-1/snapshots/document/${eventId(1)}`);
+    expect(JSON.parse(fileWrites![0]!.data)).toEqual({ huge: 'x'.repeat(301 * 1024) });
 
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows).toHaveLength(1);
     // No path on the row: it is derived from the row's own keys, so the two cannot drift.
-    expect(rows[0].data).toEqual({ type: 'storageDrive', views: ['document'] });
+    expect(rows![0]!.data).toEqual({ type: 'storageDrive', views: ['document'] });
   });
 
   it('carries the tenant scope through the prefix read and every snapshot write', () => {
@@ -412,7 +412,7 @@ describe('projectEventDocSummary snapshots', () => {
     runStory(projectEventDocSummary(streamRecord('tenant-a')), mocks);
 
     // The scoped prefix read found the log (it lives under the composed pk).
-    expect(foldCalls[0].input.events).toHaveLength(2);
+    expect(foldCalls![0]!.input.events).toHaveLength(2);
 
     const snapshotUpserts = upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE);
     expect(snapshotUpserts).toHaveLength(2);
@@ -462,8 +462,8 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
     // No seed under 'k2' → the whole prefix, from scratch.
     expect(foldCalls).toHaveLength(1);
-    expect(foldCalls[0].input.seedViews).toBeUndefined();
-    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    expect(foldCalls![0]!.input.seedViews).toBeUndefined();
+    expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
 
     // New rows land under the keyed pk; the legacy rows persist untouched.
     const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
@@ -482,7 +482,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
     // The offloaded document state is filed under the key too, so the row and its bytes always share one.
     expect(fileWrites).toHaveLength(1);
-    expect(fileWrites[0].filepath).toBe(`doc-1/snapshots/k2/document/${eventId(1)}`);
+    expect(fileWrites![0]!.filepath).toBe(`doc-1/snapshots/k2/document/${eventId(1)}`);
   });
 
   it('hands the fold the seed and ONLY the gap since it', () => {
@@ -492,8 +492,8 @@ describe('projectEventDocSummary incremental snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(1);
-    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
-    expect(foldCalls[0].input.seedViews).toEqual({ document: { seedDocument: true }, summary: { seedSummary: true } });
+    expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
+    expect(foldCalls![0]!.input.seedViews).toEqual({ document: { seedDocument: true }, summary: { seedSummary: true } });
 
     // The new snapshot lands at the target event, alongside the seed rows.
     const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
@@ -557,9 +557,9 @@ describe('projectEventDocSummary incremental snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(2);
-    expect(foldCalls[0].input.seedViews).toBeDefined();
-    expect(foldCalls[1].input.seedViews).toBeUndefined();
-    expect(foldCalls[1].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    expect(foldCalls![0]!.input.seedViews).toBeDefined();
+    expect(foldCalls![1]!.input.seedViews).toBeUndefined();
+    expect(foldCalls![1]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
 
     const documentRow = (tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[]).find((row) => row.sk === eventId(1))!;
     expect(documentRow.data).toEqual({ type: 'inline', snapshot: { refolded: true }, views: ['document'] });
@@ -576,8 +576,8 @@ describe('projectEventDocSummary incremental snapshots', () => {
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(1);
-    expect(foldCalls[0].input.seedViews).toBeUndefined();
-    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    expect(foldCalls![0]!.input.seedViews).toBeUndefined();
+    expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
   });
 
   it('resolves an offloaded seed state from the blob drive', () => {
@@ -590,7 +590,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    expect(foldCalls[0].input.seedViews).toEqual({ document: { offloadedDocument: true }, summary: { seedSummary: true } });
-    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
+    expect(foldCalls![0]!.input.seedViews).toEqual({ document: { offloadedDocument: true }, summary: { seedSummary: true } });
+    expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
   });
 });

@@ -7,7 +7,7 @@ import { createDevJwt, createDevUserId, DEV_USER_EMAIL, DevUserDirectory, resolv
 import { verifyDevJwt } from './devJwt';
 
 const SECRET = 'test-secret';
-const decodeJwtPayload = (jwt: string): Record<string, any> => JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString());
+const decodeJwtPayload = (jwt: string): Record<string, any> => JSON.parse(Buffer.from(jwt!.split('.')[1]!, 'base64url').toString());
 
 const DIRECTORY: DevUserDirectory = { serviceName: 'my-service', directoryName: 'users' };
 const SIBLING_DIRECTORY: DevUserDirectory = { serviceName: 'my-service', directoryName: 'admins' };
@@ -84,7 +84,7 @@ describe('createDevJwt', () => {
     const jwt = createDevJwt(SECRET, DIRECTORY, 'joe@example.com');
     const [header, , signature] = jwt.split('.');
 
-    expect(JSON.parse(Buffer.from(header, 'base64url').toString())).toEqual({ alg: 'HS256', typ: 'JWT' });
+    expect(JSON.parse(Buffer.from(header!, 'base64url')!.toString())).toEqual({ alg: 'HS256', typ: 'JWT' });
     expect(signature).not.toBe('dev-signature');
     expect(verifyDevJwt(SECRET, jwt)).toMatchObject({ email: 'joe@example.com' });
     expect(verifyDevJwt('another-secret', jwt)).toBeNull();

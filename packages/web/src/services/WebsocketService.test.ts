@@ -57,7 +57,7 @@ describe('WebsocketService', () => {
 
     expect(service.url).toBe('wss://example.com');
     expect(service.getSocket()).toBe(lastSocket());
-    expect(lastSocket().url).toBe('wss://example.com');
+    expect(lastSocket!()!.url).toBe('wss://example.com');
   });
 
   it('reports connection state from the socket readyState', () => {
@@ -65,7 +65,7 @@ describe('WebsocketService', () => {
 
     expect(service.isConnected()).toBe(true);
 
-    lastSocket().readyState = FakeWebSocket.CLOSED;
+    lastSocket!()!.readyState = FakeWebSocket.CLOSED;
     expect(service.isConnected()).toBe(false);
   });
 
@@ -74,7 +74,7 @@ describe('WebsocketService', () => {
     const onOpen = vi.fn();
     service.subscribe(WebsocketServiceEvent.OPEN, onOpen);
 
-    lastSocket().emit(WebsocketServiceEvent.OPEN);
+    lastSocket!()!.emit(WebsocketServiceEvent.OPEN);
 
     expect(onOpen).toHaveBeenCalledWith(service, undefined);
   });
@@ -85,7 +85,7 @@ describe('WebsocketService', () => {
     const handle = service.subscribe(WebsocketServiceEvent.OPEN, onOpen);
 
     service.unsubscribe(handle);
-    lastSocket().emit(WebsocketServiceEvent.OPEN);
+    lastSocket!()!.emit(WebsocketServiceEvent.OPEN);
 
     expect(onOpen).not.toHaveBeenCalled();
   });
@@ -98,8 +98,8 @@ describe('WebsocketService', () => {
     service.subscribe(WebsocketServiceEvent.ERROR, onError);
 
     service.unsubscribeAll();
-    lastSocket().emit(WebsocketServiceEvent.OPEN);
-    lastSocket().emit(WebsocketServiceEvent.ERROR);
+    lastSocket!()!.emit(WebsocketServiceEvent.OPEN);
+    lastSocket!()!.emit(WebsocketServiceEvent.ERROR);
 
     expect(onOpen).not.toHaveBeenCalled();
     expect(onError).not.toHaveBeenCalled();
@@ -110,20 +110,20 @@ describe('WebsocketService', () => {
 
     service.send('hello');
 
-    expect(lastSocket().sent).toEqual(['hello']);
+    expect(lastSocket!()!.sent).toEqual(['hello']);
   });
 
   it('queues messages while closed and flushes them once open', () => {
     const service = new WebsocketService('wss://example.com');
-    lastSocket().readyState = FakeWebSocket.CLOSED;
+    lastSocket!()!.readyState = FakeWebSocket.CLOSED;
 
     service.send('queued');
-    expect(lastSocket().sent).toEqual([]);
+    expect(lastSocket!()!.sent).toEqual([]);
 
-    lastSocket().readyState = FakeWebSocket.OPEN;
-    lastSocket().emit(WebsocketServiceEvent.OPEN);
+    lastSocket!()!.readyState = FakeWebSocket.OPEN;
+    lastSocket!()!.emit(WebsocketServiceEvent.OPEN);
 
-    expect(lastSocket().sent).toEqual(['queued']);
+    expect(lastSocket!()!.sent).toEqual(['queued']);
   });
 
   it('serialises events through sendEvent', () => {
@@ -132,7 +132,7 @@ describe('WebsocketService', () => {
 
     service.sendEvent(event as never);
 
-    expect(lastSocket().sent).toEqual([JSON.stringify(event)]);
+    expect(lastSocket!()!.sent).toEqual([JSON.stringify(event)]);
   });
 
   it('routes matching messages to typed event subscribers', () => {
@@ -140,7 +140,7 @@ describe('WebsocketService', () => {
     const onPing = vi.fn();
     service.subscribeToEvent<{ type: 'ping' }>('ping', onPing);
 
-    lastSocket().emit(WebsocketServiceEvent.MESSAGE, { data: JSON.stringify({ type: 'ping', n: 1 }) });
+    lastSocket!()!.emit(WebsocketServiceEvent.MESSAGE, { data: JSON.stringify({ type: 'ping', n: 1 }) });
 
     expect(onPing).toHaveBeenCalledWith(service, { type: 'ping', n: 1 });
   });
@@ -150,9 +150,9 @@ describe('WebsocketService', () => {
     const onPing = vi.fn();
     service.subscribeToEvent<{ type: 'ping' }>('ping', onPing);
 
-    lastSocket().emit(WebsocketServiceEvent.MESSAGE, { data: JSON.stringify({ type: 'pong' }) });
-    lastSocket().emit(WebsocketServiceEvent.MESSAGE, { data: 'not-json' });
-    lastSocket().emit(WebsocketServiceEvent.MESSAGE, undefined);
+    lastSocket!()!.emit(WebsocketServiceEvent.MESSAGE, { data: JSON.stringify({ type: 'pong' }) });
+    lastSocket!()!.emit(WebsocketServiceEvent.MESSAGE, { data: 'not-json' });
+    lastSocket!()!.emit(WebsocketServiceEvent.MESSAGE, undefined);
 
     expect(onPing).not.toHaveBeenCalled();
   });
@@ -163,7 +163,7 @@ describe('WebsocketService', () => {
     const errorEvent = { message: 'bad' };
     service.subscribe(WebsocketServiceEvent.ERROR, onError);
 
-    lastSocket().emit(WebsocketServiceEvent.ERROR, errorEvent);
+    lastSocket!()!.emit(WebsocketServiceEvent.ERROR, errorEvent);
 
     expect(onError).toHaveBeenCalledWith(service, errorEvent);
   });
@@ -173,7 +173,7 @@ describe('WebsocketService', () => {
     new WebsocketService('wss://example.com');
     const first = lastSocket();
 
-    first.emit(WebsocketServiceEvent.CLOSE);
+    first!.emit(WebsocketServiceEvent.CLOSE);
     vi.runOnlyPendingTimers();
 
     expect(FakeWebSocket.instances.length).toBe(2);
@@ -187,15 +187,15 @@ describe('WebsocketService', () => {
     const first = lastSocket();
     service.sendEvent({ type: 'Authenticate', payload: { accessToken: 'tok-123' } } as any);
 
-    first.emit(WebsocketServiceEvent.CLOSE);
+    first!.emit(WebsocketServiceEvent.CLOSE);
     vi.runOnlyPendingTimers();
     const second = lastSocket();
-    second.emit(WebsocketServiceEvent.OPEN);
+    second!.emit(WebsocketServiceEvent.OPEN);
 
     expect(second).not.toBe(first);
-    expect(second.url).toBe('wss://example.com/ws');
-    expect(second.url).not.toContain('tok-123');
-    expect(second.sent).toEqual([]);
+    expect(second!.url).toBe('wss://example.com/ws');
+    expect(second!.url).not.toContain('tok-123');
+    expect(second!.sent).toEqual([]);
   });
 
   it('does not reconnect once destroyed', () => {
@@ -204,11 +204,11 @@ describe('WebsocketService', () => {
     const first = lastSocket();
 
     service.destroy();
-    first.emit(WebsocketServiceEvent.CLOSE);
+    first!.emit(WebsocketServiceEvent.CLOSE);
     vi.runOnlyPendingTimers();
 
     expect(service.hasBeenDestroyed()).toBe(true);
-    expect(first.closed).toBe(true);
+    expect(first!.closed).toBe(true);
     expect(FakeWebSocket.instances.length).toBe(1);
   });
 
@@ -217,6 +217,6 @@ describe('WebsocketService', () => {
 
     service.close();
 
-    expect(lastSocket().closed).toBe(true);
+    expect(lastSocket!()!.closed).toBe(true);
   });
 });

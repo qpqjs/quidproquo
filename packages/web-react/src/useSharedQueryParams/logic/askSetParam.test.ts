@@ -1,6 +1,6 @@
 import { ActionOf, askStateDispatchBase, StateActionType } from '@qpqjs/core';
 import { runStory } from '@qpqjs/testing';
-import { QueryParamsActionType, QueryParamsSetAction } from '@qpqjs/web';
+import { askQueryParamsSet, QueryParamsActionType } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 
@@ -13,7 +13,7 @@ describe('askSetParam', () => {
     const dispatched: unknown[] = [];
 
     runStory(askSetParam('tab', ['one', 'two']), {
-      [QueryParamsActionType.Set]: (action: QueryParamsSetAction) => {
+      [QueryParamsActionType.Set]: (action: ActionOf<typeof askQueryParamsSet>) => {
         setPayloads.push(action.payload);
       },
       [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {

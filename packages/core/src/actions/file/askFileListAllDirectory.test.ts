@@ -22,7 +22,7 @@ describe('askFileListAllDirectory', () => {
     const result = runStory(askFileListAllDirectory('drive', 'folder'), {
       [FileActionType.ListDirectory]: () => {
         const page = pages[cursor];
-        cursor = page.pageToken ?? 'done';
+        cursor = page!.pageToken ?? 'done';
         return page;
       },
     });

@@ -14,7 +14,7 @@ describe('getUserDirectoryConfirmEmailVerificationActionProcessor', () => {
   it('accepts any verification code in dev', async () => {
     const process = await getProcessor();
 
-    const [result, error] = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken: 'token', code: '000000' } as any);
+    const [result, error] = await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken: 'token', code: '000000' } as any);
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();

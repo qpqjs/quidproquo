@@ -36,3 +36,4 @@ jobs:
       # suite needs the monorepo built before vitest can load the test files.
       - run: npm run build
       - run: npm test
+      - run: npm run test:types

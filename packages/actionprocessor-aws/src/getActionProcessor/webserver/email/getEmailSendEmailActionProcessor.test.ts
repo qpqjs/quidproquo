@@ -26,7 +26,7 @@ describe('getEmailSendEmailActionProcessor', () => {
     vi.mocked(sendEmail).mockResolvedValue('message-1');
     const processor = await resolveProcessor();
 
-    const [messageId, error] = await invokeProcessor(processor, payload);
+    const [messageId, error] = await invokeProcessor(processor!, payload);
 
     expect(error).toBeUndefined();
     expect(messageId).toBe('message-1');
@@ -45,7 +45,7 @@ describe('getEmailSendEmailActionProcessor', () => {
     vi.mocked(sendEmail).mockRejectedValue(sesError(errorName));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, payload);
+    const [, error] = await invokeProcessor(processor!, payload);
 
     expect(error?.errorType).toBe(expectedType);
   });

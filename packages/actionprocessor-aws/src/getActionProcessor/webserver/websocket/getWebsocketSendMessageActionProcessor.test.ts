@@ -18,10 +18,7 @@ vi.mock('../../../logic/cloudformation/getExportedValue', () => ({
 const websocketEventProcessors = { onConnect: undefined, onDisconnect: undefined } as any;
 
 const resolveProcessor = async () => {
-  const config = buildTestQpqConfig([
-    defineAwsServiceAccountInfo('111', 'eu-west-1'),
-    defineWebsocket('ws', 'example.com', websocketEventProcessors),
-  ]);
+  const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), defineWebsocket('ws', websocketEventProcessors)]);
   const processors = await getWebsocketSendMessageActionProcessor(config, {} as any);
   return processors[WebsocketActionType.SendMessage];
 };

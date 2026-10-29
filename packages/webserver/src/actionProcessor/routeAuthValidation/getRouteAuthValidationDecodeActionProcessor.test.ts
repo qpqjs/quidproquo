@@ -12,7 +12,7 @@ const invoke = async (payload: unknown, decodeProcessor: () => ActionProcessorRe
   const processors = await getRouteAuthValidationDecodeActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const processor = processors[RouteAuthValidationActionType.Decode];
 
-  return processor(
+  return processor!(
     payload,
     buildTestStorySession(),
     buildActionProcessorList({ [UserDirectoryActionType.DecodeAccessToken]: async () => decodeProcessor() }),

@@ -30,7 +30,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       code: '000000',
       username: 'joe@example.com',
@@ -45,7 +45,7 @@ describe('getUserDirectoryConfirmForgotPasswordActionProcessor', () => {
     userStore.upsertDevUser.mockRejectedValue(new Error('disk full'));
     const process = await getProcessor();
 
-    const [, error] = await invokeProcessor(process, {
+    const [, error] = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       code: '000000',
       username: 'joe@example.com',

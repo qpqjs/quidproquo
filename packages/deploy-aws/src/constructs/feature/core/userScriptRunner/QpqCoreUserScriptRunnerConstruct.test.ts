@@ -13,8 +13,8 @@ import { QpqCoreUserScriptRunnerConstruct } from './QpqCoreUserScriptRunnerConst
 
 // The log extension layer is produced by the aws package build; a synth in a unit test only needs a directory to package.
 const extensionLayer = vi.hoisted(() => ({ path: '' }));
-vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@qpqjs/actionprocessor-aws')>()),
+vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
+  ...((await importOriginal()) as typeof import('@qpqjs/actionprocessor-aws')),
   getLogExtensionLayerPath: () => extensionLayer.path,
 }));
 
@@ -35,7 +35,7 @@ const synth = () => {
   const stack = new Stack(new App(), 'api', { env: { account: '123456789012', region: 'ap-southeast-2' } });
   new QpqCoreUserScriptRunnerConstruct(stack, 'runner', {
     qpqConfig,
-    userScriptRunnerConfig: qpqConfig.find((s) => s.uniqueKey === 'UserScriptRunner') as any,
+    userScriptRunnerConfig: qpqConfig.find((s) => (s as any).uniqueKey === 'UserScriptRunner') as any,
   });
   return Template.fromStack(stack);
 };

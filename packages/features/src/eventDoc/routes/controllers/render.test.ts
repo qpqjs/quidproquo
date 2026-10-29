@@ -160,15 +160,15 @@ describe('render route', () => {
   it('hands the renderer the state at the head and no version for a draft render', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Draft });
 
-    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
-    expect(renderInput.version).toBeUndefined();
+    expect(renderInput!.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
+    expect(renderInput!.version).toBeUndefined();
   });
 
   it('defaults to the head state when no mode is given', () => {
     const { renderInput } = renderWith({});
 
-    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
-    expect(renderInput.version).toBeUndefined();
+    expect(renderInput!.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
+    expect(renderInput!.version).toBeUndefined();
   });
 
   it('hands the renderer the state at the version head and the version itself for a published render', () => {
@@ -176,9 +176,9 @@ describe('render route', () => {
 
     // Folded from the prefix truncated at v1's head, the draft edits (2, 3) must not
     // reach a published render.
-    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1)] });
+    expect(renderInput!.state).toEqual({ foldedEventIds: [eventId(0), eventId(1)] });
     // The version is what carries publishedAt, the clock the renderer resolves its links at.
-    expect(renderInput.version).toEqual(VERSION_1);
+    expect(renderInput!.version).toEqual(VERSION_1);
   });
 
   it('resolves the published version as of an explicit effectiveAt, not the request time', () => {

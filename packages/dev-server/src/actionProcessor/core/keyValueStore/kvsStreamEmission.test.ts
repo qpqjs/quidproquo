@@ -50,13 +50,13 @@ const testQpqConfig = buildTestQpqConfig([
 const upsert = async (keyValueStoreName: string, item: Record<string, unknown>, scope?: string) => {
   const processors = await getKeyValueStoreUpsertActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.Upsert], { keyValueStoreName, item, options: scope ? { scope } : undefined });
+  return invokeProcessor(processors![KeyValueStoreActionType.Upsert]!, { keyValueStoreName, item, options: scope ? { scope } : undefined });
 };
 
 const remove = async (keyValueStoreName: string, key: string, sortKey?: string) => {
   const processors = await getKeyValueStoreDeleteActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.Delete], { keyValueStoreName, key, sortKey });
+  return invokeProcessor(processors![KeyValueStoreActionType.Delete]!, { keyValueStoreName, key, sortKey });
 };
 
 // emitKvsStreamEvent(qpqConfig, session, emission)

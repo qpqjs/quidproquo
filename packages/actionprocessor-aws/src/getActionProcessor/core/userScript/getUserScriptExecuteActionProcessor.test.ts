@@ -34,7 +34,7 @@ const payload = { drive: 'scripts', filepath: 'tenant-a/main.js', functionName: 
 const invoke = async (config = withRunner, actionProcessors: Record<string, unknown> = urlProcessors, args: unknown[] = payload.args) => {
   const processors = await getUserScriptExecuteActionProcessor(config, async () => null);
   return invokeProcessor(
-    processors[UserScriptActionType.Execute],
+    processors![UserScriptActionType.Execute]!,
     { ...payload, args },
     {
       session: buildTestStorySession(),
@@ -115,7 +115,7 @@ describe('getUserScriptExecuteActionProcessor (lambda)', () => {
     ],
     ['RequestEntityTooLargeException: Request must be smaller than 6291456 bytes', 'PayloadTooLarge'],
     ['ResourceNotFoundException: Function not found', 'RunnerUnavailable'],
-  ])('classifies an invoke failure [%s] as %s', async (message, expected) => {
+  ])('classifies an invoke failure [%s] as %s', async (message: any, expected: any) => {
     vi.mocked(executeLambdaByName).mockRejectedValue(new Error(message));
 
     const [, error] = await invoke();

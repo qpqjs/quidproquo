@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
-  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { verifyAuthChallenge: runtime } })]);
+  buildTestQpqConfig([
+    defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime, defineAuthChallenge: runtime, verifyAuthChallenge: runtime } }),
+  ]);
 
 describe('cognito/verifyAuthChallenge getEventGetRecordsActionProcessor', () => {
   it('parses a json challenge answer', async () => {

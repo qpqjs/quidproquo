@@ -50,7 +50,7 @@ describe('askCryptoVerifyJwt', () => {
     ['non base64url segment', `${HEADER}.pay+load.c2ln`],
     ['header not json', `${base64UrlEncodeUtf8('nope')}.${base64UrlEncodeUtf8('{}')}.c2ln`],
     ['header json but not an object', `${base64UrlEncodeUtf8('[1]')}.${base64UrlEncodeUtf8('{}')}.c2ln`],
-  ])('rejects a %s token as malformed before touching the key', (_label, token) => {
+  ])('rejects a %s token as malformed before touching the key', (_label: any, token: any) => {
     const { result, verifyCalls } = run(token);
 
     expect(result).toEqual({ valid: false, reason: 'malformed' });

@@ -11,7 +11,7 @@ describe('getOpenApiGetDocumentActionProcessor', () => {
     const qpqConfig = buildTestQpqConfig([defineRoute('GET', '/v1/widgets', '/src/widgets::list')]);
     const processors = await getOpenApiGetDocumentActionProcessor(qpqConfig, noopDynamicModuleLoader);
 
-    const [document] = await processors[OpenApiActionType.GetDocument](
+    const [document] = await processors![OpenApiActionType.GetDocument]!(
       { options: { title: 'Widgets' } },
       buildTestStorySession(),
       buildActionProcessorList({}),

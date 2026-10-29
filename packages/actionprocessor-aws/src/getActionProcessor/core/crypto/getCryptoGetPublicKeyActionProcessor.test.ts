@@ -26,7 +26,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockResolvedValue('-----BEGIN PUBLIC KEY-----');
     const processor = await resolveProcessor();
 
-    const [pem, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [pem, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error).toBeUndefined();
     expect(pem).toBe('-----BEGIN PUBLIC KEY-----');
@@ -36,7 +36,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
   it('fails with KeyNotConfigured for an undeclared key, without touching KMS', async () => {
     const processor = await resolveProcessor(false);
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.KeyNotConfigured);
     expect(getCachedPublicKey).not.toHaveBeenCalled();
@@ -46,7 +46,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('NotFoundException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.KeyUnavailable);
   });
@@ -55,7 +55,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('DisabledException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.KeyUnavailable);
   });
@@ -64,7 +64,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('AccessDeniedException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.KeyUnavailable);
   });
@@ -73,7 +73,7 @@ describe('getCryptoGetPublicKeyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('ThrottlingException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key' });
 
     expect(error?.errorType).toBe(askCryptoGetPublicKey.errorType.Throttled);
   });

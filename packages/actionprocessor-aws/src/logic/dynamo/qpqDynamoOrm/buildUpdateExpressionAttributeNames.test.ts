@@ -27,7 +27,7 @@ describe('buildUpdateExpressionAttributeNames', () => {
 
     buildUpdateExpressionAttributeNames(updates);
 
-    expect(updates[0].attributePath).toBe('name');
-    expect(updates[1].attributePath).toEqual(['a', 0, 'b']);
+    expect(updates![0]!.attributePath).toBe('name');
+    expect(updates![1]!.attributePath).toEqual(['a', 0, 'b']);
   });
 });

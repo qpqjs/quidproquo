@@ -44,7 +44,7 @@ describe('foldStreamPart', () => {
     const before = mergeStreamParts(parts.slice(0, 4));
     const snapshot = JSON.parse(JSON.stringify(before));
 
-    foldStreamPart(before, parts[4]);
+    foldStreamPart(before, parts![4]!);
 
     expect(before).toEqual(snapshot);
   });

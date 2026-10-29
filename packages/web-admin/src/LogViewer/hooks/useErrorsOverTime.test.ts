@@ -16,7 +16,7 @@ describe('useErrorsOverTime', () => {
     const { result } = renderHook(() => useErrorsOverTime(logs, searchParams));
 
     expect(result.current).toHaveLength(10);
-    expect(result.current[0].errors).toBe(1);
+    expect(result!.current[0]!.errors).toBe(1);
     expect(result.current.reduce((sum, b) => sum + b.errors, 0)).toBe(1);
   });
 });

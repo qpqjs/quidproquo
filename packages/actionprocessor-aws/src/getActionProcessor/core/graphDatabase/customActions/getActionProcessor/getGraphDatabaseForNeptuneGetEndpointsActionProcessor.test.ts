@@ -16,7 +16,7 @@ const invoke = async (payload: { graphDatabaseName: string }) => {
   const processor = (await getGraphDatabaseForNeptuneGetEndpointsActionProcessor(qpqConfig, null as any))[
     GraphDatabaseForNeptuneActionType.GetEndpoints
   ];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessGetEndpoints', () => {

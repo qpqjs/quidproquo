@@ -24,7 +24,7 @@ const synth = (options: Partial<QPQConfigAdvancedWebEntrySettings> = {}) => {
   ]);
   const stack = new Stack(new App(), 'web', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
-  new WebQpqWebserverWebEntryConstruct(stack, 'entry', { qpqConfig, webEntryConfig: qpqWebServerUtils.getWebEntryConfigs(qpqConfig)[0] });
+  new WebQpqWebserverWebEntryConstruct(stack, 'entry', { qpqConfig, webEntryConfig: qpqWebServerUtils.getWebEntryConfigs(qpqConfig)[0]! });
 
   return Template.fromStack(stack);
 };

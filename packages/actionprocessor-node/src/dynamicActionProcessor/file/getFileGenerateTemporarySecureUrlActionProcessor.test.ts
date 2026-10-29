@@ -20,7 +20,7 @@ describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
     expect(url.startsWith('http://localhost:4000/secure-download?token=')).toBe(true);
 
     const token = url.split('token=')[1];
-    const decoded = verifySecureUrlToken(token, fileConfig.secureUrlSecret);
+    const decoded = verifySecureUrlToken(token!, fileConfig.secureUrlSecret);
     expect(decoded?.operation).toBe('download');
   });
 

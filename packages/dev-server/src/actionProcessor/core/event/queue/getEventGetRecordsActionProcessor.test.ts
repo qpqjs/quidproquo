@@ -10,7 +10,7 @@ describe('getEventGetRecordsActionProcessor (queue)', () => {
     const processors = await getEventGetRecordsActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[EventActionType.GetRecords];
 
-    const result = await invokeProcessor(process, { eventParams: [{ type: 'order.created', payload: { id: 1 }, messageId: 'm-1' }] } as any);
+    const result = await invokeProcessor(process!, { eventParams: [{ type: 'order.created', payload: { id: 1 }, messageId: 'm-1' }] } as any);
 
     expect(resolveActionResult(result)).toEqual([{ message: { type: 'order.created', payload: { id: 1 } }, id: 'm-1' }]);
   });

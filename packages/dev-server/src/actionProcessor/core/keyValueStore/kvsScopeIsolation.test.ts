@@ -78,27 +78,27 @@ describe('KVS scope isolation', () => {
   it('round-trips a scoped item, invisible to other scopes, and refuses an unscoped read', async () => {
     const { upsert, get } = await getProcessors();
 
-    await invokeProcessor(upsert, {
+    await invokeProcessor(upsert!, {
       keyValueStoreName: 'widgets',
       item: { id: 'w1', name: 'Sprocket' },
       options: { scope: 'tenant-a' },
     });
 
-    const sameScope = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
+    const sameScope = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
     expect(resolveActionResult(sameScope)).toEqual({ id: 'w1', name: 'Sprocket' });
 
-    const otherScope = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-b' } });
+    const otherScope = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-b' } });
     expect(resolveActionResult(otherScope)).toBeNull();
 
-    const unscoped = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1' });
+    const unscoped = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1' });
     expect(resolveActionResultError(unscoped).errorType).toContain('InvalidScope');
   });
 
   it('partitions rows by the scope column and stores items raw', async () => {
     const { upsert } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
 
     const db = new DatabaseSync(path.join(runtimePath, 'kvs', 'kvs.db'));
     try {
@@ -118,24 +118,24 @@ describe('KVS scope isolation', () => {
   it('refuses a scoped call on an unscoped store', async () => {
     const { upsert, get } = await getProcessors();
 
-    const written = await invokeProcessor(upsert, {
+    const written = await invokeProcessor(upsert!, {
       keyValueStoreName: 'globals',
       item: { id: 'g1', name: 'Global' },
       options: { scope: 'tenant-a' },
     });
     expect(resolveActionResultError(written).errorType).toContain('InvalidScope');
 
-    const read = await invokeProcessor(get, { keyValueStoreName: 'globals', key: 'g1', options: { scope: 'tenant-a' } });
+    const read = await invokeProcessor(get!, { keyValueStoreName: 'globals', key: 'g1', options: { scope: 'tenant-a' } });
     expect(resolveActionResultError(read).errorType).toContain('InvalidScope');
   });
 
   it('scopes queries on the partition key and strips returned items', async () => {
     const { upsert, query } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'B' }, options: { scope: 'tenant-b' } });
 
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'widgets',
       keyCondition: { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'w1' },
       options: { scope: 'tenant-a' },
@@ -150,7 +150,7 @@ describe('KVS scope isolation', () => {
     // The dynamo translator only recognizes the store's real pk attribute, so
     // an alias-keyed scoped query that passed locally would 500 deployed. It
     // must fail locally first.
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'widgets',
       keyCondition: { key: 'pk', operation: KvsQueryOperationType.Equal, valueA: 'w1' },
       options: { scope: 'tenant-a' },
@@ -163,7 +163,7 @@ describe('KVS scope isolation', () => {
   it('rejects a scoped query whose key condition does not constrain the partition key', async () => {
     const { query } = await getProcessors();
 
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'widgets',
       keyCondition: { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'A' },
       options: { scope: 'tenant-a' },
@@ -176,10 +176,10 @@ describe('KVS scope isolation', () => {
   it('serves a scoped query on a GSI partition key from its own scope only, storing rows raw', async () => {
     const { upsert, query } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'gadgets', item: { id: 'g1', category: 'tools' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'gadgets', item: { id: 'g2', category: 'tools' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'gadgets', item: { id: 'g1', category: 'tools' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'gadgets', item: { id: 'g2', category: 'tools' }, options: { scope: 'tenant-b' } });
 
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'gadgets',
       keyCondition: { key: 'category', operation: KvsQueryOperationType.Equal, valueA: 'tools' },
       options: { scope: 'tenant-a' },
@@ -191,14 +191,14 @@ describe('KVS scope isolation', () => {
   it("reads a named GSI that shares the pk in the index's order, within the scope (the eventDoc list shape)", async () => {
     const { upsert, query } = await getProcessors();
     const upsertSummary = (id: string, updatedAt: string, scope: string) =>
-      invokeProcessor(upsert, { keyValueStoreName: 'summaries', item: { type: 'doc', id, updatedAt }, options: { scope } });
+      invokeProcessor(upsert!, { keyValueStoreName: 'summaries', item: { type: 'doc', id, updatedAt }, options: { scope } });
 
     await upsertSummary('a', '2026-03-01', 'tenant-a');
     await upsertSummary('b', '2026-01-01', 'tenant-a');
     await upsertSummary('c', '2026-02-01', 'tenant-a');
     await upsertSummary('z', '2026-09-01', 'tenant-b');
 
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'summaries',
       keyCondition: { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' },
       options: { scope: 'tenant-a', indexName: 'type', sortAscending: false },
@@ -211,26 +211,26 @@ describe('KVS scope isolation', () => {
     const { upsert, query } = await getProcessors();
     const typeIsDoc = { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' };
 
-    await invokeProcessor(upsert, {
+    await invokeProcessor(upsert!, {
       keyValueStoreName: 'summaries',
       item: { type: 'doc', id: 'a', updatedAt: '2026-01-01' },
       options: { scope: 'tenant-a' },
     });
-    await invokeProcessor(upsert, {
+    await invokeProcessor(upsert!, {
       keyValueStoreName: 'summaries',
       item: { type: 'doc', id: 'b', updatedAt: '2026-02-01' },
       options: { scope: 'tenant-a' },
     });
 
     const first = resolveActionResult(
-      await invokeProcessor(query, { keyValueStoreName: 'summaries', keyCondition: typeIsDoc, options: { scope: 'tenant-a', limit: 1 } }),
+      await invokeProcessor(query!, { keyValueStoreName: 'summaries', keyCondition: typeIsDoc, options: { scope: 'tenant-a', limit: 1 } }),
     );
-    const next = await invokeProcessor(query, {
+    const next = await invokeProcessor(query!, {
       keyValueStoreName: 'summaries',
       keyCondition: typeIsDoc,
       options: { scope: 'tenant-a', limit: 1, nextPageKey: first.nextPageKey },
     });
-    const elsewhere = await invokeProcessor(query, {
+    const elsewhere = await invokeProcessor(query!, {
       keyValueStoreName: 'summaries',
       keyCondition: typeIsDoc,
       options: { scope: 'tenant-b', limit: 1, nextPageKey: first.nextPageKey },
@@ -244,7 +244,7 @@ describe('KVS scope isolation', () => {
   it('refuses a query naming an undeclared index', async () => {
     const { query } = await getProcessors();
 
-    const result = await invokeProcessor(query, {
+    const result = await invokeProcessor(query!, {
       keyValueStoreName: 'summaries',
       keyCondition: { key: 'type', operation: KvsQueryOperationType.Equal, valueA: 'doc' },
       options: { scope: 'tenant-a', indexName: 'missing' },
@@ -256,21 +256,21 @@ describe('KVS scope isolation', () => {
   it('rejects the scoped GSI operations dynamo cannot serve (aws parity)', async () => {
     const { upsert, query, update } = await getProcessors();
 
-    const rangeOnIndexKey = await invokeProcessor(query, {
+    const rangeOnIndexKey = await invokeProcessor(query!, {
       keyValueStoreName: 'gadgets',
       keyCondition: { key: 'category', operation: KvsQueryOperationType.BeginsWith, valueA: 'to' },
       options: { scope: 'tenant-a' },
     });
     expect(resolveActionResultError(rangeOnIndexKey).errorType).toContain('InvalidScope');
 
-    const plantedCopy = await invokeProcessor(upsert, {
+    const plantedCopy = await invokeProcessor(upsert!, {
       keyValueStoreName: 'gadgets',
       item: { id: 'g1', '@@QPQGSI_category@@': 'tenant-b@@QPQSCOPE@@tools' },
       options: { scope: 'tenant-a' },
     });
     expect(resolveActionResultError(plantedCopy).errorType).toContain('InvalidScope');
 
-    const addToIndexKey = await invokeProcessor(update, {
+    const addToIndexKey = await invokeProcessor(update!, {
       keyValueStoreName: 'gadgets',
       key: 'g1',
       updates: [{ attributePath: 'category', action: KvsUpdateActionType.Add, value: 'x' }],
@@ -282,10 +282,10 @@ describe('KVS scope isolation', () => {
   it('restricts scans to the scope and strips returned items', async () => {
     const { upsert, scan } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
 
-    const result = await invokeProcessor(scan, { keyValueStoreName: 'widgets', options: { scope: 'tenant-a' } });
+    const result = await invokeProcessor(scan!, { keyValueStoreName: 'widgets', options: { scope: 'tenant-a' } });
 
     expect(resolveActionResult(result).items).toEqual([{ id: 'w1', name: 'A' }]);
   });
@@ -293,28 +293,28 @@ describe('KVS scope isolation', () => {
   it('restricts get-all to the scope', async () => {
     const { upsert, getAll } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
 
-    const scoped = await invokeProcessor(getAll, { keyValueStoreName: 'widgets', options: { scope: 'tenant-a' } });
+    const scoped = await invokeProcessor(getAll!, { keyValueStoreName: 'widgets', options: { scope: 'tenant-a' } });
     expect(resolveActionResult(scoped)).toEqual([{ id: 'w1', name: 'A' }]);
 
-    const unscoped = await invokeProcessor(getAll, { keyValueStoreName: 'widgets' });
+    const unscoped = await invokeProcessor(getAll!, { keyValueStoreName: 'widgets' });
     expect(resolveActionResultError(unscoped).errorType).toContain('InvalidScope');
   });
 
   it('deletes only within the scope', async () => {
     const { upsert, get, remove } = await getProcessors();
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
-    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'B' }, options: { scope: 'tenant-b' } });
 
-    await invokeProcessor(remove, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
+    await invokeProcessor(remove!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
 
-    const deleted = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
+    const deleted = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-a' } });
     expect(resolveActionResult(deleted)).toBeNull();
 
-    const untouched = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-b' } });
+    const untouched = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-b' } });
     expect(resolveActionResult(untouched)).toEqual({ id: 'w1', name: 'B' });
   });
 
@@ -324,7 +324,7 @@ describe('KVS scope isolation', () => {
     // AWS composes 'tenant-a@@QPQSCOPE@@acme@@QPQSCOPE@@secret' and throws;
     // the json backend stores raw, so it must throw the same typed error for
     // parity.
-    const result = await invokeProcessor(upsert, {
+    const result = await invokeProcessor(upsert!, {
       keyValueStoreName: 'widgets',
       item: { id: 'acme@@QPQSCOPE@@secret', name: 'X' },
       options: { scope: 'tenant-a' },
@@ -337,7 +337,7 @@ describe('KVS scope isolation', () => {
   it('rejects a malformed scope with the typed error', async () => {
     const { get } = await getProcessors();
 
-    const result = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: '../tenant-b' } });
+    const result = await invokeProcessor(get!, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: '../tenant-b' } });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toContain('InvalidScope');
@@ -346,7 +346,7 @@ describe('KVS scope isolation', () => {
   it('rejects scope on a store with a non-string partition key', async () => {
     const { upsert } = await getProcessors();
 
-    const result = await invokeProcessor(upsert, {
+    const result = await invokeProcessor(upsert!, {
       keyValueStoreName: 'counters',
       item: { seq: 1, value: 'x' },
       options: { scope: 'tenant-a' },

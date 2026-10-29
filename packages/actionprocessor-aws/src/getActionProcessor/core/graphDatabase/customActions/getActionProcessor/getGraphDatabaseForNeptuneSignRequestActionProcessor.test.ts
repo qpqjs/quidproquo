@@ -17,7 +17,7 @@ const invoke = async (url: string, body: string) => {
   const processor = (await getGraphDatabaseForNeptuneSignRequestActionProcessor(qpqConfig, null as any))[
     GraphDatabaseForNeptuneActionType.SignRequest
   ];
-  const [headers, error] = await invokeProcessor<Record<string, string>>(processor, { url, body });
+  const [headers, error] = await invokeProcessor<Record<string, string>>(processor!, { url, body });
   expect(error).toBeUndefined();
   return headers!;
 };

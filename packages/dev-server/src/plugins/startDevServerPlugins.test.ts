@@ -49,7 +49,7 @@ describe('startDevServerPlugins', () => {
   it('defaults a plugin with no declared phase to StopAccepting', async () => {
     const [task] = await startDevServerPlugins([{ name: 'api', start: async () => vi.fn().mockResolvedValue(undefined) }], devServerConfig);
 
-    expect(task.phase).toBe(DevServerShutdownPhase.StopAccepting);
+    expect(task!.phase).toBe(DevServerShutdownPhase.StopAccepting);
   });
 
   it('passes the resolved config to each plugin', async () => {

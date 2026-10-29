@@ -30,7 +30,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       authChallenge: { challenge: 'NEW_PASSWORD_REQUIRED', username: 'joe@example.com', session: 'sess', newPassword: 'N3w-pass' } as any,
     });

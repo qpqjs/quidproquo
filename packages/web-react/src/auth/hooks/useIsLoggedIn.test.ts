@@ -20,7 +20,7 @@ describe('useIsLoggedIn', () => {
 
   it('is true when an access token is present', () => {
     const { result } = renderHook(() => useIsLoggedIn(), {
-      wrapper: wrapperFor({ username: '', password: '', authenticationInfo: { accessToken: 'abc' } as any }),
+      wrapper: wrapperFor({ username: '', authenticationInfo: { accessToken: 'abc' } as any }),
     });
 
     expect(result.current).toBe(true);

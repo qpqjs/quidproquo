@@ -38,7 +38,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     });
     const processor = await resolveProcessor();
 
-    const [details, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+    const [details, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'tok' });
 
     expect(error).toBeUndefined();
     expect(details).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'a***@b.com' });
@@ -49,7 +49,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('NotAuthorizedException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'bad' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'bad' });
 
     expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.Unauthorized);
   });
@@ -58,7 +58,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('CodeDeliveryFailureException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'tok' });
 
     expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.CodeDeliveryFailed);
   });

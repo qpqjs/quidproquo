@@ -31,7 +31,7 @@ describe('getStateMachineGetActionProcessor', () => {
   it('returns a NotFound error when the state machine is not configured', async () => {
     const processor = await getProcessor(buildTestQpqConfig());
 
-    const [, error] = await invoke(processor, { stateMachineName: 'missing', id: 'order-1' }, {});
+    const [, error] = await invoke(processor!, { stateMachineName: 'missing', id: 'order-1' }, {});
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -40,7 +40,7 @@ describe('getStateMachineGetActionProcessor', () => {
     const processor = await getProcessor(orderConfig());
 
     const [, error] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1' },
       {
         [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
@@ -54,7 +54,7 @@ describe('getStateMachineGetActionProcessor', () => {
     const processor = await getProcessor(orderConfig());
 
     const [, error] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1' },
       {
         [KeyValueStoreActionType.Get]: async () => actionResult(null),
@@ -69,7 +69,7 @@ describe('getStateMachineGetActionProcessor', () => {
     const entity = { id: 'order-1', total: 10 };
 
     const [result] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1' },
       {
         [KeyValueStoreActionType.Get]: async () => actionResult(entity),

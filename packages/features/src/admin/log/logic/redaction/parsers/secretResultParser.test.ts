@@ -19,9 +19,9 @@ describe('secretResultParser', () => {
 
     const { redactedLog, redactions } = secretResultParser(log);
 
-    expect(redactedLog.history[0].act.payload).toEqual({ secretName: 'db' });
-    expect(redactedLog.history[0].res).toEqual([REDACTED_STRING, undefined]);
-    expect(redactedLog.history[1].res).toEqual([{ card: REDACTED_STRING, exp: 12 }, undefined]);
+    expect(redactedLog!.history[0]!.act.payload).toEqual({ secretName: 'db' });
+    expect(redactedLog!.history[0]!.res).toEqual([REDACTED_STRING, undefined]);
+    expect(redactedLog!.history[1]!.res).toEqual([{ card: REDACTED_STRING, exp: 12 }, undefined]);
     expect(redactedLog.history[2]).toBe(log.history[2]);
     expect(redactions.sort()).toEqual(['4111', 's3cret-value']);
   });
@@ -35,8 +35,8 @@ describe('secretResultParser', () => {
 
     const { redactedLog, redactions } = secretResultParser(log);
 
-    expect(redactedLog.history[0].act.payload).toEqual({ byteLength: 32 });
-    expect(redactedLog.history[0].res).toEqual([REDACTED_STRING, undefined]);
+    expect(redactedLog!.history[0]!.act.payload).toEqual({ byteLength: 32 });
+    expect(redactedLog!.history[0]!.res).toEqual([REDACTED_STRING, undefined]);
     expect(redactions).toEqual([token]);
   });
 
@@ -59,10 +59,10 @@ describe('secretResultParser', () => {
 
     const redacted = redactStoryResult(log);
 
-    expect(redacted.history[0].act.payload).toEqual({ drive: 'd', filepath: 'file.pdf', expirationMs: 300000 });
-    expect(redacted.history[0].res).toEqual([REDACTED_STRING, undefined]);
-    expect(redacted.history[1].res).toEqual([REDACTED_STRING, undefined]);
-    expect(redacted.history[2].act.payload.msg).toBe(`sent ${REDACTED_STRING} to the client`);
+    expect(redacted!.history[0]!.act.payload).toEqual({ drive: 'd', filepath: 'file.pdf', expirationMs: 300000 });
+    expect(redacted!.history[0]!.res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted!.history[1]!.res).toEqual([REDACTED_STRING, undefined]);
+    expect(redacted!.history[2]!.act.payload.msg).toBe(`sent ${REDACTED_STRING} to the client`);
   });
 
   it('through the pipeline, sweeps a generated token from everywhere it went in the log', () => {

@@ -57,10 +57,10 @@ describe('buildEventDocStoreGlobals', () => {
     // all for them - the bridge must treat that as "hook not configured", not throw at
     // request time.
     const globals = { ...buildEventDocStoreGlobals(store) };
-    delete globals[EVENT_DOC_ON_PUBLISH_GLOBAL];
-    delete globals[EVENT_DOC_ON_APPEND_GLOBAL];
-    delete globals[EVENT_DOC_SCOPE_RESOLVER_GLOBAL];
-    delete globals[EVENT_DOC_AUTHORISER_GLOBAL];
+    delete (globals as any)[EVENT_DOC_ON_PUBLISH_GLOBAL];
+    delete (globals as any)[EVENT_DOC_ON_APPEND_GLOBAL];
+    delete (globals as any)[EVENT_DOC_SCOPE_RESOLVER_GLOBAL];
+    delete (globals as any)[EVENT_DOC_AUTHORISER_GLOBAL];
 
     const resolved = runStory(askEventDocProvideStoreFromGlobals(askEventDocStoreRead()), {
       [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => {
@@ -79,7 +79,7 @@ describe('buildEventDocStoreGlobals', () => {
     const globals = { ...buildEventDocStoreGlobals(store), [EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL]: 'widgets-ws' };
 
     const resolved = runStory(askEventDocProvideStoreFromGlobals(askEventDocStoreRead()), {
-      [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
+      [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => (globals as Record<string, unknown>)[action.payload.globalName],
     });
 
     expect(resolved.syncWebsocketApiNames).toEqual(['widgets-ws']);

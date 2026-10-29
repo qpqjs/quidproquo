@@ -10,7 +10,7 @@ describe('askUserScriptPublishOutput', () => {
     const writes: unknown[] = [];
 
     runStory(askUserScriptPublishOutput('scripts', 'doc-1/assets/abc', 'js text', 'tenant-1'), {
-      [FileActionType.WriteTextContents]: (action) => {
+      [FileActionType.WriteTextContents]: (action: any) => {
         writes.push(action.payload);
         return undefined;
       },

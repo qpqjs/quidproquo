@@ -29,7 +29,7 @@ describe('getUserDirectoryRevokeRefreshTokenActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(revokeRefreshToken).mockResolvedValue(undefined);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', refreshToken: 'refresh' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', refreshToken: 'refresh' });
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();
@@ -40,7 +40,7 @@ describe('getUserDirectoryRevokeRefreshTokenActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(revokeRefreshToken).mockRejectedValue(cognitoError('NotAuthorizedException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', refreshToken: 'refresh' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', refreshToken: 'refresh' });
 
     expect(error?.errorType).toBe(askUserDirectoryRevokeRefreshToken.errorType.Unauthorized);
   });
@@ -49,7 +49,7 @@ describe('getUserDirectoryRevokeRefreshTokenActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(revokeRefreshToken).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', refreshToken: 'refresh' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', refreshToken: 'refresh' });
 
     expect(error?.errorType).toBe(askUserDirectoryRevokeRefreshToken.errorType.LimitExceeded);
   });

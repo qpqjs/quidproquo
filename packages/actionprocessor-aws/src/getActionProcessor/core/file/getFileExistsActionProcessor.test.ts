@@ -14,7 +14,7 @@ const invoke = async (payload: { drive: string; filepath: string }) => {
   const processor = (await getFileExistsActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any))[
     FileActionType.Exists
   ];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileExists', () => {

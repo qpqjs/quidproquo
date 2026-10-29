@@ -29,7 +29,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(getUserAttributesBySub).mockResolvedValue({ email: 'joe@example.com' } as any);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', userId: 'user-1' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', userId: 'user-1' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ email: 'joe@example.com' });
@@ -40,7 +40,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(getUserAttributesBySub).mockRejectedValue(cognitoError('USER_NOT_FOUND'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', userId: 'user-1' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', userId: 'user-1' });
 
     expect(error?.errorType).toBe(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound);
   });

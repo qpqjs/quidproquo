@@ -25,7 +25,7 @@ describe('file drive-not-found error shape', () => {
   it('returns the typed DriveNotFound error from Delete', async () => {
     const processor = (await getFileDeleteActionProcessor(config, {} as any))[FileActionType.Delete];
 
-    const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepaths: ['a.txt'] });
+    const [, error] = await invokeProcessor(processor!, { drive: 'missing-drive', filepaths: ['a.txt'] });
 
     expect(error?.errorType).toBe(askFileDelete.errorType.DriveNotFound);
   });
@@ -33,7 +33,7 @@ describe('file drive-not-found error shape', () => {
   it('returns the typed DriveNotFound error from IsColdStorage', async () => {
     const processor = (await getFileIsColdStorageActionProcessor(config, {} as any))[FileActionType.IsColdStorage];
 
-    const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepath: 'a.txt' });
+    const [, error] = await invokeProcessor(processor!, { drive: 'missing-drive', filepath: 'a.txt' });
 
     expect(error?.errorType).toBe(askFileIsColdStorage.errorType.DriveNotFound);
   });
@@ -41,7 +41,7 @@ describe('file drive-not-found error shape', () => {
   it('returns the typed DriveNotFound error from WriteTextContents', async () => {
     const processor = (await getFileWriteTextContentsActionProcessor(config, {} as any))[FileActionType.WriteTextContents];
 
-    const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepath: 'a.txt', data: 'x' });
+    const [, error] = await invokeProcessor(processor!, { drive: 'missing-drive', filepath: 'a.txt', data: 'x' });
 
     expect(error?.errorType).toBe(askFileWriteTextContents.errorType.DriveNotFound);
   });

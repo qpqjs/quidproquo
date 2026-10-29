@@ -38,7 +38,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     userStore.getDevUserByUserId.mockResolvedValue(user);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', userId: 'user-1' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', userId: 'user-1' });
 
     expect(userStore.getDevUserByUserId).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'user-1');
     expect(resolveActionResult(result)).toEqual(user);
@@ -48,7 +48,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     userStore.getDevUserByUserId.mockResolvedValue(null);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', userId: 'unknown' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', userId: 'unknown' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound);

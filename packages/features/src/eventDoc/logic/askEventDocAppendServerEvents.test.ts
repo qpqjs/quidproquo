@@ -143,7 +143,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
       if (options?.limit === 1 && options.sortAscending === false) {
         const head = heads[Math.min(counts.headReads, heads.length - 1)];
         counts.headReads += 1;
-        return { items: [logRow(head)], nextPageKey: undefined };
+        return { items: [logRow(head!)], nextPageKey: undefined };
       }
 
       const { after = -1, upTo = 2 } = skBounds(keyCondition);
@@ -180,9 +180,9 @@ describe('askEventDocAppendServerEvents', () => {
     // One clock read, one guid mint, one consistent head read, one write, the whole point of the batch.
     expect(counts).toEqual({ dateNow: 1, guidMints: 1, headReads: 1, delays: 0, functionCalls: {} });
     expect(upserts).toHaveLength(1);
-    expect(upserts[0].keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));
-    expect(upserts[0].options?.ifNotExists).toBe(true);
-    expect(upserts[0].items.map((item: { pk: string; sk: number }) => [item.pk, item.sk])).toEqual([
+    expect(upserts![0]!.keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));
+    expect(upserts![0]!.options?.ifNotExists).toBe(true);
+    expect(upserts![0]!.items.map((item: { pk: string; sk: number }) => [item.pk, item.sk])).toEqual([
       [DOC_ID, 5],
       [DOC_ID, 6],
       [DOC_ID, 7],
@@ -217,7 +217,7 @@ describe('askEventDocAppendServerEvents', () => {
   it('with validate, refuses a run carrying a schema version the fold cannot read, writing nothing (#554)', () => {
     const { mocks, upserts } = buildMocks({ heads: [1] });
 
-    const withBadVersion: EventDocServerEventInput[] = [INPUTS[0], { ...INPUTS[1], version: 99 }, INPUTS[2]];
+    const withBadVersion: EventDocServerEventInput[] = [INPUTS![0]!, { ...INPUTS![1]!, version: 99 }, INPUTS![2]!];
 
     expect(() => runAppend(withBadVersion, STORE, mocks, { validate: true })).toThrow(/No event-doc fold reducer for schema version 99/);
     expect(upserts).toHaveLength(0);

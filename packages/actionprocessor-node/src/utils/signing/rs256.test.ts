@@ -31,7 +31,7 @@ describe('rs256', () => {
   it('rejects a signature with a single flipped bit without throwing', () => {
     const signature = rs256Sign(privateKeyPem, 'header.payload');
     const bytes = Buffer.from(base64UrlDecode(signature));
-    bytes[bytes.length - 1] ^= 0x01;
+    bytes![bytes.length - 1]! ^= 0x01;
     const flipped = bytes.toString('base64url');
 
     expect(rs256Verify(publicKeyPem, 'header.payload', flipped)).toBe(false);

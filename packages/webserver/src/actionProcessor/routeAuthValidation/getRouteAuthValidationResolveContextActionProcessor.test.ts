@@ -12,7 +12,7 @@ describe('getRouteAuthValidationResolveContextActionProcessor', () => {
     const processors = await getRouteAuthValidationResolveContextActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const processor = processors[RouteAuthValidationActionType.ResolveContext];
 
-    const [result, error] = await processor(
+    const [result, error] = await processor!(
       { event: { headers: {} } as unknown as HTTPEvent, routeAuthSettings: {}, decodedAccessToken: null },
       buildTestStorySession(),
       buildActionProcessorList({}),

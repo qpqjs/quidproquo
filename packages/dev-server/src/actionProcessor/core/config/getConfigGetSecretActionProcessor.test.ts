@@ -26,7 +26,7 @@ describe('getConfigGetSecretActionProcessor', () => {
     configStore.getOrSeedSecretValue.mockResolvedValue('secret-guid');
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { secretName: 'apiKey' });
+    const result = await invokeProcessor(process!, { secretName: 'apiKey' });
 
     expect(configStore.getOrSeedSecretValue).toHaveBeenCalledWith('/tmp/runtime', 'apiKey', expect.anything());
     expect(resolveActionResult(result)).toBe('secret-guid');
@@ -36,7 +36,7 @@ describe('getConfigGetSecretActionProcessor', () => {
     configStore.getOrSeedSecretValue.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { secretName: 'apiKey' });
+    const result = await invokeProcessor(process!, { secretName: 'apiKey' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

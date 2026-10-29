@@ -39,7 +39,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const updates = [{ logicalOperation: 'Set' }];
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates });
 
     expect(result).toEqual([{ id: 'k1', updated: true }]);
     expect(updateItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', updates, 'pk', 'k1', 'sk', 's1', undefined);
@@ -51,7 +51,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
 
     const condition = kvsOr([kvsNotExists('headEventId'), kvsLessThan('headEventId', 7)]);
     const updates = [{ attributePath: 'headEventId', action: KvsUpdateActionType.Set, value: 7 }];
-    await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates, options: { condition } });
+    await invokeProcessor(processor!, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates, options: { condition } });
 
     expect(vi.mocked(updateItem).mock.calls[0][7]).toEqual(condition);
   });
@@ -60,7 +60,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     vi.mocked(updateItem).mockRejectedValue(Object.assign(new Error('The conditional request failed'), { name: 'ConditionalCheckFailedException' }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates: [] });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1', updates: [] });
 
     expect(error?.errorType).toBe(askKeyValueStoreUpdateBase.errorType.ConditionFailed);
   });
@@ -70,7 +70,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const updates = [{ attributePath: 'customerId', action: KvsUpdateActionType.Set, value: 'c-2' }];
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'orders', key: 'o-1', updates, options: { scope: 'acme' } });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'orders', key: 'o-1', updates, options: { scope: 'acme' } });
 
     expect(result).toEqual([{ id: 'o-1', customerId: 'c-2' }]);
     expect(vi.mocked(updateItem).mock.calls[0][2]).toEqual([

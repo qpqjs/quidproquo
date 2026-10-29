@@ -214,7 +214,7 @@ const buildHarness = (options: Harness = {}) => {
   const appendServer = (type: string, validate?: boolean) =>
     runStory(askEventDocStoreProvide(buildEventDocStore(STORE), askEventDocAppendServerEvent(DOC_ID, type, {}, 1, ACTOR, { validate })), mocks);
 
-  const summaryRow = () => tables[STORE.storeName][0] as EventDocSummary;
+  const summaryRow = () => tables![STORE.storeName]![0] as EventDocSummary;
   const snapshotRows = () => tables[SNAPSHOTS_STORE] ?? [];
   const logRows = () => tables[EVENTS_STORE];
 
@@ -228,10 +228,10 @@ describe('askEventDocEventAppend', () => {
     const appended = append(input(EventDocEffect.Publish, { effectiveFrom: T0 }));
 
     expect(appended.payload.metadata.eventId).toBe(1);
-    expect(summaryRow().versions[0].publishedAt).toBeDefined();
+    expect(summaryRow!().versions[0]!.publishedAt).toBeDefined();
     expect(summaryRow().eventId).toBe(1);
     expect(summaryUpdates).toHaveLength(1);
-    expect(summaryUpdates[0].condition).toEqual(kvsOr([kvsNotExists('eventId'), kvsLessThan('eventId', 1)]));
+    expect(summaryUpdates![0]!.condition).toEqual(kvsOr([kvsNotExists('eventId'), kvsLessThan('eventId', 1)]));
     expect(snapshotRows()).toHaveLength(0);
     expect(sequence.filter((step) => step.startsWith('fn:'))).toEqual(['fn:getServerEventTypes']);
   });
@@ -253,7 +253,7 @@ describe('askEventDocEventAppend', () => {
     append(input(EventDocEffect.Publish, { effectiveFrom: T0 }));
 
     expect(summaryRow().name).toBe('Renamed while drafting');
-    expect(summaryRow().versions[0].publishedAt).toBeDefined();
+    expect(summaryRow!().versions[0]!.publishedAt).toBeDefined();
     expect(summaryRow().eventId).toBe(3);
   });
 
@@ -263,7 +263,7 @@ describe('askEventDocEventAppend', () => {
     append(input(EventDocEffect.Publish, { effectiveFrom: T0 }));
 
     expect(summaryRow().name).toBe('Renamed');
-    expect(summaryRow().versions[0].publishedAt).toBeDefined();
+    expect(summaryRow!().versions[0]!.publishedAt).toBeDefined();
     expect(summaryRow().eventId).toBe(2);
   });
 
@@ -274,7 +274,7 @@ describe('askEventDocEventAppend', () => {
 
     expect(appended.payload.metadata.eventId).toBe(1);
     expect(summaryRow().eventId).toBe(5);
-    expect(summaryRow().versions[0].publishedAt).toBeUndefined();
+    expect(summaryRow!().versions[0]!.publishedAt).toBeUndefined();
   });
 
   it('hands the refolded summary to the hooks, after the row is written', () => {
@@ -283,7 +283,7 @@ describe('askEventDocEventAppend', () => {
     append(input(EventDocEffect.Publish, { effectiveFrom: T0 }), { ...STORE, onPublish: 'syncRecord' });
 
     expect(hookPayloads).toHaveLength(1);
-    expect(hookPayloads[0].summary.versions[0].publishedAt).toBeDefined();
+    expect(hookPayloads![0]!.summary.versions[0]!.publishedAt).toBeDefined();
     expect(sequence.indexOf(`update:${STORE.storeName}`)).toBeLessThan(sequence.indexOf('hook'));
   });
 
@@ -389,7 +389,7 @@ describe('askEventDocEventAppend head-moved push', () => {
 
     expect(harness.sequence.filter((step) => step === 'hook' || step === 'push')).toEqual(['hook', 'push', 'push']);
     expect(harness.pushes.map((push) => push.connectionId)).toEqual(['c1', 'c2']);
-    expect(harness.pushes[0].payload).toMatchObject({
+    expect(harness!.pushes[0]!.payload).toMatchObject({
       type: 'Qpq/WebSocketQueue/EventDocHeadMoved',
       payload: {
         storeName: STORE.storeName,

@@ -21,12 +21,12 @@ describe('buildAiStopConditions', () => {
     let clock = 1000;
     const [outOfTime] = buildAiStopConditions({ maxDurationMs: 500 }, () => clock);
 
-    expect(await outOfTime(noSteps as never)).toBe(false);
+    expect(await outOfTime!(noSteps as never)).toBe(false);
 
     clock = 1499;
-    expect(await outOfTime(noSteps as never)).toBe(false);
+    expect(await outOfTime!(noSteps as never)).toBe(false);
 
     clock = 1500;
-    expect(await outOfTime(noSteps as never)).toBe(true);
+    expect(await outOfTime!(noSteps as never)).toBe(true);
   });
 });

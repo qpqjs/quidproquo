@@ -25,7 +25,7 @@ describe('getUserDirectoryConfirmEmailVerificationActionProcessor', () => {
   it('verifies the email with the confirmation code', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { code: '123', accessToken: 'tok' });
+    const result = await invokeProcessor(processor!, { code: '123', accessToken: 'tok' });
 
     expect(result).toEqual([undefined]);
     expect(verifyUserEmail).toHaveBeenCalledWith('eu-west-1', 'tok', '123');

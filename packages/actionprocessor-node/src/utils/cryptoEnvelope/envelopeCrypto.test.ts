@@ -93,7 +93,7 @@ describe('envelopeEncrypt / envelopeDecrypt', () => {
     // intact, so this must surface as corruption rather than context mismatch
     const fields = JSON.parse(Buffer.from(ciphertext.slice(CRYPTO_BLOB_PREFIX_V1.length), 'base64').toString('utf8'));
     const corruptPayload = Buffer.from(fields.ct, 'base64');
-    corruptPayload[0] = corruptPayload[0] ^ 0xff;
+    corruptPayload[0] = corruptPayload![0]! ^ 0xff;
     const tamperedJson = JSON.stringify({ ...fields, ct: corruptPayload.toString('base64') });
     const tampered = `${CRYPTO_BLOB_PREFIX_V1}${Buffer.from(tamperedJson, 'utf8').toString('base64')}`;
 

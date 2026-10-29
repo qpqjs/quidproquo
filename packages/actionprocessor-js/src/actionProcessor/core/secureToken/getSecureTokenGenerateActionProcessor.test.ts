@@ -49,7 +49,7 @@ describe('getSecureTokenGenerateActionProcessor', () => {
     expect(tokens.size).toBe(3);
   });
 
-  it.each([0, -1, 1.5, 1025, Number.NaN])('refuses a byte length of %s', async (byteLength) => {
+  it.each([0, -1, 1.5, 1025, Number.NaN])('refuses a byte length of %s', async (byteLength: any) => {
     const processor = await getProcessor();
 
     const result = await processor({ byteLength }, undefined as any);
@@ -60,7 +60,7 @@ describe('getSecureTokenGenerateActionProcessor', () => {
 
   // Security regression: a token must be a whole number of bytes inside the configured range, and it must never
   // come from a weaker source than Web Crypto.
-  it.each([0, -1, 1.5, Number.NaN, SECURE_TOKEN_MAX_BYTE_LENGTH + 1])('refuses a byte length of %s', async (byteLength) => {
+  it.each([0, -1, 1.5, Number.NaN, SECURE_TOKEN_MAX_BYTE_LENGTH + 1])('refuses a byte length of %s', async (byteLength: any) => {
     const processor = await getProcessor();
 
     const result = await processor({ byteLength });

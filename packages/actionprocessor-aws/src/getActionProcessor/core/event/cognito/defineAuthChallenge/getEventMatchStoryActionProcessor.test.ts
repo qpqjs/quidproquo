@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
 const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
-  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { defineAuthChallenge: runtime } })]);
+  buildTestQpqConfig([
+    defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime, defineAuthChallenge: runtime, verifyAuthChallenge: runtime } }),
+  ]);
 
 describe('cognito/defineAuthChallenge getEventMatchStoryActionProcessor', () => {
   it('returns a NotFound error when no defineAuthChallenge runtime is configured', async () => {

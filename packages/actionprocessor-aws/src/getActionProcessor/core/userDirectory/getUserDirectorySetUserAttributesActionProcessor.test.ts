@@ -26,7 +26,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     vi.mocked(getExportedValue).mockReset().mockResolvedValue('POOL');
     vi.mocked(resolveUsernameByPreferredUsername)
       .mockReset()
-      .mockImplementation(async (_pool, _region, username) => username);
+      .mockImplementation(async (_pool: any, _region: any, username: any) => username);
     vi.mocked(setUserAttributes).mockReset();
   });
 
@@ -34,7 +34,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserAttributes).mockResolvedValue(undefined);
 
-    const [result, error] = await invokeProcessor(processor, {
+    const [result, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       username: 'joe@example.com',
       userAttributes: { email: 'new@example.com' } as any,
@@ -49,7 +49,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserAttributes).mockRejectedValue(cognitoError('UserNotFoundException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       username: 'joe@example.com',
       userAttributes: { email: 'new@example.com' } as any,
@@ -62,7 +62,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserAttributes).mockRejectedValue(cognitoError('InvalidParameterException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       username: 'joe@example.com',
       userAttributes: { email: 'new@example.com' } as any,
@@ -75,7 +75,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserAttributes).mockRejectedValue(cognitoError('AliasExistsException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       username: 'joe@example.com',
       userAttributes: { email: 'new@example.com' } as any,
@@ -88,7 +88,7 @@ describe('getUserDirectorySetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserAttributes).mockRejectedValue(cognitoError('LimitExceededException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       username: 'joe@example.com',
       userAttributes: { email: 'new@example.com' } as any,

@@ -17,7 +17,7 @@ const invoke = async (extra: Record<string, unknown> = {}) => {
   const processor = (await getFileCopyActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any))[
     FileActionType.Copy
   ];
-  return invokeProcessor(processor, { ...payload, ...extra });
+  return invokeProcessor(processor!, { ...payload, ...extra });
 };
 
 describe('getProcessFileCopy', () => {

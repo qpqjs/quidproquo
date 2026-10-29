@@ -27,7 +27,7 @@ describe('getConfigSetParameterActionProcessor', () => {
     vi.mocked(setParameter).mockResolvedValue(undefined as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterName: 'flag', parameterValue: 'on' });
+    const result = await invokeProcessor(processor!, { parameterName: 'flag', parameterValue: 'on' });
 
     expect(result).toEqual([undefined]);
     expect(setParameter).toHaveBeenCalledWith('flag-test-app-test-module-development', 'eu-west-1', 'on');
@@ -40,7 +40,7 @@ describe('getConfigSetParameterActionProcessor', () => {
     vi.mocked(setParameter).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterName: 'flag', parameterValue: 'on' });
+    const [, error] = await invokeProcessor(processor!, { parameterName: 'flag', parameterValue: 'on' });
 
     expect(error?.errorType).toBe(expectedType);
   });

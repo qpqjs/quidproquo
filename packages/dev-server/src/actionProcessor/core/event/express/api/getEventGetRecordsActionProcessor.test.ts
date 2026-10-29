@@ -13,7 +13,7 @@ describe('getEventGetRecordsActionProcessor (express)', () => {
 
   const invoke = async (expressEvent: any) => {
     const process = await getProcess();
-    return invokeProcessor(process, { eventParams: [expressEvent] } as any);
+    return invokeProcessor(process!, { eventParams: [expressEvent] } as any);
   };
 
   it('maps the express event into a base64-encoded internal record', async () => {

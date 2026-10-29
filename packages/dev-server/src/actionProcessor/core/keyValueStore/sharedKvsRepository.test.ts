@@ -34,12 +34,12 @@ describe('KVS processors share one repository instance per service', () => {
     const upsertProcessors = await getKeyValueStoreUpsertActionProcessor(devServerConfig())(qpqConfig(), noopDynamicModuleLoader);
     const getProcessors = await getKeyValueStoreGetActionProcessor(devServerConfig())(qpqConfig(), noopDynamicModuleLoader);
 
-    await invokeProcessor(upsertProcessors[KeyValueStoreActionType.Upsert], {
+    await invokeProcessor(upsertProcessors![KeyValueStoreActionType.Upsert]!, {
       keyValueStoreName: 'widgets',
       item: { id: 'w1', name: 'Sprocket' },
     });
 
-    const result = await invokeProcessor(getProcessors[KeyValueStoreActionType.Get], { keyValueStoreName: 'widgets', key: 'w1' });
+    const result = await invokeProcessor(getProcessors![KeyValueStoreActionType.Get]!, { keyValueStoreName: 'widgets', key: 'w1' });
 
     expect(resolveActionResult(result)).toEqual({ id: 'w1', name: 'Sprocket' });
   });

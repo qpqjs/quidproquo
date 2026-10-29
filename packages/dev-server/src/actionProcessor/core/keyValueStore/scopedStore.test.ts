@@ -34,7 +34,7 @@ describe('scoped key value store on the dev server', () => {
   it('refuses an unscoped get', async () => {
     const process = (await getKeyValueStoreGetActionProcessor(devServerConfig)(qpqConfig, noopDynamicModuleLoader))[KeyValueStoreActionType.Get];
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', key: { id: 'a' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', key: { id: 'a' } });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetBase.errorType.InvalidScope);
     expect(repo.get).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('scoped key value store on the dev server', () => {
       KeyValueStoreActionType.GetAll
     ];
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.InvalidScope);
     expect(repo.getAll).not.toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe('scoped key value store on the dev server', () => {
   it('refuses an unscoped scan', async () => {
     const process = (await getKeyValueStoreScanActionProcessor(devServerConfig)(qpqConfig, noopDynamicModuleLoader))[KeyValueStoreActionType.Scan];
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreScanBase.errorType.InvalidScope);
     expect(repo.scan).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('scoped key value store on the dev server', () => {
       KeyValueStoreActionType.GetAll
     ];
 
-    await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'TENANT#a' } });
+    await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', options: { scope: 'TENANT#a' } });
 
     expect(repo.getAll).toHaveBeenCalledWith('tenantStore', 'TENANT#a');
   });

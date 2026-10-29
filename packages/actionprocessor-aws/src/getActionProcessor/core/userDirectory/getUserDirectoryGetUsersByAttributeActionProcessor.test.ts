@@ -29,7 +29,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsersByAttribute).mockResolvedValue({ items: [], nextPageKey: null } as any);
 
-    const [result, error] = await invokeProcessor(processor, {
+    const [result, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       attribueName: 'email',
       attribueValue: 'joe@example.com',
@@ -46,7 +46,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsersByAttribute).mockRejectedValue(cognitoError('InvalidParameterException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       attribueName: 'email',
       attribueValue: 'joe@example.com',
@@ -61,7 +61,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsersByAttribute).mockRejectedValue(cognitoError('INVALID_COGNITO_FILTER'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       attribueName: 'email',
       attribueValue: 'joe@example.com',
@@ -76,7 +76,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsersByAttribute).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       attribueName: 'email',
       attribueValue: 'joe@example.com',

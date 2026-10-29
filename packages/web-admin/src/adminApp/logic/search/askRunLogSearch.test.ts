@@ -42,11 +42,11 @@ describe('askRunLogSearch', () => {
     });
 
     expect(applied).toHaveLength(1);
-    expect(applied[0].type).toBe(AdminSessionEffect.SearchRequested);
+    expect(applied![0]!.type).toBe(AdminSessionEffect.SearchRequested);
 
     expect(requestBodies).toHaveLength(2);
-    expect(requestBodies[1].nextPageKey).toBe('page-2');
-    expect(requestBodies[0].runtimeType).toBe('EXECUTE_STORY');
+    expect(requestBodies![1]!.nextPageKey).toBe('page-2');
+    expect(requestBodies![0]!.runtimeType).toBe('EXECUTE_STORY');
 
     const volatileTypes = dispatched.map((effect) => effect.type);
     expect(volatileTypes).toContain(VolatileEffect.logSearchStarted);

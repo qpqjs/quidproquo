@@ -15,7 +15,7 @@ const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', { onConnect,
 const invoke = async (eventType: string) => {
   const processors = await getEventMatchStoryActionProcessor(buildConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.MatchStory];
-  return invokeProcessor(process, { qpqEventRecord: { apiName: 'api', eventType }, eventParams: [] } as any);
+  return invokeProcessor(process!, { qpqEventRecord: { apiName: 'api', eventType }, eventParams: [] } as any);
 };
 
 describe('getEventMatchStoryActionProcessor (websocket)', () => {

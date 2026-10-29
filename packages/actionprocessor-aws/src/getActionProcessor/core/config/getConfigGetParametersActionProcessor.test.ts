@@ -27,7 +27,7 @@ describe('getConfigGetParametersActionProcessor', () => {
     vi.mocked(getParameters).mockResolvedValue(['x', 'y']);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterNames: ['a', 'b'] });
+    const result = await invokeProcessor(processor!, { parameterNames: ['a', 'b'] });
 
     expect(result).toEqual([['x', 'y']]);
     expect(getParameters).toHaveBeenCalledWith(['a-test-app-test-module-development', 'b-test-app-test-module-development'], 'eu-west-1');
@@ -37,7 +37,7 @@ describe('getConfigGetParametersActionProcessor', () => {
     vi.mocked(getParameters).mockRejectedValue(Object.assign(new Error('rate'), { name: 'ThrottlingException' }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterNames: ['a'] });
+    const [, error] = await invokeProcessor(processor!, { parameterNames: ['a'] });
 
     expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttled);
   });

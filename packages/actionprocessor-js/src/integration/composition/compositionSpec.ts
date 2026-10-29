@@ -131,7 +131,7 @@ type ContextState = {
 
 const nearestOverride = (overrides: OverrideFrame[], leafKind: 'ok' | 'fail'): OverrideFrame | undefined => {
   for (let i = overrides.length - 1; i >= 0; i--) {
-    if (overrides[i].target === '*' || overrides[i].target === leafKind) {
+    if (overrides[i]!.target === '*' || overrides[i]!.target === leafKind) {
       return overrides[i];
     }
   }
@@ -271,7 +271,7 @@ export const generateTowers = (depth: number): Spec[] => {
     for (const leaf of TOWER_LEAVES) {
       let node: Spec = leaf;
       for (let level = 0; level < depth; level++) {
-        node = TOWER_WRAPPERS[(level + rotation) % width](node);
+        node = TOWER_WRAPPERS[(level + rotation) % width]!(node);
       }
       towers.push(node);
     }

@@ -11,7 +11,7 @@ describe('getApiKeyValidationValidateActionProcessor', () => {
     const processors = await getApiKeyValidationValidateActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[ApiKeyValidationActionType.Validate];
 
-    const result = await invokeProcessor(process, {} as any);
+    const result = await invokeProcessor(process!, {} as any);
 
     expect(resolveActionResult(result)).toBe(true);
   });

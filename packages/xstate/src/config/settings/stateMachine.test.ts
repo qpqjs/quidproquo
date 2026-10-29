@@ -25,7 +25,7 @@ describe('defineStateMachine', () => {
   it('returns a backing key value store and the state machine setting', () => {
     const [kvs, setting] = qpqCoreUtils.flattenQpqConfig(defineStateMachine('order', { config: toggleConfig }));
 
-    expect(kvs.configSettingType).toBe(QPQCoreConfigSettingType.keyValueStore);
+    expect(kvs!.configSettingType).toBe(QPQCoreConfigSettingType.keyValueStore);
     expect(setting).toEqual({
       configSettingType: QPQXStateConfigSettingType.StateMachine,
       uniqueKey: 'order',
@@ -73,7 +73,7 @@ describe('defineStateMachine', () => {
     );
 
     expect(processors).toHaveLength(1);
-    expect(processors[0].runtime).toMatchObject({ relativePath: '../../actionProcessor', functionName: 'getStateMachineActionProcessor' });
+    expect(processors![0]!.runtime).toMatchObject({ relativePath: '../../actionProcessor', functionName: 'getStateMachineActionProcessor' });
   });
 
   it('declares action and guard runtimes as bundle entries so the bundler builds them', () => {
@@ -86,7 +86,7 @@ describe('defineStateMachine', () => {
       .filter((setting): setting is BundleEntriesQPQConfigSetting => setting.configSettingType === QPQCoreConfigSettingType.bundleEntries);
 
     expect(bundleEntries).toHaveLength(1);
-    expect(bundleEntries[0].runtimes).toEqual(['/src/notify::notify', '/src/canSubmit::canSubmit']);
+    expect(bundleEntries![0]!.runtimes).toEqual(['/src/notify::notify', '/src/canSubmit::canSubmit']);
     expect(qpqCoreUtils.getAllSrcEntries(buildTestQpqConfig(config))).toEqual(
       expect.arrayContaining(['/src/notify::notify', '/src/canSubmit::canSubmit']),
     );

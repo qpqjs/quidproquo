@@ -26,7 +26,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     vi.mocked(getExportedValue).mockReset().mockResolvedValue('POOL');
     vi.mocked(resolveUsernameByPreferredUsername)
       .mockReset()
-      .mockImplementation(async (_pool, _region, username) => username);
+      .mockImplementation(async (_pool: any, _region: any, username: any) => username);
     vi.mocked(setUserPassword).mockReset();
   });
 
@@ -34,7 +34,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserPassword).mockResolvedValue(undefined);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();
@@ -45,7 +45,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserPassword).mockRejectedValue(cognitoError('UserNotFoundException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error?.errorType).toBe(askUserDirectorySetPassword.errorType.UserNotFound);
   });
@@ -54,7 +54,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserPassword).mockRejectedValue(cognitoError('InvalidPasswordException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error?.errorType).toBe(askUserDirectorySetPassword.errorType.InvalidNewPassword);
   });
@@ -63,7 +63,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserPassword).mockRejectedValue(cognitoError('LimitExceededException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error?.errorType).toBe(askUserDirectorySetPassword.errorType.LimitExceeded);
   });
@@ -72,7 +72,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(setUserPassword).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error?.errorType).toBe(askUserDirectorySetPassword.errorType.LimitExceeded);
   });

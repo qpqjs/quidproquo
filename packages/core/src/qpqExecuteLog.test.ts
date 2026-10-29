@@ -22,10 +22,10 @@ describe('createDebugLogActionProcessor', () => {
     const proxy = await resolver({} as any);
 
     expect(
-      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+      await proxy!.Anything!(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
     ).toEqual(actionResult('one'));
     expect(
-      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+      await proxy!.Anything!(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
     ).toEqual(actionResult('two'));
   });
 

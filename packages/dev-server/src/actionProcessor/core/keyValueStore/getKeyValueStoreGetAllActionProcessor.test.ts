@@ -39,7 +39,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockResolvedValue([{ id: 'a' }, { id: 'b' }]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(repo.getAll).toHaveBeenCalledWith('store', undefined);
     expect(resolveActionResult(result)).toEqual([{ id: 'a' }, { id: 'b' }]);
@@ -49,7 +49,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockResolvedValue([]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'tenant-a' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', options: { scope: 'tenant-a' } });
 
     expect(repo.getAll).toHaveBeenCalledWith('tenantStore', 'tenant-a');
     expect(resolveActionResult(result)).toEqual([]);
@@ -58,7 +58,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
   it('rejects a malformed scope with InvalidScope', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'bad/scope' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', options: { scope: 'bad/scope' } });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.InvalidScope);
     expect(repo.getAll).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.StoreNotFound);
   });

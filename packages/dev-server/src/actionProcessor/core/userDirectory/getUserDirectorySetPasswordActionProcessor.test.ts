@@ -14,7 +14,7 @@ describe('getUserDirectorySetPasswordActionProcessor', () => {
   it('accepts any password, since dev stores none', async () => {
     const process = await getProcessor();
 
-    const [result, error] = await invokeProcessor(process, { userDirectoryName: 'directory', username: 'joe@example.com', newPassword: 'N3w-pass' });
+    const [result, error] = await invokeProcessor(process!, { userDirectoryName: 'directory', username: 'joe@example.com', newPassword: 'N3w-pass' });
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();

@@ -49,7 +49,7 @@ describe('eventDocWorkspaceApiTransport', () => {
     expect(events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2)]);
     expect(requests).toHaveLength(2);
     expect(requests[0]).toMatchObject({ service: 'notes', method: 'GET', endpoint: '/v1/notes/doc-1/events' });
-    expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2' });
+    expect(requests![1]!.params).toMatchObject({ nextPageKey: 'page-2' });
   });
 
   it('passes afterEventId through for incremental tail pulls', () => {
@@ -65,7 +65,7 @@ describe('eventDocWorkspaceApiTransport', () => {
     });
 
     // The cursor is a number in the transport and a string on the wire.
-    expect(requests[0].params).toMatchObject({ afterEventId: String(eventId(7)) });
+    expect(requests![0]!.params).toMatchObject({ afterEventId: String(eventId(7)) });
   });
 
   it('bootstrap asks for the base on the first page only, then pages the tail pinned to it', () => {
@@ -91,8 +91,8 @@ describe('eventDocWorkspaceApiTransport', () => {
     expect(bootstrap.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(4), eventId(5)]);
 
     expect(requests[0]).toMatchObject({ service: 'notes', method: 'GET', endpoint: '/v1/notes/doc-1/events', params: { includeBase: 'true' } });
-    expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2', afterEventId: String(eventId(3)) });
-    expect(requests[1].params?.includeBase).toBeUndefined();
+    expect(requests![1]!.params).toMatchObject({ nextPageKey: 'page-2', afterEventId: String(eventId(3)) });
+    expect(requests![1]!.params?.includeBase).toBeUndefined();
   });
 
   it('bootstrap passes a null base through with the full log', () => {

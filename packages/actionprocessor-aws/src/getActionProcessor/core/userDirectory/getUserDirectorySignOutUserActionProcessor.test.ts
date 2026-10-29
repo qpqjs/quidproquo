@@ -26,7 +26,7 @@ describe('getUserDirectorySignOutUserActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(globalSignOut).mockResolvedValue(undefined);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'token' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'token' });
 
     expect(error).toBeUndefined();
     expect(result).toBeUndefined();
@@ -37,7 +37,7 @@ describe('getUserDirectorySignOutUserActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(globalSignOut).mockRejectedValue(cognitoError('NotAuthorizedException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'token' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'token' });
 
     expect(error?.errorType).toBe(askUserDirectorySignOutUser.errorType.Unauthorized);
   });
@@ -46,7 +46,7 @@ describe('getUserDirectorySignOutUserActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(globalSignOut).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'token' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'token' });
 
     expect(error?.errorType).toBe(askUserDirectorySignOutUser.errorType.LimitExceeded);
   });

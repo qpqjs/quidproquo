@@ -63,18 +63,18 @@ describe('buildMcpEventDocAiToolBindings', () => {
   });
 
   it('lists only collections, and leaves listDocs out when no AI has one', () => {
-    const chatOnly: McpEventDocAi = { ...eventDocAis[0], aiName: 'registers', type: 'register', isCollection: false };
+    const chatOnly: McpEventDocAi = { ...eventDocAis[0]!, aiName: 'registers', type: 'register', isCollection: false } as McpEventDocAi;
 
     expect(buildMcpEventDocAiToolBindings([chatOnly]).map(({ tool }) => tool.name)).not.toContain('listDocs');
-    expect(buildMcpEventDocAiToolBindings([...eventDocAis, { ...chatOnly, tools: [] }])[0].tool.inputSchema).toMatchObject({
+    expect(buildMcpEventDocAiToolBindings!([...eventDocAis, { ...chatOnly, tools: [] }])[0]!.tool.inputSchema).toMatchObject({
       properties: { type: { enum: ['plan'] } },
     });
   });
 
   it("does not send a chat-only AI's docId to listDocs", () => {
-    const chatOnly: McpEventDocAi = { ...eventDocAis[0], type: 'register', isCollection: false };
+    const chatOnly: McpEventDocAi = { ...eventDocAis[0]!, type: 'register', isCollection: false } as McpEventDocAi;
     const describeFlow = buildMcpEventDocAiToolBindings([chatOnly]).find(({ tool }) => tool.name === 'describeFlow');
 
-    expect((describeFlow?.tool.inputSchema.properties as Record<string, { description: string }>).docId.description).not.toMatch(/listDocs/);
+    expect((describeFlow?.tool.inputSchema.properties as Record<string, { description: string }>)!.docId!.description).not.toMatch(/listDocs/);
   });
 });

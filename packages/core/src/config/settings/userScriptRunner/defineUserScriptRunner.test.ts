@@ -23,11 +23,11 @@ describe('defineUserScriptRunner', () => {
 
   // Security regression: the sandbox's time and memory are config, so a typo must fail at define time rather than deploy
   // an unbounded runner. The platform's ceilings (lambda's 15 minutes, 10240 MiB) are checked at synth by deploy-aws.
-  it.each([0, -5, 1.5, Number.NaN])('refuses a timeout of %s seconds', (timeoutInSeconds) => {
+  it.each([0, -5, 1.5, Number.NaN])('refuses a timeout of %s seconds', (timeoutInSeconds: any) => {
     expect(() => defineUserScriptRunner({ timeoutInSeconds })).toThrow('timeoutInSeconds');
   });
 
-  it.each([0, 512.5])('refuses a memory of %s MiB', (memoryInMiB) => {
+  it.each([0, 512.5])('refuses a memory of %s MiB', (memoryInMiB: any) => {
     expect(() => defineUserScriptRunner({ memoryInMiB })).toThrow('memoryInMiB');
   });
 });

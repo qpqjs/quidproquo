@@ -29,7 +29,7 @@ describe('s3/fileEvent getEventGetRecordsActionProcessor on a scoped drive', () 
   // first segment must fail the record, never run a handler under that string as its ambient scope.
   it.each(['../docs/x.pdf', '.%2Fdocs/x.pdf', '%40%40QPQSCOPE%40%40/x.pdf', '%2Ftenant/x.pdf'])(
     'fails the record for the key %s instead of lifting its first segment into a scope',
-    async (key) => {
+    async (key: any) => {
       const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor('uploads'), EventActionType.GetRecords, qpqConfig);
 
       await expect(processor({ eventParams: [{ Records: [buildS3Record(key)] }, {}] })).rejects.toThrow(InvalidScopeError);

@@ -36,7 +36,7 @@ describe('getCryptoSignActionProcessor', () => {
     const [pem] = await invokeProcessor(getPublicKey, { keyName: 'my-key' });
 
     expect(error).toBeUndefined();
-    expect(verify('sha256', Buffer.from('hello'), createPublicKey(pem), Buffer.from(signature, 'base64url'))).toBe(true);
+    expect(verify('sha256', Buffer.from('hello'), createPublicKey(pem as string), Buffer.from(String(signature), 'base64url'))).toBe(true);
   });
 
   // Security regression: only the owning service holds the private key, as only it holds kms:Sign deployed.

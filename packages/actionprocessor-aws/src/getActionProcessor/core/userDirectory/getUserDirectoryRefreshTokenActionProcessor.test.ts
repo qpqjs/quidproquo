@@ -30,7 +30,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     vi.mocked(refreshToken).mockResolvedValue({ challenge: 'NONE' } as any);
 
     const [result, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', refreshToken: 'refresh' },
       { session: { decodedAccessToken: { userId: 'user-1', username: 'joe@example.com', exp: 1, wasValid: false, userDirectory: 'users' } } },
     );
@@ -45,7 +45,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     vi.mocked(refreshToken).mockRejectedValue(cognitoError('NotAuthorizedException'));
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', refreshToken: 'refresh' },
       { session: { decodedAccessToken: { userId: 'user-1', username: 'joe@example.com', exp: 1, wasValid: false, userDirectory: 'users' } } },
     );
@@ -58,7 +58,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     vi.mocked(refreshToken).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { userDirectoryName: 'users', refreshToken: 'refresh' },
       { session: { decodedAccessToken: { userId: 'user-1', username: 'joe@example.com', exp: 1, wasValid: false, userDirectory: 'users' } } },
     );
@@ -71,7 +71,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
   it('answers Unauthorized when the session carries no decoded access token', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', refreshToken: 'refresh' }, { session: {} });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', refreshToken: 'refresh' }, { session: {} });
 
     expect(error?.errorType).toBe(askUserDirectoryRefreshToken.errorType.Unauthorized);
     expect(refreshToken).not.toHaveBeenCalled();

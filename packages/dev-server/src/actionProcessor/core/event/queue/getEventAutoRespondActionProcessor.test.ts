@@ -8,7 +8,7 @@ import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionP
 const invoke = async (matchResult: any) => {
   const processors = await getEventAutoRespondActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.AutoRespond];
-  return process(
+  return process!(
     { matchResult } as any,
     buildTestStorySession(),
     {},

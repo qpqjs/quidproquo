@@ -35,7 +35,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', filterCondition: { f: 1 }, nextPageKey: 'pk1' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', filterCondition: { f: 1 }, nextPageKey: 'pk1' });
 
     expect(result).toEqual([{ items: [] }]);
     expect(scan).toHaveBeenCalledWith(
@@ -50,7 +50,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, { keyValueStoreName: 'users' });
+    await invokeProcessor(processor!, { keyValueStoreName: 'users' });
 
     expect(scan).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', composedRowExclusion, undefined);
   });
@@ -59,7 +59,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     const processor = await resolveProcessor();
     const otherScopeKey = lastEvaluatedKeyToString({ id: { S: 'bobco@@QPQSCOPE@@o-1' } });
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'orders', nextPageKey: otherScopeKey, options: { scope: 'acme' } });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'orders', nextPageKey: otherScopeKey, options: { scope: 'acme' } });
 
     expect(error?.errorType).toBe(askKeyValueStoreScanBase.errorType.InvalidScope);
     expect(scan).not.toHaveBeenCalled();

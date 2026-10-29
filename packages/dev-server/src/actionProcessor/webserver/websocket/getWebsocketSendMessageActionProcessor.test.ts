@@ -12,7 +12,7 @@ vi.mock('../../../implementations/webSocket/webSocketConnectionRegistry', () => 
 }));
 
 const websocketApiName = 'api';
-const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', 'example.com', {}, { apiName: websocketApiName })]);
+const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', {} as any, { apiName: websocketApiName })]);
 
 const getProcessor = async () => {
   const processors = await getWebsocketSendMessageActionProcessor(buildConfig(), {} as any);
@@ -27,7 +27,7 @@ describe('getWebsocketSendMessageActionProcessor', () => {
     (sendMessageToWebSocketConnection as any).mockResolvedValue(true);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { connectionId: 'conn-1', payload: { hi: true }, websocketApiName });
+    const result = await invokeProcessor(process!, { connectionId: 'conn-1', payload: { hi: true }, websocketApiName });
 
     expect(resolveActionResult(result)).toBeUndefined();
     expect(sendMessageToWebSocketConnection).toHaveBeenCalledWith('test-module', websocketApiName, 'conn-1', { hi: true });
@@ -37,7 +37,7 @@ describe('getWebsocketSendMessageActionProcessor', () => {
     (sendMessageToWebSocketConnection as any).mockResolvedValue(false);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { connectionId: 'gone', payload: {}, websocketApiName });
+    const result = await invokeProcessor(process!, { connectionId: 'gone', payload: {}, websocketApiName });
 
     expect(resolveActionResultError(result).errorType).toBe(askWebsocketSendMessageBase.errorType.Disconnected);
   });
@@ -46,7 +46,7 @@ describe('getWebsocketSendMessageActionProcessor', () => {
     (sendMessageToWebSocketConnection as any).mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { connectionId: 'conn-1', payload: {}, websocketApiName });
+    const result = await invokeProcessor(process!, { connectionId: 'conn-1', payload: {}, websocketApiName });
 
     expect(isErroredActionResult(result)).toBe(true);
   });

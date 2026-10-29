@@ -33,8 +33,8 @@ describe('generateAiOutputObject', () => {
     expect(answer).toMatchObject({ valid: true, object: { total_interest: 5 }, repairs: 2 });
     const third = generate.mock.calls[2][0] as { messages: { role: string; content: string }[] };
     expect(third.messages.map((message) => message.role)).toEqual(['user', 'assistant', 'user', 'assistant', 'user']);
-    expect(third.messages[3].content).toBe('{"total_interest":"5"}');
-    expect(third.messages[4].content).toContain('/total_interest must be integer');
+    expect(third!.messages[3]!.content).toBe('{"total_interest":"5"}');
+    expect(third!.messages[4]!.content).toContain('/total_interest must be integer');
   });
 
   it('gives up after maxRepairs with the last problems and every usage', async () => {

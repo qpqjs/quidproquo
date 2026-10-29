@@ -35,7 +35,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       refreshToken: createDevJwt('test-secret', resolvedDirectory, 'joe@example.com'),
     });
@@ -49,7 +49,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    await invokeProcessor(process, { userDirectoryName: 'directory', refreshToken: buildJwtWithPayload({ sub: 'user-1' }) });
+    await invokeProcessor(process!, { userDirectoryName: 'directory', refreshToken: buildJwtWithPayload({ sub: 'user-1' }) });
 
     expect(userStore.getDevUserByUserId).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'user-1');
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
@@ -59,7 +59,7 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
   it('refuses a refresh token signed with another secret', async () => {
     const process = await getProcessor();
 
-    const [, error] = await invokeProcessor(process, {
+    const [, error] = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       refreshToken: createDevJwt('another-secret', resolvedDirectory, 'joe@example.com'),
     });

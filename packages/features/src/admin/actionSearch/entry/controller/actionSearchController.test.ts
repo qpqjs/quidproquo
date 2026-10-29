@@ -91,12 +91,12 @@ describe('actionSearchController', () => {
       expect(JSON.parse(response.body!).items).toEqual([row]);
 
       expect(queries).toHaveLength(1);
-      expect(queries[0].keyValueStoreName).toBe(QPQ_LOG_ACTIONS_KVS_NAME);
+      expect(queries![0]!.keyValueStoreName).toBe(QPQ_LOG_ACTIONS_KVS_NAME);
 
-      const keyConditionKeys = flattenConditions(queries[0].keyCondition).map((condition) => condition.key);
+      const keyConditionKeys = flattenConditions(queries![0]!.keyCondition).map((condition) => condition.key);
       expect(keyConditionKeys).toEqual(['actionType', 'startedAt']);
 
-      const filterKeys = flattenConditions(queries[0].options!.filter!).map((condition) => condition.key);
+      const filterKeys = flattenConditions(queries![0]!.options!.filter!).map((condition) => condition.key);
       expect(filterKeys).toEqual(['status']);
     });
   });
@@ -116,8 +116,8 @@ describe('actionSearchController', () => {
       const response = runStory(listEntityRows(request, {}), mocks);
 
       expect(JSON.parse(response.body!).items).toEqual([entity]);
-      expect(queries[0].keyValueStoreName).toBe(QPQ_LOG_ENTITIES_KVS_NAME);
-      expect(flattenConditions(queries[0].keyCondition).map((condition) => condition.key)).toEqual(['entityType', 'createdAt']);
+      expect(queries![0]!.keyValueStoreName).toBe(QPQ_LOG_ENTITIES_KVS_NAME);
+      expect(flattenConditions(queries![0]!.keyCondition).map((condition) => condition.key)).toEqual(['entityType', 'createdAt']);
     });
 
     it('routes an exact recipient filter through the lookup table and applies remaining filters in memory', () => {
@@ -152,8 +152,8 @@ describe('actionSearchController', () => {
 
       expect(JSON.parse(response.body!).items).toEqual([matching]);
 
-      expect(queries[0].keyValueStoreName).toBe(QPQ_LOG_ENTITY_LOOKUP_KVS_NAME);
-      const lookupCondition = flattenConditions(queries[0].keyCondition).find((condition) => condition.key === 'lookupKey');
+      expect(queries![0]!.keyValueStoreName).toBe(QPQ_LOG_ENTITY_LOOKUP_KVS_NAME);
+      const lookupCondition = flattenConditions(queries![0]!.keyCondition).find((condition) => condition.key === 'lookupKey');
       expect(lookupCondition?.valueA).toBe('email#recipient#joe@x.com');
     });
 

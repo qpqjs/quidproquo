@@ -28,7 +28,7 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
     const receiver = qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0];
     const stack = buildStack();
 
-    new QpqApiWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver });
+    new QpqApiWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver! });
 
     Template.fromStack(stack).hasResourceProperties('AWS::SES::ReceiptRule', {
       RuleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
@@ -47,14 +47,14 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
       defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'),
       defineDns(['example.com']),
       defineEmailReceivingDomain(),
-      receiver,
+      receiver!,
     ]);
 
     expect(
       () =>
         new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
           qpqConfig,
-          emailReceiverConfig: qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0],
+          emailReceiverConfig: qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0]!,
         }),
     ).toThrow(/no storage drive/);
   });
@@ -63,7 +63,7 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
     const qpqConfig = buildConfig(false);
     const receiver = qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0];
 
-    expect(() => new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', { qpqConfig, emailReceiverConfig: receiver })).toThrow(
+    expect(() => new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', { qpqConfig, emailReceiverConfig: receiver! })).toThrow(
       /defineEmailReceivingDomain/,
     );
   });

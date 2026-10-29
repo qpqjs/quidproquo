@@ -23,7 +23,7 @@ const expectErrorType = (run: () => unknown, errorType: ErrorTypeEnum) => {
 describe('askEventDocAiAttachmentsValidate', () => {
   it.each(['../other-doc/assets/x', '/etc/passwd', 'a/b', 'a.b', '', 'x\u0000y', 'id?x=1'])(
     'refuses the asset id %j before touching the drive',
-    (assetId) => {
+    (assetId: any) => {
       const exists = vi.fn(() => true);
 
       expectErrorType(

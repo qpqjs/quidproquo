@@ -31,7 +31,7 @@ describe('getUserDirectoryGetUserAttributesActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue(user);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', username: 'joe@example.com' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', username: 'joe@example.com' });
 
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
     expect(resolveActionResult(result)).toEqual(user);

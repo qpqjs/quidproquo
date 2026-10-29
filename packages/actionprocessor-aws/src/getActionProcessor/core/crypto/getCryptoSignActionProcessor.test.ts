@@ -26,7 +26,7 @@ describe('getCryptoSignActionProcessor', () => {
     vi.mocked(signWithKey).mockResolvedValue(Buffer.from('sig'));
     const processor = await resolveProcessor();
 
-    const [signature, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [signature, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error).toBeUndefined();
     expect(signature).toBe(Buffer.from('sig').toString('base64url'));
@@ -36,7 +36,7 @@ describe('getCryptoSignActionProcessor', () => {
   it('fails with KeyNotConfigured for an undeclared key, without touching KMS', async () => {
     const processor = await resolveProcessor(false);
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error?.errorType).toBe(askCryptoSign.errorType.KeyNotConfigured);
     expect(signWithKey).not.toHaveBeenCalled();
@@ -46,7 +46,7 @@ describe('getCryptoSignActionProcessor', () => {
     vi.mocked(signWithKey).mockRejectedValue(kmsError('NotFoundException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error?.errorType).toBe(askCryptoSign.errorType.KeyUnavailable);
   });
@@ -55,7 +55,7 @@ describe('getCryptoSignActionProcessor', () => {
     vi.mocked(signWithKey).mockRejectedValue(kmsError('DisabledException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error?.errorType).toBe(askCryptoSign.errorType.KeyUnavailable);
   });
@@ -64,7 +64,7 @@ describe('getCryptoSignActionProcessor', () => {
     vi.mocked(signWithKey).mockRejectedValue(kmsError('AccessDeniedException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error?.errorType).toBe(askCryptoSign.errorType.KeyUnavailable);
   });
@@ -73,7 +73,7 @@ describe('getCryptoSignActionProcessor', () => {
     vi.mocked(signWithKey).mockRejectedValue(kmsError('ThrottlingException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello' });
 
     expect(error?.errorType).toBe(askCryptoSign.errorType.Throttled);
   });

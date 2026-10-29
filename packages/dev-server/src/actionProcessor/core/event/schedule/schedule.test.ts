@@ -23,7 +23,7 @@ const message: ScheduleMessageWithSession = {
 describe('schedule event processors', () => {
   it('hands the ticker record straight through', async () => {
     const processors = await getEventGetRecordsActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
-    const result = await invokeProcessor(processors[EventActionType.GetRecords], { eventParams: [message] } as any);
+    const result = await invokeProcessor(processors![EventActionType.GetRecords]!, { eventParams: [message] } as any);
 
     expect(resolveActionResult(result)).toEqual([message.record]);
   });
@@ -32,28 +32,28 @@ describe('schedule event processors', () => {
     // Deployed, the runtime comes from a per-schedule lambda env var. Locally
     // one process serves every schedule, so it has to travel with the message.
     const processors = await getEventMatchStoryActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
-    const result = await invokeProcessor(processors[EventActionType.MatchStory], { eventParams: [message] } as any);
+    const result = await invokeProcessor(processors![EventActionType.MatchStory]!, { eventParams: [message] } as any);
 
     expect(resolveActionResult(result)).toEqual({ runtime: message.runtime, runtimeOptions: {} });
   });
 
   it('has no story session of its own', async () => {
     const processors = await getEventGetStorySessionActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
-    const result = await invokeProcessor(processors[EventActionType.GetStorySession], { eventParams: [message] } as any);
+    const result = await invokeProcessor(processors![EventActionType.GetStorySession]!, { eventParams: [message] } as any);
 
     expect(resolveActionResult(result)).toBeNull();
   });
 
   it('never auto responds', async () => {
     const processors = await getEventAutoRespondActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
-    const result = await invokeProcessor(processors[EventActionType.AutoRespond], { eventParams: [message] } as any);
+    const result = await invokeProcessor(processors![EventActionType.AutoRespond]!, { eventParams: [message] } as any);
 
     expect(resolveActionResult(result)).toBeNull();
   });
 
   it('returns nothing when the story succeeded', async () => {
     const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
-    const result = await invokeProcessor(processors[EventActionType.TransformResponseResult], {
+    const result = await invokeProcessor(processors![EventActionType.TransformResponseResult]!, {
       eventParams: [message],
       qpqEventRecordResponses: [{ success: true, result: undefined }],
     } as any);
@@ -66,7 +66,7 @@ describe('schedule event processors', () => {
     // is not swallowed into a successful-looking run.
     const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
 
-    const result = await invokeProcessor(processors[EventActionType.TransformResponseResult], {
+    const result = await invokeProcessor(processors![EventActionType.TransformResponseResult]!, {
       eventParams: [message],
       qpqEventRecordResponses: [{ success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'boom', errorStack: undefined } }],
     } as any);

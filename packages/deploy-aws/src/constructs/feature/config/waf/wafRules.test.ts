@@ -13,7 +13,7 @@ describe('buildWebAclRules', () => {
     );
 
     expect(rules).toHaveLength(1);
-    expect(rules[0].statement).toEqual({
+    expect(rules![0]!.statement).toEqual({
       managedRuleGroupStatement: {
         vendorName: 'AWS',
         name: 'AWSManagedRulesCommonRuleSet',
@@ -34,11 +34,11 @@ describe('buildWebAclRules', () => {
 
     const [common, sqli] = rules;
 
-    expect(common.statement.managedRuleGroupStatement).toMatchObject({
+    expect((common!.statement as any).managedRuleGroupStatement).toMatchObject({
       name: 'AWSManagedRulesCommonRuleSet',
       ruleActionOverrides: [{ name: 'SizeRestrictions_BODY', actionToUse: { count: {} } }],
     });
-    expect(sqli.statement.managedRuleGroupStatement).toMatchObject({
+    expect((sqli!.statement as any).managedRuleGroupStatement).toMatchObject({
       name: 'AWSManagedRulesSQLiRuleSet',
       ruleActionOverrides: undefined,
     });
@@ -56,9 +56,9 @@ describe('buildWebAclRules', () => {
 
     const [rateLimit, common] = rules;
 
-    expect(rateLimit.name).toBe('rate-limit-all-traffic');
-    expect(rateLimit.action).toEqual({ block: {} });
-    expect(rateLimit.statement.rateBasedStatement).toMatchObject({ limit: 2000, aggregateKeyType: 'IP' });
-    expect(rateLimit.priority).toBeLessThan(common.priority);
+    expect(rateLimit!.name).toBe('rate-limit-all-traffic');
+    expect(rateLimit!.action).toEqual({ block: {} });
+    expect((rateLimit!.statement as any).rateBasedStatement).toMatchObject({ limit: 2000, aggregateKeyType: 'IP' });
+    expect(rateLimit!.priority).toBeLessThan(common!.priority);
   });
 });

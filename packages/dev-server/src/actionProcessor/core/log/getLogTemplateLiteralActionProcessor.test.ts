@@ -20,7 +20,7 @@ describe('getLogTemplateLiteralActionProcessor', () => {
     const processors = await getLogTemplateLiteralActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[LogActionType.TemplateLiteral];
 
-    const result = await invokeProcessor(process, { messageParts: [['a ', ' b'], ['X']] });
+    const result = await invokeProcessor(process!, { messageParts: [['a ', ' b'], ['X']] });
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const message = logSpy.mock.calls[0][0] as string;

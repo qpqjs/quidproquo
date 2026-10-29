@@ -8,7 +8,7 @@ import { askEventDocCopyAsset } from './askEventDocCopyAsset';
 
 const source = { guid: 'asset-1', filename: 'render.pdf', mimetype: 'application/pdf' };
 
-const underPackBuilds = <T>(story: Parameters<typeof askEventDocProvideStore<T>>[1]) =>
+const underPackBuilds = (story: Parameters<typeof askEventDocStoreProvide>[1]) =>
   askEventDocStoreProvide(buildEventDocStore({ storeName: 'packBuilds', type: 'packBuild' }), story);
 
 describe('askEventDocCopyAsset', () => {
@@ -50,6 +50,6 @@ describe('askEventDocCopyAsset', () => {
     });
 
     expect(ref.filename).toBe('render.pdf');
-    expect(copies[0].scope).toBeUndefined();
+    expect(copies![0]!.scope).toBeUndefined();
   });
 });

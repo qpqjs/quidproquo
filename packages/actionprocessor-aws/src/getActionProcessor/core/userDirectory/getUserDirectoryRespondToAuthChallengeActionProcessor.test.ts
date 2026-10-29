@@ -32,7 +32,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockResolvedValue({ challenge: 'NONE' } as any);
 
-    const [result, error] = await invokeProcessor(processor, {
+    const [result, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -54,7 +54,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockRejectedValue(cognitoError('CodeMismatchException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -71,7 +71,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockRejectedValue(cognitoError('ExpiredCodeException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -88,7 +88,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockRejectedValue(cognitoError('InvalidPasswordException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -105,7 +105,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockRejectedValue(cognitoError('NotAuthorizedException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -122,7 +122,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(respondToAuthChallenge).mockRejectedValue(cognitoError('LimitExceededException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: {
         challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
@@ -140,7 +140,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     vi.mocked(verifySoftwareToken).mockResolvedValue('sess-2');
     vi.mocked(respondToAuthChallenge).mockResolvedValue({ challenge: 'NONE' } as any);
 
-    const [result] = await invokeProcessor(processor, {
+    const [result] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: { challenge: AuthenticateUserChallenge.MFA_SETUP, username: 'joe@example.com', session: 'sess', mfaCode: '123456' } as any,
     });
@@ -154,7 +154,7 @@ describe('getUserDirectoryRespondToAuthChallengeActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(verifySoftwareToken).mockRejectedValue(cognitoError('EnableSoftwareTokenMFAException'));
 
-    const [, error] = await invokeProcessor(processor, {
+    const [, error] = await invokeProcessor(processor!, {
       userDirectoryName: 'users',
       authChallenge: { challenge: AuthenticateUserChallenge.MFA_SETUP, username: 'joe@example.com', session: 'sess', mfaCode: '000000' } as any,
     });

@@ -56,7 +56,7 @@ describe('askTenantConnectionScopeResolver', () => {
     expect(runWith({ userId: 'u2', tenantId: 'tenant-a', roles: [], grants: [] })).toThrowError();
   });
 
-  it.each(['tenant/../other', 'a\u0000b', 't'.repeat(200)])('refuses the malformed claim %j without reading the store', (requestedScope) => {
+  it.each(['tenant/../other', 'a\u0000b', 't'.repeat(200)])('refuses the malformed claim %j without reading the store', (requestedScope: any) => {
     const query = vi.fn(() => ({ items: [], nextPageKey: undefined }));
 
     expect(() =>

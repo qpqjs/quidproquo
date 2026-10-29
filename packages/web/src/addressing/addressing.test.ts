@@ -51,7 +51,7 @@ describe('subdomain mode', () => {
   // a lookalike page gets the primary root's hosts, never one built from its own hostname.
   it.each(['dev.example.org.evil.net', 'evilexample.org', 'example.org-cdn.net', 'EXAMPLE.ORG.evil.net'])(
     'falls back to the primary root for the lookalike page host %s',
-    (hostname) => {
+    (hostname: any) => {
       bake(subdomainAddressing);
       const location = { protocol: 'https:', hostname };
 

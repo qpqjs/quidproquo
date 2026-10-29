@@ -30,7 +30,7 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
     (eventBus.publishAndWaitForResponse as any).mockResolvedValue({ result: 'ok' });
     const process = await getProcessor();
 
-    await invokeProcessor(process, { functionName: 'doThing', service: 'svc-a', payload: { a: 1 }, isAsync: false });
+    await invokeProcessor(process!, { functionName: 'doThing', service: 'svc-a', payload: { a: 1 }, isAsync: false });
 
     expect(eventBus.publishAndWaitForResponse).toHaveBeenCalledWith(ServiceFunctionActionType.Execute, {
       functionName: 'doThing',
@@ -49,7 +49,7 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
     );
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { functionName: 'f', service: 's', payload: {}, isAsync: true });
+    const result = await invokeProcessor(process!, { functionName: 'f', service: 's', payload: {}, isAsync: true });
 
     expect(resolveActionResult(result)).toBeUndefined();
     expect(resolved).toBe(true);
@@ -59,7 +59,7 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
     (eventBus.publishAndWaitForResponse as any).mockResolvedValue({ result: { value: 42 } });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { functionName: 'f', service: 's', payload: {}, isAsync: false });
+    const result = await invokeProcessor(process!, { functionName: 'f', service: 's', payload: {}, isAsync: false });
 
     expect(resolveActionResult(result)).toEqual({ value: 42 });
   });
@@ -70,7 +70,7 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
     });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { functionName: 'f', service: 's', payload: {}, isAsync: false });
+    const result = await invokeProcessor(process!, { functionName: 'f', service: 's', payload: {}, isAsync: false });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result)).toEqual({

@@ -15,7 +15,7 @@ const invoke = async (payload: { drive: string; filepaths: string[] }) => {
   const processor = (await getFileDeleteActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any))[
     FileActionType.Delete
   ];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileDelete', () => {

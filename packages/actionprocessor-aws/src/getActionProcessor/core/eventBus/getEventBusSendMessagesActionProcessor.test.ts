@@ -25,7 +25,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('returns a NotFound error when the event bus is not configured', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { eventBusName: 'missing', eventBusMessages: [] }, { session: buildTestStorySession() });
+    const [, error] = await invokeProcessor(processor!, { eventBusName: 'missing', eventBusMessages: [] }, { session: buildTestStorySession() });
 
     expect(error?.errorType).toBe(askEventBusSendMessagesBase.errorType.TopicNotFound);
   });
@@ -34,7 +34,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
     const processor = await resolveProcessor([defineEventBus('orders')]);
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] },
       { session: buildTestStorySession() },
     );
@@ -51,7 +51,11 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('resolves a .fifo topic arn and defaults groupId/deduplicationId for a FIFO bus', async () => {
     const processor = await resolveProcessor([defineEventBus('orders', { isFifo: true })]);
 
-    await invokeProcessor(processor, { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] }, { session: buildTestStorySession() });
+    await invokeProcessor(
+      processor!,
+      { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] },
+      { session: buildTestStorySession() },
+    );
 
     const [topicArn, , entries] = vi.mocked(publishMessage).mock.calls[0];
     expect(topicArn).toBe('arn:aws:sns:eu-west-1:111:orders-test-app-test-module-development.fifo');
@@ -63,7 +67,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
     const processor = await resolveProcessor([defineEventBus('orders', { isFifo: true })]);
 
     await invokeProcessor(
-      processor,
+      processor!,
       { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true }, groupId: 'user-42', deduplicationId: 'dedup-1' }] },
       { session: buildTestStorySession() },
     );

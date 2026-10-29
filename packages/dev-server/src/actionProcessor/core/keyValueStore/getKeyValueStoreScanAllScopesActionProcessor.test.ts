@@ -24,7 +24,7 @@ const qpqConfig = buildTestQpqConfig([defineKeyValueStore('store', kvsKey('id', 
 const rawScanPage = async (nextPageKey?: string) => {
   const processors = await getKeyValueStoreScanAllScopesActionProcessor(devServerConfig)(qpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.ScanAllScopes], { keyValueStoreName: 'store', nextPageKey });
+  return invokeProcessor(processors![KeyValueStoreActionType.ScanAllScopes]!, { keyValueStoreName: 'store', nextPageKey });
 };
 
 const scanPage = async (nextPageKey?: string) => resolveActionResult(await rawScanPage(nextPageKey)) as any;

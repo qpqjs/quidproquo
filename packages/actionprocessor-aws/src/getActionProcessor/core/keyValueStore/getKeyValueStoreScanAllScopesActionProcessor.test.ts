@@ -35,7 +35,7 @@ describe('getKeyValueStoreScanAllScopesActionProcessor', () => {
     } as any);
     const processor = await resolveProcessor();
 
-    const [result] = await invokeProcessor(processor, { keyValueStoreName: 'orders' });
+    const [result] = await invokeProcessor(processor!, { keyValueStoreName: 'orders' });
 
     expect(result).toEqual({
       items: [

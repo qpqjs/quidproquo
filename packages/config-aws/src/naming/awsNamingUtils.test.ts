@@ -284,12 +284,12 @@ describe('getKvsIndexPartitionKey', () => {
   const openStore = defineKeyValueStore<Order>('open', 'id', [], { indexes: [{ partitionKey: kvsKey('level', 'number') }] });
 
   it("keys a scoped store's GSI on the hidden string copy of its partition key", () => {
-    expect(getKvsIndexPartitionKey(scopedStore, scopedStore.indexes[0])).toEqual({ key: '@@QPQGSI_level@@', type: 'string' });
+    expect(getKvsIndexPartitionKey(scopedStore, scopedStore!.indexes[0]!)).toEqual({ key: '@@QPQGSI_level@@', type: 'string' });
   });
 
   it('keeps the declared key for an index sharing the table pk, and on an unscoped store', () => {
-    expect(getKvsIndexPartitionKey(scopedStore, scopedStore.indexes[1])).toEqual({ key: 'id', type: 'string' });
-    expect(getKvsIndexPartitionKey(openStore, openStore.indexes[0])).toEqual({ key: 'level', type: 'number' });
+    expect(getKvsIndexPartitionKey(scopedStore, scopedStore!.indexes[1]!)).toEqual({ key: 'id', type: 'string' });
+    expect(getKvsIndexPartitionKey(openStore, openStore!.indexes[0]!)).toEqual({ key: 'level', type: 'number' });
   });
 });
 
@@ -315,7 +315,7 @@ describe('awsNamingUtils deployment isolation', () => {
 
   it('shares bootstrap names across modules of one deployment only', () => {
     const [base, otherApp, otherEnv, feature, otherModule] = deployments;
-    const bootstrap = (config: typeof base) => getConfigRuntimeBootstrapResourceNameFromConfig('net', config);
+    const bootstrap = (config: typeof base) => getConfigRuntimeBootstrapResourceNameFromConfig('net', config!);
 
     expect(bootstrap(otherModule)).toBe(bootstrap(base));
     expect(unique([bootstrap(base), bootstrap(otherApp), bootstrap(otherEnv), bootstrap(feature)])).toBe(true);

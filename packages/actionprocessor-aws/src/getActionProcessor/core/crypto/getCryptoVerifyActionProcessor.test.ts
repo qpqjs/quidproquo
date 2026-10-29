@@ -32,8 +32,8 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
     const processor = await resolveProcessor();
 
-    const [valid] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hello', signature: signatureFor('hello') });
-    const [forOther] = await invokeProcessor(processor, { keyName: 'my-key', message: 'hellp', signature: signatureFor('hello') });
+    const [valid] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hello', signature: signatureFor('hello') });
+    const [forOther] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'hellp', signature: signatureFor('hello') });
 
     expect(valid).toBe(true);
     expect(forOther).toBe(false);
@@ -43,7 +43,7 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'not base64url!' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'not base64url!' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.MalformedSignature);
   });
@@ -51,7 +51,7 @@ describe('getCryptoVerifyActionProcessor', () => {
   it('fails with KeyNotConfigured for an undeclared key, without touching KMS', async () => {
     const processor = await resolveProcessor(false);
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'x' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'x' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyNotConfigured);
     expect(getCachedPublicKey).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('NotFoundException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'x' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'x' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyUnavailable);
   });
@@ -70,7 +70,7 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('DisabledException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'x' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'x' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyUnavailable);
   });
@@ -79,7 +79,7 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('AccessDeniedException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'x' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'x' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.KeyUnavailable);
   });
@@ -88,7 +88,7 @@ describe('getCryptoVerifyActionProcessor', () => {
     vi.mocked(getCachedPublicKey).mockRejectedValue(kmsError('ThrottlingException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', message: 'x', signature: 'x' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'x', signature: 'x' });
 
     expect(error?.errorType).toBe(askCryptoVerify.errorType.Throttled);
   });

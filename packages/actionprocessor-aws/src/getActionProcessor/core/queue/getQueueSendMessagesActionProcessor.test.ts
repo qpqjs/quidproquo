@@ -26,7 +26,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
     const processor = await resolveProcessor();
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { queueName: 'jobs', queueMessages: [{ payload: { a: 1 } }] },
       { session: buildTestStorySession() },
     );
@@ -51,7 +51,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
       functionGlobals: { apiKey: 'k' },
     } as any;
 
-    await invokeProcessor(processor, { queueName: 'jobs', queueMessages: [{ payload: {} }] }, { session });
+    await invokeProcessor(processor!, { queueName: 'jobs', queueMessages: [{ payload: {} }] }, { session });
 
     const [, , entries] = vi.mocked(sendMessages).mock.calls[0];
     const sent = JSON.parse(entries[0].body).storySession;
@@ -64,7 +64,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('resolves a .fifo name and defaults groupId/deduplicationId for a FIFO queue', async () => {
     const processor = await resolveProcessor([defineQueue('jobs', {}, { isFifo: true })]);
 
-    await invokeProcessor(processor, { queueName: 'jobs', queueMessages: [{ payload: { a: 1 } }] }, { session: buildTestStorySession() });
+    await invokeProcessor(processor!, { queueName: 'jobs', queueMessages: [{ payload: { a: 1 } }] }, { session: buildTestStorySession() });
 
     const [queueName, , entries] = vi.mocked(sendMessages).mock.calls[0];
     expect(queueName).toBe('jobs-test-app-test-module-development.fifo');
@@ -76,7 +76,7 @@ describe('getQueueSendMessagesActionProcessor', () => {
     const processor = await resolveProcessor([defineQueue('jobs', {}, { isFifo: true })]);
 
     await invokeProcessor(
-      processor,
+      processor!,
       { queueName: 'jobs', queueMessages: [{ payload: { a: 1 }, groupId: 'user-42', deduplicationId: 'dedup-1' }] },
       { session: buildTestStorySession() },
     );

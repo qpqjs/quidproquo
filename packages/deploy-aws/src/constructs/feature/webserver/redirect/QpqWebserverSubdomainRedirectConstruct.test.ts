@@ -14,8 +14,8 @@ import { QpqWebserverSubdomainRedirectConstruct } from './QpqWebserverSubdomainR
 
 // The log extension layer is produced by the aws package build; a synth in a unit test only needs a directory to package.
 const extensionLayer = vi.hoisted(() => ({ path: '' }));
-vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@qpqjs/actionprocessor-aws')>()),
+vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
+  ...((await importOriginal()) as typeof import('@qpqjs/actionprocessor-aws')),
   getLogExtensionLayerPath: () => extensionLayer.path,
 }));
 
@@ -39,7 +39,7 @@ const synth = (extra: QPQConfig = []) => {
 
   new QpqWebserverSubdomainRedirectConstruct(stack, 'redirect', {
     qpqConfig,
-    subdomainRedirectConfig: qpqWebServerUtils.getSubdomainRedirects(qpqConfig)[0],
+    subdomainRedirectConfig: qpqWebServerUtils.getSubdomainRedirects(qpqConfig)[0]!,
   });
 
   return Template.fromStack(stack);

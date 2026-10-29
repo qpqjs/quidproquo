@@ -108,7 +108,7 @@ describe('maintenanceEventDoc', () => {
     ]);
     expect(textEdit.reason).toBe('Investigating hard');
     expect(textEdit.etaEndsAt).toBe('2026-07-24T10:30:00.000Z');
-    expect(textEdit.updates[0].updatedAt).toBe(T1);
+    expect(textEdit!.updates[0]!.updatedAt).toBe(T1);
 
     // Edit WITH an eta: fresh announcement anchored to the edit's own time.
     const etaEdit = maintenanceEventDoc.views.document.fold([
@@ -181,7 +181,7 @@ describe('maintenanceEventDoc', () => {
         'updates',
       ].sort(),
     );
-    expect(Object.keys(publicState.updates[0]).sort()).toEqual(['createdAt', 'displayText', 'id']);
+    expect(Object.keys(publicState!.updates[0]!).sort()).toEqual(['createdAt', 'displayText', 'id']);
   });
 
   it('strips internal notes and authors from the public projection; the public update text is the reason', () => {

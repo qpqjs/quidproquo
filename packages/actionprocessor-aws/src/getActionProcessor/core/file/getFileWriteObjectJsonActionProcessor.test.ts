@@ -15,7 +15,7 @@ const invoke = async (payload: Record<string, unknown>) => {
   const processor = (
     await getFileWriteObjectJsonActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
   )[FileActionType.WriteObjectJson];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileWriteObjectJson', () => {

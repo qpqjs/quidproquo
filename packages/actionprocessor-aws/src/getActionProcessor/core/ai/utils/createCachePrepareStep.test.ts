@@ -38,7 +38,7 @@ describe('createCachePrepareStep', () => {
     const result = runStep(3, 0, [...history, turnContext]);
 
     expect(markedIndexes(result)).toEqual([2]);
-    expect(result[2].providerOptions).toEqual(cachePoint);
+    expect(result![2]!.providerOptions).toEqual(cachePoint);
     expect(result[3]).toEqual(turnContext);
   });
 
@@ -70,14 +70,14 @@ describe('createCachePrepareStep', () => {
   it('keeps the anchor for an hour and the tail for five minutes by default', () => {
     const result = runStep(3, 1, [...history, turnContext, ...toolTraffic], AiCacheTtl.Dynamic);
 
-    expect(result[2].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(result[5].providerOptions).toEqual(cachePoint);
+    expect(result![2]!.providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result![5]!.providerOptions).toEqual(cachePoint);
   });
 
   it('applies a requested hour to the anchor but never to the tail', () => {
     const result = runStep(3, 1, [...history, turnContext, ...toolTraffic], AiCacheTtl.OneHour);
 
-    expect(result[2].providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
-    expect(result[5].providerOptions).toEqual(cachePoint);
+    expect(result![2]!.providerOptions).toEqual({ bedrock: { cachePoint: { type: 'default', ttl: '1h' } } });
+    expect(result![5]!.providerOptions).toEqual(cachePoint);
   });
 });

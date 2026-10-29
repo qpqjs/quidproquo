@@ -21,9 +21,9 @@ describe('getAllServiceConfigs', () => {
 
     const [result] = getAllServiceConfigs(buildDevServerConfig(qpqConfig));
 
-    expect(qpqWebServerUtils.getRootDomains(result)).toEqual(['localhost:3000']);
-    expect(qpqWebServerUtils.getDnsConfig(result)?.resolver).toBeUndefined();
-    expect(qpqWebServerUtils.resolveHosts(result, { subdomain: 'api' })).toEqual(['localhost:3000']);
+    expect(qpqWebServerUtils.getRootDomains(result!)).toEqual(['localhost:3000']);
+    expect(qpqWebServerUtils.getDnsConfig(result!)?.resolver).toBeUndefined();
+    expect(qpqWebServerUtils.resolveHosts(result!, { subdomain: 'api' })).toEqual(['localhost:3000']);
   });
 
   it('appends local and wildcard origins to routes and default route options', () => {
@@ -34,11 +34,11 @@ describe('getAllServiceConfigs', () => {
 
     const [result] = getAllServiceConfigs(buildDevServerConfig(qpqConfig));
 
-    const [route] = qpqWebServerUtils.getAllRoutes(result);
-    expect(route.options.allowedOrigins).toContain('*');
+    const [route] = qpqWebServerUtils.getAllRoutes(result!);
+    expect(route!.options.allowedOrigins).toContain('*');
 
-    const [defaultRouteSetting] = qpqWebServerUtils.getDefaultRouteSettings(result);
-    expect(defaultRouteSetting.routeOptions.allowedOrigins).toEqual(expect.arrayContaining(['https://existing.com', '*']));
+    const [defaultRouteSetting] = qpqWebServerUtils.getDefaultRouteSettings(result!);
+    expect(defaultRouteSetting!.routeOptions.allowedOrigins).toEqual(expect.arrayContaining(['https://existing.com', '*']));
   });
 
   it('does not mutate the input configs', () => {
@@ -47,6 +47,6 @@ describe('getAllServiceConfigs', () => {
 
     getAllServiceConfigs(buildDevServerConfig(qpqConfig));
 
-    expect(inputRoute.options.allowedOrigins).toBeUndefined();
+    expect(inputRoute!.options.allowedOrigins).toBeUndefined();
   });
 });

@@ -65,7 +65,7 @@ describe('getQueryParamsSetActionProcessor', () => {
     ['../../admin', 'path'],
     ['<script>alert(1)</script>', 'q'],
     ['a&b=c#hash', 'q'],
-  ])('keeps the hostile value %j under key %j inside the query string', async (value, key) => {
+  ])('keeps the hostile value %j under key %j inside the query string', async (value: any, key: any) => {
     window.history.replaceState(null, '', '/page?keep=1#top');
     const processor = await getProcessor();
 

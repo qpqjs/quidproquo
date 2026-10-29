@@ -54,7 +54,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loader = vi.fn().mockResolvedValue(null);
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
     );
@@ -70,7 +70,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loader = vi.fn().mockResolvedValue(story);
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
     );
@@ -84,7 +84,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const streamRegistry = createStreamRegistry();
 
     await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       {
         session: buildTestStorySession({ functionGlobals: { routeGlobal: 'caller' } }),
@@ -115,7 +115,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     };
 
     await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [], storySession: wireSession },
       {
         session: buildTestStorySession({ localContext: { local: 'receiver' } }),

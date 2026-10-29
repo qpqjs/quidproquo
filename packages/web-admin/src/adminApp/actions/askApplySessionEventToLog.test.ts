@@ -23,9 +23,9 @@ describe('askApplySessionEventToLog', () => {
     });
 
     expect(dispatched).toHaveLength(1);
-    expect(dispatched[0].type).toBe(SessionLogEffect.eventAppended);
+    expect(dispatched![0]!.type).toBe(SessionLogEffect.eventAppended);
 
-    const event = dispatched[0].payload;
+    const event = dispatched![0]!.payload;
     expect(event.type).toBe(AdminSessionEffect.TabChanged);
     expect(event.payload.data).toEqual({ tab: 1, tabName: 'Logs' });
     expect(event.payload.metadata.clientMessageId).toBe('cmid-1');

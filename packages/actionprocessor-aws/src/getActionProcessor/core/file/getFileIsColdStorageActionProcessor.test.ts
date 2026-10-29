@@ -14,7 +14,7 @@ const invoke = async (payload: { drive: string; filepath: string }) => {
   const processor = (
     await getFileIsColdStorageActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
   )[FileActionType.IsColdStorage];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileIsColdStorage', () => {

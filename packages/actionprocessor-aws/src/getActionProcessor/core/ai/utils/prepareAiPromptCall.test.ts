@@ -68,8 +68,8 @@ describe('prepareAiPromptCall', () => {
       throw new Error('expected a successful prepare result');
     }
 
-    expect(result.tools?.lookup.description).toBe('looks up');
-    expect(result.tools?.lookup.inputSchema).toEqual({ __jsonSchema: { type: 'object' } });
-    expect(typeof result.tools?.lookup.execute).toBe('function');
+    expect(result!.tools?.lookup!.description).toBe('looks up');
+    expect(result!.tools?.lookup!.inputSchema).toEqual({ __jsonSchema: { type: 'object' } });
+    expect(typeof result!.tools?.lookup!.execute).toBe('function');
   });
 });

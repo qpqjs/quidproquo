@@ -10,7 +10,7 @@ describe('getEmailSetDeliveryStatusActionProcessor', () => {
   it('accepts the status and answers nothing', async () => {
     const processors = await getEmailSetDeliveryStatusActionProcessor(buildTestQpqConfig(), {} as any);
 
-    const [result, error] = await invokeProcessor(processors[EmailActionType.SetDeliveryStatus], {
+    const [result, error] = await invokeProcessor(processors![EmailActionType.SetDeliveryStatus]!, {
       messageId: 'message-1',
       status: 'delivered',
     } as any);

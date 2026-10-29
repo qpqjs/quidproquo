@@ -26,7 +26,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     vi.mocked(getAllItems).mockResolvedValue([{ id: '1' }] as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users' });
 
     expect(result).toEqual([[{ id: '1' }]]);
     expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', {

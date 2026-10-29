@@ -48,9 +48,9 @@ describe('askStartSession', () => {
 
     runStory(askStartSession(), baseMocks(applied, dispatched, networkCalls));
 
-    expect(networkCalls[0].url).toBe('/v1/admin/session');
-    expect(networkCalls[0].body).toEqual({ name: 'joe — 2026-07-07T00:00:00.000Z', code: 'guid-1' });
-    expect(networkCalls[1].url).toBe('/v1/admin/session/doc-1/events');
+    expect(networkCalls![0]!.url).toBe('/v1/admin/session');
+    expect(networkCalls![0]!.body).toEqual({ name: 'joe — 2026-07-07T00:00:00.000Z', code: 'guid-1' });
+    expect(networkCalls![1]!.url).toBe('/v1/admin/session/doc-1/events');
 
     expect(dispatched).toContainEqual(expect.objectContaining({ payload: { docId: 'doc-1', events: [initEvent] } }));
 
@@ -74,6 +74,6 @@ describe('askStartSession', () => {
     });
 
     expect(applied).toHaveLength(1);
-    expect(applied[0].type).toBe(AdminSessionEffect.SessionStarted);
+    expect(applied![0]!.type).toBe(AdminSessionEffect.SessionStarted);
   });
 });

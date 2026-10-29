@@ -22,7 +22,7 @@ const invoke = async (
   const map = await getHttpApiEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader);
   const processor = map[EventActionType.GetStorySession];
 
-  return processor(
+  return processor!(
     { qpqEventRecord, matchStoryResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
     buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),

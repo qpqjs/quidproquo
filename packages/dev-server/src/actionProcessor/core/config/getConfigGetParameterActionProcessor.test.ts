@@ -26,7 +26,7 @@ describe('getConfigGetParameterActionProcessor', () => {
     configStore.getOrSeedParameterValue.mockResolvedValue('some-value');
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { parameterName: 'adminEmail' });
+    const result = await invokeProcessor(process!, { parameterName: 'adminEmail' });
 
     expect(configStore.getOrSeedParameterValue).toHaveBeenCalledWith('/tmp/runtime', 'adminEmail', expect.anything());
     expect(resolveActionResult(result)).toBe('some-value');
@@ -36,7 +36,7 @@ describe('getConfigGetParameterActionProcessor', () => {
     configStore.getOrSeedParameterValue.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { parameterName: 'adminEmail' });
+    const result = await invokeProcessor(process!, { parameterName: 'adminEmail' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

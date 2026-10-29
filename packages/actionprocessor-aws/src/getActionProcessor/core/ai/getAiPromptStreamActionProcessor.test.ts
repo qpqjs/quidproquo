@@ -43,7 +43,7 @@ const buildRegistry = () => ({ register: vi.fn() });
 
 const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown) => {
   const processor = (await getAiPromptStreamActionProcessor({} as never, null as any))[AiActionType.PromptStream];
-  return invokeProcessor(processor, payload, { streamRegistry });
+  return invokeProcessor(processor!, payload, { streamRegistry });
 };
 
 const drain = async (registry: { register: ReturnType<typeof vi.fn> }): Promise<string[]> => {

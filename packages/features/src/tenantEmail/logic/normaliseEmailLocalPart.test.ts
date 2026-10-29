@@ -19,7 +19,7 @@ describe('normaliseEmailLocalPart', () => {
   // characters, separators and the scope marker can never become an inbox key or collide with another tenant's.
   it.each(['fin\u0430nce', 'caf\u00e9', '"quoted"', 'a\r\nb', 'back\\slash', 'a/b', '+leading', 'trailing-', 'a\u0000b', 'İnbox'])(
     'refuses the lookalike or control-character local part %j',
-    (address) => {
+    (address: any) => {
       expect(normaliseEmailLocalPart(address)).toBeNull();
     },
   );

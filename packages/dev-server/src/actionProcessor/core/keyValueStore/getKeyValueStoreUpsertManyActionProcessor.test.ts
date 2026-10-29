@@ -43,7 +43,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     repo.upsertMany.mockImplementation(async (_name: string, items: any[]) => items.map((item) => ({ item, oldItem: null })));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', items: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] });
 
     expect(isErroredActionResult(result)).toBe(false);
     // One repository call is what makes the batch a single transaction on the
@@ -51,7 +51,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     expect(repo.upsertMany).toHaveBeenCalledTimes(1);
     expect(repo.upsertMany).toHaveBeenCalledWith('store', [{ id: 'a' }, { id: 'b' }, { id: 'c' }], { ifNotExists: undefined }, undefined);
     expect(emitKvsStreamEvent).toHaveBeenCalledTimes(3);
-    expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.newImage)).toEqual([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+    expect(emitKvsStreamEvent.mock.calls.map(([, , event]: any[]) => event.newImage)).toEqual([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
   });
 
   it('emits Modify for an existing key and Insert for a fresh one, with the replaced row as oldImage', async () => {
@@ -61,17 +61,17 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     ]);
     const process = await getProcessor();
 
-    await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }, { id: 'b' }] });
+    await invokeProcessor(process!, { keyValueStoreName: 'store', items: [{ id: 'a' }, { id: 'b' }] });
 
-    expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.eventType)).toEqual(['Modify', 'Insert']);
-    expect(emitKvsStreamEvent.mock.calls.map(([, , event]) => event.oldImage)).toEqual([{ id: 'a', old: true }, undefined]);
+    expect(emitKvsStreamEvent.mock.calls.map(([, , event]: any[]) => event.eventType)).toEqual(['Modify', 'Insert']);
+    expect(emitKvsStreamEvent.mock.calls.map(([, , event]: any[]) => event.oldImage)).toEqual([{ id: 'a', old: true }, undefined]);
   });
 
   it('passes ifNotExists through and maps a lost condition to the typed Conflict with no stream events', async () => {
     repo.upsertMany.mockRejectedValue(Object.assign(new Error('exists'), { name: 'ConditionalCheckFailedException' }));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }], options: { ifNotExists: true } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', items: [{ id: 'a' }], options: { ifNotExists: true } });
 
     expect(repo.upsertMany).toHaveBeenCalledWith('store', [{ id: 'a' }], { ifNotExists: true }, undefined);
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertManyBase.errorType.Conflict);
@@ -82,7 +82,7 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
     repo.upsertMany.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }] });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', items: [{ id: 'a' }] });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound);
   });

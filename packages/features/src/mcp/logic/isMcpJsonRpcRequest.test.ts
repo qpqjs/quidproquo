@@ -23,7 +23,7 @@ describe('isMcpJsonRpcRequest', () => {
     [{ jsonrpc: '2.0', id: 1, method: 'ping', params: 'x' }],
     [{ jsonrpc: '2.0', id: { nested: true }, method: 'ping' }],
     [{ jsonrpc: '2.0', id: true, method: 'ping' }],
-  ])('refuses %j', (body) => {
+  ])('refuses %j', (body: any) => {
     expect(isMcpJsonRpcRequest(body)).toBe(false);
   });
 });

@@ -100,7 +100,7 @@ describe('BootstrapQpqServiceStack email receiving domain', () => {
     ]);
     const app = new App();
     return Template.fromStack(
-      new BootstrapQpqServiceStack(app, 'test-bs', { qpqConfig, env: { account: '123456789012', region: 'ap-southeast-2' } }),
+      new BootstrapQpqServiceStack(app, 'test-bs', { qpqConfig, env: { account: '123456789012', region: 'ap-southeast-2' } } as any),
     );
   };
 

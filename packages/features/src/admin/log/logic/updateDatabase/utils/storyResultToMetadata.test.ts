@@ -23,14 +23,14 @@ describe('storyResultToMetadata', () => {
   });
 
   it('reads the username from the session decoded access token', () => {
-    const metadata = storyResultToMetadata({ ...baseStoryResult, session: { decodedAccessToken: { username: 'joe' } } });
+    const metadata = storyResultToMetadata({ ...baseStoryResult, session: { decodedAccessToken: { username: 'joe' } } as any });
 
     expect(metadata.userInfo).toBe('joe');
   });
 
   it('falls back to the identity a route auth decode put on the GetStorySession result', () => {
     const history = [{ act: { type: EventActionType.GetStorySession }, res: { decodedAccessToken: { username: 'qpqjs/quidproquo#1' } } }];
-    const metadata = storyResultToMetadata({ ...baseStoryResult, runtimeType: QpqRuntimeType.API, history });
+    const metadata = storyResultToMetadata({ ...baseStoryResult, runtimeType: QpqRuntimeType.API, history: history as any });
 
     expect(metadata.userInfo).toBe('qpqjs/quidproquo#1');
   });

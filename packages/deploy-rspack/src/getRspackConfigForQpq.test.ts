@@ -62,7 +62,7 @@ describe('getRspackConfig', () => {
       expect(externals).toHaveLength(2);
 
       let result: string | undefined = undefined;
-      externals[1]({ request }, (_err?: unknown, external?: string) => {
+      externals![1]!({ request }, (_err?: unknown, external?: string) => {
         result = external;
       });
 
@@ -97,7 +97,7 @@ describe('getRspackConfig', () => {
       const externals = config.externals as unknown as ExternalFunction[];
 
       let result: string | undefined = undefined;
-      externals[1]({ request: 'sharp' }, (_err?: unknown, external?: string) => {
+      externals![1]!({ request: 'sharp' }, (_err?: unknown, external?: string) => {
         result = external;
       });
 

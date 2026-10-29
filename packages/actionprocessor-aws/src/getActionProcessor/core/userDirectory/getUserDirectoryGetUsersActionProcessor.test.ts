@@ -29,7 +29,7 @@ describe('getUserDirectoryGetUsersActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsers).mockResolvedValue({ items: [], nextPageKey: null } as any);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', nextPageKey: 'page-2' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', nextPageKey: 'page-2' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ items: [], nextPageKey: null });
@@ -40,7 +40,7 @@ describe('getUserDirectoryGetUsersActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsers).mockRejectedValue(cognitoError('InvalidParameterException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', nextPageKey: 'page-2' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', nextPageKey: 'page-2' });
 
     expect(error?.errorType).toBe(askUserDirectoryGetUsers.errorType.InvalidPageKey);
   });
@@ -49,7 +49,7 @@ describe('getUserDirectoryGetUsersActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(listPagedUsers).mockRejectedValue(cognitoError('TooManyRequestsException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', nextPageKey: 'page-2' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', nextPageKey: 'page-2' });
 
     expect(error?.errorType).toBe(askUserDirectoryGetUsers.errorType.LimitExceeded);
   });

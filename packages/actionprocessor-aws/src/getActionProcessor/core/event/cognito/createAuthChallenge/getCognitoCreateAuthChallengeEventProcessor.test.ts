@@ -6,7 +6,9 @@ import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
-  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime } })]);
+  buildTestQpqConfig([
+    defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime, defineAuthChallenge: runtime, verifyAuthChallenge: runtime } }),
+  ]);
 
 describe('createAuthChallenge getCognitoCreateAuthChallengeEventProcessor', () => {
   it('auto responds with null', async () => {

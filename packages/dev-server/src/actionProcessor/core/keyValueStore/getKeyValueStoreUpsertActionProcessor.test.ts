@@ -42,7 +42,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockResolvedValue({ id: 'a' });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: { id: 'a' } });
 
     expect(repo.upsert).toHaveBeenCalledWith('store', { id: 'a' }, { ifNotExists: undefined }, undefined);
     expect(resolveActionResult(result)).toEqual({ id: 'a' });
@@ -52,7 +52,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: {} });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.StoreNotFound);
   });
@@ -63,7 +63,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(conflictError);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.Conflict);
@@ -73,7 +73,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: {} });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

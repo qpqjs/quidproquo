@@ -107,7 +107,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loadedStory = async (a: number, b: number) => a + b;
     const dynamicModuleLoader = async () => loadedStory;
 
-    const result = await processor(
+    const result = await processor!(
       { runtime: 'some/runtime', params: [2, 3] },
       buildTestStorySession(),
       buildActionProcessorList({}),
@@ -132,7 +132,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loadedStory = async (run: (story: AskResponse<string>) => Promise<string>) => run(innerStory());
     const dynamicModuleLoader = async () => loadedStory;
 
-    const result = await processor(
+    const result = await processor!(
       { runtime: 'some/runtime', params: [] },
       buildTestStorySession(),
       buildActionProcessorList({ Fails: async () => actionResultError(ErrorTypeEnum.PaymentRequired, 'inner gone') }),
@@ -151,7 +151,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const map = await getSystemExecuteStoryActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader as any);
     const processor = map[SystemActionType.ExecuteStory];
 
-    const result = await processor(
+    const result = await processor!(
       { runtime: 'missing', params: [] },
       buildTestStorySession(),
       buildActionProcessorList({}),

@@ -8,7 +8,7 @@ import { getEventTransformResponseResultActionProcessor } from './getEventTransf
 const invoke = async (qpqEventRecordResponses: any) => {
   const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.TransformResponseResult];
-  return invokeProcessor(process, { eventParams: [], qpqEventRecordResponses } as any);
+  return invokeProcessor(process!, { eventParams: [], qpqEventRecordResponses } as any);
 };
 
 describe('getEventTransformResponseResultActionProcessor (websocket)', () => {

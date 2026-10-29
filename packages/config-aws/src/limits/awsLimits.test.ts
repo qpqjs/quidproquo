@@ -10,11 +10,11 @@ describe('awsLimits', () => {
 
   // Security regression: the sandbox's time and memory ceilings are config, so a typo must fail at synth rather than
   // deploy an unbounded runner.
-  it.each([0, 901, 1.5, Number.NaN])('refuses a timeout of %s seconds', (timeoutInSeconds) => {
+  it.each([0, 901, 1.5, Number.NaN])('refuses a timeout of %s seconds', (timeoutInSeconds: any) => {
     expect(() => assertLambdaTimeoutInSeconds(timeoutInSeconds, 'runner')).toThrow('runner: timeoutInSeconds');
   });
 
-  it.each([127, 10241, 512.5])('refuses a memory of %s MiB', (memoryInMiB) => {
+  it.each([127, 10241, 512.5])('refuses a memory of %s MiB', (memoryInMiB: any) => {
     expect(() => assertLambdaMemoryInMiB(memoryInMiB, 'runner')).toThrow('runner: memoryInMiB');
   });
 

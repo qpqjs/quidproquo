@@ -60,7 +60,7 @@ describe('buildUserScript', () => {
 
     const written: unknown[] = [];
     const sum = runStory((scriptExports.add as (...args: unknown[]) => any)('drive', 'out.txt', 20, 22), {
-      [FileActionType.WriteTextContents]: (action) => {
+      [FileActionType.WriteTextContents]: (action: any) => {
         written.push(action.payload);
         return undefined;
       },

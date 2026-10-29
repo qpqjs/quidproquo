@@ -39,7 +39,7 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     mockedDecode.mockReturnValue(decoded);
     const process = await getProcess();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'pool', accessToken: 'token-abc', ignoreExpiration: true });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'pool', accessToken: 'token-abc', ignoreExpiration: true });
 
     expect(mockedDecode).toHaveBeenCalledWith('test-secret', 'pool', 'token-abc', true);
     expect(resolveActionResult(result)).toBe(decoded);
@@ -49,7 +49,7 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     mockedDecode.mockReturnValue(null as any);
     const process = await getProcess();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'pool', accessToken: 'bad', ignoreExpiration: false });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'pool', accessToken: 'bad', ignoreExpiration: false });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);

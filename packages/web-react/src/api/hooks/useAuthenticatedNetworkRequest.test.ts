@@ -26,7 +26,7 @@ const wrapperFor = (state: AuthState) =>
 
 describe('useAuthenticatedNetworkRequest', () => {
   it('sends the request unchanged when there is no auth token', async () => {
-    const payload = { url: 'https://api', method: 'GET' } as NetworkRequestActionPayload<any>;
+    const payload = { url: 'https://api', method: 'GET' } as unknown as NetworkRequestActionPayload<any>;
     const { result } = renderHook(() => useAuthenticatedNetworkRequest(payload));
 
     await result.current();
@@ -36,7 +36,7 @@ describe('useAuthenticatedNetworkRequest', () => {
   });
 
   it('adds a bearer Authorization header when a token is present', async () => {
-    const payload = { url: 'https://api', method: 'GET', headers: { 'X-A': '1' } } as NetworkRequestActionPayload<any>;
+    const payload = { url: 'https://api', method: 'GET', headers: { 'X-A': '1' } } as unknown as NetworkRequestActionPayload<any>;
     const { result } = renderHook(() => useAuthenticatedNetworkRequest(payload), {
       wrapper: wrapperFor({ username: '', authenticationInfo: { accessToken: 'tok' } as any }),
     });

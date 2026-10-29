@@ -43,7 +43,7 @@ describe('updateItem', () => {
     // One name placeholder serves both the SET and the condition, and the value 7 is shared the same way.
     expect(names).toEqual([[expect.stringMatching(/^#/), 'headEventId']]);
     expect(values).toEqual([[expect.stringMatching(/^:/), { N: '7' }]]);
-    expect(input.ConditionExpression).toBe(`(attribute_not_exists(${names[0][0]})) OR (${names[0][0]} < ${values[0][0]})`);
-    expect(input.UpdateExpression).toBe(`SET ${names[0][0]} = ${values[0][0]}`);
+    expect(input.ConditionExpression).toBe(`(attribute_not_exists(${names![0]![0]})) OR (${names![0]![0]} < ${values![0]![0]})`);
+    expect(input.UpdateExpression).toBe(`SET ${names![0]![0]} = ${values![0]![0]}`);
   });
 });

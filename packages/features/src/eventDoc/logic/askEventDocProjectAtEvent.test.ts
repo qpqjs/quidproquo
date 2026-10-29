@@ -139,7 +139,7 @@ describe('askEventDocProjectAtEvent', () => {
 
     expect(projected?.name).toBe('Renamed');
     expect(summaryUpdates[0]).toContainEqual({ attributePath: 'eventId', action: KvsUpdateActionType.Set, value: 1 });
-    expect((tables[STORE_NAME][0] as EventDocSummary).eventId).toBe(1);
+    expect((tables![STORE_NAME]![0] as EventDocSummary).eventId).toBe(1);
   });
 
   it('leaves a newer summary row alone but still files the snapshots and returns the view', () => {
@@ -148,8 +148,8 @@ describe('askEventDocProjectAtEvent', () => {
     const projected = project(1);
 
     expect(projected?.name).toBe('Renamed');
-    expect(tables[STORE_NAME][0]).toEqual(newerSummaryRow);
-    expect(tables[SNAPSHOTS_STORE].map((row) => `${row.pk}@${row.sk}`).sort()).toEqual([`${DOC_ID}#document@1`, `${DOC_ID}#summary@1`]);
+    expect(tables![STORE_NAME]![0]).toEqual(newerSummaryRow);
+    expect(tables![SNAPSHOTS_STORE]!.map((row) => `${row.pk}@${row.sk}`).sort()).toEqual([`${DOC_ID}#document@1`, `${DOC_ID}#summary@1`]);
   });
 
   it('rewrites the summary from a seed already at the event without folding', () => {
@@ -166,7 +166,7 @@ describe('askEventDocProjectAtEvent', () => {
     expect(foldCalls).toEqual([]);
     expect(projected).toEqual(seedSummary);
     expect(summaryUpdates[0]).toContainEqual({ attributePath: 'eventId', action: KvsUpdateActionType.Set, value: 1 });
-    expect((tables[STORE_NAME][0] as EventDocSummary).eventId).toBe(1);
+    expect((tables![STORE_NAME]![0] as EventDocSummary).eventId).toBe(1);
   });
 
   it('rederives from the log when the seed summary does not parse, as one from before the view carried its event id', () => {
@@ -182,6 +182,6 @@ describe('askEventDocProjectAtEvent', () => {
 
     expect(projected?.eventId).toBe(1);
     expect(summaryUpdates[0]).toContainEqual({ attributePath: 'eventId', action: KvsUpdateActionType.Set, value: 1 });
-    expect((tables[STORE_NAME][0] as EventDocSummary).eventId).toBe(1);
+    expect((tables![STORE_NAME]![0] as EventDocSummary).eventId).toBe(1);
   });
 });

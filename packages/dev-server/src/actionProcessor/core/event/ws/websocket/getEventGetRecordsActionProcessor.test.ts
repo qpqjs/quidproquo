@@ -12,7 +12,7 @@ const getProcess = async () => {
 
 const invoke = async (wsEvent: any) => {
   const process = await getProcess();
-  return invokeProcessor(process, { eventParams: [wsEvent] } as any);
+  return invokeProcessor(process!, { eventParams: [wsEvent] } as any);
 };
 
 const baseEvent = {

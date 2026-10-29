@@ -73,7 +73,7 @@ describe('resolveCryptoKeyForResource', () => {
     // The alias ARN is assembled from the stack's region and account tokens, so
     // it renders as a join; the alias segment is the part that matters.
     const [bucket] = Object.values(Template.fromStack(stack).findResources('AWS::S3::Bucket'));
-    const keyId = bucket.Properties.BucketEncryption.ServerSideEncryptionConfiguration[0].ServerSideEncryptionByDefault.KMSMasterKeyID;
+    const keyId = bucket!.Properties.BucketEncryption.ServerSideEncryptionConfiguration[0].ServerSideEncryptionByDefault.KMSMasterKeyID;
 
     expect(JSON.stringify(keyId)).toMatch(/:alias\/shared-test-app-shell-development/);
   });

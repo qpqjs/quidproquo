@@ -26,7 +26,7 @@ describe('getUserDirectoryGetUserAttributesActionProcessor', () => {
     vi.mocked(getExportedValue).mockReset().mockResolvedValue('POOL');
     vi.mocked(resolveUsernameByPreferredUsername)
       .mockReset()
-      .mockImplementation(async (_pool, _region, username) => username);
+      .mockImplementation(async (_pool: any, _region: any, username: any) => username);
     vi.mocked(getUserAttributes).mockReset();
   });
 
@@ -34,7 +34,7 @@ describe('getUserDirectoryGetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(getUserAttributes).mockResolvedValue({ email: 'joe@example.com' } as any);
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ email: 'joe@example.com' });
@@ -45,7 +45,7 @@ describe('getUserDirectoryGetUserAttributesActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(getUserAttributes).mockRejectedValue(cognitoError('UserNotFoundException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com' });
 
     expect(error?.errorType).toBe(askUserDirectoryGetUserAttributes.errorType.UserNotFound);
   });

@@ -10,7 +10,7 @@ describe('getEventGetRecordsActionProcessor (node service function)', () => {
     const processors = await getEventGetRecordsActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[EventActionType.GetRecords];
 
-    const result = await invokeProcessor(process, { eventParams: [{ functionName: 'doThing', payload: [1, 2] }] } as any);
+    const result = await invokeProcessor(process!, { eventParams: [{ functionName: 'doThing', payload: [1, 2] }] } as any);
 
     expect(resolveActionResult(result)).toEqual([{ functionName: 'doThing', payload: [1, 2] }]);
   });

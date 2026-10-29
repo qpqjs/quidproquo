@@ -17,8 +17,8 @@ describe('encryptInputParser', () => {
 
     const { redactedLog, redactions } = encryptInputParser(log);
 
-    expect(redactedLog.history[0].act.payload).toEqual({ keyName: REDACTED_STRING, plaintext: REDACTED_STRING, context: { a: REDACTED_STRING } });
-    expect(redactedLog.history[0].res).toEqual(['cipher', undefined]);
+    expect(redactedLog!.history[0]!.act.payload).toEqual({ keyName: REDACTED_STRING, plaintext: REDACTED_STRING, context: { a: REDACTED_STRING } });
+    expect(redactedLog!.history[0]!.res).toEqual(['cipher', undefined]);
     expect(redactedLog.history[1]).toBe(log.history[1]);
     expect(redactions.sort()).toEqual(['b', 'k', 'secret']);
   });

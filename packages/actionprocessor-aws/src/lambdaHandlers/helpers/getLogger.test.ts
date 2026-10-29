@@ -60,7 +60,7 @@ describe('getLogger', () => {
     ['no log service is configured', () => (logSettings = { disableLogs: false, instantLogs: false })],
     ['logs are disabled', () => (logSettings = { logServiceName: 'logs', disableLogs: true, instantLogs: false })],
     ['running as the logs drive file-event lambda', () => (process.env.storageDriveName = QPQ_LOGS_STORAGE_DRIVE_NAME)],
-  ])('ships nothing when %s', async (_name, arrange) => {
+  ])('ships nothing when %s', async (_name: any, arrange: any) => {
     arrange();
     process.env.AWS_LAMBDA_RUNTIME_API = '127.0.0.1:9001';
 

@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 const userDirectoryConfig = (runtime: QpqFunctionRuntime) =>
-  buildTestQpqConfig([defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime } })]);
+  buildTestQpqConfig([
+    defineUserDirectory('ud', { customAuthRuntime: { createAuthChallenge: runtime, defineAuthChallenge: runtime, verifyAuthChallenge: runtime } }),
+  ]);
 
 describe('cognito/createAuthChallenge getEventGetRecordsActionProcessor', () => {
   it('maps the trigger event session and user attributes', async () => {
