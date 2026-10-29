@@ -1,7 +1,6 @@
-// Deep import (not the package root) so lambda bundles only pull the tracer subtree,
-// the node package's root index drags in processors (Claude SDK etc.) every lambda
-// would otherwise ship.
-import { getSystemTraceStoryActionProcessor as getNodeSystemTraceStoryActionProcessor } from '@qpqjs/actionprocessor-node/lib/commonjs/traceStoryExecution';
+// The tracer subpath (not the package root) so lambda bundles only pull the tracer: the node
+// package's root index drags in processors (Claude SDK etc.) every lambda would otherwise ship.
+import { getSystemTraceStoryActionProcessor as getNodeSystemTraceStoryActionProcessor } from '@qpqjs/actionprocessor-node/traceStoryExecution';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 // The federated code cache on /tmp, where loadFederatedStory materialises the service's
