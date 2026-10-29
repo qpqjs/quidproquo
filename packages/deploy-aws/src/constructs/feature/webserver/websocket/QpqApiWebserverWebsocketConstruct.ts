@@ -58,16 +58,13 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    // Let api gateway invoke this ok
-    func.lambdaFunction.grantInvoke(
-      new aws_iam.ServicePrincipal('apigateway.amazonaws.com', {
-        conditions: {
-          ArnLike: {
-            'aws:SourceArn': `arn:aws:execute-api:${region}:${awsAccountId}:${apiId}/*`,
-          },
-        },
-      }),
-    );
+    // A fixed construct id: grantInvoke derives one from the principal, and the imported api id
+    // token renders differently on every synth, which would replace the permission on every deploy.
+    func.lambdaFunction.addPermission('api-gateway-invoke', {
+      principal: new aws_iam.ServicePrincipal('apigateway.amazonaws.com'),
+      action: 'lambda:InvokeFunction',
+      sourceArn: `arn:aws:execute-api:${region}:${awsAccountId}:${apiId}/*`,
+    });
 
     const integration = new aws_apigatewayv2.CfnIntegration(this, 'websocket-integration', {
       apiId,
