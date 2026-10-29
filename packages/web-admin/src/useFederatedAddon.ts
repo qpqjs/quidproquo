@@ -26,9 +26,8 @@ export function useFederatedAddon(): {
 
   useEffect(() => {
     doAsyncWork()
-      .catch((e) => {
-        console.log(e);
-        console.log('Unable to federate modules in');
+      .catch(() => {
+        // A remote that fails to load leaves the addon list empty; the shell renders without it.
       })
       .finally(() => {
         setLoading(false);

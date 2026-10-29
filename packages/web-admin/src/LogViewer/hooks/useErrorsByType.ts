@@ -23,7 +23,5 @@ export const useErrorsByType = (logs: StoryResultMetadata[]) => {
     return Object.values(errorCounts).sort((a, b) => b.count - a.count);
   }, [logs]);
 
-  console.log(data);
-
   return data.slice(0, 10);
 };
