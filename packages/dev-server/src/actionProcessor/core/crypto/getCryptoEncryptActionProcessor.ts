@@ -29,7 +29,8 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: Resolved
 
       return actionResult(ciphertext);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

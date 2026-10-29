@@ -44,7 +44,7 @@ export const resolveActionResultError = <T>(actionResult: ActionProcessorResult<
 
 type ErrorMap = { [key: string]: (error: Error) => ActionProcessorResult<any> };
 
-export const actionResultErrorFromCaughtError = (error: unknown, errorMap: ErrorMap): ReturnType<typeof actionResultError> => {
+export const actionResultErrorFromCaughtError = (error: unknown, errorMap: ErrorMap = {}): ReturnType<typeof actionResultError> => {
   if (error instanceof Error) {
     const errorCode = (error as any).code as string | undefined;
     const errorName = error.name;

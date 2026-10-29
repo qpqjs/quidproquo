@@ -24,7 +24,8 @@ const getProcessGetUsersByAttribute = (
         items: limit ? users.slice(0, limit) : users,
       });
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

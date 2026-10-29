@@ -9,7 +9,8 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig, devServerConfig: Res
       await setParameterValue(devServerConfig.runtimePath, parameterName, qpqConfig, parameterValue);
       return actionResult(undefined);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

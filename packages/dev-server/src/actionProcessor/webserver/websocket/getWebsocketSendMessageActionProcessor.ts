@@ -1,4 +1,12 @@
-import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  createActionProcessor,
+  ProcessorFor,
+  QPQConfig,
+  qpqCoreUtils,
+} from '@qpqjs/core';
 import { askWebsocketSendMessageBase, qpqWebServerUtils } from '@qpqjs/webserver';
 
 // The connection REGISTRY, not the implementation: webSocketImplementation imports
@@ -13,11 +21,16 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
     const service = websocketConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
     try {
-      await sendMessageToWebSocketConnection(service, websocketApiName, connectionId, payload);
+      // A connection that is no longer registered answers Disconnected, as AWS does with GoneException.
+      const sent = await sendMessageToWebSocketConnection(service, websocketApiName, connectionId, payload);
+      if (!sent) {
+        return actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists');
+      }
 
       return actionResult(undefined);
     } catch (error) {
-      return actionResultErrorFromCaughtError(error, {});
+      // A send that throws (socket closing) has no catalogued local failure; it becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

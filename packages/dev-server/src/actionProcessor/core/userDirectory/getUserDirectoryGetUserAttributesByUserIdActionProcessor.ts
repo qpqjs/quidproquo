@@ -27,7 +27,8 @@ const getProcessGetUserAttributesByUserId = (
 
       return actionResult(user);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

@@ -22,7 +22,8 @@ const getProcessGetUserAttributes = (
 
       return actionResult(await upsertDevUser(devServerConfig.runtimePath, userDirectory, username));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

@@ -34,7 +34,8 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
 
       return actionResult(rs256Sign(privateKeyPem, message));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

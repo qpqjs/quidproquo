@@ -23,7 +23,8 @@ const getProcessAuthenticateUser = (
 
       return actionResult(createDevAuthResponse(userDirectory, authenticateUserRequest.email));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };
