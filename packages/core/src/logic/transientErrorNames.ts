@@ -45,5 +45,3 @@ export const TRANSIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
 
 /** Whether an error name or OS code names a transient, worth-retrying condition. */
 export const isTransientErrorName = (name?: string): boolean => !!name && TRANSIENT_ERROR_NAMES.has(name);
-
-// TODO: This is a shit file, we should do this a better way,

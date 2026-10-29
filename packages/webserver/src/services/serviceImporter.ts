@@ -1,4 +1,4 @@
-// TODO: Remove this
+// TODO: @joe-coady: Remove this
 export const _deprecated_serviceEntryMap = {
   // [getServiceEntry('log', 'controller', 'logController')]: require('../services/log/entry/controller/logController'),
   // [getServiceEntry('log', 'webSocket', 'onWebsocketEvent')]: require('../services/log/entry/webSocket/onWebsocketEvent'),

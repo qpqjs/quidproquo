@@ -4,7 +4,7 @@ import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 import { getLambdaServiceFunctionEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-// TODO: also declared in @qpqjs/dev-server (serviceFunction/types.ts); this
+// TODO: @joe-coady: also declared in @qpqjs/dev-server (serviceFunction/types.ts); this
 // cross-layer shape belongs in @qpqjs/webserver as a named model.
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<unknown[]> & {
   storySession: StorySession;

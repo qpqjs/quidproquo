@@ -14,7 +14,6 @@ type ApiGatwayEventWebsocketWithIdentity = APIGatewayProxyWebsocketEventV2WithRe
   }
 >;
 
-// TODO: Don't use Globals like this
 export const GLOBAL_WEBSOCKET_API_NAME = process.env.websocketApiName!;
 
 // Externals - The ins and outs of the external event

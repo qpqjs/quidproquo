@@ -5,7 +5,7 @@ import { authContext } from '../authContext';
 export const useAuthAccessToken = () => {
   const authState = useContext(authContext);
 
-  // TODO: dont return access token if it has expired.
+  // TODO: @joe-coady: do not return access token if it has expired.
 
   return authState.authenticationInfo?.accessToken;
 };

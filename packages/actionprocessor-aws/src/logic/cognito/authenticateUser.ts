@@ -12,7 +12,7 @@ import { calculateSecretHash } from './utils/calculateSecretHash';
 import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
-// TODO: retry for TooManyRequestsException
+// TODO: @joe-coady: retry for TooManyRequestsException
 
 /**
  * Starts a Cognito auth flow (password auth, or CUSTOM_AUTH when isCustom) and

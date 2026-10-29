@@ -10,7 +10,7 @@ export const getEventBridgeEvent_recurringSchedule = (dynamicModuleLoader: Dynam
   getQpqLambdaRuntimeForEvent<EventBridgeEvent<string, void>>(
     QpqRuntimeType.RECURRING_SCHEDULE,
     getBlankStorySession,
-    // TODO: rename this to something recurring-schedule specific.
+    // TODO: @joe-coady: rename this to something recurring-schedule specific.
     getEventBridgeEventActionProcessor,
     dynamicModuleLoader,
     qpqConfig,

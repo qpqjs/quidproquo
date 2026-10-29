@@ -41,7 +41,7 @@ export interface GenericRouteOptions<T> {
   schema?: RouteSchema;
 }
 
-// TODO: Probably clean up the types here
+// TODO: @joe-coady: clean up the types here
 // The idea is just so we can let the user define apiKeys as strings not objects
 // But let the internal logic always use objects
 export type RouteAuthSettings = GenericRouteAuthSettings<ApiKeyReference>;

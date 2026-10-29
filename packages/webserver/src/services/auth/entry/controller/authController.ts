@@ -1,6 +1,5 @@
 import { AnyAuthChallenge, askCatch, AskResponse, askThrowError, AuthenticateUserChallenge, ErrorTypeEnum } from '@qpqjs/core';
 
-// TODO: Fix this import (name it up the chain)
 import { qpqWebServerUtils } from '../../../../index';
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { authLogic } from '../../logic';

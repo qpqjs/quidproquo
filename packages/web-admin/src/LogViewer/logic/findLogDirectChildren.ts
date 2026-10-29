@@ -8,7 +8,7 @@ export const fineLogDirectChildren = cache(async function findLogDirectChildren(
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> {
   try {
-    // TODO: Paging
+    // TODO: @joe-coady: Paging
     const fetchedChildLogs = await apiRequestGet<QpqPagedData<StoryResultMetadata>>(
       `/log/children/${encodeURIComponent(logCorrelation)}`,
       apiBaseUrl,

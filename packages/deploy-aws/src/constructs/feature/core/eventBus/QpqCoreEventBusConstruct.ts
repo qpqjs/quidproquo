@@ -139,9 +139,8 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       }
     });
 
-    // TODO: remove this, its deprecated
+    // TODO: @joe-coady: @joe-coady: remove this deprecated export.
     const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(props.eventBusConfig.name, props.qpqConfig);
     qpqDeployAwsUtils.exportStackValue(this, exportName, this.topic.topicArn);
-    // ///////// end todo
   }
 }

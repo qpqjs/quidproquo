@@ -58,8 +58,6 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
 
     const unmappedKey = errorCode ?? errorName;
 
-    // TODO: This is really shit... this does not belong here.
-    //
     // Classify throttles and transient service failures BEFORE the generic fallback, so a caller can tell
     // "the service is busy" from "this request is wrong" without matching on error text. Without this they
     // are indistinguishable GenericErrors, and a caller that records failures durably writes a permanent

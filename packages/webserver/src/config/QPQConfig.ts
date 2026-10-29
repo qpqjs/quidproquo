@@ -19,7 +19,7 @@ export enum QPQWebServerConfigSettingType {
   FileUploadSettings = '@quidproquo-webserver/config/FileUploadSettings',
 }
 
-// TODO: move this somewhere better
+// TODO: @joe-coady: move this somewhere better
 export interface CacheSettings {
   minTTLInSeconds: number;
   maxTTLInSeconds: number;

@@ -5,7 +5,7 @@ export * from './getLambdaEntries';
 export * from './lambdaHandlers';
 export * from './runtimeConfig';
 
-// TODO: give ./logic a full barrel; today it only covers cognito and
+// TODO: @joe-coady: give ./logic a full barrel; today it only covers cognito and
 // federatedModuleStore, so the cache and parameter helpers are deep-exported here.
 export * from './logic';
 export * from './logic/cache/memoFunc';

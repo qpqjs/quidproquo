@@ -1,5 +1,4 @@
 import { AskResponse, AuthenticateUserChallenge } from '@qpqjs/core';
-// TODO: Fix this import (name it up the chain)
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 
@@ -56,7 +55,7 @@ export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEvent
     qpqWebServerUtils.requireStringFields('email', 'session', 'challenge', 'newPassword'),
   );
 
-  // TODO: Make this more generic ~ Currently we only support one challenge
+  // TODO: @joe-coady: Make this more generic ~ Currently we only support one challenge
   const response = yield* authLogic.askRespondToAuthChallenge(
     authChallenge.email,
     AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,

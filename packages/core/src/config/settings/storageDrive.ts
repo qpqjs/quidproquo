@@ -79,7 +79,7 @@ export type StorageDriveLifecycleRule = {
   fileSizeGreaterThan?: number;
   enabled?: boolean;
 
-  // TODO: If we ever add versions
+  // TODO: @joe-coady: If we ever add versions
   // add noncurrentVersionExpiration / noncurrentVersionTransitions support
 };
 

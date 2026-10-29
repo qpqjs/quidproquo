@@ -17,8 +17,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;
 
   srcFilename?: string;
-  functionType: string; // TODO: Rename this to subFolder / folder or something
-  executorName: string; // TODO: Rename this to handlerName or something maybe?
+  functionType: string; // TODO: @joe-coady: Rename this to subFolder / folder or something
+  executorName: string; // TODO: @joe-coady: Rename this to handlerName or something maybe?
 
   timeoutInSeconds?: number;
   memoryInBytes?: number;

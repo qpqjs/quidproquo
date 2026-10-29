@@ -18,5 +18,5 @@ export type EventOutput = void;
 export type InternalEventRecord = DeployEvent;
 export type InternalEventOutput = DeployEventResponse;
 
-// TODO: Get rid of any types
+// TODO: @joe-coady: Get rid of any types
 export type MatchResult = MatchStoryResult<any, any>;

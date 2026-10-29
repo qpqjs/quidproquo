@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-// TODO: Move this to global configs.
+// TODO: @joe-coady: Move this to global configs.
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import ReactTimeAgo from 'react-time-ago';

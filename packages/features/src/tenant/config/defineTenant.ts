@@ -116,7 +116,7 @@ export const defineTenant = ({ owner, roles, ...routeOptions }: TenantOptions): 
         // Creating a tenant must also link the creator as its first member, or the
         // doc is unreachable: nothing but the membership table can find it again.
         // POST {myTenantsBasePath} owns that; the stock create would bypass it.
-        // TODO: Adding the user to the event doc, this could be done in the on publish... or something.
+        // TODO: @joe-coady: Adding the user to the event doc, this could be done in the on publish... or something.
         excludeRoutes: ['create'],
       }),
       defineTenantRoutes(routeOptions),

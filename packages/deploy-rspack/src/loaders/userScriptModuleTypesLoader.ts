@@ -13,7 +13,7 @@ import { generateDtsBundle } from 'dts-bundle-generator';
 import path from 'path';
 import type { LoaderContext } from '@rspack/core';
 
-// TODO: Fix this. A type the harness pulls from any other package (@qpqjs/features, zod)
+// TODO: @joe-coady: Fix this. A type the harness pulls from any other package (@qpqjs/features, zod)
 // is left as an import the browser editor cannot follow, so it shows as `any`. The generator
 // matches package names exactly, so build this list in the loader instead: every dependency
 // of the nearest package.json to the entry, plus the quidproquo packages.

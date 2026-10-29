@@ -78,7 +78,6 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
       body: successRecord.body,
       headers: responseHeaders,
 
-      // TODO: Revist this.
       bodyEncoding: successRecord.bodyEncoding === 'base64' ? 'base64' : 'text',
     };
 

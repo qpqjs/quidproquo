@@ -156,7 +156,7 @@ export function createEventDocDefinition(
     storeName,
     type,
     sync,
-    // TODO: This seems like the wrong place for a workspace slot kind...
+    // TODO: @joe-coady: This seems like the wrong place for a workspace slot kind...
     // likely should be defined at the workspace, when we define the slots.
     kind: EventDocWorkspaceSlotKind.document,
     // The workspace mounts the primary view: an editor edits a document, never a summary.

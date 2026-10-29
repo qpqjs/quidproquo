@@ -186,7 +186,7 @@ export function* askEventDocAiStreamTurn(
   // A pending client tool (saved in the history; the client renders it, e.g.
   // as a form) resumes when the answer arrives as the next chat message.
   if (segments.some(segmentHasPendingToolUse)) {
-    // TODO: Send the tool call frontend request to the frontend via websocket, on this corrolation.
+    // TODO: @joe-coady: Send the tool call frontend request to the frontend via websocket, on this correlation.
     // the toolcall can be completed and send as a message back to the chat here, on another lambda invoke.
 
     return { complete: false };

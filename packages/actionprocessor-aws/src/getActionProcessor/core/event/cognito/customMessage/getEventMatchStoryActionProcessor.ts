@@ -13,7 +13,6 @@ import { EmailSendEventType } from '@qpqjs/webserver';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-// TODO: Don't use Globals like this
 const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {

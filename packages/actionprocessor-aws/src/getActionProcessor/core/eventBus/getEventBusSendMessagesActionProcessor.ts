@@ -19,7 +19,7 @@ import {
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';
 
-// TODO: Unify this once the lambda code moves from CDK to awslambda
+// TODO: @joe-coady: Unify this once the lambda code moves from CDK to awslambda
 type AnyEventBusMessageWithSession = EventBusMessage<any> & {
   storySession: StorySession;
 };

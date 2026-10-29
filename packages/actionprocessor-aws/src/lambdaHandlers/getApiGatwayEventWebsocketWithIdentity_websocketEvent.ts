@@ -6,7 +6,7 @@ import { getApiGatewayWebsocketEventEventProcessor } from '../getActionProcessor
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-// TODO: this shape is also declared in getActionProcessor/core/event/apiGatwayEvent/websocket/types.ts;
+// TODO: @joe-coady: this shape is also declared in getActionProcessor/core/event/apiGatwayEvent/websocket/types.ts;
 // it belongs in one shared model file.
 type ApiGatwayEventWebsocketWithIdentity = APIGatewayProxyWebsocketEventV2WithRequestContext<
   APIGatewayEventWebsocketRequestContextV2 & {

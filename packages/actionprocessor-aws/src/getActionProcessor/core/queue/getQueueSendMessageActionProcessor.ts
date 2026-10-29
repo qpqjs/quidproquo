@@ -18,7 +18,7 @@ import {
 import { getQueueRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 import { sendMessages, SqsQueueMessageEntry } from '../../../logic/sqs/sendMessages';
 
-// TODO: Unify this once the lambda code moves from CDK to awslambda
+// TODO: @joe-coady: Unify this once the lambda code moves from CDK to awslambda
 type AnyQueueMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
 };

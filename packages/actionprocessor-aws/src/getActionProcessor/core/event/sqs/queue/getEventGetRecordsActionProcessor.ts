@@ -101,7 +101,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
         return queueEvent;
       }
 
-      // TODO: Remove the session from this object
+      // TODO: @joe-coady: Remove the session from this object
       //       note: we still need to access the session in the story execution for depth and auth etc.
       const internalEventRecord: InternalEventRecord = {
         message: {

@@ -12,7 +12,6 @@ import {
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-// TODO: Globals? Are these bad....
 const GLOBAL_DEPLOY_EVENT_NAME = process.env.deployEventConfigName!;
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {

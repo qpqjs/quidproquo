@@ -9,7 +9,7 @@ export const rawFromJsonEventRequest = (httpJsonEvent: HTTPEvent): string | unde
   return json;
 };
 
-// TODO: Make a generator version of this
+// TODO: @joe-coady: Make a generator version of this
 //       so we can throw errors with generators
 export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
   const json = rawFromJsonEventRequest(httpJsonEvent);

@@ -1,7 +1,7 @@
 import { CrossModuleOwner, KeyOf, QpqFunctionRuntime } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-// TODO: When we put validation on the QPQConfig, we need to make sure
+// TODO: @joe-coady: When we put validation on the QPQConfig, we need to make sure
 // Key Length and Data Type: DynamoDB has limitations on key length and data type.
 // Your KvsKeyType only supports 'string', 'number', and 'binary' types. Make sure
 // that you're validating these in convertKvsKeyToDynamodbAttribute function and
