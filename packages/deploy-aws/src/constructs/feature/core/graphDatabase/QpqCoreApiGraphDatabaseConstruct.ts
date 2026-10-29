@@ -2,12 +2,12 @@ import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { GraphDatabaseQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
-import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
+import { aws_dynamodb, aws_ec2, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 
-import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
+import { applyEnvironmentTags, getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlockProps {
@@ -60,10 +60,8 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
         subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
 
-      // Optionally configuring audit logs to be exported to CloudWatch Logs
       cloudwatchLogsExports: [aws_neptune.LogType.AUDIT],
-      // Optionally set a retention period on exported CloudWatch Logs
-      cloudwatchLogsRetention: aws_logs.RetentionDays.ONE_WEEK,
+      cloudwatchLogsRetention: resolveLogRetention(qpqConfigAwsUtils.getCloudWatchLogRetentionDays(props.qpqConfig)),
 
       // Retain data stores by default; a final snapshot preserves the graph data without keeping
       // an orphaned live cluster running. Dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
@@ -74,6 +72,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
 
       // clusterParameterGroup,
     });
+    applyEnvironmentTags(this.cluster, props.qpqConfig);
 
     // Only lambdas carrying the bootstrap-created workload security group can
     // reach the cluster, not everything that lands in the shared VPC

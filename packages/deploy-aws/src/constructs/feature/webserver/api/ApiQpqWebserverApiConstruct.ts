@@ -7,7 +7,7 @@ import { aws_apigateway, aws_cloudwatch, aws_ec2, aws_lambda, aws_logs, aws_ssm,
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
+import { applyEnvironmentTags, getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -95,6 +95,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
         dataTraceEnabled: false,
       },
     });
+    applyEnvironmentTags(api, props.qpqConfig);
 
     // Default alarm (opt-in via defineNotifyError): server-side (5XX) errors
     // reaching clients. 4XX is caller error, so not alarmed by default.

@@ -39,4 +39,17 @@ describe('QpqCoreApiGraphDatabaseConstruct', () => {
   it('still lets only the workload security group reach the cluster', () => {
     synth().hasResourceProperties('AWS::EC2::SecurityGroupIngress', Match.objectLike({ Description: 'qpq workload lambdas' }));
   });
+
+  it('carries the identity tags and the shared log retention', () => {
+    const template = synth();
+
+    template.hasResourceProperties('AWS::Neptune::DBCluster', {
+      Tags: Match.arrayWith([
+        { Key: 'application', Value: Match.anyValue() },
+        { Key: 'environment', Value: Match.anyValue() },
+        { Key: 'module', Value: Match.anyValue() },
+      ]),
+    });
+    template.hasResourceProperties('Custom::LogRetention', { RetentionInDays: 7 });
+  });
 });

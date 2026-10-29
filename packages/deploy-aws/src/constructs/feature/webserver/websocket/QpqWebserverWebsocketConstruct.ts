@@ -6,7 +6,7 @@ import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from '@qpqjs/we
 import { aws_apigateway, aws_apigatewayv2, aws_iam, aws_lambda, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { exportStackValue } from '../../../../utils';
+import { applyEnvironmentTags, exportStackValue } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqServiceRole } from '../../../base/QpqServiceRole';
 
@@ -25,6 +25,7 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
       protocolType: 'WEBSOCKET',
       routeSelectionExpression: '$request.body.type',
     });
+    applyEnvironmentTags(this.api, props.qpqConfig);
 
     exportStackValue(this, awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig), this.api.ref);
 
