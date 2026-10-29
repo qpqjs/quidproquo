@@ -1,3 +1,4 @@
+import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionActionProcessor } from '@qpqjs/actionprocessor-js';
 import { EventActionType, KvsStreamEventType } from '@qpqjs/core';
 import { resolveEventProcessor } from '@qpqjs/testing';
 
@@ -12,7 +13,6 @@ vi.hoisted(() => {
 });
 
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
-import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 
 const SCOPE_DELIMITER = '@@QPQSCOPE@@';
 

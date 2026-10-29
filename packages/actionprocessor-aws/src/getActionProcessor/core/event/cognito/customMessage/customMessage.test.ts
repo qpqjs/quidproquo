@@ -1,3 +1,4 @@
+import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionActionProcessor } from '@qpqjs/actionprocessor-js';
 import { defineUserDirectory, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 import { EmailSendEventType } from '@qpqjs/webserver';
@@ -6,7 +7,6 @@ import { describe, expect, it } from 'vitest';
 
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
-import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 

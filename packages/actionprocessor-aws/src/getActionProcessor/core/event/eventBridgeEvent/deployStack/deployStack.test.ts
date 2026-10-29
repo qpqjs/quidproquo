@@ -1,3 +1,4 @@
+import { getEventGetStorySessionNoopActionProcessor as getEventGetStorySessionActionProcessor } from '@qpqjs/actionprocessor-js';
 import { defineDeployEvent, DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
@@ -6,7 +7,6 @@ import { describe, expect, it } from 'vitest';
 import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
-import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
