@@ -1,5 +1,5 @@
 export * from './AnyAuthChallenge';
-export * from './AuthChallenges';
+export * from './authChallenges';
 export * from './AuthenticateUserChallenge';
 export * from './AuthenticateUserResponse';
 export * from './AuthenticationDeliveryDetails';

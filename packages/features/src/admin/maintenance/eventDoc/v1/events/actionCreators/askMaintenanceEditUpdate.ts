@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askApplyEventDocEvent } from '../../../../../../eventDoc/actions/eventDocEvent/askApplyEventDocEvent';
+import { askApplyEventDocEvent } from '../../../../../../eventDoc/actions/askApplyEventDocEvent';
 import { MaintenanceEditUpdateEffect } from '../effects/MaintenanceEditUpdateEffect';
 import { MaintenanceEffect } from '../effects/MaintenanceEffect';
 import { MaintenanceUpdateData } from '../effects/MaintenanceUpdateData';

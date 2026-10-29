@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askEventDocReadState } from '../actions/eventDocEvent/askEventDocReadState';
+import { askEventDocReadState } from '../actions/askEventDocReadState';
 
 /**
  * Mints a doc type's typed read verb, the one home of the unknown to TView assertion. Kept off the definition object:

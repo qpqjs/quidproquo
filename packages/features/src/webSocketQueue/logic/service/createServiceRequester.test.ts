@@ -2,8 +2,8 @@ import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
+import { ServiceActionType } from '../../actions/ServiceActionType';
 import { createServiceRequester } from './createServiceRequester';
-import { ServiceActionType } from './ServiceActionType';
 
 describe('createServiceRequester', () => {
   it('exposes the service name and method metadata', () => {

@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askServiceRequest } from './askServiceRequest';
+import { askServiceRequest } from '../../actions/askServiceRequest';
 
 export type ServiceRequester<TPayload, TResponse> = {
   (payload: TPayload): AskResponse<TResponse>;

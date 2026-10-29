@@ -3,7 +3,7 @@ import {
   AuthenticateUserMfaSetupChallenge,
   AuthenticateUserNewPasswordRequiredChallenge,
   AuthenticateUserSoftwareTokenMfaChallenge,
-} from './AuthChallenges';
+} from './authChallenges';
 
 export type AnyAuthChallenge =
   | AuthenticateUserNewPasswordRequiredChallenge

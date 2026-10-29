@@ -1,6 +1,6 @@
 import { createActionRequester, Nullable } from '@qpqjs/core';
 
-import { EventDocWorkspaceDocumentIdentity } from '../../workspace/types/EventDocWorkspaceDocumentIdentity';
+import { EventDocWorkspaceDocumentIdentity } from '../workspace/types/EventDocWorkspaceDocumentIdentity';
 import { EventDocActionType } from './EventDocActionType';
 
 /**

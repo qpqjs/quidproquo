@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askServiceRequest } from '../../../webSocketQueue/logic/service';
+import { askServiceRequest } from '../../../webSocketQueue/actions';
 import { askEventDocAiRead } from '../../context';
 import type { EventDocAiDocRef } from '../../models';
 import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
