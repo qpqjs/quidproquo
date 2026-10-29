@@ -1,3 +1,4 @@
+import { Nullable } from '../../types/Nullable';
 import { createContextIdentifier } from '../context/createContextIdentifier';
 import { createContextProvider } from '../context/createContextProvider';
 import { createContextReader } from '../context/createContextReader';
@@ -9,7 +10,7 @@ import { createContextReader } from '../context/createContextReader';
 // queue/service boundaries, so async work spawned inside a scoped request (a
 // render job, an AI edit) reads and writes the same partition as the request
 // that started it.
-export const storageScopeContext = createContextIdentifier<string | null>('qpq-storage-scope', null);
+export const storageScopeContext = createContextIdentifier<Nullable<string>>('qpq-storage-scope', null);
 
 export const askStorageScopeProvide = createContextProvider(storageScopeContext, (scope: string) => scope);
 

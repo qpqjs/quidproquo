@@ -1,5 +1,6 @@
 import { askKeyValueStoreQuery, KvsQueryOperation } from '../../actions';
 import { AskResponse, QpqPagedData } from '../../types';
+import { Nullable } from '../../types/Nullable';
 
 export function* askKeyValueStoreQuerySingle<T>(
   keyValueStoreName: string,
@@ -8,7 +9,7 @@ export function* askKeyValueStoreQuerySingle<T>(
   sortAscending?: boolean,
   limit = 1,
   scope?: string,
-): AskResponse<T | null> {
+): AskResponse<Nullable<T>> {
   const allData: T[] = [];
   let data: QpqPagedData<T> = {
     items: [],

@@ -3,6 +3,7 @@ import { ContextActionType, ContextReadActionPayload } from '../../actions/conte
 import { askContextList } from '../../actions/context/askContextList';
 import { ContextReadAction } from '../../actions/context/askContextRead';
 import { ActionOf, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
+import { Nullable } from '../../types/Nullable';
 import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
 
 export function* askContextProvideValue<R, T extends AskResponse<any>>(
@@ -10,7 +11,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
   value: R,
   storyIterator: T,
 ): AskResponse<AskResponseReturnType<T>> {
-  let cache: QpqContext<any> | null = null;
+  let cache: Nullable<QpqContext<any>> = null;
 
   return yield* askOverrideActions(storyIterator, {
     [ContextActionType.Read]: function* (action: ContextReadAction<any>) {

@@ -1,3 +1,4 @@
+import { Nullable } from '../../types/Nullable';
 // Base64url (RFC 4648 §5, unpadded) over UTF-8 text, on web globals
 // (TextEncoder/TextDecoder/btoa/atob) rather than Node's Buffer so it works in
 // browser bundles of @qpqjs/core too. This is the JOSE encoding: JWT
@@ -19,7 +20,7 @@ export const isBase64Url = (value: string): boolean => /^[A-Za-z0-9_-]+$/.test(v
 // Returns null rather than throwing for anything that is not base64url, so
 // callers validating untrusted input (a bearer token) can branch without a
 // try/catch.
-export const base64UrlDecodeUtf8 = (value: string): string | null => {
+export const base64UrlDecodeUtf8 = (value: string): Nullable<string> => {
   if (!isBase64Url(value)) {
     return null;
   }

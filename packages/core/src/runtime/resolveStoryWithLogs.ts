@@ -1,6 +1,7 @@
 import { QPQConfig } from '../config';
 import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { ActionProcessorList } from '../types/Action';
+import { Nullable } from '../types/Nullable';
 import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
 import { resolveStory } from './resolveStory';
 
@@ -15,7 +16,7 @@ import { resolveStory } from './resolveStory';
 type ConsoleLogCollector = { logs: qpqConsoleLog[]; getTimeNow: () => string };
 
 let activeLogCollectors: ConsoleLogCollector[] = [];
-let unpatchedConsoleLog: typeof console.log | null = null;
+let unpatchedConsoleLog: Nullable<typeof console.log> = null;
 
 const pushLogCollector = (collector: ConsoleLogCollector): void => {
   if (unpatchedConsoleLog === null) {
