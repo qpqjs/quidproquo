@@ -1,5 +1,6 @@
 export * from './askEventDocAiAttachmentsValidate';
 export * from './askEventDocAiAuthorise';
+export * from './askEventDocAiChatCreate';
 export * from './askEventDocAiContinueHandoff';
 export * from './askEventDocAiLoadChats';
 export * from './askEventDocAiNewChat';
