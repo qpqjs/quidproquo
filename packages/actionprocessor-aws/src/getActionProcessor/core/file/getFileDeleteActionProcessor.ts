@@ -6,7 +6,6 @@ import {
   askFileDelete,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';

@@ -1,12 +1,4 @@
-import {
-  actionResult,
-  askEventTransformResponseResultBase,
-  createActionProcessor,
-  EitherActionResult,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventTransformResponseResultBase, createActionProcessor, EitherActionResult, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 

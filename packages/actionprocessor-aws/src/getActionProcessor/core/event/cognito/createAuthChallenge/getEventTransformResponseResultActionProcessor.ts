@@ -4,7 +4,6 @@ import {
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -32,7 +31,7 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
     }
 
     // No error has happened
-    let successRecord = qpqEventRecordResponse.result;
+    const successRecord = qpqEventRecordResponse.result;
 
     const eventOutput: EventOutput = {
       ...customMessageTriggerEvent,

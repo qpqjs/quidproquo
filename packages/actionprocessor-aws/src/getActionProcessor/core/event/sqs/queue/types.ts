@@ -1,4 +1,4 @@
-import { MatchStoryResult, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from '@qpqjs/core';
+import { MatchStoryResult, Nullable, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from '@qpqjs/core';
 
 import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 
@@ -19,7 +19,7 @@ export type MatchResult = MatchStoryResult<any, any>;
 // Special types
 export interface CloudWatchAlarmNotification {
   AlarmName: string;
-  AlarmDescription: string | null;
+  AlarmDescription: Nullable<string>;
   AWSAccountId: string;
   AlarmConfigurationUpdatedTimestamp: string;
   NewStateValue: 'OK' | 'ALARM' | 'INSUFFICIENT_DATA';
@@ -36,7 +36,7 @@ export interface CloudWatchAlarmNotification {
     Namespace: string;
     StatisticType: string;
     Statistic: string;
-    Unit: string | null;
+    Unit: Nullable<string>;
     Dimensions: any[];
     Period: number;
     EvaluationPeriods: number;

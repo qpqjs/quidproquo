@@ -2,7 +2,6 @@ import {
   actionResult,
   askEventGetRecordsBase,
   createActionProcessor,
-  EventActionType,
   NotifyErrorQueueBaseEventPayload,
   NotifyErrorQueueErrorQueueEvent,
   NotifyErrorQueueEvents,
@@ -57,7 +56,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
-    const [sqsEvent, context] = eventParams as EventInput;
+    const [sqsEvent] = eventParams as EventInput;
 
     const records = sqsEvent.Records.map((record) => {
       const parsedInternalEventRecord = JSON.parse(record.body) as AnyQueueMessageWithSession;

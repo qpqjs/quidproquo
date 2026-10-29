@@ -4,7 +4,6 @@ import {
   createActionProcessor,
   DeployEventStatusType,
   DeployEventType,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -22,7 +21,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
-    const [eventBridgeEvent, context] = eventParams as EventInput;
+    const [eventBridgeEvent] = eventParams as EventInput;
 
     const status = eventBridgeEvent.detail['status-details'].status || '';
     const stackId = eventBridgeEvent.detail['stack-id'];

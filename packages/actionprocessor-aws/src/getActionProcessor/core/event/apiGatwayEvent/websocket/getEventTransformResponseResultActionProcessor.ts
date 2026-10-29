@@ -4,7 +4,6 @@ import {
   askLogCreate,
   AskResponse,
   createActionProcessor,
-  EventActionType,
   EventTransformResponseResultActionPayload,
   generateUuid,
   getProcessCustomImplementation,
@@ -13,7 +12,7 @@ import {
   QPQConfig,
 } from '@qpqjs/core';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventRecord } from './types';
 
 export function* askTransformResponseStory({
   eventParams,

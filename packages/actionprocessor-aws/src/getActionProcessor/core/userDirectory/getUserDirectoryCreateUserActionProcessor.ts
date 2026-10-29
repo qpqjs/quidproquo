@@ -8,7 +8,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';

@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { askWebsocketSendMessageBase, WebsocketActionType } from '@qpqjs/webserver';
+import { askWebsocketSendMessageBase } from '@qpqjs/webserver';
 
 import { getCFExportNameWebsocketApiIdFromConfig } from '../../../awsNamingUtils';
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';

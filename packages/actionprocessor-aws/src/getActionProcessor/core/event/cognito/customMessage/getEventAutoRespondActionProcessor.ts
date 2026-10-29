@@ -4,23 +4,21 @@ import {
   askEventAutoRespondBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from '@qpqjs/core';
 import { EmailSendEventType } from '@qpqjs/webserver';
 
-import { GLOBAL_USER_DIRECTORY_NAME, InternalEventOutput, InternalEventRecord, MatchResult } from './types';
+import { GLOBAL_USER_DIRECTORY_NAME, InternalEventRecord } from './types';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
   const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
 
-  return async ({ qpqEventRecord: rawQpqEventRecord, matchResult: rawMatchResult }) => {
+  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
-    const matchResult = rawMatchResult as MatchResult;
 
     const getErrorResult = () => actionResultError(ErrorTypeEnum.NotFound, `Email lambda not implemented for ${qpqEventRecord.eventType}`);
 

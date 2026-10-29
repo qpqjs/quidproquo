@@ -1,8 +1,7 @@
-// Files that are allowed to write to the console: the CLIs (their output is their UI),
-// logger implementations, the log and metric processors, and the lambda log extension.
+// Files that are allowed to write to the console: logger implementations, the log and metric
+// processors and the lambda log extension. Tools whose console output is their user interface
+// (the CLIs, the dev server, the bundler) turn the rule off in their own eslint.config.mjs.
 const consoleAllowed = [
-  '**/cli/src/**',
-  '**/create-qpq-app/src/**',
   '**/*[Ll]ogger*',
   '**/log/**',
   '**/metric/**',

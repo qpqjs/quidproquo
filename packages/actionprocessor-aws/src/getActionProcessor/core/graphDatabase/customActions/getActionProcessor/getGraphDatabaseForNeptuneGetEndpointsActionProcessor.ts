@@ -3,7 +3,7 @@ import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, 
 
 import { getConfigRuntimeResourceNameFromConfig } from '../../../../../awsNamingUtils';
 import { getNeptuneEndpoints } from '../../../../../logic/neptune';
-import { askGraphDatabaseForNeptuneGetEndpoints, GraphDatabaseForNeptuneActionType } from '../actions';
+import { askGraphDatabaseForNeptuneGetEndpoints } from '../actions';
 
 const getProcessGetEndpoints = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseForNeptuneGetEndpoints> => {
   return async ({ graphDatabaseName }) => {

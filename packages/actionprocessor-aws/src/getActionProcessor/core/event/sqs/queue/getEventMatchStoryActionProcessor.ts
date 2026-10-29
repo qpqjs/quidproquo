@@ -4,7 +4,6 @@ import {
   askEventMatchStoryBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -12,7 +11,7 @@ import {
 } from '@qpqjs/core';
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
 export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetting => {
   // Only the queue name travels via the environment - the full setting lives in

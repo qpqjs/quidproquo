@@ -1,13 +1,4 @@
-import {
-  actionResult,
-  askEventGetRecordsBase,
-  createActionProcessor,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-  qpqCoreUtils,
-  splitScopedFilePath,
-} from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils, splitScopedFilePath } from '@qpqjs/core';
 import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { EventInput, GLOBAL_STORAGE_DRIVE_NAME, InternalEventRecord } from './types';
@@ -31,7 +22,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
-    const [s3Event, context] = eventParams as EventInput;
+    const [s3Event] = eventParams as EventInput;
 
     const records = s3Event.Records.map((r) =>
       toInternalEventRecord(

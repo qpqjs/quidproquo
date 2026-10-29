@@ -1,16 +1,8 @@
-import {
-  actionResult,
-  askEventTransformResponseResultBase,
-  createActionProcessor,
-  EitherActionResult,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventTransformResponseResultBase, createActionProcessor, EitherActionResult, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { SQSBatchItemFailure } from 'aws-lambda';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // We might need to JSON.stringify the body.

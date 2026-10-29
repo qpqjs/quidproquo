@@ -7,7 +7,6 @@ import {
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
   ErrorTypeEnum,
-  FileActionType,
   generateUuid,
   ProcessorFor,
   QPQConfig,

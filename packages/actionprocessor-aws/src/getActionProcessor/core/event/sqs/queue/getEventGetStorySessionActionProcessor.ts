@@ -1,14 +1,6 @@
-import {
-  actionResult,
-  askEventGetStorySessionBase,
-  createActionProcessor,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-  toCrossServiceSession,
-} from '@qpqjs/core';
+import { actionResult, askEventGetStorySessionBase, createActionProcessor, ProcessorFor, QPQConfig, toCrossServiceSession } from '@qpqjs/core';
 
-import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';
+import { AnyQueueMessageWithSession, EventInput, InternalEventRecord } from './types';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   return async ({ eventParams, qpqEventRecord: rawQpqEventRecord }) => {

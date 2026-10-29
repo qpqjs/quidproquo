@@ -7,7 +7,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { globalSignOut } from '../../../logic/cognito/globalSignOut';

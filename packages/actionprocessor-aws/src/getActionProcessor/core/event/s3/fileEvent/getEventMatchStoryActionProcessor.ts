@@ -1,6 +1,6 @@
-import { actionResult, askEventMatchStoryBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { EventInput, GLOBAL_STORAGE_DRIVE_RUNTIME, InternalEventRecord, MatchResult } from './types';
+import { GLOBAL_STORAGE_DRIVE_RUNTIME, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord }) => {

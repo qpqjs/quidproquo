@@ -6,7 +6,6 @@ import {
   askEventBusSendMessagesBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventBusActionType,
   EventBusMessage,
   generateUuid,
   ProcessorFor,

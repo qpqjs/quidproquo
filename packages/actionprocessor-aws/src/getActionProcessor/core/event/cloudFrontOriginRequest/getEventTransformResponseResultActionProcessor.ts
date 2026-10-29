@@ -4,14 +4,12 @@ import {
   createActionProcessor,
   EitherActionResult,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   QPQError,
 } from '@qpqjs/core';
-import { HttpEventHeaders } from '@qpqjs/webserver';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.BadRequest]: 400,
@@ -27,16 +25,6 @@ const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.NotImplemented]: 501,
   [ErrorTypeEnum.NoContent]: 204,
   [ErrorTypeEnum.Invalid]: 422,
-};
-
-const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
-  headers: HttpEventHeaders,
-): {
-  [header: string]: boolean | number | string;
-} => {
-  return Object.keys(headers)
-    .filter((header) => !!headers[header])
-    .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
 };
 
 const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {

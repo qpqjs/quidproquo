@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreGetAllBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';

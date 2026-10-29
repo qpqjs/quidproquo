@@ -9,7 +9,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';

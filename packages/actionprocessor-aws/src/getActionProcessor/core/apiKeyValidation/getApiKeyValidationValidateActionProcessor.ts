@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { actionResult, createActionProcessor, Nullable, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { ApiKeyReference, ApiKeyValidationActionType, askApiKeyValidationValidate } from '@qpqjs/webserver';
+import { ApiKeyReference, askApiKeyValidationValidate } from '@qpqjs/webserver';
 
 import { timingSafeEqual } from 'crypto';
 

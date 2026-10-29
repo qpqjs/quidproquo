@@ -6,7 +6,6 @@ import {
   askFileListDirectory,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
   stripScopedFilePath,

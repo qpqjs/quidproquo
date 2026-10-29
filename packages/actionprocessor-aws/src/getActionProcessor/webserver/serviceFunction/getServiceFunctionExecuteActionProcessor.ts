@@ -10,7 +10,7 @@ import {
   StorySession,
   toCrossServiceSession,
 } from '@qpqjs/core';
-import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
+import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';

@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 /**
  * qpq-log-extension
  *
@@ -20,7 +22,6 @@
  *
  * Authored in TS, bundled to a single CJS file by scripts/buildLogExtensionLayer.mjs.
  */
-
 import { createServer, IncomingMessage, request, ServerResponse } from 'http';
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
@@ -108,7 +109,7 @@ const shipEnvelope = async (envelope: LogEnvelope): Promise<boolean> => {
 // flush() returns that same in-flight promise (and flags a re-scan), so
 // `await flush()` never resolves with a ship still outstanding. That is what
 // makes the SHUTDOWN drain safe -- process.exit must not run mid-write.
-let activeFlush: Promise<void> | null = null;
+let activeFlush: Nullable<Promise<void>> = null;
 let rerun = false;
 
 const runFlushLoop = async (): Promise<void> => {

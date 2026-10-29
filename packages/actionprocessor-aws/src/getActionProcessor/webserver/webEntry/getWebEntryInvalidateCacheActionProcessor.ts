@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { actionResult, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-import { askWebEntryInvalidateCache, WebEntryActionType } from '@qpqjs/webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { askWebEntryInvalidateCache } from '@qpqjs/webserver';
 
 import { getCFExportNameDistributionIdArnFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';

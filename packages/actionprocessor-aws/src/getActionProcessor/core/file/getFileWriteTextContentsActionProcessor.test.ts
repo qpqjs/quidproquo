@@ -2,7 +2,6 @@ import { askFileWriteTextContents, buildTestQpqConfig, FileActionType } from '@q
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
 import { writeTextFile } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';

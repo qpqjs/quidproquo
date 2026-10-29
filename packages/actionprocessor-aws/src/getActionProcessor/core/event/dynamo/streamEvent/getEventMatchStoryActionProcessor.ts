@@ -1,6 +1,6 @@
-import { actionResult, askEventMatchStoryBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { EventInput, GLOBAL_KVS_STREAM_RUNTIME, InternalEventRecord, MatchResult } from './types';
+import { GLOBAL_KVS_STREAM_RUNTIME, MatchResult } from './types';
 
 // One store, one handler, the runtime is stamped on the lambda by the CDK, so there is
 // nothing to route on.

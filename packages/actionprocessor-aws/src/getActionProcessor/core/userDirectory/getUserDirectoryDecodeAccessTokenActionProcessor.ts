@@ -1,13 +1,5 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import {
-  actionResult,
-  actionResultError,
-  askUserDirectoryDecodeAccessToken,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askUserDirectoryDecodeAccessToken, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';

@@ -2,7 +2,6 @@ import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
 import { writeTextFile } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';

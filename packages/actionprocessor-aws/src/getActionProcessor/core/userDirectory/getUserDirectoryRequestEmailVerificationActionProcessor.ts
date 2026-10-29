@@ -7,7 +7,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { requestEmailVerificationCode } from '../../../logic/cognito/requestEmailVerificationCode';

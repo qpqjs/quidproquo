@@ -4,12 +4,11 @@ import {
   askEventTransformResponseResultBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventOutput } from './types';
 
 // Throwing here fails the whole batch, which makes Lambda retry it and, by default,
 // stall the shard until it succeeds or the records expire. That is the correct default for

@@ -1,12 +1,4 @@
-import {
-  actionResult,
-  askEventGetRecordsBase,
-  createActionProcessor,
-  EventActionType,
-  KvsStreamEventType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, KvsStreamEventType, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { DynamoDBRecord } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';

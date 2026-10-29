@@ -1,15 +1,7 @@
-import {
-  actionResult,
-  actionResultError,
-  askEventMatchStoryBase,
-  createActionProcessor,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/LambdaRuntimeConfig';
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { MatchResult } from './types';
 
 const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRuntimeConfig || '{}');
 

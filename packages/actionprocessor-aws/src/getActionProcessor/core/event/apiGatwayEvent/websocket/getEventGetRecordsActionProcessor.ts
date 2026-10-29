@@ -1,4 +1,4 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { WebSocketEventType } from '@qpqjs/webserver';
 
 import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord } from './types';
@@ -13,7 +13,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
-    const [websocketEvent, context] = eventParams as EventInput;
+    const [websocketEvent] = eventParams as EventInput;
 
     const internalEventRecord: InternalEventRecord = {
       eventType: awsToQoqEventTypeMap[websocketEvent.requestContext.eventType],

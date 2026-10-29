@@ -5,7 +5,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertManyBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,

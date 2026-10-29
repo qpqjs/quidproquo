@@ -6,7 +6,6 @@ import {
   askFileGenerateTemporaryUploadSecureUrl,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';

@@ -1,5 +1,5 @@
 import { MatchStoryResult } from '@qpqjs/core';
-import { EmailSendEvent, EmailSendEventResponse, HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
+import { EmailSendEvent, EmailSendEventResponse } from '@qpqjs/webserver';
 
 import { Context, CustomMessageTriggerEvent } from 'aws-lambda';
 

@@ -1,11 +1,4 @@
-import {
-  actionResult,
-  askGraphDatabaseInternalFieldNames,
-  createActionProcessor,
-  GraphDatabaseActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askGraphDatabaseInternalFieldNames, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessInternalFieldNames = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseInternalFieldNames> => {
   return async () => {

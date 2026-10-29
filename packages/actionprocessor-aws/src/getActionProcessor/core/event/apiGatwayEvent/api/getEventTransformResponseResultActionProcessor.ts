@@ -15,7 +15,7 @@ import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerCon
 
 import { findApiRoute } from '../../../../../awsLambdaUtils';
 import { getApiRecordPath } from './getApiRecordPath';
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.BadRequest]: 400,

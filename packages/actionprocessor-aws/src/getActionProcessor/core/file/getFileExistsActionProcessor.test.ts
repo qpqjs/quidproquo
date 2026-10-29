@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { objectExists } from '../../../logic/s3';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
-import { resolveStorageDriveBucketName } from './utils';
 
 vi.mock('@qpqjs/config-aws', () => ({
   qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },

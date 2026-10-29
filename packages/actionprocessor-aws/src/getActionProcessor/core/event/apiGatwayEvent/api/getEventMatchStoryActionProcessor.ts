@@ -1,17 +1,8 @@
-import {
-  actionResult,
-  actionResultError,
-  askEventMatchStoryBase,
-  createActionProcessor,
-  ErrorTypeEnum,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askEventMatchStoryBase, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { findApiRoute } from '../../../../../awsLambdaUtils';
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);

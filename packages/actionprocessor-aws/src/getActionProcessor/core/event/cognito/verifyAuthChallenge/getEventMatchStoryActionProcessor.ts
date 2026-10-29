@@ -4,13 +4,12 @@ import {
   askEventMatchStoryBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from '@qpqjs/core';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { MatchResult } from './types';
 
 const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
 

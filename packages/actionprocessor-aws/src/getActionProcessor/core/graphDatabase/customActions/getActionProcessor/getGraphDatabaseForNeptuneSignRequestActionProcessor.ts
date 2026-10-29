@@ -4,7 +4,7 @@ import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, 
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 
 import { signNeptuneRequest } from '../../../../../logic/neptune';
-import { askGraphDatabaseForNeptuneSignRequest, GraphDatabaseForNeptuneActionType } from '../actions';
+import { askGraphDatabaseForNeptuneSignRequest } from '../actions';
 
 const getProcessSignRequest = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseForNeptuneSignRequest> => {
   return async ({ url, body }) => {
