@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askStreamRead` carries an error catalog (A5): reading an unknown or closed stream answers `askStreamRead.errorType.StreamNotFound` and a producer failure `askStreamRead.errorType.StreamFailed` (both were a thrown `GenericError` before).
 - `askExecuteStory` (NotFound: the runtime could not be loaded) and `askTraceStory` (BadRequest, NotFound) now carry error catalogs (A5); their processors return the action-scoped values instead of the bare `ErrorTypeEnum` ones.
 - `askAiPrompt` and `askAiPromptStream` now carry error catalogs (A5): a missing ai config, an unsupported model and a reply that fails `outputSchema` come back as `askAiPrompt.errorType.NotFound` / `.NotImplemented` / `.Invalid` (action-scoped strings) instead of the bare `ErrorTypeEnum` values. Unexpected provider failures are still `GenericError`.
 - `ContextReadAction`, `StateReadAction` and `StateDispatchAction` are gone from `@qpqjs/core` (A7): type a mock or override with `ActionOf<typeof askContextReadBase>` / `ActionOf<typeof askStateReadBase>` / `ActionOf<typeof askStateDispatchBase>` (the payload types `ContextReadActionPayload`, `StateReadActionPayload`, `StateDispatchActionPayload` remain). `ExtractGeneratorReturnType` is folded into `AskResponseReturnType`. `QpqLogList` is gone from `@qpqjs/webserver`; it was `QpqPagedData<StoryResultMetadata>` from core.
