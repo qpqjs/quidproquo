@@ -4,6 +4,7 @@ export * from './actionValidators';
 export * from './context';
 export * from './decomposedString';
 export * from './error';
+export * from './graphDatabase';
 export * from './keyValueStore';
 export * from './logHistory';
 export * from './lookup';

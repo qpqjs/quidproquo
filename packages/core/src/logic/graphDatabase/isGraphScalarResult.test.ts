@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { isNeptuneScalarResult } from './isNeptuneScalarResult';
+import { isGraphScalarResult } from './isGraphScalarResult';
 
-describe('isNeptuneScalarResult', () => {
+describe('isGraphScalarResult', () => {
   it.each([
     ['a number', 42],
     ['a string', 'hello'],
     ['a boolean', true],
     ['null', null],
   ])('accepts %s', (_label: string, value: unknown) => {
-    expect(isNeptuneScalarResult(value as never)).toBe(true);
+    expect(isGraphScalarResult(value)).toBe(true);
   });
 
   it('rejects an object entity', () => {
-    expect(isNeptuneScalarResult({ '~entityType': 'node' } as never)).toBe(false);
+    expect(isGraphScalarResult({ labels: [] })).toBe(false);
   });
 });
