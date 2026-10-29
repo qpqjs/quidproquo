@@ -11,8 +11,8 @@ import {
   QpqPagedData,
 } from '@qpqjs/core';
 
-import { QPQ_LOG_ENTITIES_KVS_NAME } from '../../constants/qpqLogEntitiesKvsName';
-import { ActionSearchEntityRow } from '../../domain/ActionSearchEntityRow';
+import { QPQ_LOG_ENTITIES_KVS_NAME } from '../constants/qpqLogEntitiesKvsName';
+import { ActionSearchEntityRow } from '../domain/ActionSearchEntityRow';
 
 const entityRowStoreName = QPQ_LOG_ENTITIES_KVS_NAME;
 

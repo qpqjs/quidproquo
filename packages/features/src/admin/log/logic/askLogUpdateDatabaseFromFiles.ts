@@ -24,8 +24,8 @@ import {
 
 import { askActionSearchUpdateFromStoryResult } from '../../actionSearch/logic/askActionSearchUpdateFromStoryResult';
 import { ADMIN_LOG_RETENTION_DAYS_GLOBAL } from '../../constants';
-import { askLogLogUpsert } from '../entry/data/logLogData';
-import * as logMetadataData from '../entry/data/logMetadataData';
+import { askLogLogUpsert } from '../data/logLogData';
+import * as logMetadataData from '../data/logMetadataData';
 import { LogLog, LogMetadata } from '../entry/domain';
 import { redactStoryResult } from './redaction/redactStoryResult';
 import {

@@ -13,7 +13,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { LogMetadata } from '../domain/LogMetadata';
+import { LogMetadata } from '../entry/domain/LogMetadata';
 import {
   askLogMetadataGetAllByFromCorrelation,
   askLogMetadataGetByCorrelation,

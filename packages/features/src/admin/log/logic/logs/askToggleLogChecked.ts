@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import * as logMetadataData from '../../entry/data/logMetadataData';
+import * as logMetadataData from '../../data/logMetadataData';
 import { askAuthGetLoggedInUsername } from '../auth';
 import { askLogSendToAdmins } from '../webSocket';
 

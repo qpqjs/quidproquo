@@ -22,7 +22,7 @@ import {
   StoryResultMetadataWithChildren,
 } from '@qpqjs/core';
 
-import { LogMetadata } from '../domain/LogMetadata';
+import { LogMetadata } from '../entry/domain/LogMetadata';
 
 const metadataStoreName = QPQ_LOGS_STORAGE_DRIVE_NAME;
 export function* askLogMetadataUpsert(logMetadata: LogMetadata): AskResponse<void> {

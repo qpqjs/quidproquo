@@ -1,6 +1,6 @@
 import { AskResponse, isErroredActionResult, resolveActionResultError } from '@qpqjs/core';
 
-import { askRedactedLogGetByCorrelation } from '../../entry/data/redactedLogData';
+import { askRedactedLogGetByCorrelation } from '../../data/redactedLogData';
 
 export type LogAiToolActionSummary = {
   index: number;

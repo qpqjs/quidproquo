@@ -12,8 +12,8 @@ import {
   StoryResult,
 } from '@qpqjs/core';
 
-import { getRedactedLogFilePath } from '../../logic/redaction/getRedactedLogFilePath';
-import { redactStoryResult } from '../../logic/redaction/redactStoryResult';
+import { getRedactedLogFilePath } from '../logic/redaction/getRedactedLogFilePath';
+import { redactStoryResult } from '../logic/redaction/redactStoryResult';
 
 /**
  * Makes sure a redacted copy of the log exists on the reports drive and returns its path there.

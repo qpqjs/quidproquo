@@ -1,7 +1,7 @@
 import { askDateNow, AskResponse, LogLevelEnum, NotifyErrorQueueTimeoutEventPayload } from '@qpqjs/core';
 
+import { askLogLogUpsert } from '../../data/logLogData';
 import { LogLog } from '../../entry';
-import { askLogLogUpsert } from '../../entry/data/logLogData';
 
 export function* askNotifyErrorProcessThrottle(error: NotifyErrorQueueTimeoutEventPayload): AskResponse<void> {
   const inError = error.newStateInAlarm;

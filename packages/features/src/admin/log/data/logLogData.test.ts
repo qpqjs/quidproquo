@@ -14,7 +14,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { LogLog } from '../domain';
+import { LogLog } from '../entry/domain';
 import { askLogLogGet, askLogLogList, askLogLogUpsert } from './logLogData';
 
 const storeName = 'qpq-logs-list';

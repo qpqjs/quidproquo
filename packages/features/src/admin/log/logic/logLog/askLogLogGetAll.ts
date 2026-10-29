@@ -1,6 +1,6 @@
 import { askDateNow, AskResponse, askSecondsElapsedFrom, LogLevelEnum, QpqPagedData } from '@qpqjs/core';
 
-import { askLogLogList } from '../../entry/data/logLogData';
+import { askLogLogList } from '../../data/logLogData';
 import { LogLog } from '../../entry/domain';
 
 export function* askLogLogGetAll(

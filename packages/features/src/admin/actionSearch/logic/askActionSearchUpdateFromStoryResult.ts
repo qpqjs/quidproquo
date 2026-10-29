@@ -9,13 +9,13 @@ import {
   StoryResult,
 } from '@qpqjs/core';
 
+import * as actionRowData from '../data/actionRowData';
+import * as entityLookupData from '../data/entityLookupData';
+import * as entityRowData from '../data/entityRowData';
 import { ActionSearchActionRow } from '../domain/ActionSearchActionRow';
 import { ActionSearchEntityDefinition } from '../domain/ActionSearchEntityDefinition';
 import { ActionSearchEntityRow } from '../domain/ActionSearchEntityRow';
 import { ActionSearchLookupRow } from '../domain/ActionSearchLookupRow';
-import * as actionRowData from '../entry/data/actionRowData';
-import * as entityLookupData from '../entry/data/entityLookupData';
-import * as entityRowData from '../entry/data/entityRowData';
 import { getActionSearchDefinitionByActionType } from './registry/getActionSearchDefinitionByActionType';
 import { toLookupKey } from './toLookupKey';
 

@@ -17,7 +17,7 @@ import {
   QpqPagedData,
 } from '@qpqjs/core';
 
-import { LogLog } from '../domain';
+import { LogLog } from '../entry/domain';
 
 const storeName = `${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`;
 

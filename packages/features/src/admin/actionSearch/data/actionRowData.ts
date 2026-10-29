@@ -10,8 +10,8 @@ import {
   QpqPagedData,
 } from '@qpqjs/core';
 
-import { QPQ_LOG_ACTIONS_KVS_NAME } from '../../constants/qpqLogActionsKvsName';
-import { ActionSearchActionRow } from '../../domain/ActionSearchActionRow';
+import { QPQ_LOG_ACTIONS_KVS_NAME } from '../constants/qpqLogActionsKvsName';
+import { ActionSearchActionRow } from '../domain/ActionSearchActionRow';
 
 const actionRowStoreName = QPQ_LOG_ACTIONS_KVS_NAME;
 
