@@ -4,3 +4,4 @@ export * from './askEventDocListNextPage';
 export * from './askEventDocListPreviousPage';
 export * from './askEventDocListRefresh';
 export * from './askEventDocListSetPageSize';
+export * from './createInitialEventDocListState';
