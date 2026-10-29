@@ -16,9 +16,9 @@ import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
-import { EventDocStoreOptions } from '../context/buildEventDocStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocServerEventInput } from '../models';
+import { EventDocStoreOptions } from '../types/EventDocStoreOptions';
 import { askEventDocAppendServerEvents } from './askEventDocAppendServerEvents';
 
 // The batch append's load-bearing guarantees live in this composition, not in the
@@ -164,7 +164,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
 };
 
 const runAppend = (inputs: EventDocServerEventInput[], store: EventDocStoreOptions, mocks: object, options?: { validate: boolean }) =>
-  runStory(askEventDocProvideStore(store, askEventDocAppendServerEvents(DOC_ID, inputs, ACTOR, options)), mocks);
+  runStory(askEventDocStoreProvide(buildEventDocStore(store), askEventDocAppendServerEvents(DOC_ID, inputs, ACTOR, options)), mocks);
 
 describe('askEventDocAppendServerEvents', () => {
   it('lands the whole burst above the head in one conditional write: consecutive ids, shared createdAt', () => {

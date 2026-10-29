@@ -13,7 +13,7 @@ import {
 } from '../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide } from '../context/askEventDocStoreProvide';
-import { toSyncWebsocketApiNames } from '../context/buildEventDocStore';
+import { toSyncWebsocketApiNames } from '../context/toSyncWebsocketApiNames';
 
 // A missing optional hook global must read as "not configured" ('') rather than throw; routes registered before the
 // key existed have no global at all.

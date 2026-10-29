@@ -12,7 +12,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserve
 
 import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
 import { eventDocRouteAction } from '../../constants/eventDocRouteAction';
-import { askEventDocResolveStore } from '../../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../../context/askEventDocStoreReadOrThrow';
 import { EventDocInvokableFunctions } from '../../definition/types/EventDocInvokableFunctions';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
@@ -52,7 +52,7 @@ function* askEventDocRenderResolve(
 }
 
 function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
 
   const renderModeParam = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'renderMode');
   const renderMode = renderModeParam === EventDocRenderMode.Draft || renderModeParam === EventDocRenderMode.Published ? renderModeParam : undefined;

@@ -1,7 +1,7 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventLast } from '../data/askEventDocEventLast';
 import { askEventDocProjectAtEvent } from './askEventDocProjectAtEvent';
 
@@ -12,7 +12,7 @@ import { askEventDocProjectAtEvent } from './askEventDocProjectAtEvent';
  * Returns true when a projection ran.
  */
 export function* askEventDocReprojectHead(modelId: string): AskResponse<boolean> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const head = yield* askEventDocEventLast(modelId);
 
   if (!head) {

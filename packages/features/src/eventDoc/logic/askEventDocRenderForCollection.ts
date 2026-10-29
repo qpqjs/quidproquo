@@ -1,7 +1,7 @@
 import { AskResponse, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocRenderInput, EventDocRenderResult } from '../models';
 
@@ -12,5 +12,5 @@ import { EventDocRenderInput, EventDocRenderResult } from '../models';
 export function* askEventDocRenderForCollection(storeName: string, type: string, input: EventDocRenderInput): AskResponse<EventDocRenderResult> {
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
-  return yield* askEventDocProvideStore({ storeName, type }, functionsCaller.render(input));
+  return yield* askEventDocStoreProvide(buildEventDocStore({ storeName, type }), functionsCaller.render(input));
 }

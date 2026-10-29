@@ -1,7 +1,7 @@
 import { askCatch, askInlineFunctionExecute, AskResponse, askThrowError, createDynamicFunctionCaller, Nullable } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../../eventDoc/context';
+import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocEventWrite, askEventDocUpsert } from '../../eventDoc/data';
 import { EventDocInvokableFunctions } from '../../eventDoc/definition/types/EventDocInvokableFunctions';
 import { askEventDocHookStates } from '../../eventDoc/logic/askEventDocHookStates';
@@ -42,7 +42,7 @@ const findLatestPublishEvent = (events: EventDocEvent[]): Nullable<EventDocEvent
 
 // Hooks fire once per doc, not once per imported event: per-event firing would replay every historical publish.
 function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], summary: EventDocSummary): AskResponse<void> {
-  const { onPublish, onAppend } = yield* askEventDocResolveStore();
+  const { onPublish, onAppend } = yield* askEventDocStoreReadOrThrow();
 
   const tailEvent = events[events.length - 1];
 
@@ -67,7 +67,7 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
 // against the state its predecessors fold to. The opening INIT_STATE seeds the state like a create does, so the run
 // starts after it. A collection with no registered definition degrades to an unvalidated write, as an append does.
 function* askEventDocValidateForeignTail(events: EventDocEvent[], fromIndex: number): AskResponse<void> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const seedCount = Math.max(fromIndex, 1);
@@ -96,7 +96,7 @@ export function* askEventDocWriteForeignEvents(
   fromIndex: number,
   { importerUserId, logRewritten = false }: EventDocWriteForeignEventsOptions,
 ): AskResponse<number> {
-  const { type } = yield* askEventDocResolveStore();
+  const { type } = yield* askEventDocStoreReadOrThrow();
 
   const localised = events.map((event) => toLocalActor(event, importerUserId));
   const missing = localised.slice(fromIndex);

@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent, EventDocSummary, EventDocVersion } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { askEventDocPublishedVersionAsOf } from './askEventDocPublishedVersionAsOf';
@@ -113,7 +113,10 @@ const resolveAsOf = (summary: EventDocSummary | null, clock: string) => {
   eventQueries = [];
 
   return runStory(
-    askEventDocProvideStore({ storeName: STORE_NAME, type: 'template' }, askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime)),
+    askEventDocStoreProvide(
+      buildEventDocStore({ storeName: STORE_NAME, type: 'template' }),
+      askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime),
+    ),
     {
       [KeyValueStoreActionType.Query]: (action: {
         payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { consistentRead?: boolean } };

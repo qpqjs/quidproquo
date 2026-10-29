@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { askEventDocCopyAsset } from './askEventDocCopyAsset';
 
 const source = { guid: 'asset-1', filename: 'render.pdf', mimetype: 'application/pdf' };
 
 const underPackBuilds = <T>(story: Parameters<typeof askEventDocProvideStore<T>>[1]) =>
-  askEventDocProvideStore({ storeName: 'packBuilds', type: 'packBuild' }, story);
+  askEventDocStoreProvide(buildEventDocStore({ storeName: 'packBuilds', type: 'packBuild' }), story);
 
 describe('askEventDocCopyAsset', () => {
   it('copies from the source collection drive to this collection drive under the ambient scope', () => {

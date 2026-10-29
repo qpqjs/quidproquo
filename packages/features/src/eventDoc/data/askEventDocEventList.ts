@@ -1,6 +1,6 @@
 import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsBetween, kvsEqual, kvsGreaterThan, kvsLessThanOrEqual, QpqPagedData } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocEvent } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
@@ -35,7 +35,7 @@ const eventRangeCondition = (options?: EventDocEventListOptions) => {
 
 /** One page of a document's events from the `${storeName}Events` store (pk=modelId, sk=eventId). */
 export function* askEventDocEventList(modelId: string, options?: EventDocEventListOptions): AskResponse<QpqPagedData<EventDocEvent>> {
-  const { eventsStoreName } = yield* askEventDocResolveStore();
+  const { eventsStoreName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   // An ascending continuation is positioned by its cursor. Keeping afterEventId too can race (a snapshot landing between

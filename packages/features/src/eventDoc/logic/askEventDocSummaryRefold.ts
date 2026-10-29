@@ -1,6 +1,6 @@
 import { askCatch, askLogCreate, AskResponse, LogLevelEnum, Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite';
@@ -38,7 +38,7 @@ function* askRefoldAndWrite(modelId: string, eventId: number): AskResponse<Event
  * client retry of a failed append would only double-append. Returns the summary as written, or null when it was not.
  */
 export function* askEventDocSummaryRefold(modelId: string, eventId: number): AskResponse<Nullable<EventDocSummary>> {
-  const { type } = yield* askEventDocResolveStore();
+  const { type } = yield* askEventDocStoreReadOrThrow();
 
   const refolded = yield* askCatch(askRefoldAndWrite(modelId, eventId));
 

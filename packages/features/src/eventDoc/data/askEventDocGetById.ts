@@ -1,7 +1,7 @@
 import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual } from '@qpqjs/core';
 import { Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocSummary } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
@@ -10,7 +10,7 @@ export function* askEventDocGetById<T extends EventDocSummary = EventDocSummary>
   id: string,
   options?: { consistentRead?: boolean },
 ): AskResponse<Nullable<T>> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const page = yield* askKeyValueStoreQuery<T>(storeName, kvsAnd([kvsEqual('type', type), kvsEqual('id', id)]), {

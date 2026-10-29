@@ -17,7 +17,7 @@ import { describe, expect, it } from 'vitest';
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEffect, EventDocEvent, EventDocSummary } from '../models';
 import { foldEventDocSummary } from '../summary';
 import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
@@ -121,7 +121,10 @@ const buildHarness = (seed: { summaryRow?: Row; snapshotRows?: Row[] } = {}) => 
   };
 
   const project = (eventId: number) =>
-    runStory(askEventDocProvideStore({ storeName: STORE_NAME, type: TYPE }, askEventDocProjectAtEvent(DOC_ID, eventId, FUNCTIONS)), mocks);
+    runStory(
+      askEventDocStoreProvide(buildEventDocStore({ storeName: STORE_NAME, type: TYPE }), askEventDocProjectAtEvent(DOC_ID, eventId, FUNCTIONS)),
+      mocks,
+    );
 
   return { project, tables, foldCalls, summaryUpdates };
 };

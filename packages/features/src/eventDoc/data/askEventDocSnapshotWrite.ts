@@ -1,7 +1,7 @@
 import { askFileWriteTextContents, askKeyValueStoreUpsert, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_SNAPSHOT_INLINE_MAX_BYTES } from '../constants/eventDocSnapshotInlineLimits';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { serializeEventDocValue } from '../logic/serializeEventDocValue';
 import { EventDocSnapshot } from '../models';
 import { eventDocSnapshotPk, EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
@@ -22,7 +22,7 @@ export function* askEventDocSnapshotWrite(
   snapshotCacheKey: string,
   views?: string[],
 ): AskResponse<void> {
-  const { snapshotsStoreName, storageDriveName, type } = yield* askEventDocResolveStore();
+  const { snapshotsStoreName, storageDriveName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const { json, bytes } = serializeEventDocValue(state);

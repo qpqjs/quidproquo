@@ -4,7 +4,7 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { askEventDocEventIdAsOf } from './askEventDocEventIdAsOf';
@@ -51,19 +51,24 @@ const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
 }));
 
 const eventIdAsOf = (clock: string) =>
-  runStory(askEventDocProvideStore({ storeName: STORE_NAME, type: 'content' }, askEventDocEventIdAsOf(DOC_ID, clock as QpqIsoDateTime)), {
-    [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string; options?: { sortAscending?: boolean; limit?: number } } }) => {
-      if (action.payload.keyValueStoreName !== EVENTS_STORE_NAME) {
-        throw new Error(`Unexpected store read: ${action.payload.keyValueStoreName}`);
-      }
+  runStory(
+    askEventDocStoreProvide(buildEventDocStore({ storeName: STORE_NAME, type: 'content' }), askEventDocEventIdAsOf(DOC_ID, clock as QpqIsoDateTime)),
+    {
+      [KeyValueStoreActionType.Query]: (action: {
+        payload: { keyValueStoreName: string; options?: { sortAscending?: boolean; limit?: number } };
+      }) => {
+        if (action.payload.keyValueStoreName !== EVENTS_STORE_NAME) {
+          throw new Error(`Unexpected store read: ${action.payload.keyValueStoreName}`);
+        }
 
-      // The walk must be newest-first, an ascending read would find the OLDEST match.
-      expect(action.payload.options?.sortAscending).toBe(false);
+        // The walk must be newest-first, an ascending read would find the OLDEST match.
+        expect(action.payload.options?.sortAscending).toBe(false);
 
-      const descending = [...storedEvents].sort((a, b) => String(b.sk).localeCompare(String(a.sk)));
-      return { items: descending.slice(0, action.payload.options?.limit), nextPageKey: undefined };
+        const descending = [...storedEvents].sort((a, b) => String(b.sk).localeCompare(String(a.sk)));
+        return { items: descending.slice(0, action.payload.options?.limit), nextPageKey: undefined };
+      },
     },
-  });
+  );
 
 describe('askEventDocEventIdAsOf', () => {
   it('returns the newest event at or before the clock', () => {

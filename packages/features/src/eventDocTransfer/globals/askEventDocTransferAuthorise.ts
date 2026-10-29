@@ -1,6 +1,6 @@
 import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../../eventDoc/context';
+import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { EventDocAuthoriseInput } from '../../eventDoc/types/EventDocAuthoriseInput';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
@@ -16,7 +16,7 @@ export function* askEventDocTransferAuthorise(action: EventDocPermissionAction):
     return;
   }
 
-  const { storeName } = yield* askEventDocResolveStore();
+  const { storeName } = yield* askEventDocStoreReadOrThrow();
 
   yield* askInlineFunctionExecute<void, EventDocAuthoriseInput>(authorise.result, { storeName, action });
 }

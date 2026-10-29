@@ -1,7 +1,7 @@
 import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocLink } from '../models';
 import { askEventDocDocumentStateLatest } from './askEventDocDocumentStateLatest';
@@ -12,7 +12,7 @@ import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
  * and for a doc with no events.
  */
 export function* askEventDocReferencesFromState(docId: string): AskResponse<EventDocLink[]> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
 
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 

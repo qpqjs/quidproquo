@@ -1,6 +1,6 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { EventDocSummary } from '../models';
 
@@ -9,7 +9,7 @@ export function* askEventDocGetByIdOrThrow(id: string): AskResponse<EventDocSumm
   const model = yield* askEventDocGetById(id);
 
   if (!model) {
-    const { type } = yield* askEventDocResolveStore();
+    const { type } = yield* askEventDocStoreReadOrThrow();
     return yield* askThrowError(ErrorTypeEnum.NotFound, `${type} model not found: ${id}`);
   }
 

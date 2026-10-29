@@ -1,6 +1,6 @@
 import { AskResponse, Nullable } from '@qpqjs/core';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { askEventDocCopyAsset } from '../data/askEventDocCopyAsset';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGenerateAssetDownloadUrl } from '../data/askEventDocGenerateAssetDownloadUrl';
@@ -40,7 +40,7 @@ export function createEventDocBackend<TState>(functions: EventDocFunctions): Eve
   const store = { ...identity, syncWebsocketApiName: functions.sync?.websocketApiName };
 
   function* askProvideStore<T>(story: AskResponse<T>): AskResponse<T> {
-    return yield* askEventDocProvideStore(store, story);
+    return yield* askEventDocStoreProvide(buildEventDocStore(store), story);
   }
 
   return {

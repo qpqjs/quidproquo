@@ -26,11 +26,11 @@ import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
-import { EventDocStoreOptions } from '../context/buildEventDocStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocEventOrigin, EventDocSummary } from '../models';
 import { foldEventDocSummary } from '../summary';
 import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
+import { EventDocStoreOptions } from '../types/EventDocStoreOptions';
 import { askEventDocAppendServerEvent } from './askEventDocAppendServerEvent';
 import { askEventDocEventAppend } from './askEventDocEventAppend';
 
@@ -209,10 +209,10 @@ const buildHarness = (options: Harness = {}) => {
   };
 
   const append = (next: EventDocEventInput, store: EventDocStoreOptions = STORE, origin?: EventDocEventOrigin) =>
-    runStory(askEventDocProvideStore(store, askEventDocEventAppend(DOC_ID, next, ACTOR, { validate: false, origin })), mocks);
+    runStory(askEventDocStoreProvide(buildEventDocStore(store), askEventDocEventAppend(DOC_ID, next, ACTOR, { validate: false, origin })), mocks);
 
   const appendServer = (type: string, validate?: boolean) =>
-    runStory(askEventDocProvideStore(STORE, askEventDocAppendServerEvent(DOC_ID, type, {}, 1, ACTOR, { validate })), mocks);
+    runStory(askEventDocStoreProvide(buildEventDocStore(STORE), askEventDocAppendServerEvent(DOC_ID, type, {}, 1, ACTOR, { validate })), mocks);
 
   const summaryRow = () => tables[STORE.storeName][0] as EventDocSummary;
   const snapshotRows = () => tables[SNAPSHOTS_STORE] ?? [];

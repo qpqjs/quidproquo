@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent } from '../models';
 import { askEventDocEventWrite } from './askEventDocEventWrite';
 
@@ -29,7 +29,7 @@ describe('askEventDocEventWrite', () => {
   it('writes with ifNotExists under the ambient scope', () => {
     let payload: UpsertPayload | undefined;
 
-    runStory(askEventDocProvideStore({ storeName: 'templates', type: 'template' }, askEventDocEventWrite('doc-1', EVENT)), {
+    runStory(askEventDocStoreProvide(buildEventDocStore({ storeName: 'templates', type: 'template' }), askEventDocEventWrite('doc-1', EVENT)), {
       [ContextActionType.Read]: 'TENANT#tenant-a',
       [KeyValueStoreActionType.Upsert]: (action: { payload: UpsertPayload }) => {
         payload = action.payload;

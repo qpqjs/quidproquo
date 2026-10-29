@@ -1,4 +1,4 @@
-import { askEventDocCreate, askEventDocProvideStore, askEventDocSoftDelete } from '@qpqjs/features';
+import { askEventDocCreate, askEventDocSoftDelete, askEventDocStoreProvide, buildEventDocStore } from '@qpqjs/features';
 import { askQueueSendMessages, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
@@ -80,5 +80,5 @@ function* askRunInStore(runId: string): AskResponse<void> {
 }
 
 export function* askRunEventDocInterleavedBatchAppendTest(runId: string): AskResponse<void> {
-  yield* askEventDocProvideStore(SMOKE_EVENT_DOC_STORE_OPTIONS, askRunInStore(runId));
+  yield* askEventDocStoreProvide(buildEventDocStore(SMOKE_EVENT_DOC_STORE_OPTIONS), askRunInStore(runId));
 }

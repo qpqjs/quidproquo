@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features` event doc store context (A8): `askEventDocResolveStore` is `askEventDocStoreReadOrThrow`, and `askEventDocProvideStore(options, story)` is gone; write `askEventDocStoreProvide(buildEventDocStore(options), story)`. The store context is local (never serialized), so its new key `qpq-event-doc-store` changes nothing on the wire.
 - `@qpqjs/features` event doc AI context (A8): `askEventDocAiContextRead` is `askEventDocAiRead` and `askEventDocAiContextProvide` is `askEventDocAiProvide`, now under `eventDocAi/context`; the serialized key is `qpq-event-doc-ai` (was `event-doc-ai-context`), so deploy all services of an app together.
 - `@qpqjs/features` websocket queue context (A8): `askWebsocketReadConnectionInfo` is `askWebsocketConnectionInfoRead`, `askWebsocketProvideConnectionInfo` is `askWebsocketConnectionInfoProvide`, `askWebsocketReadApiNameOrThrow` is `askWebsocketApiNameReadOrThrow`; the context's serialized key is `qpq-websocket-connection-info` (was `websocket-connection-info`), so deploy all services of an app together.
 - The test helpers (`runStory`, `captureRequester`, `buildTestQpqConfig`, `throwsError`, `expectError`, `StoryError`, `buildTestStorySession`, `createStubLogger`, `buildActionProcessorList`, `buildActionProcessorResolver`, `TEST_TIME_NOW` and friends) moved from `@qpqjs/core` to `@qpqjs/testing` (T2). Add `@qpqjs/testing` to devDependencies and change the import; nothing else about them changed. `@qpqjs/dev-server` no longer exports `runKvsRepositoryContractTests`.

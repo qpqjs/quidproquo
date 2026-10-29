@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { askEventDocListPage } from './askEventDocListPage';
 
 type QueryPayload = { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: KeyValueStoreQueryOptions };
@@ -11,7 +11,7 @@ type QueryPayload = { keyValueStoreName: string; keyCondition: KvsQueryOperation
 const captureListQuery = (): QueryPayload => {
   let captured: QueryPayload | undefined;
 
-  runStory(askEventDocProvideStore({ storeName: 'content', type: 'content' }, askEventDocListPage()), {
+  runStory(askEventDocStoreProvide(buildEventDocStore({ storeName: 'content', type: 'content' }), askEventDocListPage()), {
     [KeyValueStoreActionType.Query]: (action: { payload: QueryPayload }) => {
       captured = action.payload;
       return { items: [], nextPageKey: undefined };

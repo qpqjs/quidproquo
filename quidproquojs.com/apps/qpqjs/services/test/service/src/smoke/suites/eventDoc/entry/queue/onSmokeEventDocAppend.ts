@@ -1,4 +1,4 @@
-import { askEventDocAppendServerEvent, askEventDocAppendServerEvents, askEventDocProvideStore, EventDocServerEventInput } from '@qpqjs/features';
+import { askEventDocAppendServerEvent, askEventDocAppendServerEvents, askEventDocStoreProvide, buildEventDocStore, EventDocServerEventInput } from '@qpqjs/features';
 import { AskResponse, QueueEventResponse } from 'quidproquo';
 
 import {
@@ -37,7 +37,7 @@ function* askAppendMarks(docId: string, runId: string, writerId: number, values:
 export function* onSmokeEventDocAppend(event: SmokeEventDocAppendQueueEvent): AskResponse<QueueEventResponse> {
   const { docId, runId, writerId, values } = event.message.payload;
 
-  yield* askEventDocProvideStore(SMOKE_EVENT_DOC_STORE_OPTIONS, askAppendMarks(docId, runId, writerId, values));
+  yield* askEventDocStoreProvide(buildEventDocStore(SMOKE_EVENT_DOC_STORE_OPTIONS), askAppendMarks(docId, runId, writerId, values));
 
   return true;
 }

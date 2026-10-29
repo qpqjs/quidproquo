@@ -1,7 +1,7 @@
 import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotBaseLatest } from '../data/askEventDocSnapshotBaseLatest';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
@@ -21,7 +21,7 @@ export type EventDocHookStates = {
  * triggering event was written moments ago. A collection with no registered definition gets the reserved base fold instead.
  */
 export function* askEventDocHookStates(modelId: string, event: EventDocEvent): AskResponse<EventDocHookStates> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const eventId = event.payload.metadata.eventId;
