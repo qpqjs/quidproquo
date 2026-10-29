@@ -20,7 +20,7 @@ import * as cdk from 'aws-cdk-lib';
 
 import { requireDomainResolver } from '../../../../../appWorkspace/requireDomainResolver';
 
-export const convertStrictTransportSecurity = (
+const convertStrictTransportSecurity = (
   strictTransportSecurity?: ResponseHeadersStrictTransportSecurity,
 ): aws_cloudfront.ResponseHeadersStrictTransportSecurity | undefined => {
   if (!strictTransportSecurity) {
@@ -93,7 +93,7 @@ export const convertContentSecurityPolicy = (
   };
 };
 
-export const convertContentTypeOptions = (
+const convertContentTypeOptions = (
   contentTypeOptions?: ResponseHeadersContentTypeOptions,
 ): aws_cloudfront.ResponseHeadersContentTypeOptions | undefined => {
   if (!contentTypeOptions) {
@@ -107,7 +107,7 @@ export const convertContentTypeOptions = (
   };
 };
 
-export const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
+const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
   if (!frameOptions) {
     return {
       frameOption: aws_cloudfront.HeadersFrameOption.DENY,
@@ -126,7 +126,7 @@ export const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions):
   };
 };
 
-export const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPolicy): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
+const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPolicy): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
   if (!referrerPolicy) {
     return {
       referrerPolicy: aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
@@ -151,7 +151,7 @@ export const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPo
   };
 };
 
-export const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
+const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
   if (!xssProtection) {
     return {
       protection: true,

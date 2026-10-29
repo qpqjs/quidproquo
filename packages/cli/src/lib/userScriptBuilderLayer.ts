@@ -22,7 +22,7 @@ export type BuilderLayerInstallOptions = {
 };
 
 /** The npm cpu name for a lambda architecture. */
-export const getBuilderLayerCpu = (architecture: JavascriptRuntimeArchitecture): 'arm64' | 'x64' => npmCpuByArchitecture[architecture];
+const getBuilderLayerCpu = (architecture: JavascriptRuntimeArchitecture): 'arm64' | 'x64' => npmCpuByArchitecture[architecture];
 
 /**
  * The npm argv that installs rspack for linux and the lambda's cpu into the layer's
@@ -82,7 +82,9 @@ export const buildUserScriptBuilderLayer = (options: BuilderLayerInstallOptions,
 
   const installed = USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => fs.existsSync(path.join(nodeDir, 'node_modules', name)));
   if (installed.length !== USER_SCRIPT_BUILDER_LAYER_MODULES.length) {
-    throw new Error(`script:builder-layer: the layer is missing ${USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => !installed.includes(name)).join(', ')}`);
+    throw new Error(
+      `script:builder-layer: the layer is missing ${USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => !installed.includes(name)).join(', ')}`,
+    );
   }
 
   return nodeDir;

@@ -8,7 +8,7 @@ import { createAwsClient } from '../createAwsClient';
 
 // DescribeUserPoolClient succeeds even when the app client has no secret, so a
 // missing secret is a hand-thrown, discriminable configuration error.
-export class ClientSecretNotFoundError extends Error {
+class ClientSecretNotFoundError extends Error {
   readonly code = 'CLIENT_SECRET_NOT_FOUND';
 
   constructor() {

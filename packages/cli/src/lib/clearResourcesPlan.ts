@@ -28,7 +28,7 @@ export type ClearResourcesPlan =
   | { kind: 'resources'; appName: string; resources: ClearableResource[] };
 
 // Every owned data resource across the app's services, in service order.
-export const getClearableResources = (appName: string): ClearableResource[] => {
+const getClearableResources = (appName: string): ClearableResource[] => {
   const resources: ClearableResource[] = [];
 
   for (const service of getServiceNames(appName)) {

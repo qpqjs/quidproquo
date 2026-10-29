@@ -9,7 +9,7 @@ import path from 'path';
 import { getLambdaRuntime } from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
+const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
 
   return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({

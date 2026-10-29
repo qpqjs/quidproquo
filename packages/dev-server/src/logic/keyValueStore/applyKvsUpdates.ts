@@ -1,6 +1,6 @@
 import { KvsAttributePath, KvsUpdate, KvsUpdateActionType } from '@qpqjs/core';
 
-export const getPathArray = (path: KvsAttributePath): string[] => {
+const getPathArray = (path: KvsAttributePath): string[] => {
   if (typeof path === 'string') {
     return path.split('.');
   }
@@ -11,7 +11,7 @@ export const getNestedValue = (obj: any, path: string[]): any => {
   return path.reduce((current, key) => current?.[key], obj);
 };
 
-export const setNestedValue = (obj: any, path: string[], value: any): void => {
+const setNestedValue = (obj: any, path: string[], value: any): void => {
   const lastKey = path[path.length - 1];
   const parentPath = path.slice(0, -1);
 
@@ -25,7 +25,7 @@ export const setNestedValue = (obj: any, path: string[], value: any): void => {
   parent[lastKey] = value;
 };
 
-export const removeNestedValue = (obj: any, path: string[]): void => {
+const removeNestedValue = (obj: any, path: string[]): void => {
   const lastKey = path[path.length - 1];
   const parentPath = path.slice(0, -1);
 

@@ -6,7 +6,7 @@ import { getArgValue } from './args';
 import { getRoot } from './discovery';
 import { promptSelect } from './prompts';
 
-export const DEPLOYMENT_FLAG = '--deployment';
+const DEPLOYMENT_FLAG = '--deployment';
 
 export type ResolvedDeployment = {
   deploymentName: string;
@@ -21,7 +21,9 @@ const selectDeploymentName = async (argv: string[], appName: string, configuredN
 
   if (requested) {
     if (!configuredNames.includes(requested)) {
-      console.error(`Unknown deployment '${requested}' in ${getQpqAppDeployConfigPath(getRoot(), appName)}. Configured: ${configuredNames.join(', ')}`);
+      console.error(
+        `Unknown deployment '${requested}' in ${getQpqAppDeployConfigPath(getRoot(), appName)}. Configured: ${configuredNames.join(', ')}`,
+      );
       process.exit(1);
     }
     return requested;

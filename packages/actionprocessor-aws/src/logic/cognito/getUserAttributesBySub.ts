@@ -9,7 +9,7 @@ import { getQpqAttributesFromCognitoUserAttributes } from './getQpqAttributesFro
 
 // ListUsers returns an empty list rather than throwing for no match, so we throw
 // our own error with a discriminable `code` for the processor's catch to map.
-export class UserNotFoundError extends Error {
+class UserNotFoundError extends Error {
   readonly code = 'USER_NOT_FOUND';
 
   constructor() {

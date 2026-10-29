@@ -24,7 +24,7 @@ export const getAvailableApps = (): string[] => {
 };
 
 // Every service directory under an app's services/ folder (no subdir filter).
-export const getAllServiceNames = (appName: string): string[] => {
+const getAllServiceNames = (appName: string): string[] => {
   const directoryPath = path.join(getAppDirectory(appName), 'services');
 
   if (!fs.existsSync(directoryPath)) {
@@ -36,7 +36,7 @@ export const getAllServiceNames = (appName: string): string[] => {
 
 // True when a service contains the given child directory (e.g. 'service' for a
 // backend, 'views' for a frontend).
-export const serviceHasSubdir = (appName: string, service: string, subdir: string): boolean => {
+const serviceHasSubdir = (appName: string, service: string, subdir: string): boolean => {
   const subdirPath = path.join(getServiceDirectory(appName, service), subdir);
   return fs.existsSync(subdirPath) && fs.statSync(subdirPath).isDirectory();
 };

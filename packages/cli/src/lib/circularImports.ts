@@ -41,7 +41,7 @@ const expandWorkspaceGlob = (root: string, pattern: string): string[] => {
   return candidates.filter((dir) => fs.existsSync(dir) && fs.statSync(dir).isDirectory());
 };
 
-export const getWorkspaceDirectories = (root: string): string[] => {
+const getWorkspaceDirectories = (root: string): string[] => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
   const patterns: string[] = packageJson.workspaces ?? [];
   return patterns.flatMap((pattern) => expandWorkspaceGlob(root, pattern));

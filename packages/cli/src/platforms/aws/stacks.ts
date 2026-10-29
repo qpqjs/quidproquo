@@ -36,7 +36,7 @@ export const deployServiceStack = (serviceName: string, stackName: string, appNa
 // `cdk destroy` still synths the app to find the stack, so it runs the same
 // generic workspace app with the same DEPLOY_* env as deploys — meaning the
 // service bundles under dist/ must exist for asset resolution to succeed.
-export const destroyStack = async (stackName: string, env: Record<string, string> = {}): Promise<void> => {
+const destroyStack = async (stackName: string, env: Record<string, string> = {}): Promise<void> => {
   logTimeStart(stackName);
   await runCommand(
     'npx',
