@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineParameter } from './parameter';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineParameter } from './defineParameter';
 
 describe('defineParameter', () => {
   it('builds a Parameter setting with the given key and defaults value to an empty string', () => {

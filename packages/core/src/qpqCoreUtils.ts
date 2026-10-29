@@ -35,7 +35,6 @@ import {
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
-  ParameterQPQConfigSetting,
   QPQConfig,
   QPQConfigItem,
   QPQConfigSetting,
@@ -65,6 +64,7 @@ import { isQpqFunctionRuntimeAdvanced } from './utils';
 
 // The config walk and the application accessors live in logic/config; they are part of this
 // namespace for callers.
+export { getAllParameterConfigs, getOwnedParameterConfigs, getParameterByName, resolveParameterOrThrow } from './config/settings/parameter/logic';
 export { getAllQueueConfigs, getOwnedQueueConfigs, getQueueByName, resolveQueueOrThrow } from './config/settings/queue/logic';
 export { getAllSecretConfigs, getOwnedSecretConfigs, getSecretByName, resolveSecretOrThrow } from './config/settings/secret/logic';
 export {
@@ -429,31 +429,6 @@ export const resolveUserDirectoryOrThrow = (userDirectoryName: string, qpqConfig
   }
 
   return userDirectory;
-};
-
-export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
-
-  return parameters;
-};
-
-export const getParameterByName = (name: string, qpqConfig: QPQConfig): Nullable<ParameterQPQConfigSetting> =>
-  getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter).find((p) => p.key === name) ?? null;
-
-export const resolveParameterOrThrow = (name: string, qpqConfig: QPQConfig): ParameterQPQConfigSetting => {
-  const param = getParameterByName(name, qpqConfig);
-
-  if (!param) {
-    throw new Error(`Parameter ${name} not found`);
-  }
-
-  return param;
-};
-
-export const getOwnedParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
-  const parameters = getAllParameterConfigs(qpqConfig);
-
-  return getOwnedItems(parameters, qpqConfig);
 };
 
 /**
