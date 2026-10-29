@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateCombined, show, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateCombined, show, Spec } from './spec';
 
 // Combined matrix: ok/fail/read leaves freely nested under provide + override + catch +
 // parallel, run through the REAL runtime, asserted against the contract oracle. This is the

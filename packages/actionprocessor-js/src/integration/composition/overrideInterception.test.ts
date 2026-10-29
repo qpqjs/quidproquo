@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateOverride, show, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateOverride, show, Spec } from './spec';
 
 // Override-interception matrix: every composition of askOverrideActions (by leaf type or
 // wildcard) over ok/fail leaves, wrapped in askCatch / askRunParallel, run through the REAL
