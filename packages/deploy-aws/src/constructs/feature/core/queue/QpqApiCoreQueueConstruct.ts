@@ -20,8 +20,7 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
 
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
       functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
-      functionType: 'sqsEvent_queueEvent',
-      executorName: 'sqsEvent_queueEvent',
+      handler: 'sqsEvent_queueEvent',
 
       qpqConfig: props.qpqConfig,
 

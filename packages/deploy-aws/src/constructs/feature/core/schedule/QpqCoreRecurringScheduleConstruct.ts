@@ -19,8 +19,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
 
     const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
       functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
-      functionType: 'eventBridgeEvent_recurringSchedule',
-      executorName: 'eventBridgeEvent_recurringSchedule',
+      handler: 'eventBridgeEvent_recurringSchedule',
 
       qpqConfig: props.qpqConfig,
 

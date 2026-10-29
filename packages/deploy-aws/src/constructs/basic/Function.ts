@@ -17,8 +17,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;
 
   srcFilename?: string;
-  functionType: string; // TODO: @joe-coady: Rename this to subFolder / folder or something
-  executorName: string; // TODO: @joe-coady: Rename this to handlerName or something maybe?
+  // The bundle folder under the api build path and the export the lambda invokes are the same name.
+  handler: string;
 
   timeoutInSeconds?: number;
   memoryInBytes?: number;
@@ -89,8 +89,8 @@ export class Function extends QpqConstructBlock {
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
-      code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.functionType)),
-      handler: `${handlerFile}.${props.executorName}`,
+      code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.handler)),
+      handler: `${handlerFile}.${props.handler}`,
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',

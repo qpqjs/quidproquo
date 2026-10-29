@@ -131,8 +131,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     ) {
       const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
-        functionType: 'customMessageTriggerEvent_customMessage',
-        executorName: 'customMessageTriggerEvent_customMessage',
+        handler: 'customMessageTriggerEvent_customMessage',
 
         qpqConfig: props.qpqConfig,
         apiLayerVersions: getTriggerLayers(),
@@ -150,8 +149,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     if (props.userDirectoryConfig.customAuthRuntime) {
       const defAuthChallengeTrigger = new Function(this, 'def-auth-challenge', {
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-define'),
-        functionType: 'customMessageTriggerEvent_defineAuthChallenge',
-        executorName: 'customMessageTriggerEvent_defineAuthChallenge',
+        handler: 'customMessageTriggerEvent_defineAuthChallenge',
 
         qpqConfig: props.qpqConfig,
         apiLayerVersions: getTriggerLayers(),
@@ -168,8 +166,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       if (props.userDirectoryConfig.customAuthRuntime.createAuthChallenge) {
         const createAuthChallengeTrigger = new Function(this, 'create-auth-challenge', {
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-create'),
-          functionType: 'customMessageTriggerEvent_createAuthChallenge',
-          executorName: 'customMessageTriggerEvent_createAuthChallenge',
+          handler: 'customMessageTriggerEvent_createAuthChallenge',
 
           qpqConfig: props.qpqConfig,
           apiLayerVersions: getTriggerLayers(),
@@ -186,8 +183,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       if (props.userDirectoryConfig.customAuthRuntime.verifyAuthChallenge) {
         const verifyAuthChallengeTrigger = new Function(this, 'verify-auth-challenge', {
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-verify'),
-          functionType: 'customMessageTriggerEvent_verifyAuthChallenge',
-          executorName: 'customMessageTriggerEvent_verifyAuthChallenge',
+          handler: 'customMessageTriggerEvent_verifyAuthChallenge',
 
           qpqConfig: props.qpqConfig,
           apiLayerVersions: getTriggerLayers(),

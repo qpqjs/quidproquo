@@ -43,8 +43,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
 
     const func = new Function(this, 'api-function', {
       functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
-      functionType: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
-      executorName: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
+      handler: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
 
       qpqConfig: props.qpqConfig,
 

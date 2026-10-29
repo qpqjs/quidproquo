@@ -45,8 +45,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
     // Build Function
     const func = new Function(this, 'api-function', {
       functionName: this.resourceName(`${props.apiConfig.apiName}-route`),
-      functionType: 'apiGatewayEventHandler',
-      executorName: 'apiGatewayEventHandler',
+      handler: 'apiGatewayEventHandler',
 
       // Match API Gateway's 29s integration cap, the (25s) Function default would kill
       // slow requests as a 502 with 4s of the gateway window still unused

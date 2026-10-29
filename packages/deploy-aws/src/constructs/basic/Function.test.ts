@@ -18,7 +18,7 @@ const synth = (settings: QPQConfigItem[] = [], environment: Record<string, strin
   const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), ...settings], { configRoot });
   const stack = new Stack(new App(), 'api', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
-  new Function(stack, 'fn', { qpqConfig, functionType: 'handler', executorName: 'handler', environment, reservedConcurrentExecutions: 3 });
+  new Function(stack, 'fn', { qpqConfig, handler: 'handler', environment, reservedConcurrentExecutions: 3 });
 
   return Template.fromStack(stack);
 };

@@ -54,8 +54,7 @@ export class QpqCoreUserScriptRunnerConstruct extends QpqConstructBlock {
 
     this.function = new Function(this, 'runner-function', {
       functionName: this.resourceName(USER_SCRIPT_RUNNER_FUNCTION_NAME),
-      functionType: 'userScriptRunnerEvent_userScript',
-      executorName: 'userScriptRunnerEvent_userScript',
+      handler: 'userScriptRunnerEvent_userScript',
 
       timeoutInSeconds: props.userScriptRunnerConfig.timeoutInSeconds,
       memoryInBytes: props.userScriptRunnerConfig.memoryInMiB,

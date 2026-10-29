@@ -78,8 +78,7 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       // shortening rule in Function.ts rather than more characters shaved off here.
       functionName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'ks'),
 
-      functionType: 'dynamoStreamEvent_kvsStreamEvent',
-      executorName: 'dynamoStreamEvent_kvsStreamEvent',
+      handler: 'dynamoStreamEvent_kvsStreamEvent',
 
       qpqConfig: props.qpqConfig,
 
