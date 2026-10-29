@@ -9,6 +9,8 @@ const consoleAllowed = [
   '**/lambdaExtensions/**',
   // The console-redaction feature's processors write the redacted line to the console on purpose.
   '**/consoleLogRedaction/**',
+  // Test-support harnesses silence and restore the console around the runs they drive.
+  '**/integration/**',
   // The console patcher that captures console output into a story's log.
   '**/resolveStoryWithLogs*',
 ];

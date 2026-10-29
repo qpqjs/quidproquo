@@ -21,6 +21,7 @@ function getActionProcessorListLoader(dynamicModuleLoader: DynamicModuleLoader, 
 
       return apl;
     } catch (e) {
+      // eslint-disable-next-line no-console -- the resolver runs before any logger exists, and the caller settles every loader.
       console.log(`Unable to dynamically load action processors: [${e}] ${JSON.stringify(qpqFunctionRuntime)}`);
 
       throw e;
@@ -42,7 +43,7 @@ const getProcessCustomAction = async (qpqConfig: QPQConfig, dynamicModuleLoader:
 
     return actionProcessorLists.reduce((acc, cur) => ({ ...acc, ...cur }), {});
   } catch (e) {
-    // This should never get hit, but just in case
+    // eslint-disable-next-line no-console -- see above; this path should be unreachable.
     console.log(`Unable to dynamically load action processors: [${e}]`);
 
     return {};

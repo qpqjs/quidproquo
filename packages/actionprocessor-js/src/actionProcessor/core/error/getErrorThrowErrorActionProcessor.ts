@@ -1,4 +1,4 @@
-import { actionResultError, askThrowErrorBase, createActionProcessor, ErrorActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResultError, askThrowErrorBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 const getProcessErrorThrowError = (qpqConfig: QPQConfig): ProcessorFor<typeof askThrowErrorBase> => {
   return async ({ errorStack, errorText, errorType }) => {
