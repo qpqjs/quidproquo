@@ -25,7 +25,7 @@ export default function userScriptModuleTypesLoader(this: LoaderContext): void {
   const entryPath = this.resourcePath;
   this.addContextDependency(path.dirname(entryPath));
 
-  let declarations: string;
+  let declarations: string | undefined;
   try {
     // The nearest tsconfig to the entry supplies the compiler options, as for the entry's own build.
     [declarations] = generateDtsBundle([
@@ -37,6 +37,11 @@ export default function userScriptModuleTypesLoader(this: LoaderContext): void {
     ]);
   } catch (error) {
     this.callback(new Error(`Could not generate the user script module types for [${entryPath}]:\n${getErrorMessage(error)}`));
+    return;
+  }
+
+  if (declarations === undefined) {
+    this.callback(new Error(`Could not generate the user script module types for [${entryPath}]: the bundle came back empty`));
     return;
   }
 

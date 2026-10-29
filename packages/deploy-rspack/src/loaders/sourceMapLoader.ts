@@ -34,7 +34,7 @@ const readDataUrlMap = (url: string): Nullable<string> => {
     return null;
   }
 
-  const [, isBase64, data] = match;
+  const [, isBase64, data = ''] = match;
   return isBase64 ? Buffer.from(data, 'base64').toString('utf8') : decodeURIComponent(data);
 };
 
@@ -77,6 +77,10 @@ export default function sourceMapLoader(this: LoaderContext, content: string): v
   }
 
   const url = lastMatch[1] || lastMatch[2];
+  if (!url) {
+    callback(null, content);
+    return;
+  }
   const resourceDirectory = path.dirname(this.resourcePath);
 
   let rawMap: Nullable<string> = null;

@@ -15,13 +15,15 @@ export type ServiceDirParts = {
 export const parseServiceDir = (serviceDir: string, leaf: string): ServiceDirParts => {
   const parts = serviceDir.split(path.sep);
   const appsIdx = parts.lastIndexOf('apps');
-  if (appsIdx < 0 || parts[appsIdx + 2] !== 'services' || parts[appsIdx + 4] !== leaf) {
+  const appName = parts[appsIdx + 1];
+  const serviceName = parts[appsIdx + 3];
+  if (appsIdx < 0 || appName === undefined || serviceName === undefined || parts[appsIdx + 2] !== 'services' || parts[appsIdx + 4] !== leaf) {
     throw new Error(`Expected apps/<app>/services/<svc>/${leaf}, got ${serviceDir}`);
   }
 
   return {
     root: parts.slice(0, appsIdx).join(path.sep),
-    appName: parts[appsIdx + 1],
-    serviceName: parts[appsIdx + 3],
+    appName,
+    serviceName,
   };
 };

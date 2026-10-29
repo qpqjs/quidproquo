@@ -42,7 +42,7 @@ describe('userScriptModuleTypesLoader', () => {
     // Self-contained: nothing left for a browser editor to resolve.
     expect(declarations).not.toMatch(/from ['"](@qpqjs\/|quidproquo['"/])/);
     // The types the exports use are present but not exported.
-    expect(declarations).toMatch(/\ninterface Action<T>/);
+    expect(declarations).toMatch(/\ntype Action<T>/);
   }, 60_000);
 
   it("watches the entry's folder, so editing the module regenerates its declarations", async () => {
