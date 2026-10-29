@@ -3,8 +3,8 @@ import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askAuthChallengeSetMfaCode } from './authActionCreator';
-import { AuthChallengeMfaEffect } from './authChallengeTypes';
+import { AuthChallengeMfaEffect } from '../effects/AuthChallengeMfaEffect';
+import { askAuthChallengeSetMfaCode } from './askAuthChallengeSetMfaCode';
 
 describe('askAuthChallengeSetMfaCode', () => {
   it('dispatches a SetMfaCode effect', () => {

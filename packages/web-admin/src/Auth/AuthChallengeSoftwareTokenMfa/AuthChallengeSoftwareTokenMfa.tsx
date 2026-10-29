@@ -8,7 +8,9 @@ import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
 import { AuthState } from '../types/AuthState';
-import { authChallengeMfaInitialState, authChallengeMfaLogic, authChallengeMfaReducer } from './logic';
+import { createInitialAuthChallengeMfaState } from './logic/createInitialAuthChallengeMfaState';
+import { authChallengeMfaReducer } from './authChallengeMfaReducer';
+import { frontendAuthChallengeMfaApi } from './frontendAuthChallengeMfaApi';
 
 type AuthChallengeSoftwareTokenMfaProps = {
   authState: AuthState;
@@ -16,8 +18,8 @@ type AuthChallengeSoftwareTokenMfaProps = {
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeSoftwareTokenMfa',
-  api: authChallengeMfaLogic,
-  initialState: authChallengeMfaInitialState,
+  api: frontendAuthChallengeMfaApi,
+  initialState: createInitialAuthChallengeMfaState(),
   reducer: authChallengeMfaReducer,
 });
 

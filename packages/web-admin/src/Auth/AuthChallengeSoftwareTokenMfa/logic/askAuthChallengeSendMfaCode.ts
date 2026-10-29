@@ -1,8 +1,9 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
-import { askPlatformRequest, askSaveAuthToken } from '../../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../../../actionCreators/askAuthUISetAuthInfo';
-import { AuthChallengeMfaState, AuthChallengeSendMfaCodePayload } from '../authChallengeTypes';
+import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
+import { askAuthUISetAuthInfo } from '../../actionCreators/askAuthUISetAuthInfo';
+import { AuthChallengeMfaState } from '../types/AuthChallengeMfaState';
+import { AuthChallengeSendMfaCodePayload } from '../types/AuthChallengeSendMfaCodePayload';
 
 export function* askAuthChallengeSendMfaCode(challenge: string, session: string, email: string): AskResponse<void> {
   const { mfaCode } = yield* askStateRead<AuthChallengeMfaState>('');
