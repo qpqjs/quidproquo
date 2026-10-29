@@ -9,13 +9,12 @@ import {
   askSecondsElapsedFrom,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
-  QpqRuntimeType,
   StoryResult,
 } from '@qpqjs/core';
 
 import { ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, ADMIN_LOG_SEARCH_MAX_ITEMS, ADMIN_LOG_SEARCH_TIMEOUT_SECONDS } from '../../../constants';
 import { askLogMetadataList } from '../../data/logMetadata';
-import { LogMetadata } from '../../entry/domain';
+import { LogDeepSearchQuery, LogMetadata } from '../../entry/domain';
 import { redactStoryResult } from '../redaction/redactStoryResult';
 
 // The deep filter is a substring oracle over the log text, so it has to run over the same redacted log the admin
@@ -28,33 +27,16 @@ const toSearchableLogText = (rawLogText: string): string => {
   }
 };
 
-export function* askLogGetAll(
-  runtimeType: QpqRuntimeType,
-  startIsoDateTime: string,
-  endIsoDateTime: string,
-  errorFilter: string,
-  serviceFilter: string,
-  infoFilter: string,
-  userFilter: string,
-  deep: string,
-  onlyErrors: boolean,
-  nextPageKey?: string,
-): AskResponse<QpqPagedData<LogMetadata>> {
+// Searches the log metadata from the caller's page, deep-filtering each page against the redacted log text when
+// `deep` is set, until the item cap or the time budget is reached; the unread page key comes back with the items.
+export function* askLogGetAll(query: LogDeepSearchQuery): AskResponse<QpqPagedData<LogMetadata>> {
+  const { deep, nextPageKey, ...search } = query;
+
   const startTime = yield* askDateNow();
 
   return yield* askPagedDataDrain(
     function* askLogPage(pageKey) {
-      const logPage = yield* askLogMetadataList(
-        runtimeType,
-        startIsoDateTime,
-        endIsoDateTime,
-        errorFilter,
-        serviceFilter,
-        infoFilter,
-        userFilter,
-        onlyErrors,
-        pageKey,
-      );
+      const logPage = yield* askLogMetadataList({ ...search, nextPageKey: pageKey });
 
       const data = deep
         ? yield* askMapParallelBatch(logPage.items, ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, function* askFilterDeep(log): AskResponse<string> {

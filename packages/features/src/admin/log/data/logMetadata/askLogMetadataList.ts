@@ -9,22 +9,14 @@ import {
   KvsQueryCondition,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
-  QpqRuntimeType,
 } from '@qpqjs/core';
 
 import { LogMetadata } from '../../entry/domain/LogMetadata';
+import { LogSearchQuery } from '../../entry/domain/LogSearchQuery';
 
-export function* askLogMetadataList(
-  runtimeType: QpqRuntimeType,
-  startDateTime: string,
-  endDateTime: string,
-  errorFilter: string,
-  serviceFilter: string,
-  infoFilter: string,
-  userFilter: string,
-  onlyErrors: boolean,
-  nextPageKey?: string,
-): AskResponse<QpqPagedData<LogMetadata>> {
+export function* askLogMetadataList(query: LogSearchQuery): AskResponse<QpqPagedData<LogMetadata>> {
+  const { runtimeType, startIsoDateTime, endIsoDateTime, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, nextPageKey } = query;
+
   const filters: KvsQueryCondition[] = [];
 
   if (onlyErrors) {
@@ -49,7 +41,7 @@ export function* askLogMetadataList(
 
   const logs = yield* askKeyValueStoreQuery<LogMetadata>(
     QPQ_LOGS_STORAGE_DRIVE_NAME,
-    kvsAnd([kvsEqual('runtimeType', runtimeType), kvsBetween('startedAt', startDateTime, endDateTime)]),
+    kvsAnd([kvsEqual('runtimeType', runtimeType), kvsBetween('startedAt', startIsoDateTime, endIsoDateTime)]),
     {
       nextPageKey,
       filter: filters.length > 0 ? kvsAnd(filters) : undefined,

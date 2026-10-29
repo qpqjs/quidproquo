@@ -23,38 +23,12 @@ import {
 import { askEnsureRedactedLog, askRedactedLogGetByCorrelation } from '../../data/redactedLogData';
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
-
-export type GetLogsParams = {
-  nextPageKey?: string;
-
-  startIsoDateTime: string;
-  endIsoDateTime: string;
-  runtimeType: QpqRuntimeType;
-
-  infoFilter: string;
-  errorFilter: string;
-  serviceFilter: string;
-  userFilter: string;
-  deep: string;
-  onlyErrors: boolean;
-};
+import { LogDeepSearchQuery } from '../domain';
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
-  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =
-    yield* askFromJsonEventRequest<GetLogsParams>(event);
+  const query = yield* askFromJsonEventRequest<LogDeepSearchQuery>(event);
 
-  const logs = yield* logsLogic.askLogGetAll(
-    runtimeType,
-    startIsoDateTime,
-    endIsoDateTime,
-    errorFilter,
-    serviceFilter,
-    infoFilter,
-    userFilter,
-    deep,
-    onlyErrors,
-    nextPageKey,
-  );
+  const logs = yield* logsLogic.askLogGetAll(query);
 
   return toJsonEventResponse(logs);
 }
