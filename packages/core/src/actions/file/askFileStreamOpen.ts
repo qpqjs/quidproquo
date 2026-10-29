@@ -24,7 +24,7 @@ export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
 export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
   drive: string,
   filepath: string,
-  encoding: E = 'text' as E,
+  encoding?: E,
   chunkSize?: number,
   scope?: string,
 ): AskResponse<StreamHandle<E>> {

@@ -18,7 +18,7 @@ export function* askServiceFunctionExecute<TResult, TPayload = unknown>(
   service: string,
   functionName: string,
   payload: TPayload,
-  isAsync: boolean = false,
+  isAsync?: boolean,
 ): AskResponse<TResult> {
   return (yield* askServiceFunctionExecuteBase(service, functionName, payload, isAsync)) as TResult;
 }

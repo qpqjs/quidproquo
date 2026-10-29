@@ -9,5 +9,4 @@ import { PlatformActionType } from './PlatformActionType';
  */
 export const askPlatformGetName = createActionRequester<string>()({
   actionType: PlatformActionType.GetName,
-  getPayload: () => ({}),
 });

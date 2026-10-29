@@ -13,5 +13,4 @@ export const askUserScriptModuleTypes = createActionRequester<UserScriptModuleTy
   errorTypes: [
     'TypesNotFound', // a declared types entry did not load as declarations (a bundling problem)
   ],
-  getPayload: () => undefined,
 });
