@@ -1,8 +1,7 @@
 import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { askStateMachineGetBase, StateMachineActionType } from '../actions';
+import { askStateMachineGetBase } from '../actions';
 import { getStateMachineByName } from '../config';
-import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
 

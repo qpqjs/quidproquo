@@ -2,7 +2,7 @@ import { actionResult, actionResultError, askKeyValueStoreUpsert, createActionPr
 
 import { createActor, createMachine } from 'xstate';
 
-import { askStateMachineCreateBase, StateMachineActionType } from '../actions';
+import { askStateMachineCreateBase } from '../actions';
 import { getStateMachineByName } from '../config';
 import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createFiredActionRecorder } from './utils/createFiredActionRecorder';

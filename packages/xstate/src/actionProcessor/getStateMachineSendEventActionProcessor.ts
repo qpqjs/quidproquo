@@ -2,9 +2,8 @@ import { actionResult, actionResultError, askKeyValueStoreUpsert, createActionPr
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
-import { askStateMachineSendEventBase, StateMachineActionType } from '../actions';
+import { askStateMachineSendEventBase } from '../actions';
 import { getStateMachineByName } from '../config';
-import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createFiredActionRecorder } from './utils/createFiredActionRecorder';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';

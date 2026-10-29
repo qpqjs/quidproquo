@@ -2,7 +2,7 @@ import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, 
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
-import { askStateMachineGetState, StateMachineActionType } from '../actions';
+import { askStateMachineGetState } from '../actions';
 import { getStateMachineByName } from '../config';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
