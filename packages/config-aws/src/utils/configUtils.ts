@@ -255,11 +255,6 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
       return Object.keys(b.info).length - Object.keys(a.info).length;
     });
 
-  // if (printInfo) {
-  //   console.log(`getMatchWeight: targetModule: [${targetModule}], targetEnvironment: [${targetEnvironment}], targetFeature: [${targetFeature}], targetApplication: [${targetApplication}]`);
-  //   console.log(JSON.stringify(sortedAwsServiceAccountInfos.slice(0, 5), null, 2));
-  // }
-
   const serviceAccountInfo = sortedAwsServiceAccountInfos.find((info) => info.weight > 0);
 
   if (!serviceAccountInfo) {

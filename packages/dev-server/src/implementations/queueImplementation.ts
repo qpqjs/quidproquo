@@ -66,10 +66,6 @@ const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessa
 const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage: AnyEventBusMessageWithSession) => {
   const thisServiceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  // console.log('------------------------');
-  // console.log(`Service trying to process message [${thisServiceName}]`);
-  // console.log('Processing event bus message', ebMessage.type);
-
   const allEventBuses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => {
     const srcApplication = ebc.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
     const srcEnvironment = ebc.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
@@ -83,15 +79,6 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       ((!srcFeature && !ebMessage.targetFeature) || srcFeature === ebMessage.targetFeature)
     );
   });
-  //  console.log(
-  //   'All event buses',
-  //   JSON.stringify(
-  //     allEventBuses.map((eb) => eb.name),
-  //     null,
-  //     2,
-  //   ),
-  // );
-
   // All the queues that we should publish to
   const queues = qpqCoreUtils
     .getOwnedQueues(qpqConfig)
@@ -107,15 +94,6 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
         // And we are subed to the message that its trying to get to
         q.eventBusSubscriptions.includes(ebMessage.eventBusName),
     );
-
-  // console.log(
-  //   'All queues',
-  //   JSON.stringify(
-  //     queues.map((eb) => eb.name),
-  //     null,
-  //     2,
-  //   ),
-  // );
 
   for (const queue of queues) {
     const queueMessage: AnyQueueMessageWithSession = {
@@ -137,12 +115,8 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       messageId: generateUuid(),
     };
 
-    // console.log(JSON.stringify(queueMessage, null, 2));
-
     eventBus.publish(QueueActionType.SendMessages, queueMessage);
   }
-
-  // console.log('------------------------');
 };
 
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {

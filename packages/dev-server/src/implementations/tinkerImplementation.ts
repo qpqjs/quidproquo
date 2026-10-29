@@ -185,123 +185,6 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
       // Add convenience function for quick runs
       replServer.context.run = tinkerInterface.run;
 
-      // Add dynamic require relative to current service
-      // This allows importing any module from the service codebase
-      // replServer.context.requireLocal = (relativePath: string) => {
-      //   // Get the config root from the current service's QPQ config
-      //   const currentConfig = getServiceConfig();
-      //   const configRoot = qpqCoreUtils.getConfigRoot(currentConfig);
-
-      //   // Resolve the path relative to the service's config root
-      //   const fullPath = path.resolve(configRoot, relativePath);
-
-      //   try {
-      //     // Clear the require cache to get fresh imports
-      //     delete require.cache[require.resolve(fullPath)];
-      //     return require(fullPath);
-      //   } catch (e) {
-      //     // Try without .ts extension if it was included
-      //     if (relativePath.endsWith('.ts')) {
-      //       const jsPath = fullPath.replace(/\.ts$/, '');
-      //       try {
-      //         delete require.cache[require.resolve(jsPath)];
-      //         return require(jsPath);
-      //       } catch (e2) {
-      //         // Fall through
-      //       }
-      //     }
-
-      //     // Try with .js extension if no extension was provided
-      //     if (!path.extname(relativePath)) {
-      //       try {
-      //         delete require.cache[require.resolve(fullPath + '.js')];
-      //         return require(fullPath + '.js');
-      //       } catch (e3) {
-      //         // Fall through
-      //       }
-      //     }
-
-      //     throw new Error(`Could not resolve module: ${relativePath} from ${configRoot}`);
-      //   }
-      // };
-
-      // // Import QPQ entry points (queue events, service functions, etc) using the dynamic module loader
-      // // This properly loads them in the QPQ runtime context
-      // replServer.context.importQpqModule = async (relativePath: string) => {
-      //   const currentConfig = getServiceConfig();
-      //   const dynamicModuleLoader = getDynamicModuleLoader(currentConfig, devServerConfig);
-
-      //   // Parse the path to create a QPQ function runtime
-      //   // Remove .ts extension if present
-      //   const cleanPath = relativePath.replace(/\.ts$/, '').replace(/\.js$/, '');
-
-      //   // Extract function name (last part after ::, or last segment)
-      //   const pathParts = cleanPath.split('/');
-      //   const lastPart = pathParts[pathParts.length - 1];
-      //   const [modulePath, functionName] = lastPart.includes('::')
-      //     ? lastPart.split('::')
-      //     : [lastPart, 'default'];
-
-      //   // Rebuild the path without the function name if it was included
-      //   const basePath = lastPart.includes('::')
-      //     ? [...pathParts.slice(0, -1), modulePath].join('/')
-      //     : cleanPath;
-
-      //   const qpqFunctionRuntime = {
-      //     basePath: qpqCoreUtils.getConfigRoot(currentConfig),
-      //     relativePath: basePath.startsWith('/') ? basePath : `/${basePath}`,
-      //     functionName: functionName
-      //   };
-
-      //   try {
-      //     const module = await dynamicModuleLoader(qpqFunctionRuntime);
-
-      //     // If it's a function that expects getRun (async QPQ story)
-      //     // These are typically queue events, service functions, etc.
-      //     if (typeof module === 'function') {
-      //       // Create a getRun function for this module
-      //       const createGetRun = () => {
-      //         return async (storyRuntime: any) => {
-      //           // Execute the story in the tinker runtime
-      //           const result = await tinkerInterface.run(storyRuntime);
-      //           return result.result;
-      //         };
-      //       };
-
-      //       return {
-      //         module,
-      //         // Execute with getRun support (for async stories)
-      //         execute: async (...args: any[]) => {
-      //           try {
-      //             // Try calling with getRun as last parameter (async mode)
-      //             const getRun = createGetRun();
-      //             const result = await module(...args, getRun);
-      //             return result;
-      //           } catch (e) {
-      //             // If that fails, try executing as a regular generator story
-      //             if (module.constructor.name === 'GeneratorFunction') {
-      //               const result = await tinkerInterface.run(module, args);
-      //               return result.result;
-      //             }
-      //             throw e;
-      //           }
-      //         },
-      //         // Direct access to the module
-      //         raw: module
-      //       };
-      //     }
-
-      //     return module;
-      //   } catch (error) {
-      //     // Fallback to regular require for non-QPQ modules
-      //     console.log('Failed to load as QPQ module, trying regular require...');
-      //     return replServer.context.requireLocal(relativePath);
-      //   }
-      // };
-
-      // // Alias for convenience
-      // replServer.context.importLocal = replServer.context.importQpqModule;
-
       // Update prompt when service changes
       const originalSwitchService = tinkerInterface.switchService;
       tinkerInterface.switchService = (serviceName: string) => {
@@ -311,13 +194,10 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
 
       // Import all the ask functions from @qpqjs/core for convenience
       const qpqConxtext = { ...qpqCore, ...qpqWebserver };
-      // replServer.context.qpq = qpqConxtext;
 
       // Add commonly used ask functions directly to context
       Object.keys(qpqConxtext).forEach((key) => {
-        // if (key.startsWith('ask')) {
         replServer.context[key] = (qpqConxtext as any)[key];
-        // }
       });
 
       // `.exit` and ctrl+d used to call process.exit outright, which dropped

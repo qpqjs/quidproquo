@@ -7,11 +7,6 @@ import { askCloudflareGetDNSRecordId } from './askCloudflareGetDNSRecordId';
 import { askCloudflareGetZoneId } from './askCloudflareGetZoneId';
 
 export function getDnsEntryName(dnsEntryName: string, rootDomain: string) {
-  // Apparently you don't need to do this...
-  // if (dnsEntryName === rootDomain) {
-  //   return '@';
-  // }
-
   return dnsEntryName;
 }
 
