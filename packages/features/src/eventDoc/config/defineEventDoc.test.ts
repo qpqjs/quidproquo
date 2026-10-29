@@ -24,7 +24,7 @@ const memoFunctions: EventDocFunctions = {
 // The stream globals of the events store carry the snapshot map - dig them out of the
 // emitted config the same way the deploy layer would.
 const snapshotFunctionsGlobalOf = (config: ReturnType<typeof defineEventDoc>): Record<string, string> | undefined => {
-  const eventsStore = qpqCoreUtils.getAllKeyValueStores(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'));
+  const eventsStore = qpqCoreUtils.getAllKeyValueStoreConfigs(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'));
   const runtime = eventsStore?.onStream?.runtime;
 
   return runtime && typeof runtime === 'object' ? (runtime.globals?.[EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL] as Record<string, string>) : undefined;
@@ -48,12 +48,12 @@ describe('defineEventDoc', () => {
     const scoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos', scopeResolver: '/entry/scope::askResolveScope' });
     const unscoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos' });
 
-    const scopedStores = qpqCoreUtils.getAllKeyValueStores(scoped);
+    const scopedStores = qpqCoreUtils.getAllKeyValueStoreConfigs(scoped);
     expect(scopedStores).toHaveLength(3);
     expect(scopedStores.every((kvs) => kvs.scoped === true)).toBe(true);
     expect(qpqCoreUtils.getStorageDrives(scoped).map((drive) => drive.scoped)).toEqual([true]);
 
-    expect(qpqCoreUtils.getAllKeyValueStores(unscoped).some((kvs) => kvs.scoped)).toBe(false);
+    expect(qpqCoreUtils.getAllKeyValueStoreConfigs(unscoped).some((kvs) => kvs.scoped)).toBe(false);
     expect(qpqCoreUtils.getStorageDrives(unscoped).some((drive) => drive.scoped)).toBe(false);
   });
 

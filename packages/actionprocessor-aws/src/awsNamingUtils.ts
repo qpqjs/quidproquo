@@ -138,7 +138,7 @@ export const getKvsDynamoTableNameFromConfig = (resourceName: string, qpqConfig:
     return tableNameOverride;
   }
 
-  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
+  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(resourceName, qpqConfig);
 
   const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, { module: storeConfig?.owner?.module });
 

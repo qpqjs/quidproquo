@@ -204,8 +204,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
     // Cross-service access stays as exact ARNs on purpose: this short list is
     // the part of the policy a human should be reviewing.
-    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStores(qpqConfig);
-    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig);
+    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig);
+    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStoreConfigs(qpqConfig);
     const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
 
     const foreignArns = foreignKvsConfigs.flatMap((cfg) => {

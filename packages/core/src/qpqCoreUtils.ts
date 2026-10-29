@@ -1,3 +1,4 @@
+import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
 import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
 import {
   getApplicationConfigSetting,
@@ -64,6 +65,12 @@ import { isQpqFunctionRuntimeAdvanced } from './utils';
 
 // The config walk and the application accessors live in logic/config; they are part of this
 // namespace for callers.
+export {
+  getAllKeyValueStoreConfigs,
+  getKeyValueStoreByName,
+  getOwnedKeyValueStoreConfigs,
+  resolveKeyValueStoreOrThrow,
+} from './config/settings/keyValueStore/logic';
 export { getAllParameterConfigs, getOwnedParameterConfigs, getParameterByName, resolveParameterOrThrow } from './config/settings/parameter/logic';
 export { getAllQueueConfigs, getOwnedQueueConfigs, getQueueByName, resolveQueueOrThrow } from './config/settings/queue/logic';
 export { getAllSecretConfigs, getOwnedSecretConfigs, getSecretByName, resolveSecretOrThrow } from './config/settings/secret/logic';
@@ -163,12 +170,6 @@ export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConf
 export const resolveOwnerModuleName = (owner: CrossModuleOwner | undefined, qpqConfig: QPQConfig): string =>
   owner?.module || getApplicationModuleName(qpqConfig);
 
-export const getAllKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
-  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(qpqConfig, QPQCoreConfigSettingType.keyValueStore);
-
-  return keyValueStores;
-};
-
 export const getAllGraphDatabaseConfigs = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   const graphDatabases = getConfigSettings<GraphDatabaseQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.graphDatabase);
 
@@ -188,10 +189,6 @@ export const getVirtualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQP
   return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
 };
 
-export const getOwnedKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
-  return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
-};
-
 export const getOwnedGraphDatabases = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   return getOwnedItems(getAllGraphDatabaseConfigs(qpqConfig), qpqConfig);
 };
@@ -208,15 +205,6 @@ export const resolveCrossServiceResourceName = (resourceName: ResourceName): Cro
   }
 
   return resourceName;
-};
-
-export const getKeyValueStoreByName = <T extends object = any>(
-  qpqConfig: QPQConfig,
-  kvsName: string,
-): KeyValueStoreQPQConfigSetting<T> | undefined => {
-  const keyValueStore = getAllKeyValueStores<T>(qpqConfig).find((kvs) => kvs.keyValueStoreName === kvsName);
-
-  return keyValueStore;
 };
 
 export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntime[] => {
@@ -305,7 +293,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     // zip omits it and the dev server's dynamic loader has nothing to resolve, so the handler
     // simply never runs, and since nothing throws, the only symptom is a projection that
     // silently stops updating.
-    ...(getAllKeyValueStores(qpqConfig)
+    ...(getAllKeyValueStoreConfigs(qpqConfig)
       .map((kvs) => kvs.onStream?.runtime)
       .filter((runtime) => !!runtime) as QpqFunctionRuntime[]),
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
@@ -504,7 +492,7 @@ export const getFullyQualifiedResourceName = (qpqConfig: QPQConfig, resourceName
 
 // Fully Qualified Resource Names
 export const getKeyValueStoreFullyQualifiedResourceName = (kvsName: string, qpqConfig: QPQConfig): FullyQualifiedResource => {
-  const storeConfig = getKeyValueStoreByName(qpqConfig, kvsName);
+  const storeConfig = getKeyValueStoreByName(kvsName, qpqConfig) ?? undefined;
 
   return getFullyQualifiedResourceName(qpqConfig, kvsName, storeConfig);
 };

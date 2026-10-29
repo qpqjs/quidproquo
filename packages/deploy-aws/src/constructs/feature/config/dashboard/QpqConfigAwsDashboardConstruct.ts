@@ -191,7 +191,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
     }
 
     // Data row
-    const tableWidgets = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map((kvsConfig) => {
+    const tableWidgets = qpqCoreUtils.getOwnedKeyValueStoreConfigs(props.qpqConfig).map((kvsConfig) => {
       const tableName = this.qpqResourceName(kvsConfig.keyValueStoreName, 'kvs');
 
       const tableMetric = (metricName: string, label: string): aws_cloudwatch.Metric =>

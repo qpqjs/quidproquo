@@ -157,7 +157,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     // Key value store streams, the projector lambda + event source for any store that
     // declares onStream. Lives here rather than on the Inf stack because that stack builds
     // no lambdas; the stream ARN crosses via SSM (see the construct).
-    qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).forEach(
+    qpqCoreUtils.getAllKeyValueStoreConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreKeyValueStoreStreamConstruct(this, `kvs-stream-${qpqCoreUtils.getUniqueKeyForSetting(setting)}`, {
           qpqConfig: props.qpqConfig,

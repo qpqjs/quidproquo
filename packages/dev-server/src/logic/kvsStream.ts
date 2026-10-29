@@ -41,7 +41,7 @@ export type KvsStreamEmission = {
  *   handler in exactly the same shape.
  */
 export const emitKvsStreamEvent = async (qpqConfig: QPQConfig, session: StorySession, emission: KvsStreamEmission): Promise<void> => {
-  const onStream = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, emission.keyValueStoreName)?.onStream;
+  const onStream = qpqCoreUtils.getKeyValueStoreByName(emission.keyValueStoreName, qpqConfig)?.onStream;
 
   if (!onStream) {
     return;

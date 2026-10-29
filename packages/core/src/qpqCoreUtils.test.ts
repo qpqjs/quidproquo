@@ -36,7 +36,7 @@ import {
   getAllEventBusConfigs,
   getAllGraphDatabaseConfigs,
   getAllInlineFunctions,
-  getAllKeyValueStores,
+  getAllKeyValueStoreConfigs,
   getAllParameterConfigs,
   getAllSecretConfigs,
   getAllSrcEntries,
@@ -62,7 +62,7 @@ import {
   getOwnedGraphDatabases,
   getOwnedInlineFunctions,
   getOwnedItems,
-  getOwnedKeyValueStores,
+  getOwnedKeyValueStoreConfigs,
   getOwnedParameterConfigs,
   getOwnedScheduleEvents,
   getOwnedSecretConfigs,
@@ -295,9 +295,9 @@ describe('qpqCoreUtils', () => {
     const config = buildTestQpqConfig([defineKeyValueStore('users', 'id'), defineKeyValueStore('sessions', 'id')]);
 
     it('lists all key value stores and finds by name', () => {
-      expect(getAllKeyValueStores(config)).toHaveLength(2);
-      expect(getKeyValueStoreByName(config, 'users')?.keyValueStoreName).toBe('users');
-      expect(getKeyValueStoreByName(config, 'missing')).toBeUndefined();
+      expect(getAllKeyValueStoreConfigs(config)).toHaveLength(2);
+      expect(getKeyValueStoreByName('users', config)?.keyValueStoreName).toBe('users');
+      expect(getKeyValueStoreByName('missing', config)).toBeNull();
     });
 
     it('returns only owned key value stores', () => {
@@ -306,7 +306,7 @@ describe('qpqCoreUtils', () => {
         defineKeyValueStore('theirs', 'id', [], { owner: { module: 'other-module' } }),
       ]);
 
-      expect(getOwnedKeyValueStores(mixed).map((k) => k.keyValueStoreName)).toEqual(['mine']);
+      expect(getOwnedKeyValueStoreConfigs(mixed).map((k) => k.keyValueStoreName)).toEqual(['mine']);
     });
 
     it('builds a fully qualified resource name for a store', () => {

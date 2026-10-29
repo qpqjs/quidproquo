@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqCoreUtils` key value store accessors follow D5: `getAllKeyValueStoreConfigs(cfg)`, `getOwnedKeyValueStoreConfigs(cfg)`, `getKeyValueStoreByName(name, cfg)` (name first, null when missing) and new `resolveKeyValueStoreOrThrow(name, cfg)` replace `getAllKeyValueStores`, `getOwnedKeyValueStores` and `getKeyValueStoreByName(cfg, name)`; the setting and its `Kvs*` types live in `config/settings/keyValueStore/`.
 - `qpqCoreUtils.getOwnedSecrets` is `getOwnedSecretConfigs`; the secret accessors live in `config/settings/secret/logic` (D5).
 - `qpqCoreUtils` queue accessors follow D5: `getAllQueueConfigs(cfg)`, `getOwnedQueueConfigs(cfg)`, `getQueueByName(name, cfg)` (returns null, name first) and `resolveQueueOrThrow(name, cfg)` replace `getQueues`, `getOwnedQueues` and `getQueueByName(cfg, name)`; the setting lives in `config/settings/queue/` with its types. `@qpqjs/actionprocessor-aws` `getQueueConfigSetting` is deleted in favour of `resolveQueueOrThrow`.
 - `@qpqjs/features` admin log search takes one object: `askLogGetAll(query: LogDeepSearchQuery)` and `askLogMetadataList(query: LogSearchQuery)` replace the ten and nine positional parameters; `GetLogsParams` is gone, the route body is a `LogDeepSearchQuery` (G3).

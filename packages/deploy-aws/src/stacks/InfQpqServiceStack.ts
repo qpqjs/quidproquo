@@ -173,7 +173,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // key value store
-    qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedKeyValueStoreConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreKeyValueStoreConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

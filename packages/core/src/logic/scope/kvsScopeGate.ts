@@ -19,7 +19,7 @@ import { validateScopeSegment } from './validateScopeSegment';
 
 // Store lookup with the typed misconfiguration error (never a bare throw).
 export const resolveKvsStoreConfigOrThrow = (qpqConfig: QPQConfig, keyValueStoreName: string): KeyValueStoreQPQConfigSetting => {
-  const storeConfig = getKeyValueStoreByName(qpqConfig, keyValueStoreName);
+  const storeConfig = getKeyValueStoreByName(keyValueStoreName, qpqConfig);
   if (!storeConfig) {
     throw new KvsStoreNotFoundError(keyValueStoreName);
   }

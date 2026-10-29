@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineKeyValueStore, kvsKey } from './keyValueStore';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineKeyValueStore } from './defineKeyValueStore';
+import { kvsKey } from './kvsKey';
 
 describe('kvsKey', () => {
   it('defaults the type to string', () => {

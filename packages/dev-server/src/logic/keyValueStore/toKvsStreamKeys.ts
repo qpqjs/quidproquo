@@ -4,7 +4,7 @@ import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 // (plus the images), and locally we have the whole item, so this picks out the same subset a
 // real stream would have delivered.
 export const toKvsStreamKeys = (qpqConfig: QPQConfig, keyValueStoreName: string, item: Record<string, unknown>): Record<string, unknown> => {
-  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
+  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(keyValueStoreName, qpqConfig);
 
   if (!storeConfig) {
     return {};
@@ -19,7 +19,7 @@ export const toKvsStreamKeys = (qpqConfig: QPQConfig, keyValueStoreName: string,
 // what the get/delete processors build from an explicit key + sortKey, but derived from a
 // whole item, which is what an upsert has to work with.
 export const toKvsCompositeKey = (qpqConfig: QPQConfig, keyValueStoreName: string, item: Record<string, unknown>): string => {
-  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
+  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(keyValueStoreName, qpqConfig);
   const [sortKey] = storeConfig?.sortKeys ?? [];
 
   const partitionValue = String(item[storeConfig?.partitionKey.key ?? ''] ?? '');

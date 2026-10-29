@@ -45,7 +45,9 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       return;
     }
 
-    const isOwnedHere = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
+    const isOwnedHere = qpqCoreUtils
+      .getOwnedKeyValueStoreConfigs(props.qpqConfig)
+      .some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
 
     if (!isOwnedHere) {
       return;
