@@ -115,9 +115,6 @@ interface AwsAlarmSqsConfigSetting extends BaseAwsAlarmQPQConfigSetting {
   metricName: AwsAlarmSqsMetricName;
 }
 
-// Advanced settings interface
-export interface QPQConfigAdvancedAwsAlarmSettings extends QPQConfigAdvancedSettings {}
-
 // Union type for namespace specific settings
 type AwsAlarmNamespaceSpecificSettings =
   AwsAlarmLambdaConfigSetting | AwsAlarmApiGatewayConfigSetting | AwsAlarmDynamoDbConfigSetting | AwsAlarmSqsConfigSetting;
@@ -128,6 +125,7 @@ export interface AwsAlarmQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
   alarmSettings: AwsAlarmNamespaceSpecificSettings;
+  deprecated: boolean;
 }
 
 export const defineAwsAlarm = (
@@ -140,4 +138,5 @@ export const defineAwsAlarm = (
 
   name,
   alarmSettings,
+  deprecated: options?.deprecated ?? false,
 });

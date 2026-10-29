@@ -11,6 +11,7 @@ describe('defineCertificate', () => {
       onRootDomain: true,
       subdomain: 'app',
       rootDomain: 'example.com',
+      deprecated: false,
     });
   });
 

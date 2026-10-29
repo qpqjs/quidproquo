@@ -25,6 +25,7 @@ describe('defineAwsDynamoOverrideForKvs', () => {
         resourceName: 'users',
       },
       dynamoTableName: 'users-table',
+      deprecated: false,
     });
   });
 });

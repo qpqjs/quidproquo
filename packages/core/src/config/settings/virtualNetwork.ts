@@ -4,6 +4,7 @@ export interface QPQConfigAdvancedVirtualNetworkSettings extends QPQConfigAdvanc
 
 export interface VirtualNetworkQPQConfigSetting extends QPQConfigSetting {
   name: string;
+  deprecated: boolean;
 }
 
 export const defineVirtualNetwork = (name: string, options?: QPQConfigAdvancedVirtualNetworkSettings): VirtualNetworkQPQConfigSetting => ({
@@ -11,4 +12,5 @@ export const defineVirtualNetwork = (name: string, options?: QPQConfigAdvancedVi
   uniqueKey: name,
 
   name,
+  deprecated: options?.deprecated ?? false,
 });

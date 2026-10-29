@@ -16,6 +16,7 @@ export interface AwsDynamoOverrideForKvsQPQConfigSetting extends QPQConfigSettin
 
   kvsStore: FullyQualifiedResource;
   dynamoTableName: string;
+  deprecated: boolean;
 }
 
 export const defineAwsDynamoOverrideForKvs = (
@@ -31,4 +32,5 @@ export const defineAwsDynamoOverrideForKvs = (
 
   kvsStore: qpqCoreUtils.convertCustomFullyQualifiedResourceToGeneric(kvsStore),
   dynamoTableName,
+  deprecated: options?.deprecated ?? false,
 });

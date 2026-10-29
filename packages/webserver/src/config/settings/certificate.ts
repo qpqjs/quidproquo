@@ -8,6 +8,7 @@ export interface CertificateQPQWebServerConfigSetting extends QPQConfigSetting {
   onRootDomain: boolean;
   subdomain?: string;
   rootDomain: string;
+  deprecated: boolean;
 }
 
 export const defineCertificate = (
@@ -22,4 +23,5 @@ export const defineCertificate = (
   onRootDomain,
   subdomain,
   rootDomain,
+  deprecated: options?.deprecated ?? false,
 });

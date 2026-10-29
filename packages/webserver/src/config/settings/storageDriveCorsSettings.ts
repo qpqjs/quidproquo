@@ -14,6 +14,7 @@ export interface StorageDriveCorsSettingsQPQWebServerConfigSetting extends QPQCo
    * is declared for a drive, its CORS defaults to this service's own domain.
    */
   allowedOrigins: string[];
+  deprecated: boolean;
 }
 
 /**
@@ -32,4 +33,5 @@ export const defineStorageDriveCorsSettings = (
   storageDriveName,
 
   allowedOrigins,
+  deprecated: options?.deprecated ?? false,
 });
