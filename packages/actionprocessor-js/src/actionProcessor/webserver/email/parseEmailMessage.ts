@@ -42,8 +42,9 @@ const parseAuthenticationResults = (header: string | undefined): EmailMessageAut
 
   for (const method of ['spf', 'dkim', 'dmarc'] as const) {
     const match = header.match(new RegExp(`(?:^|;)\\s*${method}=([a-z]+)`, 'i'));
-    if (match) {
-      results[method] = match[1].toLowerCase();
+    const [, value] = match ?? [];
+    if (value) {
+      results[method] = value.toLowerCase();
     }
   }
 
