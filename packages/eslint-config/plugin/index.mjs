@@ -1,5 +1,7 @@
 import askPrefixGeneratorOnly from './rules/ask-prefix-generator-only.mjs';
+import filenameMatchesExport from './rules/filename-matches-export.mjs';
 import noHistoryComments from './rules/no-history-comments.mjs';
+import oneExportPerFile from './rules/one-export-per-file.mjs';
 import requireYieldStar from './rules/require-yield-star.mjs';
 
 const plugin = {
@@ -11,6 +13,8 @@ const plugin = {
     'require-yield-star': requireYieldStar,
     'ask-prefix-generator-only': askPrefixGeneratorOnly,
     'no-history-comments': noHistoryComments,
+    'one-export-per-file': oneExportPerFile,
+    'filename-matches-export': filenameMatchesExport,
   },
 };
 
@@ -23,6 +27,8 @@ plugin.configs = {
       'qpq/require-yield-star': 'error',
       'qpq/ask-prefix-generator-only': 'error',
       'qpq/no-history-comments': 'warn',
+      'qpq/one-export-per-file': 'warn',
+      'qpq/filename-matches-export': 'warn',
     },
   },
 };

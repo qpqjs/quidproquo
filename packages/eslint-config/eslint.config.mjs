@@ -62,6 +62,11 @@ export default [
   },
 
   qpqPlugin.configs.recommended,
+  {
+    // Entry handlers are named after their trigger (C1), not ask*.
+    files: ['**/entry/**'],
+    rules: { 'qpq/ask-prefix-generator-only': 'off' },
+  },
 
   ...reactConfigs,
   ...restrictedSyntaxConfigs,
