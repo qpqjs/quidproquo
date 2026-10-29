@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { authChallengeInitialState, authChallengeReducer } from './authChallengeReducer';
-import { AuthChallengeEffect } from './authChallengeTypes';
+import { AuthChallengeEffect } from './effects/AuthChallengeEffect';
+import { createInitialAuthChallengeState } from './logic/createInitialAuthChallengeState';
+import { authChallengeReducer } from './authChallengeReducer';
+
+const authChallengeInitialState = createInitialAuthChallengeState();
 
 describe('authChallengeReducer', () => {
   it('sets passwordA', () => {
