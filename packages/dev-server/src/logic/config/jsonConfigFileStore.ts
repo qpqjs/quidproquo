@@ -14,10 +14,10 @@ export enum ConfigStoreDirectory {
   secrets = 'secrets',
 }
 
-interface ConfigStorageLocation {
+type ConfigStorageLocation = {
   serviceName: string;
   key: string;
-}
+};
 
 // Mirrors the AWS runtime's resolveParameterKey / resolveSecretResourceName:
 // a cross-module owner redirects storage to the owning service's file, and

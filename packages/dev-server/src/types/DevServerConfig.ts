@@ -4,14 +4,14 @@ import { QPQConfig, QpqFunctionRuntime } from '@qpqjs/core';
 import { DevServerPorts } from './DevServerPorts';
 
 // Optional file storage config for input
-export interface OptionalFileStorageConfig {
+export type OptionalFileStorageConfig = {
   storagePath?: string;
   secureUrlPort?: number;
   // Port browsers reach the secure url server on, when a host maps it differently (docker). Default: secureUrlPort.
   secureUrlPublicPort?: number;
   secureUrlHost?: string;
   secureUrlSecret?: string;
-}
+};
 
 export type DevServerDelayConfig = number | { default?: number; [actionType: string]: number | undefined };
 

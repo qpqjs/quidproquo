@@ -33,10 +33,10 @@ export const resolveDevUsername = (username?: Nullable<string>): string => usern
 // The identity of a user directory once cross-module ownership is applied. Two
 // services declaring the same directory name resolve to different identities;
 // a directory referenced via `owner` resolves to the owning service's identity.
-export interface DevUserDirectory {
+export type DevUserDirectory = {
   serviceName: string;
   directoryName: string;
-}
+};
 
 // Mirrors the AWS runtime's user pool resolution (getCFExportNameUserPoolIdFromConfig):
 // the owner module redirects to the owning service, resourceNameOverride renames the directory.

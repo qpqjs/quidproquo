@@ -1,6 +1,6 @@
 import { QPQBinaryData } from '@qpqjs/core';
 
-export interface ExpressEvent {
+export type ExpressEvent = {
   protocol: string;
   host: string;
   path: string;
@@ -17,13 +17,13 @@ export interface ExpressEvent {
   };
 
   files?: QPQBinaryData[];
-}
+};
 
-export interface ExpressEventResponse {
+export type ExpressEventResponse = {
   statusCode: number;
   body: string;
   headers: {
     [key: string]: undefined | string;
   };
   isBase64Encoded: boolean;
-}
+};

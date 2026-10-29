@@ -25,7 +25,7 @@ export type KvsUpsertManyResult = {
  * visible to another repository over the same runtime path immediately (see
  * the contract suite's cross-instance and durability blocks).
  */
-export interface KvsRepository {
+export type KvsRepository = {
   get(keyValueStoreName: string, key: string, scope?: string): Promise<Nullable<any>>;
 
   // `indexName` reads through that declared GSI: only rows carrying its keys,
@@ -74,4 +74,4 @@ export interface KvsRepository {
   delete(keyValueStoreName: string, key: string, scope?: string): Promise<boolean>;
 
   close(): Promise<void>;
-}
+};
