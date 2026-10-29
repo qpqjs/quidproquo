@@ -1,10 +1,8 @@
 import { generateUuid, getProcessCustomImplementation, ProcessorFor } from '@qpqjs/core';
 import { ActionProcessorListResolverFactory } from '@qpqjs/web-react';
 
+import { AdminSessionActionType, askApplySessionEventBase, askApplySessionEventToLog } from '../actions';
 import { AdminAppState } from '../AdminAppState';
-import { AdminSessionActionType } from './AdminSessionActionType';
-import { askApplySessionEventBase } from './askApplySessionEvent';
-import { askApplySessionEventToLog } from './askApplySessionEventToLog';
 
 // Runs the ApplyEvent story in a sub-runtime that inherits the live processors,
 // so it can dispatch into the admin runtime's state like any story.

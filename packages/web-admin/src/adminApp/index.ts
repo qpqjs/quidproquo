@@ -1,4 +1,5 @@
 export * from './actionCreators';
+export * from './actionProcessor';
 export * from './actions';
 export * from './adminAppReducer';
 export * from './adminAppRuntime';
