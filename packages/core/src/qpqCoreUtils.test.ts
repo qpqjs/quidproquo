@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   defineActionProcessors,
   defineAi,
-  defineApiBuildPath,
   defineApplication,
   defineDeployEvent,
   defineEnvironmentSettings,

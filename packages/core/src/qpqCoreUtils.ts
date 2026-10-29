@@ -42,7 +42,6 @@ import {
 } from './config';
 import {
   ConfigUrl,
-  CrossModuleOwner,
   CrossServiceResourceName,
   CustomFullyQualifiedResource,
   FullyQualifiedResource,

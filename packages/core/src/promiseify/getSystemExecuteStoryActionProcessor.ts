@@ -4,7 +4,6 @@ import { actionResult, actionResultError, isErroredActionResult, resolveActionRe
 import { processAction } from '../runtime';
 import { askRunParallel } from '../stories';
 import { ActionProcessor, AskResponse, AskResponseReturnType, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQError, Story } from '../types';
-import { getDateNow } from '../utils/dateTime/getDateNow';
 
 // Thrown when an action inside a promisified story fails without returnErrors.
 // Carries the structured action error so the ExecuteStory processor can
@@ -35,7 +34,7 @@ export function qpqPromisify<S extends Story<any, any>>(
       while (!storyProgress.done) {
         const action = storyProgress.value;
 
-        const [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry] = runtimeInfo;
+        const [, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry] = runtimeInfo;
         const actionResult = await processAction(action, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry);
 
         const isSuccess = !isErroredActionResult(actionResult);

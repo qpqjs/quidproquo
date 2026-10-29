@@ -1,4 +1,4 @@
-import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfig, QPQConfigSetting } from '../QPQConfig';
 import { defineApiBuildPath } from './apiBuildPath';
 import { defineApplication } from './applicationName';
 import { defineModule } from './moduleName';

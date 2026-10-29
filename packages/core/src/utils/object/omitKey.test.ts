@@ -16,7 +16,7 @@ describe('omitKey', () => {
   it('drops the key from the result type', () => {
     const result = omitKey({ a: 1, b: 'two' }, 'a');
 
-    // @ts-expect-error the omitted key is no longer on the type
+    // @ts-expect-error the omitted key is not on the type
     expect(result.a).toBeUndefined();
     expect(result.b).toBe('two');
   });

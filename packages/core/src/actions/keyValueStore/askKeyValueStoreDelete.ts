@@ -1,4 +1,3 @@
-import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsCoreDataType } from './types';

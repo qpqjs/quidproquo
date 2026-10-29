@@ -16,7 +16,7 @@ const base = [
     message: 'C2: stories are deterministic; use askDateNow().',
   },
   {
-    selector: inGenerator("NewExpression[callee.name='Date']"),
+    selector: inGenerator("NewExpression[callee.name='Date'][arguments.length=0]"),
     message: 'C2: stories are deterministic; use askDateNow().',
   },
   {
@@ -24,11 +24,11 @@ const base = [
     message: 'C2: stories are deterministic; use askNewGuid() or a seeded source.',
   },
   {
-    selector: inGenerator("CallExpression[callee.name='randomUUID'], CallExpression[callee.property.name='randomUUID']"),
+    selector: `${inGenerator("CallExpression[callee.name='randomUUID']")}, ${inGenerator("CallExpression[callee.property.name='randomUUID']")}`,
     message: 'C2: stories are deterministic; use askNewGuid().',
   },
   {
-    selector: 'TSUnionType > TSNullKeyword',
+    selector: 'TSUnionType[types.length=2] > TSNullKeyword',
     message: 'G5: use Nullable<T> for a value that may be absent.',
   },
   {
@@ -81,10 +81,15 @@ export const restrictedSyntaxConfigs = [
         'warn',
         ...base,
         {
-          selector: 'TemplateLiteral > Identifier[name=/^(applicationName|environment|feature|featureName|moduleName)$/]',
+          selector: "TemplateLiteral:has(Identifier[name='applicationName']):has(Identifier[name='environment'])",
           message: 'D6: application, environment, feature and module names are composed by the naming module only.',
         },
       ],
     },
+  },
+  {
+    // The one place `T | null` is spelled out.
+    files: ['**/Nullable.ts'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
 ];

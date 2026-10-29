@@ -8,7 +8,8 @@ export type StreamDataType<E extends StreamEncoding, T = unknown> = E extends 't
       ? T
       : never;
 
-export interface StreamHandle<E extends StreamEncoding = StreamEncoding, T = unknown> {
+// The second parameter is a phantom: it carries the chunk type for callers and is never read here.
+export interface StreamHandle<E extends StreamEncoding = StreamEncoding, _T = unknown> {
   id: string;
   encoding: E;
 }

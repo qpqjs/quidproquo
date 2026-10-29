@@ -2,7 +2,7 @@ import { QPQConfig } from '../config';
 import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { ActionProcessorList } from '../types/Action';
 import { Nullable } from '../types/Nullable';
-import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
+import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession } from '../types/StorySession';
 import { resolveStory } from './resolveStory';
 
 // Stories run concurrently in one process (overlapping requests, nested runtimes for

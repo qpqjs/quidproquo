@@ -5,7 +5,7 @@ import { Lookup } from './Lookup';
 //
 export enum LogLevelEnum {
   // the log level that tells that the application encountered an event or entered a state
-  // in which one of the crucial business functionality is no longer working. A FATAL log
+  // in which one of the crucial business functions has stopped working. A FATAL log
   // level may be used when the application is not able to connect to a crucial data store
   // like a database or all the payment systems are not available and users can’t checkout
   // their baskets in your e-commerce.

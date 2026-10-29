@@ -15,7 +15,7 @@ export function* askMapParallelBatch<T, R>(
   }
 
   // Copy the items array to avoid modifying the original array
-  let itemsToBatch = [...items];
+  const itemsToBatch = [...items];
 
   // Prepare an array to collect all results
   let allResults: R[] = [];

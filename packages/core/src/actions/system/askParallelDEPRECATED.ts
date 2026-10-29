@@ -15,7 +15,7 @@ import { askBatch } from './askBatch';
  */
 export function* askParallelDEPRECATED(stories: Array<any>): AskResponse<any[]> {
   const itt = stories.map((s: any) => s[0](...s.slice(1)));
-  let actions = itt.map((i: any) => i.next());
+  const actions = itt.map((i: any) => i.next());
   let values: Array<any> = actions.map((a) => a.value);
 
   while (true) {
