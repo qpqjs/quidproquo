@@ -1,4 +1,4 @@
-import { askEventBusSendMessages, askNewGuid, AskResponse, EventBusMessage } from 'quidproquo';
+import { askEventBusSendMessages, askGuidNew, AskResponse, EventBusMessage } from 'quidproquo';
 
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
 import { SMOKE_PROBE_EVENT_BUS } from '../constants/SMOKE_PROBE_EVENT_BUS';
@@ -10,7 +10,7 @@ import { SmokeProbeEventPayload } from '../models/SmokeProbeEventQueueEvent';
 // polls the store for it. Covers sns:Publish, the bus -> queue subscription,
 // and the queue lambda's own store access, in one round trip.
 export function* askRunEventBusTest(): AskResponse<void> {
-  const markerId = yield* askNewGuid();
+  const markerId = yield* askGuidNew();
 
   const message: EventBusMessage<SmokeProbeEventPayload> = {
     type: SMOKE_PROBE_EVENT_TYPE,

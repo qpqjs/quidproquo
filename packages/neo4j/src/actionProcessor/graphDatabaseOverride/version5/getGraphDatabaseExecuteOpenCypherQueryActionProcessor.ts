@@ -21,7 +21,7 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
     // No extra action processors beyond the caller's list.
     null,
     // Platform boundary: the real clock and uuid source live here; the story
-    // itself only ever reaches them through askDateNow/askNewGuid.
+    // itself only ever reaches them through askDateNow/askGuidNew.
     () => new Date().toISOString(),
     generateUuid,
   ),

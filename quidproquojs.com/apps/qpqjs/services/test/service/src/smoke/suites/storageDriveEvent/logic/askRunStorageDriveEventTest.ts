@@ -1,4 +1,4 @@
-import { askFileDelete, askFileWriteTextContents, askNewGuid, AskResponse, StorageDriveEventType } from 'quidproquo';
+import { askFileDelete, askFileWriteTextContents, askGuidNew, AskResponse, StorageDriveEventType } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
@@ -12,7 +12,7 @@ import { smokeFileEventMarkerId } from './smokeFileEventMarkerId';
 // arrive with the scope as its own field, the path made scope-relative, and
 // the handler running under that scope.
 export function* askRunStorageDriveEventTest(): AskResponse<void> {
-  const fileId = yield* askNewGuid();
+  const fileId = yield* askGuidNew();
   const filepath = `events/${fileId}.txt`;
   const scope = `smoke-ev-${fileId}`;
 

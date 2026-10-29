@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocInitData } from '../models';
@@ -16,7 +16,7 @@ export function* askEventDocSeedInitState(modelId: string, code: string, name: s
       data: { id: modelId, code, name },
       metadata: {
         version: 1,
-        clientMessageId: yield* askNewGuid(),
+        clientMessageId: yield* askGuidNew(),
         createdBy: actor,
         createdAt: now,
         eventId: 0,

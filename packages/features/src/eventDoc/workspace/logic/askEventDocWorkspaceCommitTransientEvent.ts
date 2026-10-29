@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocApplyTransientEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -13,7 +13,7 @@ export function* askEventDocWorkspaceCommitTransientEvent(
   binding: EventDocWorkspaceSlotBinding,
   { transientKey, eventType, data }: EventDocApplyTransientEventActionPayload,
 ): AskResponse<void> {
-  const clientMessageId = yield* askNewGuid();
+  const clientMessageId = yield* askGuidNew();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {

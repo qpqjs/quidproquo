@@ -1,5 +1,5 @@
 import { SmokeRun, SmokeRunStatus, SmokeTestResult, SmokeTestStatus } from '@qpqjs/test-models';
-import { askDateNow, askNewGuid, askPlatformGetName, askQueueSendMessages, AskResponse, QueueMessage } from 'quidproquo';
+import { askDateNow, askGuidNew, askPlatformGetName, askQueueSendMessages, AskResponse, QueueMessage } from 'quidproquo';
 
 import { SMOKE_RUN_QUEUE, SMOKE_TEST_REQUESTED_MESSAGE_TYPE } from '../../constants/smokeRunQueue';
 import { askSaveSmokeRun } from '../../data/askSaveSmokeRun';
@@ -27,7 +27,7 @@ const createTestRequestedMessage = (runId: string, test: SmokeTestDefinition): Q
 // messages are sent so a poll (or a worker) that races the queue still finds
 // it. A run of nothing but skips never gets a worker, so it is finished here.
 export function* askStartSmokeRun(): AskResponse<SmokeRun> {
-  const runId = yield* askNewGuid();
+  const runId = yield* askGuidNew();
   const startedAt = yield* askDateNow();
   const platformName = yield* askPlatformGetName();
 

@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
 
 import { askSessionLogEventAppended } from '../actionCreators/sessionLog/askSessionLogEventAppended';
@@ -11,7 +11,7 @@ import { ApplySessionEventActionPayload } from './askApplySessionEvent';
 // the flush loop drains it to the backend. NOTE: the runtime invokes action
 // processors with the action's PAYLOAD, so that is what this story receives.
 export function* askApplySessionEventToLog(payload: ApplySessionEventActionPayload): AskResponse<void> {
-  const clientMessageId = yield* askNewGuid();
+  const clientMessageId = yield* askGuidNew();
   const createdAt = yield* askDateNow();
 
   const event: EventDocEvent = {

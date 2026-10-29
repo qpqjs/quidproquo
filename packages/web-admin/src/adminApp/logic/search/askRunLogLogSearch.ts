@@ -1,7 +1,7 @@
 import {
   askCatch,
   askDateNow,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   askRunParallel,
   askStateRead,
@@ -64,7 +64,7 @@ export function* askRunLogLogSearch(): AskResponse<void> {
   const state = yield* askStateRead<AdminAppState>('');
   const search = selectSearchParams(state);
 
-  const requestId = yield* askNewGuid();
+  const requestId = yield* askGuidNew();
   yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, { search, requestId, origin: SearchOrigin.logs });
 
   const logLevels = resolveLookupValues([effectiveLogLevelLookup(search) as LogLevelEnumLookup], LogLevelEnum);

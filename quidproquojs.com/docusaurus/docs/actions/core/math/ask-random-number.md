@@ -43,4 +43,4 @@ None. There are no bounds arguments — scale or offset the result yourself, as 
 
 ## Related
 
-- [askNewGuid](../guid/ask-new-guid.md) — for a unique identifier rather than a raw random number.
+- [askGuidNew](../guid/ask-new-guid.md) — for a unique identifier rather than a raw random number.

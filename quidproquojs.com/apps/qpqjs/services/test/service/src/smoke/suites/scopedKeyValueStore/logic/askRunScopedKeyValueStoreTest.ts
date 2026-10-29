@@ -11,7 +11,7 @@ import {
   askKeyValueStoreUpdate,
   askKeyValueStoreUpsert,
   askKeyValueStoreUpsertBase,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   kvsEqual,
   kvsSet,
@@ -57,8 +57,8 @@ function* askSmokeScopedCategoryQuery(category: string, scope: string, expectedP
 // a hidden copy of each GSI partition key, so the reads also prove neither
 // composed form leaks to the caller, and a page key can't cross scopes.
 export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
-  const probeId = yield* askNewGuid();
-  const otherProbeId = yield* askNewGuid();
+  const probeId = yield* askGuidNew();
+  const otherProbeId = yield* askGuidNew();
   const scopeA = `smoke-a-${probeId}`;
   const scopeB = `smoke-b-${probeId}`;
   const category = `scoped-kvs-${probeId}`;
@@ -93,7 +93,7 @@ export function* askRunScopedKeyValueStoreTest(): AskResponse<void> {
   // Paging a scoped index: the scope's own page key (a real DynamoDB page key,
   // carrying the hidden index copy) continues the listing, and the same key
   // used from another scope is refused rather than read.
-  const pagedProbeId = yield* askNewGuid();
+  const pagedProbeId = yield* askGuidNew();
   yield* askKeyValueStoreUpsert<SmokeProbeRecord>(SMOKE_SCOPED_PROBE_STORE, { probeId: pagedProbeId, category, value: 3 }, { scope: scopeB });
 
   const scopeBRows = [otherProbeId, pagedProbeId].sort().join(',');

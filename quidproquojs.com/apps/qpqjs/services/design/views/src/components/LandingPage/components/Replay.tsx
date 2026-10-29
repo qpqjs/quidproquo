@@ -41,7 +41,7 @@ const LINES: TraceLine[] = [
     code: (
       <>
         {'  '}
-        {kw('const')} userId = {kw('yield')}* {fn('askNewGuid')}();
+        {kw('const')} userId = {kw('yield')}* {fn('askGuidNew')}();
       </>
     ),
     note: "userId = '8f2c41ab-9d7e-4c02'",

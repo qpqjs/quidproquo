@@ -51,4 +51,4 @@ function* askSecureTokenGenerate(byteLength?: number): AskResponse<string>;
 ## Related
 
 - [askRedactString](../log/ask-redact-string.md): mark any other value as sensitive in the log.
-- [askNewGuid](../guid/ask-new-guid.md): a random id for identifying things, not for use as a secret.
+- [askGuidNew](../guid/ask-new-guid.md): a random id for identifying things, not for use as a secret.

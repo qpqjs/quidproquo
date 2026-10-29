@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from '@qpqjs/core';
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -17,7 +17,7 @@ export function* askEventDocWorkspaceCommitEvent(
   binding: EventDocWorkspaceSlotBinding,
   { eventType, data }: EventDocApplyEventActionPayload,
 ): AskResponse<void> {
-  const clientMessageId = yield* askNewGuid();
+  const clientMessageId = yield* askGuidNew();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {

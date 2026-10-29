@@ -4,7 +4,7 @@ import {
   askFileExists,
   askFileGenerateTemporarySecureUrl,
   askFileWriteTextContents,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   askUserScriptBuild,
   createUserScriptCaller,
@@ -22,7 +22,7 @@ import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 // back denied, the only identity it can reach must be the runner's own role, and no AWS_*
 // variable may be visible to it.
 export function* askRunUserScriptAwsLockdownTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/lockdown-${scriptId}`;
   const sourceDirectory = `${directory}/source`;
   const builtPath = `${directory}/built.js`;

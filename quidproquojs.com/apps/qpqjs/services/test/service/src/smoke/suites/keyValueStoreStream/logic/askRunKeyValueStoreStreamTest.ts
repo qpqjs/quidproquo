@@ -1,5 +1,5 @@
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import { askKeyValueStoreDelete, askKeyValueStoreUpsert, askNewGuid, AskResponse, KvsStreamEventType } from 'quidproquo';
+import { askKeyValueStoreDelete, askKeyValueStoreUpsert, askGuidNew, AskResponse, KvsStreamEventType } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
@@ -13,7 +13,7 @@ import { smokeStreamMarkerId } from './smokeStreamMarkerId';
 // with the key stripped and the hidden copy dropped, the same as the dev
 // server does.
 export function* askRunKeyValueStoreStreamTest(): AskResponse<void> {
-  const probeId = yield* askNewGuid();
+  const probeId = yield* askGuidNew();
   const scope = `smoke-st-${probeId}`;
 
   const record: SmokeProbeRecord = {

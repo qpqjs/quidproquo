@@ -127,7 +127,7 @@ All code conventions (comments, types, story and config rules, module and file l
 
 Three rules worth restating because they bite most often:
 
-- Every generator is `ask<Domain><Verb>` and deterministic (`askDateNow`, `askNewGuid`; never `Date.now()` or `Math.random()` in a story). Entry handlers are named after their trigger.
+- Every generator is `ask<Domain><Verb>` and deterministic (`askDateNow`, `askGuidNew`; never `Date.now()` or `Math.random()` in a story). Entry handlers are named after their trigger.
 - Throw with `return yield* askErrorThrow(...)`; clear loading flags through `askCatch`'s finally parameter.
 - `define*` returns config only and is never spread; names are derived, platform concerns live in the owning layer.
 

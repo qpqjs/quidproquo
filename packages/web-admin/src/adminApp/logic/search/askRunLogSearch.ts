@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, askRunParallel, askStateRead, QpqRuntimeType } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse, askRunParallel, askStateRead, QpqRuntimeType } from '@qpqjs/core';
 
 import { askVolatileLogSearchCompleted } from '../../actionCreators/volatile/askVolatileLogSearchCompleted';
 import { askVolatileLogSearchStarted } from '../../actionCreators/volatile/askVolatileLogSearchStarted';
@@ -18,7 +18,7 @@ export function* askRunLogSearch(): AskResponse<void> {
   const state = yield* askStateRead<AdminAppState>('');
   const search = selectSearchParams(state);
 
-  const requestId = yield* askNewGuid();
+  const requestId = yield* askGuidNew();
   yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, {
     search,
     requestId,

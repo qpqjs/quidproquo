@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
 
 import { askVolatileLogSearchCompleted } from '../../actionCreators/volatile/askVolatileLogSearchCompleted';
 import { askVolatileLogSearchStarted } from '../../actionCreators/volatile/askVolatileLogSearchStarted';
@@ -27,7 +27,7 @@ export function* askRunDashboardErrorSearch(): AskResponse<void> {
     endIsoDateTime: new Date(now.getTime() + DAY_MS).toISOString(),
   };
 
-  const requestId = yield* askNewGuid();
+  const requestId = yield* askGuidNew();
   yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, {
     search,
     requestId,

@@ -1,5 +1,5 @@
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import { askCatch, askNewGuid, AskResponse, askUserScriptBuild } from 'quidproquo';
+import { askCatch, askGuidNew, AskResponse, askUserScriptBuild } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -7,7 +7,7 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 // error on whichever backend serves the drive: S3 answers an empty listing, the
 // dev server refuses the missing directory, and both must land on the same type.
 export function* askRunUserScriptBuildErrorTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/missing-${scriptId}`;
 
   const result = yield* askCatch(askUserScriptBuild(SMOKE_PROBE_DRIVE, `${directory}/source`, `${directory}/built.js`));

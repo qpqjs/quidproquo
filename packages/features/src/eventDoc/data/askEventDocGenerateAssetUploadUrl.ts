@@ -1,4 +1,4 @@
-import { askFileGenerateTemporaryUploadSecureUrl, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askFileGenerateTemporaryUploadSecureUrl, askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocAssetUploadUrl } from '../models';
@@ -19,7 +19,7 @@ export function* askEventDocGenerateAssetUploadUrl(
   const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
-  const assetId = yield* askNewGuid();
+  const assetId = yield* askGuidNew();
 
   const uploadUrl = yield* askFileGenerateTemporaryUploadSecureUrl(
     storageDriveName,

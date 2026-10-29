@@ -47,7 +47,7 @@ Tenant records, memberships and the tenant documents themselves live in their ow
 User scripts are code your users write and your service runs. They are treated as hostile. [defineUserScriptRunner](./config/core/user-script-runner.md) gives each service a sandbox with two walls:
 
 - **No permissions.** The runner is its own function with its own role, which can write its logs and nothing else. It does not use the service role, so a script cannot reach a drive, a store, a secret, a queue or any other AWS resource, no matter what it imports or calls. The deployed smoke suite checks this on every deploy: no `AWS_*` variables are visible, the SDK's own credential lookup ends with no credentials, and direct calls against the service's bucket and account are denied.
-- **Pure actions only.** The runner's action processors are date, guid, log, math and error. A script can yield `askDateNow` or `askNewGuid`; anything else it yields has no processor and fails at that point. A [user script module](./config/core/user-script-module.md) controls what a script can import, not what it can do, so treat it as an API surface rather than a boundary.
+- **Pure actions only.** The runner's action processors are date, guid, log, math and error. A script can yield `askDateNow` or `askGuidNew`; anything else it yields has no processor and fails at that point. A [user script module](./config/core/user-script-module.md) controls what a script can import, not what it can do, so treat it as an API surface rather than a boundary.
 
 Timeout, memory and concurrency are set on the runner. A runner placed in a [virtual network](./config/core/virtual-network.md) with no route out has no internet either.
 
@@ -57,7 +57,7 @@ The dev server mirrors this with a child process that has no cloud credentials a
 
 - Secrets are read through `askConfigGetSecret` and live in the platform's secret store, never in config or in the bundle. Config carries the secret's name, not its value.
 - Encryption and signing go through [crypto](./actions/core/crypto/ask-crypto-encrypt.md) actions backed by platform keys. Plaintext and decrypted values are marked in the story log so the redaction below removes them.
-- Random values that act as credentials come from `askSecureTokenGenerate`, which uses the platform's secure random source and refuses to fall back to a weaker one. `askNewGuid` uses the same source.
+- Random values that act as credentials come from `askSecureTokenGenerate`, which uses the platform's secure random source and refuses to fall back to a weaker one. `askGuidNew` uses the same source.
 - The admin app keeps tokens in memory only. A page refresh means a fresh login.
 
 ## What the admin tooling can see

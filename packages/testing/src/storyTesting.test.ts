@@ -2,7 +2,7 @@ import { askConfigGetParameter } from '@qpqjs/core';
 import { ConfigActionType } from '@qpqjs/core';
 import { askDateNow } from '@qpqjs/core';
 import { DateActionType } from '@qpqjs/core';
-import { askNewGuid } from '@qpqjs/core';
+import { askGuidNew } from '@qpqjs/core';
 import { GuidActionType } from '@qpqjs/core';
 import { askRandomNumber } from '@qpqjs/core';
 import { MathActionType } from '@qpqjs/core';
@@ -27,7 +27,7 @@ describe('runStory', () => {
   it('mocks each action in a sequence and threads results through the story', () => {
     function* story(): AskResponse<string> {
       const random = yield* askRandomNumber();
-      const guid = yield* askNewGuid();
+      const guid = yield* askGuidNew();
       return `${random}-${guid}`;
     }
 
@@ -121,7 +121,7 @@ describe('runStory', () => {
 
   it('mocks double as spies via vi.fn', () => {
     function* story(): AskResponse<void> {
-      yield* askNewGuid();
+      yield* askGuidNew();
     }
 
     const guid = vi.fn(() => 'spy-guid');

@@ -1,4 +1,4 @@
-import { askNewGuid, AskResponse } from '@qpqjs/core';
+import { askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocEventActor, EventDocEventOrigin } from '../models';
 import { askEventDocEventAppend } from './askEventDocEventAppend';
@@ -23,7 +23,7 @@ export function* askEventDocAppendServerEvent<T>(
   actor: EventDocEventActor,
   options: EventDocServerEventAppendOptions = {},
 ): AskResponse<EventDocEvent> {
-  const clientMessageId = yield* askNewGuid();
+  const clientMessageId = yield* askGuidNew();
 
   return yield* askEventDocEventAppend(modelId, { type, payload: { data, metadata: { version, clientMessageId } } }, actor, {
     validate: options.validate ?? false,

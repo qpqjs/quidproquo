@@ -1,4 +1,4 @@
-import { askFileWriteBinaryContents, askNewGuid, AskResponse, QPQBinaryData } from '@qpqjs/core';
+import { askFileWriteBinaryContents, askGuidNew, AskResponse, QPQBinaryData } from '@qpqjs/core';
 
 import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocAssetRef } from '../models';
@@ -13,7 +13,7 @@ const FALLBACK_MIMETYPE = 'application/octet-stream';
 export function* askEventDocWriteAsset(docId: string, binary: QPQBinaryData): AskResponse<EventDocAssetRef> {
   const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
-  const guid = yield* askNewGuid();
+  const guid = yield* askGuidNew();
 
   yield* askFileWriteBinaryContents(storageDriveName, `${docId}/assets/${guid}`, binary, undefined, scope);
 

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { askDateNow } from '../../actions/date/askDateNow';
 import { DateActionType } from '../../actions/date/DateActionType';
-import { askNewGuid } from '../../actions/guid/askNewGuid';
+import { askGuidNew } from '../../actions/guid/askGuidNew';
 import { GuidActionType } from '../../actions/guid/GuidActionType';
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
@@ -14,7 +14,7 @@ import { askRunParallel } from './askRunParallel';
 
 describe('askRunParallel', () => {
   it('returns the results of every story in input order', () => {
-    const result = runStory(askRunParallel([askRandomNumber(), askDateNow(), askNewGuid()]), {
+    const result = runStory(askRunParallel([askRandomNumber(), askDateNow(), askGuidNew()]), {
       [MathActionType.RandomNumber]: 0.5,
       [DateActionType.Now]: 'now',
       [GuidActionType.New]: 'guid-1',
@@ -33,8 +33,8 @@ describe('askRunParallel', () => {
 
   it('keeps result order when stories finish after different numbers of steps', () => {
     function* longStory(): AskResponse<string> {
-      const a = yield* askNewGuid();
-      const b = yield* askNewGuid();
+      const a = yield* askGuidNew();
+      const b = yield* askGuidNew();
       return `${a}+${b}`;
     }
     function* shortStory(): AskResponse<number> {
@@ -70,8 +70,8 @@ describe('askRunParallel', () => {
     };
 
     function* guidTwice(): AskResponse<void> {
-      yield* askNewGuid();
-      yield* askNewGuid();
+      yield* askGuidNew();
+      yield* askGuidNew();
     }
     function* randomTwice(): AskResponse<void> {
       yield* askRandomNumber();

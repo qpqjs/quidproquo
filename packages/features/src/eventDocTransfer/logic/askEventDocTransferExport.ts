@@ -1,4 +1,4 @@
-import { askFileGenerateTemporarySecureUrl, askFileWriteObjectJson, askNewGuid, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { askFileGenerateTemporarySecureUrl, askFileWriteObjectJson, askGuidNew, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferBundleFilename, eventDocTransferExportPath } from '../constants';
@@ -34,7 +34,7 @@ export function* askEventDocTransferExport(registry: EventDocTransferRegistry, s
   const bundle = yield* askEventDocBundleBuild(registry, exportable);
 
   const scope = yield* askEventDocResolveScope();
-  const transferId = yield* askNewGuid();
+  const transferId = yield* askGuidNew();
   const filepath = eventDocTransferExportPath(transferId);
 
   yield* askFileWriteObjectJson(EVENT_DOC_TRANSFER_DRIVE_NAME, filepath, bundle, undefined, scope);

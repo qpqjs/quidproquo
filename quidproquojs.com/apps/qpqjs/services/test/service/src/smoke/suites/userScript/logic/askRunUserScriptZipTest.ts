@@ -4,7 +4,7 @@ import {
   askFileExists,
   askFileReadTextContents,
   askFileWriteBinaryContents,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   askUserScriptBuildFromZip,
 } from 'quidproquo';
@@ -19,7 +19,7 @@ import { askRunSmokeUserScriptCalls } from './askRunSmokeUserScriptCalls';
 // The build goes to an extensionless, asset-style path with its source map turned on, so
 // this also proves the output is exactly one file with the map embedded in it.
 export function* askRunUserScriptZipTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/${scriptId}`;
   const zipPath = `${directory}/script.zip`;
   const builtPath = `${directory}/assets/built`;

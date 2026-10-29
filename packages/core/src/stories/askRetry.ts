@@ -1,4 +1,4 @@
-import { askDelay, askNewGuid } from '../actions';
+import { askDelay, askGuidNew } from '../actions';
 import { AskResponse } from '../types';
 import { askCatch } from './system';
 
@@ -9,7 +9,7 @@ export type AskRetryOptions = {
 
   // Add 0..maxJitterMs of guid-derived jitter to each wait, so concurrent
   // losers of a shared race spread out instead of retrying in lockstep.
-  // (Stories cannot use Math.random; askNewGuid is the replay-safe entropy
+  // (Stories cannot use Math.random; askGuidNew is the replay-safe entropy
   // source.)
   maxJitterMs?: number;
 };
@@ -40,7 +40,7 @@ export function* askRetry<R>(
     let waitMs = options?.linearBackoff ? timeToWaitMs * attempt : timeToWaitMs;
 
     if (options?.maxJitterMs) {
-      const guid = yield* askNewGuid();
+      const guid = yield* askGuidNew();
       const jitterByte = parseInt(guid.slice(0, 2), 16);
 
       // Guid processors are platform-pluggable, so guard against a non-hex id

@@ -5,7 +5,7 @@ import {
   askFileListDirectory,
   askFileReadTextContents,
   askFileWriteTextContents,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
 } from 'quidproquo';
 
@@ -16,7 +16,7 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 // name-suffix wildcard rather than a tag condition, so it is the one that
 // breaks if the naming convention and the policy pattern ever drift apart.
 export function* askRunStorageDriveTest(): AskResponse<void> {
-  const fileId = yield* askNewGuid();
+  const fileId = yield* askGuidNew();
   const folder = 'smoke';
   const filepath = `${folder}/${fileId}.txt`;
   const contents = `smoke probe ${fileId}`;

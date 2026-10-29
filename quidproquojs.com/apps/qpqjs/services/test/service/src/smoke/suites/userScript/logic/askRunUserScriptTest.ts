@@ -1,5 +1,5 @@
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import { askFileDelete, askFileWriteTextContents, askNewGuid, AskResponse, askUserScriptBuild } from 'quidproquo';
+import { askFileDelete, askFileWriteTextContents, askGuidNew, AskResponse, askUserScriptBuild } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_USER_SCRIPT_SOURCES } from '../generated/SMOKE_USER_SCRIPT_SOURCES';
@@ -10,7 +10,7 @@ import { askRunSmokeUserScriptCalls } from './askRunSmokeUserScriptCalls';
 // askUserScriptBuild into one file, and that file's exports are then callable by name,
 // each call running in the service's sandbox (see askRunSmokeUserScriptCalls).
 export function* askRunUserScriptTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/${scriptId}`;
   const sourceDirectory = `${directory}/source`;
   const builtPath = `${directory}/built.js`;

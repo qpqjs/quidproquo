@@ -2,7 +2,7 @@ import { expectError, runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askNewGuid } from '../../actions/guid/askNewGuid';
+import { askGuidNew } from '../../actions/guid/askGuidNew';
 import { GuidActionType } from '../../actions/guid/GuidActionType';
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
@@ -31,7 +31,7 @@ describe('askCatch', () => {
   it('runs the finally story after a success', () => {
     let ran = false;
     function* cleanup(): AskResponse<void> {
-      yield* askNewGuid();
+      yield* askGuidNew();
       ran = true;
     }
     function* story(): AskResponse<EitherActionResult<number>> {
@@ -47,7 +47,7 @@ describe('askCatch', () => {
   it('runs the finally story even when the body fails', () => {
     let ran = false;
     function* cleanup(): AskResponse<void> {
-      yield* askNewGuid();
+      yield* askGuidNew();
       ran = true;
     }
     function* story(): AskResponse<EitherActionResult<number>> {

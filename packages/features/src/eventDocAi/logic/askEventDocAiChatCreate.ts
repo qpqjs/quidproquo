@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveActor } from '../../eventDoc';
 import { askEventDocAiRead } from '../context';
@@ -10,7 +10,7 @@ export function* askEventDocAiChatCreate(payload: EventDocAiChatCreatePayload): 
   const actor = yield* askEventDocResolveActor();
   const { docId } = yield* askEventDocAiRead();
 
-  const chatId = yield* askNewGuid();
+  const chatId = yield* askGuidNew();
   const now = yield* askDateNow();
 
   const chat: EventDocAiChatSummary = {

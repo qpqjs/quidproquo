@@ -165,7 +165,7 @@ try {
 
 **C1. Every generator is `ask<Domain><Verb>`**, noun first. Entry handlers (route controllers, queue and event handlers, inline functions) are the one exception: they are named after their trigger. A generator that never yields may stay a generator; it is an extension point. **lint** (`ask` prefix reserved for generators, with the entry-folder exemption)
 
-**C2. Stories are deterministic.** No clock, randomness or `process.env` inside a story or anything it calls; use `askDateNow` and `askNewGuid`. **lint**
+**C2. Stories are deterministic.** No clock, randomness or `process.env` inside a story or anything it calls; use `askDateNow` and `askGuidNew`. **lint**
 
 **C3. Throw with `return yield* askErrorThrow(...)`.** Never a bare `yield*`, never `throw new`, never a `!` or `as` to satisfy the checker after a throw. **lint**
 

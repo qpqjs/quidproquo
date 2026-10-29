@@ -37,7 +37,7 @@ describe('userScriptModuleTypesLoader', () => {
     expect(result.error).toBeNull();
     const declarations = evaluate(result.content).declarations as string;
     expect(declarations).toContain('export declare const shout: (text: string) => string;');
-    expect(declarations).toContain('export declare const askNewGuid');
+    expect(declarations).toContain('export declare const askGuidNew');
     expect(declarations).toContain('export type AskResponse<T>');
     // Self-contained: nothing left for a browser editor to resolve.
     expect(declarations).not.toMatch(/from ['"](@qpqjs\/|quidproquo['"/])/);

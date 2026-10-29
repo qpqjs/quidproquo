@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse } from '@qpqjs/core';
 import { askQueryParamsGetAll } from '@qpqjs/web';
 
 import { askSessionLogDocCreated } from '../../actionCreators/sessionLog/askSessionLogDocCreated';
@@ -22,7 +22,7 @@ export function* askStartSession(): AskResponse<void> {
   const seededParams = seededParamsFromQueryParams(queryParams);
 
   const loginAt = yield* askDateNow();
-  const code = yield* askNewGuid();
+  const code = yield* askGuidNew();
 
   const summary = yield* askSessionApiCreate(`${username} — ${loginAt}`, code);
   const ackedEvents = yield* askSessionApiListAllEvents(summary.id);

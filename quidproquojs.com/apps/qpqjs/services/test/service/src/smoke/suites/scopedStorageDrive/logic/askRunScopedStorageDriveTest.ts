@@ -6,7 +6,7 @@ import {
   askFileListDirectory,
   askFileReadTextContents,
   askFileWriteTextContents,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
 } from 'quidproquo';
 
@@ -18,7 +18,7 @@ import { SMOKE_SCOPED_PROBE_DRIVE } from '../constants/SMOKE_SCOPED_PROBE_DRIVE'
 // and an unscoped drive refuses a scoped one. Each refusal must be the typed
 // InvalidScope error, not a generic failure.
 export function* askRunScopedStorageDriveTest(): AskResponse<void> {
-  const fileId = yield* askNewGuid();
+  const fileId = yield* askGuidNew();
   const scopeA = `smoke-a-${fileId}`;
   const scopeB = `smoke-b-${fileId}`;
   const folder = 'scoped';

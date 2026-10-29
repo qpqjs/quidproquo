@@ -1,9 +1,9 @@
 ---
-title: askNewGuid
+title: askGuidNew
 description: Generate a new random (version 4) UUID.
 ---
 
-# askNewGuid
+# askGuidNew
 
 Generates a new random, globally-unique identifier and returns it as a string.
 
@@ -13,10 +13,10 @@ Generates a new random, globally-unique identifier and returns it as a string.
 Minting an id is non-deterministic — two runs would otherwise produce different values. By yielding this as an action, the story stays a pure generator: the runtime produces the id and records it in the execution log, so the run can be inspected, tested, and replayed with the exact same id it saw originally.
 
 ```typescript
-import { askNewGuid } from '@qpqjs/core';
+import { askGuidNew } from '@qpqjs/core';
 
 export function* askCreateUser(name: string) {
-  const userId = yield* askNewGuid();
+  const userId = yield* askGuidNew();
   return { userId, name };
 }
 ```
@@ -24,7 +24,7 @@ export function* askCreateUser(name: string) {
 ## Signature
 
 ```typescript
-function* askNewGuid(): AskResponse<string>;
+function* askGuidNew(): AskResponse<string>;
 ```
 
 ## Parameters

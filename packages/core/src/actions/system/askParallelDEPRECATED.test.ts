@@ -3,7 +3,7 @@ import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { AskResponse } from '../../types';
-import { askNewGuid } from '../guid/askNewGuid';
+import { askGuidNew } from '../guid/askGuidNew';
 import { GuidActionType } from '../guid/GuidActionType';
 import { askRandomNumber } from '../math/askRandomNumber';
 import { MathActionType } from '../math/MathActionType';
@@ -15,7 +15,7 @@ describe('askParallelDEPRECATED', () => {
       return yield* askRandomNumber();
     }
     function* storyB(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
 
     const result = runStory(askParallelDEPRECATED([[storyA], [storyB]]), {
@@ -28,7 +28,7 @@ describe('askParallelDEPRECATED', () => {
 
   it('passes the trailing tuple entries as story arguments', () => {
     function* echo(prefix: string): AskResponse<string> {
-      const guid = yield* askNewGuid();
+      const guid = yield* askGuidNew();
       return `${prefix}-${guid}`;
     }
 
@@ -50,11 +50,11 @@ describe('askParallelDEPRECATED', () => {
     // crashes the batch processor): the pending action is batched alone and its result
     // routed back to the right story.
     function* shortStory(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
     function* longStory(): AskResponse<string> {
-      const first = yield* askNewGuid();
-      const second = yield* askNewGuid();
+      const first = yield* askGuidNew();
+      const second = yield* askGuidNew();
       return `${first}+${second}`;
     }
 
@@ -71,7 +71,7 @@ describe('askParallelDEPRECATED', () => {
       return yield* askRandomNumber();
     }
     function* storyB(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
 
     const run = () =>

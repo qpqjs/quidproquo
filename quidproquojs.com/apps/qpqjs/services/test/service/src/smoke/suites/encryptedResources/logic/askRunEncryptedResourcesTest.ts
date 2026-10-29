@@ -6,7 +6,7 @@ import {
   askKeyValueStoreDelete,
   askKeyValueStoreGet,
   askKeyValueStoreUpsert,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
 } from 'quidproquo';
 
@@ -19,7 +19,7 @@ import { SMOKE_ENCRYPTED_PROBE_STORE } from '../constants/SMOKE_ENCRYPTED_PROBE_
 // the alias-conditioned grant, so a plain round trip on each is the proof.
 // Locally there is no encryption at rest and this is a plain round trip.
 export function* askRunEncryptedResourcesTest(): AskResponse<void> {
-  const probeId = yield* askNewGuid();
+  const probeId = yield* askGuidNew();
 
   const record: SmokeProbeRecord = { probeId, category: 'encrypted', value: 1 };
   yield* askKeyValueStoreUpsert<SmokeProbeRecord>(SMOKE_ENCRYPTED_PROBE_STORE, record);

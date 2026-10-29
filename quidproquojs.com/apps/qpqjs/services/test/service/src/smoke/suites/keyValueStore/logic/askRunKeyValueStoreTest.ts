@@ -6,7 +6,7 @@ import {
   askKeyValueStoreQuery,
   askKeyValueStoreUpdate,
   askKeyValueStoreUpsert,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   kvsEqual,
   kvsIncrement,
@@ -20,7 +20,7 @@ import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 // the GSI: the grant's `table/*/index/*` resource is a separate ARN shape, so
 // index access is the part most likely to break on its own.
 export function* askRunKeyValueStoreTest(): AskResponse<void> {
-  const probeId = yield* askNewGuid();
+  const probeId = yield* askGuidNew();
   const category = `kvs-${probeId}`;
 
   const record: SmokeProbeRecord = { probeId, category, value: 1 };

@@ -16,9 +16,9 @@ import { describe, expect, it } from 'vitest';
 import { handleUserScriptRunnerEvent } from './handleUserScriptRunnerEvent';
 
 const SCRIPT = `
-  const { askNewGuid, askFileReadTextContents } = require('@qpqjs/core');
+  const { askGuidNew, askFileReadTextContents } = require('@qpqjs/core');
   exports.add = (a, b) => a + b;
-  exports.stamped = function* (text) { const id = yield* askNewGuid(); return text + ':' + id.length; };
+  exports.stamped = function* (text) { const id = yield* askGuidNew(); return text + ':' + id.length; };
   exports.readsAFile = function* () { return yield* askFileReadTextContents('secrets', 'keys.txt'); };
   exports.shouts = (text) => require('my-sdk/v1').shout(text);
 `;

@@ -1,7 +1,7 @@
 import {
   askDateNow,
   askFileReadTextContents,
-  askNewGuid,
+  askGuidNew,
   createRuntime,
   DateActionType,
   FileActionType,
@@ -53,7 +53,7 @@ describe('getUserScriptRunnerActionProcessor', () => {
 
   it('runs a story made of pure actions', async () => {
     const result = await runInSandbox(function* () {
-      const guid = yield* askNewGuid();
+      const guid = yield* askGuidNew();
       const now = yield* askDateNow();
       return { guidLength: guid.length, now: typeof now };
     });

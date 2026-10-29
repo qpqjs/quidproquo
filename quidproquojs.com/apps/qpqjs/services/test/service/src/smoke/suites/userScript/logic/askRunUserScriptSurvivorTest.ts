@@ -1,5 +1,5 @@
 import { SMOKE_PROBE_DRIVE } from '@qpqjs/constants';
-import { askFileDelete, askFileWriteTextContents, askNewGuid, AskResponse, askUserScriptBuild, createUserScriptCaller } from 'quidproquo';
+import { askFileDelete, askFileWriteTextContents, askGuidNew, AskResponse, askUserScriptBuild, createUserScriptCaller } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SMOKE_SURVIVOR_PORT } from '../constants/SMOKE_SURVIVOR_PORT';
@@ -11,7 +11,7 @@ import { SmokeUserScriptFunctions } from './SmokeUserScriptFunctions';
 // sandbox in the same (warm) runner, must find nothing answering on it. A survivor could
 // otherwise sit in a reused runner and take the next caller's event off the runtime api.
 export function* askRunUserScriptSurvivorTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/survivor-${scriptId}`;
   const sourceDirectory = `${directory}/source`;
   const builtPath = `${directory}/built.js`;

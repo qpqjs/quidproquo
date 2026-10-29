@@ -170,7 +170,7 @@ export default [
 A single config plus the four actions is enough to create a durable instance and move it through its lifecycle across separate invocations:
 
 ```typescript
-import { askNewGuid } from '@qpqjs/core';
+import { askGuidNew } from '@qpqjs/core';
 import {
   askStateMachineCreate,
   askStateMachineSendEvent,
@@ -178,7 +178,7 @@ import {
 } from '@qpqjs/xstate';
 
 export function* processOrder(customerId: string) {
-  const orderId = yield* askNewGuid();
+  const orderId = yield* askGuidNew();
 
   // 1. Create — starts at the machine's initial state ('pending')
   yield* askStateMachineCreate('order', orderId, { customerId, total: 4200 });

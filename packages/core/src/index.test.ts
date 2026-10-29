@@ -8,7 +8,7 @@ describe('@qpqjs/core entry point', () => {
   it('re-exports the core building blocks', () => {
     expect(typeof core.defineApplication).toBe('function');
     expect(typeof core.askCatch).toBe('function');
-    expect(typeof core.askNewGuid).toBe('function');
+    expect(typeof core.askGuidNew).toBe('function');
     expect(typeof core.isString).toBe('function');
   });
 
