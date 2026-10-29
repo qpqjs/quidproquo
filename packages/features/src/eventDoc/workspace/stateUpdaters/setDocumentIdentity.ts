@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSetDocumentIdentityPayload } from '../../effects/EventDocWorkspaceSetDocumentIdentityEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetDocumentIdentityPayload } from '../effects/EventDocWorkspaceSetDocumentIdentityEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
 /** Binds a slot to a document. */

@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSetErrorPayload } from '../../effects/EventDocWorkspaceSetErrorEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetErrorPayload } from '../effects/EventDocWorkspaceSetErrorEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
 /** Sets a slot's error. */

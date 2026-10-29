@@ -1,5 +1,5 @@
-import { EventDocWorkspaceAppendFullHistoryPayload } from '../../effects/EventDocWorkspaceAppendFullHistoryEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceAppendFullHistoryPayload } from '../effects/EventDocWorkspaceAppendFullHistoryEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /**
  * Appends one older page to a slot's display history and advances the cursor. No-op when nothing is loaded yet or on an

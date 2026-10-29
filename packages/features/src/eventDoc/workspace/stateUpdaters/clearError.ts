@@ -1,5 +1,5 @@
-import { EventDocWorkspaceClearErrorPayload } from '../../effects/EventDocWorkspaceClearErrorEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceClearErrorPayload } from '../effects/EventDocWorkspaceClearErrorEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
 /** Clears a slot's error. */

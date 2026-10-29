@@ -1,10 +1,10 @@
 import { replayEffects } from '@qpqjs/core';
 
-import { foldEventDocLogStep } from '../../../fold/foldEventDocLogStep';
-import { EventDocDocument, EventDocEvent } from '../../../models';
-import { reservedEventDocEventValidators } from '../../../validation/reservedEventDocEventValidators';
-import { EventDocWorkspaceSlotFoldConfig } from '../../types/EventDocWorkspaceSlotFoldConfig';
-import { EventDocWorkspaceSlotKind } from '../../types/EventDocWorkspaceSlotKind';
+import { foldEventDocLogStep } from '../../fold/foldEventDocLogStep';
+import { EventDocDocument, EventDocEvent } from '../../models';
+import { reservedEventDocEventValidators } from '../../validation/reservedEventDocEventValidators';
+import { EventDocWorkspaceSlotFoldConfig } from '../types/EventDocWorkspaceSlotFoldConfig';
+import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
 
 /**
  * Folds history events onto the stored accumulator (initial fold and appended tails alike). Document slots step through

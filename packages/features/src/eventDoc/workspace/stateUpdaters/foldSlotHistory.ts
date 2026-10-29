@@ -1,7 +1,7 @@
 import { Nullable } from '@qpqjs/core';
 
-import { EventDocEvent, EventDocSnapshotBase } from '../../../models';
-import { EventDocWorkspaceSlotFoldConfig } from '../../types/EventDocWorkspaceSlotFoldConfig';
+import { EventDocEvent, EventDocSnapshotBase } from '../../models';
+import { EventDocWorkspaceSlotFoldConfig } from '../types/EventDocWorkspaceSlotFoldConfig';
 import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumulator';
 
 /**

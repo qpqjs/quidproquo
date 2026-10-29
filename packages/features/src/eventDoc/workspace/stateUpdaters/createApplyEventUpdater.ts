@@ -1,9 +1,9 @@
-import { EventDocEvent } from '../../../models';
-import { EventDocWorkspaceApplyEventPayload } from '../../effects/EventDocWorkspaceApplyEventEffect';
-import { getSlotNextEventId } from '../../logic/getSlotNextEventId';
-import { EventDocWorkspaceCoalesceRules } from '../../types/EventDocWorkspaceCoalesceRules';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
-import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
+import { EventDocEvent } from '../../models';
+import { EventDocWorkspaceApplyEventPayload } from '../effects/EventDocWorkspaceApplyEventEffect';
+import { coalesceWorkspaceEvents } from '../logic/coalesceWorkspaceEvents';
+import { getSlotNextEventId } from '../logic/getSlotNextEventId';
+import { EventDocWorkspaceCoalesceRules } from '../types/EventDocWorkspaceCoalesceRules';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /**
  * Lands a commit in the slot's pending buffer. Coalescing and the provisional eventId stamp happen here, atomically, so

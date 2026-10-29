@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSetSavingPayload } from '../../effects/EventDocWorkspaceSetSavingEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetSavingPayload } from '../effects/EventDocWorkspaceSetSavingEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
 /** Sets a slot's saving flag. */

@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSetFullHistoryPayload } from '../../effects/EventDocWorkspaceSetFullHistoryEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetFullHistoryPayload } from '../effects/EventDocWorkspaceSetFullHistoryEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /** Replaces (or clears) a slot's display history. Nothing folds from it. No-op on an unknown slot. */
 export const setFullHistory = (

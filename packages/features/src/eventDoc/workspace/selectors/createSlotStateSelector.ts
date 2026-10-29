@@ -1,5 +1,6 @@
+import { createInitialEventDocWorkspaceSlotState } from '../logic/createInitialEventDocWorkspaceSlotState';
 import { EventDocWorkspaceSelector } from '../types/EventDocWorkspaceSelectors';
-import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from '../types/EventDocWorkspaceSlotState';
+import { EventDocWorkspaceSlotState } from '../types/EventDocWorkspaceSlotState';
 
 // Shared read-only fallback for reads before init.
 const fallbackSlotState = createInitialEventDocWorkspaceSlotState();

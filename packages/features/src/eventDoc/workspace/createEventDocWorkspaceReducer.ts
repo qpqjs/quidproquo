@@ -1,9 +1,8 @@
 import { buildEffectReducer, QpqReducer } from '@qpqjs/core';
 
-import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
-import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';
-import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
-import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
+import { EventDocWorkspaceEffect } from './effects/EventDocWorkspaceEffect';
+import { EventDocWorkspaceEffects } from './effects/EventDocWorkspaceEffects';
+import { getSlotCoalesceRules } from './logic/getSlotCoalesceRules';
 import { appendFullHistory } from './stateUpdaters/appendFullHistory';
 import { clearError } from './stateUpdaters/clearError';
 import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
@@ -21,7 +20,8 @@ import { setFullHistory } from './stateUpdaters/setFullHistory';
 import { setLoading } from './stateUpdaters/setLoading';
 import { setPendingEvents } from './stateUpdaters/setPendingEvents';
 import { setSaving } from './stateUpdaters/setSaving';
-import { getSlotCoalesceRules } from './getSlotCoalesceRules';
+import { EventDocWorkspaceSlotFoldsConfig } from './types/EventDocWorkspaceSlotFoldsConfig';
+import { EventDocWorkspaceState } from './types/EventDocWorkspaceState';
 
 /**
  * Builds the workspace reducer over the slot configs. History-writing updaters fold into historyViews here, so no selector

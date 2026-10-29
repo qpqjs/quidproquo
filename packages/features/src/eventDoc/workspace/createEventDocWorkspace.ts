@@ -2,18 +2,19 @@ import { eventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlo
 import { bindEventDocWorkspaceApi } from './logic/bindEventDocWorkspaceApi';
 import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
 import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspaceSnapshot';
+import { createInitialEventDocWorkspaceState } from './logic/createInitialEventDocWorkspaceState';
 import { foldSlotPendingTail } from './logic/foldSlotPendingTail';
 import { getSlotHistoryView } from './logic/getSlotHistoryView';
 import { getSlotPending } from './logic/getSlotPending';
 import { getSlotValidator } from './logic/getSlotValidator';
-import { createEventDocWorkspaceReducer } from './reducer/createEventDocWorkspaceReducer';
 import { createEventDocWorkspaceSelectors } from './selectors/createEventDocWorkspaceSelectors';
 import { EventDocWorkspaceDefinition } from './types/EventDocWorkspaceDefinition';
 import { EventDocWorkspaceSlotBinding } from './types/EventDocWorkspaceSlotBinding';
 import { EventDocWorkspaceSlotConfig } from './types/EventDocWorkspaceSlotConfig';
 import { EventDocWorkspaceSlotKind } from './types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceSlotsConfig } from './types/EventDocWorkspaceSlotsConfig';
-import { createInitialEventDocWorkspaceState, EventDocWorkspaceState } from './types/EventDocWorkspaceState';
+import { EventDocWorkspaceState } from './types/EventDocWorkspaceState';
+import { createEventDocWorkspaceReducer } from './createEventDocWorkspaceReducer';
 import { EventDocWorkspace, EventDocWorkspaceResolvedSlots } from './EventDocWorkspace';
 
 const getSlotBinding = (

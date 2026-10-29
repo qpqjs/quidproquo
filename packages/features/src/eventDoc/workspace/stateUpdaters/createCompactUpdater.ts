@@ -1,8 +1,8 @@
-import { EventDocSnapshotBase } from '../../../models';
-import { EventDocWorkspaceCompactPayload } from '../../effects/EventDocWorkspaceCompactEffect';
-import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
-import { EventDocWorkspaceSlotKind } from '../../types/EventDocWorkspaceSlotKind';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocSnapshotBase } from '../../models';
+import { EventDocWorkspaceCompactPayload } from '../effects/EventDocWorkspaceCompactEffect';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
+import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /**
  * Makes the stored accumulator the slot's base at its last held event and empties the history. No fold and no fetch: the

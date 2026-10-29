@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSlotState } from '../../types/EventDocWorkspaceSlotState';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSlotState } from '../types/EventDocWorkspaceSlotState';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /** Merges a partial update into one slot's status; no-op on an unknown slot. */
 export const updateSlotState = (

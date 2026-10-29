@@ -1,5 +1,5 @@
-import { EventDocWorkspaceSetLoadingPayload } from '../../effects/EventDocWorkspaceSetLoadingEffect';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetLoadingPayload } from '../effects/EventDocWorkspaceSetLoadingEffect';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { updateSlotState } from './updateSlotState';
 
 /** Sets a slot's loading flag. */

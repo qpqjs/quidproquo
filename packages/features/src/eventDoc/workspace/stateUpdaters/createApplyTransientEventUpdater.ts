@@ -1,7 +1,7 @@
-import { EventDocWorkspaceApplyTransientEventPayload } from '../../effects/EventDocWorkspaceApplyTransientEventEffect';
-import { EventDocWorkspaceCoalesceRules } from '../../types/EventDocWorkspaceCoalesceRules';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
-import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
+import { EventDocWorkspaceApplyTransientEventPayload } from '../effects/EventDocWorkspaceApplyTransientEventEffect';
+import { coalesceWorkspaceEvents } from '../logic/coalesceWorkspaceEvents';
+import { EventDocWorkspaceCoalesceRules } from '../types/EventDocWorkspaceCoalesceRules';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 
 /**
  * Lands a transient commit under its transientKey, coalesced within that key only. eventId stays 0: transients are ordered

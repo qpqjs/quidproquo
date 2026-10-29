@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 
 import { EventDocEvent, EventDocEventInput } from '../../models';
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
-import { createInitialEventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceSaveSlot } from './askEventDocWorkspaceSaveSlot';
+import { createInitialEventDocWorkspaceState } from './createInitialEventDocWorkspaceState';
 
 const pendingEvent: EventDocEvent = {
   type: 'NOTE_ADD',

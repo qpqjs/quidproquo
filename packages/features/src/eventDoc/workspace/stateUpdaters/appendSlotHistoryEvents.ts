@@ -1,7 +1,7 @@
-import { EventDocEvent } from '../../../models';
-import { isContiguousWithSlotHead } from '../../logic/isContiguousWithSlotHead';
-import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocEvent } from '../../models';
+import { isContiguousWithSlotHead } from '../logic/isContiguousWithSlotHead';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumulator';
 
 /**

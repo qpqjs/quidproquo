@@ -1,6 +1,6 @@
-import { EventDocWorkspaceSetHistoryEventsPayload } from '../../effects/EventDocWorkspaceSetHistoryEventsEffect';
-import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
-import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
+import { EventDocWorkspaceSetHistoryEventsPayload } from '../effects/EventDocWorkspaceSetHistoryEventsEffect';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
+import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { foldSlotHistory } from './foldSlotHistory';
 
 /**
