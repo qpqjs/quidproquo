@@ -6,11 +6,15 @@ import { baseUrlsContext } from '../../../platformLogic/contexts/baseUrlContext'
 // Quiet API request for session persistence: authorised like askPlatformRequest
 // but with no global loading spinner or error toast, the flush is background
 // bookkeeping, not user-facing navigation.
-export function* askSessionApiRequest<TBody, TResponse>(method: HTTPMethod, url: string, body?: TBody): AskResponse<HTTPNetworkResponse<TResponse>> {
+export function* askSessionApiRequest<TResult, TPayload = unknown>(
+  method: HTTPMethod,
+  url: string,
+  body?: TPayload,
+): AskResponse<HTTPNetworkResponse<TResult>> {
   const baseUrls = yield* askContextRead(baseUrlsContext);
   const authInfo = yield* askLoadAuthToken();
 
-  return yield* askNetworkRequest<TResponse, TBody>(method, url, {
+  return yield* askNetworkRequest<TResult, TPayload>(method, url, {
     body,
     headers: authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {},
     basePath: baseUrls.api,

@@ -35,7 +35,7 @@ function* askFetchLogLogSearchPart(searchKey: string, search: AdminSearchParams,
 
   do {
     const response: EitherActionResult<HTTPNetworkResponse<QpqPagedData<LogLog>>> = yield* askCatch(
-      askPlatformRequest<unknown, QpqPagedData<LogLog>>('POST', '/loglog/list', {
+      askPlatformRequest<QpqPagedData<LogLog>, unknown>('POST', '/loglog/list', {
         body: {
           logLevel,
           startIsoDateTime: search.startIsoDateTime || nowIso,

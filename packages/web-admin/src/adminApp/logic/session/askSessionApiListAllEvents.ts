@@ -11,7 +11,7 @@ export function* askSessionApiListAllEvents(docId: string): AskResponse<EventDoc
 
   do {
     const query = nextPageKey ? `?nextPageKey=${encodeURIComponent(nextPageKey)}` : '';
-    const page: QpqPagedData<EventDocEvent> = yield* askSessionApiRequestOrThrow<undefined, QpqPagedData<EventDocEvent>>(
+    const page: QpqPagedData<EventDocEvent> = yield* askSessionApiRequestOrThrow<QpqPagedData<EventDocEvent>, undefined>(
       'GET',
       `${adminSessionApiBasePath}/${docId}/events${query}`,
     );

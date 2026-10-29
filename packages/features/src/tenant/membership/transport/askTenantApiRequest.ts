@@ -5,13 +5,18 @@ import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { tenantMyTenantsEndpoint } from '../constants/tenantMyTenantsEndpoint';
 
 /** One call to a tenant route; a non-2xx status becomes a thrown error carrying the server's message where it sent one. */
-export function* askTenantApiRequest<TBody, TResponse>(
+export function* askTenantApiRequest<TResult, TPayload = unknown>(
   target: TenantClientTarget,
   method: HTTPMethod,
   path: string,
-  body?: TBody,
-): AskResponse<TResponse> {
-  const response = yield* askApiRequest<TResponse, TBody>(target.service, method, tenantMyTenantsEndpoint(target, path), body ? { body } : undefined);
+  body?: TPayload,
+): AskResponse<TResult> {
+  const response = yield* askApiRequest<TResult, TPayload>(
+    target.service,
+    method,
+    tenantMyTenantsEndpoint(target, path),
+    body ? { body } : undefined,
+  );
 
   if (response.status < 200 || response.status >= 300) {
     const message = (response.data as { message?: string } | undefined)?.message;

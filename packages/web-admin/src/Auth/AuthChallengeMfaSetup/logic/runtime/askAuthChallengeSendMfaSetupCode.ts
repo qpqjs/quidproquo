@@ -9,7 +9,7 @@ import { AuthChallengeMfaSetupState, AuthChallengeSendMfaSetupCodePayload } from
 export function* askAuthChallengeSendMfaSetupCode(challenge: string, email: string): AskResponse<void> {
   const { mfaCode, session } = yield* askStateRead<AuthChallengeMfaSetupState>('');
 
-  const response = yield* askPlatformRequest<AuthChallengeSendMfaSetupCodePayload, AuthenticateUserResponse>('POST', '/challenge', {
+  const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthChallengeSendMfaSetupCodePayload>('POST', '/challenge', {
     body: {
       challenge,
       email,

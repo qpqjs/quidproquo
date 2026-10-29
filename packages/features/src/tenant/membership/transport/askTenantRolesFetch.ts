@@ -7,5 +7,5 @@ import { askTenantApiRequest } from './askTenantApiRequest';
 
 /** GET myTenants/{id}/roles: the role catalog as a pick list. */
 export function* askTenantRolesFetch(target: TenantClientTarget, tenantId: TenantId): AskResponse<TenantRoleOption[]> {
-  return yield* askTenantApiRequest<void, TenantRoleOption[]>(target, 'GET', `/${tenantId}/roles`);
+  return yield* askTenantApiRequest<TenantRoleOption[], void>(target, 'GET', `/${tenantId}/roles`);
 }

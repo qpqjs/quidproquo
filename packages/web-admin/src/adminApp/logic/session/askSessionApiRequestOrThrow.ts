@@ -2,8 +2,8 @@ import { AskResponse, askThrowError, ErrorTypeEnum, HTTPMethod } from '@qpqjs/co
 
 import { askSessionApiRequest } from './askSessionApiRequest';
 
-export function* askSessionApiRequestOrThrow<TBody, TResponse>(method: HTTPMethod, url: string, body?: TBody): AskResponse<TResponse> {
-  const response = yield* askSessionApiRequest<TBody, TResponse>(method, url, body);
+export function* askSessionApiRequestOrThrow<TResult, TPayload = unknown>(method: HTTPMethod, url: string, body?: TPayload): AskResponse<TResult> {
+  const response = yield* askSessionApiRequest<TResult, TPayload>(method, url, body);
 
   if (response.status < 200 || response.status >= 300) {
     return yield* askThrowError(ErrorTypeEnum.GenericError, `Session request failed (${response.status}): ${method}::${url}`);

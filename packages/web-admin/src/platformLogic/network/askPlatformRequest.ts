@@ -4,7 +4,7 @@ import { askLoadAuthToken } from '../config';
 import { baseUrlsContext } from '../contexts';
 import { askUIShowError, askUIStartLoading, askUIStopLoading } from '../effects';
 
-export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<T>) {
+export function* askPlatformRequest<TResult, TPayload = unknown>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<TPayload>) {
   const baseUrls = yield* askContextRead(baseUrlsContext);
 
   yield* askUIStartLoading();
@@ -16,7 +16,7 @@ export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpR
     ...(authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {}),
   };
 
-  const response = yield* askNetworkRequest<R, T>(method, url, {
+  const response = yield* askNetworkRequest<TResult, TPayload>(method, url, {
     ...httpRequestOptions,
     headers,
     basePath: baseUrls.api,

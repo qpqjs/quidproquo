@@ -7,7 +7,7 @@ import { AuthLoginPayload, AuthState } from '../authTypes';
 export function* askAuthLogin(): AskResponse<void> {
   const { username, password } = yield* askStateRead<AuthState>('');
 
-  const response = yield* askPlatformRequest<AuthLoginPayload, AuthenticateUserResponse>('POST', '/login', {
+  const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthLoginPayload>('POST', '/login', {
     body: {
       username,
       password,

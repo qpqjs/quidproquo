@@ -19,7 +19,7 @@ export function* askFetchLogSearchPart(
 
   do {
     const response: EitherActionResult<HTTPNetworkResponse<QpqLogList>> = yield* askCatch(
-      askPlatformRequest<unknown, QpqLogList>('POST', '/log/list', {
+      askPlatformRequest<QpqLogList, unknown>('POST', '/log/list', {
         body: {
           runtimeType,
           startIsoDateTime: search.startIsoDateTime || nowIso,

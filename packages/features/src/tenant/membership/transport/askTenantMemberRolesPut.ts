@@ -13,5 +13,5 @@ export function* askTenantMemberRolesPut(
   userId: string,
   assignment: TenantMemberRolesSetRequest,
 ): AskResponse<TenantMembership> {
-  return yield* askTenantApiRequest<TenantMemberRolesSetRequest, TenantMembership>(target, 'PUT', `/${tenantId}/members/${userId}/roles`, assignment);
+  return yield* askTenantApiRequest<TenantMembership, TenantMemberRolesSetRequest>(target, 'PUT', `/${tenantId}/members/${userId}/roles`, assignment);
 }

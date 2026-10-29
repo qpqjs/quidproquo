@@ -7,7 +7,7 @@ import { AuthChallengeAssociateSoftwareTokenPayload } from '../authChallengeType
 // Kicks off TOTP enrollment: trades the MFA_SETUP challenge session for the
 // shared secret (to show as a QR / manual key) and a refreshed session.
 export function* askAuthChallengeAssociateSoftwareToken(session: string): AskResponse<void> {
-  const response = yield* askPlatformRequest<AuthChallengeAssociateSoftwareTokenPayload, AssociateSoftwareTokenResult>(
+  const response = yield* askPlatformRequest<AssociateSoftwareTokenResult, AuthChallengeAssociateSoftwareTokenPayload>(
     'POST',
     '/associateSoftwareToken',
     {

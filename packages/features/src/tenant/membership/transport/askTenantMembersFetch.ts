@@ -12,7 +12,7 @@ export function* askTenantMembersFetch(target: TenantClientTarget, tenantId: Ten
 
   do {
     const query = nextPageKey ? `?nextPageKey=${encodeURIComponent(nextPageKey)}` : '';
-    const page = yield* askTenantApiRequest<void, QpqPagedData<TenantMember>>(target, 'GET', `/${tenantId}/members${query}`);
+    const page = yield* askTenantApiRequest<QpqPagedData<TenantMember>, void>(target, 'GET', `/${tenantId}/members${query}`);
 
     members.push(...page.items);
     nextPageKey = page.nextPageKey;

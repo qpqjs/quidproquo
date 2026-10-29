@@ -13,5 +13,5 @@ export function* askTenantMemberDisabledPatch(
   userId: string,
   disabled: boolean,
 ): AskResponse<TenantMembership> {
-  return yield* askTenantApiRequest<TenantMemberUpdateRequest, TenantMembership>(target, 'PATCH', `/${tenantId}/members/${userId}`, { disabled });
+  return yield* askTenantApiRequest<TenantMembership, TenantMemberUpdateRequest>(target, 'PATCH', `/${tenantId}/members/${userId}`, { disabled });
 }

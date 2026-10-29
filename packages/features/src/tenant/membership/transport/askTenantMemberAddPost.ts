@@ -8,5 +8,5 @@ import { askTenantApiRequest } from './askTenantApiRequest';
 
 /** POST myTenants/{id}/members: add an existing account by email. */
 export function* askTenantMemberAddPost(target: TenantClientTarget, tenantId: TenantId, email: string): AskResponse<TenantMember> {
-  return yield* askTenantApiRequest<TenantMemberAddRequest, TenantMember>(target, 'POST', `/${tenantId}/members`, { email });
+  return yield* askTenantApiRequest<TenantMember, TenantMemberAddRequest>(target, 'POST', `/${tenantId}/members`, { email });
 }

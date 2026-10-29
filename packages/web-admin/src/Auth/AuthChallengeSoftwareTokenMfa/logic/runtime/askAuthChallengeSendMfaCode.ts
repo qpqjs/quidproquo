@@ -7,7 +7,7 @@ import { AuthChallengeMfaState, AuthChallengeSendMfaCodePayload } from '../authC
 export function* askAuthChallengeSendMfaCode(challenge: string, session: string, email: string): AskResponse<void> {
   const { mfaCode } = yield* askStateRead<AuthChallengeMfaState>('');
 
-  const response = yield* askPlatformRequest<AuthChallengeSendMfaCodePayload, AuthenticateUserResponse>('POST', '/challenge', {
+  const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthChallengeSendMfaCodePayload>('POST', '/challenge', {
     body: {
       challenge,
       email,

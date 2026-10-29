@@ -9,7 +9,7 @@ type GetServiceNamesResponse = {
 };
 
 export function* askLoadServiceNames(): AskResponse<void> {
-  const response = yield* askPlatformRequest<undefined, GetServiceNamesResponse>('GET', '/admin/services');
+  const response = yield* askPlatformRequest<GetServiceNamesResponse, undefined>('GET', '/admin/services');
 
   if (response.status < 200 || response.status >= 300) {
     return;

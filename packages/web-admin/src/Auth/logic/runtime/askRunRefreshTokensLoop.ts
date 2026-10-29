@@ -24,7 +24,7 @@ export function* askRunRefreshTokensLoop(): AskResponse<void> {
         yield* askDelay(refreshTime);
       }
 
-      const response = yield* askPlatformRequest<AuthRefreshTokenPayload, AuthenticateUserResponse>('POST', '/refreshToken', {
+      const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthRefreshTokenPayload>('POST', '/refreshToken', {
         body: {
           refreshToken: authenticateUserResponse.authenticationInfo?.refreshToken,
         },

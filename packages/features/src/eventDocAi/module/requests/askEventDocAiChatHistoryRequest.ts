@@ -5,5 +5,5 @@ import { EVENT_DOC_AI_METHOD_CHAT_HISTORY } from '../constants/eventDocAiMethodN
 import { askEventDocAiServiceRequest } from '../logic/askEventDocAiServiceRequest';
 
 export function* askEventDocAiChatHistoryRequest(payload: EventDocAiChatHistoryPayload): AskResponse<EventDocAiChatMessage[]> {
-  return yield* askEventDocAiServiceRequest<EventDocAiChatHistoryPayload, EventDocAiChatMessage[]>(EVENT_DOC_AI_METHOD_CHAT_HISTORY, payload);
+  return yield* askEventDocAiServiceRequest<EventDocAiChatMessage[], EventDocAiChatHistoryPayload>(EVENT_DOC_AI_METHOD_CHAT_HISTORY, payload);
 }

@@ -7,5 +7,5 @@ import { askSessionApiRequestOrThrow } from './askSessionApiRequestOrThrow';
 // POST /v1/admin/session, creates the session doc (server seeds INIT_STATE)
 // and returns its summary; the id anchors the whole audited session.
 export function* askSessionApiCreate(name: string, code: string): AskResponse<EventDocSummary> {
-  return yield* askSessionApiRequestOrThrow<{ name: string; code: string }, EventDocSummary>('POST', adminSessionApiBasePath, { name, code });
+  return yield* askSessionApiRequestOrThrow<EventDocSummary, { name: string; code: string }>('POST', adminSessionApiBasePath, { name, code });
 }

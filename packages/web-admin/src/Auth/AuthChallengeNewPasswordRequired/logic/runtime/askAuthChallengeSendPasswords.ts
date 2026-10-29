@@ -7,7 +7,7 @@ import { AuthChallengeSetPasswordPayload, AuthChallengeState } from '../authChal
 export function* askAuthChallengeSendPasswords(challenge: string, session: string, email: string): AskResponse<void> {
   const { passwordA } = yield* askStateRead<AuthChallengeState>('');
 
-  const response = yield* askPlatformRequest<AuthChallengeSetPasswordPayload, AuthenticateUserResponse>('POST', '/challenge', {
+  const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthChallengeSetPasswordPayload>('POST', '/challenge', {
     body: {
       challenge,
       email,

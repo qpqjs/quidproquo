@@ -5,5 +5,5 @@ import { EVENT_DOC_AI_METHOD_CHAT_SEND } from '../constants/eventDocAiMethodName
 import { askEventDocAiServiceRequest } from '../logic/askEventDocAiServiceRequest';
 
 export function* askEventDocAiChatSendRequest(payload: EventDocAiChatSendPayload): AskResponse<EventDocAiChatSendResult> {
-  return yield* askEventDocAiServiceRequest<EventDocAiChatSendPayload, EventDocAiChatSendResult>(EVENT_DOC_AI_METHOD_CHAT_SEND, payload);
+  return yield* askEventDocAiServiceRequest<EventDocAiChatSendResult, EventDocAiChatSendPayload>(EVENT_DOC_AI_METHOD_CHAT_SEND, payload);
 }
