@@ -27,7 +27,7 @@ const buildStack = () => new Stack(new App(), 'inf', { env: { account: '12345678
 describe('QpqApiWebserverEmailReceiverConstruct', () => {
   it('adds the app rule to the account rule set, for every root, into the landing bucket', () => {
     const qpqConfig = buildConfig(true);
-    const receiver = qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0];
+    const receiver = qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0];
     const stack = buildStack();
 
     new QpqApiWebserverEmailReceiverConstruct(stack, 'receiver', { qpqConfig, emailReceiverConfig: receiver });
@@ -56,14 +56,14 @@ describe('QpqApiWebserverEmailReceiverConstruct', () => {
       () =>
         new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', {
           qpqConfig,
-          emailReceiverConfig: qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0],
+          emailReceiverConfig: qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0],
         }),
     ).toThrow(/no storage drive/);
   });
 
   it('fails synth when the app has no receiving domain', () => {
     const qpqConfig = buildConfig(false);
-    const receiver = qpqWebServerUtils.getEmailReceiverConfigs(qpqConfig)[0];
+    const receiver = qpqWebServerUtils.getAllEmailReceiverConfigs(qpqConfig)[0];
 
     expect(() => new QpqApiWebserverEmailReceiverConstruct(buildStack(), 'receiver', { qpqConfig, emailReceiverConfig: receiver })).toThrow(
       /defineEmailReceivingDomain/,

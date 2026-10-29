@@ -1,20 +1,9 @@
-import { defineInlineFunction, defineStorageDrive, QPQConfig, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
+import { defineInlineFunction, defineStorageDrive, QPQConfig } from '@qpqjs/core';
 
-import { EMAIL_RECEIVER_ON_EMAIL_GLOBAL } from '../../services/emailReceiving/constants/emailReceivingGlobals';
-import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-
-export type EmailReceiverQPQWebServerConfigSetting = {
-  name: string;
-  // The drive raw messages land in, owned by the receiver; apps never name it.
-  storageDriveName: string;
-  onEmailFunctionName: string;
-} & QPQConfigSetting;
-
-export type EmailReceiverOptions = {
-  // Runs once per received message with an EmailReceivedEvent.
-  onEmail: QpqFunctionRuntime;
-};
+import { EMAIL_RECEIVER_ON_EMAIL_GLOBAL } from '../../../services/emailReceiving/constants/emailReceivingGlobals';
+import { getServiceEntryQpqFunctionRuntime } from '../../../services/getServiceEntryQpqFunctionRuntime';
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { EmailReceiverOptions, EmailReceiverQPQWebServerConfigSetting } from './types';
 
 /** The drive a receiver's raw messages land in. Framework-owned: the api never names it. */
 export const emailReceiverStorageDriveName = (name: string): string => `email-${name}`;

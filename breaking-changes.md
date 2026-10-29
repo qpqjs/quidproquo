@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqWebServerUtils.getEmailReceiverConfigs` is `getAllEmailReceiverConfigs`, joined by `getOwnedEmailReceiverConfigs`, `getEmailReceiverByName(name, cfg)` and `resolveEmailReceiverOrThrow`; `getEmailReceiversForStorageDrive` takes `(storageDriveName, cfg)`. The setting lives in `config/settings/emailReceiver/` (D5).
 - `qpqWebServerUtils.getApiConfigs` is `getAllApiConfigs`, joined by `getOwnedApiConfigs`, `getApiByName(apiName, cfg)` and `resolveApiOrThrow`; the api setting lives in `config/settings/api/` (D5).
 - `qpqWebServerUtils` websocket accessors follow D5: `getAllWebsocketConfigs(cfg)`, `getOwnedWebsocketConfigs(cfg)`, `getWebsocketByName(apiName, cfg)` (null when missing) and `resolveWebsocketOrThrow(apiName, cfg)` replace `getWebsocketSettings`, `getOwnedWebsocketSettings` and the throwing `getWebsocketEntryByApiName`; the setting lives in `config/settings/websocket/`.
 - `qpqWebServerUtils` cache accessors follow D5: `getAllCacheConfigs(cfg)`, `getOwnedCacheConfigs(cfg)` (was `getAllOwnedCacheConfigs`), `getCacheByName(name, cfg)` (null when missing) and `resolveCacheOrThrow(name, cfg)` (was the throwing `getCacheConfigByName`); the setting lives in `config/settings/cache/`.

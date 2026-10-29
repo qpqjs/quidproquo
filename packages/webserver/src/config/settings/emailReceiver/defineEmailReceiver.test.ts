@@ -2,8 +2,9 @@ import { InlineFunctionQPQConfigSetting, QPQCoreConfigSettingType, StorageDriveQ
 
 import { describe, expect, it } from 'vitest';
 
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineEmailReceiver, EmailReceiverQPQWebServerConfigSetting } from './emailReceiver';
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { defineEmailReceiver } from './defineEmailReceiver';
+import { EmailReceiverQPQWebServerConfigSetting } from './types';
 
 const onEmail = '/entry/email/onEmail::onEmail';
 

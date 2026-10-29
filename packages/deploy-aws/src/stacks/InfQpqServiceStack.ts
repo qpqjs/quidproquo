@@ -60,7 +60,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
     // A drive a receiver writes into is written by the account's receipt rule of that name.
     const emailReceiptRuleNamesForDrive = (storageDriveName: string): string[] =>
-      qpqWebServerUtils.getEmailReceiversForStorageDrive(props.qpqConfig, storageDriveName).map((r) => emailReceiptRuleName(props.qpqConfig, r.name));
+      qpqWebServerUtils.getEmailReceiversForStorageDrive(storageDriveName, props.qpqConfig).map((r) => emailReceiptRuleName(props.qpqConfig, r.name));
 
     // Build the storage drives
     qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).map(
