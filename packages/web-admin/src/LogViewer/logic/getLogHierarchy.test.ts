@@ -6,7 +6,7 @@ const apiRequestGet = vi.fn();
 const externalRequestGet = vi.fn();
 
 // Only the network wrappers are replaced, not the whole logic barrel.
-vi.mock('../../logic/platform/apiRequest', async (importOriginal) => ({
+vi.mock('../../logic/platform/apiRequest', async (importOriginal: <T>() => Promise<T>) => ({
   ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
   externalRequestGet: (...args: unknown[]) => externalRequestGet(...args),

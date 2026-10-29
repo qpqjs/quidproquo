@@ -3,6 +3,7 @@ import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@q
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getConfigGetParameterActionProcessor } from './getConfigGetParameterActionProcessor';
 
 const { configStore } = vi.hoisted(() => ({
@@ -11,7 +12,7 @@ const { configStore } = vi.hoisted(() => ({
 
 vi.mock('../../../logic/config', () => configStore);
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 const getProcessor = async () => {
   const processors = await getConfigGetParameterActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);

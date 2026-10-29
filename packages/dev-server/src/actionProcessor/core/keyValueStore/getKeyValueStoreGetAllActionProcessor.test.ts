@@ -10,6 +10,7 @@ import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@q
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -20,7 +21,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 const getProcessor = async () => {
   const config = buildTestQpqConfig([

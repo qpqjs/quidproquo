@@ -14,6 +14,7 @@ import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@q
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -24,7 +25,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 // A real KvsQueryOperation: the processor walks the condition tree (scope
 // gate validation), so a stand-in string would throw before reaching the repo.

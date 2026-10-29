@@ -10,6 +10,7 @@ import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@q
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
@@ -22,7 +23,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const qpqConfig = buildTestQpqConfig([defineKeyValueStore('tenantStore', { key: 'id', type: 'string' }, [], { scoped: true })]);
 
 // The processors that branch on scope before validating are the ones that

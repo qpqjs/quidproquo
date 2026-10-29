@@ -2,6 +2,7 @@ import {
   Action,
   ConfigActionType,
   DateActionType,
+  ErrorTypeEnum,
   EventActionType,
   FileActionType,
   KeyValueStoreActionType,
@@ -88,7 +89,7 @@ describe('storyResultToMetadata', () => {
   });
 
   it('records the error and clears the ttl when the story failed', () => {
-    const metadata = storyResultToMetadata({ ...baseStoryResult, error: { errorText: 'kaboom' } }, 99);
+    const metadata = storyResultToMetadata({ ...baseStoryResult, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'kaboom' } }, 99);
 
     expect(metadata.error).toBe('kaboom');
     expect(metadata.ttl).toBeUndefined();

@@ -38,7 +38,7 @@ describe('useAuthenticatedNetworkRequest', () => {
   it('adds a bearer Authorization header when a token is present', async () => {
     const payload = { url: 'https://api', method: 'GET', headers: { 'X-A': '1' } } as NetworkRequestActionPayload<any>;
     const { result } = renderHook(() => useAuthenticatedNetworkRequest(payload), {
-      wrapper: wrapperFor({ username: '', password: '', authenticationInfo: { accessToken: 'tok' } as any }),
+      wrapper: wrapperFor({ username: '', authenticationInfo: { accessToken: 'tok' } as any }),
     });
 
     await result.current();

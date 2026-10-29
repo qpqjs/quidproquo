@@ -1,6 +1,6 @@
 import { ErrorTypeEnum, EventActionType, resolveActionResult } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
-import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { defineRoute } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -26,14 +26,7 @@ describe('getEventTransformResponseResultActionProcessor (express)', () => {
 
   it("answers with the matched route's own allowed origin, as its preflight does", async () => {
     const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'POST/signer/session',
-        path: '/signer/session',
-        method: 'POST',
-        runtime: { src: 'handler', runtimeType: 'Function' },
-        options: { allowedOrigins: ['http://localhost:3082'] },
-      } as any,
+      defineRoute('POST', '/signer/session', '/entry/handler::handler', { allowedOrigins: ['http://localhost:3082'] }),
     ]);
     const processors = await getEventTransformResponseResultActionProcessor(config, noopDynamicModuleLoader);
     const fromSigningSite = async (path: string) =>

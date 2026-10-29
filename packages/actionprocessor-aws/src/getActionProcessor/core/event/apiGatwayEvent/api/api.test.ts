@@ -1,6 +1,6 @@
-import { ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
-import { defineFileUploadSettings, FileUploadErrorTypeEnum, QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { defineFileUploadSettings, defineRoute, FileUploadErrorTypeEnum } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -100,17 +100,8 @@ describe('apiGatwayEvent/api getEventMatchStoryActionProcessor', () => {
   });
 
   it('matches the request to a configured route', async () => {
-    const runtime = { src: 'handler', runtimeType: 'Function' } as any;
-    const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'GET/users',
-        path: '/users',
-        method: 'GET',
-        runtime,
-        options: { allowedOrigins: [] },
-      } as any,
-    ]);
+    const runtime: QpqFunctionRuntime = '/entry/handler::handler';
+    const config = buildTestQpqConfig([defineRoute('GET', '/users', runtime, { allowedOrigins: [] })]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { path: '/users', method: 'GET', headers: {} } });
@@ -119,17 +110,8 @@ describe('apiGatwayEvent/api getEventMatchStoryActionProcessor', () => {
   });
 
   it('decodes route params before handing them to the story', async () => {
-    const runtime = { src: 'handler', runtimeType: 'Function' } as any;
-    const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'GET/log/{id}',
-        path: '/log/{id}',
-        method: 'GET',
-        runtime,
-        options: { allowedOrigins: [] },
-      } as any,
-    ]);
+    const runtime: QpqFunctionRuntime = '/entry/handler::handler';
+    const config = buildTestQpqConfig([defineRoute('GET', '/log/{id}', runtime, { allowedOrigins: [] })]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { path: '/log/svc%3A%3A1', method: 'GET', headers: {} } });
@@ -142,17 +124,8 @@ describe('apiGatwayEvent/api getEventMatchStoryActionProcessor', () => {
   // Security regression: the matcher compares the raw path, so dot segments or encoded slashes never fold a request
   // onto a different route.
   it('never matches a route through dot segments or encoded separators', async () => {
-    const runtime = { src: 'handler', runtimeType: 'Function' } as any;
-    const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'GET/users',
-        path: '/users',
-        method: 'GET',
-        runtime,
-        options: { allowedOrigins: [] },
-      } as any,
-    ]);
+    const runtime: QpqFunctionRuntime = '/entry/handler::handler';
+    const config = buildTestQpqConfig([defineRoute('GET', '/users', runtime, { allowedOrigins: [] })]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     for (const path of ['/public/../users', '/users/..', '/public/..%2Fusers', '/%2Fusers']) {
@@ -214,14 +187,7 @@ describe('apiGatwayEvent/api getEventTransformResponseResultActionProcessor', ()
 
   it("answers with the matched route's own allowed origin, as its preflight does", async () => {
     const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'POST/signer/session',
-        path: '/signer/session',
-        method: 'POST',
-        runtime: { src: 'handler', runtimeType: 'Function' },
-        options: { allowedOrigins: ['https://sign.example.com'] },
-      } as any,
+      defineRoute('POST', '/signer/session', '/entry/handler::handler', { allowedOrigins: ['https://sign.example.com'] }),
     ]);
     const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult, config);
     const record = { success: true, result: { status: 200, body: 'ok', headers: {} } };

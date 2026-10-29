@@ -1,6 +1,6 @@
-import { ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
-import { defineDns, QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { defineDns, defineSeo } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -70,8 +70,8 @@ describe('cloudFrontOriginRequest getEventMatchStoryActionProcessor', () => {
   });
 
   it('matches the request path to a configured seo entry', async () => {
-    const runtime = { src: 'seo' } as any;
-    const config = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.Seo, path: '/page', runtime } as any]);
+    const runtime: QpqFunctionRuntime = '/entry/seo::seo';
+    const config = buildTestQpqConfig([defineSeo('/page', runtime)]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { path: '/page' } });
@@ -80,8 +80,8 @@ describe('cloudFrontOriginRequest getEventMatchStoryActionProcessor', () => {
   });
 
   it('decodes seo path params', async () => {
-    const runtime = { src: 'seo' } as any;
-    const config = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.Seo, path: '/page/{slug}', runtime } as any]);
+    const runtime: QpqFunctionRuntime = '/entry/seo::seo';
+    const config = buildTestQpqConfig([defineSeo('/page/{slug}', runtime)]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { path: '/page/caf%C3%A9' } });

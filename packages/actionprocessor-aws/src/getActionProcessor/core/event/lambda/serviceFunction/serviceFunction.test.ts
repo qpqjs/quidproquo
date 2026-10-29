@@ -1,6 +1,6 @@
-import { ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
-import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { defineServiceFunction } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -31,10 +31,8 @@ describe('lambda/serviceFunction getEventMatchStoryActionProcessor', () => {
   });
 
   it('returns the runtime for a matching service function', async () => {
-    const runtime = { src: 'doThing' };
-    const config = buildTestQpqConfig([
-      { configSettingType: QPQWebServerConfigSettingType.ServiceFunction, functionName: 'doThing', runtime } as any,
-    ]);
+    const runtime: QpqFunctionRuntime = '/entry/functions::doThing';
+    const config = buildTestQpqConfig([defineServiceFunction(runtime)]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { functionName: 'doThing' } });

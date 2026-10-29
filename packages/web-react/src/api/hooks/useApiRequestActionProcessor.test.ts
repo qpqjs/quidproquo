@@ -41,8 +41,8 @@ const wrapperFor = (state: AuthState) =>
     return createElement(BaseUrlContext.Provider, { value: resolvers }, createElement(authContext.Provider, { value: state }, children));
   };
 
-const signedOut: AuthState = { username: '', password: '' };
-const signedIn: AuthState = { username: '', password: '', authenticationInfo: { accessToken: 'tok' } as any };
+const signedOut: AuthState = { username: '' };
+const signedIn: AuthState = { username: '', authenticationInfo: { accessToken: 'tok' } as any };
 
 describe('useApiRequestActionProcessor', () => {
   it('sends no authorization header when there is no token', async () => {

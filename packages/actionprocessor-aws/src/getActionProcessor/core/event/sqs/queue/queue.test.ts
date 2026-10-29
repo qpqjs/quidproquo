@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType, NotifyErrorQueueEvents, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { defineQueue, ErrorTypeEnum, EventActionType, NotifyErrorQueueEvents, QpqFunctionRuntime } from '@qpqjs/core';
 import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -64,9 +64,9 @@ describe('sqs/queue getQueueConfigSetting', () => {
 
   it('looks up the queue config setting named by the environment', () => {
     process.env.queueName = 'q';
-    const setting = { configSettingType: QPQCoreConfigSettingType.queue, name: 'q', eventBusSubscriptions: [] };
+    const setting = defineQueue('q', {});
 
-    expect(getQueueConfigSetting(buildTestQpqConfig([setting as any]))).toEqual(setting);
+    expect(getQueueConfigSetting(buildTestQpqConfig([setting]))).toEqual(setting);
   });
 
   it('throws when the named queue is not in the config', () => {
@@ -77,7 +77,7 @@ describe('sqs/queue getQueueConfigSetting', () => {
 });
 
 describe('sqs/queue getEventMatchStoryActionProcessor', () => {
-  const runtime = { src: 'onOrder' };
+  const runtime: QpqFunctionRuntime = '/entry/queue::onOrder';
 
   beforeEach(() => {
     process.env.queueName = 'q';
@@ -88,14 +88,7 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   });
 
   const buildConfig = (eventBusSubscriptions: string[] = []) =>
-    buildTestQpqConfig([
-      {
-        configSettingType: QPQCoreConfigSettingType.queue,
-        name: 'q',
-        qpqQueueProcessors: { orderCreated: runtime },
-        eventBusSubscriptions,
-      } as any,
-    ]);
+    buildTestQpqConfig([defineQueue('q', { orderCreated: runtime }, { eventBusSubscriptions })]);
 
   it('matches a queue message type to its processor', async () => {
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, buildConfig());

@@ -8,7 +8,7 @@ const apiRequestGet = vi.fn();
 
 // Only the network wrapper is replaced: findLogDirectChildren and the memoising `cache` are real,
 // so the children come back from the paths the hierarchy asks for.
-vi.mock('../../logic/platform/apiRequest', async (importOriginal) => ({
+vi.mock('../../logic/platform/apiRequest', async (importOriginal: <T>() => Promise<T>) => ({
   ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
 }));
