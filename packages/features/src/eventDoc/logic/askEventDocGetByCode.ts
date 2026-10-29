@@ -21,5 +21,5 @@ export function* askEventDocGetByCode<T extends EventDocSummary = EventDocSummar
     return yield* askThrowError(ErrorTypeEnum.Conflict, `Multiple instances detected for code "${code}"`);
   }
 
-  return matches[0];
+  return matches[0] ?? null;
 }

@@ -64,5 +64,6 @@ export const buildKvsFilterConditions = (filters: ActionSearchFilter[], fields: 
     return null;
   }
 
-  return conditions.length === 1 ? conditions[0] : kvsAnd(conditions);
+  const [only] = conditions;
+  return conditions.length === 1 && only ? only : kvsAnd(conditions);
 };

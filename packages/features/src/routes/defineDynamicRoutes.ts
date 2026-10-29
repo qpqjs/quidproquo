@@ -9,8 +9,8 @@ import { DynamicRouteMeta } from './dynamicRoute';
 type BrandedRouteHandler = { dynamicRoute: DynamicRouteMeta };
 
 export const defineDynamicRoutes = (controllerRuntime: Record<string, BrandedRouteHandler>, path: `/${string}` = '/entry/controller'): QPQConfig =>
-  Object.keys(controllerRuntime).map((key) => {
-    const route = controllerRuntime[key].dynamicRoute;
+  Object.entries(controllerRuntime).map(([key, handler]) => {
+    const route = handler.dynamicRoute;
     if (!route) {
       throw new Error(`Route not defined for ${key}`);
     }

@@ -6,5 +6,7 @@ export const updateSlotState = (
   state: EventDocWorkspaceState,
   slotKey: string,
   update: Partial<EventDocWorkspaceSlotState>,
-): EventDocWorkspaceState =>
-  slotKey in state.slots ? { ...state, slots: { ...state.slots, [slotKey]: { ...state.slots[slotKey], ...update } } } : state;
+): EventDocWorkspaceState => {
+  const slot = state.slots[slotKey];
+  return slot ? { ...state, slots: { ...state.slots, [slotKey]: { ...slot, ...update } } } : state;
+};

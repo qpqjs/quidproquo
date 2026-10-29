@@ -14,7 +14,8 @@ export const findEventDocLogDivergence = (existing: EventDocEvent[], incoming: E
   const sharedLength = Math.min(existing.length, incoming.length);
 
   for (let index = 0; index < sharedLength; index += 1) {
-    if (eventIdentity(existing[index]) !== eventIdentity(incoming[index])) {
+    const [existingEvent, incomingEvent] = [existing[index], incoming[index]];
+    if (!existingEvent || !incomingEvent || eventIdentity(existingEvent) !== eventIdentity(incomingEvent)) {
       return { diverged: true, atIndex: index };
     }
   }

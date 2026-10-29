@@ -43,7 +43,7 @@ export function* askEventDocTransferExport(registry: EventDocTransferRegistry, s
 
   return {
     downloadUrl,
-    filename: eventDocTransferBundleFilename(roots[0].type, roots[0].code, bundle.source.exportedAt, roots.length),
+    filename: eventDocTransferBundleFilename(roots[0]?.type ?? '', roots[0]?.code ?? '', bundle.source.exportedAt, roots.length),
     items,
   };
 }

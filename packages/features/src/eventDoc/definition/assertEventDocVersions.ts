@@ -16,7 +16,7 @@ export const assertEventDocVersions = (versions: EventDocVersions, schemaVersion
     }
   });
 
-  const latest = versions[versions.length - 1].version;
+  const latest = versions[versions.length - 1]?.version;
   if (latest !== schemaVersion) {
     throw new Error(
       `Event doc schemaVersion is ${schemaVersion} but the newest declared version is ${latest}, add the missing version to \`versions\`, or correct schemaVersion.`,

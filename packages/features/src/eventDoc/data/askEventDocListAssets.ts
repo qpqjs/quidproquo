@@ -4,7 +4,7 @@ import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { eventDocAssetFolderPath } from './eventDocAssetPath';
 
-const assetGuidFromFilepath = (filepath: string): string => filepath.split('/').slice(-1)[0];
+const assetGuidFromFilepath = (filepath: string): string => filepath.split('/').slice(-1)[0] ?? '';
 
 /**
  * Every asset guid under a doc's `<docId>/assets/` prefix. Guids only: filename and mimetype live in the event that

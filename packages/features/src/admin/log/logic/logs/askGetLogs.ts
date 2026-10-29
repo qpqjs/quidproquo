@@ -68,7 +68,7 @@ export function* askGetLogs(
 
     const filtered = deep
       ? yield* askFilter(logPage.items, function* askFilterDeep(log, index) {
-          return data[index].includes(deep);
+          return (data[index] ?? '').includes(deep);
         })
       : logPage.items;
 

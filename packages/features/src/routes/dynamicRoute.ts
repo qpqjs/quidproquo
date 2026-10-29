@@ -75,8 +75,8 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
         [ErrorTypeEnum.Invalid]: 422,
       };
 
-      if (allKnownErrors[res.error.errorType]) {
-        const errorInfo = allKnownErrors[res.error.errorType];
+      const errorInfo = allKnownErrors[res.error.errorType];
+      if (errorInfo) {
         if (isDynamicRouteErrorCode(errorInfo)) {
           return qpqWebServerUtils.toJsonEventResponse(
             {

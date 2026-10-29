@@ -47,7 +47,11 @@ const updateLastTool = (
   }
 
   const tools = [...last.tools];
-  tools[index] = update(tools[index]);
+  const tool = tools[index];
+  if (!tool) {
+    return segments;
+  }
+  tools[index] = update(tool);
 
   return replaceLast(segments, { type: 'tool-use', tools });
 };

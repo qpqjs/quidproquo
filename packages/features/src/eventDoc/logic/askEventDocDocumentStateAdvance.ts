@@ -22,5 +22,5 @@ export function* askEventDocDocumentStateAdvance(modelId: string, base: EventDoc
 
   const state = yield* functionsCaller.foldDocumentState(gap, base.state);
 
-  return { eventId: gap[gap.length - 1].payload.metadata.eventId, state };
+  return { eventId: gap[gap.length - 1]?.payload.metadata.eventId ?? base.eventId, state };
 }

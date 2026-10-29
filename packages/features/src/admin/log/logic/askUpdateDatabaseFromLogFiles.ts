@@ -131,7 +131,7 @@ export function* askErrorReadingStoryResultToMetadata(correlation: string): AskR
   // Base metadata
   const metadata: LogMetadata = {
     correlation: correlation,
-    moduleName: correlation.split('::')[0],
+    moduleName: correlation.split('::')[0] ?? '',
     runtimeType: QpqRuntimeType.EXECUTE_STORY,
     startedAt: yield* askDateNow(),
     generic: tags.filter((t) => !!t).join(', '),

@@ -7,7 +7,7 @@ export const getFeatureEntryQpqFunctionRuntime = (
   entryType: string,
   runtime: `${string}::${string}`,
 ): QpqFunctionRuntimeAdvanced => {
-  const [src, methodName] = runtime.split('::');
+  const [src = '', methodName = ''] = runtime.split('::');
 
   return {
     basePath: __dirname,

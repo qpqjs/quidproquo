@@ -32,6 +32,6 @@ export function* askTenantAssertRoutePermission(
     return;
   }
 
-  const message = tenantRoutePermissionMessage(routePermission) ?? `Missing permission: ${requirements[0].permission}`;
+  const message = tenantRoutePermissionMessage(routePermission) ?? `Missing permission: ${requirements[0]?.permission ?? ''}`;
   return yield* askThrowError(ErrorTypeEnum.Forbidden, message);
 }

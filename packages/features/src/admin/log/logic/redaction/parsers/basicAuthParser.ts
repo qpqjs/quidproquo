@@ -24,7 +24,7 @@ const basicAuthRedactions = (encoded: string): string[] => {
  */
 export const basicAuthParser: LogRedactionParser = (log) => {
   const redactions = collectStrings(log).flatMap((text) =>
-    [...text.matchAll(basicAuthPattern)].flatMap(([, encoded]) => basicAuthRedactions(encoded)),
+    [...text.matchAll(basicAuthPattern)].flatMap(([, encoded = '']) => basicAuthRedactions(encoded)),
   );
 
   return { redactedLog: log, redactions };

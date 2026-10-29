@@ -35,6 +35,6 @@ export function* askEventDocWorkspaceRebasePending(slots: EventDocWorkspaceSlotF
   yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, kept);
   yield* askUIEventDocWorkspaceSetError(slotKey, {
     operation: EventDocWorkspaceSlotOperation.rebase,
-    error: { errorType: ErrorTypeEnum.Invalid, errorText: describeDrop(dropped.length, dropped[0].reason) },
+    error: { errorType: ErrorTypeEnum.Invalid, errorText: describeDrop(dropped.length, dropped[0]?.reason ?? 'unknown') },
   });
 }

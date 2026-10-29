@@ -59,15 +59,22 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
   const selectorMap = <T>(keyed: unknown) => keyed as Record<string, (state: EventDocWorkspaceState) => T>;
 
   const docs = Object.fromEntries(
-    slotEntries.map(([slotKey, slot]) => [
-      slotKey,
-      {
-        api: bindEventDocWorkspaceApi(getSlotBinding(slotKey, slot, selectorMap(selectors.view)[slotKey]), slot.api),
-        view: selectorMap(selectors.view)[slotKey],
-        liveEvents: selectorMap(selectors.liveEvents)[slotKey],
-        slotState: selectorMap(selectors.slotState)[slotKey],
-      },
-    ]),
+    slotEntries.map(([slotKey, slot]) => {
+      const view = selectorMap(selectors.view)[slotKey];
+      if (!view) {
+        throw new Error(`Slot [${slotKey}] has no view selector`);
+      }
+
+      return [
+        slotKey,
+        {
+          api: bindEventDocWorkspaceApi(getSlotBinding(slotKey, slot, view), slot.api),
+          view,
+          liveEvents: selectorMap(selectors.liveEvents)[slotKey],
+          slotState: selectorMap(selectors.slotState)[slotKey],
+        },
+      ];
+    }),
   ) as EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>>['docs'];
 
   return {

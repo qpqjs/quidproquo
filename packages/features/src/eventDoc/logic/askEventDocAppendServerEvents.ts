@@ -74,7 +74,7 @@ export function* askEventDocAppendServerEvents(
         data: input.data,
         metadata: {
           version: input.version,
-          clientMessageId: clientMessageIds[index],
+          clientMessageId: clientMessageIds[index] ?? '',
           createdBy: actor,
           createdAt: now,
           eventId: base.headEventId + 1 + index,
@@ -112,12 +112,15 @@ export function* askEventDocAppendServerEvents(
 
   const events = result.result;
 
-  if (events.some((event) => isEventDocReservedEffect(event.type))) {
-    yield* askEventDocSummaryRefold(modelId, events[events.length - 1].payload.metadata.eventId);
+  const lastEvent = events[events.length - 1];
+  if (lastEvent && events.some((event) => isEventDocReservedEffect(event.type))) {
+    yield* askEventDocSummaryRefold(modelId, lastEvent.payload.metadata.eventId);
   }
 
   // One push for the batch, at its last event. Best-effort, as in the single append.
-  yield* askCatch(askEventDocSendHeadMoved(modelId, events[events.length - 1]));
+  if (lastEvent) {
+    yield* askCatch(askEventDocSendHeadMoved(modelId, lastEvent));
+  }
 
   return events;
 }

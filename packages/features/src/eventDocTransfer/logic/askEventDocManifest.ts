@@ -48,7 +48,11 @@ export function* askEventDocManifest(registry: EventDocTransferRegistry, starts:
 
   // The queue grows while it is walked.
   for (let cursor = 0; cursor < queue.length; cursor += 1) {
-    const { ref, depth } = queue[cursor];
+    const entry = queue[cursor];
+    if (!entry) {
+      break;
+    }
+    const { ref, depth } = entry;
     const key = manifestKey(ref);
 
     if (visited.has(key)) {

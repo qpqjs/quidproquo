@@ -21,7 +21,7 @@ export const urlFragmentParser: LogRedactionParser = (log) => {
   const redactions: string[] = [];
 
   const collectFromText = (text: string): string => {
-    for (const [, fragment] of text.matchAll(URL_WITH_FRAGMENT)) {
+    for (const [, fragment = ''] of text.matchAll(URL_WITH_FRAGMENT)) {
       if (!fragment.startsWith('/')) {
         redactions.push(...(fragment.match(TOKEN_RUN) ?? []).filter((run) => !GUID.test(run)));
       }

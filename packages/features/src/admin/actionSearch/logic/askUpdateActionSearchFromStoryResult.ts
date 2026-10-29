@@ -95,7 +95,7 @@ function* askRefoldEntity(
   }
   const rows = [...rowsByKey.values()];
 
-  const createdAt = rows.map((row) => row.startedAt).sort()[0];
+  const createdAt = rows.map((row) => row.startedAt).sort()[0] ?? '';
 
   // Fixed fields spread last so folded fields can never clobber them
   const entityRow: ActionSearchEntityRow = {
