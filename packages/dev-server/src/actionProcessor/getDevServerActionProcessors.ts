@@ -15,7 +15,7 @@ export const getDevServerActionProcessors = (
     // The aws processors first, then the local overrides (node file storage, sqlite stores, local auth) on top.
     getAwsActionProcessors,
     (config, loader) => getCoreActionProcessor(config, loader, devServerConfig),
-    getWebserverActionProcessor,
+    getWebserverActionProcessor(devServerConfig),
     // Always last, so a service's own processors can override the defaults.
     getCustomActionActionProcessor,
   ]);

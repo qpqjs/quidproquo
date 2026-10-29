@@ -22,7 +22,8 @@ const UNHANDLED_RETENTION_DAYS = 1;
  * verdicts. The transport (a drive the
  * provider writes raw messages into, a create handler that parses them) is the receiver's own.
  * A throwing handler loses that message after the platform's retries; catch inside it to do
- * otherwise. Deployed platforms only; the dev server does not receive mail.
+ * otherwise. The dev server receives too: a local send to any address at a receiving host is
+ * delivered into the receiver's drive and runs onEmail the same way.
  */
 export const defineEmailReceiver = (name: string, options: EmailReceiverOptions): QPQConfig => {
   const storageDriveName = emailReceiverStorageDriveName(name);
