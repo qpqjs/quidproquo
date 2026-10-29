@@ -32,7 +32,7 @@ export class AccountQpqStack extends QpqServiceStack {
         }),
     );
 
-    const budgets = qpqConfigAwsUtils.getAccountBudgetConfigs(props.qpqConfig).map(
+    qpqConfigAwsUtils.getAccountBudgetConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqAccountBudgetConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

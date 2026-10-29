@@ -20,7 +20,7 @@ export class WebQpqServiceStack extends QpqServiceStack {
     }
 
     // Web entries
-    const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).forEach(
       (setting) =>
         new WebQpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -29,7 +29,7 @@ export class WebQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    const domainProxies = qpqWebServerUtils.getDomainProxyConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getDomainProxyConfigs(props.qpqConfig).forEach(
       (setting) =>
         new WebQpqWebserverDomainProxyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

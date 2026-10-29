@@ -43,7 +43,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     });
 
     // Schedule Events
-    const scheduleEvent = qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreRecurringScheduleConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -54,7 +54,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Api - routes
-    const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getApiConfigs(props.qpqConfig).forEach(
       (setting) =>
         new ApiQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -65,7 +65,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Queues
-    const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
+    qpqCoreUtils.getQueues(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -76,7 +76,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Redirects
-    const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
+    qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverSubdomainRedirectConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -87,7 +87,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Service Functions
-    const serviceFunctions = qpqWebServerUtils.getOwnedServiceFunctions(props.qpqConfig).map(
+    qpqWebServerUtils.getOwnedServiceFunctions(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverServiceFunctionConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -99,17 +99,17 @@ export class ApiQpqServiceStack extends QpqServiceStack {
 
     // User script runner: the sandbox that askUserScriptExecute hands scripts to
     const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunner(props.qpqConfig);
-    const userScriptRunner = userScriptRunnerConfig
-      ? new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
-          qpqConfig: props.qpqConfig,
+    if (userScriptRunnerConfig) {
+      new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
+        qpqConfig: props.qpqConfig,
 
-          userScriptRunnerConfig,
-          apiLayerVersions: layers.layers,
-        })
-      : undefined;
+        userScriptRunnerConfig,
+        apiLayerVersions: layers.layers,
+      });
+    }
 
     // Build websocket apis
-    const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
+    qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -121,7 +121,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     QpqWebserverWebsocketConstruct.authorizeManageConnectionsForReferencedWebsockets(this, props.qpqConfig);
 
     // migrations
-    const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreDeployEventConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -132,7 +132,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Storage Drives
-    const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
+    qpqCoreUtils.getStorageDrives(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -157,7 +157,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     // Key value store streams, the projector lambda + event source for any store that
     // declares onStream. Lives here rather than on the Inf stack because that stack builds
     // no lambdas; the stream ARN crosses via SSM (see the construct).
-    const keyValueStoreStreams = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(
+    qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreKeyValueStoreStreamConstruct(this, `kvs-stream-${qpqCoreUtils.getUniqueKeyForSetting(setting)}`, {
           qpqConfig: props.qpqConfig,
@@ -169,7 +169,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
 
     // alarms
     // create alarms inside the api stack because we want sns topics to be already made
-    const alarms = qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).map(
+    qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqConfigAwsAlarmConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -178,7 +178,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    const notifyErrors = qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreNotifyErrorConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

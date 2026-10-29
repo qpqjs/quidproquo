@@ -127,7 +127,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     // Do local secondary indexes
     for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {
-      let sortKey = props.keyValueStoreConfig.sortKeys[i];
+      const sortKey = props.keyValueStoreConfig.sortKeys[i];
 
       table.addLocalSecondaryIndex({
         indexName: sortKey.key,

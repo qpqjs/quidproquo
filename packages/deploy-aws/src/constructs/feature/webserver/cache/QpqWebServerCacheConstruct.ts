@@ -2,7 +2,7 @@ import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { QPQConfig } from '@qpqjs/core';
 import { CacheQPQWebServerConfigSetting, qpqHeaderIsBot } from '@qpqjs/webserver';
 
-import { aws_cloudfront, aws_s3 } from 'aws-cdk-lib';
+import { aws_cloudfront } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 

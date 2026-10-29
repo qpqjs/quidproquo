@@ -1,12 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { buildTestQpqConfig, defineStorageDrive, QPQConfig } from '@qpqjs/core';
-import {
-  defineDns,
-  defineEmailReceiver,
-  defineEmailReceivingDomain,
-  EmailReceiverQPQWebServerConfigSetting,
-  qpqWebServerUtils,
-} from '@qpqjs/webserver';
+import { defineDns, defineEmailReceiver, defineEmailReceivingDomain, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

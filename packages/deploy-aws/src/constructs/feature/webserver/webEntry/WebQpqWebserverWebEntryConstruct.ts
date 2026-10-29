@@ -1,6 +1,6 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { qpqCoreUtils } from '@qpqjs/core';
+import { Nullable, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import {
@@ -36,7 +36,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     // create / reference an s3 bucket
-    let originBucket: aws_s3.IBucket | null = null;
+    let originBucket: Nullable<aws_s3.IBucket> = null;
 
     if (!props.webEntryConfig.storageDrive.sourceStorageDrive) {
       originBucket = new aws_s3.Bucket(this, 'bucket', {
@@ -229,7 +229,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         role: this.getServiceRole(),
       });
 
-      for (let seo of seos) {
+      for (const seo of seos) {
         // Deprecated edge lambdas are not added as a behavior, but they are still built
         if (seo.deprecated) {
           continue;

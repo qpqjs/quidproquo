@@ -1,7 +1,6 @@
 import { AwsOrganizationQPQConfigSetting } from '@qpqjs/config-aws';
 
-import * as cdk from 'aws-cdk-lib';
-import { aws_iam, aws_organizations, aws_sso } from 'aws-cdk-lib';
+import { aws_organizations } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

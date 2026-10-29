@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { KeyValueStoreQPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_lambda, aws_lambda_event_sources, aws_ssm, Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';

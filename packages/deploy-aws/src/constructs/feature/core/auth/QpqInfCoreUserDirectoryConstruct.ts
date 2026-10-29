@@ -8,7 +8,6 @@ import {
   UserDirectoryMfaSecondFactor,
   UserDirectoryQPQConfigSetting,
 } from '@qpqjs/core';
-import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -17,7 +16,6 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { lookupHostedZone, resolveDeployPrimaryHost, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { Function } from '../../../basic/Function';
 import { LambdaLayers } from '../../../basic/LambdaLayers';

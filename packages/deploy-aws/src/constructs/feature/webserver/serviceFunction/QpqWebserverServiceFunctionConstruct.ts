@@ -38,7 +38,7 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
         : undefined;
 
     // Build Function
-    const func = new Function(this, 'api-function', {
+    new Function(this, 'api-function', {
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
       handler: 'anyExecuteServiceFunctionEvent_serviceFunction',
 

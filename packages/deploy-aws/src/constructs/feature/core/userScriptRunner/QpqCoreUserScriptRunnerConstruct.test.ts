@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineUserScriptRunner, qpqCoreUtils } from '@qpqjs/core';
+import { buildTestQpqConfig, defineUserScriptRunner } from '@qpqjs/core';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Capture, Match, Template } from 'aws-cdk-lib/assertions';

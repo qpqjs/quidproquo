@@ -1,6 +1,6 @@
 import { NotifyErrorQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_cloudwatch, aws_cloudwatch_actions, aws_sns } from 'aws-cdk-lib';
+import { aws_cloudwatch, aws_cloudwatch_actions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 

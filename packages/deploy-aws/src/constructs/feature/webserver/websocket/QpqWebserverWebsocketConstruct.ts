@@ -3,7 +3,7 @@ import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_apigatewayv2, aws_iam, aws_lambda, aws_ssm } from 'aws-cdk-lib';
+import { aws_apigatewayv2, aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { applyEnvironmentTags, exportStackValue } from '../../../../utils';

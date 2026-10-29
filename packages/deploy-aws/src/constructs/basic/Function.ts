@@ -72,6 +72,7 @@ export class Function extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: FunctionProps) {
     super(scope, id, props);
 
+    // eslint-disable-next-line no-console -- deliberate synth-time guardrail: a function name over 64 characters fails at deploy, this shows the length early.
     console.log(`Function: [${props.functionName || ''}]::${props.functionName?.length}`);
 
     const handlerFile = props.srcFilename || 'index';

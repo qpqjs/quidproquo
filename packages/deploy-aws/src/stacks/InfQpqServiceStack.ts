@@ -87,7 +87,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end storage drives
 
     // Build the parameters
-    const parameters = qpqCoreUtils.getOwnedParameterConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedParameterConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreParameterConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -99,7 +99,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end parameters
 
     // Secrets
-    const secrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedSecrets(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreSecretConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -111,7 +111,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end secrets
 
     // Signing keys
-    const signingKeys = qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedSigningKeys(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreSigningKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -153,7 +153,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqInfCoreUserDirectoryConstruct.authorizeReadActionsForRole(webserverRole, referencedUserDirectoriesConfigs, props.qpqConfig);
 
     // Api Keys
-    const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverApiKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -163,7 +163,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // Event Busses
-    const eventBusses = qpqCoreUtils.getOwnedEventBusConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedEventBusConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreEventBusConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -189,7 +189,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
     // Graph Databases
     const allGraphDatabaseConfigs = qpqCoreUtils.getAllGraphDatabaseConfigs(props.qpqConfig);
-    const graphDatabases = qpqCoreUtils.getOwnedGraphDatabases(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedGraphDatabases(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreApiGraphDatabaseConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -231,7 +231,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqWebserverEmailSenderConstruct.authorizeSendEmailForRole(webserverRole, emailSenderConfigs, props.qpqConfig);
 
     // Cache settings
-    const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebServerCacheConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -241,7 +241,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // Certificates
-    const certifcates = qpqWebServerUtils.getAllOwnedCertificateConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getAllOwnedCertificateConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverCertificateConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

@@ -25,7 +25,7 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
       qpqConfig: props.qpqConfig,
     });
 
-    const virtualNetworks = qpqCoreUtils.getVirtualNetworkConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getVirtualNetworkConfigs(props.qpqConfig).forEach(
       (setting) =>
         new BootstrapQpqCoreVirtualNetworkConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -34,7 +34,7 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    const organiaztions = qpqConfigAwsUtils.getAwsBootstrapOrganizationConfigs(props.qpqConfig).map(
+    qpqConfigAwsUtils.getAwsBootstrapOrganizationConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqBootstrapConfigAwsOrganizationConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
