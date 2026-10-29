@@ -7,20 +7,22 @@ import { describe, expect, it } from 'vitest';
 
 // A2: `@quidproquo-<pkg>/<PascalDomain>/<PascalVerb>`, the enum member equals the last segment, and
 // an id is minted once across the whole framework. The enums are discovered from each package's
-// exports (any exported object whose values are all `@quidproquo-` strings), so a new domain is
-// checked the moment it is exported.
+// exports (an `<X>ActionType` export whose values are all `@quidproquo-` strings; config setting
+// and effect enums share the prefix but are not action ids), so a new domain is checked the
+// moment it is exported.
 const ACTION_ID = /^@quidproquo-([a-z-]+)\/([A-Za-z]+)\/([A-Z][A-Za-z]*)$/;
 
-// Stored identifiers (logs, admin search) that predate the PascalDomain rule and stay as they are.
-const LOWER_CASE_DOMAINS = ['eventDoc', 'mcp', 'mcpEventDocAi'];
+// Stored identifiers (logs, admin search, messages between services) that predate the PascalDomain
+// rule and stay as they are: renaming an id orphans every record that carries it.
+const LOWER_CASE_DOMAINS = ['error', 'event', 'eventDoc', 'genericDataResource', 'mcp', 'mcpEventDocAi'];
 
 type ActionTypeEnum = Record<string, string>;
 
 const discoverEnums = (packageName: string, exports: Record<string, unknown>): [string, ActionTypeEnum][] =>
   Object.entries(exports)
     .filter((entry): entry is [string, ActionTypeEnum] => {
-      const [, value] = entry;
-      if (!value || typeof value !== 'object') return false;
+      const [name, value] = entry;
+      if (!/ActionType(Enum)?$/.test(name) || !value || typeof value !== 'object') return false;
       const values = Object.values(value);
       return values.length > 0 && values.every((v) => typeof v === 'string' && v.startsWith('@quidproquo-'));
     })
