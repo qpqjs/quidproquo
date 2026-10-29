@@ -1,7 +1,5 @@
-import { Nullable } from '../../types/Nullable';
-import { createContextIdentifier } from '../context/createContextIdentifier';
-import { createContextProvider } from '../context/createContextProvider';
-import { createContextReader } from '../context/createContextReader';
+import { Nullable } from '../../../types/Nullable';
+import { createContextIdentifier } from '../../context/createContextIdentifier';
 
 // The ambient storage scope: THE value scope-aware data layers (e.g. the
 // eventDoc feature) forward as the File/KVS `scope` option. Null = unscoped.
@@ -11,7 +9,3 @@ import { createContextReader } from '../context/createContextReader';
 // render job, an AI edit) reads and writes the same partition as the request
 // that started it.
 export const storageScopeContext = createContextIdentifier<Nullable<string>>('qpq-storage-scope', null);
-
-export const askStorageScopeProvide = createContextProvider(storageScopeContext, (scope: string) => scope);
-
-export const askStorageScopeRead = createContextReader(storageScopeContext);

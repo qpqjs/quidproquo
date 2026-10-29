@@ -2,7 +2,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askStorageScopeProvide, askStorageScopeRead, storageScopeContext } from './storageScopeContext';
+import { askStorageScopeProvide, askStorageScopeRead, storageScopeContext } from './index';
 
 describe('storageScopeContext', () => {
   it('defaults to null (unscoped) and is deliberately non-local', () => {
