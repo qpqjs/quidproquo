@@ -10,13 +10,13 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
   return async ({ connectionId, payload, websocketApiName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const apiId = await getExportedValue(getCFExportNameWebsocketApiIdFromConfig(websocketApiName, qpqConfig), region);
-
     try {
+      const apiId = await getExportedValue(getCFExportNameWebsocketApiIdFromConfig(websocketApiName, qpqConfig), region);
+
       await sendMessageToWebSocketConnection(apiId, connectionId, region, payload);
 
       return actionResult(undefined);
-    } catch (error) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ThrottlingException: () => actionResultError(askWebsocketSendMessageBase.errorType.Throttled, 'Rate exceeded'),
         GoneException: () => actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists'),

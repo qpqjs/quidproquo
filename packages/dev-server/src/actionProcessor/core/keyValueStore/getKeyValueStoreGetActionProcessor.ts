@@ -26,7 +26,7 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: Resol
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 
       return actionResult(await repository.get(keyValueStoreName, key, scope));
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreGetBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreGetBase.errorType.StoreNotFound, error.message),

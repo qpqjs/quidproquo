@@ -9,6 +9,7 @@ export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
     'InvalidStorageClass', // object is in cold storage and cannot be streamed directly
     'FileNotFound', // no object exists at the given filepath
     'InvalidScope', // scope is not a valid single path segment
+    'NoContent', // the storage answered without a body to stream
   ],
   getPayload: (drive: string, filepath: string, encoding: StreamEncoding = 'text', chunkSize?: number, scope?: string) => ({
     drive,

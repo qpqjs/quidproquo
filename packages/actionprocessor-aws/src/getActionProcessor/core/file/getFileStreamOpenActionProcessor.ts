@@ -6,7 +6,6 @@ import {
   askFileStreamOpenBase,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  ErrorTypeEnum,
   generateUuid,
   ProcessorFor,
   QPQConfig,
@@ -61,7 +60,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       );
 
       if (!response.Body) {
-        return actionResultError(ErrorTypeEnum.GenericError, `Empty response body for: ${filepath}`);
+        return actionResultError(askFileStreamOpenBase.errorType.NoContent, `Empty response body for: ${filepath}`);
       }
 
       const streamId = `s3-${generateUuid()}`;

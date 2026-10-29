@@ -38,7 +38,7 @@ const getProcessKeyValueStoreScan = (
       );
 
       return actionResult(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.StoreNotFound, error.message),

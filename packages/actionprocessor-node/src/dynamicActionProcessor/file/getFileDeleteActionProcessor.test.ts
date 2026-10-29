@@ -1,4 +1,4 @@
-import { askFileDelete, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { askFileDelete, FileActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -39,12 +39,12 @@ describe('getFileDeleteActionProcessor', () => {
     expect(resolveActionResultError(result).errorType).toBe(askFileDelete.errorType.AccessDenied);
   });
 
-  it('returns GenericError when every deletion fails for another reason', async () => {
+  it('answers DeleteFailed when every deletion fails for another reason', async () => {
     vi.mocked(fs.unlink).mockRejectedValue(errorWithCode('EBUSY'));
 
     const result = await invoke(['a.txt']);
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(resolveActionResultError(result).errorType).toBe(askFileDelete.errorType.DeleteFailed);
   });
 
   it('reports the deleted files when only some deletions fail', async () => {

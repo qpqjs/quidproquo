@@ -51,7 +51,7 @@ const getProcessKeyValueStoreDelete = (
       });
 
       return actionResult(undefined);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreDelete.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreDelete.errorType.StoreNotFound, error.message),

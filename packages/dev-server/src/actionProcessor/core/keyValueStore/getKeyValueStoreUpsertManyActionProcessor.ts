@@ -67,7 +67,7 @@ const getProcessKeyValueStoreUpsertMany = (
       }
 
       return actionResult(undefined);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),

@@ -50,7 +50,7 @@ const getProcessKeyValueStoreUpdate = (
       });
 
       return actionResult(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         // Nothing was written, so no stream event was emitted above either.
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpdateBase.errorType.ConditionFailed, 'KVS update condition failed'),

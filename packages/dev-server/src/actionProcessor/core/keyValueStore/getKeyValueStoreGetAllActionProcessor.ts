@@ -33,7 +33,7 @@ const getProcessKeyValueStoreGetAll = (
       const items = await repository.getAll(keyValueStoreName, scope);
 
       return actionResult(items);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreGetAllBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreGetAllBase.errorType.StoreNotFound, error.message),

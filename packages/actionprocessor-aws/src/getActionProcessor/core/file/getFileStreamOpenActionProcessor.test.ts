@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { askFileStreamOpenBase, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { Readable } from 'stream';
@@ -78,7 +78,7 @@ describe('getProcessFileStreamOpen', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt', encoding: 'text' }, { register: vi.fn() });
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorType).toBe(askFileStreamOpenBase.errorType.NoContent);
     expect(error?.errorText).toContain('Empty response body');
   });
 
