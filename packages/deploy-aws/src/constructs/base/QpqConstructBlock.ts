@@ -8,9 +8,9 @@ import { Construct } from 'constructs';
 import { QpqResource } from './QpqResource';
 import { QpqServiceRole } from './QpqServiceRole';
 
-export interface QpqConstructBlockProps {
+export type QpqConstructBlockProps = {
   qpqConfig: QPQConfig;
-}
+};
 
 export class QpqConstructBlock extends Construct implements QpqResource {
   qpqConfig: QPQConfig;

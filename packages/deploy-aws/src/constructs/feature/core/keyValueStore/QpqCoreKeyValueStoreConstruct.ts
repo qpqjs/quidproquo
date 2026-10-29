@@ -10,7 +10,7 @@ import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
+export type QpqCoreKeyValueStoreConstructProps = {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
 
   /**
@@ -18,7 +18,7 @@ export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockPro
    * resolveCryptoKeyForResource). Required when the store names one.
    */
   cryptoKey?: aws_kms.IKey;
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBlock {
   abstract table: aws_dynamodb.ITable;

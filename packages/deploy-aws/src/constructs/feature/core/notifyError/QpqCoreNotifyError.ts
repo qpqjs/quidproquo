@@ -7,9 +7,9 @@ import { Construct } from 'constructs';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreEventBusConstruct } from '..';
 
-export interface QpqCoreNotifyErrorConstructProps extends QpqConstructBlockProps {
+export type QpqCoreNotifyErrorConstructProps = {
   notifyErrorConfig: NotifyErrorQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreNotifyErrorConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreNotifyErrorConstructProps) {

@@ -10,12 +10,12 @@ import { requireDomainResolver } from '../appWorkspace/requireDomainResolver';
 import { lookupHostedZone, resolveHostedZoneForHost } from '../utils/domain';
 import { applyApplicationTags } from '../utils/qpqDeployAwsUtils';
 
-export interface DomainCertificateStackProps {
+export type DomainCertificateStackProps = {
   qpqConfig: QPQConfig;
   certificateConfig: DomainCertificateQPQConfigSetting;
 
   stackName?: string;
-}
+};
 
 // ACM's default quota for names on one certificate; a synth error beats a deploy failure.
 const acmDomainNamesPerCertificateQuota = 10;

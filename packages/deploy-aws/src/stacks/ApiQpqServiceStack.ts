@@ -25,9 +25,9 @@ import {
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
-export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
+export type ApiQpqServiceStackProps = {
   infQpqServiceStack?: InfQpqServiceStack;
-}
+} & QpqServiceStackProps;
 
 export class ApiQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: ApiQpqServiceStackProps) {

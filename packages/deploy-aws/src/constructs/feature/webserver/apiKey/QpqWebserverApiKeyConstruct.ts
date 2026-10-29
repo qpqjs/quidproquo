@@ -7,10 +7,10 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqWebserverApiKeyConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverApiKeyConstructProps = {
   apiKeyConfig: ApiKeyQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebserverApiKeyConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverApiKeyConstructProps) {

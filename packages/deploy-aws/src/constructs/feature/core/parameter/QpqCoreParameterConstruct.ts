@@ -9,9 +9,9 @@ import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreParameterConstructProps extends QpqConstructBlockProps {
+export type QpqCoreParameterConstructProps = {
   parameterConfig: ParameterQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreParameterConstructBase extends QpqConstructBlock {
   abstract stringParameter: aws_ssm.IStringParameter;

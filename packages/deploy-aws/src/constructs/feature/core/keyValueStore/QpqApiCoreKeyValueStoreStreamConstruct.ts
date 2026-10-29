@@ -7,10 +7,10 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { kvsStreamArnSsmParameterName } from './QpqCoreKeyValueStoreConstruct';
 
-export interface QpqApiCoreKeyValueStoreStreamConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreKeyValueStoreStreamConstructProps = {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 // A failing batch is retried, and by DEFAULT a DynamoDB stream keeps retrying the SAME
 // batch until it succeeds or the records expire (24 hours), which stalls the whole shard

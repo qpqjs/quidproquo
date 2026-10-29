@@ -19,7 +19,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { QpqResource } from '../../../base/QpqResource';
 import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../../webserver/emailReceiving/emailReceiptRuleSetName';
 
-export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
+export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
 
   /**
@@ -53,7 +53,7 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * may put objects and nothing else. Resolved by the (web-aware) caller from the receiver configs.
    */
   emailReceiptRuleNames?: string[];
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
   abstract bucket: aws_s3.IBucket;

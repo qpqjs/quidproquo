@@ -15,7 +15,7 @@ import { BSQpqLambdaWarmerEventConstruct } from '../constructs/basic/BSQpqLambda
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
 
-export interface BootstrapQpqServiceStackProps extends QpqServiceStackProps {}
+export type BootstrapQpqServiceStackProps = {} & QpqServiceStackProps;
 
 export class BootstrapQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: BootstrapQpqServiceStackProps) {

@@ -6,10 +6,10 @@ import { Construct } from 'constructs';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
-export interface QpqCoreDeployEventConstructProps extends QpqConstructBlockProps {
+export type QpqCoreDeployEventConstructProps = {
   deployEventConfig: DeployEventsQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreDeployEventConstructProps) {

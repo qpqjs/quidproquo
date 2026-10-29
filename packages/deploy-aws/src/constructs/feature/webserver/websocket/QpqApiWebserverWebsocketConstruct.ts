@@ -12,10 +12,10 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { SubdomainName } from '../../../basic';
 import { Function } from '../../../basic/Function';
 
-export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
+export type QpqApiWebserverWebsocketConstructProps = {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiWebserverWebsocketConstructProps) {

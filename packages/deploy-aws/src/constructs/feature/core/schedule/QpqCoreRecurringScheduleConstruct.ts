@@ -8,10 +8,10 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { renderAwsCronExpression } from './renderAwsCronExpression';
 
-export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
+export type QpqCoreRecurringScheduleConstructProps = {
   scheduleConfig: ScheduleQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreRecurringScheduleConstructProps) {

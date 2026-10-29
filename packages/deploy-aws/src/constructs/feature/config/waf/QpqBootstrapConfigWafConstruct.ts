@@ -7,9 +7,9 @@ import { Construct } from 'constructs';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { buildWebAclRules } from './wafRules';
 
-export interface QpqBootstrapConfigWafConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapConfigWafConstructProps = {
   wafConfig: BootstrapWafQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The REGIONAL web acl protecting api gateway stages. Each service's api stack attaches
 // itself via a WebACLAssociation, resolving the arn from the SSM parameter published here

@@ -5,9 +5,9 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqAccountBudgetConstructProps extends QpqConstructBlockProps {
+export type QpqAccountBudgetConstructProps = {
   budgetConfig: AccountBudgetQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const defaultThresholds: BudgetThreshold[] = [
   { thresholdPercent: 80, type: BudgetThresholdType.actual },

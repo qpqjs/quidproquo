@@ -8,7 +8,7 @@ import { DomainQpqWebserverApiConstruct } from '../constructs/feature/webserver/
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { createDomainCertificateStacks } from './createDomainCertificateStacks';
 
-export interface DomainQpqServiceStackProps extends QpqServiceStackProps {}
+export type DomainQpqServiceStackProps = {} & QpqServiceStackProps;
 
 export class DomainQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: DomainQpqServiceStackProps) {

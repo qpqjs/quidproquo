@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import { BootstrapResource } from '../../constants';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export interface BSQpqLambdaWarmerEventConstructProps extends QpqConstructBlockProps {}
+export type BSQpqLambdaWarmerEventConstructProps = {} & QpqConstructBlockProps;
 
 export class BSQpqLambdaWarmerEventConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: BSQpqLambdaWarmerEventConstructProps) {

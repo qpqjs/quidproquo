@@ -12,7 +12,7 @@ import {
 } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
-export interface AccountQpqStackProps extends QpqServiceStackProps {}
+export type AccountQpqStackProps = {} & QpqServiceStackProps;
 
 // Owns account-level resources (audit trail, budgets, security services) so they never
 // share an app's lifecycle - tearing down an app's bootstrap must not take the account's

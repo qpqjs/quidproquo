@@ -21,7 +21,7 @@ const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
   }));
 };
 
-export interface LambdaLayersProps extends QpqConstructBlockProps {}
+export type LambdaLayersProps = {} & QpqConstructBlockProps;
 
 export class LambdaLayers extends QpqConstructBlock {
   public readonly layers: aws_lambda.ILayerVersion[];

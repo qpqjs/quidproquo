@@ -10,9 +10,9 @@ import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
+export type QpqCoreQueueConstructProps = {
   queueConfig: QueueQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The same owner-fallback derivation the runtime send processor and the service role use.
 const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string[] =>

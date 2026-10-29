@@ -8,9 +8,9 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
+export type QpqCoreEventBusConstructProps = {
   eventBusConfig: EventBusQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // `*-<app>-*-<env>[-<feature>]` in every app account, plain and FIFO: the queue naming scheme
 // with the queue and service segments wildcarded.

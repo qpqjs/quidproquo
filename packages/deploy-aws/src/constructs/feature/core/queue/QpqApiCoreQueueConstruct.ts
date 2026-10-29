@@ -9,10 +9,10 @@ import { Function } from '../../../basic/Function';
 import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
 import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
 
-export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreQueueConstructProps = {
   queueConfig: QueueQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiCoreQueueConstructProps) {

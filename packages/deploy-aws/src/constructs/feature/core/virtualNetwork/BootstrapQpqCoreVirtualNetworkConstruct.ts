@@ -9,9 +9,9 @@ import { Construct } from 'constructs';
 import { getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface BootstrapQpqCoreVirtualNetworkConstructProps extends QpqConstructBlockProps {
+export type BootstrapQpqCoreVirtualNetworkConstructProps = {
   virtualNetworkConfig: VirtualNetworkQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const flowLogTrafficTypeMap: Record<AwsVpcFlowLogTrafficType, aws_ec2.FlowLogTrafficType> = {
   [AwsVpcFlowLogTrafficType.all]: aws_ec2.FlowLogTrafficType.ALL,

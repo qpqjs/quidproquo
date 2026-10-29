@@ -10,9 +10,9 @@ import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreSigningKeyConstructProps extends QpqConstructBlockProps {
+export type QpqCoreSigningKeyConstructProps = {
   signingKeyConfig: SigningKeyQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // An asymmetric RSA-2048 KMS key for RS256 signing. The private half is generated
 // inside KMS and can never be exported, so there is nothing to seed or rotate by

@@ -7,9 +7,9 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigGithubDeployRoleConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapConfigGithubDeployRoleConstructProps = {
   githubDeployRoleConfig: AwsGithubDeployRoleQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 /** The subject claims GitHub may present: the immutable-id form when ids are known, the name form when there are none or it was asked for. */
 export const buildGithubSubjectClaims = (config: AwsGithubDeployRoleQPQConfigSetting, githubEnvironment: string): string[] => {

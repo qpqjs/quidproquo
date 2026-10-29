@@ -8,10 +8,10 @@ import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
-export interface QpqWebserverServiceFunctionConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverServiceFunctionConstructProps = {
   serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverServiceFunctionConstructProps) {

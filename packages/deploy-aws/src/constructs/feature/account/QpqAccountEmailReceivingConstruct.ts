@@ -5,7 +5,7 @@ import { Construct } from 'constructs';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../webserver/emailReceiving/emailReceiptRuleSetName';
 
-export interface QpqAccountEmailReceivingConstructProps extends QpqConstructBlockProps {}
+export type QpqAccountEmailReceivingConstructProps = {} & QpqConstructBlockProps;
 
 // The account's one active receipt rule set. CloudFormation can create a rule set but not
 // activate it, so activation is an SDK call; every app's inf stack adds its rules to this set

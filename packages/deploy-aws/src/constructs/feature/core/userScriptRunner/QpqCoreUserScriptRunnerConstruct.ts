@@ -8,10 +8,10 @@ import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
-export interface QpqCoreUserScriptRunnerConstructProps extends QpqConstructBlockProps {
+export type QpqCoreUserScriptRunnerConstructProps = {
   userScriptRunnerConfig: UserScriptRunnerQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 /**
  * The sandbox that runs a service's user scripts (defineUserScriptRunner): one function on

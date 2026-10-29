@@ -6,7 +6,7 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export interface ApiGatewayServiceLinkedRoleProps extends QpqConstructBlockProps {}
+export type ApiGatewayServiceLinkedRoleProps = {} & QpqConstructBlockProps;
 
 // API Gateway reads ACM certificates through AWSServiceRoleForAPIGateway, which AWS creates
 // lazily on first use. A fresh account's first custom domain therefore fails with "Access

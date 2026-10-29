@@ -7,10 +7,10 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { QpqCoreStorageDriveConstruct } from './QpqCoreStorageDriveConstruct';
 
-export interface QpqApiCoreStorageDriveConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiCoreStorageDriveConstructProps) {

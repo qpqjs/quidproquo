@@ -13,7 +13,7 @@ import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils, resolveLog
 import * as qpqDeployAwsUtils from '../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export interface FunctionProps extends QpqConstructBlockProps {
+export type FunctionProps = {
   functionName?: string;
 
   srcFilename?: string;
@@ -37,7 +37,7 @@ export interface FunctionProps extends QpqConstructBlockProps {
 
   vpc?: aws_ec2.IVpc;
   securityGroups?: aws_ec2.ISecurityGroup[];
-}
+} & QpqConstructBlockProps;
 
 // Resolves the federated code store location for this service, if it opted in via
 // defineFederatedModuleStore. Points the lambda at the referenced storage drive's

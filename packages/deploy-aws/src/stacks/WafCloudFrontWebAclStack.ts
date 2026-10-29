@@ -8,12 +8,12 @@ import { Construct } from 'constructs';
 
 import { buildWebAclRules } from '../constructs/feature/config/waf/wafRules';
 
-export interface WafCloudFrontWebAclStackProps {
+export type WafCloudFrontWebAclStackProps = {
   qpqConfig: QPQConfig;
   wafConfig: BootstrapWafQPQConfigSetting;
 
   stackName?: string;
-}
+};
 
 // CLOUDFRONT-scope web acls must live in us-east-1 regardless of the deploy region, so this
 // is a sibling stack spawned by the bootstrap stack (mirroring DomainCertificateStack). The

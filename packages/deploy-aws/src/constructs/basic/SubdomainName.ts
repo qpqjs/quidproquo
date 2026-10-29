@@ -8,10 +8,10 @@ import { lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { lookupDomainCertificate } from './DomainCertificateLookup';
 
-export interface SubdomainNameProps extends QpqConstructBlockProps {
+export type SubdomainNameProps = {
   target: DomainTarget;
   rootDomain: string;
-}
+} & QpqConstructBlockProps;
 
 /** A regional API Gateway custom domain plus its A record, for one target on one root. */
 export class SubdomainName extends QpqConstructBlock {

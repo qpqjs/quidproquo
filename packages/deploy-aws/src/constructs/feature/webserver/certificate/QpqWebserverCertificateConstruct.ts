@@ -4,9 +4,9 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqWebserverCertificateConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverCertificateConstructProps = {
   certificateConfig: CertificateQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 /**
  * No-op kept so user configs that still call `defineCertificate` assemble cleanly.

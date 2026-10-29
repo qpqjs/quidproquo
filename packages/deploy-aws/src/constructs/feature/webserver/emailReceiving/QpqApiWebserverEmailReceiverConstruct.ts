@@ -9,9 +9,9 @@ import { emailReceiptRuleName } from './emailReceiptRuleName';
 import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
 import { resolveEmailReceivingHosts } from './resolveEmailReceivingHosts';
 
-export interface QpqApiWebserverEmailReceiverConstructProps extends QpqConstructBlockProps {
+export type QpqApiWebserverEmailReceiverConstructProps = {
   emailReceiverConfig: EmailReceiverQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The app's rule in the account's shared receipt rule set: mail to the receiving host of any
 // root lands in the receiver's own drive. The set is referenced by name (the account stack owns

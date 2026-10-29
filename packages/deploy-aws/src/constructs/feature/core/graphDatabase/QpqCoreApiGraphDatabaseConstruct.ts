@@ -10,9 +10,9 @@ import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 import { applyEnvironmentTags, getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlockProps {
+export type QpqCoreApiGraphDatabaseConstructProps = {
   graphDatabaseConfig: GraphDatabaseQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
   cluster: aws_neptune.IDatabaseCluster;

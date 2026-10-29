@@ -7,9 +7,9 @@ import { Construct } from 'constructs';
 import { resolveLogRetention } from '../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqAccountCloudTrailConstructProps extends QpqConstructBlockProps {
+export type QpqAccountCloudTrailConstructProps = {
   cloudTrailConfig: AccountCloudTrailQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
   // Only set when the config enables cloudWatchLogs - consumed by the security services

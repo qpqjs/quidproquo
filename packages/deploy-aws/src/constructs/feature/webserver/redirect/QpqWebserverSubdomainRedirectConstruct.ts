@@ -10,10 +10,10 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic/SubdomainName';
 
-export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverSubdomainRedirectConstructProps = {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 // An absolute url redirects as-is. A declared root redirects to that root's site root under
 // the resolver (so `www` -> `development.example.com` in dev), keeping the request path. Any

@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export interface WebserverRoleProps extends QpqConstructBlockProps {}
+export type WebserverRoleProps = {} & QpqConstructBlockProps;
 
 export class WebserverRole extends QpqConstructBlock {
   role: aws_iam.IRole;

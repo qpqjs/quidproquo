@@ -10,9 +10,9 @@ import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreCryptoKeyConstructProps extends QpqConstructBlockProps {
+export type QpqCoreCryptoKeyConstructProps = {
   cryptoKeyConfig: CryptoKeyQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // No fromOtherStack import path: the one cross-stack reference (a drive or
 // store's cryptoKeyName on a foreign key, see resolveCryptoKeyForResource) is

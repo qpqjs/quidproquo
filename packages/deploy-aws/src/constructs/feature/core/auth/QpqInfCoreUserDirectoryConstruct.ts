@@ -20,9 +20,9 @@ import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup'
 import { Function } from '../../../basic/Function';
 import { LambdaLayers } from '../../../basic/LambdaLayers';
 
-export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
+export type QpqInfCoreUserDirectoryConstructProps = {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
   switch (mode) {

@@ -27,7 +27,7 @@ import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cach
 import { emailReceiptRuleName } from '../constructs/feature/webserver/emailReceiving/emailReceiptRuleName';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
-export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
+export type InfQpqServiceStackProps = {} & QpqServiceStackProps;
 
 export class InfQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: InfQpqServiceStackProps) {

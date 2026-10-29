@@ -27,9 +27,9 @@ import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup'
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
-export interface WebQpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
+export type WebQpqWebserverWebEntryConstructProps = {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: WebQpqWebserverWebEntryConstructProps) {

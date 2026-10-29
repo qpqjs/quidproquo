@@ -9,9 +9,9 @@ import { domainScopedId, lookupHostedZone, resolveDeployHostForRoot, resolveHost
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { resolveEmailReceivingHosts } from '../emailReceiving/resolveEmailReceivingHosts';
 
-export interface QpqWebserverEmailSenderConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverEmailSenderConstructProps = {
   emailSenderConfig: EmailSenderQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The sending identity per root is its site root (development.example.com), which is
 // also the zone the DKIM records land in.

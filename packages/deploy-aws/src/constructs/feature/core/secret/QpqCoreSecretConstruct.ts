@@ -10,9 +10,9 @@ import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreSecretConstructProps extends QpqConstructBlockProps {
+export type QpqCoreSecretConstructProps = {
   secretConfig: SecretQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock implements QpqResource {
   abstract secret: aws_secretsmanager.ISecret;

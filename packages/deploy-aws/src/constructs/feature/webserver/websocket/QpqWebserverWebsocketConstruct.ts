@@ -10,9 +10,9 @@ import { applyEnvironmentTags, exportStackValue } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqServiceRole } from '../../../base/QpqServiceRole';
 
-export interface QpqWebserverWebsocketConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverWebsocketConstructProps = {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
   public api: aws_apigatewayv2.CfnApi;

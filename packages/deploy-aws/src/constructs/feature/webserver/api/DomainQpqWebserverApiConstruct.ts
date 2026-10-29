@@ -7,10 +7,10 @@ import { domainScopedId } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { SubdomainName } from '../../../basic/SubdomainName';
 
-export interface DomainQpqWebserverApiConstructProps extends QpqConstructBlockProps {
+export type DomainQpqWebserverApiConstructProps = {
   apiConfig: ApiQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 /** The api's custom domain on every root (SubdomainName reads the deploy-region cert from SSM). */
 export class DomainQpqWebserverApiConstruct extends QpqConstructBlock {

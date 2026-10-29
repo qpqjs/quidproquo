@@ -5,9 +5,9 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigAwsOrganizationConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapConfigAwsOrganizationConstructProps = {
   awsOrganizationConfig: AwsOrganizationQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 function getEmailForAccount(baseEmailAddress: string, orgName: string, accountName: string): string {
   const [mainEmail, domainEmail] = baseEmailAddress.split('@');

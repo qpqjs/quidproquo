@@ -13,10 +13,10 @@ import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceA
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
-export interface ApiQpqWebserverApiConstructProps extends QpqConstructBlockProps {
+export type ApiQpqWebserverApiConstructProps = {
   apiConfig: ApiQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: ApiQpqWebserverApiConstructProps) {

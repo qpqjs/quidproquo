@@ -5,9 +5,9 @@ import { QPQConfig } from '@qpqjs/core';
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export interface QpqServiceStackProps {
+export type QpqServiceStackProps = {
   qpqConfig: QPQConfig;
-}
+};
 
 export class QpqServiceStack extends Stack {
   qpqConfig: QPQConfig;

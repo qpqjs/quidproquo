@@ -7,9 +7,9 @@ import { Construct } from 'constructs';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreEventBusConstruct } from '../../core';
 
-export interface QpqConfigAwsAlarmConstructProps extends QpqConstructBlockProps {
+export type QpqConfigAwsAlarmConstructProps = {
   alarmConfig: AwsAlarmQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 function AwsAlarmOperatorToComparisonOperator(operator: AwsAlarmOperator): aws_cloudwatch.ComparisonOperator {
   switch (operator) {

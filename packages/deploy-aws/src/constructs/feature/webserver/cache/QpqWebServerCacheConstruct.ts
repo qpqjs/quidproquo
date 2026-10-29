@@ -9,9 +9,9 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqWebServerCacheConstructProps extends QpqConstructBlockProps {
+export type QpqWebServerCacheConstructProps = {
   cacheConfig: CacheQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebServerCacheConstruct extends QpqConstructBlock {
   cachePolicy: aws_cloudfront.ICachePolicy;

@@ -7,9 +7,9 @@ import { WebQpqWebserverDomainProxyConstruct, WebQpqWebserverWebEntryConstruct }
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
-export interface WebQpqServiceStackProps extends QpqServiceStackProps {
+export type WebQpqServiceStackProps = {
   infQpqServiceStack?: InfQpqServiceStack;
-}
+} & QpqServiceStackProps;
 
 export class WebQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: WebQpqServiceStackProps) {

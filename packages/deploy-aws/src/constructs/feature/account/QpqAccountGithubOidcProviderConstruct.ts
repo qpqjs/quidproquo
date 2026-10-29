@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqAccountGithubOidcProviderConstructProps extends QpqConstructBlockProps {}
+export type QpqAccountGithubOidcProviderConstructProps = {} & QpqConstructBlockProps;
 
 // The URL fixes the provider's ARN (arn:aws:iam::<account>:oidc-provider/token.actions.
 // githubusercontent.com), which is what the per-app deploy roles trust by name.

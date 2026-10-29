@@ -13,9 +13,9 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 
-export interface WebQpqWebserverDomainProxyConstructProps extends QpqConstructBlockProps {
+export type WebQpqWebserverDomainProxyConstructProps = {
   domainProxyConfig: DomainProxyQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 function convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
   policy: DomainProxyViewerProtocolPolicy,

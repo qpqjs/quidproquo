@@ -12,9 +12,9 @@ import { getNotifyErrorEventBusNames } from '../../../base/createDefaultResource
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreEventBusConstruct } from '../../core/eventBus/QpqCoreEventBusConstruct';
 
-export interface QpqConfigAwsDashboardConstructProps extends QpqConstructBlockProps {
+export type QpqConfigAwsDashboardConstructProps = {
   dashboardConfig: AwsServiceDashboardQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const FIVE_MINUTES = Duration.minutes(5);
 
