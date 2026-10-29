@@ -1,11 +1,8 @@
 {
   "extends": "@qpqjs/tsconfig/tsconfig.commonjs.json",
   "compilerOptions": {
-    "skipLibCheck": true,
     "outDir": "./lib/commonjs",
-    "jsx": "react-jsx",
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true
+    "jsx": "react-jsx"
   },
   "include": [
     "src"
@@ -14,7 +11,6 @@
     "node_modules",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
+    "**/__fixtures__/**"
   ]
 }

@@ -15,20 +15,15 @@
     // Allows default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
 
-    // Enables all strict type checking options
+    // Enables all strict type checking options (noImplicitAny, strictNullChecks, alwaysStrict and the rest)
     "strict": true,
 
-    // Enforces ECMAScript strict mode to eliminate some JavaScript silent errors
-    "alwaysStrict": true,
+    // Indexing an array or record yields `T | undefined`; overriding a base member needs the keyword
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
 
-    // Enables strict null checks for more type safety
-    "strictNullChecks": true,
-
-    // Raise error on expressions and declarations with an implied 'any' type
-    "noImplicitAny": true,
-    
-    // Raise error on 'this' expressions with an implied 'any' type
-    "noImplicitThis": true,
+    // Dependencies ship their own checked declarations
+    "skipLibCheck": true,
 
     // Report error when not all code paths return in function
     "noImplicitReturns": true,
@@ -42,10 +37,9 @@
     // Do not emit output (JavaScript files)
     "noEmit": false,
 
-    // Emit '.map' files with the ORIGINAL TS embedded (inlineSources), so consumers of
-    // the built output never need access to src files — this is what lets the federated
-    // remote build chain framework code back to TS in execution traces
-    // (see trace-replay-plan.md).
+    // Emit '.map' files with the original TS embedded (inlineSources), so consumers of
+    // the built output never need the src files: this is what lets the federated remote
+    // build chain framework code back to TS in execution traces.
     "sourceMap": true,
     "inlineSources": true,
 
