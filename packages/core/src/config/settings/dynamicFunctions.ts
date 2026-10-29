@@ -2,15 +2,15 @@ import { CrossModuleOwner, QpqFunctionRuntime } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 
-export interface QPQConfigAdvancedDynamicFunctionsSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedDynamicFunctionsSettings = {
   owner?: CrossModuleOwner<'dynamicFunctionsName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface DynamicFunctionsQPQConfigSetting extends QPQConfigSetting {
+export type DynamicFunctionsQPQConfigSetting = {
   runtime: QpqFunctionRuntime;
 
   dynamicFunctionsName: string;
-}
+} & QPQConfigSetting;
 
 // Registers a module export - an OBJECT whose properties are functions - under a
 // name, so stories can invoke its members via askDynamicFunctionExecute without a

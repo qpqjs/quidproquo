@@ -83,12 +83,12 @@ export type StorageDriveLifecycleRule = {
   // add noncurrentVersionExpiration / noncurrentVersionTransitions support
 };
 
-export interface StorageDriveEvents {
+export type StorageDriveEvents = {
   create?: QpqFunctionRuntime;
   delete?: QpqFunctionRuntime;
-}
+};
 
-export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedStorageDriveSettings = {
   copyPath?: string;
   global?: boolean;
 
@@ -110,9 +110,9 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
   lockedDown?: boolean;
 
   owner?: CrossModuleOwner<'storageDriveName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
+export type StorageDriveQPQConfigSetting = {
   storageDrive: string;
   copyPath?: string;
   global: boolean;
@@ -124,7 +124,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   cryptoKeyName?: string;
   scoped: boolean;
   lockedDown: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => {
   // copyPath content is deployed straight to the bucket root, outside every

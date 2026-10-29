@@ -1,9 +1,9 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface GlobalQPQConfigSetting<T> extends QPQConfigSetting {
+export type GlobalQPQConfigSetting<T> = {
   key: string;
   value: T;
-}
+} & QPQConfigSetting;
 
 export const defineGlobal = <T>(key: string, value: T): GlobalQPQConfigSetting<T> => ({
   configSettingType: QPQCoreConfigSettingType.global,

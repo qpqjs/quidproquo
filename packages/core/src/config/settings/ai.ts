@@ -2,7 +2,7 @@ import { CrossModuleOwner } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 
-export interface AiToolDefinition {
+export type AiToolDefinition = {
   name: string;
   description: string;
   /**
@@ -13,17 +13,17 @@ export interface AiToolDefinition {
    */
   executor?: string;
   inputSchema: Record<string, unknown>;
-}
+};
 
-export interface QPQConfigAdvancedAiSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedAiSettings = {
   tools?: AiToolDefinition[];
   owner?: CrossModuleOwner<'aiName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface AiQPQConfigSetting extends QPQConfigSetting {
+export type AiQPQConfigSetting = {
   aiName: string;
   tools: AiToolDefinition[];
-}
+} & QPQConfigSetting;
 
 export const defineAi = (aiName: string, options?: QPQConfigAdvancedAiSettings): AiQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.ai,

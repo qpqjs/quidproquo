@@ -2,14 +2,14 @@ import { CrossModuleOwner } from '../../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../utils/crossModuleUtils';
 
-export interface QPQConfigAdvancedGraphDatabaseSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedGraphDatabaseSettings = {
   owner?: CrossModuleOwner<'graphDatabaseName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface GraphDatabaseQPQConfigSetting extends QPQConfigSetting {
+export type GraphDatabaseQPQConfigSetting = {
   name: string;
   virtualNetworkName: string;
-}
+} & QPQConfigSetting;
 
 export const defineGraphDatabase = (
   name: string,

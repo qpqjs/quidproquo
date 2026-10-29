@@ -32,11 +32,11 @@ describe('askConfigGetGlobal', () => {
     });
 
     it('should handle typed globals', () => {
-      interface MyGlobalType {
+      type MyGlobalType = {
         id: number;
         name: string;
         active: boolean;
-      }
+      };
 
       const globalName = 'typedGlobal';
       const mockValue: MyGlobalType = { id: 1, name: 'Test', active: true };

@@ -2,15 +2,15 @@ import { CrossModuleOwner } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 
-export interface QPQConfigAdvancedParameterSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedParameterSettings = {
   owner?: CrossModuleOwner<'parameterName'>;
   value?: string;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface ParameterQPQConfigSetting extends QPQConfigSetting {
+export type ParameterQPQConfigSetting = {
   key: string;
   value: string;
-}
+} & QPQConfigSetting;
 
 export const defineParameter = (key: string, options?: QPQConfigAdvancedParameterSettings): ParameterQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.parameter,

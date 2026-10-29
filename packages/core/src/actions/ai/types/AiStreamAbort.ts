@@ -5,8 +5,8 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * No `Finish` part will follow an `Abort`.
  */
-export interface AiStreamAbort {
+export type AiStreamAbort = {
   type: AiStreamPartType.Abort;
   /** Optional human-readable reason for the abort. */
   reason?: string;
-}
+};

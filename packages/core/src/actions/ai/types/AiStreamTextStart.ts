@@ -6,8 +6,8 @@ import { AiStreamPartType } from './AiStreamPartType';
  * Pair with the matching {@link AiStreamTextEnd} (same `id`). Deltas for this block
  * arrive as {@link AiStreamTextDelta} with the same `id` in between.
  */
-export interface AiStreamTextStart {
+export type AiStreamTextStart = {
   type: AiStreamPartType.TextStart;
   /** Identifier shared by the matching `TextDelta` / `TextEnd` parts. */
   id: string;
-}
+};

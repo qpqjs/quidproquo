@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { buildMutableEffectReducer } from './buildMutableEffectReducer';
 
-interface CounterState {
+type CounterState = {
   count: number;
-}
+};
 
 type CounterEffect = { type: 'add'; payload: number } | { type: 'reset'; payload: undefined };
 

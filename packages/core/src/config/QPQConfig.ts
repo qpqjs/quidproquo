@@ -35,16 +35,16 @@ export enum QPQCoreConfigSettingType {
   userScriptRunner = '@quidproquo-core/config/UserScriptRunner',
 }
 
-export interface QPQConfigSetting {
+export type QPQConfigSetting = {
   configSettingType: string;
   uniqueKey: string;
 
   owner?: CrossModuleOwner;
-}
+};
 
-export interface QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedSettings = {
   deprecated?: boolean;
-}
+};
 
 export type QPQConfigItem = QPQConfigSetting | QPQConfigItem[];
 export type QPQConfig = QPQConfigItem[];

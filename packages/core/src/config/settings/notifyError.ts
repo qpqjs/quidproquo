@@ -1,18 +1,18 @@
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedNotifyErrorSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedNotifyErrorSettings = {
   onAlarm: {
     publishToEventBus?: string[];
   };
-}
+} & QPQConfigAdvancedSettings;
 
-export interface NotifyErrorQPQConfigSetting extends QPQConfigSetting {
+export type NotifyErrorQPQConfigSetting = {
   name: string;
 
   onAlarm: {
     publishToEventBus?: string[];
   };
-}
+} & QPQConfigSetting;
 
 export const defineNotifyError = (name: string, options?: QPQConfigAdvancedNotifyErrorSettings): NotifyErrorQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.notifyError,

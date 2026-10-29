@@ -22,9 +22,9 @@ type IncrementEffect = Effect<CounterEffect.Increment>;
 type AddEffect = Effect<CounterEffect.Add, number>;
 type CounterEffects = IncrementEffect | AddEffect;
 
-interface CounterState {
+type CounterState = {
   count: number;
-}
+};
 
 const counterReducer = buildMutableEffectReducer<CounterState, CounterEffects>({
   [CounterEffect.Increment]: (state) => {
@@ -42,9 +42,9 @@ enum MarkEffect {
 type MarkMarkEffect = Effect<MarkEffect.Mark, string>;
 type MarkEffects = MarkMarkEffect;
 
-interface MarkState {
+type MarkState = {
   marks: string[];
-}
+};
 
 const markReducer = buildMutableEffectReducer<MarkState, MarkEffects>({
   [MarkEffect.Mark]: (state, label) => {

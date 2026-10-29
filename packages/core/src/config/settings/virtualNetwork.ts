@@ -1,11 +1,11 @@
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedVirtualNetworkSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedVirtualNetworkSettings = {} & QPQConfigAdvancedSettings;
 
-export interface VirtualNetworkQPQConfigSetting extends QPQConfigSetting {
+export type VirtualNetworkQPQConfigSetting = {
   name: string;
   deprecated: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineVirtualNetwork = (name: string, options?: QPQConfigAdvancedVirtualNetworkSettings): VirtualNetworkQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.virtualNetwork,

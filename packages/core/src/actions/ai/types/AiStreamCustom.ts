@@ -5,8 +5,8 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * The payload is not forwarded, `kind` identifies the event for debugging or custom handling.
  */
-export interface AiStreamCustom {
+export type AiStreamCustom = {
   type: AiStreamPartType.Custom;
   /** Provider-defined identifier for the custom event (e.g. `provider.eventName`). */
   kind: string;
-}
+};

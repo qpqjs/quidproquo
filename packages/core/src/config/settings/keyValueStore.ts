@@ -108,7 +108,7 @@ export type KvsStreamSettings = {
   maximumBatchingWindowInSeconds?: number;
 };
 
-export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> = {
   indexes?: CompositeKvsIndex<T>[];
 
   global?: boolean;
@@ -132,9 +132,9 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
   // Turn on change data capture, see KvsStreamSettings. Absent means no stream is
   // created at all.
   onStream?: KvsStreamSettings;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends QPQConfigSetting {
+export type KeyValueStoreQPQConfigSetting<T extends object = any> = {
   keyValueStoreName: string;
 
   partitionKey: KvsKey<T>;
@@ -152,7 +152,7 @@ export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends Q
   scoped: boolean;
 
   onStream?: KvsStreamSettings;
-}
+} & QPQConfigSetting;
 
 export const defineKeyValueStore = <T extends object = any>(
   keyValueStoreName: string,

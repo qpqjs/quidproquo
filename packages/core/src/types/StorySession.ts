@@ -3,7 +3,7 @@ import { QPQError } from './ErrorTypeEnum';
 import { QpqContext } from './QpqContextIdentifier';
 import { QpqFunctionRuntime } from './QpqFunctionRuntime';
 
-export interface DecodedAccessToken {
+export type DecodedAccessToken = {
   userId: string;
   username: string;
   // Unix timestamp (number of seconds since January 1, 1970 UTC).
@@ -12,9 +12,9 @@ export interface DecodedAccessToken {
 
   userDirectory: string;
   wasValid: boolean;
-}
+};
 
-export interface StorySession {
+export type StorySession = {
   correlation?: string;
   depth: number;
 
@@ -36,7 +36,7 @@ export interface StorySession {
   // Set per-runtime from qpqFunctionRuntimeInfo. In-process nested runs also inherit the
   // caller's (their own win on collision); transport entries (http/queue/ws) never do.
   functionGlobals?: Record<string, unknown>;
-}
+};
 
 export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
 
@@ -86,12 +86,12 @@ export type ExtractGeneratorReturnType<T extends Generator> = T extends Generato
 export type AskResponseReturnType<T extends AskResponse<any>> = ExtractGeneratorReturnType<T>;
 
 // Any generator function that returns an AskResponse
-export interface ActionHistory<P = any, R = any> {
+export type ActionHistory<P = any, R = any> = {
   act: Action<P>;
   res: R;
   startedAt: string;
   finishedAt: string;
-}
+};
 
 export enum QpqRuntimeType {
   API = 'API',
@@ -117,12 +117,12 @@ export enum QpqRuntimeType {
   AUTH_VERIFY_AUTH_CHALLENGE = 'AUTH_VERIFY_AUTH_CHALLENGE',
 }
 
-export interface qpqConsoleLog {
+export type qpqConsoleLog = {
   t: string;
   a: any[];
-}
+};
 
-export interface StoryResult<TArgs extends Array<any>, TResult = any> {
+export type StoryResult<TArgs extends Array<any>, TResult = any> = {
   // Params to story
   input: TArgs;
 
@@ -158,7 +158,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
   // What was the function runtime that this was executed against
   qpqFunctionRuntimeInfo?: QpqFunctionRuntime;
-}
+};
 
 export type StoryResultMetadata = {
   correlation: string;

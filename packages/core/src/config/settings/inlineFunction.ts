@@ -3,17 +3,17 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType }
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 import { getStoryNameFromQpqFunctionRuntime } from '../utils/qpqFunctionRuntimeUtils';
 
-export interface QPQConfigAdvancedInlineFunctionSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedInlineFunctionSettings = {
   functionName?: string;
 
   owner?: CrossModuleOwner<'functionName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface InlineFunctionQPQConfigSetting extends QPQConfigSetting {
+export type InlineFunctionQPQConfigSetting = {
   runtime: QpqFunctionRuntime;
 
   functionName: string;
-}
+} & QPQConfigSetting;
 
 export const defineInlineFunction = (
   runtime: QpqFunctionRuntime,

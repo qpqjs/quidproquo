@@ -7,10 +7,10 @@ export type StateReadActionPayload = {
   path?: string;
 };
 
-export interface StateReadAction extends Action<StateReadActionPayload> {
+export type StateReadAction = {
   type: StateActionType.Read;
   payload: StateReadActionPayload;
-}
+} & Action<StateReadActionPayload>;
 
 export const askStateReadBase = createActionRequester<unknown>()({
   actionType: StateActionType.Read,

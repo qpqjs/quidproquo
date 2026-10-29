@@ -1,11 +1,11 @@
 import { QpqFunctionRuntime } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface QpqQueueProcessors {
+export type QpqQueueProcessors = {
   [type: string]: QpqFunctionRuntime;
-}
+};
 
-export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedQueueSettings = {
   batchSize?: number;
   batchWindowInSeconds?: number;
   concurrency?: number;
@@ -15,9 +15,9 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   eventBusSubscriptions?: string[];
   maxConcurrentExecutions?: number;
   isFifo?: boolean;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface QueueQPQConfigSetting extends QPQConfigSetting {
+export type QueueQPQConfigSetting = {
   name: string;
 
   batchSize: number;
@@ -36,7 +36,7 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   maxConcurrentExecutions?: number;
 
   isFifo: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => {
   return {

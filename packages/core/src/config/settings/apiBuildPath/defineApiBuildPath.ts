@@ -1,8 +1,8 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../../QPQConfig';
 
-export interface ApiBuildPathQPQConfigSetting extends QPQConfigSetting {
+export type ApiBuildPathQPQConfigSetting = {
   apiBuildPath: string;
-}
+} & QPQConfigSetting;
 
 export const defineApiBuildPath = (apiBuildPath: string): ApiBuildPathQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.apiBuildPath,

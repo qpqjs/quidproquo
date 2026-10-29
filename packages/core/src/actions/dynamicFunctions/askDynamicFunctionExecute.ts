@@ -23,11 +23,11 @@ export type DynamicFunctions = Record<string, (...args: any[]) => any>;
 // story return value, a promise-returning member to its awaited value.
 export type DynamicFunctionResult<TFn extends (...args: any[]) => any> =
   ReturnType<TFn> extends Generator<any, infer R, any> ? R : ReturnType<TFn> extends Promise<infer R> ? R : ReturnType<TFn>;
-export interface DynamicFunctionsExecuteActionPayload {
+export type DynamicFunctionsExecuteActionPayload = {
   dynamicFunctionsName: string;
   functionName: string;
   args: unknown[];
-}
+};
 
 export const askDynamicFunctionExecuteBase = createActionRequester<unknown>()({
   actionType: DynamicFunctionsActionType.Execute,

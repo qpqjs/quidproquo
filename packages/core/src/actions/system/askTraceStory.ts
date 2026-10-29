@@ -2,7 +2,7 @@ import { QpqExecutionTrace, StoryResult } from '../../types';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { SystemActionType } from './SystemActionType';
 
-export interface SystemTraceStoryActionPayload {
+export type SystemTraceStoryActionPayload = {
   storyResult: StoryResult<any>;
 
   // Regex sources matched against script urls to trace in addition to the story
@@ -13,7 +13,7 @@ export interface SystemTraceStoryActionPayload {
   // positions mapping into node_modules (framework/deps) get no breakpoints, so the
   // step budget is spent entirely on user statements.
   onlyOwnCode?: boolean;
-}
+};
 
 export const askTraceStory = createActionRequester<QpqExecutionTrace>()({
   actionType: SystemActionType.TraceStory,

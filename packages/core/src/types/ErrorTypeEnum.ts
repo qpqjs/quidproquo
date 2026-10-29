@@ -43,8 +43,8 @@ export enum ErrorTypeEnum {
   Conflict = 'Conflict',
 }
 
-export interface QPQError {
+export type QPQError = {
   errorType: ErrorTypeEnum | string;
   errorText: string;
   errorStack?: string;
-}
+};

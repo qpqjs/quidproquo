@@ -1,7 +1,7 @@
 import { CrossModuleOwner } from '../../../../types';
 import { QPQConfigAdvancedSettings } from '../../../QPQConfig';
 
-export interface QPQConfigAdvancedScheduleSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedScheduleSettings = {
   metadata?: Record<string, any>;
   owner?: CrossModuleOwner<'recurringSchedule'>;
 
@@ -9,4 +9,4 @@ export interface QPQConfigAdvancedScheduleSettings extends QPQConfigAdvancedSett
   // throttled below it, never scales above it. Free, but carved out of the
   // deploy account's shared concurrency pool.
   maxConcurrentExecutions?: number;
-}
+} & QPQConfigAdvancedSettings;

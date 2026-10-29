@@ -1,12 +1,12 @@
 import { StreamChunk, StreamRegistry } from '../../types/StreamRegistry';
 
-interface StreamEntry {
+type StreamEntry = {
   iterator: AsyncIterableIterator<string>;
   nextPromise: Promise<IteratorResult<string>>;
   settled: boolean;
   settledResult?: IteratorResult<string>;
   settledError?: unknown;
-}
+};
 
 export const createStreamRegistry = (): StreamRegistry => {
   const streams = new Map<string, StreamEntry>();

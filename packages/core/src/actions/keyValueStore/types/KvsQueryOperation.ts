@@ -8,9 +8,9 @@ export type KvsListDataType = KvsAdvancedDataType[];
 // Use an interface for the recursive data type. Members may be undefined so that a
 // domain model with OPTIONAL fields can be written directly; the marshaller drops
 // undefined members, since DynamoDB has no representation for them.
-export interface KvsObjectDataType {
+export type KvsObjectDataType = {
   [key: string]: KvsAdvancedDataType | undefined;
-}
+};
 
 export type KvsAdvancedDataType = KvsBasicDataType | KvsListDataType | KvsObjectDataType;
 

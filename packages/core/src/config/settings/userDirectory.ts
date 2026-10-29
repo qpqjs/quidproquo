@@ -18,14 +18,14 @@ export enum UserDirectoryMfaSecondFactor {
   // sms = 'sms', // future, additionally needs phone + SNS role infra.
 }
 
-export interface UserDirectoryMfaSettings {
+export type UserDirectoryMfaSettings = {
   mode: UserDirectoryMfaMode;
 
   // Enabled second factors. Defaults to [totp] when omitted.
   secondFactors?: UserDirectoryMfaSecondFactor[];
-}
+};
 
-export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedUserDirectorySettings = {
   phoneRequired?: boolean;
 
   selfSignUpEnabled?: boolean;
@@ -47,9 +47,9 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   //
   // Generally web apps should refresh in the few mins so this should be > 5.
   accessTokenValidityMinutes?: number;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
+export type UserDirectoryQPQConfigSetting = {
   name: string;
 
   phoneRequired: boolean;
@@ -67,7 +67,7 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   mfa: UserDirectoryMfaSettings;
 
   accessTokenValidityMinutes?: number;
-}
+} & QPQConfigSetting;
 
 export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUserDirectorySettings): UserDirectoryQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.userDirectory,

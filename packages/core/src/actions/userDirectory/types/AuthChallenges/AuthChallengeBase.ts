@@ -1,8 +1,8 @@
 import { AuthenticateUserChallenge } from '../AuthenticateUserChallenge';
 
-export interface AuthChallengeBase {
+export type AuthChallengeBase = {
   challenge: AuthenticateUserChallenge;
   username: string;
 
   session: string;
-}
+};

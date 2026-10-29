@@ -5,6 +5,6 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * The raw payload is not forwarded, this part exists as a marker for debugging or telemetry.
  */
-export interface AiStreamRaw {
+export type AiStreamRaw = {
   type: AiStreamPartType.Raw;
-}
+};

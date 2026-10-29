@@ -6,10 +6,10 @@ import { AiStreamPartType } from './AiStreamPartType';
  * Concatenate all deltas sharing the same `id` to reconstruct the block's full text.
  * This is the part to render in a typewriter-style UI.
  */
-export interface AiStreamTextDelta {
+export type AiStreamTextDelta = {
   type: AiStreamPartType.TextDelta;
   /** Identifier of the text block this delta belongs to. */
   id: string;
   /** The new text fragment to append. */
   text: string;
-}
+};

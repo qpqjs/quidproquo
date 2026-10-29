@@ -1,8 +1,8 @@
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface ServiceSettingsQPQConfigSetting extends QPQConfigSetting {
+export type ServiceSettingsQPQConfigSetting = {
   settingsByService: Record<string, QPQConfig>;
-}
+} & QPQConfigSetting;
 
 export const defineServiceSettings = (settingsByService: Record<string, QPQConfig>): ServiceSettingsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.serviceSettings,

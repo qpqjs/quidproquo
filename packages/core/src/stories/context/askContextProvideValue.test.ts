@@ -15,11 +15,11 @@ import { askContextProvideValue } from './askContextProvideValue';
 
 // ─── Runtime simulator (mirrors askOverrideActions.test.ts) ────────────────────
 
-interface SimulatorError {
+type SimulatorError = {
   __simulateError: true;
   errorType: string;
   errorText: string;
-}
+};
 
 function simulatorError(errorType: string, errorText: string): SimulatorError {
   return { __simulateError: true, errorType, errorText };

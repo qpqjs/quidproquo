@@ -21,11 +21,11 @@ import { askRunParallel } from './askRunParallel';
 // records what reached it. Every test then reads as a story + overrides + responses,
 // followed by assertions on the resolved value and on which actions hit the runtime.
 
-interface ResponseError {
+type ResponseError = {
   readonly __responseError: true;
   readonly errorType: string;
   readonly errorText: string;
-}
+};
 
 // Use as a response value to make the runtime fail that action.
 const respondError = (errorType: string, errorText: string): ResponseError => ({ __responseError: true, errorType, errorText });
@@ -35,14 +35,14 @@ const isResponseError = (value: unknown): value is ResponseError =>
 
 type ResponseMap = Record<string, unknown>;
 
-interface RuntimeOutcome {
+type RuntimeOutcome = {
   // The story's resolved value (undefined if an uncaught error escaped first).
   result: any;
   // Actions that reached the runtime, excluding the empty batch askCatch emits internally.
   runtimeActions: Action<any>[];
   // Set when an uncaught askThrowError escaped to the runtime.
   threwError?: { errorType: string; errorText: string };
-}
+};
 
 // Shapes a single action's response, wrapping it as an EitherActionResult when the action
 // opted into returnErrors. A failed response either becomes a caught error or throws.

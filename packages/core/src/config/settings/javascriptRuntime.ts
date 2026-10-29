@@ -13,15 +13,15 @@ export enum JavascriptRuntimeArchitecture {
   X86_64 = 'x86_64',
 }
 
-export interface QPQConfigAdvancedJavascriptRuntimeSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedJavascriptRuntimeSettings = {
   runtimeVersion?: JavascriptRuntimeVersion;
   architecture?: JavascriptRuntimeArchitecture;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface JavascriptRuntimeQPQConfigSetting extends QPQConfigSetting {
+export type JavascriptRuntimeQPQConfigSetting = {
   runtimeVersion: JavascriptRuntimeVersion;
   architecture: JavascriptRuntimeArchitecture;
-}
+} & QPQConfigSetting;
 
 export const defineJavascriptRuntime = (options?: QPQConfigAdvancedJavascriptRuntimeSettings): JavascriptRuntimeQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.javascriptRuntime,

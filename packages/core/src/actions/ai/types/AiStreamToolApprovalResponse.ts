@@ -3,7 +3,7 @@ import { AiStreamPartType } from './AiStreamPartType';
 /**
  * The approve/deny decision for a prior {@link AiStreamToolApprovalRequest}.
  */
-export interface AiStreamToolApprovalResponse {
+export type AiStreamToolApprovalResponse = {
   type: AiStreamPartType.ToolApprovalResponse;
   /** Identifier of the approval request this response answers. */
   approvalId: string;
@@ -15,4 +15,4 @@ export interface AiStreamToolApprovalResponse {
   approved: boolean;
   /** Optional reason for the approval or denial. */
   reason?: string;
-}
+};

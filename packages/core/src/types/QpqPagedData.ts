@@ -1,4 +1,4 @@
-export interface QpqPagedData<T> {
+export type QpqPagedData<T> = {
   nextPageKey?: string;
   items: T[];
-}
+};

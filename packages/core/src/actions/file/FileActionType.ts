@@ -19,18 +19,18 @@ export enum FileActionType {
 
 export const filePathDelimiter = `/`;
 
-export interface FileInfo {
+export type FileInfo = {
   filepath: string;
   drive: string;
   isDir: boolean;
   hashMd5?: string;
-}
+};
 
-export interface DirectoryList {
+export type DirectoryList = {
   fileInfos: FileInfo[];
   pageToken?: string;
-}
+};
 
-export interface StorageDriveAdvancedWriteOptions {
+export type StorageDriveAdvancedWriteOptions = {
   storageDriveTier?: StorageDriveTier;
-}
+};

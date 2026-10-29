@@ -13,14 +13,14 @@ import { QPQConfig, QPQConfigItem } from '../config';
 //   const config = buildTestQpqConfig([defineSecret('apiKey')]);
 //   const config = buildTestQpqConfig([...], { environment: 'production', feature: 'beta' });
 
-export interface TestQpqConfigAppOptions {
+export type TestQpqConfigAppOptions = {
   applicationName?: string;
   moduleName?: string;
   environment?: string;
   configRoot?: string;
   apiBuildPath?: string;
   feature?: string;
-}
+};
 
 // Builds a QPQConfig from `settings`, prepending a default application module so context-
 // dependent selectors work. Any field of that module can be overridden via `appOptions`.

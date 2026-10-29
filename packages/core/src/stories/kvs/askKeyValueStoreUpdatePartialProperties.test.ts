@@ -7,12 +7,12 @@ import { runStory } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
 import { askKeyValueStoreUpdatePartialProperties } from './askKeyValueStoreUpdatePartialProperties';
 
-interface Widget {
+type Widget = {
   id: string;
   name: string;
   count: number;
   note?: string;
-}
+};
 
 describe('askKeyValueStoreUpdatePartialProperties', () => {
   it('sets valid properties, removes undefined ones, and skips the partition key', () => {

@@ -1,5 +1,5 @@
 // Shared base type for common properties
-export interface GraphEntity {
+export type GraphEntity = {
   $id: string;
   $properties: Record<string, any>;
-}
+};

@@ -5,8 +5,8 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * A {@link AiStreamToolCall} with the parsed arguments follows shortly.
  */
-export interface AiStreamToolInputEnd {
+export type AiStreamToolInputEnd = {
   type: AiStreamPartType.ToolInputEnd;
   /** Identifier of the argument stream being closed. */
   id: string;
-}
+};

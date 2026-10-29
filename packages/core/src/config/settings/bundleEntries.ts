@@ -2,9 +2,9 @@ import { QpqFunctionRuntime } from '../../types';
 import { getUniqueKeyFromQpqFunctionRuntime } from '../../utils';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface BundleEntriesQPQConfigSetting extends QPQConfigSetting {
+export type BundleEntriesQPQConfigSetting = {
   runtimes: QpqFunctionRuntime[];
-}
+} & QPQConfigSetting;
 
 /**
  * Registers runtimes that are only ever reached through the dynamic module loader (a

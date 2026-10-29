@@ -4,7 +4,7 @@
  * Each field may be undefined if the underlying provider doesn't report it.
  * `totalTokens` is the sum of input + output (plus any reasoning tokens, when applicable).
  */
-export interface AiStreamUsage {
+export type AiStreamUsage = {
   /** Prompt tokens consumed. */
   inputTokens?: number;
   /** Completion tokens produced. */
@@ -17,4 +17,4 @@ export interface AiStreamUsage {
   cacheWriteInputTokens?: number;
   /** Prompt tokens neither read from nor written to the cache. */
   noCacheInputTokens?: number;
-}
+};

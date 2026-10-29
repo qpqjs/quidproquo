@@ -1,13 +1,13 @@
 import { QpqFunctionRuntime } from '../../../../types';
 
-export interface EmailTemplates {
+export type EmailTemplates = {
   verifyEmail?: QpqFunctionRuntime;
   resetPassword?: QpqFunctionRuntime;
   resetPasswordAdmin?: QpqFunctionRuntime;
-}
+};
 
-export interface CustomAuthRuntime {
+export type CustomAuthRuntime = {
   defineAuthChallenge: QpqFunctionRuntime;
   createAuthChallenge?: QpqFunctionRuntime;
   verifyAuthChallenge?: QpqFunctionRuntime;
-}
+};

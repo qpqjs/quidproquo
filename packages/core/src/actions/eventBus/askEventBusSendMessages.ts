@@ -11,10 +11,10 @@ export type EventBusMessage<T> = CrossModuleMessage<T> & {
   deduplicationId?: string;
 };
 
-export interface EventBusSendMessageOptions<T> {
+export type EventBusSendMessageOptions<T> = {
   eventBusName: string;
   eventBusMessages: EventBusMessage<T>[];
-}
+};
 
 export const askEventBusSendMessagesBase = createActionRequester<void>()({
   actionType: EventBusActionType.SendMessages,

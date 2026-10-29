@@ -4,7 +4,7 @@
  * `sourceType` is `'url'` for web sources and `'document'` for files/documents.
  * URL sources populate `url` (and optionally `title`); document sources populate `mediaType`.
  */
-export interface AiStreamSource {
+export type AiStreamSource = {
   /** Kind of source, typically `'url'` or `'document'`. */
   sourceType: string;
   /** Stable identifier for this source within the response. */
@@ -17,4 +17,4 @@ export interface AiStreamSource {
   mediaType?: string;
   /** Optional filename, only set on document sources. */
   filename?: string;
-}
+};

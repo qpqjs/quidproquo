@@ -11,12 +11,12 @@ import { Action, AskResponse, AskResponseReturnType } from '../types';
 //   expect(action).toEqual({ type: ConfigActionType.GetParameter, payload: { parameterName: 'name' } });
 //   expect(returned).toBe('value');
 
-export interface CapturedRequester<T> {
+export type CapturedRequester<T> = {
   // The action the requester yielded.
   readonly action: Action<any>;
   // The value the requester returned after the runtime answered with `result`.
   readonly returned: T;
-}
+};
 
 // Runs a single-action requester: pulls the one action it yields, answers with `result`,
 // and captures the value it returns. Throws if the requester yields nothing or yields

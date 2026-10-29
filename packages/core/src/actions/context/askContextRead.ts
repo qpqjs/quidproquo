@@ -4,14 +4,14 @@ import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { ContextActionType } from './ContextActionType';
 
-export interface ContextReadActionPayload<T> {
+export type ContextReadActionPayload<T> = {
   contextIdentifier: QpqContextIdentifier<T>;
-}
+};
 
-export interface ContextReadAction<T> extends Action<ContextReadActionPayload<T>> {
+export type ContextReadAction<T> = {
   type: ContextActionType.Read;
   payload: ContextReadActionPayload<T>;
-}
+} & Action<ContextReadActionPayload<T>>;
 
 export const askContextReadBase = createActionRequester<unknown>()({
   actionType: ContextActionType.Read,

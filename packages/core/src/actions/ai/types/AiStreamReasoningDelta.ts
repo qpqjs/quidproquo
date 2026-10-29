@@ -5,10 +5,10 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * Concatenate all deltas sharing the same `id` to reconstruct the block's full reasoning.
  */
-export interface AiStreamReasoningDelta {
+export type AiStreamReasoningDelta = {
   type: AiStreamPartType.ReasoningDelta;
   /** Identifier of the reasoning block this delta belongs to. */
   id: string;
   /** The new reasoning fragment to append. */
   text: string;
-}
+};

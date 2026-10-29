@@ -5,6 +5,6 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * Multi-step responses occur when the model invokes tools, each tool round-trip is a step.
  */
-export interface AiStreamStartStep {
+export type AiStreamStartStep = {
   type: AiStreamPartType.StartStep;
-}
+};

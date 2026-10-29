@@ -25,30 +25,30 @@ export enum UserDirectoryActionType {
   GetUsersByAttribute = '@quidproquo-core/UserDirectory/GetUsersByAttribute',
 }
 
-export interface AuthenticationInfo {
+export type AuthenticationInfo = {
   accessToken?: string;
   expirationDurationInSeconds?: number;
   expiresAt?: QpqIsoDateTime;
   idToken?: string;
   refreshToken?: string;
   tokenType?: string;
-}
+};
 
-export interface AuthenticationDeliveryDetails {
+export type AuthenticationDeliveryDetails = {
   attributeName: string;
   deliveryMedium: 'EMAIL' | 'SMS';
   destination: string;
-}
+};
 
-export interface AuthenticateUserResponse {
+export type AuthenticateUserResponse = {
   challenge: AuthenticateUserChallenge;
   challengeParameters?: Record<string, string>;
   session?: string;
 
   authenticationInfo?: AuthenticationInfo;
-}
+};
 
-export interface UserAttributes {
+export type UserAttributes = {
   /** The user's email address */
   email?: string;
   /** Indicates whether the user's email address has been verified */
@@ -85,4 +85,4 @@ export interface UserAttributes {
   website?: string;
   /** The user's timezone (e.g., "America/Los_Angeles", "Europe/London") */
   zoneInfo?: string;
-}
+};

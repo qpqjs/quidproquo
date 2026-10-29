@@ -3,7 +3,7 @@ import { QPQConfigSetting } from '../../../QPQConfig';
 import { ScheduleRecurrence } from './ScheduleRecurrence';
 import { ScheduleTypeEnum } from './ScheduleTypeEnum';
 
-export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
+export type ScheduleQPQConfigSetting = {
   scheduleType: ScheduleTypeEnum;
 
   runtime: QpqFunctionRuntime;
@@ -17,4 +17,4 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
   maxConcurrentExecutions?: number;
 
   owner?: CrossModuleOwner;
-}
+} & QPQConfigSetting;

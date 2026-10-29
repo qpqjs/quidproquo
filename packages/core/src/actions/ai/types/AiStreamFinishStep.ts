@@ -7,7 +7,7 @@ import { AiStreamUsage } from './AiStreamUsage';
  *
  * For total-response accounting use {@link AiStreamFinish}; this carries the per-step slice only.
  */
-export interface AiStreamFinishStep {
+export type AiStreamFinishStep = {
   type: AiStreamPartType.FinishStep;
   /** Why this step stopped, `toolCalls` between steps, `stop` on the final step. */
   finishReason: AiStreamFinishReasonEnum;
@@ -15,4 +15,4 @@ export interface AiStreamFinishStep {
   rawFinishReason?: string;
   /** Token usage for this step only. */
   usage: AiStreamUsage;
-}
+};

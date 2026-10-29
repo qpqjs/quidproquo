@@ -5,14 +5,14 @@ const MAX_TIMEOUT_IN_SECONDS = 15 * 60;
 const MIN_MEMORY_IN_MIB = 128;
 const MAX_MEMORY_IN_MIB = 10240;
 
-export interface UserScriptRunnerQPQConfigSetting extends QPQConfigSetting {
+export type UserScriptRunnerQPQConfigSetting = {
   timeoutInSeconds: number;
   memoryInMiB: number;
   // Cap on concurrent script executions, carved out of the account's shared pool.
   maxConcurrentExecutions?: number;
   // Put the runner in this virtual network (one with no route out) to deny scripts the internet.
   virtualNetworkName?: string;
-}
+} & QPQConfigSetting;
 
 export type UserScriptRunnerOptions = {
   timeoutInSeconds?: number;

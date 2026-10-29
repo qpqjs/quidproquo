@@ -30,12 +30,12 @@ export type ActionMock<TAction extends Action<any> = Action<any>, TResult = any>
 export type ActionMockMap = Record<string, ActionMock>;
 
 // Sentinel produced by `throwsError` so a mock can simulate an action that fails.
-interface MockedActionError {
+type MockedActionError = {
   readonly __qpqMockError: true;
   readonly errorType: string;
   readonly errorText: string;
   readonly errorStack?: string;
-}
+};
 
 const isMockedActionError = (value: unknown): value is MockedActionError =>
   typeof value === 'object' && value !== null && (value as MockedActionError).__qpqMockError === true;

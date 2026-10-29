@@ -7,12 +7,12 @@ export enum GraphDatabaseInstanceType {
   Write = 'write',
 }
 
-export interface GraphDatabaseExecuteOpenCypherQueryActionPayload {
+export type GraphDatabaseExecuteOpenCypherQueryActionPayload = {
   graphDatabaseName: string;
   openCypherQuery: string;
   params?: Record<string, any>;
   instance: GraphDatabaseInstanceType;
-}
+};
 
 export const askGraphDatabaseExecuteOpenCypherQuery = createActionRequester<GraphCypherResponse>()({
   actionType: GraphDatabaseActionType.ExecuteOpenCypherQuery,

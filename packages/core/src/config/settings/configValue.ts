@@ -1,9 +1,9 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface ConfigValueQPQConfigSetting<T> extends QPQConfigSetting {
+export type ConfigValueQPQConfigSetting<T> = {
   configValueName: string;
   configValue: T;
-}
+} & QPQConfigSetting;
 
 export const defineConfigValue = <T>(configValueName: string, configValue: T): ConfigValueQPQConfigSetting<T> => ({
   configSettingType: QPQCoreConfigSettingType.configValue,

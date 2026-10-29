@@ -3,9 +3,9 @@ import { defineApiBuildPath } from './apiBuildPath';
 import { defineApplication } from './applicationName';
 import { defineModule } from './moduleName';
 
-export interface ApplicationModuleQPQConfigSetting extends QPQConfigSetting {
+export type ApplicationModuleQPQConfigSetting = {
   // Noop
-}
+} & QPQConfigSetting;
 
 export const defineApplicationModule = (
   applicationName: string,
