@@ -27,9 +27,9 @@ import {
   WebSocketQueueServerEventMessageUnauthenticated,
   WebSocketQueueServerMessageEventType,
 } from '../../../types';
-import { askBroadcastUnknownMessage } from '../askBroadcastUnknownMessage';
-import { askSendMessage } from '../askSendMessage';
-import { askProcessOnUnauthenticate } from './askProcessOnUnauthenticate';
+import { askWebSocketQueueBroadcastUnknownMessage } from '../askWebSocketQueueBroadcastUnknownMessage';
+import { askWebSocketQueueSendMessage } from '../askWebSocketQueueSendMessage';
+import { askWebSocketQueueProcessUnauthenticate } from './askWebSocketQueueProcessUnauthenticate';
 
 export function isWebSocketAuthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,
@@ -110,7 +110,7 @@ function* askAuthenticateWithAuthenticator(
 }
 
 function* askStoreAuthenticated(connection: Connection, accessToken: string, principal: WebSocketQueueAuthenticateResult): AskResponse<void> {
-  yield* webSocketConnectionData.askUpsert({
+  yield* webSocketConnectionData.askConnectionUpsert({
     ...connection,
 
     userId: principal.userId,
@@ -123,9 +123,9 @@ function* askStoreAuthenticated(connection: Connection, accessToken: string, pri
 
   // Subscriptions are filed under the scope the connection held when it subscribed, so a re-authenticate (a tenant
   // switch, say) drops them all; the client subscribes again on Authenticated.
-  yield* webSocketSubscriptionData.askDeleteByConnectionId(connection.id);
+  yield* webSocketSubscriptionData.askConnectionDeleteByConnectionId(connection.id);
 
-  yield* askSendMessage(connection.id, {
+  yield* askWebSocketQueueSendMessage(connection.id, {
     type: WebSocketQueueServerMessageEventType.Authenticated,
   } satisfies WebSocketQueueServerEventMessageAuthenticated);
 
@@ -135,17 +135,17 @@ function* askStoreAuthenticated(connection: Connection, accessToken: string, pri
     payload: {},
   };
 
-  yield* askBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
+  yield* askWebSocketQueueBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
 }
 
-export function* askProcessOnAuthenticate(connectionId: string, accessToken: string, scope?: string): AskResponse<void> {
-  const connection = yield* webSocketConnectionData.askGetById(connectionId);
+export function* askWebSocketQueueProcessAuthenticate(connectionId: string, accessToken: string, scope?: string): AskResponse<void> {
+  const connection = yield* webSocketConnectionData.askConnectionGetById(connectionId);
 
   // No connection record (e.g. the connect event hasn't been processed yet) ,
   // tell the client rather than dropping the request silently, so it can
   // distinguish "not authenticated" from "no reply".
   if (!connection) {
-    yield* askSendMessage(connectionId, {
+    yield* askWebSocketQueueSendMessage(connectionId, {
       type: WebSocketQueueServerMessageEventType.Unauthenticated,
     } satisfies WebSocketQueueServerEventMessageUnauthenticated);
     return;
@@ -170,7 +170,7 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
   // untouched would keep the session alive under the old identity and scope
   // while the client believes it is unauthenticated.
   if (!principal) {
-    return yield* askProcessOnUnauthenticate(connectionId);
+    return yield* askWebSocketQueueProcessUnauthenticate(connectionId);
   }
 
   yield* askStoreAuthenticated(connection, accessToken, principal);

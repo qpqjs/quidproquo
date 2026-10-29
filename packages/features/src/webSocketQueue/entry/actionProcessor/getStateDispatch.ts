@@ -11,11 +11,11 @@ import {
 } from '@qpqjs/core';
 
 import { askWebsocketConnectionInfoRead } from '../../context';
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askWebSocketQueueSendEventMessageWithCorrelationToFrontend } from '../../logic/webSocket/askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 import { WebSocketQueueServerEventMessageStateDispatch } from '../../types/serverMessages';
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages';
 
-export function* askStateDispatchToFrontend(payload: StateDispatchActionPayload<any>): AskResponse<void> {
+export function* askWebSocketQueueStateDispatchToFrontend(payload: StateDispatchActionPayload<any>): AskResponse<void> {
   const { connectionId, correlationId } = yield* askWebsocketConnectionInfoRead();
 
   const response: WebSocketQueueServerEventMessageStateDispatch = {
@@ -23,13 +23,13 @@ export function* askStateDispatchToFrontend(payload: StateDispatchActionPayload<
     payload: payload.action,
   };
 
-  yield* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
+  yield* askWebSocketQueueSendEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
 }
 
 export const getStateDispatch = (qpqConfig: QPQConfig) => ({
   [StateActionType.Dispatch]: getProcessCustomImplementation<ProcessorFor<typeof askStateDispatchBase>>(
     qpqConfig,
-    askStateDispatchToFrontend,
+    askWebSocketQueueStateDispatchToFrontend,
     'Send state dispatch to UI',
     null,
     getDateNow,

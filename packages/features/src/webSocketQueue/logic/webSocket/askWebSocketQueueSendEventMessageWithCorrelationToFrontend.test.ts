@@ -4,15 +4,15 @@ import { askWebsocketSendMessageBase, WebsocketActionType } from '@qpqjs/webserv
 
 import { describe, expect, it } from 'vitest';
 
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from './askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askWebSocketQueueSendEventMessageWithCorrelationToFrontend } from './askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 
 const message = { type: 'some-event', correlationId: 'corr' } as any;
 
-describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => {
+describe('askWebSocketQueueSendEventMessageWithCorrelationToFrontend', () => {
   it('sends directly to the connection when the send succeeds', () => {
     const sends: any[] = [];
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message, 'direct'), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message, 'direct'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         sends.push(action.payload.connectionId);
@@ -26,7 +26,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
   it('fills the correlation id from the connection info when the payload lacks one', () => {
     let captured: any;
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend({ type: 'some-event' } as any, 'direct'), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend({ type: 'some-event' } as any, 'direct'), {
       [ContextActionType.Read]: { apiName: 'demo', correlationId: 'from-context' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         captured = action;
@@ -41,7 +41,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     const sends: any[] = [];
     const deletes: any[] = [];
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message, 'direct', 'u1'), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message, 'direct', 'u1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       // The connection store answers the user lookup; the subscriptions store has nothing for the dead connection.
       [KeyValueStoreActionType.Query]: (action: any) => ({ items: action.payload.keyValueStoreName === 'qpq-wsq-demo' ? [{ id: 'user-conn' }] : [] }),
@@ -66,7 +66,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
   it('broadcasts to everyone when neither a connection nor a user is given', () => {
     const sends: any[] = [];
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'b' }] },
       [WebsocketActionType.SendMessage]: (action: any) => {
@@ -82,7 +82,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     const sends: any[] = [];
     const deletes: any[] = [];
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'dead' }, { id: 'b' }] },
       [KeyValueStoreActionType.Query]: (action: any) => ({
@@ -113,7 +113,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     const sends: any[] = [];
     const deletes: any[] = [];
 
-    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
+    runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'busy' }, { id: 'b' }] },
       [KeyValueStoreActionType.Delete]: (action: any) => {

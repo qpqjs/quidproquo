@@ -3,17 +3,17 @@ import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askTryAuthenticateConnection } from './askTryAuthenticateConnection';
+import { askConnectionTryAuthenticate } from './askConnectionTryAuthenticate';
 
 const baseConnection = { id: 'c1', requestTime: 't', requestTimeEpoch: 1, ip: '1.1.1.1' };
 
 const userDirectoryGlobals = (action: any) => (action.payload.globalName === 'qpq-wsq-kvs-name-demo' ? 'user-directory' : '');
 
-describe('askTryAuthenticateConnection', () => {
+describe('askConnectionTryAuthenticate', () => {
   it('does nothing when no user directory is configured', () => {
     let setAccessTokenCalled = false;
 
-    runStory(askTryAuthenticateConnection('c1'), {
+    runStory(askConnectionTryAuthenticate('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: '',
       [UserDirectoryActionType.SetAccessToken]: () => {
@@ -28,7 +28,7 @@ describe('askTryAuthenticateConnection', () => {
   it('sets the access token into the session when the connection has one', () => {
     let captured: any;
 
-    runStory(askTryAuthenticateConnection('c1'), {
+    runStory(askConnectionTryAuthenticate('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: userDirectoryGlobals,
       [KeyValueStoreActionType.Query]: { items: [{ ...baseConnection, accessToken: 'token-1' }] },
@@ -44,7 +44,7 @@ describe('askTryAuthenticateConnection', () => {
   it('does not set an access token when the connection has none', () => {
     let setAccessTokenCalled = false;
 
-    runStory(askTryAuthenticateConnection('c1'), {
+    runStory(askConnectionTryAuthenticate('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: userDirectoryGlobals,
       [KeyValueStoreActionType.Query]: { items: [baseConnection] },
@@ -64,7 +64,7 @@ describe('askTryAuthenticateConnection', () => {
       let setAccessTokenCalled = false;
       let input: any;
 
-      const result = runStory(askTryAuthenticateConnection('c1'), {
+      const result = runStory(askConnectionTryAuthenticate('c1'), {
         [ContextActionType.Read]: { apiName: 'demo' },
         [ConfigActionType.GetGlobal]: globals,
         [KeyValueStoreActionType.Query]: { items: [{ ...baseConnection, accessToken: 'session-1', scope: 'TENANT#t1', userId: 'signer:s1' }] },
@@ -85,7 +85,7 @@ describe('askTryAuthenticateConnection', () => {
 
     it('propagates the authenticator refusal', () => {
       const run = () =>
-        runStory(askTryAuthenticateConnection('c1'), {
+        runStory(askConnectionTryAuthenticate('c1'), {
           [ContextActionType.Read]: { apiName: 'demo' },
           [ConfigActionType.GetGlobal]: globals,
           [KeyValueStoreActionType.Query]: { items: [{ ...baseConnection, accessToken: 'stale' }] },

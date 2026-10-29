@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askBroadcastUnknownMessage } from './askBroadcastUnknownMessage';
+import { askWebSocketQueueBroadcastUnknownMessage } from './askWebSocketQueueBroadcastUnknownMessage';
 
-describe('askBroadcastUnknownMessage', () => {
+describe('askWebSocketQueueBroadcastUnknownMessage', () => {
   it('drops the correlation id and forwards the message to the configured event bus', () => {
     let captured: any;
 
-    runStory(askBroadcastUnknownMessage({ type: 'some-event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+    runStory(askWebSocketQueueBroadcastUnknownMessage({ type: 'some-event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: 'event-bus',
       [EventBusActionType.SendMessages]: (action: any) => {
@@ -27,7 +27,7 @@ describe('askBroadcastUnknownMessage', () => {
   it('reads the event bus name with the api-scoped global key', () => {
     let capturedKey: any;
 
-    runStory(askBroadcastUnknownMessage({ type: 'some-event', correlationId: 'corr' } as any), {
+    runStory(askWebSocketQueueBroadcastUnknownMessage({ type: 'some-event', correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: (action: any) => {
         capturedKey = action.payload.globalName;

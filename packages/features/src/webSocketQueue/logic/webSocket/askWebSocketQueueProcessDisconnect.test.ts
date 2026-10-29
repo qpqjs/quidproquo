@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnDisconnect } from './askProcessOnDisconnect';
+import { askWebSocketQueueProcessDisconnect } from './askWebSocketQueueProcessDisconnect';
 
-describe('askProcessOnDisconnect', () => {
+describe('askWebSocketQueueProcessDisconnect', () => {
   it('deletes the connection record and every subscription filed for the connection', () => {
     const deletes: [string, string, string | undefined][] = [];
 
-    runStory(askProcessOnDisconnect('c1'), {
+    runStory(askWebSocketQueueProcessDisconnect('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: (action: any) => ({
         items:

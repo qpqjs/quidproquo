@@ -3,7 +3,7 @@ import { AskResponse, EitherActionResult } from '@qpqjs/core';
 import { askWebsocketConnectionInfoRead } from '../../context';
 import { WebSocketQueueServerEventMessageServiceRequestResponse } from '../../types/serverMessages/WebSocketQueueServerEventMessageServiceRequestResponse';
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages/WebSocketQueueServerMessageEventType';
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askWebSocketQueueSendEventMessageWithCorrelationToFrontend } from '../webSocket/askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 
 /**
  * Sends a service request's result to the connection and correlation in context.
@@ -18,5 +18,5 @@ export function* askServiceRequestRespond(result: EitherActionResult<unknown>): 
     payload: result,
   };
 
-  yield* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
+  yield* askWebSocketQueueSendEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
 }

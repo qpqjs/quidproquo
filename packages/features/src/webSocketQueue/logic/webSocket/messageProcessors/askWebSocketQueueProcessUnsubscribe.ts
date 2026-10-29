@@ -16,7 +16,7 @@ export function isWebSocketUnsubscribeMessage(
 }
 
 /** Removes the connection's subscription to the topic under its own scope; nothing to do for an unknown connection. */
-export function* askProcessOnUnsubscribe(connection: Nullable<Connection>, topic: string): AskResponse<void> {
+export function* askWebSocketQueueProcessUnsubscribe(connection: Nullable<Connection>, topic: string): AskResponse<void> {
   if (!connection) {
     return;
   }

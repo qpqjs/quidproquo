@@ -3,13 +3,13 @@ import { AskResponse } from '@qpqjs/core';
 import { askWebsocketConnectionInfoProvide } from '../../context';
 import { webSocketSubscriptionData } from '../../data/subscriptionData';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';
-import { askSendToConnectionCleaningUpStale } from './askSendToConnectionCleaningUpStale';
+import { askWebSocketQueueSendToConnectionCleaningUpStale } from './askWebSocketQueueSendToConnectionCleaningUpStale';
 
 function* askSendToSubscribers(scopedTopic: string, message: AnyWebSocketQueueEventMessage): AskResponse<void> {
   const subscriptions = yield* webSocketSubscriptionData.askGetByTopic(scopedTopic);
 
   for (const subscription of subscriptions) {
-    yield* askSendToConnectionCleaningUpStale(subscription.connectionId, message);
+    yield* askWebSocketQueueSendToConnectionCleaningUpStale(subscription.connectionId, message);
   }
 }
 

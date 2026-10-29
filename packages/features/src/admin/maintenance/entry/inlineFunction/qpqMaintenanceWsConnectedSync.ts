@@ -1,7 +1,7 @@
 import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 import { askServiceFunctionExecute } from '@qpqjs/webserver';
 
-import { askSendMessage } from '../../../../webSocketQueue/logic/webSocket/askSendMessage';
+import { askWebSocketQueueSendMessage } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueSendMessage';
 import { WebSocketQueueServerMessageEventType } from '../../../../webSocketQueue/types/serverMessages/WebSocketQueueServerMessageEventType';
 import { WebSocketQueueOnConnectedInput } from '../../../../webSocketQueue/types/WebSocketQueueOnConnectedInput';
 import { QPQ_ADMIN_SERVICE_NAME_GLOBAL, QPQ_GET_ACTIVE_MAINTENANCES_FUNCTION_NAME } from '../../constants/maintenanceConstants';
@@ -23,7 +23,7 @@ export function* qpqMaintenanceWsConnectedSync(input: WebSocketQueueOnConnectedI
     undefined,
   );
 
-  yield* askSendMessage(input.connectionId, {
+  yield* askWebSocketQueueSendMessage(input.connectionId, {
     type: WebSocketQueueServerMessageEventType.Maintenance,
     payload: { maintenances },
   } satisfies MaintenanceServerEventMessage);

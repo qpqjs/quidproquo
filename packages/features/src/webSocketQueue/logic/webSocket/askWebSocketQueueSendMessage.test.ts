@@ -4,13 +4,13 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { askSendMessage } from './askSendMessage';
+import { askWebSocketQueueSendMessage } from './askWebSocketQueueSendMessage';
 
-describe('askSendMessage', () => {
+describe('askWebSocketQueueSendMessage', () => {
   it('sends the payload over the websocket using the connection-info api name', () => {
     let captured: any;
 
-    runStory(askSendMessage('c1', { type: 'anything' } as any), {
+    runStory(askWebSocketQueueSendMessage('c1', { type: 'anything' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         captured = action;

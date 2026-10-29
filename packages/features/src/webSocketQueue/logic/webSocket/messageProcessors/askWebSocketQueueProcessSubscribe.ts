@@ -43,7 +43,7 @@ function* askIsSubscriptionAllowed(connection: Connection, topic: string): AskRe
  * Files a subscription under the connection's validated scope. An unauthenticated connection, or one the topic
  * authoriser refuses, is ignored: a subscribe is fire-and-forget on the wire, and the client simply never hears pushes.
  */
-export function* askProcessOnSubscribe(connection: Nullable<Connection>, topic: string): AskResponse<void> {
+export function* askWebSocketQueueProcessSubscribe(connection: Nullable<Connection>, topic: string): AskResponse<void> {
   if (!connection?.userId || !(yield* askIsSubscriptionAllowed(connection, topic))) {
     return;
   }

@@ -8,7 +8,7 @@ import {
   WebSocketQueueServerEventMessageUnauthenticated,
   WebSocketQueueServerMessageEventType,
 } from '../../../types';
-import { askSendMessage } from '../askSendMessage';
+import { askWebSocketQueueSendMessage } from '../askWebSocketQueueSendMessage';
 
 export function isWebSocketUnauthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,
@@ -16,8 +16,8 @@ export function isWebSocketUnauthenticateMessage(
   return event.type === WebSocketQueueClientMessageEventType.Unauthenticate;
 }
 
-export function* askProcessOnUnauthenticate(connectionId: string): AskResponse<void> {
-  const connection = yield* webSocketConnectionData.askGetById(connectionId);
+export function* askWebSocketQueueProcessUnauthenticate(connectionId: string): AskResponse<void> {
+  const connection = yield* webSocketConnectionData.askConnectionGetById(connectionId);
   if (!connection) {
     return;
   }
@@ -27,10 +27,10 @@ export function* askProcessOnUnauthenticate(connectionId: string): AskResponse<v
   const { userId, accessToken, scope, ...connectionWithNoUserInfo } = connection;
 
   if (connection) {
-    yield* webSocketConnectionData.askUpsert(connectionWithNoUserInfo);
+    yield* webSocketConnectionData.askConnectionUpsert(connectionWithNoUserInfo);
   }
 
-  yield* askSendMessage(connectionId, {
+  yield* askWebSocketQueueSendMessage(connectionId, {
     type: WebSocketQueueServerMessageEventType.Unauthenticated,
   } satisfies WebSocketQueueServerEventMessageUnauthenticated);
 }

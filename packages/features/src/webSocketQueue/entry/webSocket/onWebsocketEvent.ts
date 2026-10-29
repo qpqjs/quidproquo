@@ -11,7 +11,7 @@ export function* onConnect(event: WebsocketEvent): AskResponse<void> {
       apiName: event.apiName,
       connectionId: event.connectionId,
     },
-    webSocketQueueLogic.askProcessOnConnect(event.connectionId, event.requestTime, event.requestTimeEpoch, event.sourceIp),
+    webSocketQueueLogic.askWebSocketQueueProcessConnect(event.connectionId, event.requestTime, event.requestTimeEpoch, event.sourceIp),
   );
 }
 
@@ -21,7 +21,7 @@ export function* onDisconnect(event: WebsocketEvent): AskResponse<void> {
       apiName: event.apiName,
       connectionId: event.connectionId,
     },
-    webSocketQueueLogic.askProcessOnDisconnect(event.connectionId),
+    webSocketQueueLogic.askWebSocketQueueProcessDisconnect(event.connectionId),
   );
 }
 
@@ -38,6 +38,6 @@ export function* onMessage(event: WebsocketEvent): AskResponse<void> {
       connectionId: event.connectionId,
       correlationId: message.correlationId,
     },
-    webSocketQueueLogic.askProcessOnMessage(event.connectionId, message),
+    webSocketQueueLogic.askWebSocketQueueProcessMessage(event.connectionId, message),
   );
 }

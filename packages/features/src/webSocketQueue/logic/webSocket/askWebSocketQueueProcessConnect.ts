@@ -6,7 +6,7 @@ import { webSocketConnectionData } from '../../data';
 import { Connection } from '../../types';
 import { WebSocketQueueOnConnectedInput } from '../../types/WebSocketQueueOnConnectedInput';
 
-export function* askProcessOnConnect(id: string, requestTime: string, requestTimeEpoch: number, ip: string) {
+export function* askWebSocketQueueProcessConnect(id: string, requestTime: string, requestTimeEpoch: number, ip: string) {
   const newConnection: Connection = {
     id,
     requestTime,
@@ -14,7 +14,7 @@ export function* askProcessOnConnect(id: string, requestTime: string, requestTim
     ip,
   };
 
-  yield* webSocketConnectionData.askUpsert(newConnection);
+  yield* webSocketConnectionData.askConnectionUpsert(newConnection);
 
   // Connect-time sync hook: let a configured feature push current PUBLIC state
   // to the fresh connection (e.g. the active maintenance set), deliberately

@@ -5,17 +5,17 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 import { describe, expect, it } from 'vitest';
 
 import { WebSocketQueueClientMessageEventType, WebSocketQueueServerMessageEventType } from '../../types';
-import { askProcessOnMessage } from './askProcessOnMessage';
+import { askWebSocketQueueProcessMessage } from './askWebSocketQueueProcessMessage';
 
 const connection = { id: 'c1', requestTime: 't', requestTimeEpoch: 1, ip: '1.1.1.1' };
 
 const globalByKey = (values: Record<string, string>) => (action: any) => values[action.payload.globalName] ?? '';
 
-describe('askProcessOnMessage', () => {
+describe('askWebSocketQueueProcessMessage', () => {
   it('routes a ping message to the pong reply', () => {
     const sends: any[] = [];
 
-    runStory(askProcessOnMessage('c1', { type: WebSocketQueueClientMessageEventType.Ping } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: WebSocketQueueClientMessageEventType.Ping } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         sends.push(action.payload.payload.type);
@@ -29,7 +29,7 @@ describe('askProcessOnMessage', () => {
   it('routes an unauthenticate message to the unauthenticated reply', () => {
     const sends: any[] = [];
 
-    runStory(askProcessOnMessage('c1', { type: WebSocketQueueClientMessageEventType.Unauthenticate } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: WebSocketQueueClientMessageEventType.Unauthenticate } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [connection] },
       [KeyValueStoreActionType.Upsert]: undefined,
@@ -45,7 +45,7 @@ describe('askProcessOnMessage', () => {
   it('routes an authenticate message with no token to the unauthenticated reply', () => {
     const sends: any[] = [];
 
-    runStory(askProcessOnMessage('c1', { type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [connection] },
       [KeyValueStoreActionType.Upsert]: undefined,
@@ -62,7 +62,7 @@ describe('askProcessOnMessage', () => {
     const sends: any[] = [];
 
     runStory(
-      askProcessOnMessage('c1', {
+      askWebSocketQueueProcessMessage('c1', {
         type: WebSocketQueueClientMessageEventType.Authenticate,
         payload: { accessToken: 'token-1' },
       } as any),
@@ -89,7 +89,7 @@ describe('askProcessOnMessage', () => {
   it('broadcasts an unknown message to the event bus', () => {
     let broadcast: any;
 
-    runStory(askProcessOnMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-eb-name-demo': 'event-bus' }),
       [EventBusActionType.SendMessages]: (action: any) => {
@@ -107,7 +107,7 @@ describe('askProcessOnMessage', () => {
     const sends: any[] = [];
     let broadcast = false;
 
-    runStory(askProcessOnMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [connection] },
       [ConfigActionType.GetGlobal]: globalByKey({
@@ -131,7 +131,7 @@ describe('askProcessOnMessage', () => {
   it('broadcasts a message on a tenant connection under the connection storage scope', () => {
     let broadcast: any;
 
-    runStory(askProcessOnMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+    runStory(askWebSocketQueueProcessMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [{ ...connection, accessToken: 'token-1', scope: 'tenant-a' }] },
       [ConfigActionType.GetGlobal]: globalByKey({

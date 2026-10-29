@@ -12,7 +12,7 @@ import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
  * connection and its subscriptions so the stores self-heal; any other failure (e.g. Throttled) just drops this message
  * for this connection. Returns whether the send succeeded.
  */
-export function* askSendToConnectionCleaningUpStale(
+export function* askWebSocketQueueSendToConnectionCleaningUpStale(
   connectionId: string,
   payload: AnyWebSocketQueueEventMessageWithCorrelation,
 ): AskResponse<boolean> {
@@ -24,8 +24,8 @@ export function* askSendToConnectionCleaningUpStale(
   }
 
   if (result.error.errorType === askWebsocketSendMessageBase.errorType.Disconnected) {
-    yield* webSocketConnectionData.askDeleteByConnectionId(connectionId);
-    yield* webSocketSubscriptionData.askDeleteByConnectionId(connectionId);
+    yield* webSocketConnectionData.askConnectionDeleteByConnectionId(connectionId);
+    yield* webSocketSubscriptionData.askConnectionDeleteByConnectionId(connectionId);
   }
 
   return false;

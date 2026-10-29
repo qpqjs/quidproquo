@@ -5,7 +5,7 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 import { describe, expect, it } from 'vitest';
 
 import { WebSocketQueueClientMessageEventType, WebSocketQueueServerMessageEventType } from '../../../types';
-import { askProcessOnUnauthenticate, isWebSocketUnauthenticateMessage } from './askProcessOnUnauthenticate';
+import { askWebSocketQueueProcessUnauthenticate, isWebSocketUnauthenticateMessage } from './askWebSocketQueueProcessUnauthenticate';
 
 const authenticatedConnection = {
   id: 'c1',
@@ -27,11 +27,11 @@ describe('isWebSocketUnauthenticateMessage', () => {
   });
 });
 
-describe('askProcessOnUnauthenticate', () => {
+describe('askWebSocketQueueProcessUnauthenticate', () => {
   it('does nothing when the connection does not exist', () => {
     let sendCalled = false;
 
-    runStory(askProcessOnUnauthenticate('c1'), {
+    runStory(askWebSocketQueueProcessUnauthenticate('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [] },
       [WebsocketActionType.SendMessage]: () => {
@@ -47,7 +47,7 @@ describe('askProcessOnUnauthenticate', () => {
     let upsert: any;
     let send: any;
 
-    runStory(askProcessOnUnauthenticate('c1'), {
+    runStory(askWebSocketQueueProcessUnauthenticate('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [authenticatedConnection] },
       [KeyValueStoreActionType.Upsert]: (action: any) => {

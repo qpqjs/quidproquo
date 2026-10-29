@@ -9,7 +9,7 @@ import {
 } from '@qpqjs/core';
 
 import { askWebsocketConnectionInfoRead } from '../../../../webSocketQueue/context';
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askWebSocketQueueSendEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 import { ADMIN_CONFIG_SYNC_BATCH_SIZE } from '../../../constants';
 import {
   AdminSettingDataType,
@@ -41,7 +41,7 @@ export function* onConfigSyncRequest(event: WebSocketQueueQpqAdminConfigSyncRequ
       },
     };
 
-    yield* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
+    yield* askWebSocketQueueSendEventMessageWithCorrelationToFrontend(
       {
         ...logMessage,
         correlationId,

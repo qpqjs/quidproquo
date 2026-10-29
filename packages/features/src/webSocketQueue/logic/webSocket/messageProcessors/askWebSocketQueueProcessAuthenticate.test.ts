@@ -12,7 +12,7 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 import { describe, expect, it } from 'vitest';
 
 import { WebSocketQueueClientMessageEventType, WebSocketQueueServerMessageEventType } from '../../../types';
-import { askProcessOnAuthenticate, isWebSocketAuthenticateMessage } from './askProcessOnAuthenticate';
+import { askWebSocketQueueProcessAuthenticate, isWebSocketAuthenticateMessage } from './askWebSocketQueueProcessAuthenticate';
 
 const connection = { id: 'c1', requestTime: 't', requestTimeEpoch: 1, ip: '1.1.1.1' };
 
@@ -33,12 +33,12 @@ describe('isWebSocketAuthenticateMessage', () => {
   });
 });
 
-describe('askProcessOnAuthenticate', () => {
+describe('askWebSocketQueueProcessAuthenticate', () => {
   it('notifies the connection it is unauthenticated when the connection does not exist', () => {
     let setAccessTokenCalled = false;
     const sends: any[] = [];
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [] },
       [UserDirectoryActionType.SetAccessToken]: () => {
@@ -58,7 +58,7 @@ describe('askProcessOnAuthenticate', () => {
   it('does nothing when no user directory is configured', () => {
     let setAccessTokenCalled = false;
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [connection] },
       [ConfigActionType.GetGlobal]: '',
@@ -75,7 +75,7 @@ describe('askProcessOnAuthenticate', () => {
     const sends: any[] = [];
     let upsert: any;
 
-    runStory(askProcessOnAuthenticate('c1', 'bad-token'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'bad-token'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', scope: 'old-tenant' }] },
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory' }),
@@ -99,7 +99,7 @@ describe('askProcessOnAuthenticate', () => {
     const sends: any[] = [];
     let broadcast: any;
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
@@ -132,7 +132,7 @@ describe('askProcessOnAuthenticate', () => {
     let resolverCall: any;
     const sends: any[] = [];
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1', 'tenant-a'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
@@ -165,7 +165,7 @@ describe('askProcessOnAuthenticate', () => {
     let upsert: any;
     let resolverCall: any;
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: queryByStore(),
       [ConfigActionType.GetGlobal]: globalByKey({
@@ -194,7 +194,7 @@ describe('askProcessOnAuthenticate', () => {
     let upsert: any;
     const sends: any[] = [];
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-b'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1', 'tenant-b'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', scope: 'old-tenant' }] },
       [ConfigActionType.GetGlobal]: globalByKey({
@@ -221,7 +221,7 @@ describe('askProcessOnAuthenticate', () => {
     let upsert: any;
     const sends: any[] = [];
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1', 'tenant-a'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', scope: 'old-tenant' }] },
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory' }),
@@ -243,7 +243,7 @@ describe('askProcessOnAuthenticate', () => {
   it('clears a previous scope when re-authenticating without a claim on a plain queue', () => {
     let upsert: any;
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: (action: any) => ({
         items: action.payload.keyValueStoreName === 'qpq-wsq-subs-demo' ? [] : [{ ...connection, scope: 'tenant-a' }],
@@ -266,7 +266,7 @@ describe('askProcessOnAuthenticate', () => {
   it('drops the subscriptions filed under the previous authentication', () => {
     const deletes: [string, string, string | undefined][] = [];
 
-    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+    runStory(askWebSocketQueueProcessAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: queryByStore([{ topic: 'TENANT#old#eventDoc#docs#1', connectionId: 'c1' }]),
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory', 'qpq-wsq-eb-name-demo': 'event-bus' }),
@@ -292,7 +292,7 @@ describe('askProcessOnAuthenticate', () => {
       const sends: any[] = [];
       let upsert: any;
 
-      runStory(askProcessOnAuthenticate('c1', 'session-1'), {
+      runStory(askWebSocketQueueProcessAuthenticate('c1', 'session-1'), {
         [ContextActionType.Read]: { apiName: 'demo' },
         [KeyValueStoreActionType.Query]: queryByStore(),
         [ConfigActionType.GetGlobal]: globals,
@@ -324,7 +324,7 @@ describe('askProcessOnAuthenticate', () => {
     it('hands a scope claim to the authenticator', () => {
       let input: any;
 
-      runStory(askProcessOnAuthenticate('c1', 'session-1', 'TENANT#t1'), {
+      runStory(askWebSocketQueueProcessAuthenticate('c1', 'session-1', 'TENANT#t1'), {
         [ContextActionType.Read]: { apiName: 'demo' },
         [KeyValueStoreActionType.Query]: queryByStore(),
         [ConfigActionType.GetGlobal]: globals,
@@ -344,7 +344,7 @@ describe('askProcessOnAuthenticate', () => {
       const sends: any[] = [];
       let upsert: any;
 
-      runStory(askProcessOnAuthenticate('c1', 'stale-session'), {
+      runStory(askWebSocketQueueProcessAuthenticate('c1', 'stale-session'), {
         [ContextActionType.Read]: { apiName: 'demo' },
         [KeyValueStoreActionType.Query]: queryByStore(),
         [ConfigActionType.GetGlobal]: globals,

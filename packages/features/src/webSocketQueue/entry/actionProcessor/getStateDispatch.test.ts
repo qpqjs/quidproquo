@@ -5,13 +5,13 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 import { describe, expect, it, vi } from 'vitest';
 
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages';
-import { askStateDispatchToFrontend, getStateDispatch } from './getStateDispatch';
+import { askWebSocketQueueStateDispatchToFrontend, getStateDispatch } from './getStateDispatch';
 
-describe('askStateDispatchToFrontend', () => {
+describe('askWebSocketQueueStateDispatchToFrontend', () => {
   it('sends a state dispatch message with the correlation id to the connection', () => {
     let captured: any;
 
-    runStory(askStateDispatchToFrontend({ action: { type: 'increment' } } as any), {
+    runStory(askWebSocketQueueStateDispatchToFrontend({ action: { type: 'increment' } } as any), {
       [ContextActionType.Read]: { connectionId: 'c1', correlationId: 'corr', apiName: 'demo' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         captured = action;
@@ -30,12 +30,12 @@ describe('askStateDispatchToFrontend', () => {
 
 // Security regression: a story with no websocket connection in its context (a queue or schedule run, say) cannot push
 // state to anyone; the dispatch fails before any message is sent.
-describe('askStateDispatchToFrontend without a websocket context', () => {
+describe('askWebSocketQueueStateDispatchToFrontend without a websocket context', () => {
   it('throws and sends nothing when no connection info was provided', () => {
     const send = vi.fn();
 
     expect(() =>
-      runStory(askStateDispatchToFrontend({ action: { type: 'increment' } } as any), {
+      runStory(askWebSocketQueueStateDispatchToFrontend({ action: { type: 'increment' } } as any), {
         [ContextActionType.Read]: {},
         [WebsocketActionType.SendMessage]: send,
       }),

@@ -14,7 +14,7 @@ import { Connection, WebSocketQueueAuthenticateInput, WebSocketQueueAuthenticate
  * and service functions see the user. A connectionAuthenticator queue re-runs the authenticator; its throw propagates,
  * as an expired user-directory token does. Null when the queue authenticates nobody.
  */
-export function* askTryAuthenticateConnection(connectionId: string): AskResponse<Nullable<Connection>> {
+export function* askConnectionTryAuthenticate(connectionId: string): AskResponse<Nullable<Connection>> {
   const apiName = yield* askWebsocketApiNameReadOrThrow();
   const connectionAuthenticator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName));
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
@@ -23,7 +23,7 @@ export function* askTryAuthenticateConnection(connectionId: string): AskResponse
     return null;
   }
 
-  const connection = yield* webSocketConnectionData.askGetById(connectionId);
+  const connection = yield* webSocketConnectionData.askConnectionGetById(connectionId);
 
   if (connection?.accessToken) {
     if (connectionAuthenticator) {

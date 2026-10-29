@@ -3,13 +3,13 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnConnect } from './askProcessOnConnect';
+import { askWebSocketQueueProcessConnect } from './askWebSocketQueueProcessConnect';
 
-describe('askProcessOnConnect', () => {
+describe('askWebSocketQueueProcessConnect', () => {
   it('upserts a new connection record into the store', () => {
     let captured: any;
 
-    runStory(askProcessOnConnect('c1', '2026-06-26', 1234, '1.1.1.1'), {
+    runStory(askWebSocketQueueProcessConnect('c1', '2026-06-26', 1234, '1.1.1.1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: '',
       [KeyValueStoreActionType.Upsert]: (action: any) => {
@@ -30,7 +30,7 @@ describe('askProcessOnConnect', () => {
   it('invokes the configured onConnected hook with the fresh connection id', () => {
     let hookCall: any;
 
-    runStory(askProcessOnConnect('c1', '2026-06-26', 1234, '1.1.1.1'), {
+    runStory(askWebSocketQueueProcessConnect('c1', '2026-06-26', 1234, '1.1.1.1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [ConfigActionType.GetGlobal]: 'syncMaintenance',
       [KeyValueStoreActionType.Upsert]: undefined,

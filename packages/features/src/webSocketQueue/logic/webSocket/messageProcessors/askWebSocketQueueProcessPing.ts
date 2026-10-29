@@ -7,16 +7,16 @@ import {
   WebSocketQueueServerEventMessagePong,
   WebSocketQueueServerMessageEventType,
 } from '../../../types';
-import { askSendMessage } from '../askSendMessage';
+import { askWebSocketQueueSendMessage } from '../askWebSocketQueueSendMessage';
 
 export function isWebSocketPingMessage(event: AnyWebSocketQueueEventMessageWithCorrelation): event is WebSocketQueueClientEventMessagePing {
   return event.type === WebSocketQueueClientMessageEventType.Ping;
 }
 
-export function* askProcessOnPing(id: string): AskResponse<void> {
+export function* askWebSocketQueueProcessPing(id: string): AskResponse<void> {
   const pongMessage: WebSocketQueueServerEventMessagePong = {
     type: WebSocketQueueServerMessageEventType.Pong,
   };
 
-  yield* askSendMessage(id, pongMessage);
+  yield* askWebSocketQueueSendMessage(id, pongMessage);
 }

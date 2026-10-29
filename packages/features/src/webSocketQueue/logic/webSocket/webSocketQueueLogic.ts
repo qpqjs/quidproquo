@@ -1,9 +1,9 @@
-import { askProcessOnConnect } from './askProcessOnConnect';
-import { askProcessOnDisconnect } from './askProcessOnDisconnect';
-import { askProcessOnMessage } from './askProcessOnMessage';
+import { askWebSocketQueueProcessConnect } from './askWebSocketQueueProcessConnect';
+import { askWebSocketQueueProcessDisconnect } from './askWebSocketQueueProcessDisconnect';
+import { askWebSocketQueueProcessMessage } from './askWebSocketQueueProcessMessage';
 
 export const webSocketQueueLogic = {
-  askProcessOnConnect,
-  askProcessOnDisconnect,
-  askProcessOnMessage,
+  askWebSocketQueueProcessConnect,
+  askWebSocketQueueProcessDisconnect,
+  askWebSocketQueueProcessMessage,
 };

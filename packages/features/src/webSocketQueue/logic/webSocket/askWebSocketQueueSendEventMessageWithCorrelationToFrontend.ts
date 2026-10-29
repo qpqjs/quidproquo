@@ -4,7 +4,7 @@ import { askWebsocketConnectionInfoRead } from '../../context';
 import { webSocketConnectionData } from '../../data';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';
-import { askSendToConnectionCleaningUpStale } from './askSendToConnectionCleaningUpStale';
+import { askWebSocketQueueSendToConnectionCleaningUpStale } from './askWebSocketQueueSendToConnectionCleaningUpStale';
 
 export type askSendMessageToFrontendArgs = {
   userId?: string;
@@ -13,22 +13,22 @@ export type askSendMessageToFrontendArgs = {
 };
 
 function* askSendMessageToEveryone(payload: AnyWebSocketQueueEventMessageWithCorrelation) {
-  const connections = yield* webSocketConnectionData.askGetAllConnections();
+  const connections = yield* webSocketConnectionData.askConnectionGetAll();
 
   for (const connection of connections) {
-    yield* askSendToConnectionCleaningUpStale(connection.id, payload);
+    yield* askWebSocketQueueSendToConnectionCleaningUpStale(connection.id, payload);
   }
 }
 
 function* askSendMessageToUser(userId: string, payload: AnyWebSocketQueueEventMessageWithCorrelation) {
-  const connections = yield* webSocketConnectionData.askGetConnectionsByUserId(userId);
+  const connections = yield* webSocketConnectionData.askConnectionGetByUserId(userId);
 
   for (const connection of connections) {
-    yield* askSendToConnectionCleaningUpStale(connection.id, payload);
+    yield* askWebSocketQueueSendToConnectionCleaningUpStale(connection.id, payload);
   }
 }
 
-export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
+export function* askWebSocketQueueSendEventMessageWithCorrelationToFrontend(
   payload: AnyWebSocketQueueEventMessageWithCorrelation,
   connectionId?: string,
   userId?: string,
@@ -43,7 +43,7 @@ export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
   }
 
   if (connectionId) {
-    const sent = yield* askSendToConnectionCleaningUpStale(connectionId, payloadWithCorrelationId);
+    const sent = yield* askWebSocketQueueSendToConnectionCleaningUpStale(connectionId, payloadWithCorrelationId);
 
     // If we sent the message, or we don't have a direct user to send it to, bail
     if (sent || !userId) {

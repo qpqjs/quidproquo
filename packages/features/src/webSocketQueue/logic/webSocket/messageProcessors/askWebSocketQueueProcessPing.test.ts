@@ -5,7 +5,7 @@ import { WebsocketActionType } from '@qpqjs/webserver';
 import { describe, expect, it } from 'vitest';
 
 import { WebSocketQueueClientMessageEventType, WebSocketQueueServerMessageEventType } from '../../../types';
-import { askProcessOnPing, isWebSocketPingMessage } from './askProcessOnPing';
+import { askWebSocketQueueProcessPing, isWebSocketPingMessage } from './askWebSocketQueueProcessPing';
 
 describe('isWebSocketPingMessage', () => {
   it('accepts a ping message', () => {
@@ -17,11 +17,11 @@ describe('isWebSocketPingMessage', () => {
   });
 });
 
-describe('askProcessOnPing', () => {
+describe('askWebSocketQueueProcessPing', () => {
   it('replies to the connection with a pong message', () => {
     let captured: any;
 
-    runStory(askProcessOnPing('c1'), {
+    runStory(askWebSocketQueueProcessPing('c1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [WebsocketActionType.SendMessage]: (action: any) => {
         captured = action;

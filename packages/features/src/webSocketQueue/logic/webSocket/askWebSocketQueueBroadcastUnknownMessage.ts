@@ -4,7 +4,7 @@ import { getWebSocketQueueGlobalConfigKeyForEventBusName } from '../../config/de
 import { askWebsocketApiNameReadOrThrow } from '../../context';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 
-export function* askBroadcastUnknownMessage({
+export function* askWebSocketQueueBroadcastUnknownMessage({
   // We want to drop the correlationId
   correlationId,
   ...anyWebSocketQueueEventMessage

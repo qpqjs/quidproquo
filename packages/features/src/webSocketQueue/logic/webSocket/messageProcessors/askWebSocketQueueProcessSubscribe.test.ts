@@ -4,7 +4,7 @@ import { runStory, throwsError } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { Connection, WebSocketQueueClientMessageEventType } from '../../../types';
-import { askProcessOnSubscribe, isWebSocketSubscribeMessage } from './askProcessOnSubscribe';
+import { askWebSocketQueueProcessSubscribe, isWebSocketSubscribeMessage } from './askWebSocketQueueProcessSubscribe';
 
 const connection: Connection = { id: 'c1', requestTime: '', requestTimeEpoch: 0, ip: '', userId: 'u1', scope: 'TENANT#t1', accessToken: 'token-1' };
 
@@ -12,7 +12,7 @@ const subscribe = (conn: Connection | null, topicAuthoriser = '', authoriserThro
   const upserts: any[] = [];
   const authorised: any[] = [];
 
-  runStory(askProcessOnSubscribe(conn, 'eventDoc#docs#1'), {
+  runStory(askWebSocketQueueProcessSubscribe(conn, 'eventDoc#docs#1'), {
     [ContextActionType.Read]: { apiName: 'demo' },
     [ConfigActionType.GetGlobal]: topicAuthoriser,
     [InlineFunctionActionType.Execute]: (action: any) => {
@@ -38,7 +38,7 @@ describe('isWebSocketSubscribeMessage', () => {
   });
 });
 
-describe('askProcessOnSubscribe', () => {
+describe('askWebSocketQueueProcessSubscribe', () => {
   it("files the subscription under the connection's own scope", () => {
     const { upserts } = subscribe(connection);
 

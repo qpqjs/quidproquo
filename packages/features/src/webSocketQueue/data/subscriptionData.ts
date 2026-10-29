@@ -4,26 +4,26 @@ import { getWebSocketQueueSubscriptionsKeyValueStoreName } from '../config/defin
 import { askWebsocketApiNameReadOrThrow } from '../context';
 import { Subscription } from '../types/Subscription';
 
-function* askGetStoreName(): AskResponse<string> {
+function* askConnectionGetStoreName(): AskResponse<string> {
   return getWebSocketQueueSubscriptionsKeyValueStoreName(yield* askWebsocketApiNameReadOrThrow());
 }
 
 function* askSubscribe(topic: string, connectionId: string): AskResponse<void> {
   const subscription: Subscription = { topic, connectionId };
 
-  yield* askKeyValueStoreUpsertWithRetry(yield* askGetStoreName(), subscription);
+  yield* askKeyValueStoreUpsertWithRetry(yield* askConnectionGetStoreName(), subscription);
 }
 
 function* askUnsubscribe(topic: string, connectionId: string): AskResponse<void> {
-  yield* askKeyValueStoreDelete(yield* askGetStoreName(), topic, connectionId);
+  yield* askKeyValueStoreDelete(yield* askConnectionGetStoreName(), topic, connectionId);
 }
 
 function* askGetByTopic(topic: string): AskResponse<Subscription[]> {
-  return yield* askKeyValueStoreQueryAll<Subscription>(yield* askGetStoreName(), kvsEqual('topic', topic));
+  return yield* askKeyValueStoreQueryAll<Subscription>(yield* askConnectionGetStoreName(), kvsEqual('topic', topic));
 }
 
-function* askDeleteByConnectionId(connectionId: string): AskResponse<void> {
-  const storeName = yield* askGetStoreName();
+function* askConnectionDeleteByConnectionId(connectionId: string): AskResponse<void> {
+  const storeName = yield* askConnectionGetStoreName();
   const subscriptions = yield* askKeyValueStoreQueryAll<Subscription>(storeName, kvsEqual('connectionId', connectionId));
 
   for (const subscription of subscriptions) {
@@ -36,5 +36,5 @@ export const webSocketSubscriptionData = {
   askSubscribe,
   askUnsubscribe,
   askGetByTopic,
-  askDeleteByConnectionId,
+  askConnectionDeleteByConnectionId,
 };
