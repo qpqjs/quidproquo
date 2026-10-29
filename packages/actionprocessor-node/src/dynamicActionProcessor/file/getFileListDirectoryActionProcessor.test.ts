@@ -3,7 +3,7 @@ import { askFileListDirectory, FileActionType, resolveActionResult, resolveActio
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 
 vi.mock('fs/promises');

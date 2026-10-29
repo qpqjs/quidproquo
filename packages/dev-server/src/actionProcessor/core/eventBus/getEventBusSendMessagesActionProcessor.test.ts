@@ -1,10 +1,9 @@
 import { defineEventBus, ErrorTypeEnum, EventBusActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../../logic/eventBus';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getEventBusSendMessagesActionProcessor } from './getEventBusSendMessagesActionProcessor';
 
 vi.mock('../../../logic/eventBus', () => ({
@@ -69,7 +68,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
       context: { tenant: 't1' },
     } as any;
 
-    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] }, session);
+    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] }, { session: session });
 
     const published = (eventBus.publish as any).mock.calls[0][1];
     expect(published.storySession.accessToken).toBeUndefined();

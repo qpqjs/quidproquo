@@ -9,7 +9,7 @@ import {
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';

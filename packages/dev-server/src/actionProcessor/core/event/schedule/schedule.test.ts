@@ -1,9 +1,8 @@
 import { ErrorTypeEnum, EventActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../testing/testProcessorRuntime';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';

@@ -6,11 +6,10 @@ import {
   KeyValueStoreActionType,
   resolveActionResultError,
 } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';

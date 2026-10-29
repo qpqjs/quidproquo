@@ -1,10 +1,9 @@
 import { askFileExists, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { objectExists } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

@@ -6,11 +6,10 @@ import {
   resolveActionResultError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirectoryReadAccessTokenActionProcessor';
 
 const nowInSeconds = Math.floor(Date.now() / 1000);
@@ -39,7 +38,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -52,7 +51,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(isErroredActionResult(result)).toBe(true);
@@ -66,7 +65,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(isErroredActionResult(result)).toBe(true);
@@ -80,7 +79,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: true },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -93,7 +92,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -106,7 +105,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const result = await invokeProcessor(
       process,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ accessToken }),
+      { session: buildTestStorySession({ accessToken }) },
     );
 
     expect(resolveActionResult(result).username).toBe('joe@example.com');
@@ -115,7 +114,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
   it('returns Unauthorized when the session carries no token at all', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', ignoreExpiration: false }, buildTestStorySession());
+    const result = await invokeProcessor(process, { userDirectoryName: 'directory', ignoreExpiration: false }, { session: buildTestStorySession() });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);

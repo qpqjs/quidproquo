@@ -1,9 +1,8 @@
 import { ConfigActionType, defineParameter } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigListParametersActionProcessor } from './getConfigListParametersActionProcessor';
 
 const resolveProcessor = async (config = buildTestQpqConfig()) => {

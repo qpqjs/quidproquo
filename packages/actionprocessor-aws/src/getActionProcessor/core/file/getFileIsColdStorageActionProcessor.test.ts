@@ -1,10 +1,9 @@
 import { FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { getObjectStorageClass } from '../../../logic/s3/getObjectStorageClass';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

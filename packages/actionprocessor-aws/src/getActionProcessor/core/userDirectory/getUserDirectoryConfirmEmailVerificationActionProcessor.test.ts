@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { verifyUserEmail } from '../../../logic/cognito/verifyUserEmail';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryConfirmEmailVerificationActionProcessor } from './getUserDirectoryConfirmEmailVerificationActionProcessor';
 
 vi.mock('../../../logic/cognito/verifyUserEmail', () => ({

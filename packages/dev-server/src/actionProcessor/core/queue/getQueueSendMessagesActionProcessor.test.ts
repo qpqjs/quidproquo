@@ -1,10 +1,9 @@
 import { defineQueue, ErrorTypeEnum, isErroredActionResult, QueueActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../../logic/eventBus';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getQueueSendMessagesActionProcessor } from './getQueueSendMessagesActionProcessor';
 
 vi.mock('../../../logic/eventBus', () => ({

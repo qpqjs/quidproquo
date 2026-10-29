@@ -1,6 +1,8 @@
 export * from './configTesting';
 export { expectGenerator, GeneratorExpectChain } from './generatorExpect';
+export { invokeProcessor, ProcessorRuntimeOverrides } from './invokeProcessor';
 export * from './requesterTesting';
+export { resolveEventProcessor } from './resolveEventProcessor';
 export * from './runtimeTesting';
 export * from './storyTesting';
 export * from './types';

@@ -1,10 +1,9 @@
 import { askFileListDirectory, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { listFiles } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

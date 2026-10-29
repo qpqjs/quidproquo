@@ -1,7 +1,7 @@
 import { ActionProcessorList, ActionProcessorListResolver, defineStorageDrive, DynamicModuleLoader, FileActionType } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
-import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
+import { FileStorageConfig } from '../types';
 
 // Shared fixtures for the local-filesystem file action processor tests. Every processor
 // is resolved against the same fake config: an open 'media' drive and a scoped 'tenantMedia'.

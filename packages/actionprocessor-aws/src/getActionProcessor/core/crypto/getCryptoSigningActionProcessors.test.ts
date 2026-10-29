@@ -1,13 +1,12 @@
 import { generateRs256KeyPair, rs256Sign, rs256Verify } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askCryptoGetPublicKey, askCryptoSign, askCryptoVerify, CryptoActionType, defineSigningKey } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCachedPublicKey } from '../../../logic/kms/getCachedPublicKey';
 import { signWithKey } from '../../../logic/kms/signWithKey';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getCryptoGetPublicKeyActionProcessor } from './getCryptoGetPublicKeyActionProcessor';
 import { getCryptoSignActionProcessor } from './getCryptoSignActionProcessor';
 import { getCryptoVerifyActionProcessor } from './getCryptoVerifyActionProcessor';

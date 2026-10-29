@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askConfigGetSecret, ConfigActionType, defineSecret } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getSecret } from '../../../logic/secretsManager/getSecret';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigGetSecretActionProcessor } from './getConfigGetSecretActionProcessor';
 
 vi.mock('../../../logic/secretsManager/getSecret', () => ({

@@ -8,7 +8,7 @@ import {
   CryptoActionType,
   defineSigningKey,
 } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { createPublicKey, verify } from 'crypto';
 import { existsSync } from 'fs';
@@ -17,7 +17,6 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getCryptoActionProcessor } from './getCryptoActionProcessor';
 
 describe('signing key action processors (dev server)', () => {

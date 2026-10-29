@@ -1,10 +1,9 @@
 import { ErrorTypeEnum, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { generatePresignedUploadUrl } from '../../../logic/s3/generatePresignedUploadUrl';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

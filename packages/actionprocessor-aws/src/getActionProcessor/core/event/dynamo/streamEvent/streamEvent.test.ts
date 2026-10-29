@@ -1,4 +1,5 @@
 import { EventActionType, KvsStreamEventType } from '@qpqjs/core';
+import { resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -10,7 +11,6 @@ vi.hoisted(() => {
   process.env.kvsStreamCoalesceByPartitionKey = 'true';
 });
 
-import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 

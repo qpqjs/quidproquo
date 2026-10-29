@@ -1,10 +1,9 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askKeyValueStoreDelete, askKeyValueStoreGetBase, askKeyValueStoreQueryBase, KeyValueStoreActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';

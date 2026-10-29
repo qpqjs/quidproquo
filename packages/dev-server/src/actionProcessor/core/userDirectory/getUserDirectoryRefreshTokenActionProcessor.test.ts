@@ -1,10 +1,9 @@
 import { defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDevJwt } from '../../../logic/auth/devAuth';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getUserDirectoryRefreshTokenActionProcessor } from './getUserDirectoryRefreshTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({

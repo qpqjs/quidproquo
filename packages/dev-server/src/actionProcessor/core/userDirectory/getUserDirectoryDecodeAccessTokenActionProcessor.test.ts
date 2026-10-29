@@ -1,10 +1,9 @@
 import { ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError, UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getUserDirectoryDecodeAccessTokenActionProcessor } from './getUserDirectoryDecodeAccessTokenActionProcessor';
 
 vi.mock('../../../logic/auth/decodeAccessTokenForDev', () => ({

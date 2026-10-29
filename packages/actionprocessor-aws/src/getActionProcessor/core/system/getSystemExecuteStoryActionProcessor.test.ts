@@ -10,11 +10,10 @@ import {
   StreamRegistry,
   SystemActionType,
 } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
 
 const PROBE = 'Test/Probe';

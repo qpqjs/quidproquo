@@ -1,9 +1,8 @@
 import { defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirectorySetAccessTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -34,7 +33,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, buildTestStorySession({}));
+    const result = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(resolveActionResult(result).userId).toBe('user-1');
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
@@ -45,7 +44,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, buildTestStorySession({}));
+    await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(userStore.upsertDevUser).not.toHaveBeenCalled();
   });

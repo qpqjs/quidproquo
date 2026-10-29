@@ -1,10 +1,9 @@
 import { askFileReadObjectJsonBase, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { readTextFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileReadObjectJsonActionProcessor } from './getFileReadObjectJsonActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

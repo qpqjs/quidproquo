@@ -1,11 +1,10 @@
 import { FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
 import { writeBinaryFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

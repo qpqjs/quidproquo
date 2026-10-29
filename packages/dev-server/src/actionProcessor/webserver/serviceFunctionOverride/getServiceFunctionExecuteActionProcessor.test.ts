@@ -1,11 +1,10 @@
 import { ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../../logic/eventBus';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getServiceFunctionExecuteActionProcessor } from './getServiceFunctionExecuteActionProcessor';
 
 vi.mock('../../../logic/eventBus', () => ({

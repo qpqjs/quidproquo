@@ -7,7 +7,7 @@ import {
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -16,7 +16,6 @@ import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';

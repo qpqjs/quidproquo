@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineQueue, QPQConfigItem, QueueActionType } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sendMessages } from '../../../logic/sqs/sendMessages';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getQueueSendMessagesActionProcessor } from './getQueueSendMessagesActionProcessor';
 
 vi.mock('../../../logic/sqs/sendMessages', () => ({

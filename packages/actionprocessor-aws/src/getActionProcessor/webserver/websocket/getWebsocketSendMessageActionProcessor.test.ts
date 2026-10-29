@@ -1,12 +1,11 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 import { askWebsocketSendMessageBase, defineWebsocket, WebsocketActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
 vi.mock('../../../logic/apiGateway/sendMessageToWebSocketConnection', () => ({

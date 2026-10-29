@@ -1,12 +1,11 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askKeyValueStoreScanBase, defineKeyValueStore, KeyValueStoreActionType, KvsLogicalOperatorType, KvsQueryOperationType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { scan } from '../../../logic/dynamo/scan';
 import { lastEvaluatedKeyToString } from '../../../logic/dynamo/utils/lastEvaluatedKeyToString';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 
 vi.mock('../../../logic/dynamo/scan', () => ({

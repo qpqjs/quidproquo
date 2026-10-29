@@ -1,9 +1,8 @@
 import { defineKeyValueStore, isErroredActionResult, KeyValueStoreActionType, kvsKey, resolveActionResult } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 
 // The point of this action is that it sees what an ordinary scan deliberately cannot. If it

@@ -1,10 +1,9 @@
 import { defineStorageDrive, EventActionType, InvalidScopeError } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 // The drive name is read from the lambda environment at module load, so it is

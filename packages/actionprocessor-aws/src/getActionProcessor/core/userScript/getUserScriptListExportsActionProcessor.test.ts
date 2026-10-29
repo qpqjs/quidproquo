@@ -7,12 +7,11 @@ import {
   FileActionType,
   UserScriptActionType,
 } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserScriptListExportsActionProcessor } from './getUserScriptListExportsActionProcessor';
 
 vi.mock('../../../logic/lambda/executeLambdaByName', () => ({

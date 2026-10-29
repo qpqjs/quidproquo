@@ -1,6 +1,7 @@
+import { invokeProcessor } from '@qpqjs/testing';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/processorTestHelpers';
 import { GraphDatabaseForNeptuneActionType } from '../actions';
 import { getGraphDatabaseForNeptuneSignRequestActionProcessor } from './getGraphDatabaseForNeptuneSignRequestActionProcessor';
 

@@ -3,7 +3,7 @@ import { askFileReadBinaryContents, ErrorTypeEnum, FileActionType, resolveAction
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
 
 vi.mock('fs/promises');

@@ -1,10 +1,9 @@
 import { askFileDelete, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { deleteFiles } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
 

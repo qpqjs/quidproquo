@@ -1,10 +1,9 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';

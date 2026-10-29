@@ -1,10 +1,9 @@
 import { askFileCopy, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { copyFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { resolveStorageDriveBucketName } from './utils';
 

@@ -1,6 +1,6 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
 import { ActionProcessor, askCryptoDecrypt, askCryptoEncrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { existsSync } from 'fs';
 import { mkdtemp, rm } from 'fs/promises';
@@ -8,7 +8,6 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getCryptoActionProcessor } from './getCryptoActionProcessor';
 
 describe('getCryptoActionProcessor (dev server)', () => {

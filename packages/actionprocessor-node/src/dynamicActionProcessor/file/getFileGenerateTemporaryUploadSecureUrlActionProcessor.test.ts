@@ -2,7 +2,7 @@ import { askFileGenerateTemporaryUploadSecureUrl, ErrorTypeEnum, FileActionType,
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
 import { verifySecureUrlToken } from './secureUrlUtils';
 

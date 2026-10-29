@@ -1,8 +1,8 @@
 import { AiActionType, AiDataRegion, AiModel } from '@qpqjs/core';
+import { invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getAiGetModelRegionsActionProcessor } from './getAiGetModelRegionsActionProcessor';
 
 describe('getAiGetModelRegionsActionProcessor', () => {

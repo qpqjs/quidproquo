@@ -1,11 +1,10 @@
 import { isErroredActionResult, resolveActionResult } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 import { defineWebsocket, WebsocketActionType } from '@qpqjs/webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketConnectionRegistry';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
 vi.mock('../../../implementations/webSocket/webSocketConnectionRegistry', () => ({

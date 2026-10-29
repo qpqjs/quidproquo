@@ -1,5 +1,5 @@
 import { defineKeyValueStore, KeyValueStoreActionType, resolveActionResult } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import * as os from 'os';
@@ -7,7 +7,6 @@ import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 

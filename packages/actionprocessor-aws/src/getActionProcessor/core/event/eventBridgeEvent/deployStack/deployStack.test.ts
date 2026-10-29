@@ -1,10 +1,9 @@
 import { DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
-import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';

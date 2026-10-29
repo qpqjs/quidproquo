@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getServiceFunctionExecuteActionProcessor } from './getServiceFunctionExecuteActionProcessor';
 
 vi.mock('../../../logic/lambda/executeLambdaByName', () => ({

@@ -1,10 +1,9 @@
 import { ErrorTypeEnum, EventActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 import { defineFileUploadSettings, FileUploadErrorTypeEnum, QPQWebServerConfigSettingType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';

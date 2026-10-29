@@ -1,8 +1,8 @@
 import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from '@qpqjs/core';
+import { invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getAiPromptActionProcessor } from './getAiPromptActionProcessor';
 import {
   buildAiPromptInput,

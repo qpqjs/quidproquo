@@ -1,10 +1,9 @@
 import { ErrorTypeEnum, EventActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { defineServiceFunction } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
 const runtime = '/entry::doThing' as const;

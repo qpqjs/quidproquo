@@ -1,13 +1,12 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askCryptoEncrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCachedGeneratedDataKey } from '../../../logic/kms/getCachedGeneratedDataKey';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getCryptoEncryptActionProcessor } from './getCryptoEncryptActionProcessor';
 
 vi.mock('../../../logic/kms/getCachedGeneratedDataKey', () => ({

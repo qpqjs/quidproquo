@@ -1,8 +1,8 @@
 import { GraphDatabaseActionType } from '@qpqjs/core';
+import { invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getGraphDatabaseInternalFieldNamesActionProcessor } from './getGraphDatabaseInternalFieldNamesActionProcessor';
 
 describe('getProcessInternalFieldNames', () => {

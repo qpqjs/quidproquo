@@ -1,10 +1,9 @@
 import { resolveActionResult } from '@qpqjs/core';
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { ApiKeyValidationActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getApiKeyValidationValidateActionProcessor } from './getApiKeyValidationValidateActionProcessor';
 
 describe('getApiKeyValidationValidateActionProcessor', () => {

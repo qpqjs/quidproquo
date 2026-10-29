@@ -1,13 +1,12 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askUserDirectoryForgotPassword, defineUserDirectory, UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryForgotPasswordActionProcessor } from './getUserDirectoryForgotPasswordActionProcessor';
 
 vi.mock('../../../logic/cloudformation/getExportedValue', () => ({ getExportedValue: vi.fn() }));

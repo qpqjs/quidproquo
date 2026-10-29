@@ -1,10 +1,9 @@
 import { FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { writeTextFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

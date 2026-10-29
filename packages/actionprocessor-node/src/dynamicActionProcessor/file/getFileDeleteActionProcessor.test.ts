@@ -3,7 +3,7 @@ import { askFileDelete, ErrorTypeEnum, FileActionType, resolveActionResult, reso
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 
 vi.mock('fs/promises');

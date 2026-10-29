@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineEventBus, ErrorTypeEnum, EventBusActionType } from '@qpqjs/core';
-import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/testing';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { publishMessage } from '../../../logic/sns/publishMessage';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getEventBusSendMessagesActionProcessor } from './getEventBusSendMessagesActionProcessor';
 
 vi.mock('../../../logic/sns/publishMessage', () => ({

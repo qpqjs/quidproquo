@@ -1,13 +1,12 @@
 import { envelopeEncrypt } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askCryptoDecrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCachedUnwrappedDataKey } from '../../../logic/kms/getCachedUnwrappedDataKey';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getCryptoDecryptActionProcessor } from './getCryptoDecryptActionProcessor';
 
 vi.mock('../../../logic/kms/getCachedUnwrappedDataKey', () => ({

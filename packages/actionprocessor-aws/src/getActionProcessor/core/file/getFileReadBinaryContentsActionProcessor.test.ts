@@ -1,10 +1,9 @@
 import { FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { readBinaryFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

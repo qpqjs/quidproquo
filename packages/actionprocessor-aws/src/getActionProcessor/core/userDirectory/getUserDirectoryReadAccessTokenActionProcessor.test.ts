@@ -1,10 +1,9 @@
 import { DecodedAccessToken, ErrorTypeEnum, UserDirectoryActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { decodeAccessToken } from '../../../logic/cognito/decodeAccessToken';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirectoryReadAccessTokenActionProcessor';
 
 vi.mock('../../../logic/cognito/decodeAccessToken', () => ({

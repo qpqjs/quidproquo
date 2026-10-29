@@ -1,9 +1,8 @@
 import { MetricActionType, MetricUnit } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getMetricPutActionProcessor } from './getMetricPutActionProcessor';
 
 const resolveProcessor = async () => {

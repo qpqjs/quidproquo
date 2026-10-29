@@ -5,7 +5,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fileConfig } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig } from './__fixtures__/fileProcessorTestHelpers';
 import { ensureDirectoryExists, ensureParentDirectoryExists, isStorageDriveNameValid, resolveDriveServiceName, resolveFilePath } from './utils';
 
 vi.mock('fs/promises');

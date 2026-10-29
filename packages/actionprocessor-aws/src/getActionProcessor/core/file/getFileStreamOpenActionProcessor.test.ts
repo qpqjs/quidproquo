@@ -1,11 +1,10 @@
 import { ErrorTypeEnum, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { Readable } from 'stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createAwsClient } from '../../../logic/createAwsClient';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 
 vi.mock('@qpqjs/config-aws', () => ({

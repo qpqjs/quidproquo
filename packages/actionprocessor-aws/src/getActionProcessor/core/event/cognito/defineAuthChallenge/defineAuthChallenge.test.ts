@@ -1,9 +1,8 @@
 import { ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveEventProcessor } from '../../../../../testing/eventProcessorTestHelpers';
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';

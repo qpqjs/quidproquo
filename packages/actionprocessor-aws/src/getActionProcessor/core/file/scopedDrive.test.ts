@@ -1,10 +1,9 @@
 import { askFileListDirectory, askFileWriteTextContents, defineStorageDrive, FileActionType } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { listFiles, writeTextFile } from '../../../logic/s3';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 

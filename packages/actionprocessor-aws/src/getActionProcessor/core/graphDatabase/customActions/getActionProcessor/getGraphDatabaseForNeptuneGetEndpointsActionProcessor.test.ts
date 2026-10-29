@@ -1,10 +1,10 @@
 import { ErrorTypeEnum } from '@qpqjs/core';
+import { invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { getConfigRuntimeResourceNameFromConfig } from '../../../../../awsNamingUtils';
 import { getNeptuneEndpoints } from '../../../../../logic/neptune';
-import { invokeProcessor } from '../../../../../testing/processorTestHelpers';
 import { GraphDatabaseForNeptuneActionType } from '../actions';
 import { getGraphDatabaseForNeptuneGetEndpointsActionProcessor } from './getGraphDatabaseForNeptuneGetEndpointsActionProcessor';
 

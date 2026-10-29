@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { askConfigGetParameters, ConfigActionType, defineParameter } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getParameters } from '../../../logic/parametersManager/getParameters';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigGetParametersActionProcessor } from './getConfigGetParametersActionProcessor';
 
 vi.mock('../../../logic/parametersManager/getParameters', () => ({
