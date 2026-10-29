@@ -15,5 +15,6 @@ export * from './scanFederatedExposes';
 export * from './serviceTsRules';
 export * from './USER_SCRIPT_CHILD_BUNDLE_NAME';
 export * from './ViewsContext';
+export * from './viewsEntry';
 export * from './ViewsInfo';
 export * from './writeFederatedTsconfigForApp';

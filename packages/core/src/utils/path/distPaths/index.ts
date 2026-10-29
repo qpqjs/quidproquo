@@ -10,3 +10,4 @@ export * from './getServiceDistPath';
 export * from './getServiceRemoteDistPath';
 export * from './getServiceRemotePublishedDistPath';
 export * from './getViewsDistPath';
+export * from './getViewsEntryDistPath';

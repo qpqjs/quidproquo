@@ -15,6 +15,7 @@ import { Configuration, rspack } from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
 import { getQpqCircularCheckPlugin } from '../plugins';
+import { resolveViewsEntry } from './viewsEntry/resolveViewsEntry';
 import { getAppServiceQpqConfigs } from './getAppServiceQpqConfigs';
 import { getViewsContext } from './getViewsContext';
 import { getViewsDevtool } from './getViewsDevtool';
@@ -160,16 +161,13 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     remotes[sib.alias] = `${sib.mfName}@${baseUrl}/mf-manifest.json`;
   }
 
-  const htmlTemplate = path.join(viewsDir, 'src', 'index.html');
+  // The package's own entry and html, or generated defaults for a modules-only package (E8).
+  const { entry, htmlTemplate } = resolveViewsEntry(viewsDir, root, self.appName, self.service);
   const favicon = path.join(viewsDir, 'src', 'favicon.ico');
 
   // Optional static assets served from the output root (web app manifest,
   // service worker, PWA icons…): anything under src/public is copied verbatim.
   const publicDir = path.join(viewsDir, 'src', 'public');
-
-  // main.ts for TypeScript apps, main.js for JavaScript apps
-  const tsEntry = path.join(viewsDir, 'src', 'main.ts');
-  const entry = fs.existsSync(tsEntry) ? tsEntry : path.join(viewsDir, 'src', 'main.js');
 
   return {
     mode: isDev ? 'development' : 'production',
