@@ -1,4 +1,5 @@
 import askPrefixGeneratorOnly from './rules/ask-prefix-generator-only.mjs';
+import noHistoryComments from './rules/no-history-comments.mjs';
 import requireYieldStar from './rules/require-yield-star.mjs';
 
 const plugin = {
@@ -9,6 +10,7 @@ const plugin = {
   rules: {
     'require-yield-star': requireYieldStar,
     'ask-prefix-generator-only': askPrefixGeneratorOnly,
+    'no-history-comments': noHistoryComments,
   },
 };
 
@@ -20,6 +22,7 @@ plugin.configs = {
     rules: {
       'qpq/require-yield-star': 'error',
       'qpq/ask-prefix-generator-only': 'error',
+      'qpq/no-history-comments': 'warn',
     },
   },
 };

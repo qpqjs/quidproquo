@@ -6,6 +6,7 @@ import pluginJs from '@eslint/js';
 import { overrides } from './config/overrides.mjs';
 import { prettierConfigs } from './config/prettier.mjs';
 import { reactConfigs } from './config/react.mjs';
+import { restrictedSyntaxConfigs } from './config/restrictedSyntax.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
 // Standalone use, without adopting the whole shared config:
@@ -63,6 +64,7 @@ export default [
   qpqPlugin.configs.recommended,
 
   ...reactConfigs,
+  ...restrictedSyntaxConfigs,
   ...prettierConfigs,
 
   ...overrides,
