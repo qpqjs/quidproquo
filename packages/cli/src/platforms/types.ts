@@ -15,7 +15,7 @@ export enum QpqDeployPlatform {
 // then hands off here; the platform comes from the deployment's entry in
 // apps/<app>/deploy.config.json, so an app can move platforms with a config
 // change instead of a different command.
-export interface QpqPlatformDriver {
+export type QpqPlatformDriver = {
   // Check the deployment's platformSettings and prime the platform's identity
   // env vars from them. Throws when the entry is incomplete. Runs before any
   // infrastructure.ts is required, since service configs read those vars at load.
@@ -47,4 +47,4 @@ export interface QpqPlatformDriver {
   publishBuild: (appName: string, serviceNames: string[]) => Promise<void>;
   publishUpload: (appName: string, serviceNames: string[]) => Promise<void>;
   publishDeploy: (appName: string, serviceNames: string[]) => Promise<void>;
-}
+};

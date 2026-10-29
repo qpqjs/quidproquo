@@ -5,23 +5,23 @@ import { getAppDirectory, getAppsDirectory, getAvailableApps, getRoot } from './
 import { nextPrefixColor, runCommand, runCommandPrefixed } from './runCommand';
 import { runDependencyTasks, TaskFailure } from './runTasks';
 
-interface HookPackageJson {
+type HookPackageJson = {
   name?: string;
   scripts?: Record<string, string>;
   workspaces?: string[];
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-}
+};
 
 // A directory whose package.json can carry qpq:<hook> scripts: either an app
 // (apps/<app>/package.json, which need not be an npm workspace) or any package
 // matched by the consumer root's `workspaces` globs.
-interface HookPackage {
+type HookPackage = {
   dir: string;
   label: string; // app name or package name, for display
   pkg: HookPackageJson;
-}
+};
 
 // App lifecycle hooks: apps/<app>/package.json scripts named `qpq:<hook>`
 // (e.g. qpq:postinstall, qpq:prebuild). The CLI invokes them when present;
