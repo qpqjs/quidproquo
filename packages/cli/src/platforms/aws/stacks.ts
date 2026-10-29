@@ -14,6 +14,7 @@ import { getAppPrefix, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { getCdkAppCommand } from './cdkApp';
+import { getDeployEnv } from './getDeployEnv';
 
 export const deployStack = async (stackName: string, env: Record<string, string> = {}): Promise<void> => {
   logTimeStart(stackName);
@@ -29,10 +30,7 @@ export const deployStack = async (stackName: string, env: Record<string, string>
 };
 
 export const deployServiceStack = (serviceName: string, stackName: string, appName: string): Promise<void> =>
-  deployStack(stackName, {
-    DEPLOY_SERVICE_NAME: serviceName,
-    DEPLOY_APP_NAME: appName,
-  });
+  deployStack(stackName, getDeployEnv(appName, serviceName));
 
 // `cdk destroy` still synths the app to find the stack, so it runs the same
 // generic workspace app with the same DEPLOY_* env as deploys, meaning the
@@ -51,10 +49,7 @@ const destroyStack = async (stackName: string, env: Record<string, string> = {})
 };
 
 export const destroyServiceStack = (serviceName: string, stackName: string, appName: string): Promise<void> =>
-  destroyStack(stackName, {
-    DEPLOY_SERVICE_NAME: serviceName,
-    DEPLOY_APP_NAME: appName,
-  });
+  destroyStack(stackName, getDeployEnv(appName, serviceName));
 
 export const deployDomainStack = async (appName: string): Promise<void> => {
   const [firstService] = getServiceNames(appName);
@@ -64,10 +59,7 @@ export const deployDomainStack = async (appName: string): Promise<void> => {
   const qpqConfig = loadServiceQpqConfig(appName, firstService);
   const stackName = qpqDeployAwsUtils.getDomainStackName(qpqConfig);
   console.log('Deploy Domain: ', stackName);
-  await deployStack(stackName, {
-    DEPLOY_SERVICE_NAME: '',
-    DEPLOY_APP_NAME: appName,
-  });
+  await deployStack(stackName, getDeployEnv(appName));
 };
 
 // Account-level guardrails stack - statically named (one per AWS account,
@@ -77,10 +69,7 @@ export const deployDomainStack = async (appName: string): Promise<void> => {
 export const deployAccountStack = async (appName: string): Promise<void> => {
   const stackName = qpqDeployAwsUtils.getAccountStackName();
   console.log('Deploy Account: ', stackName);
-  await deployStack(stackName, {
-    DEPLOY_SERVICE_NAME: '',
-    DEPLOY_APP_NAME: appName,
-  });
+  await deployStack(stackName, getDeployEnv(appName));
 };
 
 export const deployBootstrapStack = async (appName: string): Promise<void> => {
@@ -88,8 +77,5 @@ export const deployBootstrapStack = async (appName: string): Promise<void> => {
   const environment = process.env[QpqDeployEnvVar.environment];
   const feature = process.env[QpqDeployEnvVar.featureName];
   const stackName = awsNamingUtils.getAppStackName(appPrefix, environment ?? '', feature, 'bs');
-  await deployStack(stackName, {
-    DEPLOY_SERVICE_NAME: '',
-    DEPLOY_APP_NAME: appName,
-  });
+  await deployStack(stackName, getDeployEnv(appName));
 };

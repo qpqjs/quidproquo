@@ -63,6 +63,7 @@ import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
 import { isAwsCredentialsValid } from './awsCredentials';
 import { getCdkAppCommand, getCdkCliVersion, getDockerDir } from './cdkApp';
+import { getDeployEnv } from './getDeployEnv';
 import {
   fromManifestPath,
   getGoDockerAssemblyDir,
@@ -395,7 +396,7 @@ const buildGoDockerOutput = async (appName: string, deploymentName: string, plan
               ['cdk', 'synth', '--quiet', '--app', getCdkAppCommand(), '--output', getGoDockerAssemblyDir(appName, service)],
               {
                 cwd: getRoot(),
-                env: { DEPLOY_SERVICE_NAME: service, DEPLOY_APP_NAME: appName },
+                env: getDeployEnv(appName, service),
                 color: nextPrefixColor(),
               },
             ),

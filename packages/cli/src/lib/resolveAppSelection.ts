@@ -28,6 +28,11 @@ const exitWithAppList = (requested: string | undefined, availableApps: string[])
   process.exit(1);
 };
 
+// The app a caller named, from the sources above the auto-select and the prompt (--app, the npm
+// config flag, the command's env var); undefined when none did.
+export const getRequestedAppName = (argv: string[], envVar?: string): string | undefined =>
+  getArgValue(argv, '--app') || process.env.npm_config_app || (envVar ? process.env[envVar] : undefined);
+
 export const resolveAppSelection = async (options: ResolveAppOptions): Promise<string> => {
   const availableApps = getAvailableApps();
   if (availableApps.length === 0) {
@@ -35,8 +40,7 @@ export const resolveAppSelection = async (options: ResolveAppOptions): Promise<s
     process.exit(1);
   }
 
-  const requested =
-    getArgValue(options.argv, '--app') || process.env.npm_config_app || (options.envVar ? process.env[options.envVar] : undefined);
+  const requested = getRequestedAppName(options.argv, options.envVar);
 
   if (requested) {
     if (options.allowAll && requested === 'all') return 'all';

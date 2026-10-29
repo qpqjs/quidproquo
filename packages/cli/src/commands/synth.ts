@@ -4,7 +4,7 @@
 // Runs with ts-node hooks registered (see runCli), which transpiles each
 // service's infrastructure.ts on require. Cross-package `@scope/*` imports
 // resolve through the workspace node_modules symlinks to already-built dist.
-import { qpqCoreUtils } from '@qpqjs/core';
+import { qpqCoreUtils, QpqDeployEnvVar } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
@@ -12,7 +12,7 @@ import path from 'path';
 import { getPositionalArgs } from '../lib/args';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { getRequestedAppName, resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 
 const processConfig = (folderName: string, appName: string): void => {
@@ -29,11 +29,8 @@ const processConfig = (folderName: string, appName: string): void => {
 export const synthCommand = async (argv: string[]): Promise<void> => {
   const [specifiedServiceName] = getPositionalArgs(argv, ['--app', '--deployment']);
 
-  const hasExplicitApp =
-    argv.includes('--app') || argv.some((a) => a.startsWith('--app=')) || !!process.env.npm_config_app || !!process.env.DEPLOY_APP_NAME;
-
   let appNames: string[];
-  if (specifiedServiceName && !hasExplicitApp) {
+  if (specifiedServiceName && !getRequestedAppName(argv, QpqDeployEnvVar.deployAppName)) {
     // A bare service name is unambiguous, synth it in whichever app owns it.
     const appWithService = getAvailableApps().find((appName) => getServiceNamesWithSubdir(appName, 'service').includes(specifiedServiceName));
     if (!appWithService) {
@@ -42,11 +39,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     }
     appNames = [appWithService];
   } else {
-    const selection = await resolveAppSelection({
-      argv,
-      envVar: 'DEPLOY_APP_NAME',
-      allowAll: true,
-    });
+    const selection = await resolveAppSelection({ argv, envVar: QpqDeployEnvVar.deployAppName, allowAll: true });
     appNames = selection === 'all' ? getAvailableApps() : [selection];
   }
 
