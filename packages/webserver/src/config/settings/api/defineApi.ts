@@ -12,8 +12,6 @@ export const defineApi = (apiName: string, options?: QPQConfigAdvancedApiSetting
 
     deprecated: options?.deprecated ?? false,
 
-    cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
-
     virtualNetworkName: options?.virtualNetworkName,
 
     maxConcurrentExecutions: options?.maxConcurrentExecutions,

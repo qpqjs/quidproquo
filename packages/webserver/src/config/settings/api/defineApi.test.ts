@@ -11,7 +11,6 @@ describe('defineApi', () => {
       apiSubdomain: 'orders',
       apiName: 'orders',
       deprecated: false,
-      cloudflareApiKeySecretName: undefined,
       virtualNetworkName: undefined,
     });
   });
@@ -20,13 +19,11 @@ describe('defineApi', () => {
     const setting = defineApi('orders', {
       subDomain: 'api-orders',
       deprecated: true,
-      cloudflareApiKeySecretName: 'cf-secret',
       virtualNetworkName: 'vnet',
     });
 
     expect(setting.apiSubdomain).toBe('api-orders');
     expect(setting.deprecated).toBe(true);
-    expect(setting.cloudflareApiKeySecretName).toBe('cf-secret');
     expect(setting.virtualNetworkName).toBe('vnet');
   });
 });

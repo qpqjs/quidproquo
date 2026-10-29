@@ -18,7 +18,6 @@ describe('defineWebsocket', () => {
       onRootDomain: false,
       apiName: 'api',
       deprecated: false,
-      cloudflareApiKeySecretName: undefined,
       maxConcurrentExecutions: undefined,
       owner: undefined,
     });

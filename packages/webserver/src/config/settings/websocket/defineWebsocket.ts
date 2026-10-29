@@ -24,8 +24,6 @@ export const defineWebsocket = (
 
     deprecated: options?.deprecated ?? false,
 
-    cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
-
     maxConcurrentExecutions: options?.maxConcurrentExecutions,
 
     owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),

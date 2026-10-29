@@ -13,7 +13,5 @@ export type WebSocketQPQWebServerConfigSetting = {
 
   deprecated: boolean;
 
-  cloudflareApiKeySecretName?: string;
-
   maxConcurrentExecutions?: number;
 } & QPQConfigSetting;

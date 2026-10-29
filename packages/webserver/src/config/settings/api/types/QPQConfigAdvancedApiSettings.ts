@@ -2,7 +2,6 @@ import { QPQConfigAdvancedSettings } from '@qpqjs/core';
 
 export type QPQConfigAdvancedApiSettings = {
   subDomain?: string;
-  cloudflareApiKeySecretName?: string;
   virtualNetworkName?: string;
 
   // Cap (and guarantee) on this api's concurrent requests: never throttled below

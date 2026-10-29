@@ -34,8 +34,6 @@ export type QPQConfigAdvancedWebEntrySettings = {
 
   compressFiles?: boolean;
 
-  cloudflareApiKeySecretName?: string;
-
   securityHeaders?: ResponseSecurityHeaders;
 
   /**
@@ -59,8 +57,6 @@ export type WebEntryQPQWebServerConfigSetting = {
   ignoreCache: string[];
 
   compressFiles: boolean;
-
-  cloudflareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
 
@@ -87,8 +83,6 @@ export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntryS
   compressFiles: options?.compressFiles ?? true,
 
   securityHeaders: options?.securityHeaders,
-
-  cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 
   cacheSettingsName: options?.cacheSettingsName,
 

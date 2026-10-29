@@ -7,8 +7,6 @@ export type ApiQPQWebServerConfigSetting = {
 
   deprecated: boolean;
 
-  cloudflareApiKeySecretName?: string;
-
   virtualNetworkName?: string;
 
   maxConcurrentExecutions?: number;
