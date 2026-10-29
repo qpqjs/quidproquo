@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, askStateReadBase, ProcessorFor, StateActionType } from '@qpqjs/core';
+import { ActionProcessorListResolver, actionResult, askStateReadBase, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
 const getProcessStateRead =
   <State>(getCurrentState: () => State): ProcessorFor<typeof askStateReadBase> =>
@@ -6,8 +6,5 @@ const getProcessStateRead =
     return actionResult(getCurrentState());
   };
 
-export const getStateReadActionListResolver =
-  <State>(getCurrentState: () => State): ActionProcessorListResolver =>
-  async (qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
-    [StateActionType.Read]: getProcessStateRead(getCurrentState),
-  });
+export const getStateReadActionListResolver = <State>(getCurrentState: () => State): ActionProcessorListResolver =>
+  createActionProcessor(askStateReadBase, () => getProcessStateRead(getCurrentState));

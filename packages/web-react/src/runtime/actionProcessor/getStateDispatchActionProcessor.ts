@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, askStateDispatchBase, ProcessorFor, StateActionType } from '@qpqjs/core';
+import { ActionProcessorListResolver, actionResult, askStateDispatchBase, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
 import { Dispatch } from 'react';
 
@@ -10,8 +10,5 @@ const getProcessStateDispatch =
     return actionResult(undefined);
   };
 
-export const getStateDispatchActionListResolver =
-  (dispatch: Dispatch<any>): ActionProcessorListResolver =>
-  async (qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
-    [StateActionType.Dispatch]: getProcessStateDispatch(dispatch),
-  });
+export const getStateDispatchActionListResolver = (dispatch: Dispatch<any>): ActionProcessorListResolver =>
+  createActionProcessor(askStateDispatchBase, () => getProcessStateDispatch(dispatch));

@@ -18,11 +18,11 @@ export function useQpqWebsocketQueueRuntime<TState, TAction, TApi extends QpqApi
   const sendEventRef = useRef<Nullable<(event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>>>(null);
 
   const mergedFactory: ActionProcessorListResolverFactory<TState> = (dispatch, getCurrentState) => {
-    const serviceResolver = async () => getServiceRequestActionProcessor(sendEventRef);
+    const serviceResolver = getServiceRequestActionProcessor(sendEventRef);
     const callerResolver = getActionProcessors?.(dispatch, getCurrentState);
 
     return async (qpqConfig, dynamicModuleLoader) => ({
-      ...(await serviceResolver()),
+      ...(await serviceResolver(qpqConfig, dynamicModuleLoader)),
       ...(callerResolver ? await callerResolver(qpqConfig, dynamicModuleLoader) : {}),
     });
   };

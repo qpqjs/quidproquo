@@ -1,12 +1,13 @@
-import { ActionProcessorList, actionResult, actionResultError, Nullable } from '@qpqjs/core';
-import { AnyWebSocketQueueEventMessageWithCorrelation, ServiceActionType } from '@qpqjs/features';
+import { ActionProcessorListResolver, actionResult, actionResultError, createActionProcessor, Nullable, ProcessorFor } from '@qpqjs/core';
+import { AnyWebSocketQueueEventMessageWithCorrelation, askServiceRequestBase } from '@qpqjs/features';
 
 import { RefObject } from 'react';
 
-export const getServiceRequestActionProcessor = (
-  sendEventRef: RefObject<Nullable<(event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>>>,
-): ActionProcessorList => ({
-  [ServiceActionType.Request]: async ({ serviceName, method, payload }: { serviceName: string; method: string; payload: any }) => {
+type SendEvent = (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>;
+
+const getProcessServiceRequest =
+  (sendEventRef: RefObject<Nullable<SendEvent>>): ProcessorFor<typeof askServiceRequestBase> =>
+  async ({ serviceName, method, payload }) => {
     const response = await sendEventRef.current?.({ type: `qpq/serviceRequest/${serviceName}/${method}`, payload } as any);
 
     if (response && !response.success) {
@@ -14,5 +15,8 @@ export const getServiceRequestActionProcessor = (
     }
 
     return actionResult(response?.result);
-  },
-});
+  };
+
+/** Answers service requests over the websocket; the sender ref is filled once the socket is up. */
+export const getServiceRequestActionProcessor = (sendEventRef: RefObject<Nullable<SendEvent>>): ActionProcessorListResolver =>
+  createActionProcessor(askServiceRequestBase, () => getProcessServiceRequest(sendEventRef));
