@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
+import { getDnsConfig } from '../../../config/settings/dns/logic/getDnsConfig';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { DomainTarget } from '../../../domain/types/DomainTarget';
 import { getDomainResolver } from '../resolver/getDomainResolver';

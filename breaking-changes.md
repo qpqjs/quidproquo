@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Singleton settings get the two-form accessors `get<X>Config(cfg)` (null when absent) and `resolve<X>ConfigOrThrow(cfg)` in their own folders (D5): webserver `getDnsConfig` / `resolveDnsConfigOrThrow` (with `getRootDomains` and `getPrimaryRootDomain`, moved out of `configUtils/dns`), `getEmailSenderConfig` / `resolveEmailSenderConfigOrThrow` (replacing the array-returning `getEmailSenderSettings`; a second `defineEmailSender` in one service now throws), core `getJavascriptRuntimeConfig` (unchanged, always resolves to the defaults) and `getUserScriptRunnerConfig` / `resolveUserScriptRunnerConfigOrThrow` (replacing `getUserScriptRunner`).
 - `qpqWebServerUtils.getEmailReceiverConfigs` is `getAllEmailReceiverConfigs`, joined by `getOwnedEmailReceiverConfigs`, `getEmailReceiverByName(name, cfg)` and `resolveEmailReceiverOrThrow`; `getEmailReceiversForStorageDrive` takes `(storageDriveName, cfg)`. The setting lives in `config/settings/emailReceiver/` (D5).
 - `qpqWebServerUtils.getApiConfigs` is `getAllApiConfigs`, joined by `getOwnedApiConfigs`, `getApiByName(apiName, cfg)` and `resolveApiOrThrow`; the api setting lives in `config/settings/api/` (D5).
 - `qpqWebServerUtils` websocket accessors follow D5: `getAllWebsocketConfigs(cfg)`, `getOwnedWebsocketConfigs(cfg)`, `getWebsocketByName(apiName, cfg)` (null when missing) and `resolveWebsocketOrThrow(apiName, cfg)` replace `getWebsocketSettings`, `getOwnedWebsocketSettings` and the throwing `getWebsocketEntryByApiName`; the setting lives in `config/settings/websocket/`.

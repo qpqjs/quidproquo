@@ -218,16 +218,16 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // Email senders (SES identities). The construct id is keyed by the primary root, not the
     // setting: an SES identity's physical id is the domain itself, so a changed logical id would
     // fail creation against the identity the stack already owns.
-    const emailSenderConfigs = qpqWebServerUtils.getEmailSenderSettings(props.qpqConfig);
+    const emailSenderConfig = qpqWebServerUtils.getEmailSenderConfig(props.qpqConfig);
+    const emailSenderConfigs = emailSenderConfig ? [emailSenderConfig] : [];
     const emailSenderConstructId = `EmailSender${qpqWebServerUtils.getPrimaryRootDomain(props.qpqConfig) ?? ''}`;
-    emailSenderConfigs.map(
-      (setting) =>
-        new QpqWebserverEmailSenderConstruct(this, emailSenderConstructId, {
-          qpqConfig: props.qpqConfig,
+    if (emailSenderConfig) {
+      new QpqWebserverEmailSenderConstruct(this, emailSenderConstructId, {
+        qpqConfig: props.qpqConfig,
 
-          emailSenderConfig: setting,
-        }),
-    );
+        emailSenderConfig,
+      });
+    }
     QpqWebserverEmailSenderConstruct.authorizeSendEmailForRole(webserverRole, emailSenderConfigs, props.qpqConfig);
 
     // Cache settings

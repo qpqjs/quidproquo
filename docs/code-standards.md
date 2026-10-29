@@ -219,7 +219,7 @@ The options type is always `QPQConfigAdvanced<Name>Settings` extending `QPQConfi
 
 **D4a. `define*` is config only.** A `define*` helper returns `QPQConfigSetting`s or a `QPQConfig`; helpers that instantiate live objects (reducers, apis, CDK constructs) are `create*` or `build*`. `define*` results are never spread into a config (`...defineX()`); QPQ flattens nested arrays itself. **lint**
 
-**D5. Accessors.** Per setting type: `getAll<X>Configs(cfg)`, `getOwned<X>Configs(cfg)`, `get<X>ByName(name, cfg): Nullable`, `resolve<X>OrThrow(name, cfg)`. Name first, config last. They live in the setting folder's `logic/` and are re-exported by the package's utils namespace. No inline `getConfigSettings` elsewhere.
+**D5. Accessors.** Per setting type: `getAll<X>Configs(cfg)`, `getOwned<X>Configs(cfg)`, `get<X>ByName(name, cfg): Nullable`, `resolve<X>OrThrow(name, cfg)`. A singleton setting (one per service, no name) has `get<X>Config(cfg): Nullable` and `resolve<X>ConfigOrThrow(cfg)` instead. Name first, config last. They live in the setting folder's `logic/` and are re-exported by the package's utils namespace. No inline `getConfigSettings` elsewhere.
 
 **D6. Naming lives in config-aws.** One naming module plus one `resolveOwnedResourceName(name, cfg, owner)` applying the owner's override, module, application, environment and feature. Every physical name, ARN and SSM key goes through it, at deploy time and at runtime, so grants and lookups cannot disagree. Template literals combining app, environment or feature are banned outside it. **lint**
 

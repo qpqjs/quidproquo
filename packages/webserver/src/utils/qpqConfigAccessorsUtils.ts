@@ -7,7 +7,6 @@ import {
   DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
   EmailReceivingDomainQPQWebServerConfigSetting,
-  EmailSenderQPQWebServerConfigSetting,
   FileUploadSettings,
   FileUploadSettingsQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
@@ -140,10 +139,6 @@ export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptio
     qpqCoreUtils.getConfigSettings<DefaultRouteOptionsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.DefaultRouteOptions) || [];
 
   return defaultRouteSettings;
-};
-
-export const getEmailSenderSettings = (qpqConfig: QPQConfig): EmailSenderQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
 };
 
 export const getEmailReceivingDomainConfig = (qpqConfig: QPQConfig): EmailReceivingDomainQPQWebServerConfigSetting | undefined =>

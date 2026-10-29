@@ -1,7 +1,7 @@
 import { Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { QPQWebServerConfigSettingType } from '../../config/QPQConfig';
-import { DnsQPQWebServerConfigSetting } from '../../config/settings/dns';
+import { QPQWebServerConfigSettingType } from '../../../QPQConfig';
+import { DnsQPQWebServerConfigSetting } from '../types';
 
 /** The service's single Dns setting, or null when it declares no domain. Throws on more than one. */
 export const getDnsConfig = (qpqConfig: QPQConfig): Nullable<DnsQPQWebServerConfigSetting> => {

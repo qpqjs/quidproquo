@@ -98,7 +98,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // User script runner: the sandbox that askUserScriptExecute hands scripts to
-    const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunner(props.qpqConfig);
+    const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunnerConfig(props.qpqConfig);
     if (userScriptRunnerConfig) {
       new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
         qpqConfig: props.qpqConfig,

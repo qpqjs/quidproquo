@@ -1,6 +1,6 @@
 import { Nullable, QPQConfig } from '@qpqjs/core';
 
-import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
+import { getRootDomains } from '../../../config/settings/dns/logic/getRootDomains';
 
 /**
  * Which declared root a request host belongs to, longest match wins, null when none does.

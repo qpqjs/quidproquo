@@ -1,6 +1,6 @@
 import { QPQConfig } from '@qpqjs/core';
 
-import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
+import { getRootDomains } from '../../../config/settings/dns/logic/getRootDomains';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { DomainTarget } from '../../../domain/types/DomainTarget';
 import { resolveHosts } from './resolveHosts';

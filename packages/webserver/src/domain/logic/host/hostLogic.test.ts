@@ -3,8 +3,8 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { defineDns } from '../../../config/settings/dns';
-import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
-import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
+import { getDnsConfig } from '../../../config/settings/dns/logic/getDnsConfig';
+import { getRootDomains } from '../../../config/settings/dns/logic/getRootDomains';
 import { defaultDomainResolver } from '../../../domain/resolvers/defaultDomainResolver';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { loadDomainResolver } from '../resolver/loadDomainResolver';

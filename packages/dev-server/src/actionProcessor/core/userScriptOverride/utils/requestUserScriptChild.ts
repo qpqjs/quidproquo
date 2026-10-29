@@ -66,7 +66,7 @@ export type RequestUserScriptChildInput = {
 export const requestUserScriptChild = async <R>(input: RequestUserScriptChildInput): Promise<ActionProcessorResult<R>> => {
   const { devServerConfig, qpqConfig, source, errorType, label } = input;
 
-  const runner = qpqCoreUtils.getUserScriptRunner(qpqConfig);
+  const runner = qpqCoreUtils.getUserScriptRunnerConfig(qpqConfig);
   if (!runner) {
     return actionResultError(errorType.RunnerUnavailable, 'This service has no user script runner: add defineUserScriptRunner() to its config');
   }

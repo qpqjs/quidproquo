@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineUserScriptRunner } from './userScriptRunner';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineUserScriptRunner } from './defineUserScriptRunner';
 
 describe('defineUserScriptRunner', () => {
   it('builds one UserScriptRunner setting per service with the defaults', () => {

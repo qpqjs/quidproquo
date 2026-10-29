@@ -2,6 +2,7 @@ import { getEventBusByName } from './config/settings/eventBus/logic';
 import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
 export { getAllCryptoKeyConfigs, getCryptoKeyByName, getOwnedCryptoKeyConfigs, resolveCryptoKeyOrThrow } from './config/settings/cryptoKey/logic';
 export { getAllEventBusConfigs, getEventBusByName, getOwnedEventBusConfigs, resolveEventBusOrThrow } from './config/settings/eventBus/logic';
+export { getJavascriptRuntimeConfig } from './config/settings/javascriptRuntime/logic';
 export {
   getAllSigningKeyConfigs,
   getOwnedSigningKeyConfigs,
@@ -20,6 +21,7 @@ export {
   getUserDirectoryByName,
   resolveUserDirectoryOrThrow,
 } from './config/settings/userDirectory/logic';
+export { getUserScriptRunnerConfig, resolveUserScriptRunnerConfigOrThrow } from './config/settings/userScriptRunner/logic';
 import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
 import { getAllStorageDriveConfigs } from './config/settings/storageDrive/logic';
 import { getAllUserDirectoryConfigs, getOwnedUserDirectoryConfigs } from './config/settings/userDirectory/logic';
@@ -42,7 +44,6 @@ import {
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
   BundleEntriesQPQConfigSetting,
-  defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
   DynamicFunctionsQPQConfigSetting,
   EmailTemplates,
@@ -53,7 +54,6 @@ import {
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
-  JavascriptRuntimeQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
@@ -67,7 +67,6 @@ import {
   ServiceSettingsQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   UserScriptModuleQPQConfigSetting,
-  UserScriptRunnerQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
 import {
@@ -142,11 +141,6 @@ export const getStorageDriveNames = (configs: QPQConfig): string[] => {
 
 export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
   return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
-};
-
-// Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
-export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
-  return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
 };
 
 /** The module a setting belongs to: its declared owner, or the executing module when it declares none. */
@@ -247,10 +241,6 @@ export const getAllUserScriptModules = (qpqConfig: QPQConfig): UserScriptModuleQ
 
 // The sandbox this service runs user scripts in (defineUserScriptRunner), or null when
 // the service has not declared one.
-export const getUserScriptRunner = (qpqConfig: QPQConfig): Nullable<UserScriptRunnerQPQConfigSetting> => {
-  return getConfigSetting<UserScriptRunnerQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptRunner) ?? null;
-};
-
 // Runtime-attached action processor override sources must join the bundler sweep,
 // or the deployed bundle omits them and the dynamic load fails at runtime.
 export const expandSrcEntriesWithActionProcessors = (runtimes: QpqFunctionRuntime[]): QpqFunctionRuntime[] => {

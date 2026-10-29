@@ -1,8 +1,5 @@
-import { QPQConfigSetting } from '@qpqjs/core';
-
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-
-export type EmailSenderQPQWebServerConfigSetting = QPQConfigSetting;
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { EmailSenderQPQWebServerConfigSetting } from './types';
 
 /** Sends from the app's root domains (defineDns); one per service. */
 export const defineEmailSender = (): EmailSenderQPQWebServerConfigSetting => ({

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineDns } from './dns';
+import { QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { defineDns } from './defineDns';
 
 describe('defineDns', () => {
   it('wraps a single root in a list', () => {

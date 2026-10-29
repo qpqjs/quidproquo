@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineJavascriptRuntime, JavascriptRuntimeArchitecture, JavascriptRuntimeVersion } from './javascriptRuntime';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineJavascriptRuntime } from './defineJavascriptRuntime';
+import { JavascriptRuntimeArchitecture, JavascriptRuntimeVersion } from './types';
 
 describe('defineJavascriptRuntime', () => {
   it('defaults to node22 on arm64', () => {

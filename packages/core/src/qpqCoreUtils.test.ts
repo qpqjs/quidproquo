@@ -82,7 +82,6 @@ import {
   getUserDirectoryByName,
   getUserDirectoryEmailTemplates,
   getUserDirectorySrcEntries,
-  getUserScriptRunner,
   getVirtualNetworkConfigs,
   isSameResource,
   resolveCrossServiceResourceName,
@@ -625,13 +624,6 @@ describe('qpqCoreUtils', () => {
       ]);
 
       expect(getAllSrcEntries(withStream)).toContain('/entry/kvsStream/project::project');
-    });
-  });
-
-  describe('getUserScriptRunner', () => {
-    it('returns the declared runner, or null when the service has none', () => {
-      expect(getUserScriptRunner(buildTestQpqConfig())).toBeNull();
-      expect(getUserScriptRunner(buildTestQpqConfig([defineUserScriptRunner({ timeoutInSeconds: 30 })]))).toMatchObject({ timeoutInSeconds: 30 });
     });
   });
 

@@ -1,6 +1,6 @@
 import { DynamicModuleLoader, Nullable, QPQConfig } from '@qpqjs/core';
 
-import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
+import { getDnsConfig } from '../../../config/settings/dns/logic/getDnsConfig';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { getDomainResolver } from './getDomainResolver';
 
