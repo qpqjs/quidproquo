@@ -25,7 +25,7 @@ Using the shared config gets you the rules automatically. To use the plugin on i
 
 ```js
 // eslint.config.mjs
-import { qpqPlugin } from '@qpqjs/eslint-config';
+import qpqPlugin from '@qpqjs/eslint-config/plugin';
 
 export default [
   qpqPlugin.configs.recommended,

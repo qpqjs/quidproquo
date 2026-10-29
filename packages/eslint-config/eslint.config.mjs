@@ -3,16 +3,13 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import pluginJs from '@eslint/js';
 
+import { jsdocConfigs } from './config/jsdoc.mjs';
 import { overrides } from './config/overrides.mjs';
 import { prettierConfigs } from './config/prettier.mjs';
 import { reactConfigs } from './config/react.mjs';
 import { restrictedSyntaxConfigs } from './config/restrictedSyntax.mjs';
+import { testingConfigs } from './config/testing.mjs';
 import qpqPlugin from './plugin/index.mjs';
-
-// Standalone use, without adopting the whole shared config:
-//   import { qpqPlugin } from '@qpqjs/eslint-config';
-//   export default [qpqPlugin.configs.recommended];
-export { qpqPlugin };
 
 export default [
   { ignores: ['**/dist/**', '**/lib/esm/**', '**/lib/commonjs/**', '**/node_modules/**', '**/*.d.ts'] },
@@ -70,6 +67,8 @@ export default [
 
   ...reactConfigs,
   ...restrictedSyntaxConfigs,
+  ...testingConfigs,
+  ...jsdocConfigs,
   ...prettierConfigs,
 
   ...overrides,

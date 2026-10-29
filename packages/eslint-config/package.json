@@ -5,7 +5,8 @@
   "main": "eslint.config.mjs",
   "exports": {
     ".": "./eslint.config.mjs",
-    "./prettier": "./prettier.config.mjs"
+    "./prettier": "./prettier.config.mjs",
+    "./plugin": "./plugin/index.mjs"
   },
   "publishConfig": {
     "access": "public"
@@ -31,7 +32,9 @@
   "license": "MIT",
   "dependencies": {
     "@eslint/js": "^9.13.0",
+    "@vitest/eslint-plugin": "^1.6.28",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsdoc": "^65.4.2",
     "eslint-plugin-jsx-a11y": "^6.10.0",
     "eslint-plugin-prettier": "^5.2.0",
     "eslint-plugin-react": "^7.37.0",
