@@ -54,10 +54,6 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
     storyResult.qpqFunctionRuntimeInfo,
   );
 
-  // Execute it with the initial input
-  // We use a debugger here to catch code before it is executed
-  // eslint-disable-next-line no-debugger
-  debugger;
   const result = await resolveStory(runtime, storyResult.input);
 
   return result;

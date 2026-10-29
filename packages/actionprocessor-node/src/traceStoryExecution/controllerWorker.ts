@@ -380,7 +380,7 @@ export function traceControllerWorkerMain(): void {
     if (!firstPauseAt) firstPauseAt = Date.now();
     const frame = message.params.callFrames[0];
 
-    // Non-traced pause (e.g. the debugger; statement in qpqExecuteLog) — just resume.
+    // A pause outside the instrumented scripts is not a traced step: just resume.
     if (!instrumentedScriptIds.has(frame.location.scriptId)) {
       return post('Debugger.resume');
     }
