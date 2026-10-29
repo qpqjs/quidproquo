@@ -1,6 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
+import { generateUuid, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
@@ -106,5 +104,5 @@ export const setParameterValue = async (runtimePath: string, parameterName: stri
 export const getOrSeedSecretValue = async (runtimePath: string, secretName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveSecretStorageLocation(secretName, qpqConfig);
 
-  return getOrSeedConfigStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => randomUUID());
+  return getOrSeedConfigStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => generateUuid());
 };

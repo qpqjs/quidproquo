@@ -7,6 +7,7 @@ import {
   askFileGenerateTemporarySecureUrl,
   createNestedRuntime,
   DynamicModuleLoader,
+  generateUuid,
   getDateNow,
   QPQConfig,
   qpqCoreUtils,
@@ -20,8 +21,6 @@ import {
   UserScriptRunnerEvent,
   UserScriptRunnerRequest,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { ResolvedDevServerConfig } from '../../../../types';
 import { getUserScriptChildEnv } from '../getUserScriptChildEnv';
@@ -81,7 +80,7 @@ export const requestUserScriptChild = async <R>(input: RequestUserScriptChildInp
     input.actionProcessors,
     getDateNow,
     input.logger,
-    randomUUID,
+    generateUuid,
     QpqRuntimeType.EXECUTE_STORY,
     input.dynamicModuleLoader,
     undefined,

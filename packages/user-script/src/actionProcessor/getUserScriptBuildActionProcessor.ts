@@ -9,6 +9,7 @@ import {
   createActionProcessor,
   createNestedRuntime,
   DynamicModuleLoader,
+  generateUuid,
   getDateNow,
   ProcessorFor,
   QPQConfig,
@@ -19,8 +20,6 @@ import {
   StreamRegistry,
   UserScriptBuildActionPayload,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { UserScriptBuildError } from '../build/UserScriptBuildError';
 import { askUserScriptCheckPublishedOutput } from './logic/askUserScriptCheckPublishedOutput';
@@ -58,7 +57,7 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
       actionProcessors,
       getDateNow,
       logger,
-      randomUUID,
+      generateUuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       undefined,

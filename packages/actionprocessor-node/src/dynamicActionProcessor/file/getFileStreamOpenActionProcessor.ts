@@ -5,11 +5,11 @@ import {
   askFileStreamOpenBase,
   createActionProcessor,
   FileActionType,
+  generateUuid,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import { Readable } from 'stream';
 
@@ -44,7 +44,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfi
       const isText = encoding === 'text';
       const highWaterMark = chunkSize ?? 65536;
       const readStream = fs.createReadStream(fullPath, isText ? { encoding: 'utf8', highWaterMark } : { highWaterMark });
-      const streamId = `file-${randomUUID()}`;
+      const streamId = `file-${generateUuid()}`;
 
       const iterator = isText ? textStreamIterator(readStream) : binaryStreamIterator(readStream);
       streamRegistry.register(streamId, iterator);

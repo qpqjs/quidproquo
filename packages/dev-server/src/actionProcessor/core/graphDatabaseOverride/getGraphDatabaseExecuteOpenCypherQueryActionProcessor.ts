@@ -6,6 +6,7 @@ import {
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
+  generateUuid,
   getProcessCustomImplementation,
   GraphCypherResponse,
   GraphDatabaseActionType,
@@ -15,8 +16,6 @@ import {
   qpqCoreUtils,
 } from '@qpqjs/core';
 import { askServiceFunctionExecute } from '@qpqjs/webserver';
-
-import { randomUUID } from 'crypto';
 
 const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
   return function* askRunNeptuneOpenCypherQuery(
@@ -57,7 +56,7 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
       // as we use the service functions to proxy the queries though the VPC
       getServiceFunctionActionProcessor,
       () => new Date().toISOString(),
-      randomUUID,
+      generateUuid,
     ),
   };
 };

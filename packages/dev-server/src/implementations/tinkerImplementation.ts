@@ -1,8 +1,7 @@
-import { createRuntime, getDateNow, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from '@qpqjs/core';
+import { createRuntime, generateUuid, getDateNow, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from '@qpqjs/core';
 import * as qpqCore from '@qpqjs/core';
 import * as qpqWebserver from '@qpqjs/webserver';
 
-import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import * as repl from 'repl';
@@ -59,7 +58,7 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
         }),
         getDateNow,
         logger,
-        `${serviceName}::tinker-${randomUUID()}`,
+        `${serviceName}::tinker-${generateUuid()}`,
         QpqRuntimeType.SERVICE_FUNCTION_EXE,
         dynamicModuleLoader,
         undefined,

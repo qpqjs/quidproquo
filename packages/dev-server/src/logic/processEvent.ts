@@ -4,6 +4,7 @@ import {
   askProcessEvent,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
   getDateNow,
   QPQConfig,
   qpqCoreUtils,
@@ -11,8 +12,6 @@ import {
   StoryResult,
   StorySession,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getDevServerLogger } from '../implementations/logger';
@@ -49,7 +48,7 @@ export const processEvent = async <E, ER>(
       ),
     getDateNow,
     logger,
-    `${serviceName}::${randomUUID()}`,
+    `${serviceName}::${generateUuid()}`,
     qpqRuntimeType,
     dynamicModuleLoader,
     undefined,

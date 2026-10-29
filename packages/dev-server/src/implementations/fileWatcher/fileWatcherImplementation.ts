@@ -3,6 +3,7 @@ import {
   askExecuteStory,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
   getDateNow,
   QPQConfig,
   qpqCoreUtils,
@@ -13,7 +14,6 @@ import {
 } from '@qpqjs/core';
 
 import * as chokidar from 'chokidar';
-import { randomUUID } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -129,7 +129,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       }),
       getDateNow,
       logger,
-      `${serviceName}::storage-event::${randomUUID()}`,
+      `${serviceName}::storage-event::${generateUuid()}`,
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
       dynamicModuleLoaderForService,
       undefined,

@@ -2,13 +2,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   askGraphDatabaseExecuteOpenCypherQuery,
+  generateUuid,
   getProcessCustomImplementation,
   GraphDatabaseActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { askRunNeo4jOpenCypherQuery } from './stories';
 
@@ -24,6 +23,6 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
     // Platform boundary: the real clock and uuid source live here; the story
     // itself only ever reaches them through askDateNow/askNewGuid.
     () => new Date().toISOString(),
-    randomUUID,
+    generateUuid,
   ),
 });

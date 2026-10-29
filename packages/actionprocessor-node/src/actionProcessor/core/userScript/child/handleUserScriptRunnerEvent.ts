@@ -6,6 +6,7 @@ import {
   askUserScriptListExports,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
   isErroredActionResult,
   QPQConfig,
   QpqLogger,
@@ -17,8 +18,6 @@ import {
   UserScriptRunnerRequestKind,
   UserScriptRunnerResult,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { getUserScriptRunnerActionProcessors } from '../getUserScriptRunnerActionProcessors';
 import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
@@ -97,7 +96,7 @@ export const handleUserScriptRunnerEvent = async (
             getUserScriptRunnerActionProcessors,
             () => new Date().toISOString(),
             silentLogger,
-            `${event.filename}::${randomUUID()}`,
+            `${event.filename}::${generateUuid()}`,
             QpqRuntimeType.EXECUTE_STORY,
             dynamicModuleLoader,
           ),

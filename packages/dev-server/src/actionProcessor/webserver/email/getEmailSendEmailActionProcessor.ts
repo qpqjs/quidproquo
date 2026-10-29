@@ -1,7 +1,5 @@
-import { actionResult, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { actionResult, createActionProcessor, generateUuid, ProcessorFor } from '@qpqjs/core';
 import { askEmailSendEmail, EmailActionType } from '@qpqjs/webserver';
-
-import { randomUUID } from 'crypto';
 
 // Local dev sends nothing: log what would have gone out and hand back a fake message id
 const getProcessSendEmail = (): ProcessorFor<typeof askEmailSendEmail> => {
@@ -20,7 +18,7 @@ const getProcessSendEmail = (): ProcessorFor<typeof askEmailSendEmail> => {
 
     // Unique per send, like a real SES messageId: a subject-derived id would make
     // same-subject emails share a linkKey and fold into one entity in the admin
-    return actionResult(`dev-server-email-${randomUUID()}`);
+    return actionResult(`dev-server-email-${generateUuid()}`);
   };
 };
 

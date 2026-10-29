@@ -9,6 +9,7 @@ import {
   DynamicFunctionsExecuteActionPayload,
   DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
+  generateUuid,
   getDateNow,
   ProcessorFor,
   QPQConfig,
@@ -20,8 +21,6 @@ import {
   StorySessionUpdater,
   StreamRegistry,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { isStoryIterator } from '../logic/isStoryIterator';
 
@@ -85,7 +84,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
         actionProcessors,
         getDateNow,
         logger,
-        randomUUID,
+        generateUuid,
         QpqRuntimeType.EXECUTE_STORY,
         dynamicModuleLoader,
         dynamicFunctionsSetting.runtime,
