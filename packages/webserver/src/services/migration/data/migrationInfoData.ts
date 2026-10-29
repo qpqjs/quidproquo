@@ -1,11 +1,10 @@
 import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsEqual } from '@qpqjs/core';
 
+import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { MigrationInfo } from '../domain/Migration';
 
-const migrationStoreName = 'qpqMigrations';
-
 export function* askGetMigrationBySrcPath(srcPath: string, nextPageKey?: string): AskResponse<MigrationInfo | undefined> {
-  const migrationInfo = yield* askKeyValueStoreQuery<MigrationInfo>(migrationStoreName, kvsEqual('srcPath', srcPath), {
+  const migrationInfo = yield* askKeyValueStoreQuery<MigrationInfo>(QPQ_MIGRATIONS_RESOURCE_NAME, kvsEqual('srcPath', srcPath), {
     nextPageKey,
   });
 
@@ -13,5 +12,5 @@ export function* askGetMigrationBySrcPath(srcPath: string, nextPageKey?: string)
 }
 
 export function* askUpsert(migrationInfo: MigrationInfo): AskResponse<void> {
-  yield* askKeyValueStoreUpsert<MigrationInfo>(migrationStoreName, migrationInfo);
+  yield* askKeyValueStoreUpsert<MigrationInfo>(QPQ_MIGRATIONS_RESOURCE_NAME, migrationInfo);
 }

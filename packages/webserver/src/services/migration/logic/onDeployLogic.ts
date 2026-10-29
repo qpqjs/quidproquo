@@ -1,11 +1,12 @@
 import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, DeployEventType, QueueMessage } from '@qpqjs/core';
 
+import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
 import { askIsMigrationPending, getMigrationKey } from './pendingMigrations';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
-  const allMigrations = yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
+  const allMigrations = yield* askConfigGetGlobal<Migration[]>(QPQ_MIGRATIONS_RESOURCE_NAME);
 
   // Insert all migrations into the database
   // we don't need to run any current migrations
@@ -19,7 +20,7 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
 }
 
 export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): AskResponse<void> {
-  const allMigrations = yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
+  const allMigrations = yield* askConfigGetGlobal<Migration[]>(QPQ_MIGRATIONS_RESOURCE_NAME);
   const migrationsForThisDeploy = allMigrations.filter((m) => m.deployType === deployEventType);
 
   for (const migration of migrationsForThisDeploy) {
@@ -37,7 +38,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
       payload: undefined,
     };
 
-    yield* askQueueSendMessages('qpqMigrations', message);
+    yield* askQueueSendMessages(QPQ_MIGRATIONS_RESOURCE_NAME, message);
 
     // Insert the migration into into the database
     yield* migrationInfoData.askUpsert({

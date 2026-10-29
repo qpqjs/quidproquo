@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `adminUserDirectoryResourceName` (`@qpqjs/features`) is renamed `ADMIN_USER_DIRECTORY_NAME` and lives in the admin constants; the value (`qpq-admin`) is unchanged.
 - `InvalidBatchSizeError` / `InvalidBatchSizeErrorCode` (askMapParallelBatch) and `InvalidKvsPartialPropertyError` / `InvalidKvsPartialPropertyErrorCode` (askKeyValueStoreUpdatePartialProperties) are removed from `@qpqjs/core`; both stories now throw a qpq `Invalid` error through `askThrowError` with the same message.
 - `askTenantApiRequest`, `askEventDocAiServiceRequest` (`@qpqjs/features`) and `askSessionApiRequest`, `askSessionApiRequestOrThrow`, `askPlatformRequest` (`@qpqjs/web-admin`) now take `<TResult, TPayload = unknown>`; callers passing two type arguments must swap them.
 - Generic order is now `<TResult, TPayload>` on `askNetworkRequest`, `askApiRequest` (both were `<TPayload, TResult>`) and `askServiceRequest` (was `<TPayload, TResponse>`); `askInlineFunctionExecute` and `askServiceFunctionExecute` keep result-first and gain a `TPayload = unknown` default. Callers that pass two type arguments to the first three must swap them; callers can now pass only the result type.

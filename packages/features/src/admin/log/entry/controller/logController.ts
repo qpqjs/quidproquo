@@ -13,6 +13,7 @@ import { askServiceFunctionExecute } from '@qpqjs/webserver';
 import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
+import { ADMIN_LOG_SERVICE_NAME_GLOBAL, ADMIN_SERVICE_NAMES_GLOBAL } from '../../../constants';
 import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
@@ -80,8 +81,8 @@ export function* toggleLogCheck(
 }
 
 export function* getServiceNames(event: HTTPEvent) {
-  const services = yield* askConfigGetGlobal<string[]>('qpq-serviceNames');
-  const logServiceName = yield* askConfigGetGlobal<string>('qpq-log-service-name');
+  const services = yield* askConfigGetGlobal<string[]>(ADMIN_SERVICE_NAMES_GLOBAL);
+  const logServiceName = yield* askConfigGetGlobal<string>(ADMIN_LOG_SERVICE_NAME_GLOBAL);
 
   return toJsonEventResponse({ services, logServiceName });
 }

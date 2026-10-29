@@ -1,5 +1,6 @@
 import { askLogCreate, askQueueSendMessages, AskResponse, LogLevelEnum, QueueMessage } from '@qpqjs/core';
 
+import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { askPendingMigrations, askRecordMigrationRan, getMigrationKey } from './pendingMigrations';
 
 /**
@@ -27,7 +28,7 @@ export function* askRunPendingMigrations(): AskResponse<string[]> {
     yield* askLogCreate(LogLevelEnum.Info, `Running migration: ${key}`);
 
     const message: QueueMessage<undefined> = { type: key, payload: undefined };
-    yield* askQueueSendMessages('qpqMigrations', message);
+    yield* askQueueSendMessages(QPQ_MIGRATIONS_RESOURCE_NAME, message);
 
     yield* askRecordMigrationRan(migration);
   }

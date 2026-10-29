@@ -1,5 +1,6 @@
 import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
+import { QPQ_MIGRATIONS_RESOURCE_NAME } from '../../../config/constants';
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
 
@@ -18,7 +19,7 @@ export function* askIsMigrationPending(migration: Migration): AskResponse<boolea
 // Every configured migration, in declaration order (the config preserves the sorted filename
 // order the app registered them in, so dependencies between migrations hold).
 function* askAllMigrations(): AskResponse<Migration[]> {
-  return yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
+  return yield* askConfigGetGlobal<Migration[]>(QPQ_MIGRATIONS_RESOURCE_NAME);
 }
 
 // The ones not yet recorded as run, in order.

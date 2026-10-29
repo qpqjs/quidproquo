@@ -2,7 +2,7 @@ import { askMapParallelBatch, AskResponse, QpqPagedData, StoryResultMetadata } f
 
 import { askWebSocketQueueGetConnections } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueGetConnections';
 import { Connection } from '../../../../webSocketQueue/types';
-import { ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE } from '../../../constants';
+import { ADMIN_WEBSOCKET_API_NAME, ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE } from '../../../constants';
 import { askSendMessage } from './askSendMessage';
 import { WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from './serverMessages';
 
@@ -16,7 +16,7 @@ export function* askSendLogToAdmins(log: StoryResultMetadata) {
 
   let nextPageKey: string | undefined = undefined;
   do {
-    const pageConnections: QpqPagedData<Connection> = yield* askWebSocketQueueGetConnections('qpqadmin', true, nextPageKey);
+    const pageConnections: QpqPagedData<Connection> = yield* askWebSocketQueueGetConnections(ADMIN_WEBSOCKET_API_NAME, true, nextPageKey);
 
     yield* askMapParallelBatch(
       pageConnections.items,

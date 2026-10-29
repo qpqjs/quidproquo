@@ -26,6 +26,14 @@ import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunct
 import { defineWebSocketQueue } from '../../webSocketQueue';
 import { defineAdminServiceActionSearchRoute } from '../actionSearch/config/defineAdminServiceActionSearchRoute';
 import { QPQ_LOG_ACTIONS_KVS_NAME, QPQ_LOG_ENTITIES_KVS_NAME, QPQ_LOG_ENTITY_LOOKUP_KVS_NAME } from '../actionSearch/constants';
+import {
+  ADMIN_LOG_RETENTION_DAYS_GLOBAL,
+  ADMIN_LOG_SERVICE_NAME_GLOBAL,
+  ADMIN_SERVICE_NAMES_GLOBAL,
+  ADMIN_USER_DIRECTORY_NAME,
+  ADMIN_WEBSOCKET_API_NAME,
+  ADMIN_WEBSOCKET_QUEUE_NAME,
+} from '../constants';
 import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import {
   defineAdminServiceAuthRoute,
@@ -45,7 +53,6 @@ import {
   QPQ_MAINTENANCE_ON_APPEND_FN,
   QPQ_MAINTENANCE_WS_SYNC_FN,
 } from '../maintenance/constants/maintenanceConstants';
-import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
 
@@ -72,7 +79,7 @@ const calculateLogRetentionDays = (advancedSettings?: QPQConfigAdvancedLogSettin
 export const defineAdminSettings = (logServiceName: string, advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
-      userDirectoryName: adminUserDirectoryResourceName,
+      userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
     },
   };
 
@@ -81,7 +88,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
   return [
     // Owner-stamped resources, materialise as owned on the admin deploy,
     // and as foreign refs elsewhere. Owner resolution runs at IAM-scoping time.
-    defineEventBus('qpq-admin-wsq', {
+    defineEventBus(ADMIN_WEBSOCKET_QUEUE_NAME, {
       owner: { module: logServiceName },
     }),
 
@@ -95,12 +102,12 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
         },
       },
       {
-        eventBusSubscriptions: ['qpq-admin-wsq'],
+        eventBusSubscriptions: [ADMIN_WEBSOCKET_QUEUE_NAME],
       },
     ),
 
-    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', {
-      userDirectoryName: adminUserDirectoryResourceName,
+    defineWebSocketQueue(ADMIN_WEBSOCKET_QUEUE_NAME, ADMIN_WEBSOCKET_API_NAME, {
+      userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
       owner: { module: logServiceName },
     }),
 
@@ -247,7 +254,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           storeName: maintenanceStoreName,
           type: maintenanceDocType,
           basePath: maintenanceBasePath,
-          routeAuthSettings: { userDirectoryName: adminUserDirectoryResourceName },
+          routeAuthSettings: { userDirectoryName: ADMIN_USER_DIRECTORY_NAME },
           onAppend: QPQ_MAINTENANCE_ON_APPEND_FN,
         }),
 
@@ -273,8 +280,8 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           storeName: 'log',
           type: 'log',
           serviceName: logServiceName,
-          eventBusName: 'qpq-admin-wsq',
-          userDirectoryName: adminUserDirectoryResourceName,
+          eventBusName: ADMIN_WEBSOCKET_QUEUE_NAME,
+          userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
           model: AiModel.ClaudeSonnet46,
           systemPrompt: adminLogAiSystemPrompt,
           tools: adminLogAiTools,
@@ -296,7 +303,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
             ),
           },
           {
-            eventBusSubscriptions: ['qpq-admin-wsq'],
+            eventBusSubscriptions: [ADMIN_WEBSOCKET_QUEUE_NAME],
           },
         ),
 
@@ -319,9 +326,9 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
         ),
 
         defineGlobal(QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL, advancedSettings?.maintenanceWebsocketApiName ?? ''),
-        defineGlobal('qpq-serviceNames', advancedSettings?.services ?? []),
-        defineGlobal('qpq-log-retention-days', logRetentionDays),
-        defineGlobal('qpq-log-service-name', logServiceName),
+        defineGlobal(ADMIN_SERVICE_NAMES_GLOBAL, advancedSettings?.services ?? []),
+        defineGlobal(ADMIN_LOG_RETENTION_DAYS_GLOBAL, logRetentionDays),
+        defineGlobal(ADMIN_LOG_SERVICE_NAME_GLOBAL, logServiceName),
       ],
     }),
 

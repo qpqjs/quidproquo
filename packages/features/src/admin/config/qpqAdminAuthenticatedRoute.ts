@@ -1,5 +1,5 @@
 import { createRouteDefinition } from '../../routes';
-import { adminUserDirectoryResourceName } from './adminUserDirectory';
+import { ADMIN_USER_DIRECTORY_NAME } from '../constants';
 
 // Routes gated by the qpq admin user pool. The gateway verifies the JWT before
 // the handler runs.
@@ -10,6 +10,6 @@ import { adminUserDirectoryResourceName } from './adminUserDirectory';
 // dynamicRoute wrapper).
 export const qpqAdminAuthenticatedRoute = createRouteDefinition({
   routeAuthSettings: {
-    userDirectoryName: adminUserDirectoryResourceName,
+    userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
   },
 });

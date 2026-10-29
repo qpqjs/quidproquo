@@ -23,6 +23,7 @@ import {
 } from '@qpqjs/core';
 
 import { askUpdateActionSearchFromStoryResult } from '../../actionSearch/logic/askUpdateActionSearchFromStoryResult';
+import { ADMIN_LOG_RETENTION_DAYS_GLOBAL } from '../../constants';
 import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';
 import * as logMetadataData from '../entry/data/logMetadataData';
 import { LogLog, LogMetadata } from '../entry/domain';
@@ -214,7 +215,7 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
 }
 
 export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
-  const logRetentionDays = yield* askConfigGetGlobal<number | undefined>('qpq-log-retention-days');
+  const logRetentionDays = yield* askConfigGetGlobal<number | undefined>(ADMIN_LOG_RETENTION_DAYS_GLOBAL);
 
   const ttl = logRetentionDays ? Math.floor((yield* askGetCurrentEpoch()) + logRetentionDays * 24 * 60 * 60) : undefined;
 

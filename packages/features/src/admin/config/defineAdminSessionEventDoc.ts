@@ -1,8 +1,8 @@
 import { defineServiceSettings, QPQConfig } from '@qpqjs/core';
 
 import { defineEventDocRoutes, defineEventDocSummary } from '../../eventDoc';
+import { ADMIN_USER_DIRECTORY_NAME } from '../constants';
 import { adminSessionBasePath, adminSessionDocType, adminSessionStoreName } from '../constants/adminSessionConstants';
-import { adminUserDirectoryResourceName } from './adminUserDirectory';
 
 // Admin UI sessions: one event doc per login, every user-intent event appended
 // for audit. Scoped to the log service like the other admin-only resources.
@@ -18,7 +18,7 @@ export const defineAdminSessionEventDoc = (logServiceName: string): QPQConfig =>
         type: adminSessionDocType,
         basePath: adminSessionBasePath,
         routeAuthSettings: {
-          userDirectoryName: adminUserDirectoryResourceName,
+          userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
         },
       }),
     ],

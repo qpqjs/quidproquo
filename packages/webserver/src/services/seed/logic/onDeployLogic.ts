@@ -9,8 +9,10 @@ import {
   QueueMessage,
 } from '@qpqjs/core';
 
+import { QPQ_SEEDS_RESOURCE_NAME } from '../../../config/constants';
+
 export function* askProcessOnDeployCreate(): AskResponse<void> {
-  const allSeeds = yield* askConfigGetGlobal<QpqFunctionRuntime[]>('qpqSeeds');
+  const allSeeds = yield* askConfigGetGlobal<QpqFunctionRuntime[]>(QPQ_SEEDS_RESOURCE_NAME);
 
   // For each seed, send a message to the queue to run the seed script
   for (const seed of allSeeds) {
@@ -20,7 +22,7 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
       payload: undefined,
     };
 
-    yield* askQueueSendMessages('qpqSeeds', message);
+    yield* askQueueSendMessages(QPQ_SEEDS_RESOURCE_NAME, message);
   }
 }
 
