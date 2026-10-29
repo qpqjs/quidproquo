@@ -8,7 +8,6 @@ import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionPro
 import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
-import { getQueueConfigSetting } from './utils';
 
 const buildAlarm = (metricName: string): Record<string, unknown> => ({
   AlarmName: 'alarm',
@@ -55,18 +54,6 @@ describe('sqs/queue getEventGetRecordsActionProcessor', () => {
     expect(records).toEqual([
       { id: 'm1', message: { type: expectedType, payload: { newStateReason: 'because', newStateInAlarm: true, oldStateInAlarm: false } } },
     ]);
-  });
-});
-
-describe('sqs/queue getQueueConfigSetting', () => {
-  it('looks up the queue config setting named by the environment', () => {
-    const setting = defineQueue('q', {});
-
-    expect(getQueueConfigSetting(buildTestQpqConfig([setting]), 'q')).toEqual(setting);
-  });
-
-  it('throws when the named queue is not in the config', () => {
-    expect(() => getQueueConfigSetting(buildTestQpqConfig([]), 'missing')).toThrow('No queue config setting found for queue [missing]');
   });
 });
 

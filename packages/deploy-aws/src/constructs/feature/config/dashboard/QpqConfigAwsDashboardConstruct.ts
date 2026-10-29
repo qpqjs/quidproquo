@@ -26,7 +26,7 @@ const getServiceLambdaFunctionNames = (qpqConfig: QPQConfig): string[] => {
   const baseNames = [
     ...qpqWebServerUtils.getApiConfigs(qpqConfig).map((api) => `${api.apiName}-route`),
     ...qpqWebServerUtils.getOwnedServiceFunctions(qpqConfig).map((serviceFunction) => `${serviceFunction.functionName}-sfunc`),
-    ...qpqCoreUtils.getQueues(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
+    ...qpqCoreUtils.getAllQueueConfigs(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
     ...qpqCoreUtils.getOwnedScheduleEvents(qpqConfig).map((schedule) => `${schedule.uniqueKey}-SE`),
     ...qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((websocket) => `${websocket.apiName}-ws`),
   ];
@@ -212,7 +212,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
       });
     });
 
-    const queueWidgets = qpqCoreUtils.getQueues(props.qpqConfig).map((queueConfig) => {
+    const queueWidgets = qpqCoreUtils.getAllQueueConfigs(props.qpqConfig).map((queueConfig) => {
       const queueMetric = (queueName: string, metricName: string, label: string): aws_cloudwatch.Metric =>
         new aws_cloudwatch.Metric({
           namespace: 'AWS/SQS',

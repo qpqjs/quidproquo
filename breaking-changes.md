@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqCoreUtils` queue accessors follow D5: `getAllQueueConfigs(cfg)`, `getOwnedQueueConfigs(cfg)`, `getQueueByName(name, cfg)` (returns null, name first) and `resolveQueueOrThrow(name, cfg)` replace `getQueues`, `getOwnedQueues` and `getQueueByName(cfg, name)`; the setting lives in `config/settings/queue/` with its types. `@qpqjs/actionprocessor-aws` `getQueueConfigSetting` is deleted in favour of `resolveQueueOrThrow`.
 - `@qpqjs/features` admin log search takes one object: `askLogGetAll(query: LogDeepSearchQuery)` and `askLogMetadataList(query: LogSearchQuery)` replace the ten and nine positional parameters; `GetLogsParams` is gone, the route body is a `LogDeepSearchQuery` (G3).
 - `qpqWebServerUtils.fromJsonEventRequest` (the throwing twin) is deleted; use `askFromJsonEventRequest`, which answers `BadRequest` through the story. `uniqueBy` moved from `@qpqjs/web` to `@qpqjs/core` (web still re-exports it) and gained a `unique` sibling for plain values; `getMillisecondsBetween(startIso, endIso)` is the one duration helper (C5).
 - `@qpqjs/features` admin login routes now run the `@qpqjs/webserver` auth controller against the admin user pool (`defineGlobal(AUTH_USER_DIRECTORY_GLOBAL_KEY, 'qpq-admin')`), so the `/challenge` route also accepts the MFA challenges; `defineAdminServiceAuthRoute`, the admin `loginController` and the admin copies of `askAuthLogin`, `askAuthRefreshToken` and `askAuthRespondToChallenge` are deleted (C5).

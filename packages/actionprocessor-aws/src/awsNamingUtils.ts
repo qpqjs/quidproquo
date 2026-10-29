@@ -92,7 +92,7 @@ export const withFifoSuffix = (resourceName: string, isFifo?: boolean) => (isFif
 export const getQueueRuntimeResourceNameFromConfig = (queueName: string, qpqConfig: QPQConfig) => {
   const baseName = getConfigRuntimeResourceNameFromConfig(queueName, qpqConfig);
 
-  return withFifoSuffix(baseName, qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo);
+  return withFifoSuffix(baseName, qpqCoreUtils.getQueueByName(queueName, qpqConfig)?.isFifo);
 };
 
 export const getConfigRuntimeBootstrapResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig) => {

@@ -17,7 +17,7 @@ import { AnyQueueMessageWithSession } from '../event/queue/types';
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueueSendMessagesBase> => {
   return async ({ queueName, queueMessages }, session) => {
-    const queueConfig = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
+    const queueConfig = qpqCoreUtils.getQueueByName(queueName, qpqConfig);
     if (!queueConfig) {
       return actionResultError(askQueueSendMessagesBase.errorType.QueueNotFound, `Queue ${queueName} not found`);
     }

@@ -12,11 +12,10 @@ import {
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
 import { InternalEventRecord, MatchResult, ResolveQueueName } from './types';
-import { getQueueConfigSetting } from './utils';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig, resolveQueueName: ResolveQueueName): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord: rawQpqEventRecord, eventParams }) => {
-    const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig, resolveQueueName(eventParams));
+    const queueQPQConfigSetting = qpqCoreUtils.resolveQueueOrThrow(resolveQueueName(eventParams), qpqConfig);
     const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
     const queueTypes = Object.keys(queueQueueProcessors).sort();
 

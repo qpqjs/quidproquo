@@ -123,7 +123,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end signing keys
 
     // Queues
-    const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
+    const queues = qpqCoreUtils.getAllQueueConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

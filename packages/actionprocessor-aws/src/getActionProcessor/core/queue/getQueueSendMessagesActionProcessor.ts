@@ -25,7 +25,7 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueueSendMessagesBase> => {
   return async ({ queueName, queueMessages }, session) => {
     const sqsQueueName = getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
-    const isFifo = qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo || false;
+    const isFifo = qpqCoreUtils.getQueueByName(queueName, qpqConfig)?.isFifo || false;
 
     // Each entry carries the caller's session so the consuming service resumes
     // with the same correlation/context.

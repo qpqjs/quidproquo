@@ -64,15 +64,12 @@ import {
   getOwnedItems,
   getOwnedKeyValueStores,
   getOwnedParameterConfigs,
-  getOwnedQueues,
   getOwnedScheduleEvents,
   getOwnedSecrets,
   getOwnedStorageDrives,
   getOwnedUserDirectories,
   getParameterByName,
-  getQueueByName,
   getQueueQueueProcessors,
-  getQueues,
   getQueueSrcEntries,
   getScheduleEvents,
   getSecretByName,
@@ -232,12 +229,6 @@ describe('qpqCoreUtils', () => {
   describe('queues', () => {
     const config = buildTestQpqConfig([defineQueue('jobs', { created: '/q/created::run' })]);
 
-    it('lists queues and finds by name', () => {
-      expect(getQueues(config)).toHaveLength(1);
-      expect(getQueueByName(config, 'jobs')?.name).toBe('jobs');
-      expect(getQueueByName(config, 'missing')).toBeUndefined();
-    });
-
     it('returns queue processors, or empty for unknown queues', () => {
       expect(getQueueQueueProcessors('jobs', config)).toEqual({ created: '/q/created::run' });
       expect(getQueueQueueProcessors('missing', config)).toEqual({});
@@ -245,11 +236,6 @@ describe('qpqCoreUtils', () => {
 
     it('collects queue processor runtimes as src entries', () => {
       expect(getQueueSrcEntries(config)).toEqual(['/q/created::run']);
-    });
-
-    it('returns owned queues (queues carry no owner so all are owned)', () => {
-      const config = buildTestQpqConfig([defineQueue('a', {}), defineQueue('b', {})]);
-      expect(getOwnedQueues(config).map((q) => q.name)).toEqual(['a', 'b']);
     });
   });
 

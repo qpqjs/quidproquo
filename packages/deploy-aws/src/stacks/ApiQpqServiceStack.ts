@@ -65,7 +65,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Queues
-    qpqCoreUtils.getQueues(props.qpqConfig).forEach(
+    qpqCoreUtils.getAllQueueConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

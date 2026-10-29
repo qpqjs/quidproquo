@@ -1,5 +1,14 @@
-import { DEFAULT_ENVIRONMENT } from './logic/config/DEFAULT_ENVIRONMENT';
-import { flattenQpqConfig } from './logic/config/flattenQpqConfig';
+import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
+import {
+  getApplicationConfigSetting,
+  getApplicationModuleEnvironment,
+  getApplicationModuleFeature,
+  getApplicationModuleName,
+  getApplicationName,
+  getConfigSetting,
+  getConfigSettings,
+  getOwnedItems,
+} from './logic/config';
 import { CrossModuleOwner } from './types/CrossModuleOwner';
 import {
   ActionProcessorsQPQConfigSetting,
@@ -55,75 +64,23 @@ import {
 } from './types';
 import { isQpqFunctionRuntimeAdvanced } from './utils';
 
-export { flattenQpqConfig } from './logic/config/flattenQpqConfig';
-
-/**
- * Filters and returns the config settings of a specific type from a QPQConfig array.
- * @function
- * @template T - The specific type of QPQConfigSetting to filter.
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @param {string} configSettingType - The specific config setting type to filter.
- * @returns {T[]} - An array of filtered config settings of the specified type.
- */
-export const getConfigSettings = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, configSettingType: string): T[] => {
-  const flatConfig = flattenQpqConfig(qpqConfig);
-  return flatConfig.filter((c) => c.configSettingType === configSettingType) as T[];
-};
-
-/**
- * Retrieves a single config setting of a specific type from a QPQConfig array.
- * @function
- * @template T - The specific type of QPQConfigSetting to retrieve.
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @param {string} serviceInfrastructureConfigType - The specific config setting type to retrieve.
- * @returns {T | undefined} - The found config setting of the specified type or undefined if not found.
- */
-export const getConfigSetting = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, serviceInfrastructureConfigType: string): T | undefined => {
-  const [setting] = getConfigSettings<T>(qpqConfig, serviceInfrastructureConfigType);
-  return setting;
-};
-
-/**
- * Retrieves the ApplicationModuleSetting from a QPQConfig array.
- * @function
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @returns {ApplicationQPQConfigSetting} - The ApplicationQPQConfigSetting from the QPQConfig array.
- * @throws {Error} - If the ApplicationQPQConfigSetting is not found in the QPQConfig array.
- */
-export const getApplicationConfigSetting = (qpqConfig: QPQConfig): ApplicationQPQConfigSetting => {
-  const applicationModuleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
-
-  if (!applicationModuleSetting) {
-    throw new Error('please use defineApplication in your QPQ config');
-  }
-
-  return applicationModuleSetting;
-};
-
-export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
-  const moduleSetting = getConfigSetting<ModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.moduleName);
-
-  if (!moduleSetting) {
-    throw new Error('please use defineModule in your QPQ config');
-  }
-
-  return moduleSetting.moduleName;
-};
-
-export const getApplicationName = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).applicationName;
-};
-
-export const getApplicationModuleFeature = (qpqConfig: QPQConfig): string | undefined => {
-  return getApplicationConfigSetting(qpqConfig).feature;
-};
+// The config walk and the application accessors live in logic/config; they are part of this
+// namespace for callers.
+export { getAllQueueConfigs, getOwnedQueueConfigs, getQueueByName, resolveQueueOrThrow } from './config/settings/queue/logic';
+export {
+  flattenQpqConfig,
+  getApplicationConfigSetting,
+  getApplicationModuleEnvironment,
+  getApplicationModuleFeature,
+  getApplicationModuleName,
+  getApplicationName,
+  getConfigSetting,
+  getConfigSettings,
+  getOwnedItems,
+} from './logic/config';
 
 export const getConfigRoot = (qpqConfig: QPQConfig): string => {
   return getApplicationConfigSetting(qpqConfig).configRoot;
-};
-
-export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).environment || DEFAULT_ENVIRONMENT;
 };
 
 export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
@@ -138,27 +95,15 @@ export const getFederatedModuleStore = (qpqConfig: QPQConfig): FederatedModuleSt
   return getConfigSetting<FederatedModuleStoreQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.federatedModuleStore);
 };
 
-export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
-  return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
-};
-
-export const getOwnedQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
-  return getOwnedItems(getQueues(configs), configs);
-};
-
 export const getNotifyErrorConfigs = (configs: QPQConfig): NotifyErrorQPQConfigSetting[] => {
   return getConfigSettings<NotifyErrorQPQConfigSetting>(configs, QPQCoreConfigSettingType.notifyError);
-};
-
-export const getQueueByName = (configs: QPQConfig, name: string): QueueQPQConfigSetting | undefined => {
-  return getQueues(configs).find((q) => q.name === name);
 };
 
 // A FIFO queue can only be fed by a FIFO event bus - standard SNS topics cannot deliver
 // to FIFO SQS queues at all. Called at deploy/startup time (the queue and bus are separate
 // settings, so defineQueue can't validate this on its own).
 export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfig): void => {
-  const invalidSubscriptions = getQueues(qpqConfig)
+  const invalidSubscriptions = getAllQueueConfigs(qpqConfig)
     .filter((queue) => queue.isFifo)
     .flatMap((queue) =>
       queue.eventBusSubscriptions
@@ -217,22 +162,6 @@ export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConf
 /** The module a setting belongs to: its declared owner, or the executing module when it declares none. */
 export const resolveOwnerModuleName = (owner: CrossModuleOwner | undefined, qpqConfig: QPQConfig): string =>
   owner?.module || getApplicationModuleName(qpqConfig);
-
-export const getOwnedItems = <T extends QPQConfigSetting>(settings: T[], qpqConfig: QPQConfig): T[] => {
-  const appModuleName = getApplicationModuleName(qpqConfig);
-  const appName = getApplicationName(qpqConfig);
-  const appFeature = getApplicationModuleFeature(qpqConfig);
-  const appEnvironment = getApplicationModuleEnvironment(qpqConfig);
-
-  return settings.filter(
-    (s) =>
-      !s.owner ||
-      ((!s.owner.module || s.owner.module === appModuleName) &&
-        (!s.owner.application || s.owner.application === appName) &&
-        (s.owner.feature === undefined || (!s.owner.feature && !appFeature) || s.owner.feature === appFeature) &&
-        (!s.owner.environment || s.owner.environment === appEnvironment)),
-  );
-};
 
 export const getAllKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
   const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(qpqConfig, QPQCoreConfigSettingType.keyValueStore);
@@ -319,9 +248,7 @@ export const getOwnedScheduleEvents = (qpqConfig: QPQConfig): ScheduleQPQConfigS
 };
 
 export const getQueueSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
-  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
-
-  return queueConfigs.reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors)], [] as QpqFunctionRuntime[]);
+  return getAllQueueConfigs(configs).reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors)], [] as QpqFunctionRuntime[]);
 };
 
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
@@ -589,7 +516,7 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
 };
 
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-  return getQueueByName(qpqConfig, name)?.qpqQueueProcessors || {};
+  return getQueueByName(name, qpqConfig)?.qpqQueueProcessors || {};
 };
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {

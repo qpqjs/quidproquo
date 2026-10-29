@@ -1,42 +1,5 @@
-import { QpqFunctionRuntime } from '../../types';
-import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
-
-export type QpqQueueProcessors = {
-  [type: string]: QpqFunctionRuntime;
-};
-
-export type QPQConfigAdvancedQueueSettings = {
-  batchSize?: number;
-  batchWindowInSeconds?: number;
-  concurrency?: number;
-  maxTries?: number;
-  ttRetryInSeconds?: number;
-  hasDeadLetterQueue?: boolean;
-  eventBusSubscriptions?: string[];
-  maxConcurrentExecutions?: number;
-  isFifo?: boolean;
-} & QPQConfigAdvancedSettings;
-
-export type QueueQPQConfigSetting = {
-  name: string;
-
-  batchSize: number;
-  batchWindowInSeconds: number;
-
-  concurrency: number;
-
-  maxTries: number;
-  ttRetryInSeconds: number;
-
-  hasDeadLetterQueue: boolean;
-  qpqQueueProcessors: QpqQueueProcessors;
-
-  eventBusSubscriptions: string[];
-
-  maxConcurrentExecutions?: number;
-
-  isFifo: boolean;
-} & QPQConfigSetting;
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { QPQConfigAdvancedQueueSettings, QpqQueueProcessors, QueueQPQConfigSetting } from './types';
 
 export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => {
   return {

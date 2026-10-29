@@ -3,6 +3,7 @@ import {
   askProcessEventWithGroupOrdering,
   DynamicModuleLoader,
   QPQConfig,
+  qpqCoreUtils,
   QpqRuntimeType,
   QueueEvent,
   QueueMessage,
@@ -11,14 +12,13 @@ import {
 import { SQSEvent } from 'aws-lambda';
 
 import { getSqsQueueEventProcessor } from '../getActionProcessor';
-import { getQueueConfigSetting } from '../getActionProcessor/core/event/sqs/queue/utils';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 const getProcessEventStory = (qpqConfig: QPQConfig, queueName: string): typeof askProcessEvent => {
   // FIFO queues must process records one group at a time, blocking a group once a record fails
-  if (getQueueConfigSetting(qpqConfig, queueName).isFifo) {
+  if (qpqCoreUtils.resolveQueueOrThrow(queueName, qpqConfig).isFifo) {
     return function* askProcessQueueEventWithGroupOrdering(...eventArguments) {
       return yield* askProcessEventWithGroupOrdering((record: QueueEvent<QueueMessage<unknown>>) => record.groupId, ...eventArguments);
     };

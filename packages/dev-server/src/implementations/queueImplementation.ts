@@ -19,7 +19,7 @@ import { ResolvedDevServerConfig } from '../types';
 // The queue setting for a message, looked up in the config of the service it targets.
 const resolveQueueConcurrencyLimit = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): number | undefined => {
   const targetConfig = qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.targetModule);
-  const queueConfig = targetConfig ? qpqCoreUtils.getQueueByName(targetConfig, payload.queueName) : undefined;
+  const queueConfig = targetConfig ? qpqCoreUtils.getQueueByName(payload.queueName, targetConfig) : undefined;
   if (!queueConfig) {
     return undefined;
   }
@@ -81,7 +81,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   });
   // All the queues that we should publish to
   const queues = qpqCoreUtils
-    .getOwnedQueues(qpqConfig)
+    .getOwnedQueueConfigs(qpqConfig)
     .filter((q) => {
       return !!q.eventBusSubscriptions.find((ebsub) => {
         return allEventBuses.some((eb) => ebsub === eb.name);

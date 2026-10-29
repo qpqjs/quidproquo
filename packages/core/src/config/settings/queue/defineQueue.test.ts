@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineQueue } from './queue';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineQueue } from './defineQueue';
 
 describe('defineQueue', () => {
   const processors = { 'Demo/Job': '/entry/queue::onJob' as const };
