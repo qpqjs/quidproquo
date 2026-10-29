@@ -6,6 +6,9 @@ import { getCognitoCreateAuthChallengeEventProcessor } from '../getActionProcess
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
+/**
+ *
+ */
 export const getCustomMessageTriggerEvent_createAuthChallenge = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<CustomMessageTriggerEvent>(
     QpqRuntimeType.AUTH_CREATE_AUTH_CHALLENGE,

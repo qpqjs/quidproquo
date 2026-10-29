@@ -1,6 +1,9 @@
 // Discriminable failures raised inside loadFederatedStory. All of them are ultimately
 // caught there and turned into a fall-back-to-bundled (with a warning) - they exist so
 // logs/backoff can tell WHY a store didn't load, not to crash the request.
+/**
+ *
+ */
 export enum FederatedModuleLoadErrorCode {
   // Store URL wasn't s3:// or file:// (a config/env mistake).
   unsupportedStoreUrl = 'unsupportedStoreUrl',
@@ -13,6 +16,9 @@ export enum FederatedModuleLoadErrorCode {
   storyNotExported = 'storyNotExported',
 }
 
+/**
+ *
+ */
 export class FederatedModuleLoadError extends Error {
   constructor(
     public readonly code: FederatedModuleLoadErrorCode,

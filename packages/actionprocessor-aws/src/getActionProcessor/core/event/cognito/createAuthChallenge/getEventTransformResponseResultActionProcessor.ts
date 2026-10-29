@@ -4,6 +4,7 @@ import {
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
+  ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -20,6 +21,9 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
 
     const [customMessageTriggerEvent] = eventParams;
     const [qpqEventRecordResponse] = qpqEventRecordResponses;
+    if (!qpqEventRecordResponse) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     // If the runtime failed for some reason, just return this out as a fail
     if (!qpqEventRecordResponse.success) {

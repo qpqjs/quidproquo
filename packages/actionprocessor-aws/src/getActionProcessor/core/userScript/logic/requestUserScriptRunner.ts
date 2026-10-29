@@ -44,6 +44,9 @@ const classifyInvokeError = (message: string, errorType: UserScriptRunnerErrorCa
   return errorType.RunnerUnavailable;
 };
 
+/**
+ *
+ */
 export type RequestUserScriptRunnerInput = {
   qpqConfig: QPQConfig;
   source: UserScriptRunnerSource;

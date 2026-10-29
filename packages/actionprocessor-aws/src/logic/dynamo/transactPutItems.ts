@@ -27,6 +27,9 @@ const TRANSACT_WRITE_MAX_ITEMS = 100;
 // names the single-item PutItem raises, so the processors' error maps key on one
 // name each. Exists wins when both appear: it is final. Every other reason
 // (throttle, validation) is rethrown untouched.
+/**
+ *
+ */
 export async function transactPutItems(tableName: string, items: KvsObjectDataType[], partitionKeyAttribute: string, region: string): Promise<void> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 

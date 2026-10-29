@@ -6,6 +6,9 @@ import { createAwsClient } from '../createAwsClient';
 import { getQpqAttributesFromCognitoUserAttributes } from './getQpqAttributesFromCognitoUserAttributes';
 import { getValidCognitoUserAttributes, pageKeyToPaginationToken, paginationTokenToPageKey } from './utils';
 
+/**
+ *
+ */
 export const listPagedUsers = async (userPoolId: string, region: string, pageKey?: string): Promise<QpqPagedData<UserAttributes>> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

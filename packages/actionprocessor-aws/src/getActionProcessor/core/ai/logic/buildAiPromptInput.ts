@@ -4,12 +4,18 @@ import type { ModelMessage } from 'ai';
 
 import { AiDriveFileResolver, toSdkMessages } from './toSdkMessages';
 
+/**
+ *
+ */
 export type AiPromptInputPayload = {
   prompt: string;
   messages?: AiMessage[];
   turnContext?: AiMessage[];
 };
 
+/**
+ *
+ */
 export type AiPromptInput = {
   /** Spread into the SDK call: `{ prompt }` or `{ messages }`, never both. */
   promptOrMessages: { prompt: string } | { messages: ModelMessage[] };

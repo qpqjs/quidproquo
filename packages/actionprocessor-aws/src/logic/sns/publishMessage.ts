@@ -5,6 +5,9 @@ import { createAwsClient } from '../createAwsClient';
 // PublishBatch accepts at most 10 entries per request (and 256 KB total payload)
 const MAX_ENTRIES_PER_BATCH = 10;
 
+/**
+ *
+ */
 export type SnsPublishMessageEntry = {
   message: string;
 

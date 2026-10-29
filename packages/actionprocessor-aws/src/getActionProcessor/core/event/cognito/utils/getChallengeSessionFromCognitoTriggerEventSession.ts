@@ -2,6 +2,9 @@ import { ChallengeResult, ChallengeSession } from '@qpqjs/core';
 
 import { DefineAuthChallengeTriggerEvent } from 'aws-lambda';
 
+/**
+ *
+ */
 export const getChallengeSessionFromCognitoTriggerEventSession = (
   session: DefineAuthChallengeTriggerEvent['request']['session'],
 ): ChallengeSession => {

@@ -6,6 +6,9 @@ import { GenerateDataKeyCommand, KMSClient } from '@aws-sdk/client-kms';
 import { createAwsClient } from '../createAwsClient';
 import { toKmsEncryptionContext } from './toKmsEncryptionContext';
 
+/**
+ *
+ */
 export const generateDataKey = async (keyAlias: string, context: CryptoContext, region: string): Promise<GeneratedDataKey> => {
   const kmsClient = createAwsClient(KMSClient, {
     region,

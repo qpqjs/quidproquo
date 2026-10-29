@@ -1,5 +1,6 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
@@ -49,12 +50,16 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
 
     const [cloudFrontRequestEvent] = eventParams;
     const [seoEventResponse] = qpqEventRecordResponses;
+    if (!seoEventResponse) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
     const successRecord = seoEventResponse.success ? seoEventResponse.result : getResponseFromErrorResult(seoEventResponse.error);
 
-    if (successRecord.fallbackToCDN) {
-      return actionResult(cloudFrontRequestEvent.Records[0].cf.request);
+    const originalRequest = cloudFrontRequestEvent.Records[0]?.cf.request;
+    if (successRecord.fallbackToCDN && originalRequest) {
+      return actionResult(originalRequest);
     }
 
     const headers = successRecord.headers || {};

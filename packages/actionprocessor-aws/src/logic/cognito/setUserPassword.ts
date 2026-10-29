@@ -6,6 +6,9 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 
+/**
+ *
+ */
 export const setUserPassword = async (region: string, userPoolId: string, username: string, password: string): Promise<void> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,

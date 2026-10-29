@@ -52,6 +52,9 @@ const buildAttachmentPart = (attachment: QPQBinaryData, boundary: string): strin
 // part per attachment. Bcc recipients are deliberately never written into the headers; they
 // travel only in the SES Destination so other recipients can't see them. boundarySeed exists
 // so tests get deterministic output.
+/**
+ *
+ */
 export const buildRawMimeMessage = (payload: EmailSendEmailActionPayload, boundarySeed: string = 'qpq'): string => {
   const mixedBoundary = `----=_${boundarySeed}_mixed`;
   const alternativeBoundary = `----=_${boundarySeed}_alternative`;

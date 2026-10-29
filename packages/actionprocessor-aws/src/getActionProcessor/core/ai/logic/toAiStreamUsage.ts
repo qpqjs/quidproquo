@@ -11,6 +11,9 @@ type SdkUsage = {
   };
 };
 
+/**
+ *
+ */
 export const toAiStreamUsage = (usage: SdkUsage): AiStreamUsage => ({
   inputTokens: usage.inputTokens,
   outputTokens: usage.outputTokens,

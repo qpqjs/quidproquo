@@ -17,6 +17,9 @@ type CachedGeneratedDataKey = {
 
 const cache = new Map<string, CachedGeneratedDataKey>();
 
+/**
+ *
+ */
 export const getCachedGeneratedDataKey = async (keyAlias: string, context: CryptoContext, region: string): Promise<GeneratedDataKey> => {
   const cacheKey = `${region}|${keyAlias}|${canonicalizeCryptoContext(context)}`;
 

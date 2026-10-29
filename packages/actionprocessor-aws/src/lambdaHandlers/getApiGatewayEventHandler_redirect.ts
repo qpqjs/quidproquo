@@ -30,4 +30,7 @@ const apiGatewayEventHandler_redirect = async (event: APIGatewayEvent, context: 
   };
 };
 
+/**
+ *
+ */
 export const getApiGatewayEventHandler_redirect = () => apiGatewayEventHandler_redirect;

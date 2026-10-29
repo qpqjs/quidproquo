@@ -71,6 +71,9 @@ export function composeScopedKvsIndexKeyCondition(scope: string, operation: KvsQ
 
 // Shallow-clone an item read from storage, stripping the scope prefix off its
 // partition key attribute so callers never see the composed form.
+/**
+ *
+ */
 export function stripScopedKvsItem<T extends Record<string, any>>(scope: string, item: T, pkAttributeName: string): T {
   const storedValue = item[pkAttributeName];
   const strippedValue = stripScopedKvsValue(scope, storedValue);

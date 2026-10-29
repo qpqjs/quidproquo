@@ -1,5 +1,8 @@
 import { stepCountIs, StopCondition, ToolSet } from 'ai';
 
+/**
+ *
+ */
 export type AiStopLimits = {
   maxSteps?: number;
   maxDurationMs?: number;

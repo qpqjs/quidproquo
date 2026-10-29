@@ -5,6 +5,9 @@ import { askConvertNeptuneNodeResultToGraphNodeResult } from './askConvertNeptun
 import { askConvertNeptuneRelationshipResultToGraphRelationshipResult } from './askConvertNeptuneRelationshipResultToGraphRelationshipResult';
 import { isNeptuneNodeResult, isNeptuneRelationshipResult, isNeptuneScalarResult } from './utils';
 
+/**
+ *
+ */
 export function* askConvertAnyNeptuneResultToAnyGraphResult(anyNeptuneResult: AnyNeptuneResult): AskResponse<AnyGraphResult> {
   if (isNeptuneScalarResult(anyNeptuneResult)) {
     return anyNeptuneResult as GraphScalarResult;

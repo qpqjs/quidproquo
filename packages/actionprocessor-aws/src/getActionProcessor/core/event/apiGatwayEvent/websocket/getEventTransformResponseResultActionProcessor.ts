@@ -14,11 +14,12 @@ import {
 
 import { EventInput, EventOutput, InternalEventRecord } from './types';
 
+/** Logs a failed websocket handler run at fatal level; the gateway is always answered with a 500. */
 export function* askTransformResponseStory({
   eventParams,
   qpqEventRecordResponses: [record],
 }: EventTransformResponseResultActionPayload<EventInput, InternalEventRecord>): AskResponse<EventOutput> {
-  if (!record.success) {
+  if (record && !record.success) {
     yield* askLogCreate(LogLevelEnum.Fatal, record.error.errorText, record.error.errorStack);
   }
 

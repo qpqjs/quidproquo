@@ -1,5 +1,8 @@
 import { AnyNeptuneResult, NeptuneRelationshipResult } from '../../types';
 
+/**
+ *
+ */
 export function isNeptuneRelationshipResult(anyNeptuneResult: AnyNeptuneResult): anyNeptuneResult is NeptuneRelationshipResult {
   return (
     typeof anyNeptuneResult === 'object' &&

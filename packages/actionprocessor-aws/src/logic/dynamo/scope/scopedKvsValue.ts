@@ -9,6 +9,9 @@ export const KVS_SCOPE_DELIMITER = `${KVS_RESERVED_MARKER}SCOPE@@`;
 
 // Compose a scope into a partition key value: `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`.
 // Callers validate both first with core's kvs scope rules; the translator does.
+/**
+ *
+ */
 export function composeScopedKvsValue(scope: string, rawValue: KvsCoreDataType): string {
   return `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`;
 }
@@ -20,6 +23,9 @@ export function composeScopedKvsValue(scope: string, rawValue: KvsCoreDataType):
 // Change data capture is the case that forced it: a stream record carries the composed pk,
 // and the consumer has to re-enter the same scope before it can act on the item. An
 // unscoped value has no delimiter and comes back with `scope: undefined`.
+/**
+ *
+ */
 export const decomposeScopedKvsValue = (composedValue: string): { scope?: string; rawValue: string } => {
   const at = composedValue.indexOf(KVS_SCOPE_DELIMITER);
 
@@ -36,6 +42,9 @@ export const decomposeScopedKvsValue = (composedValue: string): { scope?: string
 // Undo composeScopedKvsValue on a value read back from storage, so callers
 // never see the composed form. A stored value that doesn't carry the expected
 // prefix is returned unchanged (it was written unscoped).
+/**
+ *
+ */
 export function stripScopedKvsValue(scope: string, storedValue: KvsCoreDataType): KvsCoreDataType {
   if (typeof storedValue !== 'string') {
     return storedValue;
@@ -47,6 +56,9 @@ export function stripScopedKvsValue(scope: string, storedValue: KvsCoreDataType)
 
 // The inverse guard for UNSCOPED Scan / GetAll: exclude rows whose pk carries the
 // scope delimiter, so unscoped listings never leak other scopes' (composed) rows.
+/**
+ *
+ */
 export function buildKvsScopeExclusionCondition(pkAttributeName: string): KvsQueryCondition {
   return {
     key: pkAttributeName,
@@ -57,6 +69,9 @@ export function buildKvsScopeExclusionCondition(pkAttributeName: string): KvsQue
 
 // A begins-with predicate on the partition key attribute, for enforcing scope
 // on operations that have no key condition (Scan / GetAll).
+/**
+ *
+ */
 export function buildKvsScopeBeginsWithCondition(pkAttributeName: string, scope: string): KvsQueryCondition {
   return {
     key: pkAttributeName,

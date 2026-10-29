@@ -3,6 +3,9 @@ import { HeadObjectCommand } from '@aws-sdk/client-s3';
 
 import { createAwsClient } from '../createAwsClient';
 
+/**
+ *
+ */
 export const objectExists = async (bucketName: string, key: string, region: string): Promise<boolean> => {
   const s3Client = createAwsClient(S3Client, { region });
 

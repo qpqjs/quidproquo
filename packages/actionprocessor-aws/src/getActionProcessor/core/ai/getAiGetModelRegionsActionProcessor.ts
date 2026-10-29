@@ -22,6 +22,9 @@ const processAiGetModelRegions: ProcessorFor<typeof askAiGetModelRegions> = asyn
   return actionResult(regions);
 };
 
+/**
+ *
+ */
 export const getAiGetModelRegionsActionProcessor: ActionProcessorListResolver = async (): Promise<ActionProcessorList> => ({
   [AiActionType.GetModelRegions]: processAiGetModelRegions,
 });

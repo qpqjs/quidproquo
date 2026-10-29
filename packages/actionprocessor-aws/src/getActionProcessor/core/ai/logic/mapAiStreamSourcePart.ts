@@ -2,6 +2,9 @@ import { AiStreamPartType, AiStreamSourcePart } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 
+/**
+ *
+ */
 export const mapAiStreamSourcePart = (part: AiSdkStreamPartOfType<'source'>): AiStreamSourcePart => ({
   type: AiStreamPartType.Source,
   source: {

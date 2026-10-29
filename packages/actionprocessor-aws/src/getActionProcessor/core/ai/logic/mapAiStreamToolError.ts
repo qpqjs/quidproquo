@@ -3,6 +3,9 @@ import { AiStreamPartType, AiStreamToolError } from '@qpqjs/core';
 import { AiSdkStreamPartOfType } from '../types';
 import { toErrorMessage } from './toErrorMessage';
 
+/**
+ *
+ */
 export const mapAiStreamToolError = (part: AiSdkStreamPartOfType<'tool-error'>): AiStreamToolError => ({
   type: AiStreamPartType.ToolError,
   toolCallId: part.toolCallId,

@@ -8,6 +8,9 @@ import { decodeValidJwt } from './decodeValidJwt';
 // decodeValidJwt returns null rather than throwing, so this throw is the
 // discriminable signal callers (e.g. the SetAccessToken processor) catch to
 // produce an Unauthorized result.
+/**
+ *
+ */
 export class InvalidAccessTokenError extends Error {
   readonly code = 'INVALID_ACCESS_TOKEN';
 

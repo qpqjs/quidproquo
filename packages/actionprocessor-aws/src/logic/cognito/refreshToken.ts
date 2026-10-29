@@ -12,6 +12,9 @@ import { calculateSecretHash } from './utils/calculateSecretHash';
 import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
+/**
+ *
+ */
 export const refreshToken = async (
   userPoolId: string,
   clientId: string,

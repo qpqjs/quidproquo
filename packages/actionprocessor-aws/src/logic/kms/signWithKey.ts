@@ -6,6 +6,9 @@ import { createAwsClient } from '../createAwsClient';
 
 // One kms:Sign per call: the private key never leaves KMS, so there is nothing
 // to cache here. Returns the raw signature bytes.
+/**
+ *
+ */
 export const signWithKey = async (keyAlias: string, message: string, region: string): Promise<Buffer> => {
   const kmsClient = createAwsClient(KMSClient, {
     region,

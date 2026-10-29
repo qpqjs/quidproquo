@@ -1,5 +1,6 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   DynamicModuleLoader,
@@ -78,6 +79,9 @@ const getProcessTransformResponseResult = async (
 
     const [apiGatewayEvent] = eventParams;
     const [record] = qpqEventRecordResponses;
+    if (!record) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     let successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
 

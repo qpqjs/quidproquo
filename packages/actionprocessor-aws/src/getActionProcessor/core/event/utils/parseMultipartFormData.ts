@@ -23,6 +23,9 @@ type MultipartRequest = {
   files: MultipartFile[];
 };
 
+/**
+ *
+ */
 export class FileUploadValidationError extends Error {
   constructor(
     public readonly errorType: FileUploadErrorTypeEnum,
@@ -34,6 +37,9 @@ export class FileUploadValidationError extends Error {
 }
 
 // Reduce a client-supplied filename to a bare, path-traversal-safe name.
+/**
+ *
+ */
 export const sanitizeFilename = (filename?: string): string => {
   const baseName = (filename || '')
     .split(/[/\\]/)
@@ -66,6 +72,9 @@ const isMimeTypeAllowed = (mimeType: string, allowedMimeTypes?: string[]): boole
   });
 };
 
+/**
+ *
+ */
 export const parseMultipartFormData = (event: APIGatewayEvent, fileUploadSettings: FileUploadSettings): Promise<QPQBinaryData[]> =>
   new Promise((resolve, reject) => {
     const busboy = Busboy({

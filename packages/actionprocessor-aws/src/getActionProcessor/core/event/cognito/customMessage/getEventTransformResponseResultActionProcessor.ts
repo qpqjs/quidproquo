@@ -1,4 +1,13 @@
-import { actionResult, askEventTransformResponseResultBase, createActionProcessor, EitherActionResult, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  askEventTransformResponseResultBase,
+  createActionProcessor,
+  EitherActionResult,
+  ErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
+} from '@qpqjs/core';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 
@@ -12,6 +21,9 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
 
     const [customMessageTriggerEvent] = eventParams;
     const [emailSendEventResponse] = qpqEventRecordResponses;
+    if (!emailSendEventResponse) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     if (emailSendEventResponse.success) {
       const updatedEvent: EventOutput = {

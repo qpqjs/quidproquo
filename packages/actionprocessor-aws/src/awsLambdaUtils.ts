@@ -4,6 +4,9 @@ import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webser
 import { match } from 'node-match-path';
 import { StorageClass } from '@aws-sdk/client-s3';
 
+/**
+ *
+ */
 export type UrlMatch = {
   didMatch: boolean;
   params: Nullable<Record<string, string>>;
@@ -40,6 +43,9 @@ export const matchRoutePath = (path: string, url: string): UrlMatch => {
   }
 };
 
+/**
+ *
+ */
 export type FoundApiRoute = {
   route: RouteQPQWebServerConfigSetting;
   match: UrlMatch;

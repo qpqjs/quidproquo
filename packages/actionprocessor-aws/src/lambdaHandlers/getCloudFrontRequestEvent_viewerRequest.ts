@@ -8,7 +8,10 @@ const botUserAgentPattern =
   /googlebot|bingbot|yandex|baiduspider|facebookexternalhit|twitterbot|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest\/0\.|pinterestbot|slackbot|vkShare|W3C_Validator|whatsapp|redditbot|applebot|flipboard|tumblr|bitlybot|skypeuripreview|nuzzel|discordbot|google page speed|qwantify|bitrix link preview|xing-contenttabreceiver|google-inspectiontool|chrome-lighthouse|telegrambot/i;
 
 const viewerRequestEventHandler = async (event: CloudFrontRequestEvent, context: Context) => {
-  const request = event.Records[0].cf.request;
+  const request = event.Records[0]?.cf.request;
+  if (!request) {
+    throw new Error('CloudFront viewer request event carried no record');
+  }
   const headers = request.headers || {};
 
   const userAgent = headers['user-agent']?.[0]?.value || 'unknown';
@@ -28,4 +31,7 @@ const viewerRequestEventHandler = async (event: CloudFrontRequestEvent, context:
   };
 };
 
+/**
+ *
+ */
 export const getCloudFrontRequestEvent_viewerRequest = () => viewerRequestEventHandler;

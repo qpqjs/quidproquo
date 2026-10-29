@@ -8,6 +8,9 @@ import { stringToLastEvaluatedKey } from './utils/stringToLastEvaluatedKey';
 import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 import { buildDynamoQueryExpression, buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
+/**
+ *
+ */
 export async function query<Item>(
   tableName: string,
   region: string,

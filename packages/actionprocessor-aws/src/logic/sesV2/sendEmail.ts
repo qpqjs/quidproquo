@@ -26,6 +26,9 @@ const getEmailContent = (payload: EmailSendEmailActionPayload): EmailContent => 
   };
 };
 
+/**
+ *
+ */
 export const sendEmail = async (payload: EmailSendEmailActionPayload, region: string): Promise<string> => {
   const sesClient = createAwsClient(SESv2Client, { region });
 

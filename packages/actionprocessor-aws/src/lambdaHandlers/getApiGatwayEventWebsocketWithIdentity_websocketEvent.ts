@@ -14,6 +14,9 @@ type ApiGatwayEventWebsocketWithIdentity = APIGatewayProxyWebsocketEventV2WithRe
   }
 >;
 
+/**
+ *
+ */
 export const getApiGatwayEventWebsocketWithIdentity_websocketEvent = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<ApiGatwayEventWebsocketWithIdentity>(
     QpqRuntimeType.WEBSOCKET_EVENT,

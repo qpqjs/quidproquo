@@ -3,6 +3,9 @@ import type { PrepareStepFunction, ToolSet } from 'ai';
 import { BedrockCacheSettings } from '../types';
 import { toCacheableMessages } from './toCacheableMessages';
 
+/**
+ *
+ */
 export type CachePrepareStepOptions = BedrockCacheSettings & {
   /** How many leading messages are the saved conversation; the turn context follows them. */
   durableCount: number;

@@ -2,6 +2,9 @@ import { createActionRequester } from '@qpqjs/core';
 
 import { GraphDatabaseForNeptuneActionType } from './GraphDatabaseForNeptuneActionType';
 
+/**
+ *
+ */
 export type GraphDatabaseEndpoints = {
   readEndpoint?: string;
   writeEndpoint?: string;

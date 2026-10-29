@@ -13,6 +13,9 @@ type CachedUnwrappedDataKey = {
 
 const cache = new Map<string, CachedUnwrappedDataKey>();
 
+/**
+ *
+ */
 export const getCachedUnwrappedDataKey = async (wrappedKey: Buffer, context: CryptoContext, region: string): Promise<Buffer> => {
   const cacheKey = `${region}|${canonicalizeCryptoContext(context)}|${wrappedKey.toString('base64')}`;
 

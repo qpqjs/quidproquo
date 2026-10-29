@@ -5,6 +5,9 @@ import type { ModelMessage } from 'ai';
 import { BedrockCachePointRole, BedrockCacheSettings } from '../types';
 import { toBedrockCachePoint } from './toBedrockCachePoint';
 
+/**
+ *
+ */
 export type CacheableMessagesOptions = BedrockCacheSettings & {
   /** How many leading messages are the saved conversation. Defaults to all of them. */
   durableCount?: number;

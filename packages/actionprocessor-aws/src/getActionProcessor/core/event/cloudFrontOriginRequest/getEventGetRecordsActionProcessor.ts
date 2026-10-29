@@ -17,7 +17,7 @@ const getProcessGetRecords = async (qpqConfig: QPQConfig, loader: DynamicModuleL
       const headers: Record<string, string> = Object.keys(cfRecordRequest.headers).reduce(
         (acc, header) => ({
           ...acc,
-          [header]: cfRecordRequest.headers[header][0].value,
+          [header]: cfRecordRequest.headers[header]?.[0]?.value ?? '',
         }),
         {},
       );

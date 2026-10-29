@@ -6,6 +6,9 @@ import { getCognitoVerifyAuthChallengeEventProcessor } from '../getActionProcess
 import { getBlankStorySession } from './helpers/getBlankStorySession';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
+/**
+ *
+ */
 export const getCustomMessageTriggerEvent_verifyAuthChallenge = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<VerifyAuthChallengeResponseTriggerEvent>(
     QpqRuntimeType.AUTH_VERIFY_AUTH_CHALLENGE,

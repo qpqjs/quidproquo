@@ -13,6 +13,9 @@ import { askConvertNeptuneCypherResponseToCypherResponse } from './converters/as
 import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
 import { convertQpqQueryToNeptune } from './utils';
 
+/**
+ *
+ */
 export function* askRunNeptuneOpenCypherQuery({
   graphDatabaseName,
   openCypherQuery,

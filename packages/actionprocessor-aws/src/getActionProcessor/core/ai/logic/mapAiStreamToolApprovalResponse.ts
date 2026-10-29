@@ -2,6 +2,9 @@ import { AiStreamPartType, AiStreamToolApprovalResponse } from '@qpqjs/core';
 
 import { AiSdkStreamPartOfType } from '../types';
 
+/**
+ *
+ */
 export const mapAiStreamToolApprovalResponse = (part: AiSdkStreamPartOfType<'tool-approval-response'>): AiStreamToolApprovalResponse => ({
   type: AiStreamPartType.ToolApprovalResponse,
   approvalId: part.approvalId,

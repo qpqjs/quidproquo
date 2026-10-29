@@ -64,6 +64,9 @@ let inflightResolve: Promise<StoreState> | undefined;
 let hostInitialised = false;
 
 // Test seam - forces the next call to re-resolve the store from env.
+/**
+ *
+ */
 export const resetFederatedModuleStoreCache = (): void => {
   resolvedState = undefined;
   recheckAfter = 0;
@@ -308,6 +311,9 @@ const resolveStore = (qpqConfig: QPQConfig, storeUrl: string): Promise<StoreStat
 // Called by dynamicModuleLoader for every story load. Returns the story function, or
 // undefined to signal "use the bundled module" (no store, nothing published, runtime
 // not exposed, or any error - availability always wins over federation).
+/**
+ *
+ */
 export const loadFederatedStory = async <T = unknown>(qpqConfig: QPQConfig, qpqFunctionRuntime: QpqFunctionRuntime): Promise<T | undefined> => {
   const storeUrl = process.env.federatedCodeStoreUrl;
   if (!storeUrl) {

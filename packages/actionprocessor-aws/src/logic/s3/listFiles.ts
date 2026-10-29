@@ -4,12 +4,18 @@ import { ListObjectsV2Command, ListObjectsV2CommandInput, S3Client } from '@aws-
 
 import { createAwsClient } from '../createAwsClient';
 
+/**
+ *
+ */
 export type S3FileInfo = {
   filepath: string;
   isDir: boolean;
   hashMd5?: string;
 };
 
+/**
+ *
+ */
 export type S3FileList = {
   fileInfos: S3FileInfo[];
   pageToken?: string;

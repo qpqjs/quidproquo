@@ -31,6 +31,9 @@ const buildSubFilter = (sub: string): string => {
   }
 };
 
+/**
+ *
+ */
 export const getUserAttributesBySub = async (userPoolId: string, region: string, sub: string): Promise<UserAttributes> => {
   const filter = buildSubFilter(sub);
 
