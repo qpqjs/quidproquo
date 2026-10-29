@@ -14,18 +14,19 @@ const consoleAllowed = [
   '**/resolveStoryWithLogs*',
 ];
 
-// Rules switched on by the code standards (H1). They warn until every package has had
-// its autofix pass; a later change flips them to errors.
+// Rules switched on by the code standards (H1). A rule is an error once every package is
+// clean under it; the rest warn until their cleanup lines land (B9 for no-console, G5 for
+// interface-to-type).
 export const overrides = [
   {
     linterOptions: {
-      reportUnusedDisableDirectives: 'warn',
+      reportUnusedDisableDirectives: 'error',
     },
     rules: {
       // C1 allows a generator that never yields (a story that only composes or returns), so
       // the stock rule stays off; qpq/require-yield-star covers the real mistake.
       'require-yield': 'off',
-      'prefer-const': 'warn',
+      'prefer-const': 'error',
       'no-console': 'warn',
       // Arguments are not checked: processor factories take `qpqConfig` by contract (B1) whether
       // or not a given processor reads it.

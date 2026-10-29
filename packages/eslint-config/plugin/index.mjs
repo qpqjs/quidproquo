@@ -26,7 +26,7 @@ plugin.configs = {
     rules: {
       'qpq/require-yield-star': 'error',
       'qpq/ask-prefix-generator-only': 'error',
-      'qpq/no-history-comments': 'warn',
+      'qpq/no-history-comments': 'error',
       'qpq/one-export-per-file': 'warn',
       'qpq/filename-matches-export': 'warn',
     },

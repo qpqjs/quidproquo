@@ -1,5 +1,5 @@
-// Comments describe the code as it is now (G7): no em dashes, and no narrating what the
-// code used to do. Git holds the history.
+// Comments describe the code as it is now (G7): no em dashes, and no narrating the code's
+// past. Git holds the history.
 const EM_DASH = /—/;
 // The narrative past tense only, not the passive "a value used to derive the key". "No longer" is
 // left alone: it is mostly present-tense logic ("a code the catalog no longer names").
