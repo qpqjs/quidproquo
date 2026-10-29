@@ -1,8 +1,8 @@
 import {
+  askDynamicFunctionExecute,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   KeyValueStoreActionType,
   KvsLogicalOperator,
   KvsQueryCondition,
@@ -204,7 +204,7 @@ describe('render route', () => {
             ? { items: storedEvents, nextPageKey: undefined }
             : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
-          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
           `Dynamic functions not found: [${FUNCTIONS_NAME}]`,
         ),
       });
@@ -223,7 +223,7 @@ describe('render route', () => {
             ? { items: storedEvents, nextPageKey: undefined }
             : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
-          DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
+          askDynamicFunctionExecute.errorType.ModuleLoadFailed,
           `Unable to dynamically load dynamic functions: [${FUNCTIONS_NAME}]`,
         ),
       });

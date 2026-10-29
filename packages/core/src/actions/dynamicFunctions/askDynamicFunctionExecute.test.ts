@@ -3,7 +3,7 @@ import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/test
 import { describe, expect, it } from 'vitest';
 
 import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
-import { DynamicFunctionsExecuteErrorTypeEnum } from './askDynamicFunctionExecute';
+import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
 import { DynamicFunctionsActionType } from './DynamicFunctionsActionType';
 
 describe('askDynamicFunctionExecute', () => {
@@ -31,14 +31,14 @@ describe('askDynamicFunctionExecute', () => {
     const runFailingStory = () =>
       runStory(askDynamicFunctionExecute('missingFunctions', 'anyMember'), {
         [DynamicFunctionsActionType.Execute]: throwsError(
-          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
           'Dynamic functions not found: [missingFunctions]',
         ),
       });
 
     expect(runFailingStory).toThrow(StoryError);
     expect(runFailingStory).toThrow(
-      `${DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound}: Dynamic functions not found: [missingFunctions]`,
+      `${askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound}: Dynamic functions not found: [missingFunctions]`,
     );
   });
 });

@@ -6,7 +6,6 @@ import {
   createActionProcessor,
   createNestedRuntime,
   DynamicFunctionsExecuteActionPayload,
-  DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
   generateUuid,
   getDateNow,
@@ -40,7 +39,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (!dynamicFunctionsSetting) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+        askDynamicFunctionExecuteBase.errorType.DynamicFunctionsNotFound,
         `Dynamic functions not found: [${payload.dynamicFunctionsName}]`,
       );
     }
@@ -49,7 +48,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (!functionsObject) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
+        askDynamicFunctionExecuteBase.errorType.ModuleLoadFailed,
         `Unable to dynamically load dynamic functions: [${payload.dynamicFunctionsName}]`,
       );
     }
@@ -61,7 +60,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (typeof member !== 'function') {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound,
+        askDynamicFunctionExecuteBase.errorType.FunctionNotFound,
         `Function not found: [${payload.dynamicFunctionsName}.${payload.functionName}]`,
       );
     }
@@ -71,7 +70,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
       invocationResult = member(...payload.args);
     } catch (error) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew,
+        askDynamicFunctionExecuteBase.errorType.FunctionThrew,
         `[${payload.dynamicFunctionsName}.${payload.functionName}] threw: ${getErrorMessage(error)}`,
       );
     }
@@ -102,7 +101,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
       return actionResult<R>((await invocationResult) as R);
     } catch (error) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew,
+        askDynamicFunctionExecuteBase.errorType.FunctionThrew,
         `[${payload.dynamicFunctionsName}.${payload.functionName}] threw: ${getErrorMessage(error)}`,
       );
     }

@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   FileActionType,
   GuidActionType,
   InlineFunctionActionType,
@@ -94,7 +94,7 @@ const buildMocks = (resolvedScope: string | null) => {
     // No functions object registered for this collection: the append's pre-write gate
     // and any state read fall back exactly as an unregistered collection does.
     [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
       'Dynamic functions not found (test collection registers none)',
     ),
 

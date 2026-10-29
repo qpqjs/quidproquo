@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   ErrorTypeEnum,
   FileActionType,
   GuidActionType,
@@ -205,7 +205,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
     [DynamicFunctionsActionType.Execute]: (action: { payload: { dynamicFunctionsName: string; functionName: string; args: [EventDocEvent[]] } }) => {
       if (!REGISTERED_FUNCTIONS.has(action.payload.dynamicFunctionsName)) {
         return throwsError(
-          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
           `Dynamic functions not found: [${action.payload.dynamicFunctionsName}]`,
         );
       }

@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
@@ -104,7 +104,7 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
     // No functions object registered for this collection: the hook-state derivation
     // falls back to the reserved base fold (see askEventDocHookStates).
     [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
       'Dynamic functions not found: [test-tenants#tenant#eventDocFunctions]',
     ),
 

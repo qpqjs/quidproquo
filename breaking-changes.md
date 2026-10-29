@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `DynamicFunctionsExecuteErrorTypeEnum` is gone (A5): the four entries live on `askDynamicFunctionExecute.errorType` (`DynamicFunctionsNotFound`, `ModuleLoadFailed`, `FunctionNotFound`, `FunctionThrew`) and the values are now action-scoped strings.
 - `askGraphDatabaseExecuteOpenCypherQuery` carries an error catalog (A5): a missing database definition, a missing read or write endpoint and a query the database rejects answer `GraphDatabaseNotFound`, `EndpointNotFound` and `QueryFailed` on its `errorType` instead of `GenericError`.
 - `askStreamRead` carries an error catalog (A5): reading an unknown or closed stream answers `askStreamRead.errorType.StreamNotFound` and a producer failure `askStreamRead.errorType.StreamFailed` (both were a thrown `GenericError` before).
 - `askExecuteStory` (NotFound: the runtime could not be loaded) and `askTraceStory` (BadRequest, NotFound) now carry error catalogs (A5); their processors return the action-scoped values instead of the bare `ErrorTypeEnum` ones.

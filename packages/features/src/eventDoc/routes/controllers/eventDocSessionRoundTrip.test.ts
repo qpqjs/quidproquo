@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   GuidActionType,
   KeyValueStoreActionType,
   KvsLogicalOperator,
@@ -86,7 +86,7 @@ const buildMocks = ({ serverEventTypes }: SessionMocks = {}) => {
   // state read fall back exactly as an unregistered collection does. With it, only the client gate's
   // member answers; everything else still reads as unregistered.
   const functionsMissing = throwsError(
-    DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+    askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
     'Dynamic functions not found (test collection registers none)',
   );
 

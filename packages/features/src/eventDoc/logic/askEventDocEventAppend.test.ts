@@ -1,8 +1,8 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpdateBase,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   ErrorTypeEnum,
   GuidActionType,
   InlineFunctionActionType,
@@ -146,7 +146,7 @@ const buildHarness = (options: Harness = {}) => {
       sequence.push(`fn:${action.payload.functionName}`);
       if (action.payload.functionName === 'getServerEventTypes') {
         return options.serverEventTypes === undefined
-          ? throwsError(DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound, 'no definition registered')
+          ? throwsError(askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound, 'no definition registered')
           : options.serverEventTypes;
       }
       if (action.payload.functionName === 'getSnapshotCacheKey') {

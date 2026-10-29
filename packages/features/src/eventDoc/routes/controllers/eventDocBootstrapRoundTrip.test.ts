@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   FileActionType,
   GuidActionType,
   KeyValueStoreActionType,
@@ -86,7 +86,7 @@ const buildMocks = () => {
     // No functions object registered for this collection: the append's pre-write gate
     // and any state read fall back exactly as an unregistered collection does.
     [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
       'Dynamic functions not found (test collection registers none)',
     ),
 
@@ -286,7 +286,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: { functionName: string } }) =>
       action.payload.functionName === 'getSnapshotCacheKey'
         ? 'k2'
-        : throwsError(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound, 'only getSnapshotCacheKey is registered');
+        : throwsError(askDynamicFunctionExecute.errorType.FunctionNotFound, 'only getSnapshotCacheKey is registered');
 
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
     const snapshotAt = eventIdOf(fullLog[2]);
