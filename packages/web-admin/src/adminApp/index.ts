@@ -7,7 +7,7 @@ export * from './adminSessionFoldReducer';
 export * from './AdminSessionState';
 export * from './components';
 export * from './constants';
-export * from './contexts';
+export * from './context';
 export * from './effects';
 export * from './hooks';
 export * from './logic';

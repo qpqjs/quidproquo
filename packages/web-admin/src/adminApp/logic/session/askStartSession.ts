@@ -1,9 +1,9 @@
-import { askContextRead, askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
 import { askQueryParamsGetAll } from '@qpqjs/web';
 
 import { askUISessionLogDocCreated } from '../../actionCreators/sessionLog/askUISessionLogDocCreated';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { adminUserContext } from '../../contexts/adminUserContext';
+import { askAdminUserRead } from '../../context';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { CorrelationOpenedData } from '../../effects/session/CorrelationOpenedEvent';
 import { SessionStartedData } from '../../effects/session/SessionStartedEvent';
@@ -16,7 +16,7 @@ import { askSessionApiListAllEvents } from './askSessionApiListAllEvents';
 // local log with its acked events (INIT_STATE), then record sessionStarted with
 // whatever the URL deep-linked to.
 export function* askStartSession(): AskResponse<void> {
-  const { username } = yield* askContextRead(adminUserContext);
+  const { username } = yield* askAdminUserRead();
 
   const queryParams = yield* askQueryParamsGetAll();
   const seededParams = seededParamsFromQueryParams(queryParams);

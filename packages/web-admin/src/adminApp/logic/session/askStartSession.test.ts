@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
-import { adminUserContext } from '../../contexts/adminUserContext';
+import { adminUserContext } from '../../context';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { makeInitStateEvent } from '../../testHelpers/makeSessionEvent';
 import { askStartSession } from './askStartSession';

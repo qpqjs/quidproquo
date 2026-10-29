@@ -3,7 +3,8 @@ import { authContext, QpqContextProvider, QpqRuntimeEffectCatcher } from '@qpqjs
 import { ReactNode, useContext } from 'react';
 
 import { adminAppRuntime } from '../../adminAppRuntime';
-import { AdminUserContext, adminUserContext } from '../../contexts/adminUserContext';
+import { adminUserContext } from '../../context';
+import { AdminUserContext } from '../../types/AdminUserContext';
 
 type AdminAppProviderProps = {
   children?: ReactNode;
