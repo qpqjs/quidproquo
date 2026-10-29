@@ -2,7 +2,7 @@ import { buildStoryResult } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { actionResult } from './logic/actionLogic';
+import { actionResult } from './logic/actionResult';
 import { AskResponse, QpqRuntimeType, StoryResult } from './types/StorySession';
 import { createDebugLogActionProcessor, qpqExecuteLog } from './qpqExecuteLog';
 

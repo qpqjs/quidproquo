@@ -2,7 +2,7 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult } from '../logic/actionLogic';
+import { actionResult } from '../logic/actionResult';
 import { DynamicModuleLoader } from '../types/DynamicModuleLoader';
 import { QpqFunctionRuntimeAdvanced } from '../types/QpqFunctionRuntime';
 import { loadRuntimeActionProcessors } from './loadRuntimeActionProcessors';

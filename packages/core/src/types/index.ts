@@ -33,5 +33,6 @@ export * from './Readonlyify';
 export * from './ScheduledEvent';
 export * from './StorySession';
 export * from './StreamRegistry';
+export * from './TextFileType';
 export * from './UnboundLogicStory';
 export * from './UnionToIntersection';

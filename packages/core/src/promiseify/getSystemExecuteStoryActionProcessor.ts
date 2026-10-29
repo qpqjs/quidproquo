@@ -1,6 +1,6 @@
 import { askExecuteStoryBase } from '../actions';
 import { QPQConfig } from '../config';
-import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { createActionProcessor } from '../logic/actions';
 import { processAction } from '../runtime';
 import { askRunParallel } from '../stories';

@@ -2,7 +2,7 @@ import { buildStoryResult } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, StoryResult } from '../types/StorySession';
 import { storyResultToActionResult } from './storyResultToActionResult';

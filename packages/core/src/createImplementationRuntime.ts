@@ -1,4 +1,4 @@
-import { actionResult, actionResultError } from './logic/actionLogic';
+import { actionResult, actionResultError } from './logic/actionResult';
 import { Nullable } from './types/Nullable';
 import { QPQConfig } from './config';
 import { createNestedRuntime, createRuntime } from './runtime';

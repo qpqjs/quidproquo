@@ -1,5 +1,5 @@
 import { askBatch, askThrowError, SystemActionType, SystemBatchActionPayload } from '../../actions';
-import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
+import { getSuccessfulEitherActionResult } from '../../logic/actionResult';
 import { Action, AskResponse, AskResponseReturnType, EitherActionResult } from '../../types';
 import { askMapParallel } from '../array/askMapParallel';
 import { askCatch } from './askCatch';

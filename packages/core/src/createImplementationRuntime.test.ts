@@ -10,7 +10,7 @@ import {
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
+import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionResult';
 import { AskResponse, QpqRuntimeType } from './types/StorySession';
 import { createImplementationRuntime, getProcessCustomImplementation } from './createImplementationRuntime';
 

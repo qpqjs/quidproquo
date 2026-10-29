@@ -2,7 +2,8 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askCreateTextQpqBinaryData, TextFileType } from './askCreateBinaryData';
+import { TextFileType } from '../../types';
+import { askCreateTextQpqBinaryData } from './askCreateTextQpqBinaryData';
 
 describe('askCreateTextQpqBinaryData', () => {
   it('base64-encodes the text and maps the file type to a mimetype', () => {

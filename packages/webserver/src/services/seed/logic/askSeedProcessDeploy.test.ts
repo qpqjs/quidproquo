@@ -3,26 +3,7 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askProcessOnDeployCreate, askSeedProcessDeploy } from './onDeployLogic';
-
-describe('askProcessOnDeployCreate', () => {
-  it('queues a run message for every seed', () => {
-    const messages: any[] = [];
-
-    runStory(askProcessOnDeployCreate(), {
-      [ConfigActionType.GetGlobal]: ['seed/a::run', 'seed/b::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
-        messages.push(action.payload);
-        return undefined;
-      },
-    });
-
-    expect(messages).toEqual([
-      { queueName: 'qpqSeeds', queueMessages: [{ type: 'seed/a::run', payload: undefined }] },
-      { queueName: 'qpqSeeds', queueMessages: [{ type: 'seed/b::run', payload: undefined }] },
-    ]);
-  });
-});
+import { askSeedProcessDeploy } from './askSeedProcessDeploy';
 
 describe('askSeedProcessDeploy', () => {
   it('runs the create path on a create status', () => {

@@ -1,4 +1,4 @@
-import { actionResultError } from '../logic/actionLogic';
+import { actionResultError } from '../logic/actionResult';
 import { DynamicModuleLoader, QpqLogger, StorySession, StreamRegistry } from '../types';
 import { Action, ActionProcessorList, ActionProcessorResult } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';

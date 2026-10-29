@@ -3,7 +3,7 @@ import { buildActionProcessorResolver, buildTestStorySession, createStubLogger, 
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult, actionResultError } from '../logic/actionLogic';
+import { actionResult, actionResultError } from '../logic/actionResult';
 import { Action } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { AskResponse, QpqRuntimeType } from '../types/StorySession';

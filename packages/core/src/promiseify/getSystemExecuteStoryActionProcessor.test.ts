@@ -4,7 +4,7 @@ import { buildActionProcessorList, buildTestStorySession, createStubLogger, noop
 import { describe, expect, it } from 'vitest';
 
 import { askExecuteStoryBase, SystemActionType } from '../actions';
-import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { AskResponse } from '../types/StorySession';
 import { getRun, getSystemExecuteStoryActionProcessor, qpqPromisify, QpqPromisifyActionError } from './getSystemExecuteStoryActionProcessor';

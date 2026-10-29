@@ -1,5 +1,5 @@
 import { QPQConfig } from '../config';
-import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { createStreamRegistry } from '../logic/stream';
 import { getApplicationModuleName } from '../qpqCoreUtils';
 import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';

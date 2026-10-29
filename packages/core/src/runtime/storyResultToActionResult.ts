@@ -1,4 +1,4 @@
-import { actionResult, actionResultError } from '../logic/actionLogic';
+import { actionResult, actionResultError } from '../logic/actionResult';
 import { ActionProcessorResult } from '../types/Action';
 import { StoryResult } from '../types/StorySession';
 

@@ -2,7 +2,7 @@ import { buildActionProcessorList, buildTestStorySession, createStubLogger, noop
 
 import { describe, expect, it } from 'vitest';
 
-import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { StorySession } from '../types/StorySession';
 import { processAction } from './processAction';

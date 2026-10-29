@@ -8,7 +8,7 @@ import {
   askEventTransformResponseResult,
 } from '../actions';
 import { askExecuteStory } from '../actions/system';
-import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionLogic';
+import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionResult';
 import { AskResponse, EitherActionResult, ErrorTypeEnum, LogLevelEnum } from '../types';
 import { askCatch } from './system/askCatch';
 import { askMapParallel } from './array';

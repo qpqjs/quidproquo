@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { composePersonalScope, composeTenantScope, getTenantIdFromScope, parseStorageScope, StorageScopeType } from './storageScope';
-import { toTenantId } from './toTenantId';
+import { toTenantId } from '../toTenantId';
+import { composePersonalScope, composeTenantScope, getTenantIdFromScope, parseStorageScope, StorageScopeType } from './index';
 
 const tenantA = toTenantId('tenant-a');
 

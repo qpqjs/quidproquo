@@ -1,4 +1,4 @@
-export * from './actionLogic';
+export * from './actionResult';
 export * from './actions';
 export * from './actionValidators';
 export * from './context';

@@ -1,17 +1,4 @@
-import { AskResponse, QPQBinaryData } from '../../types';
-
-export enum TextFileType {
-  Json = 'Json',
-  Xml = 'Xml',
-  PlainText = 'PlainText',
-  Html = 'Html',
-  Css = 'Css',
-  JavaScript = 'JavaScript',
-  Csv = 'Csv',
-  Markdown = 'Markdown',
-  Yaml = 'Yaml',
-  Rtf = 'Rtf',
-}
+import { AskResponse, QPQBinaryData, TextFileType } from '../../types';
 
 const TextFileTypeMimeTypeMap: { [key in TextFileType]: string } = {
   [TextFileType.Json]: 'application/json',

@@ -10,7 +10,7 @@ import {
 
 import { describe, expect, it } from 'vitest';
 
-import { actionResult } from '../logic/actionLogic';
+import { actionResult } from '../logic/actionResult';
 import { createStreamRegistry } from '../logic/stream';
 import { Action, ActionProcessor, DecodedAccessToken, StreamRegistry } from '../types';
 import { AskResponse, QpqRuntimeType, StorySession } from '../types/StorySession';
