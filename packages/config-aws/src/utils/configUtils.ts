@@ -21,6 +21,7 @@ import {
   EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
+import { resolveDeploymentFromConfig } from '../naming/resolveDeploymentFromConfig';
 import { withFeatureSuffix } from '../naming/withFeatureSuffix';
 import { LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
@@ -124,7 +125,7 @@ export const isWafProtectionEnabled = (qpqConfig: QPQConfig): boolean =>
 // config that creates them and the service configs that attach them are separate arrays -
 // both sides can derive this name from their own app/env/feature.
 export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig): string => {
-  const { application, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig);
+  const { application, environment, feature } = resolveDeploymentFromConfig(qpqConfig);
 
   return `/qpq/waf/web-acl-arn/${wafScope}/${withFeatureSuffix(`${application}-${environment}`, feature)}`;
 };

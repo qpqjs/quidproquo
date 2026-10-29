@@ -15,6 +15,7 @@ import { qpqWebServerUtils } from '@qpqjs/webserver';
 import { qpqConfigAwsUtils } from '../qpqConfigAwsUtils';
 import { getAwsServiceAccountInfoByDeploymentInfo } from '../utils/configUtils';
 import { getScopedKvsIndexAttributeName } from './getScopedKvsIndexAttributeName';
+import { resolveDeploymentFromConfig } from './resolveDeploymentFromConfig';
 import { withFeatureSuffix } from './withFeatureSuffix';
 
 type AwsDeploymentContext = {
@@ -53,7 +54,7 @@ export const getDeploymentName = (application: string, environment: string, feat
   withFeatureSuffix(`${application}-${environment}`, feature);
 
 export const getDeploymentNameFromConfig = (qpqConfig: QPQConfig) => {
-  const { application, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
+  const { application, environment, feature } = resolveDeploymentFromConfig(qpqConfig);
 
   return getDeploymentName(application, environment, feature);
 };
@@ -343,14 +344,13 @@ export const getApiStackName = (qpqConfig: QPQConfig) => {
   return `${getBaseStackName(qpqConfig)}-api`;
 };
 
-// App-level stacks (bootstrap, domain) are shared by every module of the app, so their
-// names carry no module segment.
-// App-level stacks (bootstrap, domain) are per deployment, not per service.
+// App-level stacks (bootstrap, domain) are per deployment, not per service, so their names
+// carry no module segment.
 export const getAppStackName = (application: string, environment: string, feature: string | undefined, suffix: string) =>
   `${getDeploymentName(application, environment, feature)}-${suffix}`;
 
 const getAppStackNameFromConfig = (qpqConfig: QPQConfig, suffix: string) => {
-  const { application, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
+  const { application, environment, feature } = resolveDeploymentFromConfig(qpqConfig);
 
   return getAppStackName(application, environment, feature, suffix);
 };
@@ -360,4 +360,5 @@ export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackNameFr
 export const getDomainStackName = (qpqConfig: QPQConfig) => getAppStackNameFromConfig(qpqConfig, 'domain');
 
 export * from './lambdaNames';
+export { resolveDeploymentFromConfig } from './resolveDeploymentFromConfig';
 export { withFeatureSuffix } from './withFeatureSuffix';
