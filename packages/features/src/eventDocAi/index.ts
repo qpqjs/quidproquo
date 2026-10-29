@@ -6,4 +6,5 @@ export * from './entry';
 export * from './logic';
 export * from './models';
 export * from './module';
+export * from './transport';
 export * from './types';

@@ -1,8 +1,8 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askServiceRequest } from '../../../webSocketQueue/actions';
-import { askEventDocAiRead } from '../../context';
-import type { EventDocAiDocRef } from '../../models';
+import { askServiceRequest } from '../../webSocketQueue/actions';
+import { askEventDocAiRead } from '../context';
+import type { EventDocAiDocRef } from '../models';
 import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 
 // The eventDocAi caller wrapper (mirrors mincept's createMinceptServiceRequester):

@@ -1,13 +1,13 @@
 import { askCatch, AskResponse, askStateRead } from '@qpqjs/core';
 
-import type { EventDocAiAttachment } from '../../models';
-import { askUIEventDocAiAppendChatMessage } from '../actionCreators/askUIEventDocAiAppendChatMessage';
-import { askUIEventDocAiClearStream } from '../actionCreators/askUIEventDocAiClearStream';
-import { askUIEventDocAiSetError } from '../actionCreators/askUIEventDocAiSetError';
-import { askUIEventDocAiSetSending } from '../actionCreators/askUIEventDocAiSetSending';
-import type { EventDocAiState } from '../EventDocAiState';
-import { askEventDocAiChatSendRequest } from '../requests/askEventDocAiChatSendRequest';
-import { makeEventDocAiUserMessage } from '../utils/makeEventDocAiUserMessage';
+import type { EventDocAiAttachment } from '../models';
+import { askUIEventDocAiAppendChatMessage } from '../module/actionCreators/askUIEventDocAiAppendChatMessage';
+import { askUIEventDocAiClearStream } from '../module/actionCreators/askUIEventDocAiClearStream';
+import { askUIEventDocAiSetError } from '../module/actionCreators/askUIEventDocAiSetError';
+import { askUIEventDocAiSetSending } from '../module/actionCreators/askUIEventDocAiSetSending';
+import type { EventDocAiState } from '../module/EventDocAiState';
+import { makeEventDocAiUserMessage } from '../module/utils/makeEventDocAiUserMessage';
+import { askEventDocAiChatSendRequest } from '../transport/askEventDocAiChatSendRequest';
 import { askEventDocAiNewChat } from './askEventDocAiNewChat';
 
 export function* askEventDocAiSendMessage(message: string, attachments: EventDocAiAttachment[] = []): AskResponse<void> {

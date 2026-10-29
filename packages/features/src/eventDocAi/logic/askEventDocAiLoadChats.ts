@@ -1,9 +1,9 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 
-import { askUIEventDocAiSetChats } from '../actionCreators/askUIEventDocAiSetChats';
-import { askUIEventDocAiSetError } from '../actionCreators/askUIEventDocAiSetError';
-import { askUIEventDocAiSetLoadingChats } from '../actionCreators/askUIEventDocAiSetLoadingChats';
-import { askEventDocAiChatListRequest } from '../requests/askEventDocAiChatListRequest';
+import { askUIEventDocAiSetChats } from '../module/actionCreators/askUIEventDocAiSetChats';
+import { askUIEventDocAiSetError } from '../module/actionCreators/askUIEventDocAiSetError';
+import { askUIEventDocAiSetLoadingChats } from '../module/actionCreators/askUIEventDocAiSetLoadingChats';
+import { askEventDocAiChatListRequest } from '../transport/askEventDocAiChatListRequest';
 
 export function* askEventDocAiLoadChats(): AskResponse<void> {
   yield* askUIEventDocAiSetLoadingChats(true);
