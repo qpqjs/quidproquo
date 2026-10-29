@@ -13,7 +13,7 @@ import { setLoadingHistory } from './stateUpdaters/setLoadingHistory';
 import { setMessages } from './stateUpdaters/setMessages';
 import { setSending } from './stateUpdaters/setSending';
 import { upsertChat } from './stateUpdaters/upsertChat';
-import type { EventDocAiState } from './EventDocAiState';
+import type { EventDocAiState } from './types/EventDocAiState';
 
 export const eventDocAiReducer = buildEffectReducer<EventDocAiState, EventDocAiEffects>({
   [EventDocAiEffect.SetChats]: setChats,

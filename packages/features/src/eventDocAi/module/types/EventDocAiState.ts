@@ -1,6 +1,6 @@
 import type { Nullable } from '@qpqjs/core';
 
-import type { EventDocAiChatMessage, EventDocAiChatSummary, EventDocAiMessageSegment } from '../models';
+import type { EventDocAiChatMessage, EventDocAiChatSummary, EventDocAiMessageSegment } from '../../models';
 
 // Which service/doc-type/document the module talks to comes from the
 // eventDocAi QPQ context (provided around the chat UI), not from state.
@@ -22,15 +22,3 @@ export type EventDocAiState = {
   isSending: boolean;
   error: Nullable<string>;
 };
-
-export const createInitialEventDocAiState = (): EventDocAiState => ({
-  chats: [],
-  activeChatId: null,
-  chatMessages: [],
-  streamSegments: [],
-  isStreaming: false,
-  isLoadingChats: false,
-  isLoadingHistory: false,
-  isSending: false,
-  error: null,
-});

@@ -1,4 +1,4 @@
-import type { EventDocAiState } from '../EventDocAiState';
+import type { EventDocAiState } from '../types/EventDocAiState';
 
 // Total completed tool uses across the finalized messages, a change signals a
 // tool mutated something (e.g. the document), letting the host UI react

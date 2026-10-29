@@ -7,8 +7,8 @@ import { askUIEventDocAiClearStream } from '../module/actionCreators/askUIEventD
 import { askUIEventDocAiSetError } from '../module/actionCreators/askUIEventDocAiSetError';
 import { askUIEventDocAiSetMessages } from '../module/actionCreators/askUIEventDocAiSetMessages';
 import { askUIEventDocAiSetSending } from '../module/actionCreators/askUIEventDocAiSetSending';
-import type { EventDocAiState } from '../module/EventDocAiState';
-import { makeEventDocAiUserMessage } from '../module/utils/makeEventDocAiUserMessage';
+import { makeEventDocAiUserMessage } from '../module/logic/makeEventDocAiUserMessage';
+import type { EventDocAiState } from '../module/types/EventDocAiState';
 import { askEventDocAiChatSendRequest } from '../transport/askEventDocAiChatSendRequest';
 import { askEventDocAiNewChat } from './askEventDocAiNewChat';
 

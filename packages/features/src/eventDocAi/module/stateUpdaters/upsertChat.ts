@@ -1,5 +1,5 @@
 import type { UpsertChatPayload } from '../effects/EventDocAiUpsertChatEffect';
-import type { EventDocAiState } from '../EventDocAiState';
+import type { EventDocAiState } from '../types/EventDocAiState';
 
 export const upsertChat = (state: EventDocAiState, { chat }: UpsertChatPayload): EventDocAiState => ({
   ...state,
