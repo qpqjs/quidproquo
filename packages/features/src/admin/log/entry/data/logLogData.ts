@@ -12,6 +12,7 @@ import {
   kvsOr,
   KvsQueryOperation,
   LogLevelEnum,
+  Nullable,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
 } from '@qpqjs/core';
@@ -54,7 +55,7 @@ export function* askListLogLogs(
   return logs;
 }
 
-export function* askGetLogLog(errorType: ErrorTypeEnum, timestamp: string): AskResponse<LogLog | null> {
+export function* askGetLogLog(errorType: ErrorTypeEnum, timestamp: string): AskResponse<Nullable<LogLog>> {
   const log = yield* askKeyValueStoreQuerySingle<LogLog>(storeName, kvsAnd([kvsEqual('type', errorType), kvsEqual('timestamp', timestamp)]));
 
   return log;

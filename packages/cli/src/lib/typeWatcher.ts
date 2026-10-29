@@ -6,6 +6,7 @@
 // One `tsc -b --watch` over every workspace package that ships types; routine
 // watch chatter is dropped so only real compile errors reach the shared
 // terminal. Opt out with `--no-types`.
+import { Nullable } from '@qpqjs/core';
 import { getWorkspacePackageDirs } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
@@ -39,7 +40,7 @@ const isTypedWorkspacePackage = (dir: string): boolean => {
   return !!(packageJson.types || packageJson.typings);
 };
 
-export const startTypeWatcher = (root: string): ChildProcess | null => {
+export const startTypeWatcher = (root: string): Nullable<ChildProcess> => {
   const projectDirs = getWorkspacePackageDirs(root).filter(isTypedWorkspacePackage);
   if (projectDirs.length === 0) {
     return null;

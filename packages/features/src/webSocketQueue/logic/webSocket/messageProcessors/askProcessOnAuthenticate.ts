@@ -51,7 +51,7 @@ interface ConnectionScopeResolution {
 // definition - an unvalidatable scope must never be silently accepted (wrong
 // partition) or silently dropped (data lands in the unscoped partition while
 // the client believes it is scoped); no claim on a plain queue stays unscoped.
-function* askResolveConnectionScope(apiName: string, userId: string, requestedScope: string | null): AskResponse<ConnectionScopeResolution> {
+function* askResolveConnectionScope(apiName: string, userId: string, requestedScope: Nullable<string>): AskResponse<ConnectionScopeResolution> {
   const scopeResolver = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName));
 
   if (!scopeResolver) {
@@ -59,7 +59,7 @@ function* askResolveConnectionScope(apiName: string, userId: string, requestedSc
   }
 
   const resolution = yield* askCatch(
-    askInlineFunctionExecute<Nullable<string>, { userId: string; requestedScope: string | null }>(scopeResolver, { userId, requestedScope }),
+    askInlineFunctionExecute<Nullable<string>, { userId: string; requestedScope: Nullable<string> }>(scopeResolver, { userId, requestedScope }),
   );
 
   if (!resolution.success) {

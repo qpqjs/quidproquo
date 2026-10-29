@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { AskResponse, askThrowError, ErrorTypeEnum, Nullable } from '@qpqjs/core';
 
 import { askTenantIdParse } from './askTenantIdParse';
 import { askTenantValidateMembership } from './askTenantValidateMembership';
@@ -11,7 +11,7 @@ import { composePersonalScope, composeTenantScope, parseStorageScope, StorageSco
 // connection is never left unscoped. A tenant claim (the raw tenant id, as
 // the client sends it) is membership-checked; a personal-scope claim is only
 // ever accepted as the user's own.
-export function* askTenantConnectionScopeResolver(input: { userId: string; requestedScope: string | null }): AskResponse<string> {
+export function* askTenantConnectionScopeResolver(input: { userId: string; requestedScope: Nullable<string> }): AskResponse<string> {
   const { userId, requestedScope } = input;
 
   if (!requestedScope) {

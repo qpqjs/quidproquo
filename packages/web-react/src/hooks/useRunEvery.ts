@@ -1,10 +1,12 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { useEffectCallback } from './useEffectCallback';
 
 export function useRunEvery<T>(func: () => T, intervalSeconds: number): T {
   const [value, setValue] = useState<T>(func);
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<Nullable<number>>(null);
 
   // Stable identity so a caller passing a fresh arrow each render doesn't
   // tear down and recreate the interval.

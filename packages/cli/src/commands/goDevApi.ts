@@ -10,6 +10,7 @@
 // infrastructure.ts is evaluated once at launch and baked into the
 // `quidproquo-dynamic-loader` virtual module, config changes need a full
 // `go:dev:api` restart.
+import { Nullable } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
@@ -63,7 +64,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const env = { ...process.env, QPQ_DEV_APP: appName };
 
   // The long-lived server process (HTTP 8080 / WS 8888), restarted per rebuild.
-  let child: ChildProcess | null = null;
+  let child: Nullable<ChildProcess> = null;
   let restartQueued = false;
 
   const startServer = (): void => {

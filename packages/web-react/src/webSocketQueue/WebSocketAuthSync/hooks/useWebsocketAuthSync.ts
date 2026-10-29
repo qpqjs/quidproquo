@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from '@qpqjs/core';
+import { AuthenticationInfo, Nullable } from '@qpqjs/core';
 import {
   WebSocketQueueClientEventMessageAuthenticate,
   WebSocketQueueClientEventMessageUnauthenticate,
@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useFastCallback } from '../../../hooks';
 import { useSubscribeToWebsocket, useSubscribeToWebSocketEvent, useWebsocketApi, useWebsocketSendEvent } from '../../../websocket/hooks';
 
-export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken'], activeScope?: string | null) => {
+export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken'], activeScope?: Nullable<string>) => {
   const sendMessage = useWebsocketSendEvent();
   const websocketApi = useWebsocketApi();
   const [isAuthenticated, setIsAuthenticated] = useState(false);

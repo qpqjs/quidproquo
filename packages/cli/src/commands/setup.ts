@@ -5,6 +5,8 @@
 //   --check      print each step's status and exit, run nothing
 //   --yes        run every step without the menu
 //   --only a,b   run only the named step ids (no menu)
+import { Nullable } from '@qpqjs/core';
+
 import { getArgValue } from '../lib/args';
 import { promptCheckbox } from '../lib/prompts';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
@@ -12,9 +14,9 @@ import { resolveDeployment } from '../lib/resolveDeployment';
 import { SetupCheckResult, SetupStep } from '../lib/setupStep';
 import { getPlatformDriver } from '../platforms';
 
-type CheckedStep = { step: SetupStep; result: SetupCheckResult | null };
+type CheckedStep = { step: SetupStep; result: Nullable<SetupCheckResult> };
 
-const statusLabel = (result: SetupCheckResult | null): string => (result === null ? '?' : result.done ? 'done' : 'todo');
+const statusLabel = (result: Nullable<SetupCheckResult>): string => (result === null ? '?' : result.done ? 'done' : 'todo');
 
 const printChecklist = (checked: CheckedStep[]): void => {
   for (const { step, result } of checked) {
@@ -51,7 +53,7 @@ const chooseSteps = async (checked: CheckedStep[]): Promise<SetupStep[]> => {
   return checked.map(({ step }) => step).filter((step) => chosen.includes(step));
 };
 
-const selectFromArgs = (steps: SetupStep[], argv: string[]): SetupStep[] | null => {
+const selectFromArgs = (steps: SetupStep[], argv: string[]): Nullable<SetupStep[]> => {
   if (argv.includes('--yes')) {
     return steps;
   }

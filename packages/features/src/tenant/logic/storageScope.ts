@@ -40,7 +40,7 @@ export const composePersonalScope = (userId: string): string => {
 };
 
 // Null = not a typed scope (unknown format, or a legacy raw scope).
-export const parseStorageScope = (scope: string): ParsedStorageScope | null => {
+export const parseStorageScope = (scope: string): Nullable<ParsedStorageScope> => {
   if (scope.startsWith(TENANT_SCOPE_PREFIX) && scope.length > TENANT_SCOPE_PREFIX.length) {
     return { type: StorageScopeType.tenant, id: scope.slice(TENANT_SCOPE_PREFIX.length) };
   }

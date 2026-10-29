@@ -1,9 +1,11 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useEffect, useRef, useState } from 'react';
 
 export function useThrottledMemo<T>(factory: () => T, deps: any[], delaySeconds: number = 1): T {
   const [value, setValue] = useState(factory);
   const isFirstRun = useRef(true);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<Nullable<NodeJS.Timeout>>(null);
 
   useEffect(() => {
     // This skips the throttling on the initial mount

@@ -1,10 +1,10 @@
-import { ActionProcessorList, actionResult, actionResultError } from '@qpqjs/core';
+import { ActionProcessorList, actionResult, actionResultError, Nullable } from '@qpqjs/core';
 import { AnyWebSocketQueueEventMessageWithCorrelation, ServiceActionType } from '@qpqjs/features';
 
 import { RefObject } from 'react';
 
 export const getServiceRequestActionProcessor = (
-  sendEventRef: RefObject<((event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>) | null>,
+  sendEventRef: RefObject<Nullable<(event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>>>,
 ): ActionProcessorList => ({
   [ServiceActionType.Request]: async ({ serviceName, method, payload }: { serviceName: string; method: string; payload: any }) => {
     const response = await sendEventRef.current?.({ type: `qpq/serviceRequest/${serviceName}/${method}`, payload } as any);

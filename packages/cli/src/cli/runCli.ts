@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import { promptCommandFromMenu } from './commandMenu';
 import { buildUsage, CliCommand, cliCommands } from './commandRegistry';
 
@@ -21,7 +23,7 @@ const isPromptExit = (error: unknown): boolean => error instanceof Error && erro
 
 // Bare `qpq` on a terminal: drill through the command menu, gathering any
 // arguments the picked command needs. Returns null when the user bails out.
-const resolveCommandInteractively = async (): Promise<{ command: CliCommand; commandArgv: string[] } | null> => {
+const resolveCommandInteractively = async (): Promise<Nullable<{ command: CliCommand; commandArgv: string[] }>> => {
   try {
     const command = await promptCommandFromMenu(cliCommands);
     const commandArgv = command.promptArgs ? await command.promptArgs() : [];

@@ -4,6 +4,8 @@
 // EADDRINUSE. Before starting, kill any listener on the given ports whose
 // command line matches `isOurs`. Anything else on the ports is left alone
 // and reported, it's not ours.
+import { Nullable } from '@qpqjs/core';
+
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -71,7 +73,7 @@ const killPidHard = (pid: number): void => {
 // where /tmp is a symlink), so comparing against a caller-supplied root
 // verbatim would false-negative whenever any component of the repo path is
 // itself a symlink (a symlinked home directory, an NFS mount, etc).
-const getProcessCwd = (pid: number): string | null => {
+const getProcessCwd = (pid: number): Nullable<string> => {
   try {
     const line = execSync(`lsof -a -p ${pid} -d cwd -Fn`, { stdio: ['ignore', 'pipe', 'ignore'] })
       .toString()

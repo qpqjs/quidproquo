@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import { encodedJsonCodecs } from './codecs/encodedJsonCodecs';
 import { transportCodecs } from './codecs/transportCodecs';
 import { mapStrings } from './mapStrings';
@@ -14,7 +16,7 @@ type TextTransform = (text: string) => string;
  * which is re-encoded only if the transform changed it.
  */
 export const mapEncodedJson = <T>(value: T, transform: ContainerTransform, transformText: TextTransform = (t) => t): T => {
-  const mapContainerText = (text: string): string | null => {
+  const mapContainerText = (text: string): Nullable<string> => {
     for (const codec of encodedJsonCodecs) {
       const decoded = codec.decode(text);
       if (decoded !== null) {

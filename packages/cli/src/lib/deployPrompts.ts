@@ -2,6 +2,8 @@
 // a future dockerized variant: pick an app, confirm the target, pick services
 // (or domain/bootstrap), pick stacks. buildDeployPlanFromArgs is the
 // non-interactive shortcut (`qpq go all all`) that skips every prompt.
+import { Nullable } from '@qpqjs/core';
+
 import { getPositionalArgs } from './args';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
@@ -31,7 +33,7 @@ export type DeployPlan =
 // Returns null when no positional services token is given, so callers fall back
 // to the interactive promptDeployPlan. Passing args is an explicit opt-in to a
 // prompt-free deploy, so the "Deploying to: [env]" confirmation is skipped too.
-export const buildDeployPlanFromArgs = (appName: string, argv: string[]): DeployPlan | null => {
+export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Nullable<DeployPlan> => {
   const [servicesArg, stacksArg] = getPositionalArgs(argv, ['--app', '--deployment']);
 
   if (!servicesArg) {

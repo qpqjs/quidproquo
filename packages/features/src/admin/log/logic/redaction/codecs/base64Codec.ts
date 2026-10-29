@@ -1,10 +1,12 @@
+import { Nullable } from '@qpqjs/core';
+
 import { TransportCodec } from '../types/TransportCodec';
 
 const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
 
 // Strict on purpose: every short word is valid base64 alphabet, so the bytes must be valid
 // utf8 AND re-encode to exactly the original text before the leaf counts as base64.
-const decodeBase64 = (text: string): string | null => {
+const decodeBase64 = (text: string): Nullable<string> => {
   if (text.length < 4 || text.length % 4 !== 0 || !base64Pattern.test(text)) {
     return null;
   }
