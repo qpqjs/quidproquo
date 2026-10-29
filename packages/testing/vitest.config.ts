@@ -1,9 +1,4 @@
-import { defineConfig } from 'vitest/config';
+// This package owns the helper, so it loads it from source rather than from its own built lib.
+import { defineQpqVitestConfig } from './src/vitestConfig';
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    pool: 'threads',
-  },
-});
+export default defineQpqVitestConfig(import.meta.url);

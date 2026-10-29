@@ -16,6 +16,11 @@
       "module": "./lib/esm/vitest.js",
       "default": "./lib/commonjs/vitest.js"
     },
+    "./vitest-config": {
+      "types": "./lib/commonjs/vitestConfig/index.d.ts",
+      "module": "./lib/esm/vitestConfig/index.js",
+      "default": "./lib/commonjs/vitestConfig/index.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": false,
