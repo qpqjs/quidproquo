@@ -7,7 +7,7 @@ import { Nullable } from '@qpqjs/core';
 import { getPositionalArgs } from './args';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
-import { promptSelect, promptText, promptYesNo } from './prompts';
+import { promptSelect, promptTypedConfirmation, promptYesNo } from './prompts';
 
 export type StackType = 'all' | 'inf' | 'api' | 'web' | 'views';
 
@@ -149,10 +149,7 @@ export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan>
   services = [...new Set(services)];
 
   console.log(`\nThis will DESTROY the web, api and inf stacks (including all stored data) for: ${services.join(', ')}`);
-  const confirmation = await promptText(`Type '${deployInfo}' to confirm`);
-
-  if (confirmation !== deployInfo) {
-    console.log('Confirmation did not match. Exiting!');
+  if (!(await promptTypedConfirmation(deployInfo))) {
     return { kind: 'cancelled' };
   }
 

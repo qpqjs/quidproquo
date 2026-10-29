@@ -9,7 +9,7 @@ import { qpqCoreUtils } from '@qpqjs/core';
 
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
-import { promptCheckbox, promptSelect, promptText } from './prompts';
+import { promptCheckbox, promptSelect, promptTypedConfirmation } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
 
 export type ClearableResourceKind = 'storageDrive' | 'keyValueStore';
@@ -97,10 +97,7 @@ export const promptClearResourcesPlan = async (appName: string): Promise<ClearRe
     console.log(`  ${resource.service} — ${resource.resourceName} (${resource.kind === 'storageDrive' ? 'bucket' : 'table'})`);
   }
 
-  const confirmation = await promptText(`Type '${deployInfo}' to confirm`);
-
-  if (confirmation !== deployInfo) {
-    console.log('Confirmation did not match. Exiting!');
+  if (!(await promptTypedConfirmation(deployInfo))) {
     return { kind: 'cancelled' };
   }
 

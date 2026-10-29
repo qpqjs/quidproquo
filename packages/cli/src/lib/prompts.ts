@@ -27,6 +27,19 @@ export const promptText = async (message: string): Promise<string> => {
   return input({ message });
 };
 
+// The friction for destructive commands: the target has to be typed back exactly. Resolves
+// true when it was; prints why it stops otherwise, so callers only have to bail out.
+export const promptTypedConfirmation = async (target: string): Promise<boolean> => {
+  const confirmation = await promptText(`Type '${target}' to confirm`);
+
+  if (confirmation !== target) {
+    console.log('Confirmation did not match. Exiting!');
+    return false;
+  }
+
+  return true;
+};
+
 // A multi-select checkbox prompt over labelled values; `checked` preselects a choice.
 export const promptCheckbox = async <T>(
   message: string,
