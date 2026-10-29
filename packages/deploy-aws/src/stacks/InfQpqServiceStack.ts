@@ -99,7 +99,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end parameters
 
     // Secrets
-    qpqCoreUtils.getOwnedSecrets(props.qpqConfig).forEach(
+    qpqCoreUtils.getOwnedSecretConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreSecretConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

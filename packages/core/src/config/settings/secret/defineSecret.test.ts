@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { QPQCoreConfigSettingType } from '../QPQConfig';
-import { defineSecret } from './secret';
+import { QPQCoreConfigSettingType } from '../../QPQConfig';
+import { defineSecret } from './defineSecret';
 
 describe('defineSecret', () => {
   it('builds a Secret setting with the given key', () => {

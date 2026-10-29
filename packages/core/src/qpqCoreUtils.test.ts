@@ -65,7 +65,7 @@ import {
   getOwnedKeyValueStores,
   getOwnedParameterConfigs,
   getOwnedScheduleEvents,
-  getOwnedSecrets,
+  getOwnedSecretConfigs,
   getOwnedStorageDrives,
   getOwnedUserDirectories,
   getParameterByName,
@@ -416,7 +416,7 @@ describe('qpqCoreUtils', () => {
     });
 
     it('returns only owned secrets', () => {
-      expect(getOwnedSecrets(config).map((s) => s.key)).toEqual(['apiKey']);
+      expect(getOwnedSecretConfigs(config).map((s) => s.key)).toEqual(['apiKey']);
     });
   });
 

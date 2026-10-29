@@ -43,7 +43,6 @@ import {
   QpqQueueProcessors,
   QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
-  SecretQPQConfigSetting,
   ServiceSettingsQPQConfigSetting,
   SigningKeyQPQConfigSetting,
   StorageDriveQPQConfigSetting,
@@ -67,6 +66,7 @@ import { isQpqFunctionRuntimeAdvanced } from './utils';
 // The config walk and the application accessors live in logic/config; they are part of this
 // namespace for callers.
 export { getAllQueueConfigs, getOwnedQueueConfigs, getQueueByName, resolveQueueOrThrow } from './config/settings/queue/logic';
+export { getAllSecretConfigs, getOwnedSecretConfigs, getSecretByName, resolveSecretOrThrow } from './config/settings/secret/logic';
 export {
   flattenQpqConfig,
   getApplicationConfigSetting,
@@ -335,31 +335,6 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
 
   const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
-};
-
-export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): Nullable<SecretQPQConfigSetting> =>
-  getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret).find((s) => s.key === secretName) ?? null;
-
-export const resolveSecretOrThrow = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
-  const secret = getSecretByName(secretName, qpqConfig);
-
-  if (!secret) {
-    throw new Error(`Can not find secret [${secretName}]`);
-  }
-
-  return secret;
-};
-
-export const getAllSecretConfigs = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
-
-  return secrets;
-};
-
-export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getAllSecretConfigs(qpqConfig);
-
-  return getOwnedItems(secrets, qpqConfig);
 };
 
 export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): Nullable<CryptoKeyQPQConfigSetting> =>

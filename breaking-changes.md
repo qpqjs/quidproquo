@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqCoreUtils.getOwnedSecrets` is `getOwnedSecretConfigs`; the secret accessors live in `config/settings/secret/logic` (D5).
 - `qpqCoreUtils` queue accessors follow D5: `getAllQueueConfigs(cfg)`, `getOwnedQueueConfigs(cfg)`, `getQueueByName(name, cfg)` (returns null, name first) and `resolveQueueOrThrow(name, cfg)` replace `getQueues`, `getOwnedQueues` and `getQueueByName(cfg, name)`; the setting lives in `config/settings/queue/` with its types. `@qpqjs/actionprocessor-aws` `getQueueConfigSetting` is deleted in favour of `resolveQueueOrThrow`.
 - `@qpqjs/features` admin log search takes one object: `askLogGetAll(query: LogDeepSearchQuery)` and `askLogMetadataList(query: LogSearchQuery)` replace the ten and nine positional parameters; `GetLogsParams` is gone, the route body is a `LogDeepSearchQuery` (G3).
 - `qpqWebServerUtils.fromJsonEventRequest` (the throwing twin) is deleted; use `askFromJsonEventRequest`, which answers `BadRequest` through the story. `uniqueBy` moved from `@qpqjs/web` to `@qpqjs/core` (web still re-exports it) and gained a `unique` sibling for plain values; `getMillisecondsBetween(startIso, endIso)` is the one duration helper (C5).
