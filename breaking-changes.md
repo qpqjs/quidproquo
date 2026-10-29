@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askAiPrompt` and `askAiPromptStream` now carry error catalogs (A5): a missing ai config, an unsupported model and a reply that fails `outputSchema` come back as `askAiPrompt.errorType.NotFound` / `.NotImplemented` / `.Invalid` (action-scoped strings) instead of the bare `ErrorTypeEnum` values. Unexpected provider failures are still `GenericError`.
 - `ContextReadAction`, `StateReadAction` and `StateDispatchAction` are gone from `@qpqjs/core` (A7): type a mock or override with `ActionOf<typeof askContextReadBase>` / `ActionOf<typeof askStateReadBase>` / `ActionOf<typeof askStateDispatchBase>` (the payload types `ContextReadActionPayload`, `StateReadActionPayload`, `StateDispatchActionPayload` remain). `ExtractGeneratorReturnType` is folded into `AskResponseReturnType`. `QpqLogList` is gone from `@qpqjs/webserver`; it was `QpqPagedData<StoryResultMetadata>` from core.
 - `@qpqjs/features` event doc store context (A8): `askEventDocResolveStore` is `askEventDocStoreReadOrThrow`, and `askEventDocProvideStore(options, story)` is gone; write `askEventDocStoreProvide(buildEventDocStore(options), story)`. The store context is local (never serialized), so its new key `qpq-event-doc-store` changes nothing on the wire.
 - `@qpqjs/features` event doc AI context (A8): `askEventDocAiContextRead` is `askEventDocAiRead` and `askEventDocAiContextProvide` is `askEventDocAiProvide`, now under `eventDocAi/context`; the serialized key is `qpq-event-doc-ai` (was `event-doc-ai-context`), so deploy all services of an app together.

@@ -49,7 +49,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
     if ('error' in prepared) {
-      return actionResultError(prepared.error.type, prepared.error.message);
+      return actionResultError(askAiPrompt.errorType[prepared.error.kind], prepared.error.message);
     }
 
     try {
@@ -100,13 +100,13 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
       }
 
       if (!answer.valid) {
-        return actionResultError(ErrorTypeEnum.Invalid, `The reply does not match the output schema: ${answer.problems}`);
+        return actionResultError(askAiPrompt.errorType.Invalid, `The reply does not match the output schema: ${answer.problems}`);
       }
 
       return actionResult({ text: answer.text, usage, object: answer.object, repairs: answer.repairs });
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
-        return actionResultError(ErrorTypeEnum.Invalid, `The reply is not JSON matching the output schema: ${error.message}`);
+        return actionResultError(askAiPrompt.errorType.Invalid, `The reply is not JSON matching the output schema: ${error.message}`);
       }
 
       // The SDK's message carries the provider's response body and request url; that is for the

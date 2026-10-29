@@ -1,4 +1,4 @@
-import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from '@qpqjs/core';
+import { AiActionType, AiCacheTtl, AiModel, askAiPromptStream, ErrorTypeEnum } from '@qpqjs/core';
 import { invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -73,12 +73,12 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('returns an action error when preparation fails', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ error: { type: ErrorTypeEnum.NotImplemented, message: 'bad model' } });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ error: { kind: 'NotImplemented', message: 'bad model' } });
 
     const [result, error] = await invoke({ prompt: 'hi' }, buildRegistry());
 
     expect(result).toBeUndefined();
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotImplemented);
+    expect(error?.errorType).toBe(askAiPromptStream.errorType.NotImplemented);
   });
 
   it('registers a json-encoded stream and returns its id', async () => {

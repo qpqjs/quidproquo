@@ -29,7 +29,8 @@ type BedrockProvider = ReturnType<typeof createAmazonBedrock>;
 type BedrockLanguageModel = ReturnType<BedrockProvider>;
 
 export type PrepareAiPromptCallResult =
-  { error: { type: ErrorTypeEnum; message: string } } | { model: BedrockLanguageModel; tools: ToolSet | undefined };
+  // `kind` names the entry of the calling action's error catalog, since prompt and stream share this step.
+  { error: { kind: 'NotFound' | 'NotImplemented'; message: string } } | { model: BedrockLanguageModel; tools: ToolSet | undefined };
 
 export const prepareAiPromptCall = (
   qpqConfig: QPQConfig,
@@ -45,7 +46,7 @@ export const prepareAiPromptCall = (
 
   const resolved = resolveBedrockModel(payload.model);
   if (!resolved) {
-    return { error: { type: ErrorTypeEnum.NotImplemented, message: `Unsupported AI model: ${payload.model}` } };
+    return { error: { kind: 'NotImplemented', message: `Unsupported AI model: ${payload.model}` } };
   }
 
   const aiTools: ToolSet = {};
@@ -55,7 +56,7 @@ export const prepareAiPromptCall = (
     const aiConfig = aiConfigs.find((c) => c.aiName === payload.aiName);
 
     if (!aiConfig) {
-      return { error: { type: ErrorTypeEnum.NotFound, message: `AI config not found: ${payload.aiName}` } };
+      return { error: { kind: 'NotFound', message: `AI config not found: ${payload.aiName}` } };
     }
 
     // Runs the tool's inline-function executor as its own story.

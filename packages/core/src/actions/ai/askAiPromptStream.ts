@@ -31,6 +31,10 @@ export type AskAiPromptStreamOptions = {
 
 export const askAiPromptStream = createActionRequester<StreamHandle<'json', AiStreamPart>>()({
   actionType: AiActionType.PromptStream,
+  errorTypes: [
+    'NotFound', // no ai config is defined under the given aiName
+    'NotImplemented', // the model is not offered on this platform
+  ],
   getPayload: (model: AiModel, prompt: string, options?: AskAiPromptStreamOptions) => ({
     model,
     prompt,

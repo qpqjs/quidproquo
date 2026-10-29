@@ -43,7 +43,7 @@ describe('prepareAiPromptCall', () => {
 
     const result = prepareAiPromptCall(config, { model: 'nope' as AiModel }, ...collaborators);
 
-    expect(result).toEqual({ error: { type: ErrorTypeEnum.NotImplemented, message: 'Unsupported AI model: nope' } });
+    expect(result).toEqual({ error: { kind: 'NotImplemented', message: 'Unsupported AI model: nope' } });
   });
 
   it('errors with NotFound when the named ai config is missing', () => {
@@ -51,7 +51,7 @@ describe('prepareAiPromptCall', () => {
 
     const result = prepareAiPromptCall(config, { model: AiModel.ClaudeHaiku35, aiName: 'missing' }, ...collaborators);
 
-    expect(result).toEqual({ error: { type: ErrorTypeEnum.NotFound, message: 'AI config not found: missing' } });
+    expect(result).toEqual({ error: { kind: 'NotFound', message: 'AI config not found: missing' } });
   });
 
   it('builds tools from the named ai config', () => {

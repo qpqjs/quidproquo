@@ -30,7 +30,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
     if ('error' in prepared) {
-      return actionResultError(prepared.error.type, prepared.error.message);
+      return actionResultError(askAiPromptStream.errorType[prepared.error.kind], prepared.error.message);
     }
 
     try {
