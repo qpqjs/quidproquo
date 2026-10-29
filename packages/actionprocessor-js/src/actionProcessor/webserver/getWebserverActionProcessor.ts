@@ -1,0 +1,14 @@
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+
+import { getDnsActionProcessor } from './dns';
+import { getEmailActionProcessor } from './email';
+import { getOpenApiActionProcessor } from './openApi';
+
+export const getWebserverActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getDnsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEmailActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getOpenApiActionProcessor(qpqConfig, dynamicModuleLoader)),
+});

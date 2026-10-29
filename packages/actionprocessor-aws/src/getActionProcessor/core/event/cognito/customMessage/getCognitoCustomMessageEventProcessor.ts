@@ -1,0 +1,17 @@
+import { getEventGetStorySessionNoopActionProcessor } from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+
+import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
+import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
+import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
+import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
+
+export const getCognitoCustomMessageEventProcessor =
+  (userDirectoryName: string): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
+    ...(await getEventAutoRespondActionProcessor(userDirectoryName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventGetStorySessionNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventMatchStoryActionProcessor(userDirectoryName)(qpqConfig, dynamicModuleLoader)),
+    ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
+  });

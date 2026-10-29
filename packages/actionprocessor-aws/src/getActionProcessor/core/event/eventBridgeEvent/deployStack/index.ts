@@ -1,17 +1,1 @@
-import { getEventGetStorySessionNoopActionProcessor } from '@qpqjs/actionprocessor-js';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
-
-import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
-import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
-import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
-import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
-
-export const getEventBridgeStackDeployEventActionProcessor =
-  (deployEventConfigName: string): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
-    ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventGetStorySessionNoopActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventMatchStoryActionProcessor(deployEventConfigName)(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
-  });
+export * from './getEventBridgeStackDeployEventActionProcessor';

@@ -1,24 +1,6 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
-
-import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
-import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
-import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
-import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
-import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
-
-export const getSqsQueueEventProcessor =
-  (queueName: string): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
-    ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventMatchStoryActionProcessor(() => queueName)(qpqConfig, dynamicModuleLoader)),
-    ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
-  });
-
-// The dev server drains its local queues through the same matcher.
 export {
   getQueueConfigSetting,
   getEventMatchStoryActionProcessor as getSqsQueueEventMatchStoryActionProcessor,
   ResolveQueueName,
 } from './getEventMatchStoryActionProcessor';
+export * from './getSqsQueueEventProcessor';
