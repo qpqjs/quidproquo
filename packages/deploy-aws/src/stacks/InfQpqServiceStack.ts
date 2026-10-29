@@ -231,7 +231,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqWebserverEmailSenderConstruct.authorizeSendEmailForRole(webserverRole, emailSenderConfigs, props.qpqConfig);
 
     // Cache settings
-    qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).forEach(
+    qpqWebServerUtils.getOwnedCacheConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebServerCacheConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

@@ -49,7 +49,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
+          qpqWebServerUtils.resolveCacheOrThrow(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 

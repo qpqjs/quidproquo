@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { CacheSettings, QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineCache } from './cache';
+import { CacheSettings, QPQWebServerConfigSettingType } from '../../QPQConfig';
+import { defineCache } from './defineCache';
 
 const cacheSettings: CacheSettings = {
   minTTLInSeconds: 1,

@@ -19,14 +19,12 @@ import { defineWebsocket } from '../config/settings/websocket';
 import {
   defaultFileUploadSettings,
   getAllApiKeyConfigs,
-  getAllOwnedCacheConfigs,
   getAllOwnedCertificateConfigs,
   getAllRoutes,
   getAllSeo,
   getAllServiceFunctions,
   getAllSrcEntries,
   getApiConfigs,
-  getCacheConfigByName,
   getDefaultRouteSettings,
   getDomainProxyConfigs,
   getFileUploadSettings,
@@ -96,18 +94,6 @@ describe('websocket selectors', () => {
 
   it('throws when no websocket matches the api name', () => {
     expect(() => getWebsocketEntryByApiName('missing', config)).toThrow('No websocket setting found');
-  });
-});
-
-describe('getCacheConfigByName', () => {
-  const config = buildTestQpqConfig([defineCache('cdn', cacheSettings)]);
-
-  it('finds a cache config by name', () => {
-    expect(getCacheConfigByName('cdn', config).name).toBe('cdn');
-  });
-
-  it('throws when no cache config matches', () => {
-    expect(() => getCacheConfigByName('missing', config)).toThrow('No cache config found');
   });
 });
 
@@ -203,7 +189,6 @@ describe('list and ownership selectors', () => {
   it('returns owned resources for the deploying module', () => {
     expect(getOwnedServiceFunctions(config)).toHaveLength(1);
     expect(getOwnedWebsocketSettings(config)).toHaveLength(1);
-    expect(getAllOwnedCacheConfigs(config)).toHaveLength(1);
     expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });

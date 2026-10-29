@@ -80,7 +80,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
+          qpqWebServerUtils.resolveCacheOrThrow(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
@@ -247,7 +247,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
               this,
               `seo-cache-${seo.uniqueKey}`,
               props.qpqConfig,
-              qpqWebServerUtils.getCacheConfigByName(seo.cacheSettingsName, props.qpqConfig),
+              qpqWebServerUtils.resolveCacheOrThrow(seo.cacheSettingsName, props.qpqConfig),
             ).cachePolicy
           : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 

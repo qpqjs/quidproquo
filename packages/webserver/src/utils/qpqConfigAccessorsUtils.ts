@@ -2,7 +2,6 @@ import { isDefined, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/c
 
 import {
   ApiKeyQPQWebServerConfigSetting,
-  CacheQPQWebServerConfigSetting,
   CertificateQPQWebServerConfigSetting,
   DefaultRouteOptionsQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,
@@ -119,12 +118,6 @@ export const getDomainProxyConfigs = (configs: QPQConfig): DomainProxyQPQWebServ
   return qpqCoreUtils.getConfigSettings<DomainProxyQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.DomainProxy);
 };
 
-export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting[] => {
-  const cacheSettings = qpqCoreUtils.getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache);
-
-  return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
-};
-
 export const getAllOwnedCertificateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
   const certificateSettings = qpqCoreUtils.getConfigSettings<CertificateQPQWebServerConfigSetting>(
     qpqConfig,
@@ -132,18 +125,6 @@ export const getAllOwnedCertificateConfigs = (qpqConfig: QPQConfig): Certificate
   );
 
   return qpqCoreUtils.getOwnedItems(certificateSettings, qpqConfig);
-};
-
-export const getCacheConfigByName = (cacheConfigName: string, qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting => {
-  const cacheSetting = qpqCoreUtils
-    .getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache)
-    .find((c) => c.name === cacheConfigName);
-
-  if (!cacheSetting) {
-    throw new Error(`No cache config found for name [${cacheConfigName}]`);
-  }
-
-  return cacheSetting;
 };
 
 export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveName: string): boolean => {

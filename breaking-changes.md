@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `qpqWebServerUtils` cache accessors follow D5: `getAllCacheConfigs(cfg)`, `getOwnedCacheConfigs(cfg)` (was `getAllOwnedCacheConfigs`), `getCacheByName(name, cfg)` (null when missing) and `resolveCacheOrThrow(name, cfg)` (was the throwing `getCacheConfigByName`); the setting lives in `config/settings/cache/`.
 - `qpqCoreUtils.getUserDirectories` and `getOwnedUserDirectories` are `getAllUserDirectoryConfigs` and `getOwnedUserDirectoryConfigs`; the user directory setting, its MFA enums and types live in `config/settings/userDirectory/` (D5).
 - `qpqCoreUtils.getOwnedSigningKeys` is `getOwnedSigningKeyConfigs`; the signing key setting and accessors live in `config/settings/signingKey/` (D5).
 - `qpqCoreUtils.getOwnedCryptoKeys` is `getOwnedCryptoKeyConfigs`; the crypto key setting and accessors live in `config/settings/cryptoKey/` (D5).
