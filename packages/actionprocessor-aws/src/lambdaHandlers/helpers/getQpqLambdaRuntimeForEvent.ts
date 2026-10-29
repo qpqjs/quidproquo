@@ -3,6 +3,7 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   askProcessEvent,
+  composeActionProcessorLayers,
   createRuntime,
   DynamicModuleLoader,
   QPQConfig,
@@ -46,14 +47,14 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
 ) => {
   // Built per invoke: the lambda context (and so the execution deadline) is not
   // known until the handler runs.
-  const getResolveActionProcessorList = (context: Context) => async (): Promise<ActionProcessorList> => ({
-    ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
-    ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
-    ...(await getLambdaRuntimeRemainingTimeActionProcessor(context)(qpqConfig, dynamicModuleLoader)),
-
-    // Always done last, so they can override the default ones if the user wants.
-    ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
-  });
+  const getResolveActionProcessorList = (context: Context) => (): Promise<ActionProcessorList> =>
+    composeActionProcessorLayers(qpqConfig, dynamicModuleLoader, [
+      getAwsActionProcessors,
+      getActionProcessorList,
+      getLambdaRuntimeRemainingTimeActionProcessor(context),
+      // Always last, so a service's own processors can override the defaults.
+      getCustomActionActionProcessor,
+    ]);
 
   return async (event: E, context: Context) => {
     const logger = getLogger(qpqConfig);
