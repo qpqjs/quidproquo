@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
@@ -104,5 +104,37 @@ describe('QpqCoreStorageDriveConstruct transport', () => {
         ]),
       },
     });
+  });
+});
+
+describe('QpqCoreStorageDriveConstruct lifecycle rules', () => {
+  it('maps each tier to its S3 storage class and honours enabled', () => {
+    const template = synth(
+      defineStorageDrive('archive', {
+        lifecycleRules: [
+          { prefix: 'logs/', transitions: [{ storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE, transitionAfterDays: 30 }] },
+          { prefix: 'tmp/', deleteAfterDays: 7, enabled: false },
+          { transitions: [{ storageDriveTier: StorageDriveTier.SMART_TIERING, transitionAfterDays: 1 }] },
+        ],
+      }),
+    );
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: Match.arrayWith([
+          Match.objectLike({ Prefix: 'logs/', Status: 'Enabled', Transitions: [{ StorageClass: 'DEEP_ARCHIVE', TransitionInDays: 30 }] }),
+          Match.objectLike({ Prefix: 'tmp/', Status: 'Disabled', ExpirationInDays: 7 }),
+          Match.objectLike({ Status: 'Enabled', Transitions: [{ StorageClass: 'INTELLIGENT_TIERING', TransitionInDays: 1 }] }),
+        ]),
+      },
+    });
+  });
+
+  it('refuses a transition to the REGULAR tier at synth', () => {
+    expect(() =>
+      synth(
+        defineStorageDrive('bad', { lifecycleRules: [{ transitions: [{ storageDriveTier: StorageDriveTier.REGULAR, transitionAfterDays: 30 }] }] }),
+      ),
+    ).toThrow('not supported');
   });
 });

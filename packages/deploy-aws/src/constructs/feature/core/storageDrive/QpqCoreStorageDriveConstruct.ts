@@ -72,9 +72,20 @@ export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock
   }
 }
 
-// REGULAR is the class objects start in, so it is never a transition target.
+// Each tier's S3 class is the one its enum doc names. REGULAR is the class objects
+// start in, so it is never a transition target.
 const convertStorageDriveTierToAwsS3StorageClass = (storageDriveTier: StorageDriveTier): aws_s3.StorageClass => {
   switch (storageDriveTier) {
+    case StorageDriveTier.OCCASIONAL_ACCESS:
+      return aws_s3.StorageClass.INFREQUENT_ACCESS;
+    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
+      return aws_s3.StorageClass.ONE_ZONE_INFREQUENT_ACCESS;
+    case StorageDriveTier.COLD_STORAGE:
+      return aws_s3.StorageClass.GLACIER;
+    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
+      return aws_s3.StorageClass.GLACIER_INSTANT_RETRIEVAL;
+    case StorageDriveTier.DEEP_COLD_STORAGE:
+      return aws_s3.StorageClass.DEEP_ARCHIVE;
     case StorageDriveTier.SMART_TIERING:
       return aws_s3.StorageClass.INTELLIGENT_TIERING;
     case StorageDriveTier.REGULAR:
