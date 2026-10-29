@@ -63,7 +63,7 @@ describe('QpqWebserverSubdomainRedirectConstruct', () => {
 
   it('passes the redirect target to the lambda as plain env values', () => {
     synth().hasResourceProperties('AWS::Lambda::Function', {
-      Environment: { Variables: Match.objectLike({ redirectBaseUrl: 'https://example.com', appendPath: 'true' }) },
+      Environment: { Variables: Match.objectLike({ redirectBaseUrl: 'https://development.example.com', appendPath: 'true' }) },
     });
   });
 });
