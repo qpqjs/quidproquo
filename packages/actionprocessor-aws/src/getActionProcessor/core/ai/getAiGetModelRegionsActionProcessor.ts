@@ -1,14 +1,4 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  AiActionType,
-  AiDataRegion,
-  AiModel,
-  AiModelRegionMap,
-  askAiGetModelRegions,
-  ProcessorFor,
-} from '@qpqjs/core';
+import { actionResult, AiDataRegion, AiModel, AiModelRegionMap, askAiGetModelRegions, createActionProcessor, ProcessorFor } from '@qpqjs/core';
 
 import { bedrockModelMap } from './aiModelMap';
 
@@ -22,6 +12,4 @@ const processAiGetModelRegions: ProcessorFor<typeof askAiGetModelRegions> = asyn
   return actionResult(regions);
 };
 
-export const getAiGetModelRegionsActionProcessor: ActionProcessorListResolver = async (): Promise<ActionProcessorList> => ({
-  [AiActionType.GetModelRegions]: processAiGetModelRegions,
-});
+export const getAiGetModelRegionsActionProcessor = createActionProcessor(askAiGetModelRegions, () => processAiGetModelRegions);

@@ -49,7 +49,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   const getResolveActionProcessorList = (context: Context) => async (): Promise<ActionProcessorList> => ({
     ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
     ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
-    ...getLambdaRuntimeRemainingTimeActionProcessor(context),
+    ...(await getLambdaRuntimeRemainingTimeActionProcessor(context)(qpqConfig, dynamicModuleLoader)),
 
     // Always done last, so they can override the default ones if the user wants.
     ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),

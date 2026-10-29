@@ -1,13 +1,13 @@
 import {
-  ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  createActionProcessor,
   Nullable,
   ProcessorFor,
 } from '@qpqjs/core';
-import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, performNetworkRequest } from '@qpqjs/webserver';
+import { askApiRequestBase, NetworkRequestErrorCode, performNetworkRequest } from '@qpqjs/webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
@@ -54,11 +54,8 @@ const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): Proce
   };
 };
 
-export const createApiRequestActionProcessor =
-  (options?: ApiRequestActionProcessorOptions): ActionProcessorListResolver =>
-  async (): Promise<ActionProcessorList> => ({
-    [ApiActionType.Request]: getProcessApiRequest(options),
-  });
+export const createApiRequestActionProcessor = (options?: ApiRequestActionProcessorOptions): ActionProcessorListResolver =>
+  createActionProcessor(askApiRequestBase, () => getProcessApiRequest(options));
 
 // Zero-config default registered in the standard web processors.
 export const getApiRequestActionProcessor: ActionProcessorListResolver = createApiRequestActionProcessor();
