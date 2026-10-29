@@ -1,9 +1,9 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
-import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceCompact } from '../actionCreators/askEventDocWorkspaceCompact';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
+import { askEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askEventDocWorkspaceSetHistoryEvents';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -29,16 +29,16 @@ export function* askEventDocWorkspaceResync(
     return;
   }
 
-  yield* askUIEventDocWorkspaceClearError(slotKey);
+  yield* askEventDocWorkspaceClearError(slotKey);
 
   const result = yield* askCatch(transport.askFetchBootstrap(documentIdentity));
 
   if (!result.success) {
-    yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
+    yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
     return;
   }
 
-  yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result.events, result.result.base);
-  yield* askUIEventDocWorkspaceCompact(slotKey);
+  yield* askEventDocWorkspaceSetHistoryEvents(slotKey, result.result.events, result.result.base);
+  yield* askEventDocWorkspaceCompact(slotKey);
   yield* askEventDocWorkspaceRebasePending(slots, slotKey);
 }

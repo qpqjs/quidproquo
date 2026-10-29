@@ -2,7 +2,7 @@ import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from '@qpqjs/core
 
 import { EventDocApplyTransientEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
-import { askUIEventDocWorkspaceApplyTransientEvent } from '../actionCreators/askUIEventDocWorkspaceApplyTransientEvent';
+import { askEventDocWorkspaceApplyTransientEvent } from '../actionCreators/askEventDocWorkspaceApplyTransientEvent';
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
 
 /**
@@ -30,5 +30,5 @@ export function* askEventDocWorkspaceCommitTransientEvent(
     },
   };
 
-  yield* askUIEventDocWorkspaceApplyTransientEvent(binding.slotKey, transientKey, event);
+  yield* askEventDocWorkspaceApplyTransientEvent(binding.slotKey, transientKey, event);
 }

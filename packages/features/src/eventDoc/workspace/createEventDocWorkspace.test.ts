@@ -33,13 +33,13 @@ import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
 import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
 import { rebaseSlotPending } from './logic/rebaseSlotPending';
 import {
-  askUIEventDocWorkspaceAppendHistoryEvent,
-  askUIEventDocWorkspaceApplyTransientEvent,
-  askUIEventDocWorkspaceDropTransient,
-  askUIEventDocWorkspaceReset,
-  askUIEventDocWorkspaceSetHistoryEvents,
-  askUIEventDocWorkspaceSetPendingEvents,
-  askUIEventDocWorkspaceSetSaving,
+  askEventDocWorkspaceAppendHistoryEvent,
+  askEventDocWorkspaceApplyTransientEvent,
+  askEventDocWorkspaceDropTransient,
+  askEventDocWorkspaceReset,
+  askEventDocWorkspaceSetHistoryEvents,
+  askEventDocWorkspaceSetPendingEvents,
+  askEventDocWorkspaceSetSaving,
 } from './actionCreators';
 import { createEventDocWorkspace } from './createEventDocWorkspace';
 import {
@@ -502,7 +502,7 @@ describe('createEventDocWorkspace declarative reads', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Saved title' }, 1)]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Saved title' }, 1)]);
       yield* workspace.docs.noteA.api.askNoteAppendTitleLine('l1');
     }
 
@@ -621,7 +621,7 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('one');
       yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'line');
       yield* workspace.docs.noteA.api.askNoteSetTitle('two'); // coalesces away 'one'
@@ -636,9 +636,9 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.docs.chrome.api.askChromeSetHistoryOpen(true);
-      yield* workspace.docs.chrome.api.askChromeSetHistoryOpen(false);
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHistoryOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHistoryOpen(false);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -662,8 +662,8 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetPendingEvents('noteA', [
         serverEvent(NoteEvent.SetTitle, { title: 'restored v1 title' }, 1),
         serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'restored v1 line' }, 2),
       ]);
@@ -689,7 +689,7 @@ describe('createEventDocWorkspace validation', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('should be rejected');
     }
 
@@ -704,7 +704,7 @@ describe('createEventDocWorkspace validation', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('rejected'); // sets the validation error
       yield* workspace.docs.noteA.api.askNoteCreateDraft();
     }
@@ -1010,7 +1010,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
       yield* workspace.api.askSyncHeadMoved('noteA', eventId(1), pending.payload.metadata.clientMessageId);
 
       // Mid-save, the ack path owns gap handling.
-      yield* askUIEventDocWorkspaceSetSaving('noteA', true);
+      yield* askEventDocWorkspaceSetSaving('noteA', true);
       yield* workspace.api.askSyncHeadMoved('noteA', eventId(5));
     }
 
@@ -1037,7 +1037,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     function* story(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA });
-      yield* askUIEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.SetTitle, { title: 'skipped ahead' }, 5));
+      yield* askEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.SetTitle, { title: 'skipped ahead' }, 5));
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1170,7 +1170,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     function* story(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA });
       yield* workspace.docs.noteA.api.askNoteSetTitle('discard me');
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
       yield* workspace.api.askCancel();
     }
 
@@ -1204,7 +1204,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     function* story(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA });
       yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved');
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, story));
@@ -1226,7 +1226,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     function* editSession(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA });
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
@@ -1545,8 +1545,8 @@ describe('createEventDocWorkspace historyViews', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Old doc' }, 1)]);
-      yield* askUIEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'still v1' }, 2));
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Old doc' }, 1)]);
+      yield* askEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'still v1' }, 2));
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1570,8 +1570,8 @@ describe('createEventDocWorkspace historyViews', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'gone' }, 1)]);
-      yield* askUIEventDocWorkspaceReset();
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'gone' }, 1)]);
+      yield* askEventDocWorkspaceReset();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1588,7 +1588,7 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('Live title');
       yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'a line');
     }
@@ -1630,7 +1630,7 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved title');
     }
 
@@ -1646,7 +1646,7 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createTestWorkspace();
 
     function* chromeOnlyStory(): AskResponse<void> {
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
     }
 
     const chromeOnlyState = runWorkspaceStory(workspace, chromeOnlyStory);
@@ -1654,7 +1654,7 @@ describe('createEventDocWorkspace selectors', () => {
     expect(workspace.selectors.isDirty(chromeOnlyState)).toBe(false);
 
     function* documentEditStory(): AskResponse<void> {
-      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askEventDocWorkspaceChromeSetHelpOpen(true);
       yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved');
     }
 
@@ -1669,8 +1669,8 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetPendingEvents('noteA', [
         serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'authored at v1' }, 1),
         eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'authored at v2' }, 2), 2),
       ]);
@@ -1691,11 +1691,11 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [
         initStateEvent(0),
         eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'already v2' }, 1), 2),
       ]);
-      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'stale v1' }, 2)]);
+      yield* askEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'stale v1' }, 2)]);
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1710,7 +1710,7 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.SetTitle, { title: 'restored v1' }, 0)]);
+      yield* askEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.SetTitle, { title: 'restored v1' }, 0)]);
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1760,7 +1760,7 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
       yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'observation, not an edit');
     }
 
@@ -1774,7 +1774,7 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
       yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'pending line');
       yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-b', 'l2', 'late');
       yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-a', 'l3', 'early');
@@ -1851,7 +1851,7 @@ describe('createEventDocWorkspace transient streams', () => {
 
     function* dropStory(): AskResponse<void> {
       yield* commits();
-      yield* askUIEventDocWorkspaceDropTransient('conn-1');
+      yield* askEventDocWorkspaceDropTransient('conn-1');
     }
 
     const after = runWorkspaceStory(workspace, dropStory);
@@ -1870,7 +1870,7 @@ describe('createEventDocWorkspace transient streams', () => {
 
     function* story(): AskResponse<void> {
       yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'gone');
-      yield* askUIEventDocWorkspaceReset();
+      yield* askEventDocWorkspaceReset();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1918,7 +1918,7 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
       yield* workspace.docs.noteA.api.askNoteSetTitle('pending');
       yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'transient');
     }
@@ -1938,11 +1938,11 @@ describe('createEventDocWorkspace transient streams', () => {
     // The transient tail reuses the pending fold, so it inherits the same
     // monotonic guard: once the folded doc is at v2, a v1 transient is corrupt.
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [
         initStateEvent(0),
         eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'already v2' }, 1), 2),
       ]);
-      yield* askUIEventDocWorkspaceApplyTransientEvent('noteA', 'conn-1', serverEvent(NoteEvent.SetTitle, { title: 'stale v1' }, 2));
+      yield* askEventDocWorkspaceApplyTransientEvent('noteA', 'conn-1', serverEvent(NoteEvent.SetTitle, { title: 'stale v1' }, 2));
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1959,7 +1959,7 @@ describe('createEventDocWorkspace history validation', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [
         initStateEvent(0),
         serverEvent(NoteEvent.SetTitle, { title: 'Before publish' }, 1),
         publishEvent(2),
@@ -1978,7 +1978,7 @@ describe('createEventDocWorkspace history validation', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0)]);
+      yield* askEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0)]);
     }
 
     const state = runWorkspaceStory(workspace, story);

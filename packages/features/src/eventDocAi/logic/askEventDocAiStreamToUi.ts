@@ -1,6 +1,6 @@
 import { type AiStreamPart, AiStreamPartType, AskResponse, askStreamMap } from '@qpqjs/core';
 
-import { askUIEventDocAiAppendStreamChunk } from '../module';
+import { askEventDocAiAppendStreamChunk } from '../module';
 import type { EventDocAiStreamHandle } from './askEventDocAiPromptStreamOpen';
 import { redactAiStreamPartUsage } from './redactAiStreamPartUsage';
 
@@ -13,7 +13,7 @@ export function* askEventDocAiStreamToUi(streamHandle: EventDocAiStreamHandle, u
     // (ToolInputStart) and what it was (ToolCall). They are still collected so
     // the saved message folds the same way.
     if (part.type !== AiStreamPartType.ToolInputDelta) {
-      yield* askUIEventDocAiAppendStreamChunk(usageVisible ? part : redactAiStreamPartUsage(part));
+      yield* askEventDocAiAppendStreamChunk(usageVisible ? part : redactAiStreamPartUsage(part));
     }
 
     return part;

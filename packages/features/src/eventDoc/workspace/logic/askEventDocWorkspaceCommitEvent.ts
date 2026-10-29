@@ -2,9 +2,9 @@ import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } fr
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
-import { askUIEventDocWorkspaceApplyEvent } from '../actionCreators/askUIEventDocWorkspaceApplyEvent';
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
+import { askEventDocWorkspaceApplyEvent } from '../actionCreators/askEventDocWorkspaceApplyEvent';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
@@ -40,7 +40,7 @@ export function* askEventDocWorkspaceCommitEvent(
 
     const reason = binding.validate(event, binding.getValidationView(state));
     if (reason) {
-      yield* askUIEventDocWorkspaceSetError(binding.slotKey, {
+      yield* askEventDocWorkspaceSetError(binding.slotKey, {
         operation: EventDocWorkspaceSlotOperation.validation,
         error: { errorType: ErrorTypeEnum.Invalid, errorText: reason },
       });
@@ -48,6 +48,6 @@ export function* askEventDocWorkspaceCommitEvent(
     }
   }
 
-  yield* askUIEventDocWorkspaceClearError(binding.slotKey);
-  yield* askUIEventDocWorkspaceApplyEvent(binding.slotKey, event);
+  yield* askEventDocWorkspaceClearError(binding.slotKey);
+  yield* askEventDocWorkspaceApplyEvent(binding.slotKey, event);
 }

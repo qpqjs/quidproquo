@@ -1,9 +1,9 @@
 import { askCatch, askMapParallel, AskResponse } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvents';
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
+import { askEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/askEventDocWorkspaceAppendHistoryEvents';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceCompact } from '../actionCreators/askEventDocWorkspaceCompact';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -26,12 +26,12 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport, slots:
 
     const afterEventId = getSlotHeadEventId(state, slotKey) ?? undefined;
 
-    yield* askUIEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceClearError(slotKey);
 
     const result = yield* askCatch(transport.askFetchEvents(documentIdentity, afterEventId));
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
+      yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
       return;
     }
 
@@ -41,8 +41,8 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport, slots:
 
     // A tail that does not start at head + 1 cannot be folded on; the bootstrap rebuilds the slot from a known base.
     if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, result.result)) {
-      yield* askUIEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
-      yield* askUIEventDocWorkspaceCompact(slotKey);
+      yield* askEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
+      yield* askEventDocWorkspaceCompact(slotKey);
       yield* askEventDocWorkspaceRebasePending(slots, slotKey);
     } else {
       yield* askEventDocWorkspaceResync(transport, slots, slotKey);

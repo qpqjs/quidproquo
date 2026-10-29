@@ -1,6 +1,6 @@
 import { AskResponse, Nullable } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
+import { askEventDocWorkspaceSetPendingEvents } from '../actionCreators/askEventDocWorkspaceSetPendingEvents';
 import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 
 /**
@@ -10,7 +10,7 @@ import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 export function* askEventDocWorkspaceRestoreLocalPending(snapshot: Nullable<EventDocWorkspaceSnapshot>, localSlotKeys: string[]): AskResponse<void> {
   for (const [slotKey, pending] of Object.entries(snapshot?.localSlots ?? {})) {
     if (localSlotKeys.includes(slotKey) && pending.length > 0) {
-      yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, pending);
+      yield* askEventDocWorkspaceSetPendingEvents(slotKey, pending);
     }
   }
 }

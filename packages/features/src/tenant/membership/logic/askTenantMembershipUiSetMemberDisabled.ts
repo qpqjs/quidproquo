@@ -3,7 +3,7 @@ import { AskResponse } from '@qpqjs/core';
 import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
-import { askUITenantMembershipSetError } from '../actionCreators/askUITenantMembershipSetError';
+import { askTenantMembershipSetError } from '../actionCreators/askTenantMembershipSetError';
 import { askTenantMemberDisabledPatch } from '../transport/askTenantMemberDisabledPatch';
 import { askTenantMembershipUiLoadMembers } from './askTenantMembershipUiLoadMembers';
 
@@ -14,7 +14,7 @@ export function* askTenantMembershipUiSetMemberDisabled(
   userId: string,
   disabled: boolean,
 ): AskResponse<boolean> {
-  const result = yield* askUiCatch(askTenantMemberDisabledPatch(target, tenantId, userId, disabled), { askSetError: askUITenantMembershipSetError });
+  const result = yield* askUiCatch(askTenantMemberDisabledPatch(target, tenantId, userId, disabled), { askSetError: askTenantMembershipSetError });
 
   if (!result.success) {
     return false;

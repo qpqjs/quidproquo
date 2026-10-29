@@ -1,9 +1,9 @@
 import { askCatch, askMapParallel, AskResponse } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceAppendFullHistory } from '../actionCreators/askUIEventDocWorkspaceAppendFullHistory';
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
-import { askUIEventDocWorkspaceSetFullHistory } from '../actionCreators/askUIEventDocWorkspaceSetFullHistory';
+import { askEventDocWorkspaceAppendFullHistory } from '../actionCreators/askEventDocWorkspaceAppendFullHistory';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
+import { askEventDocWorkspaceSetFullHistory } from '../actionCreators/askEventDocWorkspaceSetFullHistory';
 import { EVENT_DOC_WORKSPACE_HISTORY_PAGE_SIZE } from '../constants/eventDocWorkspaceHistoryPageSize';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -18,18 +18,18 @@ const getAskLoadSlotFullHistory = (transport: EventDocWorkspaceTransport) =>
       return;
     }
 
-    yield* askUIEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceClearError(slotKey);
 
     const result = yield* askCatch(
       transport.askFetchEventsPage(documentIdentity, { newestFirst: true, limit: EVENT_DOC_WORKSPACE_HISTORY_PAGE_SIZE }),
     );
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
+      yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
       return;
     }
 
-    yield* askUIEventDocWorkspaceSetFullHistory(slotKey, { events: result.result.items, nextPageKey: result.result.nextPageKey });
+    yield* askEventDocWorkspaceSetFullHistory(slotKey, { events: result.result.items, nextPageKey: result.result.nextPageKey });
   };
 
 const getAskLoadSlotOlderHistory = (transport: EventDocWorkspaceTransport) =>
@@ -42,7 +42,7 @@ const getAskLoadSlotOlderHistory = (transport: EventDocWorkspaceTransport) =>
       return;
     }
 
-    yield* askUIEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceClearError(slotKey);
 
     const result = yield* askCatch(
       transport.askFetchEventsPage(documentIdentity, {
@@ -53,11 +53,11 @@ const getAskLoadSlotOlderHistory = (transport: EventDocWorkspaceTransport) =>
     );
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
+      yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
       return;
     }
 
-    yield* askUIEventDocWorkspaceAppendFullHistory(slotKey, result.result.items, result.result.nextPageKey);
+    yield* askEventDocWorkspaceAppendFullHistory(slotKey, result.result.items, result.result.nextPageKey);
   };
 
 /**

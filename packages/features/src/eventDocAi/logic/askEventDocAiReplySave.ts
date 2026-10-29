@@ -2,7 +2,7 @@ import { type AiModel, type AiStreamPart, AskResponse } from '@qpqjs/core';
 
 import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import type { EventDocAiChatMessage, EventDocAiMessageSegment } from '../models';
-import { askUIEventDocAiAppendChatMessage, mergeStreamParts } from '../module';
+import { askEventDocAiAppendChatMessage, mergeStreamParts } from '../module';
 import { getEventDocAiStreamUsage } from './getEventDocAiStreamUsage';
 import { redactEventDocAiChatMessageUsage } from './redactEventDocAiChatMessageUsage';
 import { withEventDocAiStopNotice } from './withEventDocAiStopNotice';
@@ -37,7 +37,7 @@ export function* askEventDocAiReplySave(
 
   yield* askEventDocAiChatHistorySave(docId, chatId, [...history, assistantMessage]);
 
-  yield* askUIEventDocAiAppendChatMessage(usageVisible ? assistantMessage : redactEventDocAiChatMessageUsage(assistantMessage));
+  yield* askEventDocAiAppendChatMessage(usageVisible ? assistantMessage : redactEventDocAiChatMessageUsage(assistantMessage));
 
   return segments;
 }

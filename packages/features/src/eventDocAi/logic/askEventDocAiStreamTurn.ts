@@ -3,7 +3,7 @@ import { AiStreamFinishReasonEnum, askGetRuntimeRemainingTime, AskResponse } fro
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
 import { askEventDocAiChatTouch } from '../data/askEventDocAiChatTouch';
 import type { EventDocAiChatMessage, EventDocAiChatSendResult } from '../models';
-import { askUIEventDocAiClearStream } from '../module';
+import { askEventDocAiClearStream } from '../module';
 import { askEventDocAiContinueHandoff } from './askEventDocAiContinueHandoff';
 import { askEventDocAiPromptStreamOpen } from './askEventDocAiPromptStreamOpen';
 import { askEventDocAiReplySave } from './askEventDocAiReplySave';
@@ -56,7 +56,7 @@ export function* askEventDocAiStreamTurn(
 
   const segments = yield* askEventDocAiReplySave(docId, chatId, history, assistantParts, model, usageVisible);
 
-  yield* askUIEventDocAiClearStream();
+  yield* askEventDocAiClearStream();
 
   yield* askEventDocAiChatTouch(docId, chatId);
 

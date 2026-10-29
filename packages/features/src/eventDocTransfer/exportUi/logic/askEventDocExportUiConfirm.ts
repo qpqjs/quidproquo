@@ -2,9 +2,9 @@ import { AskResponse, Nullable } from '@qpqjs/core';
 
 import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { EventDocDocRef, EventDocTransferExportResult } from '../../models';
-import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExportSetError';
-import { askUIEventDocExportSetExporting } from '../actionCreators/askUIEventDocExportSetExporting';
-import { askUIEventDocExportSetResult } from '../actionCreators/askUIEventDocExportSetResult';
+import { askEventDocExportSetError } from '../actionCreators/askEventDocExportSetError';
+import { askEventDocExportSetExporting } from '../actionCreators/askEventDocExportSetExporting';
+import { askEventDocExportSetResult } from '../actionCreators/askEventDocExportSetResult';
 import { askEventDocExportFetch } from '../transport/askEventDocExportFetch';
 
 /**
@@ -13,8 +13,8 @@ import { askEventDocExportFetch } from '../transport/askEventDocExportFetch';
  */
 export function* askEventDocExportUiConfirm(serviceName: string, targets: EventDocDocRef[]): AskResponse<Nullable<EventDocTransferExportResult>> {
   const result = yield* askUiCatch(askEventDocExportFetch(serviceName, targets), {
-    askSetError: askUIEventDocExportSetError,
-    askSetBusy: askUIEventDocExportSetExporting,
+    askSetError: askEventDocExportSetError,
+    askSetBusy: askEventDocExportSetExporting,
     errorText: 'Export failed.',
   });
 
@@ -22,7 +22,7 @@ export function* askEventDocExportUiConfirm(serviceName: string, targets: EventD
     return null;
   }
 
-  yield* askUIEventDocExportSetResult(result.result);
+  yield* askEventDocExportSetResult(result.result);
 
   return result.result;
 }

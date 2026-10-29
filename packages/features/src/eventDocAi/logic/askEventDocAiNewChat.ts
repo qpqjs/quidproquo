@@ -3,24 +3,24 @@ import { AskResponse } from '@qpqjs/core';
 
 import { askUiCatch } from '../../ui/logic/askUiCatch';
 import type { EventDocAiChatSummary } from '../models';
-import { askUIEventDocAiClearStream } from '../module/actionCreators/askUIEventDocAiClearStream';
-import { askUIEventDocAiSetActiveChat } from '../module/actionCreators/askUIEventDocAiSetActiveChat';
-import { askUIEventDocAiSetError } from '../module/actionCreators/askUIEventDocAiSetError';
-import { askUIEventDocAiSetMessages } from '../module/actionCreators/askUIEventDocAiSetMessages';
-import { askUIEventDocAiUpsertChat } from '../module/actionCreators/askUIEventDocAiUpsertChat';
+import { askEventDocAiClearStream } from '../module/actionCreators/askEventDocAiClearStream';
+import { askEventDocAiSetActiveChat } from '../module/actionCreators/askEventDocAiSetActiveChat';
+import { askEventDocAiSetError } from '../module/actionCreators/askEventDocAiSetError';
+import { askEventDocAiSetMessages } from '../module/actionCreators/askEventDocAiSetMessages';
+import { askEventDocAiUpsertChat } from '../module/actionCreators/askEventDocAiUpsertChat';
 import { askEventDocAiChatCreateRequest } from '../transport/askEventDocAiChatCreateRequest';
 
 export function* askEventDocAiNewChat(): AskResponse<Nullable<EventDocAiChatSummary>> {
-  const result = yield* askUiCatch(askEventDocAiChatCreateRequest(), { askSetError: askUIEventDocAiSetError });
+  const result = yield* askUiCatch(askEventDocAiChatCreateRequest(), { askSetError: askEventDocAiSetError });
 
   if (!result.success) {
     return null;
   }
 
-  yield* askUIEventDocAiUpsertChat(result.result);
-  yield* askUIEventDocAiSetActiveChat(result.result.chatId);
-  yield* askUIEventDocAiSetMessages([]);
-  yield* askUIEventDocAiClearStream();
+  yield* askEventDocAiUpsertChat(result.result);
+  yield* askEventDocAiSetActiveChat(result.result.chatId);
+  yield* askEventDocAiSetMessages([]);
+  yield* askEventDocAiClearStream();
 
   return result.result;
 }

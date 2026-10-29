@@ -1,5 +1,5 @@
-import { askUIEventDocImportReset } from './actionCreators/askUIEventDocImportReset';
-import { askUIEventDocImportSetError } from './actionCreators/askUIEventDocImportSetError';
+import { askEventDocImportReset } from './actionCreators/askEventDocImportReset';
+import { askEventDocImportSetError } from './actionCreators/askEventDocImportSetError';
 import { askEventDocImportUiApply } from './logic/askEventDocImportUiApply';
 import { askEventDocImportUiClear } from './logic/askEventDocImportUiClear';
 import { askEventDocImportUiLoad } from './logic/askEventDocImportUiLoad';
@@ -9,6 +9,6 @@ export const sharedEventDocImportUiApi = {
   askEventDocImportUiLoad,
   askEventDocImportUiApply,
   askEventDocImportUiClear,
-  askUIEventDocImportSetError,
-  askUIEventDocImportReset,
+  askEventDocImportSetError,
+  askEventDocImportReset,
 };

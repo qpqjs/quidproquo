@@ -9,7 +9,7 @@ Client-side story that loads the current document's chats and pushes them into t
 
 This is one of the four client stories also exposed as `sharedEventDocAiApi`. It drives UI state through the `askUIEventDocAi*` actions (documented separately).
 
-- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatListRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiSetChats` / `askUIEventDocAiSetLoadingChats` / `askUIEventDocAiSetError` UI actions.
+- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatListRequest](./ask-event-doc-ai-chat-requests.md), and the `askEventDocAiSetChats` / `askEventDocAiSetLoadingChats` / `askEventDocAiSetError` UI actions.
 
 ```typescript
 import { askEventDocAiLoadChats } from '@qpqjs/features';
@@ -27,7 +27,7 @@ function* askEventDocAiLoadChats(): AskResponse<void>;
 
 ## Returns
 
-`void`. On success the chat list is dispatched to state via `askUIEventDocAiSetChats`; on failure the error text is dispatched via `askUIEventDocAiSetError`. The loading flag is cleared either way (passed as `askCatch`'s finally story).
+`void`. On success the chat list is dispatched to state via `askEventDocAiSetChats`; on failure the error text is dispatched via `askEventDocAiSetError`. The loading flag is cleared either way (passed as `askCatch`'s finally story).
 
 ## Related
 

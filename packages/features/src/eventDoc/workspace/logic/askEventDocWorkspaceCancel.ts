@@ -1,12 +1,12 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceSetPendingEvents } from '../actionCreators/askEventDocWorkspaceSetPendingEvents';
 
 /** Discards the pending buffer of each slot; the saved log is untouched, so the view reverts reactively. */
 export function* askEventDocWorkspaceCancel(slotKeys: string[]): AskResponse<void> {
   for (const slotKey of slotKeys) {
-    yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, []);
-    yield* askUIEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceSetPendingEvents(slotKey, []);
+    yield* askEventDocWorkspaceClearError(slotKey);
   }
 }

@@ -9,7 +9,7 @@ These `ask`-generators are **client-side UI state setters** for the Event Doc AI
 
 Each setter dispatches a typed **effect** through the core State action processors: internally it calls `askStateDispatchEffect` → `askStateDispatch`, which the SPA's state runtime folds into `EventDocAiState` via `eventDocAiReducer` (a `buildEffectReducer` over `EventDocAiEffect`). In a browser SPA the State domain is wired through the client state store (see `defineStateDispatchOverWebsockets` / `askStateDispatch` in `@qpqjs/core`), so a `yield*` here is a synchronous, local state update. Every setter returns `AskResponse<void>`.
 
-`streamSegments` is the reply currently in flight, already in the durable segment format. Each `AiStreamPart` arriving over the socket is folded into the last segment as it lands (`foldStreamPart`): text and reasoning deltas extend the current segment, a `ToolInputStart` adds a tool entry with an empty input, and `ToolCall` / `ToolResult` fill in that entry's input and output. Tool argument deltas are not sent to the browser at all, so a large tool input costs the UI one update at the start and one at the end. `isStreaming` is true from the first part until the stream is cleared, so the UI can show activity before any renderable segment exists. When the reply finishes, the backend dispatches the finalized `EventDocAiChatMessage` (via [`askUIEventDocAiAppendChatMessage`](./active-chat-state.md)) and clears the buffer.
+`streamSegments` is the reply currently in flight, already in the durable segment format. Each `AiStreamPart` arriving over the socket is folded into the last segment as it lands (`foldStreamPart`): text and reasoning deltas extend the current segment, a `ToolInputStart` adds a tool entry with an empty input, and `ToolCall` / `ToolResult` fill in that entry's input and output. Tool argument deltas are not sent to the browser at all, so a large tool input costs the UI one update at the start and one at the end. `isStreaming` is true from the first part until the stream is cleared, so the UI can show activity before any renderable segment exists. When the reply finishes, the backend dispatches the finalized `EventDocAiChatMessage` (via [`askEventDocAiAppendChatMessage`](./active-chat-state.md)) and clears the buffer.
 
 ## State shape
 
@@ -33,7 +33,7 @@ type EventDocAiState = {
 
 ---
 
-## askUIEventDocAiAppendStreamChunk
+## askEventDocAiAppendStreamChunk
 
 Appends one streaming chunk to the in-flight assistant reply. Called for each part received while a reply streams in.
 
@@ -41,18 +41,18 @@ Appends one streaming chunk to the in-flight assistant reply. Called for each pa
 - **State change:** folds `part` into `streamSegments` and sets `isStreaming` to `true`.
 
 ```typescript
-import { askUIEventDocAiAppendStreamChunk } from '@qpqjs/features';
+import { askEventDocAiAppendStreamChunk } from '@qpqjs/features';
 import type { AiStreamPart } from '@qpqjs/core';
 
 export function* onStreamPart(part: AiStreamPart) {
-  yield* askUIEventDocAiAppendStreamChunk(part);
+  yield* askEventDocAiAppendStreamChunk(part);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiAppendStreamChunk(
+function* askEventDocAiAppendStreamChunk(
   part: AiStreamPart,
 ): AskResponse<void>;
 ```
@@ -63,7 +63,7 @@ function* askUIEventDocAiAppendStreamChunk(
 
 ---
 
-## askUIEventDocAiClearStream
+## askEventDocAiClearStream
 
 Clears the in-flight stream buffer — call this once the reply has been finalized into a chat message, or to discard a stream on error/cancel.
 
@@ -72,28 +72,28 @@ Clears the in-flight stream buffer — call this once the reply has been finaliz
 
 ```typescript
 import {
-  askUIEventDocAiAppendChatMessage,
-  askUIEventDocAiClearStream,
+  askEventDocAiAppendChatMessage,
+  askEventDocAiClearStream,
 } from '@qpqjs/features';
 import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* finalizeReply(reply: EventDocAiChatMessage) {
-  yield* askUIEventDocAiAppendChatMessage(reply);
-  yield* askUIEventDocAiClearStream();
+  yield* askEventDocAiAppendChatMessage(reply);
+  yield* askEventDocAiClearStream();
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiClearStream(): AskResponse<void>;
+function* askEventDocAiClearStream(): AskResponse<void>;
 ```
 
 Takes no parameters.
 
 ---
 
-## askUIEventDocAiSetSending
+## askEventDocAiSetSending
 
 Toggles the "sending a message" flag so the composer can disable input and show a busy state while a turn is in flight.
 
@@ -101,19 +101,19 @@ Toggles the "sending a message" flag so the composer can disable input and show 
 - **State change:** sets `isSending`.
 
 ```typescript
-import { askUIEventDocAiSetSending } from '@qpqjs/features';
+import { askEventDocAiSetSending } from '@qpqjs/features';
 
 export function* sendTurn() {
-  yield* askUIEventDocAiSetSending(true);
+  yield* askEventDocAiSetSending(true);
   // ...dispatch the send and await the reply, then...
-  yield* askUIEventDocAiSetSending(false);
+  yield* askEventDocAiSetSending(false);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetSending(
+function* askEventDocAiSetSending(
   isSending: boolean,
 ): AskResponse<void>;
 ```
@@ -124,7 +124,7 @@ function* askUIEventDocAiSetSending(
 
 ---
 
-## askUIEventDocAiSetError
+## askEventDocAiSetError
 
 Sets or clears the error message surfaced to the user (e.g. a failed send or load).
 
@@ -132,21 +132,21 @@ Sets or clears the error message surfaced to the user (e.g. a failed send or loa
 - **State change:** sets `error` to the message, or `null` to clear it.
 
 ```typescript
-import { askUIEventDocAiSetError } from '@qpqjs/features';
+import { askEventDocAiSetError } from '@qpqjs/features';
 
 export function* showError() {
-  yield* askUIEventDocAiSetError('Failed to send message. Please try again.');
+  yield* askEventDocAiSetError('Failed to send message. Please try again.');
 }
 
 export function* clearError() {
-  yield* askUIEventDocAiSetError(null);
+  yield* askEventDocAiSetError(null);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetError(
+function* askEventDocAiSetError(
   error: Nullable<string>,
 ): AskResponse<void>;
 ```
