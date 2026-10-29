@@ -1,12 +1,4 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  askStateDispatchBase,
-  createActionProcessor,
-  ProcessorFor,
-  StateActionType,
-} from '@qpqjs/core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, askStateDispatchBase, ProcessorFor, StateActionType } from '@qpqjs/core';
 
 import { Dispatch } from 'react';
 

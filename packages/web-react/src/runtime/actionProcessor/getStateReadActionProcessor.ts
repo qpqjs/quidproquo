@@ -1,12 +1,4 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  askStateReadBase,
-  createActionProcessor,
-  ProcessorFor,
-  StateActionType,
-} from '@qpqjs/core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, askStateReadBase, ProcessorFor, StateActionType } from '@qpqjs/core';
 
 const getProcessStateRead =
   <State>(getCurrentState: () => State): ProcessorFor<typeof askStateReadBase> =>

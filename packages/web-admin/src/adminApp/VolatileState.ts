@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from '@qpqjs/core';
+import { Nullable, StoryResultMetadata } from '@qpqjs/core';
 import { LogLog } from '@qpqjs/features';
 
 // Server-derived / transient data that is NOT part of the audited session fold.
@@ -11,7 +11,7 @@ export type VolatileLogResults = {
   partsTotal: number;
   partsDone: number;
   isSearching: boolean;
-  fetchedAt: string | null;
+  fetchedAt: Nullable<string>;
 };
 
 export type VolatileLogLogResults = {
@@ -19,7 +19,7 @@ export type VolatileLogLogResults = {
   partsTotal: number;
   partsDone: number;
   isSearching: boolean;
-  fetchedAt: string | null;
+  fetchedAt: Nullable<string>;
 };
 
 export type VolatileState = {

@@ -1,4 +1,4 @@
-import { LogLevelEnumLookup } from '@qpqjs/core';
+import { LogLevelEnumLookup, Nullable } from '@qpqjs/core';
 import { useFastCallback } from '@qpqjs/web-react';
 
 import { useMemo } from 'react';
@@ -34,15 +34,15 @@ export const useSearchFields = () => {
     applySearch({ runtimeType: event.target.value });
   });
 
-  const handleServiceOnChange = useFastCallback((event: unknown, value: AutoCompleteOption | null) => {
+  const handleServiceOnChange = useFastCallback((event: unknown, value: Nullable<AutoCompleteOption>) => {
     applySearch({ service: value?.value || '' });
   });
 
-  const handleStartDateChange = useFastCallback((value: Date | null) => {
+  const handleStartDateChange = useFastCallback((value: Nullable<Date>) => {
     applySearch({ startIsoDateTime: value ? value.toISOString() : '' });
   });
 
-  const handleEndDateChange = useFastCallback((value: Date | null) => {
+  const handleEndDateChange = useFastCallback((value: Nullable<Date>) => {
     applySearch({ endIsoDateTime: value ? value.toISOString() : '' });
   });
 

@@ -1,4 +1,4 @@
-import { generateUuid } from '@qpqjs/core';
+import { generateUuid, Nullable } from '@qpqjs/core';
 import { EventDocSummary, MaintenanceEffect, MaintenanceLevel, MaintenanceType, toEventDocListItem } from '@qpqjs/features';
 import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
 
@@ -33,7 +33,7 @@ export function MaintenanceList({ onOpen }: MaintenanceListProps) {
 
   const [summaries, setSummaries] = useState<EventDocSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Nullable<string>>(null);
   const [creating, setCreating] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 

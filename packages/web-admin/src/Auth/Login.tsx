@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 
 import { AsyncButton } from '../components';
-import { authLogic } from './logic';
 
 interface LoginProps {
   username: string;

@@ -1,5 +1,5 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { IconButton, Typography } from '@mui/material';
+import { IconButton } from '@mui/material';
 
 import { useTruncatedText } from './hooks';
 

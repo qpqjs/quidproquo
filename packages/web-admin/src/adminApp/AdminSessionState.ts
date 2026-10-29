@@ -1,3 +1,4 @@
+import { Nullable } from '@qpqjs/core';
 import { createEventDocInitialDocumentState, EventDocDocument } from '@qpqjs/features';
 
 import { adminSessionSchemaVersion } from './constants/adminSessionSchemaVersion';
@@ -13,12 +14,12 @@ export type AdminSessionState = EventDocDocument & {
   seededParams: SessionSeededParams;
   tab: number;
   search: AdminSearchParams;
-  lastSearchRequest: SearchRequestedData | null;
-  openCorrelation: string | null;
+  lastSearchRequest: Nullable<SearchRequestedData>;
+  openCorrelation: Nullable<string>;
   logChecks: Record<string, boolean>;
   configSelectedService: string;
   chatMessageCounts: Record<string, number>;
-  endedAt: string | null;
+  endedAt: Nullable<string>;
 };
 
 export const createDefaultAdminSearchParams = (): AdminSearchParams => ({

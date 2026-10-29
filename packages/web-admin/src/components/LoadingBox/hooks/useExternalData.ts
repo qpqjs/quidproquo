@@ -1,9 +1,11 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useEffect, useRef, useState } from 'react';
 
-import { useExternalApiGet, usePlatformApiGet } from '../../../view';
+import { useExternalApiGet } from '../../../view';
 
-export const useExternalData = <T>(url?: string): T | null => {
-  const [data, setData] = useState<T | null>(null);
+export const useExternalData = <T>(url?: string): Nullable<T> => {
+  const [, setData] = useState<Nullable<T>>(null);
   const loadData = useExternalApiGet<T>(url);
   const cache = useRef<Record<string, T>>({});
 

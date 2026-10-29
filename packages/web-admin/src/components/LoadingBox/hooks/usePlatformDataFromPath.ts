@@ -1,9 +1,11 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { usePlatformApiGet } from '../../../view';
 
-export const usePlatformDataFromPath = <T>(path?: string): T | null => {
-  const [data, setData] = useState<T | null>(null);
+export const usePlatformDataFromPath = <T>(path?: string): Nullable<T> => {
+  const [data, setData] = useState<Nullable<T>>(null);
   const loadData = usePlatformApiGet<T>(path);
   const cache = useRef<Record<string, T>>({});
 

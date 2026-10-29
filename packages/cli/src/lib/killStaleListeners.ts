@@ -34,7 +34,7 @@ export const isQpqCliCommand = (command: string): boolean =>
 // matched isn't enough; wait for the whole pid to disappear so it can't bind
 // anything else afterward. Poll synchronously (this whole sweep runs before
 // anything async starts) via `kill(pid, 0)`, reliable and fast here because
-// these are unrelated, previously-orphaned processes, not children of this
+// these are unrelated processes orphaned earlier, not children of this
 // one (a real child can sit as a zombie answering `kill(pid, 0)` until this
 // process's own event loop reaps it, which a tight sync loop would starve;
 // doesn't apply to a process we didn't spawn).

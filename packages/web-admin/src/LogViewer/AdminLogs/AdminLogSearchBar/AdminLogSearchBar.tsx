@@ -1,4 +1,4 @@
-import { logLevelEnumLookups } from '@qpqjs/core';
+import { logLevelEnumLookups, Nullable } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -38,7 +38,7 @@ export function AdminLogSearchBar({ onSearch }: AdminLogSearchBarProps) {
     handleLogLevelOnChange,
   } = useSearchFields();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<Nullable<HTMLElement>>(null);
 
   const handleQuickTimeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

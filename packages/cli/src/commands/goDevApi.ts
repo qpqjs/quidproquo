@@ -14,7 +14,6 @@ import { Nullable } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
 import { ChildProcess, spawn } from 'child_process';
-import fs from 'fs';
 import path from 'path';
 import { rspack } from '@rspack/core';
 

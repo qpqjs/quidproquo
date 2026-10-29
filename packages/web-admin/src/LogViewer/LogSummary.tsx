@@ -1,4 +1,4 @@
-import { StoryResult } from '@qpqjs/core';
+import { Nullable, StoryResult } from '@qpqjs/core';
 import {
   LogMetadata,
   WebsocketAdminClientMessageEventType,
@@ -20,7 +20,7 @@ interface LogSummaryProps {
 
 export const LogSummary = ({ log }: LogSummaryProps) => {
   const [checkedLoading, setCheckedLoading] = useState(true);
-  const [logMetadata, setLogMetadata] = useState<LogMetadata | null>(null);
+  const [logMetadata, setLogMetadata] = useState<Nullable<LogMetadata>>(null);
 
   const [adminApi] = useAdminApp();
   const sendMessage = useWebsocketSendEvent();

@@ -1,4 +1,4 @@
-import { QpqExecutionTrace } from '@qpqjs/core';
+import { Nullable, QpqExecutionTrace } from '@qpqjs/core';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -76,7 +76,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(() => getDefaultSourceIndex(trace));
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const highlightedLineRef = useRef<HTMLDivElement | null>(null);
+  const highlightedLineRef = useRef<Nullable<HTMLDivElement>>(null);
 
   const annotations = useMemo(() => buildLineAnnotations(trace, selectedSourceIndex), [trace, selectedSourceIndex]);
   const displaySourceNames = useMemo(() => getDisplaySourceNames(trace.sources.map((traceSource) => traceSource.path)), [trace.sources]);

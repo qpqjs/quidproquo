@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Autocomplete, IconButton, Menu } from '@mui/material';
@@ -43,7 +45,7 @@ export function TopSection({ onSearch }: TopSectionProps) {
     updateStartAndEndTimeSpan,
   } = useSearchFields();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<Nullable<HTMLElement>>(null);
 
   const handleQuickTimeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import React, { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, FormControl, Grid, IconButton, Menu, MenuItem } from '@mui/material';
@@ -12,15 +14,15 @@ interface DateRangePickerProps {
 }
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({ startIsoDateTime, endIsoDateTime, setStartIsoDateTime, setEndIsoDateTime }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<Nullable<HTMLElement>>(null);
 
-  const handleStartDateChange = (value: Date | null) => {
+  const handleStartDateChange = (value: Nullable<Date>) => {
     if (value) {
       setStartIsoDateTime(value.toISOString());
     }
   };
 
-  const handleEndDateChange = (value: Date | null) => {
+  const handleEndDateChange = (value: Nullable<Date>) => {
     if (value) {
       setEndIsoDateTime(value.toISOString());
     }

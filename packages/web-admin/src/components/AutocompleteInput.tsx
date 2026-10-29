@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import React from 'react';
 import { Autocomplete, FormControl, TextField } from '@mui/material';
 
@@ -14,7 +16,7 @@ interface AutocompleteInputProps {
 }
 
 export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ label, value, options, onChange }: AutocompleteInputProps) => {
-  const handleChange = (event: React.SyntheticEvent, newValue: AutocompleteOption | null) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: Nullable<AutocompleteOption>) => {
     onChange(newValue ? newValue.value : '');
   };
 

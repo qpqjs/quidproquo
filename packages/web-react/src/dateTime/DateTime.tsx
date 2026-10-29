@@ -19,7 +19,7 @@ export type DateTimeProps = DateInput & {
   hideTimeAgo?: boolean;
   /** Render each part on its own line instead of inline. Defaults to true. */
   isMultiline?: boolean;
-  /** What to render when the date is missing/invalid (e.g. an empty isoDateTime). Defaults to "—". */
+  /** What to render when the date is missing/invalid (e.g. an empty isoDateTime). Defaults to an em dash. */
   placeholder?: React.ReactNode;
   className?: string;
 };

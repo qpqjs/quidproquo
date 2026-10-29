@@ -57,8 +57,8 @@ export function MaintenanceEditor({ docId, onBack }: MaintenanceEditorProps) {
   const urlResolvers = useBaseUrlResolvers();
   const accessToken = useAuthAccessToken();
 
-  const [events, setEvents] = useState<EventDocEvent[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<Nullable<EventDocEvent[]>>(null);
+  const [error, setError] = useState<Nullable<string>>(null);
   const [busy, setBusy] = useState(false);
   const [dialog, setDialog] = useState<DialogMode>({ kind: 'closed' });
 

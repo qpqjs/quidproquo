@@ -1,5 +1,3 @@
-import { StoryResultMetadataWithChildren } from '@qpqjs/core';
-
 import { Box } from '@mui/material';
 
 import { TreeApi } from './hooks';

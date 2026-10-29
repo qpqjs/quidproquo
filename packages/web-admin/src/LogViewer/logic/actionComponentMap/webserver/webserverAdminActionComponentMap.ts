@@ -1,4 +1,4 @@
-import { AdminActionType, askAdminGetLog, askAdminGetLogs } from '@qpqjs/webserver';
+import { AdminActionType } from '@qpqjs/webserver';
 
 const webserverAdminActionComponentMap: Record<string, string[]> = {
   [AdminActionType.GetLog]: ['askAdminGetLog', 'correlationId'],

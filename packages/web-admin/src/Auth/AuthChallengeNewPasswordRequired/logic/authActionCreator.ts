@@ -1,4 +1,4 @@
-import { AskResponse, askStateDispatchEffect, AuthenticateUserResponse } from '@qpqjs/core';
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
 
 import { AuthChallengeEffect, AuthChallengeSetPasswordAEffect, AuthChallengeSetPasswordBEffect } from './authChallengeTypes';
 
