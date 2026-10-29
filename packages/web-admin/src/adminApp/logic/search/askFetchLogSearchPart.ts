@@ -1,5 +1,4 @@
-import { askCatch, AskResponse, EitherActionResult, HTTPNetworkResponse, StoryResultMetadata } from '@qpqjs/core';
-import { QpqLogList } from '@qpqjs/webserver';
+import { askCatch, AskResponse, EitherActionResult, HTTPNetworkResponse, QpqPagedData, StoryResultMetadata } from '@qpqjs/core';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
 import { askUIVolatileLogSearchPartLoaded } from '../../actionCreators/volatile/askUIVolatileLogSearchPartLoaded';
@@ -18,8 +17,8 @@ export function* askFetchLogSearchPart(
   let nextPageKey: string | undefined = undefined;
 
   do {
-    const response: EitherActionResult<HTTPNetworkResponse<QpqLogList>> = yield* askCatch(
-      askPlatformRequest<QpqLogList, unknown>('POST', '/log/list', {
+    const response: EitherActionResult<HTTPNetworkResponse<QpqPagedData<StoryResultMetadata>>> = yield* askCatch(
+      askPlatformRequest<QpqPagedData<StoryResultMetadata>, unknown>('POST', '/log/list', {
         body: {
           runtimeType,
           startIsoDateTime: search.startIsoDateTime || nowIso,

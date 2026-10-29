@@ -1,4 +1,4 @@
-import { StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { ActionOf, askStateDispatchBase, StateActionType } from '@qpqjs/core';
 import { runStory } from '@qpqjs/testing';
 import { QueryParamsActionType } from '@qpqjs/web';
 
@@ -13,7 +13,7 @@ describe('askSyncParams', () => {
 
     runStory(askSyncParams(), {
       [QueryParamsActionType.GetAll]: { tab: ['one'], page: ['2'] },
-      [StateActionType.Dispatch]: (action: StateDispatchAction<unknown>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched.push(action.payload.action);
       },
     });
@@ -29,7 +29,7 @@ describe('askSyncParams', () => {
 
     runStory(askSyncParams(), {
       [QueryParamsActionType.GetAll]: {},
-      [StateActionType.Dispatch]: (action: StateDispatchAction<unknown>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched.push(action.payload.action);
       },
     });

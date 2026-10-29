@@ -1,7 +1,7 @@
 import { askThrowError } from '../../actions';
-import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
+import { ContextActionType } from '../../actions/context';
 import { askContextList } from '../../actions/context/askContextList';
-import { ContextReadAction } from '../../actions/context/askContextRead';
+import { askContextReadBase } from '../../actions/context/askContextRead';
 import { ActionOf, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
 import { Nullable } from '../../types/Nullable';
 import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
@@ -14,9 +14,8 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
   let cache: Nullable<QpqContext<any>> = null;
 
   return yield* askOverrideActions(storyIterator, {
-    [ContextActionType.Read]: function* (action: ContextReadAction<any>) {
-      const payload = action.payload as ContextReadActionPayload<any>;
-      if (payload.contextIdentifier.uniqueName === contextIdentifier.uniqueName) {
+    [ContextActionType.Read]: function* (action: ActionOf<typeof askContextReadBase>) {
+      if (action.payload.contextIdentifier.uniqueName === contextIdentifier.uniqueName) {
         // We produce this value ourselves, so we shape it for returnErrors.
         return getSuccessfulEitherActionResultIfRequired(value, action.returnErrors);
       }

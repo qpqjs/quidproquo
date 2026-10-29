@@ -1,4 +1,4 @@
-import { DateActionType, GuidActionType, StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { ActionOf, askStateDispatchBase, DateActionType, GuidActionType, StateActionType } from '@qpqjs/core';
 import { captureRequester, runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -35,7 +35,7 @@ describe('askUIShowError', () => {
     runStory(askUIShowError('boom'), {
       [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
       [GuidActionType.New]: 'guid-1',
-      [StateActionType.Dispatch]: (action: StateDispatchAction<unknown>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched = action.payload.action;
       },
     });

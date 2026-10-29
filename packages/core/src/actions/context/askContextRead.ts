@@ -1,17 +1,11 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqContextIdentifier } from '../../types';
-import { Action } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
 import { ContextActionType } from './ContextActionType';
 
 export type ContextReadActionPayload<T> = {
   contextIdentifier: QpqContextIdentifier<T>;
 };
-
-export type ContextReadAction<T> = {
-  type: ContextActionType.Read;
-  payload: ContextReadActionPayload<T>;
-} & Action<ContextReadActionPayload<T>>;
 
 export const askContextReadBase = createActionRequester<unknown>()({
   actionType: ContextActionType.Read,

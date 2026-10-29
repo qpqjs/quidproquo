@@ -1,6 +1,6 @@
-import { StateActionType, StateDispatchAction, StateReadAction } from '../../actions/state';
+import { askStateDispatchBase, askStateReadBase, StateActionType } from '../../actions/state';
 import { QpqReducer } from '../../logic/stateEffects';
-import { AskResponse } from '../../types';
+import { ActionOf, AskResponse } from '../../types';
 import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
 
 // Runs an inner story purely for its dispatched state effects and returns the computed state.
@@ -19,8 +19,9 @@ export function* askReduceState<State, Effect>(
   let state = initialState;
 
   yield* askOverrideActions(story(), {
-    [StateActionType.Dispatch]: function* (action: StateDispatchAction<Effect>) {
-      const [nextState, handled] = reducer(state, action.payload.action);
+    [StateActionType.Dispatch]: function* (action: ActionOf<typeof askStateDispatchBase>) {
+      // The dispatch payload is untyped on the wire; the reducer declares the effect shape it accepts.
+      const [nextState, handled] = reducer(state, action.payload.action as Effect);
 
       if (handled) {
         state = nextState;
@@ -34,7 +35,7 @@ export function* askReduceState<State, Effect>(
       return yield action;
     },
 
-    [StateActionType.Read]: function* (action: StateReadAction) {
+    [StateActionType.Read]: function* (action: ActionOf<typeof askStateReadBase>) {
       // Mirror the React getStateReadActionProcessor: return the whole accumulated state and ignore
       // payload.path (path reads are unsupported everywhere today). We produce this value, so we
       // shape it for returnErrors.

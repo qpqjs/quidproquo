@@ -1,4 +1,4 @@
-import { StateActionType, StateDispatchAction } from '@qpqjs/core';
+import { ActionOf, askStateDispatchBase, StateActionType } from '@qpqjs/core';
 import { runStory } from '@qpqjs/testing';
 import { QueryParamsActionType, QueryParamsSetAction } from '@qpqjs/web';
 
@@ -16,7 +16,7 @@ describe('askSetParam', () => {
       [QueryParamsActionType.Set]: (action: QueryParamsSetAction) => {
         setPayloads.push(action.payload);
       },
-      [StateActionType.Dispatch]: (action: StateDispatchAction<unknown>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched.push(action.payload.action);
       },
     });

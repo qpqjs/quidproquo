@@ -3,7 +3,8 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { ContextActionType } from '../../actions/context';
-import { ContextReadAction } from '../../actions/context/askContextRead';
+import { askContextReadBase } from '../../actions/context/askContextRead';
+import { ActionOf } from '../../types';
 import { createContextIdentifier } from './createContextIdentifier';
 import { createContextReader } from './createContextReader';
 
@@ -24,7 +25,7 @@ describe('createContextReader', () => {
     const readUser = createContextReader(userContext);
 
     const result = runStory(readUser(), {
-      [ContextActionType.Read]: (action: ContextReadAction<string>) => action.payload.contextIdentifier.uniqueName,
+      [ContextActionType.Read]: (action: ActionOf<typeof askContextReadBase>) => action.payload.contextIdentifier.uniqueName,
     });
 
     expect(result).toBe('user');

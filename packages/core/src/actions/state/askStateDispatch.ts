@@ -1,16 +1,10 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
-import { Action } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
 import { StateActionType } from './StateActionType';
 
 export type StateDispatchActionPayload<T> = {
   action: T;
 };
-
-export type StateDispatchAction<T> = {
-  type: StateActionType.Dispatch;
-  payload: StateDispatchActionPayload<T>;
-} & Action<StateDispatchActionPayload<T>>;
 
 export const askStateDispatchBase = createActionRequester<void>()({
   actionType: StateActionType.Dispatch,

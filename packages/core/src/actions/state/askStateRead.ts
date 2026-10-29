@@ -1,16 +1,10 @@
 import { createActionRequester } from '../../logic/actions/createActionRequester';
-import { Action } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
 import { StateActionType } from './StateActionType';
 
 export type StateReadActionPayload = {
   path?: string;
 };
-
-export type StateReadAction = {
-  type: StateActionType.Read;
-  payload: StateReadActionPayload;
-} & Action<StateReadActionPayload>;
 
 export const askStateReadBase = createActionRequester<unknown>()({
   actionType: StateActionType.Read,
