@@ -1,3 +1,4 @@
+import { runCommandCaptureSync, sleepSync } from './runCommand';
 // Pre-start sweep shared by the dev-server commands: a previous run whose
 // wrapper died without killing its listener (closed terminal, SIGKILL) leaves
 // an orphaned process holding a dev port, and the next launch dies with
@@ -6,7 +7,6 @@
 // and reported, it's not ours.
 import { Nullable } from '@qpqjs/core';
 
-import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -52,7 +52,7 @@ const waitForPidGone = (pid: number, timeoutMs = 8000): boolean => {
     } catch {
       return true; // throws once the pid no longer exists
     }
-    execSync('sleep 0.05');
+    sleepSync(50);
   }
 
   return false;
@@ -75,8 +75,7 @@ const killPidHard = (pid: number): void => {
 // itself a symlink (a symlinked home directory, an NFS mount, etc).
 const getProcessCwd = (pid: number): Nullable<string> => {
   try {
-    const line = execSync(`lsof -a -p ${pid} -d cwd -Fn`, { stdio: ['ignore', 'pipe', 'ignore'] })
-      .toString()
+    const line = runCommandCaptureSync('lsof', ['-a', '-p', String(pid), '-d', 'cwd', '-Fn'])
       .split('\n')
       .find((l) => l.startsWith('n'));
     return line ? fs.realpathSync(line.slice(1)) : null;
@@ -97,11 +96,7 @@ const getOwnAncestorPids = (): Set<number> => {
   while (pid > 1 && !ancestors.has(pid)) {
     ancestors.add(pid);
     try {
-      pid = Number(
-        execSync(`ps -o ppid= -p ${pid}`, { stdio: ['ignore', 'pipe', 'ignore'] })
-          .toString()
-          .trim(),
-      );
+      pid = Number(runCommandCaptureSync('ps', ['-o', 'ppid=', '-p', String(pid)]).trim());
     } catch {
       break;
     }
@@ -126,9 +121,7 @@ export const killOtherQpqDevProcesses = (root: string): void => {
 
   let lines: string[] = [];
   try {
-    lines = execSync('ps -axo pid=,command=', { stdio: ['ignore', 'pipe', 'ignore'] })
-      .toString()
-      .split('\n');
+    lines = runCommandCaptureSync('ps', ['-axo', 'pid=,command=']).split('\n');
   } catch {
     return;
   }
@@ -159,10 +152,7 @@ export const killOtherQpqDevProcesses = (root: string): void => {
 const getPortListeners = (port: number): { pid: number; command: string }[] => {
   let pids: number[] = [];
   try {
-    pids = execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, {
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-      .toString()
+    pids = runCommandCaptureSync('lsof', ['-t', `-iTCP:${port}`, '-sTCP:LISTEN'])
       .split('\n')
       .map((line) => Number(line.trim()))
       .filter(Boolean);
@@ -172,7 +162,7 @@ const getPortListeners = (port: number): { pid: number; command: string }[] => {
 
   return pids.flatMap((pid) => {
     try {
-      return [{ pid, command: execSync(`ps -p ${pid} -o command=`).toString().trim() }];
+      return [{ pid, command: runCommandCaptureSync('ps', ['-p', String(pid), '-o', 'command=']).trim() }];
     } catch {
       return []; // already gone
     }

@@ -13,7 +13,7 @@
 import { getDevServerDistPath, Nullable } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess } from 'child_process';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
@@ -26,6 +26,7 @@ import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
+import { spawnCommand } from '../lib/runCommand';
 
 // 8080/8888 are set in the generated entry; 3001 is the @qpqjs/dev-server
 // file-storage (secure URL) default port.
@@ -60,14 +61,14 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const userScriptChildEntry = writeUserScriptChildEntry(root);
   const rspackConfig = getDevServerRspackConfig({ root, entry, userScriptChildEntry, qpqConfigs });
   const bundlePath = getDevServerBundlePath(root);
-  const env = { ...process.env, QPQ_DEV_APP: appName };
+  const env = { QPQ_DEV_APP: appName };
 
   // The long-lived server process (HTTP 8080 / WS 8888), restarted per rebuild.
   let child: Nullable<ChildProcess> = null;
   let restartQueued = false;
 
   const startServer = (): void => {
-    child = spawn('node', [bundlePath], { stdio: 'inherit', env });
+    child = spawnCommand('node', [bundlePath], { env });
     child.on('exit', (code) => {
       child = null;
       if (!restartQueued) {

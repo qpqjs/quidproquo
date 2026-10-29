@@ -10,7 +10,6 @@ import { getDevServerDistPath } from '@qpqjs/core';
 // this twice is a no-op the second time.
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
-import { spawn } from 'child_process';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
@@ -18,6 +17,7 @@ import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
+import { spawnCommand } from '../lib/runCommand';
 
 export const migrateCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
@@ -57,7 +57,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
   // The bundle exits non-zero on failure; mirror that so a shell chain or CI notices instead
   // of carrying on as though the data were migrated.
   const exitCode = await new Promise<number>((resolve) => {
-    const child = spawn('node', [bundlePath], { stdio: 'inherit', env: { ...process.env, QPQ_DEV_APP: appName } });
+    const child = spawnCommand('node', [bundlePath], { env: { QPQ_DEV_APP: appName } });
     child.on('exit', (code) => resolve(code ?? 1));
   });
 

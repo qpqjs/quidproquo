@@ -1,7 +1,7 @@
+import { runCommandCaptureSync, runCommandSync } from './runCommand';
 import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 import { USER_SCRIPT_BUILDER_LAYER_MODULES } from '@qpqjs/user-script';
 
-import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -51,9 +51,9 @@ export type BuilderLayerRunners = {
 };
 
 const defaultRunners: BuilderLayerRunners = {
-  getNpmVersion: () => execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(),
+  getNpmVersion: () => runCommandCaptureSync('npm', ['--version']).trim(),
   runNpm: (args) => {
-    execFileSync('npm', args, { stdio: 'inherit' });
+    runCommandSync('npm', args);
   },
 };
 

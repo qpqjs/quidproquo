@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { ChildProcess, spawn, spawnSync, StdioOptions } from 'child_process';
 import type { Readable } from 'stream';
 
 export type RunCommandOptions = {
@@ -8,6 +8,63 @@ export type RunCommandOptions = {
   cwd?: string;
   // Echo the command before running it.
   logCommand?: boolean;
+};
+
+export type SpawnCommandOptions = RunCommandOptions & {
+  // Defaults to inheriting the parent's stdio.
+  stdio?: StdioOptions;
+};
+
+// Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run without a shell so
+// the already-array args are passed straight to the program and can't be re-interpreted by
+// `sh -c`, no command injection via interpolated values (stack names, CI-supplied env, etc.).
+const useShell = process.platform === 'win32';
+
+const toSpawnOptions = (options: SpawnCommandOptions) => ({
+  shell: useShell,
+  cwd: options.cwd ?? process.cwd(),
+  env: { ...process.env, ...(options.env ?? {}) },
+});
+
+/**
+ * Starts a long-running child (a dev server, a watcher) and hands back its handle; the caller
+ * owns its lifetime. Every process the cli starts goes through here or one of the runners
+ * below, so the shell and env rules are in one place.
+ */
+export const spawnCommand = (command: string, args: string[], options: SpawnCommandOptions = {}): ChildProcess =>
+  spawn(
+    command,
+    args.filter((a) => !!a),
+    { stdio: options.stdio ?? 'inherit', ...toSpawnOptions(options) },
+  );
+
+/** Runs a command to completion, inheriting stdio; throws on a non-zero exit. For code that cannot await. */
+export const runCommandSync = (command: string, args: string[], options: RunCommandOptions = {}): void => {
+  const validArgs = args.filter((a) => !!a);
+  const result = spawnSync(command, validArgs, { stdio: 'inherit', ...toSpawnOptions(options) });
+
+  if (result.error) throw result.error;
+  if (result.status) throw new Error(`${command} ${validArgs.join(' ')} exited with code ${result.status}`);
+};
+
+/**
+ * Runs a command to completion and returns its stdout (stderr is dropped); throws when it
+ * cannot start or exits non-zero. For the short probes (`ps`, `lsof`, `npm --version`) whose
+ * output decides what the cli does next.
+ */
+export const runCommandCaptureSync = (command: string, args: string[], options: RunCommandOptions = {}): string => {
+  const validArgs = args.filter((a) => !!a);
+  const result = spawnSync(command, validArgs, { stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8', ...toSpawnOptions(options) });
+
+  if (result.error) throw result.error;
+  if (result.status) throw new Error(`${command} ${validArgs.join(' ')} exited with code ${result.status}`);
+
+  return result.stdout;
+};
+
+/** Blocks the current thread for `ms`; only for the short polls in synchronous cleanup code. */
+export const sleepSync = (ms: number): void => {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 };
 
 // Spawn a command, inheriting stdio, resolving on success. A non-zero exit
@@ -20,16 +77,7 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
       console.log(`Running command: ${command} ${validArgs.join(' ')}`);
     }
 
-    const child = spawn(command, validArgs, {
-      stdio: 'inherit',
-      // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
-      // without a shell so the already-array args are passed straight to the
-      // program and can't be re-interpreted by `sh -c`, no command injection via
-      // interpolated values (stack names, CI-supplied env, etc.).
-      shell: process.platform === 'win32',
-      cwd: options.cwd ?? process.cwd(),
-      env: { ...process.env, ...(options.env ?? {}) },
-    });
+    const child = spawnCommand(command, validArgs, options);
 
     child.on('error', (error) => reject(error));
 
@@ -48,12 +96,7 @@ export const runCommandBestEffort = (command: string, args: string[], options: R
   new Promise((resolve) => {
     const validArgs = args.filter((a) => !!a);
 
-    const child = spawn(command, validArgs, {
-      stdio: 'ignore',
-      shell: process.platform === 'win32',
-      cwd: options.cwd ?? process.cwd(),
-      env: { ...process.env, ...(options.env ?? {}) },
-    });
+    const child = spawnCommand(command, validArgs, { ...options, stdio: 'ignore' });
 
     child.on('error', () => resolve());
     child.on('exit', () => resolve());
@@ -85,16 +128,7 @@ export const runCommandPrefixed = (label: string, command: string, args: string[
     const validArgs = args.filter((a) => !!a);
     const prefix = `\x1b[${options.color ?? 36}m[${label}]\x1b[0m `;
 
-    const child = spawn(command, validArgs, {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
-      // without a shell so the already-array args are passed straight to the
-      // program and can't be re-interpreted by `sh -c`, no command injection via
-      // interpolated values (stack names, CI-supplied env, etc.).
-      shell: process.platform === 'win32',
-      cwd: options.cwd ?? process.cwd(),
-      env: { ...process.env, ...(options.env ?? {}) },
-    });
+    const child = spawnCommand(command, validArgs, { ...options, stdio: ['ignore', 'pipe', 'pipe'] });
 
     const attach = (stream: Readable, out: NodeJS.WriteStream): void => {
       let buffered = '';
