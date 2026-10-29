@@ -1,5 +1,6 @@
+import { AwsFileUploadSettings } from '@qpqjs/config-aws';
 import { QPQBinaryData } from '@qpqjs/core';
-import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
+import { FileUploadErrorTypeEnum } from '@qpqjs/webserver';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import Busboy from 'busboy';
@@ -66,7 +67,7 @@ const isMimeTypeAllowed = (mimeType: string, allowedMimeTypes?: string[]): boole
   });
 };
 
-export const parseMultipartFormData = (event: APIGatewayEvent, fileUploadSettings: FileUploadSettings): Promise<QPQBinaryData[]> =>
+export const parseMultipartFormData = (event: APIGatewayEvent, fileUploadSettings: AwsFileUploadSettings): Promise<QPQBinaryData[]> =>
   new Promise((resolve, reject) => {
     const busboy = Busboy({
       headers: {

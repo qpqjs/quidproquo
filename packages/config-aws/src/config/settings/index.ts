@@ -1,6 +1,7 @@
 export * from './account';
 export * from './awsAlarm';
 export * from './awsDataStoreRemovalPolicy';
+export * from './awsDomainProxyViewerProtocolPolicy';
 export * from './awsDynamoOverrideForKvs';
 export * from './awsServiceDashboard';
 export * from './awsVirtualNetworkSettings';

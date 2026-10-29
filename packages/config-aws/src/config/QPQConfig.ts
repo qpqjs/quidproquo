@@ -17,4 +17,5 @@ export enum QPQAwsConfigSettingType {
   awsEmailSenderAllowList = '@quidproquo-aws/config/awsEmailSenderAllowList',
   awsDataStoreRemovalPolicy = '@quidproquo-aws/config/awsDataStoreRemovalPolicy',
   awsVirtualNetworkSettings = '@quidproquo-aws/config/awsVirtualNetworkSettings',
+  awsDomainProxyViewerProtocolPolicy = '@quidproquo-aws/config/awsDomainProxyViewerProtocolPolicy',
 }

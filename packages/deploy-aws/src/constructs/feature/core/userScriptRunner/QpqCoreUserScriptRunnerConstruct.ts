@@ -1,3 +1,4 @@
+import { assertLambdaMemoryInMiB, assertLambdaTimeoutInSeconds } from '@qpqjs/config-aws';
 import { USER_SCRIPT_RUNNER_FUNCTION_NAME, UserScriptRunnerQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_ec2, aws_iam, aws_lambda } from 'aws-cdk-lib';
@@ -51,6 +52,10 @@ export class QpqCoreUserScriptRunnerConstruct extends QpqConstructBlock {
       ],
     });
     qpqDeployAwsUtils.applyEnvironmentTags(role, props.qpqConfig);
+
+    // The sandbox's limits are config; lambda's own ceilings are checked here, where it deploys.
+    assertLambdaTimeoutInSeconds(props.userScriptRunnerConfig.timeoutInSeconds, 'defineUserScriptRunner');
+    assertLambdaMemoryInMiB(props.userScriptRunnerConfig.memoryInMiB, 'defineUserScriptRunner');
 
     this.function = new Function(this, 'runner-function', {
       functionName: this.resourceName(USER_SCRIPT_RUNNER_FUNCTION_NAME),

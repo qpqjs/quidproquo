@@ -1,6 +1,9 @@
 import { QPQCoreConfigSettingType } from '../../QPQConfig';
 import { QPQConfigAdvancedQueueSettings, QpqQueueProcessors, QueueQPQConfigSetting } from './types';
 
+// How long a failed message waits before its next try unless the queue says otherwise.
+const DEFAULT_RETRY_DELAY_IN_SECONDS = 15 * 60;
+
 export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => {
   return {
     configSettingType: QPQCoreConfigSettingType.queue,
@@ -19,7 +22,7 @@ export const defineQueue = (name: string, processors: QpqQueueProcessors, option
     concurrency: options?.concurrency ?? 1,
 
     maxTries: options?.maxTries ?? 1,
-    ttRetryInSeconds: Math.min(options?.ttRetryInSeconds ?? 15 * 60, 15 * 60),
+    ttRetryInSeconds: options?.ttRetryInSeconds ?? DEFAULT_RETRY_DELAY_IN_SECONDS,
 
     hasDeadLetterQueue: options?.hasDeadLetterQueue ?? true,
 

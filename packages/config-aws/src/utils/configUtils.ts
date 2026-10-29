@@ -7,6 +7,8 @@ import {
   AwsAlarmQPQConfigSetting,
   AwsDataStoreRemovalPolicy,
   AwsDataStoreRemovalPolicyQPQConfigSetting,
+  AwsDomainProxyViewerProtocolPolicy,
+  AwsDomainProxyViewerProtocolPolicyQPQConfigSetting,
   AwsDynamoOverrideForKvsQPQConfigSetting,
   AwsGithubDeployRoleQPQConfigSetting,
   AwsOrganizationQPQConfigSetting,
@@ -320,3 +322,9 @@ export const getDynamoTableNameOverride = (srcKvsName: string, qpqConfig: QPQCon
   // No override found, return empty string
   return '';
 };
+
+/** The viewer protocol policy declared for a domain proxy (defineAwsDomainProxyViewerProtocolPolicy), else redirect-to-https. */
+export const getAwsDomainProxyViewerProtocolPolicy = (domainProxyName: string, qpqConfig: QPQConfig): AwsDomainProxyViewerProtocolPolicy =>
+  qpqCoreUtils
+    .getConfigSettings<AwsDomainProxyViewerProtocolPolicyQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsDomainProxyViewerProtocolPolicy)
+    .find((setting) => setting.domainProxyName === domainProxyName)?.viewerProtocolPolicy ?? AwsDomainProxyViewerProtocolPolicy.redirectToHttps;

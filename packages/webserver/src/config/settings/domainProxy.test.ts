@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
-import { defineDomainProxy, DomainProxyDomainOptions, DomainProxyViewerProtocolPolicy } from './domainProxy';
+import { defineDomainProxy, DomainProxyDomainOptions } from './domainProxy';
 
 const domain: DomainProxyDomainOptions = { onRootDomain: true };
 
@@ -11,7 +11,6 @@ describe('defineDomainProxy', () => {
       defineDomainProxy('proxy', {
         httpProxyDomain: 'origin.example.com',
         domain,
-        domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       }),
     ).toEqual({
       configSettingType: QPQWebServerConfigSettingType.DomainProxy,
@@ -21,7 +20,6 @@ describe('defineDomainProxy', () => {
       domain,
       ignoreCache: [],
       cacheSettingsName: undefined,
-      domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     });
   });
 
@@ -31,7 +29,6 @@ describe('defineDomainProxy', () => {
       domain,
       ignoreCache: ['/health'],
       cacheSettingsName: 'cdn',
-      domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy.HTTPS_ONLY,
     });
 
     expect(setting.ignoreCache).toEqual(['/health']);

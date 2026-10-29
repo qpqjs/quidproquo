@@ -33,8 +33,8 @@ describe('defineQueue', () => {
     expect(defineQueue('Jobs', processors, { batchWindowInSeconds: 20 }).batchWindowInSeconds).toBe(20);
   });
 
-  it('caps ttRetryInSeconds at 15 minutes', () => {
-    expect(defineQueue('Jobs', processors, { ttRetryInSeconds: 99999 }).ttRetryInSeconds).toBe(15 * 60);
+  it('keeps a long ttRetryInSeconds as given; any platform ceiling is applied at deploy', () => {
+    expect(defineQueue('Jobs', processors, { ttRetryInSeconds: 99999 }).ttRetryInSeconds).toBe(99999);
   });
 
   it('applies supplied batching options', () => {

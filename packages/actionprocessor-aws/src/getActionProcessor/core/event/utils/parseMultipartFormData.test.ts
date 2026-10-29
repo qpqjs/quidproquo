@@ -1,4 +1,5 @@
-import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
+import { AwsFileUploadSettings } from '@qpqjs/config-aws';
+import { FileUploadErrorTypeEnum } from '@qpqjs/webserver';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';
@@ -17,7 +18,7 @@ const fieldPart = (name: string, value: string): string => `Content-Disposition:
 const buildEvent = (body: string, headers: Record<string, string>, isBase64Encoded = false): APIGatewayEvent =>
   ({ body, headers, isBase64Encoded }) as unknown as APIGatewayEvent;
 
-const defaultSettings: FileUploadSettings = {
+const defaultSettings: AwsFileUploadSettings = {
   maxFileSizeBytes: 10 * 1024 * 1024,
   maxFileCount: 10,
   maxFieldCount: 100,

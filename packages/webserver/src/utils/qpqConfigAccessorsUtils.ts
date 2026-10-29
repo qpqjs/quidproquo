@@ -113,10 +113,9 @@ export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveN
   return getWebEntryConfigs(qpqConfig).some((webEntry) => webEntry.storageDrive.sourceStorageDrive === storageDriveName);
 };
 
-// API Gateway caps request payloads at 10MB, so the default per-file ceiling matches it;
-// the other defaults exist to bound parser memory rather than to be hit in practice.
+// No default per-file ceiling: the platform applies its own request limit when the service
+// declares none. The other defaults exist to bound parser memory rather than to be hit in practice.
 export const defaultFileUploadSettings: FileUploadSettings = {
-  maxFileSizeBytes: 10 * 1024 * 1024,
   maxFileCount: 10,
   maxFieldCount: 100,
   maxFieldSizeBytes: 1024 * 1024,

@@ -1,11 +1,6 @@
 import { QPQCoreConfigSettingType } from '../../QPQConfig';
 import { UserScriptRunnerOptions, UserScriptRunnerQPQConfigSetting } from './types';
 
-/** Lambda's own ceiling on a function timeout. */
-const MAX_TIMEOUT_IN_SECONDS = 15 * 60;
-const MIN_MEMORY_IN_MIB = 128;
-const MAX_MEMORY_IN_MIB = 10240;
-
 /**
  * Declares the sandbox that runs this service's user scripts: a separate function with its
  * own role that can write logs and nothing else, and only the pure action processors (date,
@@ -16,11 +11,12 @@ export const defineUserScriptRunner = (options: UserScriptRunnerOptions = {}): U
   const timeoutInSeconds = options.timeoutInSeconds ?? 60;
   const memoryInMiB = options.memoryInMiB ?? 512;
 
-  if (!Number.isInteger(timeoutInSeconds) || timeoutInSeconds < 1 || timeoutInSeconds > MAX_TIMEOUT_IN_SECONDS) {
-    throw new Error(`defineUserScriptRunner: timeoutInSeconds [${timeoutInSeconds}] must be a whole number from 1 to ${MAX_TIMEOUT_IN_SECONDS}`);
+  // Whole, positive numbers; the platform's own ceilings are checked where it deploys the runner.
+  if (!Number.isInteger(timeoutInSeconds) || timeoutInSeconds < 1) {
+    throw new Error(`defineUserScriptRunner: timeoutInSeconds [${timeoutInSeconds}] must be a whole number of at least 1`);
   }
-  if (!Number.isInteger(memoryInMiB) || memoryInMiB < MIN_MEMORY_IN_MIB || memoryInMiB > MAX_MEMORY_IN_MIB) {
-    throw new Error(`defineUserScriptRunner: memoryInMiB [${memoryInMiB}] must be a whole number from ${MIN_MEMORY_IN_MIB} to ${MAX_MEMORY_IN_MIB}`);
+  if (!Number.isInteger(memoryInMiB) || memoryInMiB < 1) {
+    throw new Error(`defineUserScriptRunner: memoryInMiB [${memoryInMiB}] must be a whole number of at least 1`);
   }
 
   return {
