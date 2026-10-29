@@ -4,6 +4,7 @@ import {
   askFileReadTextContents,
   askFilter,
   askMapParallelBatch,
+  askPagedDataDrain,
   AskResponse,
   askSecondsElapsedFrom,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
@@ -39,46 +40,42 @@ export function* askLogGetAll(
   onlyErrors: boolean,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogMetadata>> {
-  const result: QpqPagedData<LogMetadata> = {
-    items: [],
-    nextPageKey: nextPageKey,
-  };
-
   const startTime = yield* askDateNow();
 
-  do {
-    const logPage = yield* askLogMetadataList(
-      runtimeType,
-      startIsoDateTime,
-      endIsoDateTime,
-      errorFilter,
-      serviceFilter,
-      infoFilter,
-      userFilter,
-      onlyErrors,
-      result.nextPageKey,
-    );
+  return yield* askPagedDataDrain(
+    function* askLogPage(pageKey) {
+      const logPage = yield* askLogMetadataList(
+        runtimeType,
+        startIsoDateTime,
+        endIsoDateTime,
+        errorFilter,
+        serviceFilter,
+        infoFilter,
+        userFilter,
+        onlyErrors,
+        pageKey,
+      );
 
-    const data = deep
-      ? yield* askMapParallelBatch(logPage.items, ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, function* askFilterDeep(log): AskResponse<string> {
-          const logData = yield* askCatch(askFileReadTextContents(QPQ_LOGS_STORAGE_DRIVE_NAME, `${log.correlation}.json`));
-          return logData.success ? toSearchableLogText(logData.result) : '';
-        })
-      : [];
+      const data = deep
+        ? yield* askMapParallelBatch(logPage.items, ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, function* askFilterDeep(log): AskResponse<string> {
+            const logData = yield* askCatch(askFileReadTextContents(QPQ_LOGS_STORAGE_DRIVE_NAME, `${log.correlation}.json`));
+            return logData.success ? toSearchableLogText(logData.result) : '';
+          })
+        : [];
 
-    const filtered = deep
-      ? yield* askFilter(logPage.items, function* askFilterDeep(log, index) {
-          return (data[index] ?? '').includes(deep);
-        })
-      : logPage.items;
+      const filtered = deep
+        ? yield* askFilter(logPage.items, function* askFilterDeep(log, index) {
+            return (data[index] ?? '').includes(deep);
+          })
+        : logPage.items;
 
-    result.items.push(...filtered);
-    result.nextPageKey = logPage.nextPageKey;
-  } while (
-    result.nextPageKey &&
-    result.items.length < ADMIN_LOG_SEARCH_MAX_ITEMS &&
-    (yield* askSecondsElapsedFrom(startTime)) < ADMIN_LOG_SEARCH_TIMEOUT_SECONDS
+      return { items: filtered, nextPageKey: logPage.nextPageKey };
+    },
+    {
+      startPageKey: nextPageKey,
+      *askShouldContinue(collected) {
+        return collected.length < ADMIN_LOG_SEARCH_MAX_ITEMS && (yield* askSecondsElapsedFrom(startTime)) < ADMIN_LOG_SEARCH_TIMEOUT_SECONDS;
+      },
+    },
   );
-
-  return result;
 }

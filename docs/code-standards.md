@@ -185,7 +185,7 @@ if (!result.success) {
 
 **C7. Layering.** `entry` calls `logic` calls `data`, never skipped and never reversed. `logic/` and `data/` hold one story per file.
 
-**C8. Paging.** Draining all pages uses `askKeyValueStoreQueryAll` or the shared drain helper. A hand-written page loop is allowed only when it must stop early.
+**C8. Paging.** Draining all pages uses `askKeyValueStoreQueryAll` or the shared drain helper `askPagedDataDrain`, whose `askShouldContinue` option covers the stop-early cases. A hand-written page loop is allowed only when it must stop early on something the helper cannot see, such as a failed page it still wants to keep the earlier pages of.
 
 ---
 

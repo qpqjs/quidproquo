@@ -1,4 +1,4 @@
-import { AskResponse, QpqPagedData } from '@qpqjs/core';
+import { askPagedDataDrain, AskResponse, QpqPagedData } from '@qpqjs/core';
 
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
@@ -7,16 +7,11 @@ import { askTenantApiRequest } from './askTenantApiRequest';
 
 /** GET myTenants/{id}/members: the whole roster, following pages. */
 export function* askTenantMembersFetch(target: TenantClientTarget, tenantId: TenantId): AskResponse<TenantMember[]> {
-  const members: TenantMember[] = [];
-  let nextPageKey: string | undefined;
-
-  do {
+  const { items } = yield* askPagedDataDrain(function* askMembersPage(nextPageKey) {
     const query = nextPageKey ? `?nextPageKey=${encodeURIComponent(nextPageKey)}` : '';
-    const page = yield* askTenantApiRequest<QpqPagedData<TenantMember>, void>(target, 'GET', `/${tenantId}/members${query}`);
 
-    members.push(...page.items);
-    nextPageKey = page.nextPageKey;
-  } while (nextPageKey);
+    return yield* askTenantApiRequest<QpqPagedData<TenantMember>, void>(target, 'GET', `/${tenantId}/members${query}`);
+  });
 
-  return members;
+  return items;
 }
