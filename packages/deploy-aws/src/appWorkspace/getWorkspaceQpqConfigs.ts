@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { QpqAppDeployContext } from './QpqAppDeployContext';
+import { requireModuleDefault } from './requireModuleDefault';
 
 // Loads an optional per-app config fragment (apps/<app>/account.qpq.ts or
 // bootstrap.qpq.ts), a default-exported `(ctx) => QPQConfig` of app-specific
@@ -18,9 +19,7 @@ const loadAppConfigFragment = (ctx: QpqAppDeployContext, fileName: string): QPQC
     return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const fragmentModule = require(path.join(ctx.appDir, fileName.replace(/\.ts$/, '')));
-  const fragment = fragmentModule.default || fragmentModule;
+  const fragment = requireModuleDefault<QPQConfig | ((ctx: QpqAppDeployContext) => QPQConfig)>(path.join(ctx.appDir, fileName.replace(/\.ts$/, '')));
 
   return typeof fragment === 'function' ? fragment(ctx) : fragment;
 };
@@ -54,7 +53,5 @@ export const getWorkspaceBootstrapQpqConfig = (ctx: QpqAppDeployContext): QPQCon
 export const getWorkspaceServiceQpqConfig = (root: string, appName: string, serviceName: string): QPQConfig => {
   const infrastructurePath = path.join(root, 'apps', appName, 'services', serviceName, 'service', 'src', 'infrastructure');
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const infraModule = require(infrastructurePath);
-  return infraModule.default || infraModule;
+  return requireModuleDefault<QPQConfig>(infrastructurePath);
 };

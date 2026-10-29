@@ -4,6 +4,7 @@ import { getDevServerOptions } from '@qpqjs/dev-server';
 import fs from 'fs';
 import path from 'path';
 
+import { getServicePath } from './discovery/getServicePath';
 import { requireQpqConfig } from './requireQpqConfig';
 import { sanitizeMfName } from './sanitizeMfName';
 import { ViewsInfo } from './ViewsInfo';
@@ -28,7 +29,7 @@ const resolveViewsPort = (viewsDir: string, pkg: { port?: number | string }): nu
 
 /** ViewsInfo for one service's views project, or null when it has no views package.json. */
 export const readViewsInfo = (root: string, appName: string, service: string): Nullable<ViewsInfo> => {
-  const viewsDir = path.join(root, 'apps', appName, 'services', service, 'views');
+  const viewsDir = path.join(getServicePath(root, appName, service), 'views');
   const pkgPath = path.join(viewsDir, 'package.json');
   if (!fs.existsSync(pkgPath)) return null;
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));

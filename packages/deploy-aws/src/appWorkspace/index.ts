@@ -3,3 +3,4 @@ export * from './getQpqAppDeployContext';
 export * from './getWorkspaceQpqConfigs';
 export * from './QpqAppDeployContext';
 export * from './requireDomainResolver';
+export * from './requireModuleDefault';

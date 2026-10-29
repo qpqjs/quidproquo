@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getAppServiceNames } from './getAppServiceNames';
+import { getAppServiceNames } from './discovery/getAppServiceNames';
 import { getAppServiceQpqConfigs } from './getAppServiceQpqConfigs';
 import { requireQpqConfig } from './requireQpqConfig';
 
-vi.mock('./getAppServiceNames', () => ({ getAppServiceNames: vi.fn() }));
+vi.mock('./discovery/getAppServiceNames', () => ({ getAppServiceNames: vi.fn() }));
 vi.mock('./requireQpqConfig', () => ({ requireQpqConfig: vi.fn() }));
 
 beforeEach(() => {

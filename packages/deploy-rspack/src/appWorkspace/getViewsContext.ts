@@ -1,6 +1,6 @@
-import fs from 'fs';
 import path from 'path';
 
+import { getServiceDirectoryNames } from './discovery/getServiceDirectoryNames';
 import { parseServiceDir } from './parseServiceDir';
 import { readViewsInfo } from './readViewsInfo';
 import { ViewsContext } from './ViewsContext';
@@ -13,12 +13,10 @@ export const getViewsContext = (viewsDir: string): ViewsContext => {
   const self = readViewsInfo(root, appName, service);
   if (!self) throw new Error(`No package.json for views project at ${viewsDir}`);
 
-  const servicesDir = path.join(root, 'apps', appName, 'services');
-  const siblings = fs
-    .readdirSync(servicesDir)
-    .filter((s) => s !== service)
-    .map((s) => readViewsInfo(root, appName, s))
-    .filter((v): v is ViewsInfo => v !== null);
+  const siblings = getServiceDirectoryNames(root, appName)
+    .filter((serviceName) => serviceName !== service)
+    .map((serviceName) => readViewsInfo(root, appName, serviceName))
+    .filter((views): views is ViewsInfo => views !== null);
 
   return { root, appName, self, siblings };
 };

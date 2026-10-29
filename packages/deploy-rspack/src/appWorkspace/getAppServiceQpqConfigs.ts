@@ -7,7 +7,7 @@ import { Nullable, QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 
-import { getAppServiceNames } from './getAppServiceNames';
+import { getAppServiceNames } from './discovery/getAppServiceNames';
 import { requireQpqConfig } from './requireQpqConfig';
 
 const loadServiceConfig = (root: string, appName: string, service: string): Nullable<QPQConfig> => {
