@@ -1,9 +1,9 @@
 import { AskResponse } from '@qpqjs/core';
 import { askQueryParamsSet } from '@qpqjs/web';
 
-import { askSharedQueryParamsUISetParam } from '../actionCreators/askSharedQueryParamsUISetParam';
+import { askSharedQueryParamsSetParam } from '../actionCreators/askSharedQueryParamsSetParam';
 
 export function* askSetParam(key: string, values: string[]): AskResponse<void> {
   yield* askQueryParamsSet(key, values, false);
-  yield* askSharedQueryParamsUISetParam(key, values);
+  yield* askSharedQueryParamsSetParam(key, values);
 }

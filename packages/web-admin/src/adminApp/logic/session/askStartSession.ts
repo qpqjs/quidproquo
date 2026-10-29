@@ -1,7 +1,7 @@
 import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
 import { askQueryParamsGetAll } from '@qpqjs/web';
 
-import { askUISessionLogDocCreated } from '../../actionCreators/sessionLog/askUISessionLogDocCreated';
+import { askSessionLogDocCreated } from '../../actionCreators/sessionLog/askSessionLogDocCreated';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { askAdminUserRead } from '../../context';
 import { AdminSessionCorrelationOpenedData } from '../../effects/session/AdminSessionCorrelationOpenedEffect';
@@ -27,7 +27,7 @@ export function* askStartSession(): AskResponse<void> {
   const summary = yield* askSessionApiCreate(`${username} — ${loginAt}`, code);
   const ackedEvents = yield* askSessionApiListAllEvents(summary.id);
 
-  yield* askUISessionLogDocCreated(summary.id, ackedEvents);
+  yield* askSessionLogDocCreated(summary.id, ackedEvents);
 
   yield* askApplySessionEvent<AdminSessionStartedData>(AdminSessionEffect.SessionStarted, { username, seededParams });
 

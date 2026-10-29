@@ -1,7 +1,7 @@
 import { askCatch, AskResponse, EitherActionResult, HTTPNetworkResponse, QpqPagedData, StoryResultMetadata } from '@qpqjs/core';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
-import { askUIVolatileLogSearchPartLoaded } from '../../actionCreators/volatile/askUIVolatileLogSearchPartLoaded';
+import { askVolatileLogSearchPartLoaded } from '../../actionCreators/volatile/askVolatileLogSearchPartLoaded';
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 
 // One search part = the full page-loop for one runtime type. Each part lands
@@ -42,5 +42,5 @@ export function* askFetchLogSearchPart(
     nextPageKey = response.result.data.nextPageKey;
   } while (nextPageKey);
 
-  yield* askUIVolatileLogSearchPartLoaded(searchKey, logs);
+  yield* askVolatileLogSearchPartLoaded(searchKey, logs);
 }

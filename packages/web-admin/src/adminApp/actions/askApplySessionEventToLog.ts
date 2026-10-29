@@ -1,7 +1,7 @@
 import { askDateNow, askNewGuid, AskResponse } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
 
-import { askUISessionLogEventAppended } from '../actionCreators/sessionLog/askUISessionLogEventAppended';
+import { askSessionLogEventAppended } from '../actionCreators/sessionLog/askSessionLogEventAppended';
 import { adminSessionSchemaVersion } from '../constants/adminSessionSchemaVersion';
 import { localSessionEventActor } from '../constants/localSessionEventActor';
 import { ApplySessionEventActionPayload } from './askApplySessionEvent';
@@ -28,5 +28,5 @@ export function* askApplySessionEventToLog(payload: ApplySessionEventActionPaylo
     },
   };
 
-  yield* askUISessionLogEventAppended(event);
+  yield* askSessionLogEventAppended(event);
 }

@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../../actionCreators/askAuthUISetAuthInfo';
+import { askAuthSetAuthInfo } from '../../actionCreators/askAuthSetAuthInfo';
 import { AuthChallengeMfaState } from '../types/AuthChallengeMfaState';
 import { AuthChallengeSendMfaCodePayload } from '../types/AuthChallengeSendMfaCodePayload';
 
@@ -22,5 +22,5 @@ export function* askAuthChallengeSendMfaCode(challenge: string, session: string,
   }
 
   yield* askSaveAuthToken(response.data);
-  yield* askAuthUISetAuthInfo(response.data);
+  yield* askAuthSetAuthInfo(response.data);
 }

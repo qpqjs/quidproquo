@@ -1,8 +1,8 @@
 import { AskResponse, askStateRead, AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../platformLogic';
-import { askAuthUISetAuthInfo } from '../actionCreators/askAuthUISetAuthInfo';
-import { askAuthUISetPassword } from '../actionCreators/askAuthUISetPassword';
+import { askAuthSetAuthInfo } from '../actionCreators/askAuthSetAuthInfo';
+import { askAuthSetPassword } from '../actionCreators/askAuthSetPassword';
 import { AuthLoginPayload } from '../types/AuthLoginPayload';
 import { AuthState } from '../types/AuthState';
 
@@ -22,7 +22,7 @@ export function* askAuthLogin(): AskResponse<void> {
 
   // The password is only needed for this request; the challenge flows work from the
   // server's session, so nothing downstream should still be able to read it.
-  yield* askAuthUISetPassword('');
+  yield* askAuthSetPassword('');
 
   if (response.data.challenge === AuthenticateUserChallenge.NONE) {
     yield* askSaveAuthToken(response.data);
@@ -32,5 +32,5 @@ export function* askAuthLogin(): AskResponse<void> {
     });
   }
 
-  yield* askAuthUISetAuthInfo(response.data);
+  yield* askAuthSetAuthInfo(response.data);
 }

@@ -4,13 +4,13 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { SystemEffect } from '../effects/SystemEffect';
-import { askUIShowError } from './askUIShowError';
+import { askSystemShowError } from './askSystemShowError';
 
-describe('askUIShowError', () => {
+describe('askSystemShowError', () => {
   it('dispatches a ShowError effect carrying the message, time and id', () => {
     let dispatched: unknown;
 
-    runStory(askUIShowError('boom'), {
+    runStory(askSystemShowError('boom'), {
       [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
       [GuidActionType.New]: 'guid-1',
       [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {

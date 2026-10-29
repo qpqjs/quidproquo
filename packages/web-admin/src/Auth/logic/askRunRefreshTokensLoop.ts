@@ -1,7 +1,7 @@
 import { askDateNow, askDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../platformLogic';
-import { askAuthUISetAuthInfo } from '../actionCreators/askAuthUISetAuthInfo';
+import { askAuthSetAuthInfo } from '../actionCreators/askAuthSetAuthInfo';
 import { AuthRefreshTokenPayload } from '../types/AuthRefreshTokenPayload';
 import { AuthState } from '../types/AuthState';
 
@@ -36,7 +36,7 @@ export function* askRunRefreshTokensLoop(): AskResponse<void> {
       }
 
       yield* askSaveAuthToken(response.data);
-      yield* askAuthUISetAuthInfo(response.data);
+      yield* askAuthSetAuthInfo(response.data);
     }
 
     yield* askDelay(10000);

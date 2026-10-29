@@ -4,11 +4,11 @@ import { captureRequester } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { SystemEffect } from '../effects/SystemEffect';
-import { askUIStopLoading } from './askUIStopLoading';
+import { askSystemStopLoading } from './askSystemStopLoading';
 
-describe('askUIStopLoading', () => {
+describe('askSystemStopLoading', () => {
   it('dispatches a StopLoading effect', () => {
-    const { action } = captureRequester(askUIStopLoading());
+    const { action } = captureRequester(askSystemStopLoading());
 
     expect(action).toEqual({
       type: StateActionType.Dispatch,

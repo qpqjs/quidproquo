@@ -1,15 +1,15 @@
 import { askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
 
-import { askUIShowError } from '../actionCreators/askUIShowError';
-import { askUIStartLoading } from '../actionCreators/askUIStartLoading';
-import { askUIStopLoading } from '../actionCreators/askUIStopLoading';
+import { askSystemShowError } from '../actionCreators/askSystemShowError';
+import { askSystemStartLoading } from '../actionCreators/askSystemStartLoading';
+import { askSystemStopLoading } from '../actionCreators/askSystemStopLoading';
 import { askLoadAuthToken } from '../config';
 import { askBaseUrlsRead } from '../context';
 
 export function* askPlatformRequest<TResult, TPayload = unknown>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<TPayload>) {
   const baseUrls = yield* askBaseUrlsRead();
 
-  yield* askUIStartLoading();
+  yield* askSystemStartLoading();
 
   const authInfo = yield* askLoadAuthToken();
 
@@ -25,10 +25,10 @@ export function* askPlatformRequest<TResult, TPayload = unknown>(method: HTTPMet
   });
 
   if (response.status < 200 || response.status >= 300) {
-    yield* askUIShowError(`Request Failed: ${method}::${url}`);
+    yield* askSystemShowError(`Request Failed: ${method}::${url}`);
   }
 
-  yield* askUIStopLoading();
+  yield* askSystemStopLoading();
 
   return response;
 }

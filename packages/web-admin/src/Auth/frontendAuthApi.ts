@@ -1,5 +1,5 @@
-import { askAuthUISetPassword } from './actionCreators/askAuthUISetPassword';
-import { askAuthUISetUsername } from './actionCreators/askAuthUISetUsername';
+import { askAuthSetPassword } from './actionCreators/askAuthSetPassword';
+import { askAuthSetUsername } from './actionCreators/askAuthSetUsername';
 import { askAuthLogin } from './logic/askAuthLogin';
 import { askAuthLogout } from './logic/askAuthLogout';
 import { askAuthMain } from './logic/askAuthMain';
@@ -10,6 +10,6 @@ export const frontendAuthApi = {
   askAuthLogout,
   askAuthMain,
 
-  askAuthUISetUsername,
-  askAuthUISetPassword,
+  askAuthSetUsername,
+  askAuthSetPassword,
 };

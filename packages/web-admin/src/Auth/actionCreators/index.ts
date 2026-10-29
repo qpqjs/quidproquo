@@ -1,3 +1,3 @@
-export * from './askAuthUISetAuthInfo';
-export * from './askAuthUISetPassword';
-export * from './askAuthUISetUsername';
+export * from './askAuthSetAuthInfo';
+export * from './askAuthSetPassword';
+export * from './askAuthSetUsername';

@@ -1,1 +1,1 @@
-export * from './askSharedQueryParamsUISetParam';
+export * from './askSharedQueryParamsSetParam';

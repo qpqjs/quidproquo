@@ -3,7 +3,7 @@ import { askDateNow, askNewGuid, AskResponse, askStateDispatchEffect } from '@qp
 import { SystemEffect } from '../effects/SystemEffect';
 import { SystemShowErrorEffect } from '../effects/SystemShowErrorEffect';
 
-export function* askUIShowError(error: string): AskResponse<void> {
+export function* askSystemShowError(error: string): AskResponse<void> {
   yield* askStateDispatchEffect<SystemShowErrorEffect>(SystemEffect.ShowError, {
     msg: error,
     at: yield* askDateNow(),

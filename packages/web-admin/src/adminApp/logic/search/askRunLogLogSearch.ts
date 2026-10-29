@@ -15,9 +15,9 @@ import {
 import { LogLog } from '@qpqjs/features';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
-import { askUIVolatileLogLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogLogSearchCompleted';
-import { askUIVolatileLogLogSearchPartLoaded } from '../../actionCreators/volatile/askUIVolatileLogLogSearchPartLoaded';
-import { askUIVolatileLogLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogLogSearchStarted';
+import { askVolatileLogLogSearchCompleted } from '../../actionCreators/volatile/askVolatileLogLogSearchCompleted';
+import { askVolatileLogLogSearchPartLoaded } from '../../actionCreators/volatile/askVolatileLogLogSearchPartLoaded';
+import { askVolatileLogLogSearchStarted } from '../../actionCreators/volatile/askVolatileLogLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { AdminSessionSearchRequestedData } from '../../effects/session/AdminSessionSearchRequestedEffect';
@@ -55,7 +55,7 @@ function* askFetchLogLogSearchPart(searchKey: string, search: AdminSearchParams,
     nextPageKey = response.result.data.nextPageKey;
   } while (nextPageKey);
 
-  yield* askUIVolatileLogLogSearchPartLoaded(searchKey, logLogs);
+  yield* askVolatileLogLogSearchPartLoaded(searchKey, logLogs);
 }
 
 // The Logs-tab search intent: recorded in the session doc, then fetched, one
@@ -70,12 +70,12 @@ export function* askRunLogLogSearch(): AskResponse<void> {
   const logLevels = resolveLookupValues([effectiveLogLevelLookup(search) as LogLevelEnumLookup], LogLevelEnum);
 
   const searchKey = logLogSearchKey(search);
-  yield* askUIVolatileLogLogSearchStarted(searchKey, logLevels.length);
+  yield* askVolatileLogLogSearchStarted(searchKey, logLevels.length);
 
   const nowIso = yield* askDateNow();
 
   yield* askRunParallel(logLevels.map((logLevel) => askFetchLogLogSearchPart(searchKey, search, logLevel, nowIso)));
 
   const fetchedAt = yield* askDateNow();
-  yield* askUIVolatileLogLogSearchCompleted(searchKey, fetchedAt);
+  yield* askVolatileLogLogSearchCompleted(searchKey, fetchedAt);
 }

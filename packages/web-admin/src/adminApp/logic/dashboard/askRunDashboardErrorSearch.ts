@@ -1,7 +1,7 @@
 import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
 
-import { askUIVolatileLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogSearchCompleted';
-import { askUIVolatileLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogSearchStarted';
+import { askVolatileLogSearchCompleted } from '../../actionCreators/volatile/askVolatileLogSearchCompleted';
+import { askVolatileLogSearchStarted } from '../../actionCreators/volatile/askVolatileLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { dashboardErrorsSearchKey } from '../../constants/dashboardErrorsSearchKey';
 import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
@@ -35,10 +35,10 @@ export function* askRunDashboardErrorSearch(): AskResponse<void> {
   });
 
   const runtimeTypes = Object.keys(QpqRuntimeType).sort();
-  yield* askUIVolatileLogSearchStarted(dashboardErrorsSearchKey, runtimeTypes.length);
+  yield* askVolatileLogSearchStarted(dashboardErrorsSearchKey, runtimeTypes.length);
 
   yield* askRunParallel(runtimeTypes.map((type) => askFetchLogSearchPart(dashboardErrorsSearchKey, search, type, nowIso, true)));
 
   const fetchedAt = yield* askDateNow();
-  yield* askUIVolatileLogSearchCompleted(dashboardErrorsSearchKey, fetchedAt);
+  yield* askVolatileLogSearchCompleted(dashboardErrorsSearchKey, fetchedAt);
 }

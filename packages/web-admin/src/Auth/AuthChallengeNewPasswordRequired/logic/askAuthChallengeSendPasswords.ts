@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../../actionCreators/askAuthUISetAuthInfo';
+import { askAuthSetAuthInfo } from '../../actionCreators/askAuthSetAuthInfo';
 import { AuthChallengeSetPasswordPayload } from '../types/AuthChallengeSetPasswordPayload';
 import { AuthChallengeState } from '../types/AuthChallengeState';
 
@@ -22,5 +22,5 @@ export function* askAuthChallengeSendPasswords(challenge: string, session: strin
   }
 
   yield* askSaveAuthToken(response.data);
-  yield* askAuthUISetAuthInfo(response.data);
+  yield* askAuthSetAuthInfo(response.data);
 }
