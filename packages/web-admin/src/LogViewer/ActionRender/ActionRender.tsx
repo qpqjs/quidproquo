@@ -60,13 +60,13 @@ export const ActionRender = ({ action, result, isLegacy, expanded }: ActionRende
     return <CoreBatchCustomAction action={action} expanded={expanded} result={result} />;
   }
 
+  const customComponent = customActionsMap[action.type];
   const ActionComponent = isLegacy
     ? ActionHistoryItem
-    : customActionsMap[action.type]
-      ? customActionsMap[action.type]
-      : actionComponentConfig
+    : (customComponent ??
+      (actionComponentConfig && actionComponentConfig[0] !== undefined
         ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
-        : AnyCustomAction;
+        : AnyCustomAction));
 
   return (
     <>

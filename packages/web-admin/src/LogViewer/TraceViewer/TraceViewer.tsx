@@ -97,8 +97,10 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   // own-code step (or back to the last one)
   useEffect(() => {
     if (selectedPosition === -1 && visibleStepIndexes.length > 0) {
-      const nextVisible = visibleStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex);
-      setSelectedStepIndex(nextVisible ?? visibleStepIndexes[visibleStepIndexes.length - 1]);
+      const nextVisible = visibleStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex) ?? visibleStepIndexes[visibleStepIndexes.length - 1];
+      if (nextVisible !== undefined) {
+        setSelectedStepIndex(nextVisible);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPosition, visibleStepIndexes]);
@@ -109,16 +111,29 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
   const matchStepIndexes = useMemo(() => matches.map((match) => match.stepIndex), [matches]);
   const currentMatchNumber = matchStepIndexes.indexOf(selectedStepIndex) + 1;
 
+  // A position in the visible list; out-of-range positions (the ends of the list) are ignored.
+  const selectVisiblePosition = (position: number) => {
+    const stepIndex = visibleStepIndexes[position];
+    if (stepIndex !== undefined) {
+      setSelectedStepIndex(stepIndex);
+    }
+  };
+
   const goToMatch = (direction: 1 | -1) => {
     if (matchStepIndexes.length === 0) {
       return;
     }
     if (direction === 1) {
-      const next = matchStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex);
-      setSelectedStepIndex(next ?? matchStepIndexes[0]);
+      const next = matchStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex) ?? matchStepIndexes[0];
+      if (next !== undefined) {
+        setSelectedStepIndex(next);
+      }
     } else {
-      const previous = [...matchStepIndexes].reverse().find((stepIndex) => stepIndex < selectedStepIndex);
-      setSelectedStepIndex(previous ?? matchStepIndexes[matchStepIndexes.length - 1]);
+      const previous =
+        [...matchStepIndexes].reverse().find((stepIndex) => stepIndex < selectedStepIndex) ?? matchStepIndexes[matchStepIndexes.length - 1];
+      if (previous !== undefined) {
+        setSelectedStepIndex(previous);
+      }
     }
   };
 
@@ -260,14 +275,14 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
 
       {/* slider row, controls only, fixed geometry while scrubbing */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 2, px: 1 }}>
-        <IconButton disabled={selectedPosition <= 0} onClick={() => setSelectedStepIndex(visibleStepIndexes[selectedPosition - 1])} size="small">
+        <IconButton disabled={selectedPosition <= 0} onClick={() => selectVisiblePosition(selectedPosition - 1)} size="small">
           ◀
         </IconButton>
         <Slider
           marks={matchMarks.length > 0 ? matchMarks : undefined}
           max={Math.max(visibleStepIndexes.length - 1, 0)}
           min={0}
-          onChange={(event, value) => setSelectedStepIndex(visibleStepIndexes[value as number])}
+          onChange={(event, value) => selectVisiblePosition(value as number)}
           size="small"
           sx={{ '& .MuiSlider-mark': { backgroundColor: 'warning.main', height: 8, width: 2 } }}
           value={Math.max(selectedPosition, 0)}
@@ -276,7 +291,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
         />
         <IconButton
           disabled={selectedPosition === -1 || selectedPosition >= visibleStepIndexes.length - 1}
-          onClick={() => setSelectedStepIndex(visibleStepIndexes[selectedPosition + 1])}
+          onClick={() => selectVisiblePosition(selectedPosition + 1)}
           size="small"
         >
           ▶
@@ -307,7 +322,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
                       // Jump the scrubber to this line's first visit (among visible steps)
                       const stepIndex = visibleStepIndexes.find(
                         (visibleStepIndex) =>
-                          trace.steps[visibleStepIndex].sourceIndex === selectedSourceIndex && trace.steps[visibleStepIndex].line === lineNumber,
+                          trace.steps[visibleStepIndex]?.sourceIndex === selectedSourceIndex && trace.steps[visibleStepIndex]?.line === lineNumber,
                       );
                       if (stepIndex !== undefined) {
                         setSelectedStepIndex(stepIndex);

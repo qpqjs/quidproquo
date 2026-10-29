@@ -40,8 +40,9 @@ export function MainLayout() {
       <BottomNavigation
         onChange={(event, newValue) => {
           // The trailing Logout / Loading actions are not tabs
-          if (newValue < tabs.length) {
-            adminApi.applyTabChanged(newValue, tabs[newValue].name);
+          const tab = tabs[newValue];
+          if (tab) {
+            adminApi.applyTabChanged(newValue, tab.name);
           }
         }}
         showLabels

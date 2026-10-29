@@ -34,5 +34,5 @@ export const useExternalData = <T>(url?: string): Nullable<T> => {
     };
   }, [url, loadData]);
 
-  return cache.current[url || ''];
+  return cache.current[url || ''] ?? null;
 };

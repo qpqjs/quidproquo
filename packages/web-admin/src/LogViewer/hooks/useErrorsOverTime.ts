@@ -17,8 +17,9 @@ export const useErrorsOverTime = (logs: any[], searchParams: SearchParams) => {
       const logTime = new Date(log.startedAt).getTime();
       const bucketIndex = Math.floor((logTime - startTime) / interval);
 
-      if (log.error && bucketIndex >= 0 && bucketIndex < 10) {
-        buckets[bucketIndex].errors++;
+      const bucket = buckets[bucketIndex];
+      if (log.error && bucket) {
+        bucket.errors++;
       }
     });
 

@@ -24,8 +24,7 @@ const valueIdentity = (value: QpqExecutionTraceValue | undefined): string | unde
 export const buildLineAnnotations = (trace: QpqExecutionTrace, sourceIndex: number): Map<number, TraceLineAnnotation> => {
   const annotations = new Map<number, TraceLineAnnotation>();
 
-  for (let stepIndex = 0; stepIndex < trace.steps.length; stepIndex += 1) {
-    const step = trace.steps[stepIndex];
+  for (const [stepIndex, step] of trace.steps.entries()) {
     if (step.sourceIndex !== sourceIndex) {
       continue;
     }
@@ -74,11 +73,15 @@ export const getDisplaySourceNames = (paths: string[]): string[] => {
   if (paths.length === 0) {
     return [];
   }
+  const [firstPath] = paths;
+  if (firstPath === undefined) {
+    return [];
+  }
   if (paths.length === 1) {
-    return [paths[0].split('/').pop() || paths[0]];
+    return [firstPath.split('/').pop() || firstPath];
   }
 
-  let prefix = paths[0];
+  let prefix = firstPath;
   for (const path of paths) {
     while (prefix && !path.startsWith(prefix)) {
       prefix = prefix.slice(0, -1);
@@ -115,6 +118,9 @@ export const searchStepValues = (trace: QpqExecutionTrace, query: string, stepIn
   const matches: TraceValueMatch[] = [];
   for (const stepIndex of stepIndexes) {
     const step = trace.steps[stepIndex];
+    if (!step) {
+      continue;
+    }
 
     const matchedNames = Object.entries(step.locals)
       .filter(([name, value]) => name.toLowerCase().includes(loweredQuery) || valueMatches(value))

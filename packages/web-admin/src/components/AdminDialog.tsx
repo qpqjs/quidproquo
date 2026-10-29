@@ -39,7 +39,10 @@ type AdminDialogProps = {
 export const AdminDialog = ({ open, handleClose, title, selectedTab, onSelectTab, tabs, buttons, children }: AdminDialogProps) => {
   const selectedTabIndex = tabs.findIndex((t) => t === selectedTab);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    onSelectTab(tabs[newValue]);
+    const tab = tabs[newValue];
+    if (tab !== undefined) {
+      onSelectTab(tab);
+    }
   };
 
   return (
