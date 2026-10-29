@@ -34,6 +34,7 @@ import {
   getWebsocketApiIdSsmParameterName,
   getWebStackName,
   resolveConfigRuntimeResourceNameFromConfig,
+  resolveOwnedResourceName,
   withFifoSuffix,
 } from './awsNamingUtils';
 
@@ -98,6 +99,22 @@ describe('resolveConfigRuntimeResourceNameFromConfig', () => {
     const owner = { application: 'other-app', module: 'other-svc', environment: 'prod', feature: 'beta' };
 
     expect(resolveConfigRuntimeResourceNameFromConfig('res', buildTestQpqConfig(), owner)).toBe('res-other-app-other-svc-prod-beta');
+  });
+});
+
+describe('resolveOwnedResourceName', () => {
+  it('is the local name under the local context when there is no owner', () => {
+    expect(resolveOwnedResourceName('res', buildTestQpqConfig())).toBe('res-test-app-test-module-development');
+  });
+
+  it('applies the override name under the full owner context', () => {
+    const owner = { module: 'other-svc', environment: 'prod', feature: 'beta', resourceNameOverride: 'real-name' };
+
+    expect(resolveOwnedResourceName('res', buildTestQpqConfig(), owner)).toBe('real-name-test-app-other-svc-prod-beta');
+  });
+
+  it('keeps the local name when the owner has no override', () => {
+    expect(resolveOwnedResourceName('res', buildTestQpqConfig(), { module: 'other-svc' })).toBe('res-test-app-other-svc-development');
   });
 });
 

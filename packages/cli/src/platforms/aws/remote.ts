@@ -60,11 +60,7 @@ const resolveRemoteStore = (appName: string, serviceName: string): { bucketName:
       `defineFederatedModuleStore references storage drive [${federatedStore.storageDrive}] which service [${serviceName}] does not declare`,
     );
   }
-  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
-    qpqConfig,
-    storageDrive.owner,
-  );
+  const bucketName = awsNamingUtils.resolveOwnedResourceName(storageDrive.storageDrive, qpqConfig, storageDrive.owner);
   const servicePrefix = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return { bucketName, servicePrefix };

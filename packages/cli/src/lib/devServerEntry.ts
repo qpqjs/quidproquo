@@ -1,7 +1,7 @@
+import { USER_SCRIPT_CHILD_BUNDLE_NAME } from '@qpqjs/deploy-rspack';
+
 import fs from 'fs';
 import path from 'path';
-
-import { USER_SCRIPT_CHILD_BUNDLE_NAME } from '@qpqjs/deploy-rspack';
 
 import { DEFAULT_DEV_SERVER_PORTS, getDevServerConfigPath } from './devServerPorts';
 

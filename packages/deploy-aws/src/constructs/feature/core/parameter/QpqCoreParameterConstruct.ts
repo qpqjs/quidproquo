@@ -34,7 +34,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
   stringParameter: aws_ssm.IStringParameter;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, parameterConfig: ParameterQPQConfigSetting): QpqResource {
-    const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
+    const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
     class Import extends QpqCoreParameterConstructBase {
       stringParameter = aws_ssm.StringParameter.fromStringParameterName(scope, `${id}-${parameterConfig.uniqueKey}`, paramName);
@@ -85,7 +85,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     const foreignArns = foreignConfigs.map((parameterConfig) => {
       const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
 
-      const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
+      const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
       return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
     });

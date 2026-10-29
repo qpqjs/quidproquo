@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../awsNamingUtils';
+import { resolveOwnedResourceName } from '../awsNamingUtils';
 
 /**
  * Resolves a parameter name to its deployed SSM parameter key, honouring
@@ -10,9 +10,5 @@ import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../aw
 export const resolveParameterKey = (parameterName: string, qpqConfig: QPQConfig) => {
   const parameterConfig = qpqCoreUtils.getParameterConfig(parameterName, qpqConfig);
 
-  return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    parameterConfig.owner?.resourceNameOverride || parameterName,
-    qpqConfig,
-    parameterConfig.owner?.module,
-  );
+  return resolveOwnedResourceName(parameterName, qpqConfig, parameterConfig.owner);
 };

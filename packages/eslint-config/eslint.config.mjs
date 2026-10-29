@@ -14,7 +14,7 @@ import qpqPlugin from './plugin/index.mjs';
 export { qpqPlugin };
 
 export default [
-  { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
+  { ignores: ['**/dist/**', '**/lib/esm/**', '**/lib/commonjs/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,

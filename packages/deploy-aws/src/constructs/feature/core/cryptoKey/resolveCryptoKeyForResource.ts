@@ -27,7 +27,7 @@ export const resolveCryptoKeyForResource = (
     return owned;
   }
 
-  const aliasName = `alias/${awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`;
+  const aliasName = `alias/${awsNamingUtils.resolveOwnedResourceName(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`;
 
   return aws_kms.Alias.fromAliasName(scope, id, aliasName);
 };

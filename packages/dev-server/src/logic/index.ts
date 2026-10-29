@@ -1,3 +1,4 @@
+export * from './concurrencyGate';
 export * from './config';
 export * from './cryptoKeys';
 export * from './eventBus';

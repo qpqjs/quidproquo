@@ -12,9 +12,22 @@ import {
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
-import { eventBus, processEvent, trackInFlight } from '../logic';
+import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, trackInFlight } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
+
+// The queue setting for a message, looked up in the config of the service it targets.
+const resolveQueueConcurrencyLimit = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): number | undefined => {
+  const targetConfig = qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.targetModule);
+  const queueConfig = targetConfig ? qpqCoreUtils.getQueueByName(targetConfig, payload.queueName) : undefined;
+  if (!queueConfig) {
+    return undefined;
+  }
+
+  const limit = queueConfig.maxConcurrentExecutions;
+
+  return typeof limit === 'number' && limit > 0 ? limit : undefined;
+};
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -143,8 +156,28 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
   // There is no local redelivery/DLQ, so a failed message just logs and the group moves on.
   const fifoGroupTails: Map<string, Promise<void>> = new Map();
 
+  // Per-queue concurrency: AWS caps a queue's consumer at maxConcurrentExecutions (migrations
+  // rely on 1 to run serially), so the same cap is applied here.
+  const queueGates: Map<string, ConcurrencyGate> = new Map();
+  const getQueueGate = (payload: AnyQueueMessageWithSession): ConcurrencyGate | undefined => {
+    const limit = resolveQueueConcurrencyLimit(devServerConfig.qpqConfigs, payload);
+    if (limit === undefined) {
+      return undefined;
+    }
+
+    const gateKey = `${payload.targetModule}:${payload.queueName}`;
+    const existing = queueGates.get(gateKey);
+    if (existing) {
+      return existing;
+    }
+
+    const gate = createConcurrencyGate(limit);
+    queueGates.set(gateKey, gate);
+    return gate;
+  };
+
   eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
-    const processAll = async () => {
+    const processAllUngated = async () => {
       try {
         for (const qpqConfig of devServerConfig.qpqConfigs) {
           await processQueueMessages(qpqConfig, payload, devServerConfig);
@@ -153,6 +186,9 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
         console.error(`Queue [${payload.queueName}] message [${payload.messageId}] failed:`, error);
       }
     };
+
+    const gate = getQueueGate(payload);
+    const processAll = gate ? () => gate.run(processAllUngated) : processAllUngated;
 
     if (payload.groupId === undefined) {
       await trackInFlight(processAll());

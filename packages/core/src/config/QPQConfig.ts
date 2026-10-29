@@ -10,6 +10,7 @@ export enum QPQCoreConfigSettingType {
   global = '@quidproquo-core/config/global',
   parameter = '@quidproquo-core/config/parameter',
   actionProcessors = '@quidproquo-core/config/actionProcessors',
+  bundleEntries = '@quidproquo-core/config/BundleEntries',
   apiBuildPath = '@quidproquo-core/config/apiBuildPath',
   backendBundleOptions = '@quidproquo-core/config/BackendBundleOptions',
   frontendBundleOptions = '@quidproquo-core/config/FrontendBundleOptions',

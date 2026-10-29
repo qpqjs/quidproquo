@@ -1,5 +1,5 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils, SecretQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
@@ -35,7 +35,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   secret: aws_secretsmanager.ISecret;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, secretConfig: SecretQPQConfigSetting): QpqResource {
-    const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
+    const secretName = awsNamingUtils.resolveOwnedResourceName(secretConfig.key, qpqConfig, secretConfig.owner);
 
     class Import extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(scope, `${id}-${secretConfig.uniqueKey}`, secretName);
@@ -47,9 +47,12 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     this.secret = new aws_secretsmanager.Secret(this, 'secret', {
       secretName: this.resourceName(props.secretConfig.key),
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Secret values are data too: retained unless the data-store removal policy says destroy.
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
       description: props.secretConfig.key,
     });
 
@@ -83,7 +86,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     const foreignArns = foreignConfigs.map((secretConfig) => {
       const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
 
-      const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
+      const secretName = awsNamingUtils.resolveOwnedResourceName(secretConfig.key, qpqConfig, secretConfig.owner);
 
       return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
     });

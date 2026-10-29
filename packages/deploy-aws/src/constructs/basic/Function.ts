@@ -57,11 +57,7 @@ const getFederatedCodeStoreEnv = (qpqConfig: QPQConfig): Record<string, string> 
     );
   }
 
-  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
-    qpqConfig,
-    storageDrive.owner,
-  );
+  const bucketName = awsNamingUtils.resolveOwnedResourceName(storageDrive.storageDrive, qpqConfig, storageDrive.owner);
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return {

@@ -48,11 +48,7 @@ export const convertStrictTransportSecurity = (
 // `https://*.amazonaws.com` wildcard, which allowed connections to any AWS endpoint.
 const getStorageDriveConnectSrcDomains = (qpqConfig: QPQConfig): string[] => {
   const domains = qpqCoreUtils.getStorageDrives(qpqConfig).map((cfg) => {
-    const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-      cfg.owner?.resourceNameOverride || cfg.storageDrive,
-      qpqConfig,
-      cfg.owner?.module,
-    );
+    const bucketName = awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner);
     const { awsRegion } = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
 
     return `https://${bucketName}.s3.${awsRegion}.amazonaws.com`;

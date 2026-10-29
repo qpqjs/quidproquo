@@ -43,7 +43,8 @@ export class LambdaLayers extends QpqConstructBlock {
     });
 
     // Always-on: the qpq-log-extension ships story logs to S3 off the function's
-    // response path. Attached to every function via apiLayerVersions.
+    // response path. Every construct that builds a Function must pass these layers
+    // through as apiLayerVersions; bundles externalise layer modules on that assumption.
     const logExtensionLayer = new aws_lambda.LayerVersion(this, 'qpq-log-extension-layer', {
       layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig('qpq-log-extension', props.qpqConfig),
       code: new aws_lambda.AssetCode(getLogExtensionLayerPath()),

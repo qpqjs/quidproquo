@@ -1,4 +1,5 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { CryptoKeyQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_kms } from 'aws-cdk-lib';
@@ -37,6 +38,8 @@ export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqR
   constructor(scope: Construct, id: string, props: QpqCoreCryptoKeyConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     this.key = new aws_kms.Key(this, 'key', {
       alias: `alias/${this.resourceName(props.cryptoKeyConfig.keyName)}`,
       description: props.cryptoKeyConfig.keyName,
@@ -45,9 +48,9 @@ export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqR
       // is free for the capability
       enableKeyRotation: true,
 
-      // DESTROY schedules deletion with KMS's mandatory waiting period rather
-      // than orphaning the key
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Follows the data-store removal policy: a retained store is unreadable without the
+      // key that encrypts or signs for it. DESTROY still goes through KMS's waiting period.
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.key, props.qpqConfig);
@@ -56,8 +59,7 @@ export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqR
   public static authorizeActionsForRole(role: aws_iam.IRole, cryptoKeyConfigs: CryptoKeyQPQConfigSetting[], qpqConfig: QPQConfig): void {
     if (cryptoKeyConfigs.length > 0) {
       const aliasNames = cryptoKeyConfigs.map(
-        (cryptoKeyConfig) =>
-          `alias/${awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`,
+        (cryptoKeyConfig) => `alias/${awsNamingUtils.resolveOwnedResourceName(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`,
       );
 
       // Key ARNs are random ids, so exact-ARN grants can't be written

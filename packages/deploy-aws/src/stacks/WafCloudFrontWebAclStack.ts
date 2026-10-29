@@ -1,5 +1,6 @@
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm, aws_wafv2, Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
@@ -31,17 +32,16 @@ export class WafCloudFrontWebAclStack extends Stack {
       },
     });
 
-    const application = qpqCoreUtils.getApplicationName(props.qpqConfig);
-    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
+    const webAclName = awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig('qpq-waf-cloudfront', props.qpqConfig);
 
     const webAcl = new aws_wafv2.CfnWebACL(this, 'web-acl', {
-      name: `qpq-waf-cloudfront-${application}-${environment}`,
+      name: webAclName,
       scope: 'CLOUDFRONT',
       defaultAction: { allow: {} },
       rules: buildWebAclRules(props.wafConfig),
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: `qpq-waf-cloudfront-${application}-${environment}`,
+        metricName: webAclName,
         sampledRequestsEnabled: true,
       },
     });

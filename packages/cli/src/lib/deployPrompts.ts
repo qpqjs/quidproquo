@@ -3,8 +3,8 @@
 // (or domain/bootstrap), pick stacks. buildDeployPlanFromArgs is the
 // non-interactive shortcut (`qpq go all all`) that skips every prompt.
 import { getPositionalArgs } from './args';
-import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { getServiceNames } from './discovery';
+import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { promptSelect, promptText, promptYesNo } from './prompts';
 
 export type StackType = 'all' | 'inf' | 'api' | 'web' | 'views';

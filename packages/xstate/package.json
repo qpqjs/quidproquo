@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@qpqjs/tsconfig": "0.3.0",
+    "@types/node": "^22.13.0",
     "typescript": "^5.8.2"
   }
 }

@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
+import { resolveOwnedResourceName } from '../../../../awsNamingUtils';
 import { StorageDriveNotFoundError } from './StorageDriveNotFoundError';
 
 /**
@@ -15,9 +15,5 @@ export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfi
     throw new StorageDriveNotFoundError(drive);
   }
 
-  return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    storageDriveConfig.owner?.resourceNameOverride || drive,
-    qpqConfig,
-    storageDriveConfig.owner?.module,
-  );
+  return resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
 };

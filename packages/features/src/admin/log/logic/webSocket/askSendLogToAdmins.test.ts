@@ -43,4 +43,24 @@ describe('askSendLogToAdmins', () => {
 
     expect(sent).toBe(false);
   });
+
+  it('walks every page of connections, passing the page key forward', () => {
+    const sentTo: string[] = [];
+    const scanKeys: Array<string | undefined> = [];
+
+    runStory(askSendLogToAdmins(log), {
+      [KeyValueStoreActionType.Scan]: (action: Action<any>) => {
+        scanKeys.push(action.payload.nextPageKey);
+        return scanKeys.length === 1
+          ? { items: [{ id: 'c1', userId: 'u1' }], nextPageKey: 'page-2' }
+          : { items: [{ id: 'c2', userId: 'u2' }], nextPageKey: undefined };
+      },
+      [WebsocketActionType.SendMessage]: (action: Action<any>) => {
+        sentTo.push(action.payload.connectionId);
+      },
+    });
+
+    expect(scanKeys).toEqual([undefined, 'page-2']);
+    expect(sentTo).toEqual(['c1', 'c2']);
+  });
 });

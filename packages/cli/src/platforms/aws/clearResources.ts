@@ -26,9 +26,6 @@ import { ClearableResource, ClearResourcesPlan } from '../../lib/clearResourcesP
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { isAwsCredentialsValid } from './awsCredentials';
 
-// Same resolution as the runtime's resolveStorageDriveBucketName (not exported
-// from the actionprocessor package root): honour the cross-module owner and
-// its resourceNameOverride.
 const resolveBucketName = (drive: string, qpqConfig: QPQConfig): string => {
   const storageDriveConfig = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
 
@@ -36,11 +33,7 @@ const resolveBucketName = (drive: string, qpqConfig: QPQConfig): string => {
     throw new Error(`Could not find storage drive config for [${drive}]`);
   }
 
-  return awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    storageDriveConfig.owner?.resourceNameOverride || drive,
-    qpqConfig,
-    storageDriveConfig.owner?.module,
-  );
+  return awsNamingUtils.resolveOwnedResourceName(drive, qpqConfig, storageDriveConfig.owner);
 };
 
 // Log a progress heartbeat roughly every this-many removals, so a large

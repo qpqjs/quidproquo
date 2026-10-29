@@ -10,6 +10,7 @@ import { Function } from '../../../basic/Function';
 
 export interface QpqCoreUserScriptRunnerConstructProps extends QpqConstructBlockProps {
   userScriptRunnerConfig: UserScriptRunnerQPQConfigSetting;
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
 }
 
 /**
@@ -61,6 +62,7 @@ export class QpqCoreUserScriptRunnerConstruct extends QpqConstructBlock {
       reservedConcurrentExecutions: props.userScriptRunnerConfig.maxConcurrentExecutions,
 
       qpqConfig: props.qpqConfig,
+      apiLayerVersions: props.apiLayerVersions,
 
       role,
       vpc,

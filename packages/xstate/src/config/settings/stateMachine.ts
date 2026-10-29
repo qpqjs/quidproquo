@@ -1,4 +1,13 @@
-import { CrossModuleOwner, defineKeyValueStore, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from '@qpqjs/core';
+import {
+  CrossModuleOwner,
+  defineActionProcessors,
+  defineBundleEntries,
+  defineKeyValueStore,
+  QPQConfig,
+  QPQConfigAdvancedSettings,
+  QPQConfigSetting,
+  QpqFunctionRuntime,
+} from '@qpqjs/core';
 
 import { EventObject, MachineConfig, MachineContext } from 'xstate';
 
@@ -33,7 +42,7 @@ export const getStateMachineStoreName = (stateMachineName: string): string => `q
  * Defines a persisted state machine: the setting itself plus the key value
  * store (keyed by 'id') that its entities live in.
  */
-export const defineStateMachine = (stateMachineName: string, options: QPQConfigAdvancedStateMachineSettings): QPQConfigSetting[] => {
+export const defineStateMachine = (stateMachineName: string, options: QPQConfigAdvancedStateMachineSettings): QPQConfig => {
   const keyValueStoreName = getStateMachineStoreName(stateMachineName);
   const stateMachineConfig: StateMachineQPQConfigSetting = {
     configSettingType: QPQXStateConfigSettingType.StateMachine,
@@ -50,5 +59,14 @@ export const defineStateMachine = (stateMachineName: string, options: QPQConfigA
     owner: options.owner,
   };
 
-  return [defineKeyValueStore(keyValueStoreName, 'id'), stateMachineConfig];
+  // The action/guard stories are only reached through the dynamic module loader, so they have
+  // to be declared as bundle entries or the deployed bundle never contains them.
+  const storyRuntimes = [...Object.values(stateMachineConfig.actions), ...Object.values(stateMachineConfig.guards)];
+
+  return [
+    defineKeyValueStore(keyValueStoreName, 'id'),
+    stateMachineConfig,
+    defineActionProcessors({ basePath: __dirname, relativePath: '../../actionProcessor', functionName: 'getStateMachineActionProcessor' }),
+    ...(storyRuntimes.length > 0 ? [defineBundleEntries(storyRuntimes)] : []),
+  ];
 };

@@ -22,5 +22,5 @@ export * from './secureToken';
 export * from './state';
 export * from './stream';
 export * from './system';
-export * from './userScript';
 export * from './userDirectory';
+export * from './userScript';

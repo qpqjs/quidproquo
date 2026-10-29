@@ -8,9 +8,9 @@
 import { qpqCoreUtils } from '@qpqjs/core';
 
 import { getServiceNames } from './discovery';
+import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { promptCheckbox, promptSelect, promptText } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
-import { getDeployTargetLabel } from './getDeployTargetLabel';
 
 export type ClearableResourceKind = 'storageDrive' | 'keyValueStore';
 

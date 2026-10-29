@@ -1,5 +1,5 @@
+import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -19,17 +19,16 @@ export class QpqBootstrapConfigWafConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqBootstrapConfigWafConstructProps) {
     super(scope, id, props);
 
-    const application = qpqCoreUtils.getApplicationName(props.qpqConfig);
-    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
+    const webAclName = awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig('qpq-waf-regional', props.qpqConfig);
 
     const webAcl = new aws_wafv2.CfnWebACL(this, 'web-acl', {
-      name: `qpq-waf-regional-${application}-${environment}`,
+      name: webAclName,
       scope: 'REGIONAL',
       defaultAction: { allow: {} },
       rules: buildWebAclRules(props.wafConfig),
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: `qpq-waf-regional-${application}-${environment}`,
+        metricName: webAclName,
         sampledRequestsEnabled: true,
       },
     });

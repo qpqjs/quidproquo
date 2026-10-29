@@ -7,6 +7,7 @@ import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWo
 import { askUIEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askUIEventDocWorkspaceRemovePendingEvent';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDocWorkspaceSetSaving';
+import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -40,6 +41,25 @@ export function* askEventDocWorkspaceSaveSlot(
   yield* askUIEventDocWorkspaceSetSaving(slotKey, true);
   yield* askUIEventDocWorkspaceClearError(slotKey);
 
+  // The saving flag is cleared in askCatch's finally so a throw mid-batch (a resync that
+  // fails to rebase, for example) cannot leave the slot stuck in isSaving forever.
+  const saveResult = yield* askCatch(
+    askEventDocWorkspaceSavePendingEvents(transport, slots, slotKey, documentIdentity, pendingEvents),
+    askUIEventDocWorkspaceSetSaving(slotKey, false),
+  );
+
+  if (!saveResult.success) {
+    yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.save, error: saveResult.error });
+  }
+}
+
+function* askEventDocWorkspaceSavePendingEvents(
+  transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
+  slotKey: string,
+  documentIdentity: EventDocWorkspaceDocumentIdentity,
+  pendingEvents: EventDocEvent[],
+): AskResponse<void> {
   for (const pending of pendingEvents) {
     // A resync below rebases pending, so a later event in this batch may have been dropped since the loop started.
     if (!isStillPending(getSlotPending(yield* askEventDocWorkspaceReadState(), slotKey), pending.payload.metadata.clientMessageId)) {
@@ -65,6 +85,4 @@ export function* askEventDocWorkspaceSaveSlot(
 
     yield* askUIEventDocWorkspaceRemovePendingEvent(slotKey, result.result.payload.metadata.clientMessageId);
   }
-
-  yield* askUIEventDocWorkspaceSetSaving(slotKey, false);
 }

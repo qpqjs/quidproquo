@@ -75,6 +75,14 @@ export const resolveConfigRuntimeResourceNameFromConfig = (resourceName: string,
 export const getConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig) =>
   resolveConfigRuntimeResourceNameFromConfig(resourceName, qpqConfig);
 
+/**
+ * The deployed name of a resource that may belong to another module: the owner's
+ * resourceNameOverride (or the local name) under the owner's full deployment context.
+ * Deploy-time grants and runtime lookups must both go through here so they agree.
+ */
+export const resolveOwnedResourceName = (resourceName: string, qpqConfig: QPQConfig, owner?: CrossModuleOwner) =>
+  resolveConfigRuntimeResourceNameFromConfig(owner?.resourceNameOverride || resourceName, qpqConfig, owner);
+
 // AWS FIFO resources (SQS queues, SNS topics) must be named with a trailing .fifo - it has
 // to be the final characters, so it goes after the app-service-env decoration. Every FIFO
 // resource name (runtime send, CDK resource names, cross-stack ARNs) resolves through here

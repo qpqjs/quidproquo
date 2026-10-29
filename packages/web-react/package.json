@@ -13,7 +13,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.esm.json -w",

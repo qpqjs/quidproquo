@@ -5,7 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { eventBus, processEvent } from '../logic';
 import { queueImplementation } from './queueImplementation';
 
-vi.mock('../logic', () => ({
+vi.mock('../logic', async (importOriginal: () => Promise<unknown>) => ({
+  // The concurrency gate is real: the per-queue cap test needs it to actually gate.
+  ...((await importOriginal()) as typeof import('../logic')),
   eventBus: { on: vi.fn(), publish: vi.fn() },
   processEvent: vi.fn(),
   // Passthrough: the in-flight registry has its own tests, and what this file
@@ -112,6 +114,24 @@ describe('queueImplementation FIFO group serialization', () => {
     gates.get('m1')!.resolve();
     gates.get('m2')!.resolve();
     await Promise.all([first, second]);
+  });
+
+  it('serialises ungrouped messages on a queue capped at one concurrent execution', async () => {
+    const handler = startImplementation(QueueActionType.SendMessages, [defineQueue('serialQueue', {}, { maxConcurrentExecutions: 1 })]);
+
+    const first = handler(buildPayload({ messageId: 'm1', queueName: 'serialQueue' }), 'corr');
+    const second = handler(buildPayload({ messageId: 'm2', queueName: 'serialQueue' }), 'corr');
+
+    await flush();
+    expect(started).toEqual(['m1']);
+
+    gates.get('m1')!.resolve();
+    await first;
+    await flush();
+    expect(started).toEqual(['m1', 'm2']);
+
+    gates.get('m2')!.resolve();
+    await second;
   });
 
   it('continues the group after a failed message', async () => {

@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- A setting under an application with no `environment` now counts as `production` when `flattenQpqConfig` resolves environment-scoped settings (it used to assume `development`), matching `getApplicationModuleEnvironment`. Set `environment` on the application if you relied on the old default.
+- `defineStateMachine` from `@qpqjs/xstate` now returns a `QPQConfig` instead of `QPQConfigSetting[]`. Code typing the result as `QPQConfigSetting[]` should use `QPQConfig`.
+
 ## 0.3.0
 
 - `@qpqjs/features` moves from zod 3 to zod 4 (`^4.6.7`) and drops `zod-validation-error`. Every schema a service hands the framework (a dynamic route's `body` / `query` / `response`, `askValidateModelOrThrowError`, `tenantMemberRolesSetRequestSchema` consumers) must come from zod 4: import `z` from `'zod'` (the `'zod/v4'` subpath still works but is no longer needed), and replace the three-argument `z.ZodType<Out, z.ZodTypeDef, In>` with `z.ZodType<Out, In>`. Validation failures from `askValidateModelOrThrowError` are now worded by `z.prettifyError` (one issue per line, path first) instead of zod-validation-error's single sentence; code that matched on that text needs updating. `@qpqjs/actionprocessor-aws` also declares zod 4 so the Vercel AI SDK resolves to the same copy.

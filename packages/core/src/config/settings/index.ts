@@ -4,6 +4,7 @@ export * from './apiBuildPath';
 export * from './applicationModule';
 export * from './applicationName';
 export * from './applicationVersion';
+export * from './bundleEntries';
 export * from './bundleOptions';
 export * from './configValue';
 export * from './cryptoKey';

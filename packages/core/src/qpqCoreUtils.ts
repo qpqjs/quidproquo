@@ -5,6 +5,7 @@ import {
   ApplicationQPQConfigSetting,
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
+  BundleEntriesQPQConfigSetting,
   CryptoKeyQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
@@ -52,6 +53,10 @@ import {
 } from './types';
 import { isQpqFunctionRuntimeAdvanced } from './utils';
 
+// The environment assumed when an application setting names none. flattenQpqConfig and
+// getApplicationModuleEnvironment must agree or environment-scoped settings resolve differently.
+const DEFAULT_ENVIRONMENT = 'production';
+
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
  * If a QPQConfigItem has a configSettingType of QPQCoreConfigSettingType.environmentSettings,
@@ -61,7 +66,7 @@ import { isQpqFunctionRuntimeAdvanced } from './utils';
  * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects
  */
 export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
-  let environment = 'development';
+  let environment = DEFAULT_ENVIRONMENT;
   let service: string | undefined;
 
   /**
@@ -78,7 +83,7 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
       } else {
         // If its a appName config item, update the environment variable
         if (item.configSettingType === QPQCoreConfigSettingType.appName) {
-          environment = (item as ApplicationQPQConfigSetting).environment || 'development';
+          environment = (item as ApplicationQPQConfigSetting).environment || DEFAULT_ENVIRONMENT;
         }
 
         // If its a moduleName config item, update the service variable
@@ -193,7 +198,7 @@ export const getConfigRoot = (qpqConfig: QPQConfig): string => {
 };
 
 export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).environment || 'production';
+  return getApplicationConfigSetting(qpqConfig).environment || DEFAULT_ENVIRONMENT;
 };
 
 export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
@@ -404,6 +409,10 @@ export const getOwnedInlineFunctions = (qpqConfig: QPQConfig): InlineFunctionQPQ
   return getOwnedItems(getAllInlineFunctions(qpqConfig), qpqConfig);
 };
 
+export const getAllBundleEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
+  return getConfigSettings<BundleEntriesQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.bundleEntries).flatMap((setting) => setting.runtimes);
+};
+
 export const getAllDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
   return getConfigSettings<DynamicFunctionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.dynamicFunctions);
 };
@@ -447,6 +456,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
       .filter((runtime) => !!runtime) as QpqFunctionRuntime[]),
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
     ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
+    ...getAllBundleEntries(qpqConfig),
     // Loaded only when a script is built or run, so nothing else would make the bundler see it.
     ...getAllUserScriptModules(qpqConfig).flatMap((m) => (m.typesRuntime ? [m.runtime, m.typesRuntime] : [m.runtime])),
   ];

@@ -1,4 +1,5 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils, SigningKeyQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_kms } from 'aws-cdk-lib';
@@ -35,6 +36,8 @@ export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements Qpq
   constructor(scope: Construct, id: string, props: QpqCoreSigningKeyConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     this.key = new aws_kms.Key(this, 'key', {
       alias: `alias/${this.resourceName(props.signingKeyConfig.keyName)}`,
       description: props.signingKeyConfig.keyName,
@@ -47,9 +50,9 @@ export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements Qpq
       // next public-key refresh.
       enableKeyRotation: false,
 
-      // DESTROY schedules deletion with KMS's mandatory waiting period rather
-      // than orphaning the key
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Follows the data-store removal policy: a retained store is unreadable without the
+      // key that encrypts or signs for it. DESTROY still goes through KMS's waiting period.
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.key, props.qpqConfig);
@@ -61,7 +64,7 @@ export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements Qpq
     }
 
     const toAliasName = (signingKeyConfig: SigningKeyQPQConfigSetting): string =>
-      `alias/${awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(signingKeyConfig.keyName, qpqConfig, signingKeyConfig.owner)}`;
+      `alias/${awsNamingUtils.resolveOwnedResourceName(signingKeyConfig.keyName, qpqConfig, signingKeyConfig.owner)}`;
 
     // Only the owning service may sign: that is the whole point of the
     // issuer/verifier split, so a foreign declaration (owner: another module)

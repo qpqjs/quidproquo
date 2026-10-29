@@ -20,6 +20,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { QpqResource } from '../../../base/QpqResource';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { Function } from '../../../basic/Function';
+import { LambdaLayers } from '../../../basic/LambdaLayers';
 
 export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
@@ -115,6 +116,14 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
     this.userPool = userPool;
 
+    // Trigger lambdas run story code, so they carry the same layers as the api functions.
+    // Built on first use so a directory with no triggers publishes no layer versions.
+    let triggerLayers: aws_lambda.ILayerVersion[] | undefined;
+    const getTriggerLayers = (): aws_lambda.ILayerVersion[] => {
+      triggerLayers ??= new LambdaLayers(this, 'lambda-layers', { qpqConfig: props.qpqConfig }).layers;
+      return triggerLayers;
+    };
+
     if (
       props.userDirectoryConfig.emailTemplates.resetPassword ||
       props.userDirectoryConfig.emailTemplates.resetPasswordAdmin ||
@@ -126,6 +135,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
         executorName: 'customMessageTriggerEvent_customMessage',
 
         qpqConfig: props.qpqConfig,
+        apiLayerVersions: getTriggerLayers(),
 
         environment: {
           userDirectoryName: props.userDirectoryConfig.name,
@@ -144,6 +154,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
         executorName: 'customMessageTriggerEvent_defineAuthChallenge',
 
         qpqConfig: props.qpqConfig,
+        apiLayerVersions: getTriggerLayers(),
 
         environment: {
           userDirectoryName: props.userDirectoryConfig.name,
@@ -161,6 +172,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           executorName: 'customMessageTriggerEvent_createAuthChallenge',
 
           qpqConfig: props.qpqConfig,
+          apiLayerVersions: getTriggerLayers(),
 
           environment: {
             userDirectoryName: props.userDirectoryConfig.name,
@@ -178,6 +190,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           executorName: 'customMessageTriggerEvent_verifyAuthChallenge',
 
           qpqConfig: props.qpqConfig,
+          apiLayerVersions: getTriggerLayers(),
 
           environment: {
             userDirectoryName: props.userDirectoryConfig.name,

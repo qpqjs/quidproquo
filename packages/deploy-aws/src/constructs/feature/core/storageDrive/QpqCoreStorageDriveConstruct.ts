@@ -1,6 +1,13 @@
 import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
 import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from '@qpqjs/core';
+import {
+  QPQConfig,
+  qpqCoreUtils,
+  StorageDriveLifecycleRule,
+  StorageDriveQPQConfigSetting,
+  StorageDriveTier,
+  StorageDriveTransition,
+} from '@qpqjs/core';
 
 import { aws_iam, aws_kms, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -65,14 +72,26 @@ export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock
   }
 }
 
+// REGULAR is the class objects start in, so it is never a transition target.
+const convertStorageDriveTierToAwsS3StorageClass = (storageDriveTier: StorageDriveTier): aws_s3.StorageClass => {
+  switch (storageDriveTier) {
+    case StorageDriveTier.SMART_TIERING:
+      return aws_s3.StorageClass.INTELLIGENT_TIERING;
+    case StorageDriveTier.REGULAR:
+    default:
+      throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
+  }
+};
+
 const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
-  storageClass: aws_s3.StorageClass.DEEP_ARCHIVE,
+  storageClass: convertStorageDriveTierToAwsS3StorageClass(storageDriveTransition.storageDriveTier),
   transitionAfter:
     typeof storageDriveTransition.transitionAfterDays === 'number' ? cdk.Duration.days(storageDriveTransition.transitionAfterDays) : undefined,
   transitionDate: typeof storageDriveTransition.transitionDate === 'string' ? new Date(storageDriveTransition.transitionDate) : undefined,
 });
 
 const convertStorageDriveLifecycleRuleToAwsS3LifecycleRule = (lifecycleRule: StorageDriveLifecycleRule): aws_s3.LifecycleRule => ({
+  enabled: lifecycleRule.enabled,
   prefix: lifecycleRule.prefix,
   expiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(lifecycleRule.deleteAfterDays) : undefined,
   objectSizeGreaterThan: lifecycleRule.fileSizeGreaterThan,
@@ -90,7 +109,11 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     storageDriveConfig: StorageDriveQPQConfigSetting,
   ): QpqCoreStorageDriveConstructBase {
     class Import extends QpqCoreStorageDriveConstructBase {
-      bucket = aws_s3.Bucket.fromBucketName(scope, `${id}-${storageDriveConfig.uniqueKey}`, this.resourceName(storageDriveConfig.storageDrive));
+      bucket = aws_s3.Bucket.fromBucketName(
+        scope,
+        `${id}-${storageDriveConfig.uniqueKey}`,
+        awsNamingUtils.resolveOwnedResourceName(storageDriveConfig.storageDrive, qpqConfig, storageDriveConfig.owner),
+      );
     }
 
     return new Import(scope, id, { qpqConfig });
@@ -276,11 +299,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
 
     const foreignArns = foreignDriveConfigs.flatMap((cfg) => {
-      const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-        cfg.owner?.resourceNameOverride || cfg.storageDrive,
-        qpqConfig,
-        cfg.owner?.module,
-      );
+      const bucketName = awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner);
       const bucketArn = `arn:aws:s3:::${bucketName}`;
       return [bucketArn, `${bucketArn}/*`];
     });
