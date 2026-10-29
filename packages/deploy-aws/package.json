@@ -4,7 +4,15 @@
   "description": "CDK constructs and stacks that deploy a quidproquo app to AWS.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*",
@@ -52,5 +60,8 @@
     "@types/aws-lambda": "^8.10.162",
     "@types/node": "^22.13.13",
     "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
