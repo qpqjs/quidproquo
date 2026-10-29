@@ -6,7 +6,7 @@ import { GuidActionType } from './GuidActionType';
 // (uuidv7's counter bits keep same-millisecond mints monotonic). The batch
 // primitive for bulk writers, one append fan-out should not pay one action
 // per id.
-export const askNewSortableGuids = createActionRequester<string[]>()({
+export const askGuidNewSortableMany = createActionRequester<string[]>()({
   actionType: GuidActionType.NewSortableMany,
   getPayload: (count: number) => ({ count }),
 });

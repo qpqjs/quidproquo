@@ -1,4 +1,4 @@
-import { askCatch, askDateNow, askKeyValueStoreUpsertManyBase, askNewSortableGuids, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { askCatch, askDateNow, askGuidNewSortableMany, askKeyValueStoreUpsertManyBase, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { EVENT_DOC_APPEND_MAX_RETRIES } from '../constants/eventDocAppendRetry';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
@@ -37,7 +37,7 @@ export function* askEventDocAppendServerEvents(
   }
 
   const now = yield* askDateNow();
-  const clientMessageIds = yield* askNewSortableGuids(inputs.length);
+  const clientMessageIds = yield* askGuidNewSortableMany(inputs.length);
 
   const events = yield* askEventDocAppendRetrying(modelId, options.validate, {
     buildEvents: (base) =>
