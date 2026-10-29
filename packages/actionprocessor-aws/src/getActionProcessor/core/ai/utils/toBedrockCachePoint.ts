@@ -1,7 +1,7 @@
 import { AiCacheTtl } from '@qpqjs/core';
 
 import { BedrockCachePointRole, BedrockCacheSettings } from '../types';
-import { bedrockOneHourCacheModels } from '../utils';
+import { bedrockOneHourCacheModels } from './bedrockOneHourCacheModels';
 
 export type BedrockCachePoint = { type: 'default' } | { type: 'default'; ttl: '1h' };
 

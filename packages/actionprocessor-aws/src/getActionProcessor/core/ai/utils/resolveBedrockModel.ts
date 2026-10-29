@@ -1,8 +1,8 @@
 import { AiDataRegion, AiModel, Nullable } from '@qpqjs/core';
 
 import { BedrockResolvedModel } from '../types';
-import { bedrockModelMap } from '../utils';
-import { bedrockDataRegionPreference } from '../utils';
+import { bedrockModelMap } from './aiModelMap';
+import { bedrockDataRegionPreference } from './bedrockDataRegionPreference';
 
 /**
  * Picks the inference profile a model runs under: the first preferred region it is offered in,
