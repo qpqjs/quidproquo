@@ -18,7 +18,7 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof
 
     try {
       await setParameter(awsParameterKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ThrottlingException: () => actionResultError(askConfigSetParameter.errorType.Throttling, 'Throttling: Rate exceeded'),

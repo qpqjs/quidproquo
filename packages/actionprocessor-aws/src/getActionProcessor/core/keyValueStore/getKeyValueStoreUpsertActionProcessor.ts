@@ -45,7 +45,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeo
         region,
       );
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),

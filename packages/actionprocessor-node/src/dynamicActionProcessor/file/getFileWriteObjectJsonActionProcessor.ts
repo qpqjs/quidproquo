@@ -23,7 +23,7 @@ const getProcessFileWriteObjectJson =
         await ensureParentDirectoryExists(fullPath);
         const jsonString = JSON.stringify(data, null, 2);
         await fs.writeFile(fullPath, jsonString, 'utf8');
-        return actionResult(void 0);
+        return actionResult(undefined);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
           InvalidScopeError: (error) => actionResultError(askFileWriteObjectJsonBase.errorType.InvalidScope, error.message),

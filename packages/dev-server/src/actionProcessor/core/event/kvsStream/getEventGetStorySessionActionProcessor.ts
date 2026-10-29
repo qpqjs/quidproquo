@@ -3,7 +3,7 @@ import { actionResult, askEventGetStorySessionBase, createActionProcessor, Event
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
-  return async () => actionResult(void 0);
+  return async () => actionResult(undefined);
 };
 
 export const getEventGetStorySessionActionProcessor = createActionProcessor(askEventGetStorySessionBase, getProcessGetStorySession);

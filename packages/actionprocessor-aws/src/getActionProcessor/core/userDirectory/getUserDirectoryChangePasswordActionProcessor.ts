@@ -19,7 +19,7 @@ const getProcessChangePassword = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
     try {
       await changePassword(accessToken, oldPassword, newPassword, region);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () => actionResultError(askUserDirectoryChangePassword.errorType.IncorrectPassword, 'Current password is incorrect'),

@@ -68,7 +68,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
       eventBus.publish(EventBusActionType.SendMessages, eventBusEvent);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

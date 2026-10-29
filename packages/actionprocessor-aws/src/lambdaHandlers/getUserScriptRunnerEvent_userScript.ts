@@ -36,7 +36,7 @@ export type UserScriptRunnerHandlerOptions = {
  */
 export const getUserScriptRunnerEvent_userScript = (
   _dynamicModuleLoader: DynamicModuleLoader,
-  _qpqConfig: QPQConfig,
+  qpqConfig: QPQConfig,
   options: UserScriptRunnerHandlerOptions = {},
 ) => {
   return async (event: UserScriptRunnerEvent | SNSEvent, context: Context): Promise<UserScriptRunnerResult | string> => {

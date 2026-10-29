@@ -7,7 +7,7 @@ import {
   UserDirectoryActionType,
 } from '@qpqjs/core';
 
-const getProcessAssociateSoftwareToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
+const getProcessAssociateSoftwareToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
   return async ({ session }) => {
     // Static base32 secret ~ MFA codes are never actually verified in dev
     return actionResult({

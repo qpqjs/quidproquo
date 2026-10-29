@@ -14,7 +14,7 @@ const getProcessInvalidateCache = (qpqConfig: QPQConfig): ProcessorFor<typeof as
 
     await invalidateCache(distributionId, region, paths);
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

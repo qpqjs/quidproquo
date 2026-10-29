@@ -38,7 +38,7 @@ const getProcessFileCopy =
           }
         }
 
-        return actionResult(void 0);
+        return actionResult(undefined);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
           InvalidScopeError: (error) => actionResultError(askFileCopy.errorType.InvalidScope, error.message),

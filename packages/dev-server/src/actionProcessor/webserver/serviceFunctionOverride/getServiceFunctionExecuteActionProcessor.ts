@@ -28,7 +28,7 @@ const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicMod
     );
 
     if (isAsync) {
-      return actionResult(void 0);
+      return actionResult(undefined);
     }
 
     const response = await eventPromise;

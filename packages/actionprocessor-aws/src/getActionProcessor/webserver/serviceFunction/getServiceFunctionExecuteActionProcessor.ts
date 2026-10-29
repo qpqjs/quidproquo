@@ -40,7 +40,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askService
     const result = await executeLambdaByName<EitherActionResult<any>>(awsFunctionName, region, serviceFunctionEvent, isAsync);
 
     if (!result) {
-      return actionResult(void 0);
+      return actionResult(undefined);
     }
 
     if (!result.success) {

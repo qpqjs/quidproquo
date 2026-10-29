@@ -21,7 +21,7 @@ const getProcessSetUserAttributes = (
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       await upsertDevUser(devServerConfig.runtimePath, userDirectory, username, userAttributes);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {});
     }

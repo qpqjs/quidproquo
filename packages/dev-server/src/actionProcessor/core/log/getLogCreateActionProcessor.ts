@@ -22,7 +22,7 @@ const getProcessLogCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogCr
       console.log(logMessage);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

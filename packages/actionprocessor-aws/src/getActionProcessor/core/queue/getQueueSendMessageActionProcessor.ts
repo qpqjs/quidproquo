@@ -53,7 +53,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
     try {
       await sendMessages(sqsQueueName, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), queueMessages.map(toSqsEntry));
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         AccessDenied: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),

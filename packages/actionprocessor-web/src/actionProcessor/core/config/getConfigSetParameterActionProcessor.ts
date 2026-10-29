@@ -15,7 +15,7 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof
       // localStorage global that shadows jsdom's in tests.
       window.localStorage.setItem(parameterName, parameterValue);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         QuotaExceededError: () =>

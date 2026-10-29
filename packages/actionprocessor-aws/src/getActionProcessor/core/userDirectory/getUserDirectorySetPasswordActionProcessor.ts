@@ -26,7 +26,7 @@ const getProcessSetPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUse
     try {
       await setUserPassword(region, userPoolId, resolvedUsername, newPassword);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(askUserDirectorySetPassword.errorType.UserNotFound, 'No account found for this user'),

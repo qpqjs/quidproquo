@@ -16,6 +16,6 @@ const getProcessStateRead =
 
 export const getStateReadActionListResolver =
   <State>(getCurrentState: () => State): ActionProcessorListResolver =>
-  async (_qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
+  async (qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
     [StateActionType.Read]: getProcessStateRead(getCurrentState),
   });

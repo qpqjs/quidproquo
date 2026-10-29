@@ -11,7 +11,7 @@ import {
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
 
-const getProcessReadAccessToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
+const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
   return async ({ userDirectoryName, ignoreExpiration }, { decodedAccessToken, accessToken }) => {
     if (decodedAccessToken) {
       const nowInSeconds = Math.floor(Date.now() / 1000);

@@ -20,6 +20,6 @@ const getProcessStateDispatch =
 
 export const getStateDispatchActionListResolver =
   (dispatch: Dispatch<any>): ActionProcessorListResolver =>
-  async (_qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
+  async (qpqConfig, _dynamicModuleLoader): Promise<ActionProcessorList> => ({
     [StateActionType.Dispatch]: getProcessStateDispatch(dispatch),
   });

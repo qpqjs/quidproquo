@@ -67,7 +67,7 @@ const getProcessKeyValueStoreUpsertMany = (
         });
       }
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),

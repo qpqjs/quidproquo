@@ -29,7 +29,7 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeo
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
       );
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         AccessDenied: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),

@@ -25,7 +25,7 @@ const getProcessRevokeRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof
     try {
       await revokeRefreshToken(userPoolId, userPoolClientId, region, refreshToken);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () =>

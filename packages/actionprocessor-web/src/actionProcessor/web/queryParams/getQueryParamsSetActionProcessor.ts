@@ -20,7 +20,7 @@ const getProcessQueryParamsSet = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       window.history.replaceState(null, '', newUrl);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

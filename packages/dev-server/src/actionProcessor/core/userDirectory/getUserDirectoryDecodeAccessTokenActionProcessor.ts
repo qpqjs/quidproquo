@@ -11,7 +11,7 @@ import {
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
 
-const getProcessDecodeAccessToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryDecodeAccessToken> => {
+const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryDecodeAccessToken> => {
   return async ({ userDirectoryName, accessToken, ignoreExpiration }) => {
     const decodedAccessToken = decodeAccessTokenForDev(userDirectoryName, accessToken, ignoreExpiration);
 

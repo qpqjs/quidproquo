@@ -19,7 +19,7 @@ const getProcessSignOutUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUse
     try {
       await globalSignOut(accessToken, region);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () => actionResultError(askUserDirectorySignOutUser.errorType.Unauthorized, 'Access token is invalid or has expired'),

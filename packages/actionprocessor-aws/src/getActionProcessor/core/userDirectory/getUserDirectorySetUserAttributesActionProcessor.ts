@@ -26,7 +26,7 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): ProcessorFor<typeof 
     try {
       await setUserAttributes(userPoolId, region, resolvedUsername, userAttributes);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(askUserDirectorySetUserAttributes.errorType.UserNotFound, 'No account found for this user'),

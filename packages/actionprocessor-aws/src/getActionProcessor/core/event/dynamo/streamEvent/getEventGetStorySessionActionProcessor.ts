@@ -6,7 +6,7 @@ import { EventInput, InternalEventRecord, MatchResult } from './types';
 // authority wrote it. The handler runs with a blank session, like the storage drive event.
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   return async ({ qpqEventRecord, eventParams }) => {
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

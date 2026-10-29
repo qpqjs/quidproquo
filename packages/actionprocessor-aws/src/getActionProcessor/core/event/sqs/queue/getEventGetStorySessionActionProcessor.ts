@@ -25,7 +25,7 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       return actionResult(parsedInternalEventRecord.storySession && toCrossServiceSession(parsedInternalEventRecord.storySession));
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

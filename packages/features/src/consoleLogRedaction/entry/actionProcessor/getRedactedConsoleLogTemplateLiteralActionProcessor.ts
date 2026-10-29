@@ -9,7 +9,7 @@ const getProcessRedactedConsoleLogTemplateLiteral = (qpqConfig: QPQConfig): Proc
 
     console.log(decomposedStringToString(redactedParts));
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

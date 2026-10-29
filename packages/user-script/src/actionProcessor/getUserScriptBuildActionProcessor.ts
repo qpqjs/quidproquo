@@ -1,6 +1,5 @@
 import { loadUserScriptHostModules } from '@qpqjs/actionprocessor-node';
 import {
-  ActionProcessorList,
   actionResult,
   actionResultError,
   askFileListDirectory,
@@ -8,17 +7,11 @@ import {
   askUserScriptBuild,
   createActionProcessor,
   createNestedRuntime,
-  DynamicModuleLoader,
   generateUuid,
   getDateNow,
   ProcessorFor,
   QPQConfig,
-  QpqLogger,
   QpqRuntimeType,
-  StorySession,
-  StorySessionUpdater,
-  StreamRegistry,
-  UserScriptBuildActionPayload,
 } from '@qpqjs/core';
 
 import { UserScriptBuildError } from '../build/UserScriptBuildError';
@@ -42,15 +35,7 @@ const COLLECT_ERROR_TYPES: Record<string, string> = {
 };
 
 const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScriptBuild> => {
-  return async (
-    payload: UserScriptBuildActionPayload,
-    session: StorySession,
-    actionProcessors: ActionProcessorList,
-    logger: QpqLogger,
-    updateSession: StorySessionUpdater,
-    dynamicModuleLoader: DynamicModuleLoader,
-    streamRegistry: StreamRegistry,
-  ) => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const resolveStory = createNestedRuntime(
       qpqConfig,
       session,

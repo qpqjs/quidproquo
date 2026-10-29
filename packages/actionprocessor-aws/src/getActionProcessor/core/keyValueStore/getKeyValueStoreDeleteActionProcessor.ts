@@ -26,7 +26,7 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): ProcessorFor<typeo
 
       await deleteItem(dynamoTableName, region, scoped.key(key), storeConfig.partitionKey.key, sortKey, storeConfig.sortKeys[0]?.key);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(askKeyValueStoreDelete.errorType.ServiceUnavailable, 'KVS Service Unavailable'),

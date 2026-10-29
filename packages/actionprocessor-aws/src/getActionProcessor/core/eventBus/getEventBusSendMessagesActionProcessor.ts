@@ -71,7 +71,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
     try {
       await publishMessage(topicArn, region, eventBusMessages.map(toSnsEntry));
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         AuthorizationErrorException: () =>

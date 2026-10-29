@@ -2,7 +2,7 @@ import { actionResult, askUserDirectoryForgotPassword, createActionProcessor, Pr
 
 import { resolveDevUsername } from '../../../logic/auth/devAuth';
 
-const getProcessForgotPassword = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryForgotPassword> => {
+const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryForgotPassword> => {
   return async ({ username }) => {
     // No email is actually sent in dev
     return actionResult({

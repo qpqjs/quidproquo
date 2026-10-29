@@ -7,10 +7,10 @@ import {
   UserDirectoryActionType,
 } from '@qpqjs/core';
 
-const getProcessConfirmEmailVerification = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
+const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
   return async () => {
     // Any verification code is accepted in dev
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

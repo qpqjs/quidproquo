@@ -5,7 +5,7 @@ const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetri
   return async ({ metricName, value, unit }) => {
     console.log(`metric: ${metricName}=${value}${unit ? ` ${unit}` : ''}`);
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

@@ -28,7 +28,7 @@ const getProcessFileCopy = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileCo
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       );
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         AccessDenied: () => actionResultError(askFileCopy.errorType.AccessDenied, 'Access denied copying file'),

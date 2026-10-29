@@ -15,7 +15,7 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
     try {
       await sendMessageToWebSocketConnection(service, websocketApiName, connectionId, payload);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error) {
       return actionResultErrorFromCaughtError(error, {});
     }

@@ -41,7 +41,7 @@ const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetri
 
     console.log(JSON.stringify(emf));
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

@@ -57,7 +57,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
         await batchPutItems(dynamoTableName, scopedItems, region);
       }
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
