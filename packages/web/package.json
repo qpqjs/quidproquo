@@ -4,7 +4,15 @@
   "description": "Browser-side helpers for talking to a quidproquo backend.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -43,5 +51,8 @@
   "dependencies": {
     "@qpqjs/core": "0.3.0",
     "@qpqjs/webserver": "0.3.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
