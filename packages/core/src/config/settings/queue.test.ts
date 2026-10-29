@@ -25,8 +25,7 @@ describe('defineQueue', () => {
   });
 
   it('honours an explicit zero batching window', () => {
-    // Regression: this used to be `|| 5`, so 0 was falsy and a caller asking for no window silently got 5 —
-    // the setting could not be turned off at all.
+    // An explicit 0 must be honoured, not replaced by a non-zero fallback.
     expect(defineQueue('Jobs', processors, { batchWindowInSeconds: 0 }).batchWindowInSeconds).toBe(0);
   });
 
@@ -51,7 +50,7 @@ describe('defineQueue', () => {
   });
 
   it('lets hasDeadLetterQueue be turned off', () => {
-    // Regression: `|| true` used to swallow an explicit false
+    // An explicit false must be honoured.
     expect(defineQueue('Jobs', processors, { hasDeadLetterQueue: false }).hasDeadLetterQueue).toBe(false);
   });
 

@@ -28,7 +28,7 @@ export function* askReduceState<State, Effect>(
         return getSuccessfulEitherActionResultIfRequired(undefined, action.returnErrors);
       }
 
-      // Reducer didn't handle this effect — relay it so a parent askReduceState (or the runtime)
+      // Reducer didn't handle this effect, relay it so a parent askReduceState (or the runtime)
       // can handle it. The parent's result is forwarded to the inner dispatch verbatim (correct
       // under askCatch, including error propagation).
       return yield action;

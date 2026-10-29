@@ -9,7 +9,7 @@ import { AiStreamUsage } from './AiStreamUsage';
  */
 export interface AiStreamFinishStep {
   type: AiStreamPartType.FinishStep;
-  /** Why this step stopped — `toolCalls` between steps, `stop` on the final step. */
+  /** Why this step stopped, `toolCalls` between steps, `stop` on the final step. */
   finishReason: AiStreamFinishReasonEnum;
   /** The provider's own stop reason string, when it reported one; explains an `other` or `unknown` reason. */
   rawFinishReason?: string;

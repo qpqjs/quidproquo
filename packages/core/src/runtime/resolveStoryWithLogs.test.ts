@@ -68,8 +68,8 @@ describe('resolveStoryWithLogs', () => {
     console.log = silentConsoleLog;
 
     // A processor that parks until released, so two stories can overlap
-    // out of order: A starts, B starts, A finishes, B finishes — the
-    // interleaving that used to leak A's wrapper into console.log forever.
+    // out of order: A starts, B starts, A finishes, B finishes, the
+    // interleaving that leaks A's wrapper into console.log forever if restores run out of order.
     const makeParkedStory = () => {
       let release!: () => void;
       const parked = new Promise<void>((resolve) => {

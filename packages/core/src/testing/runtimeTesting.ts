@@ -23,7 +23,7 @@ export const getTestTimeNow = (): string => TEST_TIME_NOW;
 // A deterministic guid source for correlation building (`moduleName::guid`).
 export const testRandomGuid = (): string => 'guid-0';
 
-// A dynamic module loader that never resolves a module — enough for stories that do not
+// A dynamic module loader that never resolves a module, enough for stories that do not
 // dynamically load anything.
 export const noopDynamicModuleLoader = async (): Promise<null> => null;
 

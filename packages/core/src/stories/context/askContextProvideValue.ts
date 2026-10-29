@@ -20,7 +20,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
         return getSuccessfulEitherActionResultIfRequired(value, action.returnErrors);
       }
 
-      // Not our identifier — relay the action and forward its result verbatim.
+      // Not our identifier, relay the action and forward its result verbatim.
       return yield action;
     },
 

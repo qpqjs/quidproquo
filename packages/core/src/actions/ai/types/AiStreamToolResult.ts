@@ -1,7 +1,7 @@
 import { AiStreamPartType } from './AiStreamPartType';
 
 /**
- * A tool finished executing successfully — the model will use `output` in its next step.
+ * A tool finished executing successfully, the model will use `output` in its next step.
  *
  * `toolCallId` matches the originating {@link AiStreamToolCall}.
  */

@@ -22,7 +22,7 @@ import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QPQErro
 
 // A mock for a single action type. Either the raw value the action resolves to, or a
 // function of the action that computes it (handy for asserting on / varying by payload).
-// `returnErrors` wrapping (added by askCatch) is applied for you — always supply the
+// `returnErrors` wrapping (added by askCatch) is applied for you, always supply the
 // plain success value.
 export type ActionMock<TAction extends Action<any> = Action<any>, TResult = any> = TResult | ((action: TAction) => TResult);
 
@@ -84,7 +84,7 @@ const mockActions = (mocks: ActionMockMap): ActionOverrideMap =>
   );
 
 // Drives a story (already wrapped by askOverrideActions) to completion. Every real action
-// should be mocked, so anything that reaches the runtime is a test gap and throws — except
+// should be mocked, so anything that reaches the runtime is a test gap and throws, except
 // the empty batch askOverrideActions emits internally, which we answer with [].
 const drive = <R>(story: AskResponse<R>): R => {
   let next = story.next();

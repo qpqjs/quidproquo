@@ -9,7 +9,7 @@ export interface SystemTraceStoryActionPayload {
   // function's own script (bundles split across chunks).
   scriptPatterns?: string[];
 
-  // Only break on statements whose source-mapped origin is the service's own code —
+  // Only break on statements whose source-mapped origin is the service's own code ,
   // positions mapping into node_modules (framework/deps) get no breakpoints, so the
   // step budget is spent entirely on user statements.
   onlyOwnCode?: boolean;

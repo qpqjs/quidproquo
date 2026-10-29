@@ -16,7 +16,7 @@ import { askRunParallel } from './askRunParallel';
 // ─── Independent runtime harness ─────────────────────────────────────────────────
 //
 // askOverrideActions is the primitive that `runStory` is itself built on, so we do NOT
-// test it with runStory — that would be circular. Instead this tiny independent driver
+// test it with runStory, that would be circular. Instead this tiny independent driver
 // stands in for the QPQ runtime: it answers each yielded action from a response map and
 // records what reached it. Every test then reads as a story + overrides + responses,
 // followed by assertions on the resolved value and on which actions hit the runtime.
@@ -114,7 +114,7 @@ const runWithRuntime = (story: AskResponse<any>, responses: ResponseMap = {}): R
 
 // ─── Override handler shorthands ─────────────────────────────────────────────────
 
-// A handler that simply supplies a constant value — the common override case.
+// A handler that simply supplies a constant value, the common override case.
 const returns = <T>(value: T): ActionOverrideHandler =>
   function* () {
     return value;
@@ -746,7 +746,7 @@ describe('askOverrideActions', () => {
       });
 
       // Depending on whether askCatch can catch the batch's askThrowError, the error surfaces
-      // as a thrown error or as a failed result — either way it must carry the original text.
+      // as a thrown error or as a failed result, either way it must carry the original text.
       if (threwError) {
         expect(threwError).toEqual({ errorType: 'GenericError', errorText: 'Date service down' });
       } else {
@@ -903,7 +903,7 @@ describe('askOverrideActions', () => {
 //
 // The engine forwards a handler's return value VERBATIM. A handler that relays an action
 // with a bare `return yield action` therefore gets the parent's result delivered to the
-// story unchanged — raw when the action has no returnErrors, or an EitherActionResult
+// story unchanged, raw when the action has no returnErrors, or an EitherActionResult
 // (success OR failure) when it does. Only handlers returning their OWN value must shape it.
 
 describe('relay handlers (return yield action)', () => {

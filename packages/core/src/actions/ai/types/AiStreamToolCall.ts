@@ -1,7 +1,7 @@
 import { AiStreamPartType } from './AiStreamPartType';
 
 /**
- * A fully-formed tool call — the model finished producing arguments and they parsed cleanly.
+ * A fully-formed tool call, the model finished producing arguments and they parsed cleanly.
  *
  * Execution still has to happen; a {@link AiStreamToolResult} or {@link AiStreamToolError}
  * with the same `toolCallId` follows once it does.

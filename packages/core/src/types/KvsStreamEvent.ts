@@ -25,7 +25,7 @@ export type KvsStreamRecord<TItem extends object = any> = {
   // Forgetting to would mean acting on one tenant's data while pointed at another's.
   scope?: string;
 
-  // The item's key attributes only — always present, including on Remove. RAW: the scope has
+  // The item's key attributes only, always present, including on Remove. RAW: the scope has
   // been stripped back out of the partition key, so these are the values the caller wrote.
   keys: Record<string, unknown>;
 

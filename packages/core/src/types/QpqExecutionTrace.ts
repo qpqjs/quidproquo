@@ -16,7 +16,7 @@ export interface QpqExecutionTraceSource {
   content?: string;
 }
 
-// One captured variable value. `preview` is always present — a short single-line display
+// One captured variable value. `preview` is always present, a short single-line display
 // string (used for inline annotations). `json` is present for object values that could be
 // fully serialized: a JSON string of the value walked to the capture depth/size caps
 // (strings clamped, circular refs and overflow marked with «...» placeholders), for
@@ -60,7 +60,7 @@ export interface QpqExecutionTraceStats {
   instrumentMs?: number;
 
   // Urls of every script that received breakpoints (steps can only be recorded in
-  // these) — the first thing to check when expected code is missing from a trace
+  // these), the first thing to check when expected code is missing from a trace
   instrumentedScriptUrls?: string[];
 }
 
@@ -71,7 +71,7 @@ export interface QpqExecutionTrace {
 
   tracedAt: QpqIsoDateTime;
 
-  // True when the step budget was hit — the replay still ran to completion, but steps
+  // True when the step budget was hit, the replay still ran to completion, but steps
   // beyond the budget were not recorded.
   truncated: boolean;
 

@@ -7,7 +7,7 @@ import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 // foreign drive with `owner` set for a shared bucket). The deploy layer resolves
 // that drive's bucket and points the lambdas at `<bucket>/<serviceName>`, so many
 // services can share one bucket with each service's artifacts under its own prefix.
-// Read access comes from the storage drive's own grants — nothing extra is created.
+// Read access comes from the storage drive's own grants, nothing extra is created.
 export interface FederatedModuleStoreOptions {
   // How often (ms) a warm lambda re-checks the store for a newly published version.
   // Lower = faster pickup at the cost of one small S3 GET per container per interval.

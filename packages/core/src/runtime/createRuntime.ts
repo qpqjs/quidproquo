@@ -17,7 +17,6 @@ export const createRuntime = (
   initialTags?: string[],
   streamRegistry?: StreamRegistry,
 ) => {
-  // Return a function that wraps resolveStoryWithLogs with the provided runtime context
   return <TArgs extends Array<any>>(story: Story<TArgs, any>, args: TArgs) =>
     resolveStoryWithLogs(
       story,

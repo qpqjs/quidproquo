@@ -6,7 +6,7 @@
  * moment later usually succeeds.
  *
  * They matter because the default classification is the opposite. An unmapped error name falls through to
- * GenericError, which callers reasonably treat as terminal — so a caller with retry machinery available
+ * GenericError, which callers reasonably treat as terminal, so a caller with retry machinery available
  * will not use it, and a caller that records failures durably will record a permanent failure for
  * something that was only ever momentary. That was observed in DocGen: a 300-record fanned-out batch put
  * ~100 concurrent flows against DynamoDB, 64 records came back `ThrottlingException`, and every one was
@@ -28,7 +28,7 @@ export const TRANSIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
   'RequestLimitExceeded',
   // Lambda concurrency.
   'EC2ThrottledException',
-  // Transient service-side failures — retrying is the documented response to both.
+  // Transient service-side failures, retrying is the documented response to both.
   'ServiceUnavailable',
   'InternalServerError',
   'InternalFailure',

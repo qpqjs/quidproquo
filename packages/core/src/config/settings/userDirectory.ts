@@ -15,7 +15,7 @@ export enum UserDirectoryMfaMode {
 
 export enum UserDirectoryMfaSecondFactor {
   totp = 'totp',
-  // sms = 'sms', // future — additionally needs phone + SNS role infra.
+  // sms = 'sms', // future, additionally needs phone + SNS role infra.
 }
 
 export interface UserDirectoryMfaSettings {

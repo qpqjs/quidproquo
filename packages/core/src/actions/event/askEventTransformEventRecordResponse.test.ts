@@ -16,8 +16,8 @@ describe('askEventTransformEventRecordResponse', () => {
     });
   });
 
-  // Regression: this requester used to be a copy of askEventTransformEventRecord and
-  // yielded TransformEventRecord, so the response transform could never be dispatched.
+  // Guards against this requester yielding TransformEventRecord (an easy copy-paste slip),
+  // which would mean the response transform could never be dispatched.
   it('yields the response action type, not the record one', () => {
     const { action } = captureRequester(askEventTransformEventRecordResponse({ raw: 'response' }));
 

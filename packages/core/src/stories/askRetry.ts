@@ -3,7 +3,7 @@ import { AskResponse } from '../types';
 import { askCatch } from './system';
 
 export type AskRetryOptions = {
-  // Multiply the wait by the attempt number (1-based) — linear backoff for
+  // Multiply the wait by the attempt number (1-based), linear backoff for
   // contended resources instead of a fixed interval.
   linearBackoff?: boolean;
 

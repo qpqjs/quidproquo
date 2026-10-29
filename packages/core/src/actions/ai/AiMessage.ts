@@ -10,7 +10,7 @@ export interface AiFileUrlPart {
   filename?: string;
 }
 
-// References a file on a storage drive — resolved to file contents by the action
+// References a file on a storage drive, resolved to file contents by the action
 // processor at prompt time, so no presigned url ever enters logs or session state.
 export interface AiFileDrivePart {
   type: 'file';

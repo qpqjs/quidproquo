@@ -34,7 +34,7 @@ function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
 //
 // When an action has returnErrors set to true (because askCatch wrapped it), the story expects the
 // result wrapped in { success: true, result: value }. The runtime normally does this, but an override
-// bypasses the runtime — so a handler that returns a value it computed itself must shape it with this
+// bypasses the runtime, so a handler that returns a value it computed itself must shape it with this
 // helper (passing the action's returnErrors). If returnErrors is false/undefined it returns the value
 // unchanged.
 //
@@ -84,7 +84,7 @@ export function* askOverrideActions<T extends AskResponse<any>>(
       // We have an override! Run the user's handler instead of letting the runtime process it.
       // The handler is itself a story (generator), so we yield* into it to run it.
       //
-      // We feed the handler's return value to the story VERBATIM — we never reshape it. That is what
+      // We feed the handler's return value to the story VERBATIM, we never reshape it. That is what
       // lets a handler relay an action with a bare `return yield action`: the value it gets back from
       // the parent (raw, or an EitherActionResult when the action carries returnErrors, e.g. under
       // askCatch) is already exactly what the story expects. A handler that instead returns its OWN

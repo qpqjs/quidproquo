@@ -128,7 +128,7 @@ describe('askContextProvideValue', () => {
     }
 
     const { result } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {});
-    // Single wrap — was { success: true, result: { success: true, result: 'CTX_VALUE' } } before the fix.
+    // Single wrap: no nested success envelope.
     expect(result).toEqual({ success: true, result: 'CTX_VALUE' });
   });
 

@@ -48,13 +48,13 @@ export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedD
  *
  * So: reach for this only from a migration or an equivalent whole-store operation, never on a
  * request path. Nothing in the framework calls it, and a caller with a user's request in hand
- * has no business using it — scope is what keeps tenants apart, and this steps over it.
+ * has no business using it, scope is what keeps tenants apart, and this steps over it.
  *
  * The scope comes back per row rather than being discarded, so a caller can write each row
  * back where it came from.
  *
  * DRAIN THE PAGE KEY: loop until `nextPageKey` comes back undefined. Every backend pages,
- * including the local one, deliberately so — a backend that returned everything in one call
+ * including the local one, deliberately so, a backend that returned everything in one call
  * would let a caller stop after the first page, be right locally, and silently skip most of
  * the data deployed. A local run has to be able to prove the loop.
  */

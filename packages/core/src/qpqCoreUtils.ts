@@ -434,7 +434,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getStorageDrives(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
     // A store's change-stream handler. Missing here, the bundler never sees it: the lambda
     // zip omits it and the dev server's dynamic loader has nothing to resolve, so the handler
-    // simply never runs — and since nothing throws, the only symptom is a projection that
+    // simply never runs, and since nothing throws, the only symptom is a projection that
     // silently stops updating.
     ...(getAllKeyValueStores(qpqConfig)
       .map((kvs) => kvs.onStream?.runtime)

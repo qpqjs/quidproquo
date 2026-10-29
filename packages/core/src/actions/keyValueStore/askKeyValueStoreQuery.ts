@@ -23,7 +23,7 @@ export type KeyValueStoreQueryOptions = {
   // Default reads are EVENTUALLY consistent, which is right for a viewer and wrong for a caller that just
   // wrote and is now reading back to decide something. That case is not hypothetical: a flow run appends
   // its terminal event and immediately re-lists the log to fold the outcome, and under load the terminal
-  // event is intermittently not yet visible — so a run that succeeded reads back as having no outcome at
+  // event is intermittently not yet visible, so a run that succeeded reads back as having no outcome at
   // all, with nothing recorded to explain it.
   //
   // Use it for read-your-own-writes and for any fold used as a COORDINATION primitive (deciding "am I

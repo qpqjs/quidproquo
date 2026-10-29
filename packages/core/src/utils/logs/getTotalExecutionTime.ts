@@ -4,7 +4,6 @@ export const getTotalExecutionTime = (logs: StoryResultMetadataWithChildren[]): 
   let totalExecutionTimeMs = 0;
 
   const traverse = (node: StoryResultMetadataWithChildren) => {
-    // Add the node's execution time to the total
     if (node.runtimeType === QpqRuntimeType.EXECUTE_STORY) {
       totalExecutionTimeMs += node.executionTimeMs;
     }

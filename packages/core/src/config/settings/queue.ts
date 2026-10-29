@@ -46,17 +46,11 @@ export const defineQueue = (name: string, processors: QpqQueueProcessors, option
     name,
 
     batchSize: options?.batchSize || 0,
-    // Default 0 — invoke as soon as a message arrives — which is also AWS's own default for
-    // MaximumBatchingWindowInSeconds.
-    //
-    // It used to default to 5 with a `||`, which was wrong twice over. A window only ever reaches AWS for a
-    // queue that sets `batchSize > 0` (the CDK construct omits both together otherwise), and in practice
-    // those queues all use batchSize 1 — where a batch is FULL on the first message, so a window can never
-    // gather a second one and can only delay the first. And `||` meant 0 was falsy, so a caller who noticed
-    // and passed 0 still got 5: the setting could not be turned off at all.
-    //
-    // A queue that genuinely wants to accumulate should ask for a window explicitly, rather than every
-    // queue inheriting latency that most of them cannot use.
+    // Default 0 (invoke as soon as a message arrives), which is also AWS's own default for
+    // MaximumBatchingWindowInSeconds. A window only reaches AWS for a queue with batchSize > 0, and those
+    // queues use batchSize 1, where a batch is full on the first message, so a window can only delay it.
+    // `??` rather than `||` so an explicit 0 is honoured. A queue that wants to accumulate asks for a window
+    // explicitly instead of every queue inheriting latency it cannot use.
     batchWindowInSeconds: options?.batchWindowInSeconds ?? 0,
 
     concurrency: options?.concurrency || 1,

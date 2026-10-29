@@ -45,9 +45,9 @@ describe('askParallelDEPRECATED', () => {
   });
 
   it('keeps stepping longer stories after shorter ones finish', () => {
-    // Regression: a finished story used to leave a null hole in the batch sent to the
-    // runtime, which crashed the batch processor. The pending action must be batched
-    // alone and its result routed back to the right story.
+    // A finished story must not leave a null hole in the batch sent to the runtime (that
+    // crashes the batch processor): the pending action is batched alone and its result
+    // routed back to the right story.
     function* shortStory(): AskResponse<string> {
       return yield* askNewGuid();
     }

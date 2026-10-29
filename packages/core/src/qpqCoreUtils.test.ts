@@ -603,7 +603,7 @@ describe('qpqCoreUtils', () => {
 
     it("includes a store's change-stream handler", () => {
       // Anything missing here is never bundled, so its handler cannot be resolved at runtime
-      // and simply never runs. Nothing throws — the only symptom is whatever it maintained
+      // and simply never runs. Nothing throws, the only symptom is whatever it maintained
       // quietly going stale, which is how this was found.
       const withStream = buildTestQpqConfig([
         defineKeyValueStore('events', 'pk', [], { onStream: { runtime: '/entry/kvsStream/project::project' } }),

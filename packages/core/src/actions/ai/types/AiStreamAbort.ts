@@ -1,7 +1,7 @@
 import { AiStreamPartType } from './AiStreamPartType';
 
 /**
- * The stream was aborted before completion — e.g. an abort signal fired or the client disconnected.
+ * The stream was aborted before completion, e.g. an abort signal fired or the client disconnected.
  *
  * No `Finish` part will follow an `Abort`.
  */

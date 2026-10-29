@@ -7,6 +7,6 @@
 export interface AiStreamFile {
   /** File contents, base64-encoded. */
   base64: string;
-  /** IANA media type — e.g. `'image/png'`. */
+  /** IANA media type, e.g. `'image/png'`. */
   mediaType: string;
 }

@@ -76,7 +76,7 @@ const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(compositeKvs
  * Records arrive in order PER PARTITION KEY, and different partition keys are processed
  * concurrently. A stream handler therefore gets one-writer-per-item serialisation for
  * free, which is what makes a stream the natural place to maintain a projection of a table
- * you only ever append to — no queue, no extra write on the append path, and no trigger to
+ * you only ever append to, no queue, no extra write on the append path, and no trigger to
  * lose, because the record exists precisely because the write happened.
  *
  * Mirrors defineStorageDrive's `onEvent`.
@@ -129,7 +129,7 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
   // than hitting the unpartitioned rows. askKeyValueStoreScanAllScopes is exempt.
   scoped?: boolean;
 
-  // Turn on change data capture — see KvsStreamSettings. Absent means no stream is
+  // Turn on change data capture, see KvsStreamSettings. Absent means no stream is
   // created at all.
   onStream?: KvsStreamSettings;
 }

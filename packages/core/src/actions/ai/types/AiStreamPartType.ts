@@ -8,10 +8,10 @@
  * start → delta… → end triples sharing the same `id`.
  */
 export enum AiStreamPartType {
-  /** Emitted once before any other parts — the overall response is starting. */
+  /** Emitted once before any other parts, the overall response is starting. */
   Start = 'start',
 
-  /** Emitted once at the very end — overall response is complete, with aggregate usage. */
+  /** Emitted once at the very end, overall response is complete, with aggregate usage. */
   Finish = 'finish',
 
   /** A single generation step (one round-trip to the model) has started. */
@@ -26,10 +26,10 @@ export enum AiStreamPartType {
   /** A non-fatal streaming error. `streamText` swallows errors by default; this surfaces them. */
   Error = 'error',
 
-  /** A provider-specific raw chunk — passed through for debugging or custom handling. */
+  /** A provider-specific raw chunk, passed through for debugging or custom handling. */
   Raw = 'raw',
 
-  /** The model cited a source (URL or document) — used for grounded / RAG-style responses. */
+  /** The model cited a source (URL or document), used for grounded / RAG-style responses. */
   Source = 'source',
 
   /** The model produced a file artifact (e.g. generated image). */
@@ -38,7 +38,7 @@ export enum AiStreamPartType {
   /** The model produced a reasoning file artifact (e.g. an encrypted reasoning trace). */
   ReasoningFile = 'reasoning-file',
 
-  /** A provider-specific custom event — identified by `kind`, with no higher-level mapping. */
+  /** A provider-specific custom event, identified by `kind`, with no higher-level mapping. */
   Custom = 'custom',
 
   /** Beginning of a contiguous text block. Pair with `TextEnd` via shared `id`. */
@@ -68,7 +68,7 @@ export enum AiStreamPartType {
   /** An incremental chunk of the (JSON) tool-call arguments. */
   ToolInputDelta = 'tool-input-delta',
 
-  /** A fully-assembled tool call — arguments are complete and parsed. */
+  /** A fully-assembled tool call, arguments are complete and parsed. */
   ToolCall = 'tool-call',
 
   /** A tool finished executing successfully. Includes the original `input` and the `output`. */
@@ -80,7 +80,7 @@ export enum AiStreamPartType {
   /** The caller denied executing the tool after an approval request. */
   ToolOutputDenied = 'tool-output-denied',
 
-  /** The model is requesting permission to execute a tool — awaiting approve/deny. */
+  /** The model is requesting permission to execute a tool, awaiting approve/deny. */
   ToolApprovalRequest = 'tool-approval-request',
 
   /** The approve/deny decision for a prior {@link ToolApprovalRequest}. */

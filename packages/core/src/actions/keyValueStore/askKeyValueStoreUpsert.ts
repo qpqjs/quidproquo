@@ -8,7 +8,7 @@ export type KeyValueStoreUpsertOptions = {
 
   // Conditional insert: only write when no item with the same key exists.
   // A losing concurrent writer gets ErrorTypeEnum.Conflict instead of silently
-  // overwriting — the primitive for optimistic-concurrency schemes (e.g.
+  // overwriting, the primitive for optimistic-concurrency schemes (e.g.
   // append-only event logs where the sort key is a claimed index).
   ifNotExists?: boolean;
 

@@ -166,6 +166,6 @@ describe('askReduceState', () => {
 
     expect(result.done).toBe(true);
     expect(result.value).toEqual({ marks: ['x'] }); // outer reducer handled the bubbled Mark
-    expect(caught).toEqual({ success: true, result: undefined }); // single wrap — no nesting
+    expect(caught).toEqual({ success: true, result: undefined }); // single wrap, no nesting
   });
 });

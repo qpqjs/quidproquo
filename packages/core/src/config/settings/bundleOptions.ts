@@ -1,6 +1,6 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-// Regex fields are plain regex-source strings (not RegExp) — QPQ configs must
+// Regex fields are plain regex-source strings (not RegExp), QPQ configs must
 // survive JSON serialization. Bundlers compile them with `new RegExp(...)`.
 
 export interface BundleIgnoreModule {
@@ -18,7 +18,7 @@ export interface BundleIgnoreWarning {
 
 export interface BackendBundleOptions {
   // Packages to require() at runtime instead of bundling. Prefer declaring
-  // layer-provided packages on the layer itself (`ApiLayer.modules`) — this is
+  // layer-provided packages on the layer itself (`ApiLayer.modules`), this is
   // the escape hatch for non-layer cases.
   externals?: string[];
 
@@ -44,11 +44,11 @@ export const defineBackendBundleOptions = (options: BackendBundleOptions): Backe
   ignoreWarnings: options.ignoreWarnings ?? [],
 });
 
-// Grows on demand — fonts/images are already default-on in the views build.
+// Grows on demand, fonts/images are already default-on in the views build.
 export interface FrontendBundleOptions {
   // Substring-matched against the hoisted root dependency names; matches are
   // shared as module-federation singletons. react/react-dom/react-ish deps and
-  // @qpqjs/web* are always singletons — this adds app-stack ones (e.g.
+  // @qpqjs/web* are always singletons, this adds app-stack ones (e.g.
   // 'chakra', 'zod') without baking package names into the bundler.
   sharedSingletons?: string[];
 }

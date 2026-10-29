@@ -1,7 +1,7 @@
 import { AiStreamPartType } from './AiStreamPartType';
 
 /**
- * Beginning of a reasoning ("thinking") block — emitted by extended-thinking models.
+ * Beginning of a reasoning ("thinking") block, emitted by extended-thinking models.
  *
  * Reasoning text is the model's internal scratchpad; render it separately from visible text.
  */
