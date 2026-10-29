@@ -17,7 +17,7 @@ export function* askIsMigrationPending(migration: Migration): AskResponse<boolea
 
 // Every configured migration, in declaration order (the config preserves the sorted filename
 // order the app registered them in, so dependencies between migrations hold).
-export function* askAllMigrations(): AskResponse<Migration[]> {
+function* askAllMigrations(): AskResponse<Migration[]> {
   return yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
 }
 

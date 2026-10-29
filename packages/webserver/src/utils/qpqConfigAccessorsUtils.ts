@@ -27,12 +27,6 @@ export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetti
   return routes;
 };
 
-export const getAllRoutesForApi = (apiName: string, qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
-  const routes = getAllRoutes(qpqConfig);
-
-  return routes;
-};
-
 export const getAllApiKeyConfigs = (qpqConfig: QPQConfig): ApiKeyQPQWebServerConfigSetting[] => {
   const apiKeyConfigs = qpqCoreUtils.getConfigSettings<ApiKeyQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.ApiKey);
 
@@ -60,7 +54,7 @@ export const getOwnedServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQ
   return qpqCoreUtils.getOwnedItems(serviceFunctions, qpqConfig);
 };
 
-export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
+const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   return getOwnedWebsocketSettings(qpqConfig)
     .flatMap((s) => [s.eventProcessors.onConnect, s.eventProcessors.onDisconnect, s.eventProcessors.onMessage])
     .filter(isDefined);
@@ -193,9 +187,6 @@ export const getEmailReceivingDomainConfig = (qpqConfig: QPQConfig): EmailReceiv
 
 export const getEmailReceiverConfigs = (qpqConfig: QPQConfig): EmailReceiverQPQWebServerConfigSetting[] =>
   qpqCoreUtils.getConfigSettings<EmailReceiverQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailReceiver) || [];
-
-export const getEmailReceiverByName = (qpqConfig: QPQConfig, name: string): EmailReceiverQPQWebServerConfigSetting | undefined =>
-  getEmailReceiverConfigs(qpqConfig).find((receiver) => receiver.name === name);
 
 /** The receivers that write into a drive, which the mail provider must be allowed to write into. */
 export const getEmailReceiversForStorageDrive = (qpqConfig: QPQConfig, storageDriveName: string): EmailReceiverQPQWebServerConfigSetting[] =>

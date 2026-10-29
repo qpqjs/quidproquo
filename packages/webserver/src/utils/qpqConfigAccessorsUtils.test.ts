@@ -22,7 +22,6 @@ import {
   getAllOwnedCacheConfigs,
   getAllOwnedCertifcateConfigs,
   getAllRoutes,
-  getAllRoutesForApi,
   getAllSeo,
   getAllServiceFunctions,
   getAllSrcEntries,
@@ -55,7 +54,6 @@ describe('config setting selectors', () => {
     ]);
 
     expect(getAllRoutes(config)).toHaveLength(1);
-    expect(getAllRoutesForApi('orders', config)).toHaveLength(1);
     expect(getAllApiKeyConfigs(config)).toHaveLength(1);
     expect(getAllSeo(config)).toHaveLength(1);
     expect(getAllServiceFunctions(config)).toHaveLength(1);

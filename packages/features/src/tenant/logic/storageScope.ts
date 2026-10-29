@@ -18,8 +18,8 @@ export enum StorageScopeType {
   personal = 'personal',
 }
 
-export const TENANT_SCOPE_PREFIX = 'TENANT#';
-export const PERSONAL_SCOPE_PREFIX = 'PERSONAL#';
+const TENANT_SCOPE_PREFIX = 'TENANT#';
+const PERSONAL_SCOPE_PREFIX = 'PERSONAL#';
 
 export interface ParsedStorageScope {
   type: StorageScopeType;

@@ -98,7 +98,7 @@ export function* askGetAllByFromCorrelation(fromCorrelation: string): AskRespons
   return yield* askKeyValueStoreQueryAll<LogMetadata>(metadataStoreName, kvsEqual('fromCorrelation', fromCorrelation));
 }
 
-export function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetadata | undefined> {
+function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetadata | undefined> {
   if (!fromCorrelation) {
     return;
   }
@@ -107,7 +107,7 @@ export function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetada
   return (yield* askFindRootLog(parentLog?.fromCorrelation)) || parentLog;
 }
 
-export function* askCreateHierarchy(rootStoryResultMetadata: StoryResultMetadata): AskResponse<StoryResultMetadataWithChildren> {
+function* askCreateHierarchy(rootStoryResultMetadata: StoryResultMetadata): AskResponse<StoryResultMetadataWithChildren> {
   const childrenLogs: StoryResultMetadata[] = yield* askGetAllByFromCorrelation(rootStoryResultMetadata.correlation);
 
   const sortedChildren = childrenLogs.sort((a, b) => {
