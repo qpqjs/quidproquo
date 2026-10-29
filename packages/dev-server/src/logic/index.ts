@@ -11,4 +11,5 @@ export * from './readiness';
 export * from './schedule';
 export * from './shutdown';
 export * from './signingKeys';
+export * from './sleep';
 export * from './withProcessorDelay';

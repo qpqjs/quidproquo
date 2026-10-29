@@ -154,6 +154,56 @@ describe('queueImplementation FIFO group serialization', () => {
   });
 });
 
+describe('queueImplementation retries', () => {
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => vi.restoreAllMocks());
+
+  const retrySettings = [defineQueue('retryQueue', {}, { maxTries: 3, ttRetryInSeconds: 0 })];
+
+  it('redelivers a thrown failure up to maxTries and stops once it succeeds', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let tries = 0;
+    vi.mocked(processEvent).mockImplementation(async () => {
+      tries += 1;
+      if (tries < 3) throw new Error('boom');
+      return {} as any;
+    });
+
+    const handler = startImplementation(QueueActionType.SendMessages, retrySettings);
+    await handler(buildPayload({ messageId: 'r1', queueName: 'retryQueue' }), 'corr');
+
+    expect(tries).toBe(3);
+    expect(consoleWarn).toHaveBeenCalledTimes(2);
+    expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('treats a failed story result as a failure, and drops the message after the last try', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(processEvent).mockResolvedValue({ error: { errorType: 'GenericError', errorText: 'story failed' } } as any);
+
+    const handler = startImplementation(QueueActionType.SendMessages, retrySettings);
+    await handler(buildPayload({ messageId: 'r2', queueName: 'retryQueue' }), 'corr');
+
+    expect(processEvent).toHaveBeenCalledTimes(3);
+    expect(consoleWarn).toHaveBeenCalledTimes(2);
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(String(consoleError.mock.calls[0]?.[0])).toContain('no local dead-letter queue');
+  });
+
+  it('delivers once when the queue is unknown to the config', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(processEvent).mockRejectedValue(new Error('boom'));
+
+    const handler = startImplementation();
+    await handler(buildPayload({ messageId: 'r3' }), 'corr');
+
+    expect(processEvent).toHaveBeenCalledTimes(1);
+    expect(consoleError).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('queueImplementation event bus fan-out', () => {
   beforeEach(() => vi.clearAllMocks());
 

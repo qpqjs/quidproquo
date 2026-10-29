@@ -7,24 +7,30 @@ import {
   QpqFunctionRuntime,
   QpqRuntimeType,
   QueueActionType,
+  QueueQPQConfigSetting,
+  StoryResult,
 } from '@qpqjs/core';
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/types';
-import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, trackInFlight } from '../logic';
+import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, sleep, trackInFlight } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
-// The queue setting for a message, looked up in the config of the service it targets.
-const resolveQueueConcurrencyLimit = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): number | undefined => {
-  const targetConfig = qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.targetModule);
-  const queueConfig = targetConfig ? qpqCoreUtils.getQueueByName(payload.queueName, targetConfig) : undefined;
-  if (!queueConfig) {
-    return undefined;
-  }
+// A retry waits ttRetryInSeconds on AWS (the visibility timeout). Locally the same wait is kept
+// but capped, so a queue declared with the 15 minute default does not stall a dev session.
+const LOCAL_MAX_RETRY_DELAY_MS = 5_000;
 
-  const limit = queueConfig.maxConcurrentExecutions;
+// The queue setting for a message, looked up in the config of the service it targets.
+const resolveQueueConfig = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): Nullable<QueueQPQConfigSetting> => {
+  const targetConfig = qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.targetModule);
+
+  return targetConfig ? qpqCoreUtils.getQueueByName(payload.queueName, targetConfig) : null;
+};
+
+const resolveQueueConcurrencyLimit = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): number | undefined => {
+  const limit = resolveQueueConfig(qpqConfigs, payload)?.maxConcurrentExecutions;
 
   return typeof limit === 'number' && limit > 0 ? limit : undefined;
 };
@@ -34,25 +40,30 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessageWithSession, devServerConfig: ResolvedDevServerConfig) => {
+// Runs the message through this service when the message targets it; null when it does not.
+const processQueueMessages = async (
+  qpqConfig: QPQConfig,
+  payload: AnyQueueMessageWithSession,
+  devServerConfig: ResolvedDevServerConfig,
+): Promise<Nullable<StoryResult<[AnyQueueMessageWithSession], any>>> => {
   if (payload.targetEnvironment !== qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig)) {
-    return;
+    return null;
   }
 
   if (payload.targetApplication !== qpqCoreUtils.getApplicationName(qpqConfig)) {
-    return;
+    return null;
   }
 
   if (payload.targetModule !== qpqCoreUtils.getApplicationModuleName(qpqConfig)) {
-    return;
+    return null;
   }
 
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
   if ((!!payload.targetFeature || !!feature) && payload.targetFeature !== feature) {
-    return;
+    return null;
   }
 
-  await processEvent<AnyQueueMessageWithSession, any>(
+  return processEvent<AnyQueueMessageWithSession, any>(
     payload,
     qpqConfig,
     getDynamicModuleLoader(qpqConfig, devServerConfig),
@@ -150,13 +161,42 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
   };
 
   eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
-    const processAllUngated = async () => {
+    // One delivery: the first failure (a thrown error or a failed story) is what a retry answers.
+    const processOnce = async (): Promise<Nullable<unknown>> => {
       try {
         for (const qpqConfig of devServerConfig.qpqConfigs) {
-          await processQueueMessages(qpqConfig, payload, devServerConfig);
+          const result = await processQueueMessages(qpqConfig, payload, devServerConfig);
+          if (result?.error) {
+            return result.error.errorText;
+          }
         }
       } catch (error) {
-        console.error(`Queue [${payload.queueName}] message [${payload.messageId}] failed:`, error);
+        return error;
+      }
+
+      return null;
+    };
+
+    // Redelivery as AWS does it: up to maxTries, waiting ttRetryInSeconds between tries. There is
+    // no local dead-letter queue, so the last failure is logged and the message dropped.
+    const processAllUngated = async () => {
+      const queueConfig = resolveQueueConfig(devServerConfig.qpqConfigs, payload);
+      const maxTries = Math.max(1, queueConfig?.maxTries ?? 1);
+      const retryDelayMs = Math.min((queueConfig?.ttRetryInSeconds ?? 0) * 1000, LOCAL_MAX_RETRY_DELAY_MS);
+      const label = `Queue [${payload.queueName}] message [${payload.messageId}]`;
+
+      for (let attempt = 1; attempt <= maxTries; attempt += 1) {
+        const failure = await processOnce();
+        if (failure === null) {
+          return;
+        }
+
+        if (attempt < maxTries) {
+          console.warn(`${label} failed on try ${attempt} of ${maxTries}, retrying in ${retryDelayMs / 1000}s:`, failure);
+          await sleep(retryDelayMs);
+        } else {
+          console.error(`${label} failed after ${maxTries} ${maxTries === 1 ? 'try' : 'tries'}; no local dead-letter queue, dropped:`, failure);
+        }
       }
     };
 
