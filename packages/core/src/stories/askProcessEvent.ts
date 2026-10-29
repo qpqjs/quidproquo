@@ -36,12 +36,17 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     return getSuccessfulEitherActionResult(earlyExitQpqEventRecordResponse);
   }
 
+  const { runtime } = matchResultResult.result;
+  if (!runtime) {
+    return getUnsuccessfulEitherActionResult({ errorType: ErrorTypeEnum.NotFound, errorText: 'The matched story has no runtime to execute' });
+  }
+
   const messageSession = yield* askEventGetStorySession<EventParams, QpqEventRecord, MSR>(eventArguments, qpqEventRecord, matchResultResult.result);
 
   // Execute the story
   const executeStoryResponse = yield* askCatch(
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
-      matchResultResult.result.runtime!,
+      runtime,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
       messageSession,
     ),

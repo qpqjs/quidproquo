@@ -20,7 +20,7 @@ export function* askCloudflareGetDNSRecordId(apiKey: string, zoneId: string, cna
     );
 
     if (response.status < 200 || response.status >= 300) {
-      yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting DNS record for [${cnameName}]`);
+      return yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting DNS record for [${cnameName}]`);
     }
 
     // Filter out all the non-CNAME and non-A records from the combined results

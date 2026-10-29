@@ -32,10 +32,10 @@ export function* askCloudflareAddDNSRecord(apiKey: string, zoneId: string, cname
   });
 
   if (response.status < 200 || response.status >= 300) {
-    yield* askThrowError(ErrorTypeEnum.GenericError, `Error adding DNS records`);
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `Error adding DNS records`);
   }
 
   if (!response.data.success) {
-    yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to add CNAME record: ${response.data.errors.map((e) => e.message).join(', ')}`);
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to add CNAME record: ${response.data.errors.map((e) => e.message).join(', ')}`);
   }
 }

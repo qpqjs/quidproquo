@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
 import { runStory } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
-import { askMapParallelBatch, InvalidBatchSizeError } from './askMapParallelBatch';
+import { askMapParallelBatch } from './askMapParallelBatch';
 
 function* doubleInBatches(items: number[], numBatch: number, delayMs = 0): AskResponse<number[]> {
   return yield* askMapParallelBatch(
@@ -44,9 +44,9 @@ describe('askMapParallelBatch', () => {
     expect(runStory(withIndex())).toEqual(['a@0/3', 'b@1/3', 'c@2/3']);
   });
 
-  it('throws InvalidBatchSizeError when the batch size cannot make progress', () => {
-    expect(() => runStory(doubleInBatches([1, 2], 0))).toThrowError(InvalidBatchSizeError);
-    expect(() => runStory(doubleInBatches([1, 2], -1))).toThrowError(InvalidBatchSizeError);
-    expect(() => runStory(doubleInBatches([1, 2], Number.NaN))).toThrowError(InvalidBatchSizeError);
+  it('throws Invalid when the batch size cannot make progress', () => {
+    expect(() => runStory(doubleInBatches([1, 2], 0))).toThrowError(/numBatch must be at least 1/);
+    expect(() => runStory(doubleInBatches([1, 2], -1))).toThrowError(/numBatch must be at least 1/);
+    expect(() => runStory(doubleInBatches([1, 2], Number.NaN))).toThrowError(/numBatch must be at least 1/);
   });
 });

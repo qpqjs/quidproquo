@@ -25,6 +25,6 @@ export function* askKeyValueStoreUpsertWithRetry<KvsItem>(
   );
 
   if (!upsertResponse.success) {
-    yield* askThrowError(upsertResponse.error.errorType, upsertResponse.error.errorText, upsertResponse.error.errorStack);
+    return yield* askThrowError(upsertResponse.error.errorType, upsertResponse.error.errorText, upsertResponse.error.errorStack);
   }
 }

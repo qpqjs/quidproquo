@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `InvalidBatchSizeError` / `InvalidBatchSizeErrorCode` (askMapParallelBatch) and `InvalidKvsPartialPropertyError` / `InvalidKvsPartialPropertyErrorCode` (askKeyValueStoreUpdatePartialProperties) are removed from `@qpqjs/core`; both stories now throw a qpq `Invalid` error through `askThrowError` with the same message.
 - `askTenantApiRequest`, `askEventDocAiServiceRequest` (`@qpqjs/features`) and `askSessionApiRequest`, `askSessionApiRequestOrThrow`, `askPlatformRequest` (`@qpqjs/web-admin`) now take `<TResult, TPayload = unknown>`; callers passing two type arguments must swap them.
 - Generic order is now `<TResult, TPayload>` on `askNetworkRequest`, `askApiRequest` (both were `<TPayload, TResult>`) and `askServiceRequest` (was `<TPayload, TResponse>`); `askInlineFunctionExecute` and `askServiceFunctionExecute` keep result-first and gain a `TPayload = unknown` default. Callers that pass two type arguments to the first three must swap them; callers can now pass only the result type.
 - `askLogTemplateLiteral` is removed from `@qpqjs/core`; `askLog` is the requester itself (same action type, same payload `LogTemplateLiteralActionPayload`). Processors that referenced `askLogTemplateLiteral` use `askLog`. `GenericDataResourceActionTypeEnum` in `@qpqjs/webserver` no longer has a default export; use the named import.

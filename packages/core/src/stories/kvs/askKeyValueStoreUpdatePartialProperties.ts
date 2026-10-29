@@ -1,23 +1,6 @@
-import { askKeyValueStoreUpdate, KeyValueStoreUpdateOptions, kvsRemove, kvsSet, kvsUpdate, KvsUpdateAction } from '../../actions';
-import { AskResponse } from '../../types';
+import { askKeyValueStoreUpdate, askThrowError, KeyValueStoreUpdateOptions, kvsRemove, kvsSet, kvsUpdate, KvsUpdateAction } from '../../actions';
+import { AskResponse, ErrorTypeEnum } from '../../types';
 import { isValidKvsAdvancedDataType } from './utils';
-
-export enum InvalidKvsPartialPropertyErrorCode {
-  // The property value is not a KvsAdvancedDataType, so kvsSet cannot store it.
-  unsupportedValueType = 'unsupportedValueType',
-}
-
-// Thrown instead of silently dropping a property whose value kvsSet cannot store
-// (e.g. a nested object): a silent drop looks to the caller like a successful write.
-export class InvalidKvsPartialPropertyError extends Error {
-  constructor(
-    public readonly code: InvalidKvsPartialPropertyErrorCode,
-    message: string,
-  ) {
-    super(message);
-    this.name = 'InvalidKvsPartialPropertyError';
-  }
-}
 
 export function askKeyValueStoreUpdatePartialProperties<TModel extends Record<string, any>, PartitionKey extends keyof TModel>(
   keyValueStoreName: string,
@@ -66,8 +49,8 @@ export function* askKeyValueStoreUpdatePartialProperties<TModel extends Record<s
     }
 
     if (!isValidKvsAdvancedDataType(value)) {
-      throw new InvalidKvsPartialPropertyError(
-        InvalidKvsPartialPropertyErrorCode.unsupportedValueType,
+      return yield* askThrowError(
+        ErrorTypeEnum.Invalid,
         `Cannot update property "${key}" on store "${keyValueStoreName}": the value is not a supported kvs data type`,
       );
     }

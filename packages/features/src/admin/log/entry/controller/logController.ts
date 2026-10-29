@@ -62,7 +62,7 @@ export function* getLog(
 ) {
   const log = yield* askGetByCorrelation(params.correlationId);
   if (!log) {
-    yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
+    return yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
   }
 
   return toJsonEventResponse(log);

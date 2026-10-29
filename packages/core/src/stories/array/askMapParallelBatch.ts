@@ -1,23 +1,6 @@
-import { askDelay } from '../../actions';
-import { AskResponse } from '../../types';
+import { askDelay, askThrowError } from '../../actions';
+import { AskResponse, ErrorTypeEnum } from '../../types';
 import { askMapParallel } from './askMapParallel';
-
-export enum InvalidBatchSizeErrorCode {
-  // Zero, negative, or NaN: the loop could never drain the item list.
-  notPositive = 'notPositive',
-}
-
-// Thrown when a batch size can never make progress. Without this guard a
-// numBatch below one would splice zero items per iteration and spin forever.
-export class InvalidBatchSizeError extends Error {
-  constructor(
-    public readonly code: InvalidBatchSizeErrorCode,
-    message: string,
-  ) {
-    super(message);
-    this.name = 'InvalidBatchSizeError';
-  }
-}
 
 export function* askMapParallelBatch<T, R>(
   items: T[],
@@ -28,7 +11,7 @@ export function* askMapParallelBatch<T, R>(
   // A batch size below one would remove nothing per iteration and loop forever.
   // The negated >= comparison also rejects NaN.
   if (!(numBatch >= 1)) {
-    throw new InvalidBatchSizeError(InvalidBatchSizeErrorCode.notPositive, `numBatch must be at least 1, got ${numBatch}`);
+    return yield* askThrowError(ErrorTypeEnum.Invalid, `numBatch must be at least 1, got ${numBatch}`);
   }
 
   // Copy the items array to avoid modifying the original array

@@ -7,7 +7,7 @@ export function* askValidateModelOrThrowError<T extends z.ZodType>(model: z.infe
   const validation = schema.safeParse(model);
 
   if (!validation.success) {
-    yield* askThrowError(ErrorTypeEnum.Invalid, z.prettifyError(validation.error));
+    return yield* askThrowError(ErrorTypeEnum.Invalid, z.prettifyError(validation.error));
   }
 
   return model;

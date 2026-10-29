@@ -15,13 +15,13 @@ export function* askCloudflareGetZoneId(apiKey: string, siteDomainName: string):
   );
 
   if (response.status < 200 || response.status >= 300) {
-    yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting zoneId for [${siteDomainName}]`);
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting zoneId for [${siteDomainName}]`);
   }
 
   const zoneId = response.data.result[0]?.id;
 
   if (!zoneId) {
-    yield* askThrowError(ErrorTypeEnum.GenericError, `No zoneId found for [${siteDomainName}]`);
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `No zoneId found for [${siteDomainName}]`);
   }
 
   return zoneId;

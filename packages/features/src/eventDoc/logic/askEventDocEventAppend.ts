@@ -127,14 +127,14 @@ export function* askEventDocEventAppend(
 
   // Hooks run outside the retry: a hook that throws Conflict must not re-run the append.
   const { onPublish, onAppend } = yield* askEventDocStoreRead();
-  const firePublishHook = !!onPublish && event.type === EventDocEffect.Publish;
+  const publishHook = event.type === EventDocEffect.Publish ? onPublish : undefined;
 
-  if (firePublishHook || onAppend) {
+  if (publishHook || onAppend) {
     const summary = refolded ?? (yield* askEventDocGetByIdOrThrow(modelId));
     const { state, previousState } = yield* askEventDocHookStates(modelId, event);
 
-    if (firePublishHook) {
-      yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish!, {
+    if (publishHook) {
+      yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(publishHook, {
         docId: modelId,
         event,
         summary,

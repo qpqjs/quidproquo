@@ -15,6 +15,6 @@ export function* askCloudflareDeleteDNSRecord(apiKey: string, zoneId: string, re
   );
 
   if (response.status < 200 || response.status >= 300 || !response.data.success) {
-    yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to delete DNS record: ${response.data.errors.join(', ')}`);
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to delete DNS record: ${response.data.errors.join(', ')}`);
   }
 }

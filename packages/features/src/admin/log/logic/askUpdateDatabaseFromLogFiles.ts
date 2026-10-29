@@ -161,8 +161,8 @@ export function* askGetLogInfosFromStoryResult(result: StoryResult<any>): AskRes
     }
 
     return {
-      logLevel: la.act.payload!.logLevel,
-      msg: la.act.payload!.msg,
+      logLevel: la.act.payload?.logLevel ?? LogLevelEnum.Info,
+      msg: la.act.payload?.msg ?? '',
       startedAt: la.startedAt,
     };
   });
