@@ -2,8 +2,8 @@ import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from '@qpq
 
 import { useEffect, useState } from 'react';
 
+import { useLoadFederatedAddons } from './hooks/useLoadFederatedAddons';
 import { FederatedAddon } from './FederatedAddon';
-import { useLoadFederatedAddons } from './FederatedAddonProvider';
 
 export function useFederatedAddon(): {
   addons: FederatedAddon[];

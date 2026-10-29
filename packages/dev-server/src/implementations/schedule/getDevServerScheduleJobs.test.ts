@@ -14,8 +14,8 @@ describe('getDevServerScheduleJobs', () => {
     const jobs = getDevServerScheduleJobs(buildDevServerConfig([defineRecurringSchedule({ everyMinutes: 10 }, '/s/poll::poll')]));
 
     expect(jobs).toHaveLength(1);
-    expect(jobs[0].uniqueKey).toBe('poll');
-    expect(jobs[0].fields.minutes).toEqual([0, 10, 20, 30, 40, 50]);
+    expect(jobs![0]!.uniqueKey).toBe('poll');
+    expect(jobs![0]!.fields.minutes).toEqual([0, 10, 20, 30, 40, 50]);
   });
 
   it('skips a schedule owned by another service', () => {
@@ -40,10 +40,9 @@ describe('getDevServerScheduleJobs', () => {
     // by hand. Failing at boot still beats a schedule that silently never
     // fires.
     const config = buildDevServerConfig([]);
-    config.qpqConfigs[0].push({
-      ...defineRecurringSchedule({ everyMinutes: 10 }, '/s/poll::poll'),
-      recurrence: { everyMinutes: 7 },
-    } as never);
+    // The setting as declared, with the recurrence the dev server then has to honour.
+    const schedule = defineRecurringSchedule({ everyMinutes: 10 }, '/s/poll::poll');
+    config!.qpqConfigs[0]!.push({ ...schedule, recurrence: { everyMinutes: 7 } } as never);
 
     expect(() => getDevServerScheduleJobs(config)).toThrow(InvalidScheduleRecurrenceError);
   });

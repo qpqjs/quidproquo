@@ -7,6 +7,7 @@ export * from './DateCell';
 export * from './DateRangePicker';
 export * from './GridContainer';
 export * from './GridItem';
+export * from './hooks/useAdminDialog';
 export * from './LastSeen';
 export * from './LoadingBox';
 export * from './LoadingSpinner';

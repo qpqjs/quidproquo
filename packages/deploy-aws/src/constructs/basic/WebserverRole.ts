@@ -47,6 +47,15 @@ export class WebserverRole extends QpqConstructBlock {
       .getAllEventBusConfigs(props.qpqConfig)
       .map((eventBusConfig) => awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusConfig.name, props.qpqConfig, eventBusConfig));
 
+    // Any service function of this service: the naming module builds the name, the arn wraps it.
+    const anyServiceFunctionName = awsNamingUtils.getConfigRuntimeResourceName(
+      awsNamingUtils.getServiceFunctionLambdaBaseName('*'),
+      applicationName,
+      '*',
+      environment,
+      feature,
+    );
+
     const policies: aws_iam.PolicyStatementProps[] = [
       // Resolve cross-stack resource names at runtime via CloudFormation exports. ListExports
       // has no resource-level permissions, so '*' is the only possible resource.
@@ -88,9 +97,7 @@ export class WebserverRole extends QpqConstructBlock {
       {
         sid: 'LambdaInvokeFunction',
         actions: ['lambda:InvokeFunction'],
-        resources: [
-          `arn:aws:lambda:${region}:${accountId}:function:${awsNamingUtils.getConfigRuntimeResourceName(awsNamingUtils.getServiceFunctionLambdaBaseName('*'), applicationName, '*', environment, feature)}`,
-        ],
+        resources: [`arn:aws:lambda:${region}:${accountId}:function:${anyServiceFunctionName}`],
       },
 
       // Look up ACM certs when wiring up custom domains at runtime. ListCertificates has no

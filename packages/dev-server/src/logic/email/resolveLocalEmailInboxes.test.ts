@@ -15,11 +15,11 @@ describe('resolveLocalEmailInboxes', () => {
         buildTestQpqConfig([
           defineDns(['app.example', 'app.test']),
           defineEmailReceivingDomain('inbox'),
-          ...defineEmailReceiver('support', { onEmail }),
-          ...defineEmailReceiver('audit', { onEmail }),
+          defineEmailReceiver('support', { onEmail }),
+          defineEmailReceiver('audit', { onEmail }),
         ]),
         // Receivers but no receiving domain: nothing to receive for, as the deploy would refuse.
-        buildTestQpqConfig([defineDns('app.example'), ...defineEmailReceiver('invoices', { onEmail })]),
+        buildTestQpqConfig([defineDns('app.example'), defineEmailReceiver('invoices', { onEmail })]),
         buildTestQpqConfig([]),
       ],
     });
