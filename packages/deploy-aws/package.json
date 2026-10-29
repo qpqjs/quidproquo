@@ -39,22 +39,17 @@
   "dependencies": {
     "@aws-cdk/aws-neptune-alpha": "^2.262.0-alpha.0",
     "@qpqjs/actionprocessor-aws": "0.3.0",
-    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/config-aws": "0.3.0",
     "@qpqjs/core": "0.3.0",
     "@qpqjs/webserver": "0.3.0",
     "aws-cdk-lib": "^2.275.0",
     "constructs": "^10.7.1",
-    "esbuild": "^0.25.8",
-    "liquidjs": "^10.7.0",
     "upath": "^2.0.1"
   },
   "devDependencies": {
     "@qpqjs/tsconfig": "0.3.0",
     "@types/aws-lambda": "^8.10.162",
-    "@types/babel__traverse": "7.18.2",
     "@types/node": "^22.13.13",
-    "@types/prettier": "2.6.0",
     "typescript": "^5.8.2"
   }
 }

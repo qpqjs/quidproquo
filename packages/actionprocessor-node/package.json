@@ -39,8 +39,7 @@
     "@jridgewell/trace-mapping": "^0.3.25",
     "@qpqjs/actionprocessor-js": "0.3.0",
     "@qpqjs/core": "0.3.0",
-    "@qpqjs/webserver": "0.3.0",
-    "uuidv7": "^1.0.1"
+    "@qpqjs/webserver": "0.3.0"
   },
   "devDependencies": {
     "@jridgewell/gen-mapping": "^0.3.13",

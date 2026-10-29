@@ -46,7 +46,6 @@
     "react": ">=18.3.1"
   },
   "dependencies": {
-    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/actionprocessor-web": "0.3.0",
     "@qpqjs/features": "0.3.0",
     "@qpqjs/web": "0.3.0",

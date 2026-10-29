@@ -50,7 +50,6 @@
     "javascript-time-ago": "^2.5.9",
     "@qpqjs/core": "0.3.0",
     "@qpqjs/features": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
     "@qpqjs/web": "0.3.0",
     "@qpqjs/web-react": "0.3.0",
     "@qpqjs/webserver": "0.3.0",
@@ -64,6 +63,7 @@
     "recharts": "^2.12.3"
   },
   "devDependencies": {
+    "@qpqjs/tsconfig": "0.3.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.13.13",

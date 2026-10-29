@@ -42,7 +42,6 @@
     "dts-bundle-generator": "9.5.1",
     "path-browserify": "^1.0.1",
     "@qpqjs/actionprocessor-aws": "0.3.0",
-    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/config-aws": "0.3.0",
     "@qpqjs/core": "0.3.0",
     "@qpqjs/deploy-aws": "0.3.0",

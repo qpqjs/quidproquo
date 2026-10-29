@@ -1,7 +1,7 @@
 {
   "name": "@qpqjs/cli",
   "version": "0.3.0",
-  "description": "The qpq CLI — build, dev and deploy orchestration for QPQ apps",
+  "description": "The qpq CLI \u2014 build, dev and deploy orchestration for QPQ apps",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -48,7 +48,6 @@
     "@rspack/dev-server": "^2.1.0",
     "aws-cdk": "^2.1146.1",
     "madge": "^8.0.0",
-    "quidproquo": "0.3.0",
     "@qpqjs/actionprocessor-aws": "0.3.0",
     "@qpqjs/config-aws": "0.3.0",
     "@qpqjs/core": "0.3.0",
