@@ -7,9 +7,16 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Function } from './Function';
+
+// The log extension layer is produced by the aws package build; a synth in a unit test only needs a directory to package.
+const extensionLayer = vi.hoisted(() => ({ path: '' }));
+vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@qpqjs/actionprocessor-aws')>()),
+  getLogExtensionLayerPath: () => extensionLayer.path,
+}));
 
 // The construct packages a built handler directory as the lambda asset, so a throwaway build root
 // with one empty handler stands in for the real api build.
@@ -28,6 +35,8 @@ beforeEach(() => {
   configRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-fn-'));
   fs.mkdirSync(path.join(configRoot, 'build', 'handler'), { recursive: true });
   fs.writeFileSync(path.join(configRoot, 'build', 'handler', 'index.js'), 'exports.handler = async () => {};');
+  extensionLayer.path = path.join(configRoot, 'extension-layer');
+  fs.mkdirSync(extensionLayer.path);
 });
 
 afterEach(() => {

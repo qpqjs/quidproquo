@@ -1,7 +1,7 @@
 import { awsNamingUtils } from '@qpqjs/config-aws';
 import { ApiKeyQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
@@ -9,7 +9,6 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 
 export type QpqWebserverApiKeyConstructProps = {
   apiKeyConfig: ApiKeyQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqWebserverApiKeyConstruct extends QpqConstructBlock {

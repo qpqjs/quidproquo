@@ -2,7 +2,7 @@ import { LambdaRuntimeConfig } from '@qpqjs/actionprocessor-aws';
 import { awsNamingUtils } from '@qpqjs/config-aws';
 import { resolveScheduleFields, ScheduleQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
+import { aws_events, aws_events_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -11,7 +11,6 @@ import { renderAwsCronExpression } from './renderAwsCronExpression';
 
 export type QpqCoreRecurringScheduleConstructProps = {
   scheduleConfig: ScheduleQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
@@ -23,8 +22,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       handler: 'eventBridgeEvent_recurringSchedule',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         lambdaRuntimeConfig: JSON.stringify({

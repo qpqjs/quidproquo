@@ -2,7 +2,7 @@ import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigatewayv2, aws_iam, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigatewayv2, aws_iam } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { importStackValue } from '../../../../utils';
@@ -13,7 +13,6 @@ import { Function } from '../../../basic/Function';
 
 export type QpqApiWebserverWebsocketConstructProps = {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
@@ -45,8 +44,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       handler: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         websocketApiName: props.websocketConfig.apiName,

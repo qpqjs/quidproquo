@@ -2,11 +2,11 @@ import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_cloudwatch, aws_ec2, aws_lambda, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
+import { aws_apigateway, aws_cloudwatch, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { applyEnvironmentTags, getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
+import { applyEnvironmentTags, resolveLogRetention } from '../../../../utils';
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -14,32 +14,11 @@ import { Function } from '../../../basic/Function';
 
 export type ApiQpqWebserverApiConstructProps = {
   apiConfig: ApiQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: ApiQpqWebserverApiConstructProps) {
     super(scope, id, props);
-
-    const vpc = props.apiConfig.virtualNetworkName
-      ? aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', {
-          vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.apiConfig.virtualNetworkName, props.qpqConfig),
-        })
-      : undefined;
-
-    // The bootstrap-created workload group, not a CDK auto-created one, in-VPC
-    // data stores allow ingress from this group only
-    const securityGroups =
-      vpc && props.apiConfig.virtualNetworkName
-        ? [
-            aws_ec2.SecurityGroup.fromLookupByName(
-              this,
-              'workload-sg-lookup',
-              getVirtualNetworkWorkloadSecurityGroupName(props.apiConfig.virtualNetworkName, props.qpqConfig),
-              vpc,
-            ),
-          ]
-        : undefined;
 
     // Build Function
     const func = new Function(this, 'api-function', {
@@ -52,14 +31,11 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
 
       qpqConfig: props.qpqConfig,
 
-      apiLayerVersions: props.apiLayerVersions,
-
       reservedConcurrentExecutions: props.apiConfig.maxConcurrentExecutions,
 
       role: this.getServiceRole(),
 
-      vpc,
-      securityGroups,
+      virtualNetworkName: props.apiConfig.virtualNetworkName,
     });
 
     const accessLogGroup = new aws_logs.LogGroup(this, 'access-logs', {

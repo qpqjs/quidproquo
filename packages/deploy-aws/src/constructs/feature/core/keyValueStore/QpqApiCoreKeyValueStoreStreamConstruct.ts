@@ -9,7 +9,6 @@ import { kvsStreamArnSsmParameterName } from './QpqCoreKeyValueStoreConstruct';
 
 export type QpqApiCoreKeyValueStoreStreamConstructProps = {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 // A failing batch is retried, and by DEFAULT a DynamoDB stream keeps retrying the SAME
@@ -83,8 +82,6 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       handler: 'dynamoStreamEvent_kvsStreamEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         // Never change: keyValueStoreName ~ hard coded to stop logs being recursive,

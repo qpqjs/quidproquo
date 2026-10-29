@@ -1,6 +1,5 @@
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { domainScopedId } from '../../../../utils/domain';
@@ -9,7 +8,6 @@ import { SubdomainName } from '../../../basic/SubdomainName';
 
 export type DomainQpqWebserverApiConstructProps = {
   apiConfig: ApiQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 /** The api's custom domain on every root (SubdomainName reads the deploy-region cert from SSM). */

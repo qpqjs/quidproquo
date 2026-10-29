@@ -5,3 +5,4 @@ export * from './ownedAndForeignGrants';
 export * from './path';
 export * from './qpqAwsCdkNamingUtils';
 export * from './qpqDeployAwsUtils';
+export * from './virtualNetworkLookup';

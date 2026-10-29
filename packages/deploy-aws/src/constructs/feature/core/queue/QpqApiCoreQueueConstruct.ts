@@ -1,7 +1,7 @@
 import { awsNamingUtils, clampToLambdaTimeout } from '@qpqjs/config-aws';
 import { qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
+import { aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -12,7 +12,6 @@ import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
 
 export type QpqApiCoreQueueConstructProps = {
   queueConfig: QueueQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
@@ -24,8 +23,6 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       handler: 'sqsEvent_queueEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         // Just the name - the runtime resolves the full setting from the bundled

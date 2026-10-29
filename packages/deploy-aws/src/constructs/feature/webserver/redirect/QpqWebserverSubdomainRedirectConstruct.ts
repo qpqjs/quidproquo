@@ -2,7 +2,7 @@ import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_lambda, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
+import { aws_apigateway, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
@@ -12,7 +12,6 @@ import { SubdomainName } from '../../../basic/SubdomainName';
 
 export type QpqWebserverSubdomainRedirectConstructProps = {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 // An absolute url redirects as-is. A declared root redirects to that root's site root under
@@ -42,7 +41,6 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       handler: 'apiGatewayEventHandler_redirect',
 
       qpqConfig: props.qpqConfig,
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         redirectBaseUrl,

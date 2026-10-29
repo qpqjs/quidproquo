@@ -7,9 +7,10 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { join } from 'upath';
 
-import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
+import { getLambdaArchitecture, getLambdaRuntime, lookupVirtualNetwork, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
 import * as qpqDeployAwsUtils from '../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { LambdaLayers } from './LambdaLayers';
 
 export type FunctionProps = {
   functionName?: string;
@@ -25,16 +26,14 @@ export type FunctionProps = {
     [key: string]: string;
   };
 
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-
   reservedConcurrentExecutions?: number;
 
   role?: aws_iam.IRole;
 
   reacreateOnFunctionNameChange?: boolean;
 
-  vpc?: aws_ec2.IVpc;
-  securityGroups?: aws_ec2.ISecurityGroup[];
+  // Put the lambda in this bootstrap virtual network (defineVirtualNetwork), carrying its workload security group.
+  virtualNetworkName?: string;
 } & QpqConstructBlockProps;
 
 // Resolves the federated code store location for this service, if it opted in via
@@ -79,6 +78,11 @@ export class Function extends QpqConstructBlock {
 
     const functionId = props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
 
+    // The stack's layers and, when asked for, the virtual network: applied here so no construct
+    // threads them through.
+    const layers = LambdaLayers.of(this, props.qpqConfig).layers;
+    const network = props.virtualNetworkName ? lookupVirtualNetwork(this, props.virtualNetworkName, props.qpqConfig) : undefined;
+
     this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
@@ -86,7 +90,7 @@ export class Function extends QpqConstructBlock {
       runtime: getLambdaRuntime(props.qpqConfig),
       architecture: getLambdaArchitecture(props.qpqConfig),
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
-      layers: props.apiLayerVersions,
+      layers,
 
       code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.handler)),
       handler: `${handlerFile}.${props.handler}`,
@@ -118,13 +122,9 @@ export class Function extends QpqConstructBlock {
 
       role: props.role,
 
-      vpc: props.vpc,
-      vpcSubnets: props.vpc
-        ? {
-            subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
-          }
-        : undefined,
-      securityGroups: props.securityGroups,
+      vpc: network?.vpc,
+      vpcSubnets: network ? { subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS } : undefined,
+      securityGroups: network ? [network.workloadSecurityGroup] : undefined,
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.lambdaFunction, props.qpqConfig);

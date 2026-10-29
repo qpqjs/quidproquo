@@ -6,7 +6,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 
-import { applyEnvironmentTags, getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
+import { applyEnvironmentTags, lookupVirtualNetwork, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export type QpqCoreApiGraphDatabaseConstructProps = {
@@ -29,9 +29,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreApiGraphDatabaseConstructProps) {
     super(scope, id, props);
 
-    const vpc = aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', {
-      vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.graphDatabaseConfig.virtualNetworkName, props.qpqConfig),
-    });
+    const { vpc, workloadSecurityGroup } = lookupVirtualNetwork(this, props.graphDatabaseConfig.virtualNetworkName, props.qpqConfig);
 
     // const clusterParameterGroup = new aws_neptune.ClusterParameterGroup(this, 'ClusterParams', {
     //   description: 'Cluster parameter group',
@@ -75,12 +73,6 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
 
     // Only lambdas carrying the bootstrap-created workload security group can
     // reach the cluster, not everything that lands in the shared VPC
-    const workloadSecurityGroup = aws_ec2.SecurityGroup.fromLookupByName(
-      this,
-      'workload-sg-lookup',
-      getVirtualNetworkWorkloadSecurityGroupName(props.graphDatabaseConfig.virtualNetworkName, props.qpqConfig),
-      vpc,
-    );
     this.cluster.connections.allowDefaultPortFrom(workloadSecurityGroup, 'qpq workload lambdas');
 
     // The data-plane grant needs the cluster's resource id, known only here, so it is made beside the

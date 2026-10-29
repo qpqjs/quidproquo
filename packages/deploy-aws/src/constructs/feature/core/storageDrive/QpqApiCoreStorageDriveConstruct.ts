@@ -1,6 +1,6 @@
 import { qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
+import { aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -9,7 +9,6 @@ import { QpqCoreStorageDriveConstruct } from './QpqCoreStorageDriveConstruct';
 
 export type QpqApiCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
@@ -35,8 +34,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
         qpqConfig: props.qpqConfig,
 
-        apiLayerVersions: props.apiLayerVersions,
-
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive
           storageDriveName: props.storageDriveConfig.storageDrive,
@@ -57,8 +54,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         handler: 's3Event_fileEvent',
 
         qpqConfig: props.qpqConfig,
-
-        apiLayerVersions: props.apiLayerVersions,
 
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive

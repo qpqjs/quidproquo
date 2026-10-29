@@ -1,6 +1,6 @@
 import { DeployEventsQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
+import { aws_events, aws_events_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -8,7 +8,6 @@ import { Function } from '../../../basic/Function';
 
 export type QpqCoreDeployEventConstructProps = {
   deployEventConfig: DeployEventsQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
 } & QpqConstructBlockProps;
 
 export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
@@ -20,8 +19,6 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       handler: 'eventBridgeEvent_stackDeploy',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       // 15 min timeout
       timeoutInSeconds: 15 * 60,

@@ -6,7 +6,6 @@ import { Construct } from 'constructs';
 
 import {
   ApiQpqWebserverApiConstruct,
-  LambdaLayers,
   QpqApiCoreKeyValueStoreStreamConstruct,
   QpqApiCoreQueueConstruct,
   QpqApiCoreStorageDriveConstruct,
@@ -37,11 +36,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
       this.addDependency(props.infQpqServiceStack);
     }
 
-    // Build Lambda Layers
-    const layers = new LambdaLayers(this, 'lambda-layers', {
-      qpqConfig: props.qpqConfig,
-    });
-
     // Schedule Events
     qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).forEach(
       (setting) =>
@@ -49,7 +43,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           scheduleConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -60,7 +53,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -71,7 +63,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           queueConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -82,7 +73,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           subdomainRedirectConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -93,7 +83,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           serviceFunctionConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -104,7 +93,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         qpqConfig: props.qpqConfig,
 
         userScriptRunnerConfig,
-        apiLayerVersions: layers.layers,
       });
     }
 
@@ -115,7 +103,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
     QpqWebserverWebsocketConstruct.authorizeManageConnectionsForReferencedWebsockets(this, props.qpqConfig);
@@ -127,7 +114,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           deployEventConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -138,7 +124,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
@@ -163,7 +148,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           keyValueStoreConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
