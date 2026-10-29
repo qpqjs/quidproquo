@@ -2,7 +2,7 @@ import { buildMutableEffectReducer } from '@qpqjs/core';
 
 import { SharedQueryParamsEffect, SharedQueryParamsEffects, SharedQueryParamsState } from './sharedQueryParamsTypes';
 
-export const sharedQueryParamsInitalState: SharedQueryParamsState = {
+export const sharedQueryParamsInitialState: SharedQueryParamsState = {
   // No initial state
 };
 

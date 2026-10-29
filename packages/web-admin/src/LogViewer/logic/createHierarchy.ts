@@ -1,11 +1,11 @@
 import { StoryResultMetadata, StoryResultMetadataWithChildren } from '@qpqjs/core';
 
 import { cache } from '../../logic';
-import { fineLogDirectChildren } from './findLogDirectChildren';
+import { findLogDirectChildren } from './findLogDirectChildren';
 
 export const createHierarchy = cache(
   async (rootStoryResultMetadata: StoryResultMetadata, apiBasePath: string, accessToken?: string): Promise<StoryResultMetadataWithChildren> => {
-    const childrenLogs: StoryResultMetadata[] = await fineLogDirectChildren(rootStoryResultMetadata.correlation, apiBasePath, accessToken);
+    const childrenLogs: StoryResultMetadata[] = await findLogDirectChildren(rootStoryResultMetadata.correlation, apiBasePath, accessToken);
 
     const children = await Promise.all(
       childrenLogs

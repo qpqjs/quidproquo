@@ -7,12 +7,12 @@ import {
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
-import { NetworkRequestErrorCode, preformNetworkRequest } from '@qpqjs/webserver';
+import { NetworkRequestErrorCode, performNetworkRequest } from '@qpqjs/webserver';
 
 const getProcessNetworkRequest = (qpqConfig: QPQConfig): ProcessorFor<typeof askNetworkRequestBase> => {
   return async (payload) => {
     try {
-      return actionResult(await preformNetworkRequest(payload));
+      return actionResult(await performNetworkRequest(payload));
     } catch (error: unknown) {
       // Keyed on NetworkRequestError.code, which the mapper checks before the error name.
       return actionResultErrorFromCaughtError(error, {

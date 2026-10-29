@@ -2,7 +2,7 @@ import { buildMutableEffectReducer } from '@qpqjs/core';
 
 import { AuthChallengeMfaEffect, AuthChallengeMfaEffects, AuthChallengeMfaState } from './authChallengeTypes';
 
-export const authChallengeMfaInitalState: AuthChallengeMfaState = {
+export const authChallengeMfaInitialState: AuthChallengeMfaState = {
   mfaCode: '',
 };
 

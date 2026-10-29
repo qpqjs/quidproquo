@@ -4,7 +4,7 @@ import { defineActionProcessors } from './actionProcessors';
 export const definePromiseMode = (): QPQConfig => [
   defineActionProcessors({
     basePath: __dirname,
-    relativePath: '../../proiseify/getSystemExecuteStoryActionProcessor',
+    relativePath: '../../promiseify/getSystemExecuteStoryActionProcessor',
     functionName: 'getSystemExecuteStoryActionProcessor',
   }),
 ];

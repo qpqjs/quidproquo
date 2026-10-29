@@ -2,7 +2,7 @@ import { buildMutableEffectReducer } from '@qpqjs/core';
 
 import { AuthChallengeEffect, AuthChallengeEffects, AuthChallengeState } from './authChallengeTypes';
 
-export const authChallengeInitalState: AuthChallengeState = {
+export const authChallengeInitialState: AuthChallengeState = {
   passwordA: '',
   passwordB: '',
 };

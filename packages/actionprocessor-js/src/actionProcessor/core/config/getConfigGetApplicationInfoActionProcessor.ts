@@ -8,7 +8,7 @@ import {
   qpqCoreUtils,
 } from '@qpqjs/core';
 
-const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetApplicationInfo> => {
+const getProcessConfigGetApplicationInfo = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetApplicationInfo> => {
   return async () => {
     const appInfo: ApplicationConfigInfo = {
       environment: qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
@@ -21,4 +21,4 @@ const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ProcessorFo
   };
 };
 
-export const getConfigGetApplicationInfoActionProcessor = createActionProcessor(askConfigGetApplicationInfo, getProcessConfigGetApplicationConfig);
+export const getConfigGetApplicationInfoActionProcessor = createActionProcessor(askConfigGetApplicationInfo, getProcessConfigGetApplicationInfo);

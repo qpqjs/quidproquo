@@ -3,7 +3,7 @@ import type { NetworkRequestActionPayload } from '@qpqjs/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { NetworkRequestError, NetworkRequestErrorCode } from './NetworkRequestError';
-import { preformNetworkRequest } from './preformNetworkRequest';
+import { performNetworkRequest } from './performNetworkRequest';
 
 const { executeNetworkRequest } = vi.hoisted(() => ({ executeNetworkRequest: vi.fn() }));
 
@@ -24,26 +24,26 @@ const rejectWith = async (error: unknown): Promise<NetworkRequestError> => {
   executeNetworkRequest.mockRejectedValue(error);
 
   try {
-    await preformNetworkRequest(buildPayload());
+    await performNetworkRequest(buildPayload());
   } catch (caught) {
     expect(caught).toBeInstanceOf(NetworkRequestError);
     return caught as NetworkRequestError;
   }
 
-  throw new Error('expected preformNetworkRequest to throw');
+  throw new Error('expected performNetworkRequest to throw');
 };
 
 afterEach(() => {
   executeNetworkRequest.mockReset();
 });
 
-describe('preformNetworkRequest', () => {
+describe('performNetworkRequest', () => {
   it('returns the executed network response, whatever its status', async () => {
     const response = { headers: {}, setCookies: [], status: 503, statusText: 'Service Unavailable', data: 'down' };
     executeNetworkRequest.mockResolvedValue(response);
 
     const payload = buildPayload();
-    const result = await preformNetworkRequest(payload);
+    const result = await performNetworkRequest(payload);
 
     expect(executeNetworkRequest).toHaveBeenCalledWith(payload);
     expect(result).toEqual(response);

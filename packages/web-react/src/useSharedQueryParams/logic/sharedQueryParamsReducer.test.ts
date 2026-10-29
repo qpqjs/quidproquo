@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sharedQueryParamsInitalState, sharedQueryParamsReducer } from './sharedQueryParamsReducer';
+import { sharedQueryParamsInitialState, sharedQueryParamsReducer } from './sharedQueryParamsReducer';
 import { SharedQueryParamsEffect, SharedQueryParamsSetParamEffect } from './sharedQueryParamsTypes';
 
 describe('sharedQueryParamsReducer', () => {
@@ -10,7 +10,7 @@ describe('sharedQueryParamsReducer', () => {
       payload: { key: 'tab', values: ['one', 'two'] },
     };
 
-    const [state, preventBubble] = sharedQueryParamsReducer(sharedQueryParamsInitalState, effect);
+    const [state, preventBubble] = sharedQueryParamsReducer(sharedQueryParamsInitialState, effect);
 
     expect(state).toEqual({ tab: ['one', 'two'] });
     expect(preventBubble).toBe(true);
@@ -22,9 +22,9 @@ describe('sharedQueryParamsReducer', () => {
       payload: { key: 'tab', values: ['one'] },
     };
 
-    sharedQueryParamsReducer(sharedQueryParamsInitalState, effect);
+    sharedQueryParamsReducer(sharedQueryParamsInitialState, effect);
 
-    expect(sharedQueryParamsInitalState).toEqual({});
+    expect(sharedQueryParamsInitialState).toEqual({});
   });
 
   it('passes through unknown effects without bubbling prevention', () => {

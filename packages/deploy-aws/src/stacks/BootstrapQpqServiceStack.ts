@@ -11,7 +11,7 @@ import {
   QpqBootstrapConfigWafConstruct,
   QpqBootstrapEmailReceivingDomainConstruct,
 } from '../constructs';
-import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
+import { BSQpqLambdaWarmerEventConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
 
@@ -21,7 +21,7 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: BootstrapQpqServiceStackProps) {
     super(scope, id, props);
 
-    new BSQpqLambdaWarmerEventConstructConstruct(this, 'LambdaWarmer', {
+    new BSQpqLambdaWarmerEventConstruct(this, 'LambdaWarmer', {
       qpqConfig: props.qpqConfig,
     });
 

@@ -5,13 +5,13 @@ import { App, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { describe, expect, it } from 'vitest';
 
-import { WebserverRoll } from './WebserverRoll';
+import { WebserverRole } from './WebserverRole';
 
 const synth = () => {
   const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2')]);
   const stack = new Stack(new App(), 'api', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
-  new WebserverRoll(stack, 'roll', { qpqConfig });
+  new WebserverRole(stack, 'roll', { qpqConfig });
 
   return Template.fromStack(stack);
 };
@@ -26,7 +26,7 @@ const trustPrincipals = (template: Template) =>
 
 // Security regression: the service role shares an account with other apps, so it may write its own logs but never read
 // log groups (which would include every other app's), and it is assumable only by the services that actually run it.
-describe('WebserverRoll', () => {
+describe('WebserverRole', () => {
   it('can write logs but never read any log group in the account', () => {
     const actions = policyStatements(synth()).flatMap((statement: any) => statement.Action);
 

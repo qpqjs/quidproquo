@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
 import { AuthState } from '../logic';
-import { authChallengeMfaSetupInitalState, authChallengeMfaSetupLogic, authChallengeMfaSetupReducer } from './logic';
+import { authChallengeMfaSetupInitialState, authChallengeMfaSetupLogic, authChallengeMfaSetupReducer } from './logic';
 
 interface AuthChallengeMfaSetupProps {
   authState: AuthState;
@@ -18,7 +18,7 @@ interface AuthChallengeMfaSetupProps {
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeMfaSetup',
   api: authChallengeMfaSetupLogic,
-  initialState: authChallengeMfaSetupInitalState,
+  initialState: authChallengeMfaSetupInitialState,
   reducer: authChallengeMfaSetupReducer,
 });
 

@@ -8,7 +8,7 @@ export * from './NetworkRequestError';
 export * from './networkRequestUtils';
 export * from './openApi';
 export * from './pathUtils';
-export * from './preformNetworkRequest';
+export * from './performNetworkRequest';
 export * from './qpqConfigAccessorsUtils';
 export * from './urlUtils';
 export * from './websocketEventUtils';

@@ -21,7 +21,7 @@ import {
   QpqWebserverEmailSenderConstruct,
   QpqWebserverWebsocketConstruct,
 } from '../constructs';
-import { WebserverRoll } from '../constructs/basic/WebserverRoll';
+import { WebserverRole } from '../constructs/basic/WebserverRole';
 import { OwnedCryptoKeys, resolveCryptoKeyForResource } from '../constructs/feature/core/cryptoKey/resolveCryptoKeyForResource';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { emailReceiptRuleName } from '../constructs/feature/webserver/emailReceiving/emailReceiptRuleName';
@@ -34,7 +34,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
     super(scope, id, props);
 
     // Build the role for this service.
-    const webserverRole = new WebserverRoll(this, 'webserverRoll', {
+    // The construct id keeps its 'webserverRoll' spelling: changing it changes the logical id and replaces the deployed role.
+    const webserverRole = new WebserverRole(this, 'webserverRoll', {
       qpqConfig: props.qpqConfig,
     }).role;
 

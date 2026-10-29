@@ -5,11 +5,11 @@ import { renderHook } from '@testing-library/react';
 import { authContext } from '../../auth/authContext';
 import { AuthState } from '../../auth/types';
 
-const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn().mockResolvedValue({ status: 200 }) }));
+const { performNetworkRequest } = vi.hoisted(() => ({ performNetworkRequest: vi.fn().mockResolvedValue({ status: 200 }) }));
 
 vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => {
   const original = await importOriginal<typeof import('@qpqjs/webserver')>();
-  return { ...original, preformNetworkRequest };
+  return { ...original, performNetworkRequest };
 });
 
 import { useAuthenticatedNetworkRequest } from './useAuthenticatedNetworkRequest';
@@ -26,7 +26,7 @@ describe('useAuthenticatedNetworkRequest', () => {
 
     await result.current();
 
-    expect(preformNetworkRequest).toHaveBeenLastCalledWith(payload);
+    expect(performNetworkRequest).toHaveBeenLastCalledWith(payload);
   });
 
   it('adds a bearer Authorization header when a token is present', async () => {
@@ -37,7 +37,7 @@ describe('useAuthenticatedNetworkRequest', () => {
 
     await result.current();
 
-    expect(preformNetworkRequest).toHaveBeenLastCalledWith({
+    expect(performNetworkRequest).toHaveBeenLastCalledWith({
       url: 'https://api',
       verb: 'GET',
       headers: { 'X-A': '1', Authorization: 'Bearer tok' },

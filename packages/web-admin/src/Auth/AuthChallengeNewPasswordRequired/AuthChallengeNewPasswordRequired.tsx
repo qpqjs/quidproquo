@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
 import { AuthState } from '../logic';
-import { authChallengeInitalState, authChallengeLogic, authChallengeReducer } from './logic';
+import { authChallengeInitialState, authChallengeLogic, authChallengeReducer } from './logic';
 
 interface AuthChallengeNewPasswordRequiredProps {
   authState: AuthState;
@@ -17,7 +17,7 @@ interface AuthChallengeNewPasswordRequiredProps {
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeNewPasswordRequired',
   api: authChallengeLogic,
-  initialState: authChallengeInitalState,
+  initialState: authChallengeInitialState,
   reducer: authChallengeReducer,
 });
 

@@ -1,5 +1,5 @@
 import { HTTPNetworkResponse, NetworkRequestActionPayload } from '@qpqjs/core';
-import { preformNetworkRequest } from '@qpqjs/webserver';
+import { performNetworkRequest } from '@qpqjs/webserver';
 
 import { useAuthAccessToken } from '../../auth';
 import { useFastCallback } from '../../hooks';
@@ -17,7 +17,7 @@ export const useAuthenticatedNetworkRequest = <R>(payload: NetworkRequestActionP
       }
     : payload;
 
-  const requeser = useFastCallback(() => preformNetworkRequest<R>(payloadWithAuthHeaders));
+  const requeser = useFastCallback(() => performNetworkRequest<R>(payloadWithAuthHeaders));
 
   return requeser;
 };

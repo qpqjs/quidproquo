@@ -7,7 +7,7 @@ import {
   Nullable,
   ProcessorFor,
 } from '@qpqjs/core';
-import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, preformNetworkRequest } from '@qpqjs/webserver';
+import { ApiActionType, askApiRequestBase, NetworkRequestErrorCode, performNetworkRequest } from '@qpqjs/webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
@@ -29,7 +29,7 @@ const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): Proce
     const basePath = (options?.resolveServiceBaseUrl ?? defaultResolveServiceBaseUrl)(service);
 
     try {
-      const res = await preformNetworkRequest({
+      const res = await performNetworkRequest({
         url: endpoint,
         basePath,
         method,

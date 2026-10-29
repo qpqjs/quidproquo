@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { authChallengeMfaSetupInitalState, authChallengeMfaSetupReducer } from './authChallengeReducer';
+import { authChallengeMfaSetupInitialState, authChallengeMfaSetupReducer } from './authChallengeReducer';
 import { AuthChallengeMfaSetupEffect } from './authChallengeTypes';
 
 describe('authChallengeMfaSetupReducer', () => {
   it('sets the mfa code', () => {
-    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitalState, {
+    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitialState, {
       type: AuthChallengeMfaSetupEffect.SetMfaCode,
       payload: '123456',
     });
@@ -14,7 +14,7 @@ describe('authChallengeMfaSetupReducer', () => {
   });
 
   it('sets the secret code and session from an association', () => {
-    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitalState, {
+    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitialState, {
       type: AuthChallengeMfaSetupEffect.SetAssociation,
       payload: { secretCode: 'SECRET', session: 'SESSION' },
     });
@@ -24,7 +24,7 @@ describe('authChallengeMfaSetupReducer', () => {
   });
 
   it('does not handle an unknown effect', () => {
-    const [, handled] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitalState, { type: 'unknown', payload: undefined } as never);
+    const [, handled] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitialState, { type: 'unknown', payload: undefined } as never);
 
     expect(handled).toBe(false);
   });

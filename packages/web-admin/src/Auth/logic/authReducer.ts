@@ -2,7 +2,7 @@ import { buildMutableEffectReducer } from '@qpqjs/core';
 
 import { AuthEffect, AuthEffects, AuthState } from './authTypes';
 
-export const authInitalState: AuthState = {
+export const authInitialState: AuthState = {
   username: '',
   password: '',
 };

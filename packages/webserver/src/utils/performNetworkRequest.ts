@@ -21,7 +21,7 @@ const toNetworkRequestError = (error: unknown): NetworkRequestError => {
  * NetworkRequestError when no response came back at all. Its `code` is what the
  * network and api action processors map onto their error catalogs.
  */
-export const preformNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
+export const performNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
   try {
     return await executeNetworkRequest<R>(payload);
   } catch (error: unknown) {
