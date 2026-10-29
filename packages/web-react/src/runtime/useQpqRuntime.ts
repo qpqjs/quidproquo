@@ -24,7 +24,10 @@ export function useQpqRuntime<TState, TAction, TApi extends QpqApi>(
       if (Object.prototype.hasOwnProperty.call(memoedApiGenerators, key)) {
         const withoutAsk = key.slice(3);
         const newKey = withoutAsk.charAt(0).toLowerCase() + withoutAsk.slice(1);
-        wrapped[newKey] = resolver(memoedApiGenerators[key as any]) as any;
+        const generator = memoedApiGenerators[key as any];
+        if (generator) {
+          wrapped[newKey] = resolver(generator) as any;
+        }
       }
     }
     return wrapped;
