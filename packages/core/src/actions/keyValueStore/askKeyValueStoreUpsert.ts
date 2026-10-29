@@ -36,6 +36,9 @@ export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the item shape they are writing at the call site.
-export function* askKeyValueStoreUpsert<KvsItem>(keyValueStoreName: string, item: KvsItem, options?: KeyValueStoreUpsertOptions): AskResponse<void> {
+function* askKeyValueStoreUpsertTyped<KvsItem>(keyValueStoreName: string, item: KvsItem, options?: KeyValueStoreUpsertOptions): AskResponse<void> {
   return yield* askKeyValueStoreUpsertBase(keyValueStoreName, item as KvsItemRecord, options);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreUpsert = Object.assign(askKeyValueStoreUpsertTyped, { errorType: askKeyValueStoreUpsertBase.errorType });

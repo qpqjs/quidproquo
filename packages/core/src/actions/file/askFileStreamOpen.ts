@@ -21,7 +21,7 @@ export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
 
 // The handle is tagged with the encoding the caller asked for, so reads come back as
 // text or binary chunks without a cast at every call site.
-export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
+function* askFileStreamOpenTyped<E extends StreamEncoding = 'text'>(
   drive: string,
   filepath: string,
   encoding?: E,
@@ -30,3 +30,6 @@ export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
 ): AskResponse<StreamHandle<E>> {
   return (yield* askFileStreamOpenBase(drive, filepath, encoding, chunkSize, scope)) as StreamHandle<E>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askFileStreamOpen = Object.assign(askFileStreamOpenTyped, { errorType: askFileStreamOpenBase.errorType });

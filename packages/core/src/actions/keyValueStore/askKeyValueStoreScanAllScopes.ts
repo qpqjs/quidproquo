@@ -58,7 +58,7 @@ export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedD
  * would let a caller stop after the first page, be right locally, and silently skip most of
  * the data deployed. A local run has to be able to prove the loop.
  */
-export function* askKeyValueStoreScanAllScopes<KvsItem>(
+function* askKeyValueStoreScanAllScopesTyped<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
@@ -66,3 +66,8 @@ export function* askKeyValueStoreScanAllScopes<KvsItem>(
 ): AskResponse<QpqPagedData<KvsScopedItem<KvsItem>>> {
   return (yield* askKeyValueStoreScanAllScopesBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<KvsScopedItem<KvsItem>>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreScanAllScopes = Object.assign(askKeyValueStoreScanAllScopesTyped, {
+  errorType: askKeyValueStoreScanAllScopesBase.errorType,
+});

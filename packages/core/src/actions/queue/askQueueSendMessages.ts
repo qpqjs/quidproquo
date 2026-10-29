@@ -22,6 +22,9 @@ export const askQueueSendMessagesBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the message body shape at the call site.
-export function* askQueueSendMessages<T extends QueueMessage<any>>(queueName: string, ...queueMessages: T[]): AskResponse<void> {
+function* askQueueSendMessagesTyped<T extends QueueMessage<any>>(queueName: string, ...queueMessages: T[]): AskResponse<void> {
   return yield* askQueueSendMessagesBase(queueName, queueMessages);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askQueueSendMessages = Object.assign(askQueueSendMessagesTyped, { errorType: askQueueSendMessagesBase.errorType });

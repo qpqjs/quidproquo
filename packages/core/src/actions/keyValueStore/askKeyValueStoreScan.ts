@@ -31,7 +31,7 @@ export const askKeyValueStoreScanBase = createActionRequester<QpqPagedData<unkno
 
 // The stored item shape is only known to the caller, so the base returns unknown items
 // and this story casts the page to what the caller declared.
-export function* askKeyValueStoreScan<KvsItem>(
+function* askKeyValueStoreScanTyped<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
@@ -39,3 +39,6 @@ export function* askKeyValueStoreScan<KvsItem>(
 ): AskResponse<QpqPagedData<KvsItem>> {
   return (yield* askKeyValueStoreScanBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<KvsItem>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreScan = Object.assign(askKeyValueStoreScanTyped, { errorType: askKeyValueStoreScanBase.errorType });

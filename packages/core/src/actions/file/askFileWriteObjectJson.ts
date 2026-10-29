@@ -20,7 +20,7 @@ export const askFileWriteObjectJsonBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the document shape they are writing at the call site.
-export function* askFileWriteObjectJson<T extends object>(
+function* askFileWriteObjectJsonTyped<T extends object>(
   drive: string,
   filepath: string,
   data: T,
@@ -29,3 +29,6 @@ export function* askFileWriteObjectJson<T extends object>(
 ): AskResponse<void> {
   return yield* askFileWriteObjectJsonBase(drive, filepath, data, storageDriveAdvancedWriteOptions, scope);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askFileWriteObjectJson = Object.assign(askFileWriteObjectJsonTyped, { errorType: askFileWriteObjectJsonBase.errorType });

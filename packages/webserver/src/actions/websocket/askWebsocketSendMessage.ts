@@ -12,6 +12,9 @@ export const askWebsocketSendMessageBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the message body shape at the call site.
-export function* askWebsocketSendMessage<T>(websocketApiName: string, connectionId: string, payload: T): AskResponse<void> {
+function* askWebsocketSendMessageTyped<T>(websocketApiName: string, connectionId: string, payload: T): AskResponse<void> {
   return yield* askWebsocketSendMessageBase(websocketApiName, connectionId, payload);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askWebsocketSendMessage = Object.assign(askWebsocketSendMessageTyped, { errorType: askWebsocketSendMessageBase.errorType });

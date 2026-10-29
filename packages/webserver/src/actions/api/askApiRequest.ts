@@ -34,7 +34,7 @@ export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unkno
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askApiRequest<TResult, TPayload = unknown>(
+function* askApiRequestTyped<TResult, TPayload = unknown>(
   service: string,
   method: HTTPMethod,
   endpoint: string,
@@ -42,3 +42,6 @@ export function* askApiRequest<TResult, TPayload = unknown>(
 ): AskResponse<HTTPNetworkResponse<TResult>> {
   return (yield* askApiRequestBase(service, method, endpoint, options as ApiRequestOptions<unknown>)) as HTTPNetworkResponse<TResult>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askApiRequest = Object.assign(askApiRequestTyped, { errorType: askApiRequestBase.errorType });

@@ -27,6 +27,9 @@ export const askEventBusSendMessagesBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the message body shape at the call site.
-export function* askEventBusSendMessages<T>(eventBusSendMessageOptions: EventBusSendMessageOptions<T>): AskResponse<void> {
+function* askEventBusSendMessagesTyped<T>(eventBusSendMessageOptions: EventBusSendMessageOptions<T>): AskResponse<void> {
   return yield* askEventBusSendMessagesBase(eventBusSendMessageOptions as EventBusSendMessageOptions<unknown>);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askEventBusSendMessages = Object.assign(askEventBusSendMessagesTyped, { errorType: askEventBusSendMessagesBase.errorType });

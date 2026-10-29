@@ -37,10 +37,13 @@ export const askNetworkRequestBase = createActionRequester<HTTPNetworkResponse<u
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askNetworkRequest<TResult, TPayload = unknown>(
+function* askNetworkRequestTyped<TResult, TPayload = unknown>(
   method: HTTPMethod,
   url: string,
   httpRequestOptions?: HTTPRequestOptions<TPayload>,
 ): AskResponse<HTTPNetworkResponse<TResult>> {
   return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<TResult>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askNetworkRequest = Object.assign(askNetworkRequestTyped, { errorType: askNetworkRequestBase.errorType });

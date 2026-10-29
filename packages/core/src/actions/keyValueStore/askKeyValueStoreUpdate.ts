@@ -35,7 +35,7 @@ export const askKeyValueStoreUpdateBase = createActionRequester<unknown>()({
 
 // The updated item's shape is only known to the caller, so the base returns unknown and
 // this story casts it to what the caller declared.
-export function* askKeyValueStoreUpdate<Value>(
+function* askKeyValueStoreUpdateTyped<Value>(
   keyValueStoreName: string,
 
   updates: KvsUpdate,
@@ -47,3 +47,6 @@ export function* askKeyValueStoreUpdate<Value>(
 ): AskResponse<Value> {
   return (yield* askKeyValueStoreUpdateBase(keyValueStoreName, updates, key, sortKey, options)) as Value;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreUpdate = Object.assign(askKeyValueStoreUpdateTyped, { errorType: askKeyValueStoreUpdateBase.errorType });

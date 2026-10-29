@@ -21,6 +21,9 @@ export const askKeyValueStoreGetBase = createActionRequester<unknown>()({
 
 // The stored item's shape is only known to the caller, so the base returns unknown and
 // this story casts it to what the caller declared.
-export function* askKeyValueStoreGet<Value>(keyValueStoreName: string, key: string, options?: KeyValueStoreGetOptions): AskResponse<Nullable<Value>> {
+function* askKeyValueStoreGetTyped<Value>(keyValueStoreName: string, key: string, options?: KeyValueStoreGetOptions): AskResponse<Nullable<Value>> {
   return (yield* askKeyValueStoreGetBase(keyValueStoreName, key, options)) as Nullable<Value>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreGet = Object.assign(askKeyValueStoreGetTyped, { errorType: askKeyValueStoreGetBase.errorType });
