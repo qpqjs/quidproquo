@@ -21,7 +21,7 @@ export const isStorageDriveNameValid = (drive: string, qpqConfig: QPQConfig): bo
 // under the owner's folder, mirroring how AWS resolves the bucket by owner.
 export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): string {
   const storageDrive = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
-  return storageDrive?.owner?.module ?? qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  return qpqCoreUtils.resolveOwnerModuleName(storageDrive?.owner, qpqConfig);
 }
 
 export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string, scope?: string): string {

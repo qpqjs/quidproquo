@@ -36,7 +36,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
       eventBusConfig.owner?.resourceNameOverride || eventBusName,
       qpqConfig,
 
-      eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, qpqConfig),
       eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),

@@ -7,7 +7,7 @@ import {
   Nullable,
   ProcessorFor,
 } from '@qpqjs/core';
-import { askApiRequestBase, NetworkRequestErrorCode, performNetworkRequest } from '@qpqjs/webserver';
+import { askApiRequestBase, networkRequestErrorMap, performNetworkRequest } from '@qpqjs/webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
@@ -44,12 +44,7 @@ const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): Proce
 
       return actionResult(res);
     } catch (error: unknown) {
-      // Keyed on NetworkRequestError.code, which the mapper checks before the error name.
-      return actionResultErrorFromCaughtError(error, {
-        [NetworkRequestErrorCode.timeout]: () => actionResultError(askApiRequestBase.errorType.Timeout, 'Network request timed out'),
-        [NetworkRequestErrorCode.unsupportedMethod]: (error) => actionResultError(askApiRequestBase.errorType.UnsupportedMethod, error.message),
-        [NetworkRequestErrorCode.network]: (error) => actionResultError(askApiRequestBase.errorType.NetworkError, error.message),
-      });
+      return actionResultErrorFromCaughtError(error, networkRequestErrorMap(askApiRequestBase.errorType));
     }
   };
 };

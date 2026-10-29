@@ -61,7 +61,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         targetApplication: eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
         targetEnvironment: eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
         targetFeature: eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-        targetModule: eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+        targetModule: qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, qpqConfig),
       };
 
       eventBus.publish(EventBusActionType.SendMessages, eventBusEvent);

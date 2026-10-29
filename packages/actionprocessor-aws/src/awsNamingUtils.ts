@@ -25,7 +25,7 @@ type AwsDeploymentContext = {
 // exact name the owning service deployed under.
 const resolveOwnerDeploymentContext = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): AwsDeploymentContext => ({
   application: owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-  service: owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+  service: qpqCoreUtils.resolveOwnerModuleName(owner, qpqConfig),
   environment: owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
   feature: owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
 });

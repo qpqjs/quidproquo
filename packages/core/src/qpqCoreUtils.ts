@@ -1,3 +1,4 @@
+import { CrossModuleOwner } from './types/CrossModuleOwner';
 import {
   ActionProcessorsQPQConfigSetting,
   AiQPQConfigSetting,
@@ -277,6 +278,10 @@ export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConf
 
   return allConfigs.find((eb) => eb.name === eventBusName);
 };
+
+/** The module a setting belongs to: its declared owner, or the executing module when it declares none. */
+export const resolveOwnerModuleName = (owner: CrossModuleOwner | undefined, qpqConfig: QPQConfig): string =>
+  owner?.module || getApplicationModuleName(qpqConfig);
 
 export const getOwnedItems = <T extends QPQConfigSetting>(settings: T[], qpqConfig: QPQConfig): T[] => {
   const appModuleName = getApplicationModuleName(qpqConfig);

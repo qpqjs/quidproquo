@@ -38,7 +38,7 @@ export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyNam
 
   // Mirrors the AWS runtime's resolveSigningKeyAlias: a cross-module owner
   // redirects storage to the owning service's file
-  const serviceName = signingKeyConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const serviceName = qpqCoreUtils.resolveOwnerModuleName(signingKeyConfig.owner, qpqConfig);
   const key = signingKeyConfig.owner?.resourceNameOverride || signingKeyName;
 
   const seedKey = path.join(runtimePath, serviceName, key);

@@ -18,7 +18,7 @@ import { sendMessageToWebSocketConnection } from '../../../implementations/webSo
 const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWebsocketSendMessageBase> => {
   return async ({ connectionId, payload, websocketApiName }) => {
     const websocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
-    const service = websocketConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+    const service = qpqCoreUtils.resolveOwnerModuleName(websocketConfig.owner, qpqConfig);
 
     try {
       // A connection that is no longer registered answers Disconnected, as AWS does with GoneException.

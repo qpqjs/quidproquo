@@ -48,7 +48,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
       eventBusConfig?.owner?.resourceNameOverride || eventBusSubscription,
       qpqConfig,
-      eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      qpqCoreUtils.resolveOwnerModuleName(eventBusConfig?.owner, qpqConfig),
       eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(qpqConfig),

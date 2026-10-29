@@ -43,7 +43,7 @@ const getOwnerResourceTagConditions = (qpqConfig: QPQConfig, owner?: CrossModule
 
   return {
     'aws:ResourceTag/application': owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-    'aws:ResourceTag/module': owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+    'aws:ResourceTag/module': qpqCoreUtils.resolveOwnerModuleName(owner, qpqConfig),
     'aws:ResourceTag/environment': owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
     ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
   };

@@ -90,6 +90,7 @@ import {
   isSameResource,
   resolveCrossServiceResourceName,
   resolveGlobalValue,
+  resolveOwnerModuleName,
   resolveParameterOrThrow,
   resolveSecretOrThrow,
   resolveUserDirectoryOrThrow,
@@ -395,6 +396,16 @@ describe('qpqCoreUtils', () => {
       });
 
       expect(result).toEqual({ module: 'm', application: 'a', feature: 'f', environment: 'e', resourceName: 'jobs' });
+    });
+  });
+
+  describe('resolveOwnerModuleName', () => {
+    it('answers the declared owner module, else the executing module', () => {
+      const config = buildTestQpqConfig();
+
+      expect(resolveOwnerModuleName({ module: 'other-module' }, config)).toBe('other-module');
+      expect(resolveOwnerModuleName(undefined, config)).toBe('test-module');
+      expect(resolveOwnerModuleName({ module: '' }, config)).toBe('test-module');
     });
   });
 

@@ -3,6 +3,7 @@ export * from './httpEventUtils';
 export * from './jwtUtils';
 export * from './mergeRouteUtils';
 export * from './NetworkRequestError';
+export * from './networkRequestErrorMap';
 export * from './networkRequestUtils';
 export * from './openApi';
 export * from './pathUtils';

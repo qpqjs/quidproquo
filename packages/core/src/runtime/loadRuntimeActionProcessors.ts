@@ -9,10 +9,12 @@ import { getUniqueKeyFromQpqFunctionRuntime } from '../utils/path/getUniqueKeyFr
 // that rebuilds its loader on hot reload invalidates the cache with it.
 const cachedListsByLoader = new WeakMap<DynamicModuleLoader, Map<string, Promise<ActionProcessorList>>>();
 
-// Unlike service-wide custom processor sources (skipped on load failure), a
-// runtime-attached override that fails to load throws: silently falling back to
-// the default processors would, for example, run a route under the wrong auth.
-const loadActionProcessorList = async (
+/**
+ * Loads one action processor source and checks its shape. Throws on anything wrong: a
+ * runtime-attached override that silently fell back to the defaults would, for example, run a
+ * route under the wrong auth. Callers that may skip a bad source catch and log it themselves.
+ */
+export const loadActionProcessorList = async (
   runtime: QpqFunctionRuntime,
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

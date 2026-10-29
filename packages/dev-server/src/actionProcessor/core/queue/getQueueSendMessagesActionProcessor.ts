@@ -47,7 +47,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof a
         targetApplication: queueConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
         targetEnvironment: queueConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
         targetFeature: queueConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-        targetModule: queueConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+        targetModule: qpqCoreUtils.resolveOwnerModuleName(queueConfig.owner, qpqConfig),
       };
 
       eventBus.publish(QueueActionType.SendMessages, queueEvent);

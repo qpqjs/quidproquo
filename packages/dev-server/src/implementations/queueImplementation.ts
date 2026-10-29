@@ -70,7 +70,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
     const srcApplication = ebc.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
     const srcEnvironment = ebc.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
     const srcFeature = ebc.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-    const srcModule = ebc.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+    const srcModule = qpqCoreUtils.resolveOwnerModuleName(ebc.owner, qpqConfig);
 
     return (
       srcApplication === ebMessage.targetApplication &&
@@ -110,7 +110,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       targetApplication: queue.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       targetEnvironment: queue.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       targetFeature: queue.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      targetModule: queue.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      targetModule: qpqCoreUtils.resolveOwnerModuleName(queue.owner, qpqConfig),
 
       messageId: generateUuid(),
     };

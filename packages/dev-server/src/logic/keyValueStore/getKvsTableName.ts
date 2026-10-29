@@ -6,6 +6,6 @@ import { KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/c
  * service B resolves to the same rows from either side.
  */
 export const getKvsTableName = (qpqConfig: QPQConfig, storeConfig: KeyValueStoreQPQConfigSetting, keyValueStoreName: string): string => {
-  const ownerModule = storeConfig.owner?.module ?? qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const ownerModule = qpqCoreUtils.resolveOwnerModuleName(storeConfig.owner, qpqConfig);
   return `qpq_kvs_${ownerModule}_${keyValueStoreName}`;
 };

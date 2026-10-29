@@ -49,7 +49,7 @@ export class WebserverRole extends QpqConstructBlock {
         eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
         props.qpqConfig,
 
-        eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+        qpqCoreUtils.resolveOwnerModuleName(eventBusConfig.owner, props.qpqConfig),
         eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
         eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
         eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
