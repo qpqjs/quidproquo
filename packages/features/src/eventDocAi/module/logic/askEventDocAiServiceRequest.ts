@@ -1,8 +1,8 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askServiceRequest } from '../../../webSocketQueue/logic/service';
+import { askEventDocAiRead } from '../../context';
 import type { EventDocAiDocRef } from '../../models';
-import { askEventDocAiContextRead } from '../qpqContexts/eventDocAiContext';
 import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 
 // The eventDocAi caller wrapper (mirrors mincept's createMinceptServiceRequester):
@@ -12,7 +12,7 @@ import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 // (eventDocAiServiceRequest) strips the docId back off and re-provides it as
 // context around the handler.
 export function* askEventDocAiServiceRequest<TResult, TPayload = unknown>(method: string, payload: TPayload): AskResponse<TResult> {
-  const { serviceName, type, docId } = yield* askEventDocAiContextRead();
+  const { serviceName, type, docId } = yield* askEventDocAiRead();
 
   return yield* askServiceRequest<TResult, TPayload & EventDocAiDocRef>(serviceName, buildEventDocAiMethodName(type, method), {
     ...payload,

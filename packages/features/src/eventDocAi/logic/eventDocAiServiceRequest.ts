@@ -5,8 +5,8 @@ import { askEventDocResolveActor } from '../../eventDoc';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 import { serviceRequest, ServiceRequestDeferred, ServiceRequester } from '../../webSocketQueue/logic/service';
 import { EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
+import { askEventDocAiProvide } from '../context';
 import type { EventDocAiDocRef } from '../models';
-import { askEventDocAiContextProvide } from '../module';
 import { askEventDocAiAuthorise } from './askEventDocAiAuthorise';
 
 type PayloadOf<R> = R extends ServiceRequester<infer T, any> ? T : never;
@@ -32,5 +32,5 @@ export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(
     const serviceName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_SERVICE_NAME_GLOBAL);
     const type = yield* askConfigGetGlobal<string>(EVENT_DOC_TYPE_GLOBAL);
 
-    return yield* askEventDocAiContextProvide({ serviceName, type, docId }, runtime(payload as PayloadOf<R>));
+    return yield* askEventDocAiProvide({ serviceName, type, docId }, runtime(payload as PayloadOf<R>));
   } as (payload: PayloadOf<R>) => AskResponse<ResponseOf<R> | ServiceRequestDeferred>);

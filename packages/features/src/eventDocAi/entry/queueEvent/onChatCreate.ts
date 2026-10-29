@@ -2,10 +2,10 @@ import { askDateNow, askNewGuid } from '@qpqjs/core';
 
 import { askEventDocResolveActor } from '../../../eventDoc';
 import { createServiceRequester } from '../../../webSocketQueue/logic/service';
+import { askEventDocAiRead } from '../../context';
 import { askEventDocAiChatUpsert } from '../../data/askEventDocAiChatUpsert';
 import { eventDocAiServiceRequest } from '../../logic/eventDocAiServiceRequest';
 import type { EventDocAiChatCreatePayload, EventDocAiChatSummary } from '../../models';
-import { askEventDocAiContextRead } from '../../module';
 
 // Placeholder requester: serviceRequest only stores its method for
 // defineServiceRequests-style map building, which defineEventDocAi bypasses
@@ -14,7 +14,7 @@ const askChatCreateRequest = createServiceRequester<EventDocAiChatCreatePayload,
 
 export const onChatCreate = eventDocAiServiceRequest(askChatCreateRequest, function* askOnChatCreate(payload) {
   const actor = yield* askEventDocResolveActor();
-  const { docId } = yield* askEventDocAiContextRead();
+  const { docId } = yield* askEventDocAiRead();
 
   const chatId = yield* askNewGuid();
   const now = yield* askDateNow();
