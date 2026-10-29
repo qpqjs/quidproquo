@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askDelay` is `askPlatformDelay` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askNewSortableGuids` is `askGuidNewSortableMany` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askNewSortableGuid` is `askGuidNewSortable` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askNewGuid` is `askGuidNew` (A3, noun first); every framework call site, the docs and the scaffold follow.

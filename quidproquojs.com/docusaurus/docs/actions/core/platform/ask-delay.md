@@ -1,9 +1,9 @@
 ---
-title: askDelay
+title: askPlatformDelay
 description: Pause a story for a number of milliseconds.
 ---
 
-# askDelay
+# askPlatformDelay
 
 Pauses the story for the given number of milliseconds before resuming.
 
@@ -13,18 +13,18 @@ Pauses the story for the given number of milliseconds before resuming.
 Sleeping is a side effect tied to real wall-clock time, so a story never calls `setTimeout` itself. It `yield*`s this action and lets the runtime perform (and record) the wait, keeping the story a pure generator that can be inspected, tested, and replayed.
 
 ```typescript
-import { askDelay } from '@qpqjs/core';
+import { askPlatformDelay } from '@qpqjs/core';
 
 export function* askPollWithBackoff() {
   // Wait 500ms between attempts
-  yield* askDelay(500);
+  yield* askPlatformDelay(500);
 }
 ```
 
 ## Signature
 
 ```typescript
-function* askDelay(
+function* askPlatformDelay(
   timeMs: number,
 ): AskResponse<void>;
 ```

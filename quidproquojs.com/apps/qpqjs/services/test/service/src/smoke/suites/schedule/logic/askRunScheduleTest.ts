@@ -1,4 +1,4 @@
-import { askDateNow, askDelay, askKeyValueStoreGet, askKeyValueStoreUpsert, AskResponse, Nullable } from 'quidproquo';
+import { askDateNow, askPlatformDelay, askKeyValueStoreGet, askKeyValueStoreUpsert, AskResponse, Nullable } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SCHEDULE_TICK_NAME } from '../constants/scheduleTickName';
@@ -59,7 +59,7 @@ export function* askRunScheduleTest(runId: string): AskResponse<void> {
   let tick: Nullable<ScheduleTickRecord> = null;
 
   for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt += 1) {
-    yield* askDelay(POLL_INTERVAL_MS);
+    yield* askPlatformDelay(POLL_INTERVAL_MS);
 
     tick = yield* askKeyValueStoreGet<ScheduleTickRecord>(SCHEDULE_TICK_STORE, SCHEDULE_TICK_NAME);
 

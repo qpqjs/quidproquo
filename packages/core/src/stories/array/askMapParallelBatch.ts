@@ -1,4 +1,4 @@
-import { askDelay, askThrowError } from '../../actions';
+import { askPlatformDelay, askThrowError } from '../../actions';
 import { AskResponse, ErrorTypeEnum } from '../../types';
 import { askMapParallel } from './askMapParallel';
 
@@ -39,7 +39,7 @@ export function* askMapParallelBatch<T, R>(
     // If there is a delay after each batch, wait for the delay
     if (delayAfterEachBatchMs > 0) {
       // Wait for a delay after each batch
-      yield* askDelay(delayAfterEachBatchMs);
+      yield* askPlatformDelay(delayAfterEachBatchMs);
     }
   }
 

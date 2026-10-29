@@ -1,5 +1,5 @@
 import { askEventDocEventListAll, EventDocEvent } from '@qpqjs/features';
-import { askDelay, AskResponse } from 'quidproquo';
+import { askPlatformDelay, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -21,7 +21,7 @@ export function* askAwaitSmokeEventDocLog(docId: string, expectedLength: number)
       break;
     }
 
-    yield* askDelay(POLL_INTERVAL_MS);
+    yield* askPlatformDelay(POLL_INTERVAL_MS);
   }
 
   yield* askSmokeAssert(events.length === expectedLength, `expected ${expectedLength} events on doc [${docId}], found ${events.length}`);

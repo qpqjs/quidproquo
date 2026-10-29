@@ -1,6 +1,6 @@
 import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import { askDelay, askKeyValueStoreDelete, askKeyValueStoreGet, AskResponse, Nullable } from 'quidproquo';
+import { askPlatformDelay, askKeyValueStoreDelete, askKeyValueStoreGet, AskResponse, Nullable } from 'quidproquo';
 
 import { askSmokeAssert } from './askSmokeAssert';
 
@@ -15,7 +15,7 @@ const POLL_INTERVAL_MS = 2000;
 export function* askSmokePollForMarker(markerId: string, via: string, attempts: number = POLL_ATTEMPTS): AskResponse<SmokeProbeRecord> {
   let marker: Nullable<SmokeProbeRecord> = null;
   for (let attempt = 0; attempt < attempts && !marker; attempt += 1) {
-    yield* askDelay(POLL_INTERVAL_MS);
+    yield* askPlatformDelay(POLL_INTERVAL_MS);
     marker = yield* askKeyValueStoreGet<SmokeProbeRecord>(SMOKE_PROBE_STORE, markerId);
   }
 

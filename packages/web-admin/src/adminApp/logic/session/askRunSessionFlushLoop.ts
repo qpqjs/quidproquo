@@ -1,4 +1,4 @@
-import { askCatch, askDelay, AskResponse, askStateRead } from '@qpqjs/core';
+import { askCatch, askPlatformDelay, AskResponse, askStateRead } from '@qpqjs/core';
 import { EventDocEventInput } from '@qpqjs/features';
 
 import { askSessionLogEventSaved } from '../../actionCreators/sessionLog/askSessionLogEventSaved';
@@ -19,7 +19,7 @@ export function* askRunSessionFlushLoop(): AskResponse<void> {
     const head = sessionLog.pendingEvents[0];
 
     if (!sessionLog.docId || !head) {
-      yield* askDelay(sessionFlushTiming.pollMs);
+      yield* askPlatformDelay(sessionFlushTiming.pollMs);
       continue;
     }
 
@@ -44,7 +44,7 @@ export function* askRunSessionFlushLoop(): AskResponse<void> {
       yield* askSessionLogFlushFailed(saved.error.errorText || 'Failed to save session event');
 
       const { sessionLog: failed } = yield* askStateRead<AdminAppState>('');
-      yield* askDelay(Math.min(sessionFlushTiming.retryMaxMs, sessionFlushTiming.retryBaseMs * 2 ** failed.flush.retryCount));
+      yield* askPlatformDelay(Math.min(sessionFlushTiming.retryMaxMs, sessionFlushTiming.retryBaseMs * 2 ** failed.flush.retryCount));
     }
   }
 }

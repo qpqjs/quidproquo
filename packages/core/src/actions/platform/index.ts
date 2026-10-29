@@ -1,3 +1,3 @@
-export * from './askDelay';
+export * from './askPlatformDelay';
 export * from './askPlatformGetName';
 export * from './PlatformActionType';

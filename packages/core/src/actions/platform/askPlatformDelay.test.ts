@@ -2,12 +2,12 @@ import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askDelay } from './askDelay';
+import { askPlatformDelay } from './askPlatformDelay';
 import { PlatformActionType } from './PlatformActionType';
 
-describe('askDelay', () => {
+describe('askPlatformDelay', () => {
   it('yields a Delay action with the delay in milliseconds', () => {
-    const { action } = captureRequester(askDelay(250));
+    const { action } = captureRequester(askPlatformDelay(250));
 
     expect(action).toEqual({ type: PlatformActionType.Delay, payload: { timeMs: 250 } });
   });

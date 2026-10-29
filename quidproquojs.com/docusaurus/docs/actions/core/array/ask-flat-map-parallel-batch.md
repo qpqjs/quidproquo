@@ -65,4 +65,4 @@ function* askFlatMapParallelBatch<T, R>(
 - [askFlatMap](./ask-flat-map.md) — the sequential version (one item at a time).
 - [askMapParallelBatch](./ask-map-parallel-batch.md) — batched-parallel map without flattening.
 - [askMapParallel](./ask-map-parallel.md) — unbounded parallel map.
-- [askDelay](../platform/ask-delay.md) — the delay yielded between batches.
+- [askPlatformDelay](../platform/ask-delay.md) — the delay yielded between batches.

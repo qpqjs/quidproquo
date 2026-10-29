@@ -2,7 +2,7 @@ import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
 import {
   askCatch,
-  askDelay,
+  askPlatformDelay,
   askKeyValueStoreDelete,
   askKeyValueStoreGet,
   askKeyValueStoreGetBase,
@@ -44,7 +44,7 @@ function* askSmokeScopedCategoryQuery(category: string, scope: string, expectedP
       return items;
     }
 
-    yield* askDelay(INDEX_POLL_INTERVAL_MS);
+    yield* askPlatformDelay(INDEX_POLL_INTERVAL_MS);
   }
 
   return items;

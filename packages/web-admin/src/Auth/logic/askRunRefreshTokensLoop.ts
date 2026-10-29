@@ -1,4 +1,4 @@
-import { askDateNow, askDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
+import { askDateNow, askPlatformDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../platformLogic';
 import { askAuthSetAuthInfo } from '../actionCreators/askAuthSetAuthInfo';
@@ -22,7 +22,7 @@ export function* askRunRefreshTokensLoop(): AskResponse<void> {
       const refreshTime = timeToExpire - bufferTime;
 
       if (refreshTime > 0) {
-        yield* askDelay(refreshTime);
+        yield* askPlatformDelay(refreshTime);
       }
 
       const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthRefreshTokenPayload>('POST', '/refreshToken', {
@@ -39,6 +39,6 @@ export function* askRunRefreshTokensLoop(): AskResponse<void> {
       yield* askAuthSetAuthInfo(response.data);
     }
 
-    yield* askDelay(10000);
+    yield* askPlatformDelay(10000);
   }
 }

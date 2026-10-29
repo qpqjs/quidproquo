@@ -1,4 +1,4 @@
-import { askDelay, askGuidNew } from '../actions';
+import { askGuidNew, askPlatformDelay } from '../actions';
 import { AskResponse } from '../types';
 import { askCatch } from './system';
 
@@ -50,6 +50,6 @@ export function* askRetry<R>(
       }
     }
 
-    yield* askDelay(waitMs);
+    yield* askPlatformDelay(waitMs);
   }
 }

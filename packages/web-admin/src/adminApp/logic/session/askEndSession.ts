@@ -1,4 +1,4 @@
-import { askDelay, AskResponse, askStateRead } from '@qpqjs/core';
+import { askPlatformDelay, AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
 import { sessionDrainTiming } from '../../constants/sessionDrainTiming';
@@ -26,6 +26,6 @@ export function* askEndSession(): AskResponse<void> {
       return;
     }
 
-    yield* askDelay(sessionDrainTiming.pollMs);
+    yield* askPlatformDelay(sessionDrainTiming.pollMs);
   }
 }
