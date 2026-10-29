@@ -12,6 +12,7 @@ import {
   StoryResult,
 } from '@qpqjs/core';
 
+import { ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, ADMIN_LOG_SEARCH_MAX_ITEMS, ADMIN_LOG_SEARCH_TIMEOUT_SECONDS } from '../../../constants';
 import { askListLogs } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';
 import { redactStoryResult } from '../redaction/redactStoryResult';
@@ -59,7 +60,7 @@ export function* askGetLogs(
     );
 
     const data = deep
-      ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log): AskResponse<string> {
+      ? yield* askMapParallelBatch(logPage.items, ADMIN_LOG_DEEP_SEARCH_BATCH_SIZE, function* askFilterDeep(log): AskResponse<string> {
           const logData = yield* askCatch(askFileReadTextContents(QPQ_LOGS_STORAGE_DRIVE_NAME, `${log.correlation}.json`));
           return logData.success ? toSearchableLogText(logData.result) : '';
         })
@@ -73,9 +74,11 @@ export function* askGetLogs(
 
     result.items.push(...filtered);
     result.nextPageKey = logPage.nextPageKey;
-
-    // Keep going until we get some items, if there are some to fetch, also break out if this has been running longer then 15 seconds.
-  } while (result.nextPageKey && result.items.length < 3000 && (yield* askSecondsElapsedFrom(startTime)) < 15);
+  } while (
+    result.nextPageKey &&
+    result.items.length < ADMIN_LOG_SEARCH_MAX_ITEMS &&
+    (yield* askSecondsElapsedFrom(startTime)) < ADMIN_LOG_SEARCH_TIMEOUT_SECONDS
+  );
 
   return result;
 }

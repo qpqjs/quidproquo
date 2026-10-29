@@ -10,6 +10,7 @@ import {
 
 import { askWebsocketReadConnectionInfo } from '../../../../webSocketQueue/context';
 import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { ADMIN_CONFIG_SYNC_BATCH_SIZE } from '../../../constants';
 import {
   AdminSettingDataType,
   AdminSettingFieldType,
@@ -25,7 +26,7 @@ export function* onConfigSyncRequest(event: WebSocketQueueQpqAdminConfigSyncRequ
     askConfigGetApplicationInfo(),
   ]);
 
-  yield* askMapParallelBatch(params, 5, function* askSendMessageToFrontend(param: string) {
+  yield* askMapParallelBatch(params, ADMIN_CONFIG_SYNC_BATCH_SIZE, function* askSendMessageToFrontend(param: string) {
     const value = yield* askConfigGetParameter(param);
 
     const logMessage: WebSocketQueueQpqAdminServerEventMessageModifySetting = {

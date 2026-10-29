@@ -2,6 +2,7 @@ import { askMapParallelBatch, AskResponse, QpqPagedData } from '@qpqjs/core';
 
 import { askWebSocketQueueGetConnections } from '../../../../webSocketQueue/logic/webSocket/askWebSocketQueueGetConnections';
 import { Connection } from '../../../../webSocketQueue/types';
+import { ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE } from '../../../constants';
 import { askSendMessage } from './askSendMessage';
 import { WebSocketQueueQpqAdminServerEventMessageTraceDone, WebSocketQueueQpqAdminServerMessageEventType } from './serverMessages';
 
@@ -21,11 +22,15 @@ export function* askSendTraceDoneToAdmins(correlation: string, succeeded: boolea
   do {
     const pageConnections: QpqPagedData<Connection> = yield* askWebSocketQueueGetConnections('qpqadmin', true, nextPageKey);
 
-    yield* askMapParallelBatch(pageConnections.items, 10, function* askSendTraceDoneOnConnection(connection): AskResponse<void> {
-      if (connection.userId) {
-        yield* askSendMessage(connection.id, traceDoneMessage);
-      }
-    });
+    yield* askMapParallelBatch(
+      pageConnections.items,
+      ADMIN_WEBSOCKET_FAN_OUT_BATCH_SIZE,
+      function* askSendTraceDoneOnConnection(connection): AskResponse<void> {
+        if (connection.userId) {
+          yield* askSendMessage(connection.id, traceDoneMessage);
+        }
+      },
+    );
 
     nextPageKey = pageConnections.nextPageKey;
   } while (nextPageKey);
