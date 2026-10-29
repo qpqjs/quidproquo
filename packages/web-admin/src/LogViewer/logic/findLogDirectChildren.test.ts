@@ -4,8 +4,9 @@ import { findLogDirectChildren } from './findLogDirectChildren';
 
 const apiRequestGet = vi.fn();
 
-vi.mock('../../logic', () => ({
-  cache: (fn: unknown) => fn,
+// Only the network wrapper is replaced; the memoising `cache` is real, so each test uses its own correlation.
+vi.mock('../../logic/platform/apiRequest', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
 }));
 

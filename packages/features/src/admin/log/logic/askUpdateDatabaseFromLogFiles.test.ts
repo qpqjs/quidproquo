@@ -12,9 +12,9 @@ import {
 } from '@qpqjs/core';
 import { runStory, throwsError } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { redactStoryResult } from './redaction/redactStoryResult';
+import { REDACTED_STRING } from './redaction/constants/REDACTED_STRING';
 import {
   askErrorReadingStoryResultToMetadata,
   askGetLogInfosFromStoryResult,
@@ -24,10 +24,6 @@ import {
   getDecodedAccessTokenFromSetAccessTokenActionInStoryResult,
   storyResultToMetadata,
 } from './askUpdateDatabaseFromLogFiles';
-
-vi.mock('./redaction/redactStoryResult', () => ({
-  redactStoryResult: vi.fn((storyResult: unknown) => structuredClone(storyResult)),
-}));
 
 const baseStoryResult = {
   correlation: 'mod::abc',
@@ -152,19 +148,20 @@ describe('askUpdateDatabaseFromLogFile', () => {
   });
 
   it('indexes only the redacted object', () => {
-    const redacted = { ...baseStoryResult, correlation: 'mod::redacted' };
-    vi.mocked(redactStoryResult).mockReturnValueOnce(redacted);
+    // The access token is a known secret, so the sweep scrubs its value out of every string,
+    // including the tag that becomes the generic column.
+    const leaky = { ...baseStoryResult, session: { accessToken: 'tok-123' }, tags: ['issued tok-123'] };
     let upserted: any;
 
     runStory(askUpdateDatabaseFromLogFile('drive', 'mod::abc.json'), {
-      [FileActionType.ReadObjectJson]: baseStoryResult,
+      [FileActionType.ReadObjectJson]: leaky,
       [KeyValueStoreActionType.Upsert]: (action: Action<any>) => {
         upserted = action.payload.item;
       },
     });
 
-    expect(redactStoryResult).toHaveBeenCalledWith(baseStoryResult);
-    expect(upserted.correlation).toBe('mod::redacted');
+    expect(upserted.generic).toBe(`issued ${REDACTED_STRING}`);
+    expect(leaky.tags).toEqual(['issued tok-123']);
   });
 
   it('builds error metadata and notifies admins when the file cannot be read', () => {

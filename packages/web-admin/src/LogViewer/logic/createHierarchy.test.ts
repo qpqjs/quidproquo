@@ -4,32 +4,34 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createHierarchy } from './createHierarchy';
 
-const findLogDirectChildren = vi.fn();
+const apiRequestGet = vi.fn();
 
-vi.mock('../../logic', () => ({
-  cache: (fn: unknown) => fn,
+// Only the network wrapper is replaced: findLogDirectChildren and the memoising `cache` are real,
+// so the children come back from the paths the hierarchy asks for.
+vi.mock('../../logic/platform/apiRequest', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
 }));
 
-vi.mock('./findLogDirectChildren', () => ({
-  findLogDirectChildren: (...args: unknown[]) => findLogDirectChildren(...args),
-}));
+const childrenByPath = (children: Record<string, StoryResultMetadata[]>) =>
+  apiRequestGet.mockImplementation(async (path: string) => ({ items: children[path] ?? [] }));
 
 const meta = (correlation: string, startedAt: string): StoryResultMetadata => ({ correlation, startedAt }) as StoryResultMetadata;
 
 describe('createHierarchy', () => {
   it('attaches children sorted by startedAt', async () => {
-    findLogDirectChildren.mockResolvedValueOnce([meta('b', '2026-01-02'), meta('a', '2026-01-01')]).mockResolvedValue([]);
+    childrenByPath({ '/log/children/root-h': [meta('b', '2026-01-02'), meta('a', '2026-01-01')] });
 
-    const result = await createHierarchy(meta('root', '2026-01-01'), 'https://api', 'token');
+    const result = await createHierarchy(meta('root-h', '2026-01-01'), 'https://api', 'token');
 
     expect(result.children.map((c) => c.correlation)).toEqual(['a', 'b']);
-    expect(result.correlation).toBe('root');
+    expect(result.correlation).toBe('root-h');
   });
 
   it('returns an empty children list for a leaf', async () => {
-    findLogDirectChildren.mockResolvedValue([]);
+    childrenByPath({});
 
-    const result = await createHierarchy(meta('leaf', '2026-01-01'), 'https://api');
+    const result = await createHierarchy(meta('leaf-h', '2026-01-01'), 'https://api');
 
     expect(result.children).toEqual([]);
   });
