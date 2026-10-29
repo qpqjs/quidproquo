@@ -4,20 +4,21 @@
   "description": "Test helpers for quidproquo stories, requesters and config.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
-  "sideEffects": false,
+  "types": "./lib/commonjs/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/esm/index.d.ts",
-      "import": "./lib/esm/index.js",
-      "require": "./lib/commonjs/index.js"
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
     },
     "./vitest": {
-      "types": "./lib/esm/vitest.d.ts",
-      "import": "./lib/esm/vitest.js",
-      "require": "./lib/commonjs/vitest.js"
-    }
+      "types": "./lib/commonjs/vitest.d.ts",
+      "module": "./lib/esm/vitest.js",
+      "default": "./lib/commonjs/vitest.js"
+    },
+    "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "files": [
     "lib/**/*"
   ],
@@ -60,5 +61,8 @@
     "vitest": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
