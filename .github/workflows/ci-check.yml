@@ -1,0 +1,31 @@
+name: ci-check
+
+# Reusable: the static checks that need the whole monorepo built and give one
+# answer whatever node version runs them: sibling dependency declarations
+# (check:deps), lint, and the type-check of the test files (test:types). They
+# used to run inside the test matrix, three times per push for one result.
+#
+# Called once per push by deploy-site.yml, where it is advisory (a style or
+# type slip should block merging to main, not a development deploy), and by
+# test.yml on pull requests, where it is a merge gate. Not a deploy gate, so
+# ci-deploy-site.yml does not call it.
+on:
+  workflow_call:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Neither needs a build; both fail fast.
+      - run: npm run check:deps
+      - run: npm run lint
+      # test:types resolves every @qpqjs/* import to its built lib/, so the
+      # monorepo has to be built first.
+      - run: npm run build
+      - run: npm run test:types

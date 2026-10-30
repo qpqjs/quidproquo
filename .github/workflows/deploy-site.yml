@@ -11,9 +11,9 @@ name: deploy-site
 # band.
 #
 # Pushes made by a bot (claude[bot], github-actions[bot], ...) run the
-# advisory checks but never build for or deploy to AWS: the issue automation
-# pushes plan edits and WIP commits to issue-{n} branches, and none of that
-# should hit AWS. See the resolve job.
+# advisory checks (tests, scaffold, lint) but never build for or deploy to
+# AWS: the issue automation pushes plan edits and WIP commits to issue-{n}
+# branches, and none of that should hit AWS. See the resolve job.
 on:
   push:
     branches:
@@ -75,6 +75,13 @@ jobs:
   # "deployed smoke" step at the end of ci-deploy-site.yml.
   scaffold:
     uses: ./.github/workflows/ci-scaffold.yml
+
+  # Dependency declarations, lint and the test files' type-check, once per
+  # push. Advisory for the same reason as scaffold: a style slip should block
+  # merging to main, not a deploy. It runs on every push, bots included, since
+  # it is the only place lint runs at all (there are no commit hooks).
+  check:
+    uses: ./.github/workflows/ci-check.yml
 
   # The whole deploy: gates, build, deploy and smoke, for the environment the
   # resolve job picked. The permissions block is required here, not just in
