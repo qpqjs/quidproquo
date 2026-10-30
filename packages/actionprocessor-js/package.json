@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/actionprocessor-js",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Platform-neutral action processors shared by every quidproquo runtime.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,14 +45,14 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@qpqjs/core": "0.3.0",
-    "@qpqjs/webserver": "0.3.0",
+    "@qpqjs/core": "0.4.0",
+    "@qpqjs/webserver": "0.4.0",
     "postal-mime": "^4.1.4",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
-    "@qpqjs/testing": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
+    "@qpqjs/testing": "0.4.0",
+    "@qpqjs/tsconfig": "0.4.0",
     "typescript": "^5.8.2"
   },
   "engines": {

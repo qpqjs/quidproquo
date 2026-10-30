@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.4.0
+
 - `askRandomNumber` is `askMathRandomNumber` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askDelay` is `askPlatformDelay` (A3, noun first); every framework call site, the docs and the scaffold follow.
 - `askNewSortableGuids` is `askGuidNewSortableMany` (A3, noun first); every framework call site, the docs and the scaffold follow.

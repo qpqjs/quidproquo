@@ -1,5 +1,61 @@
 # Changelog
 
+## 0.4.0
+
+- core/webserver/features: config accessors follow one shape per setting (`getAll…Configs`, `getOwned…Configs`, `get…ByName`, `resolve…OrThrow`) for queues, key value stores, storage drives, event buses, caches, websockets, apis, email receivers, user directories, keys, secrets, parameters and the dns, email sender and user script runner singletons
+- testing: test helpers (`runStory`, `captureRequester`, `buildTestQpqConfig` and friends) now live in `@qpqjs/testing`, with typed builders, `buildStoryResult` and a one-liner `defineQpqVitestConfig`; nearly every aws and dev-server processor gained a sibling test
+- core: actions carry error catalogs (`askStreamRead`, `askExecuteStory`, `askTraceStory`, `askAiPrompt`, graph queries, dynamic functions) and the catalog names are standardised (`Throttled`, `Timeout`)
+- core: transient and throttle classification is an explicit `transientErrorMap` entry that every aws processor spreads, and unknown queues and event buses answer `QueueNotFound` and `TopicNotFound`
+- core: requesters are named domain first (`askGuidNew`, `askMathRandomNumber`, `askPlatformDelay`, plus the webserver auth, migration and features admin and websocket stories)
+- core: `askEventGetStorySession` resolves null when an event has no session, and `askProcessEvent` starts a fresh one
+- web-admin/web-react/features: modules are laid out as `types/`, `effects/`, `actionCreators/`, `stateUpdaters/` and `logic/`, and creators drop the `UI` and `Chrome` infixes
+- config-aws/deploy-aws: aws limits, naming helpers and the domain proxy viewer policy (`defineAwsDomainProxyViewerProtocolPolicy`) live in config-aws instead of platform-neutral settings
+- deploy-aws: every storage drive tier maps to its s3 storage class, per-resource names use one naming helper, and there are no more account-wide wildcards for bedrock, acm or foreign tables
+- dev-server: sends email locally into the receivers' drives so `onEmail` runs as deployed, signs and verifies its JWTs, and redelivers failed queue messages up to `maxTries`
+- cli: every process goes through one command runner, output lines are prefixed `[qpq:<area>]`, and `CliError` maps to exit codes
+- deploy-rspack: a views package with only modules gets a default entry written for it
+- web-react: `createQpqRuntimeDefinition` documents the `onInit` loading pattern
+- features: admin login routes run the webserver auth controller, so `/challenge` also accepts mfa challenges
+- features: admin log search takes a single query object
+- every package ships an `exports` map, `engines` and test scripts, and `noUncheckedIndexedAccess` is on across the repo
+- lint runs in CI with the shared rules as errors, and tests run as three shards with reusable check and site deploy workflows
+- docs: code conventions moved into `docs/code-standards.md`
+- fixes: public identifier typos, dead exports and files, debug logging, a shipped `debugger` statement, unused dependencies and a bundle cycle in the aws ai utils
+
+### Breaking changes
+
+- `askRandomNumber`, `askDelay`, `askNewGuid`, `askNewSortableGuid` and `askNewSortableGuids` are now `askMathRandomNumber`, `askPlatformDelay`, `askGuidNew`, `askGuidNewSortable` and `askGuidNewSortableMany`
+- `actionResultErrorFromCaughtError` no longer classifies transient errors, so custom processors spread `transientErrorMap`
+- aws event processors take their lambda settings from the handler instead of `process.env`, and the `GLOBAL_*` constants are gone
+- `askEventGetStorySession` resolves null instead of undefined when there is no session
+- `EventBusActionType.SendMessages` and `QueueActionType.SendMessages` are `SendMessage`
+- web-admin, web-react and features creators drop their `UI` and `Chrome` infixes (`askAuthSet*`, `askEventDocWorkspaceChrome*` and so on)
+- shared query params, admin session, tenant fold and other effect and state modules renamed to the new layout (`frontendSharedQueryParamsApi`, `AdminSessionEffect`, `TenantEffect.SetBrand`)
+- `defineDomainProxy` drops `domainProxyViewerProtocolPolicy`, so use `defineAwsDomainProxyViewerProtocolPolicy`
+- `defineQueue` no longer caps `ttRetryInSeconds`, lambda limits are checked at synth, and `FileUploadSettings.maxFileSizeBytes` is optional
+- `cloudflareApiKeySecretName` is removed from `defineApi`, `defineWebEntry`, `defineWebsocket` and `defineSubdomainRedirect`
+- `awsNamingUtils` moved from actionprocessor-aws to config-aws
+- the `qpqCoreUtils` and `qpqWebServerUtils` accessors for queues, key value stores, storage drives, event buses, caches, websockets, apis, email receivers, user directories, keys, secrets, parameters, dns, email senders and user script runners are renamed to the new `getAll`, `getOwned`, `ByName` and `resolve…OrThrow` forms, and by-name lookups return null when missing
+- admin log search takes one query object, and `GetLogsParams` is gone
+- `fromJsonEventRequest` (throwing) is deleted, so use `askFromJsonEventRequest`
+- admin login routes use the webserver auth controller, and `defineAdminServiceAuthRoute` and the admin login controller are deleted
+- webserver auth, migration, features admin and websocket queue stories renamed noun first (`askAuthLogin`, `askLogGetAll`, `askConnectionUpsert` and so on)
+- user script composers are singular (`getUserScriptBuilderActionProcessor`, `getUserScriptRunnerActionProcessor`)
+- error catalog names changed (`Throttled`, `Timeout`, `ErrorTypeEnum.Timeout`) and `DynamicFunctionsExecuteErrorTypeEnum` is gone
+- `askGraphDatabaseExecuteOpenCypherQuery`, `askStreamRead`, `askExecuteStory`, `askTraceStory`, `askAiPrompt` and `askAiPromptStream` answer catalog error types instead of generic ones
+- `ContextReadAction`, `StateReadAction` and `StateDispatchAction` are removed from core, so use `ActionOf<…>`
+- event doc store, event doc AI and websocket connection contexts renamed, and the AI and websocket serialized keys changed, so deploy all services of an app together
+- test helpers moved from `@qpqjs/core` to `@qpqjs/testing`
+- packages publish an `exports` map, so deep imports of `@qpqjs/<pkg>/lib/...` stop resolving
+- exported `interface`s are now `type` aliases, so declaration merging into them no longer works
+- `adminUserDirectoryResourceName` is `ADMIN_USER_DIRECTORY_NAME`
+- `InvalidBatchSizeError` and `InvalidKvsPartialPropertyError` are removed, both stories throw a qpq `Invalid` error
+- `askTenantApiRequest`, `askEventDocAiServiceRequest`, `askSessionApiRequest*`, `askPlatformRequest`, `askNetworkRequest`, `askApiRequest` and `askServiceRequest` use `<TResult, TPayload>` generics
+- `askLogTemplateLiteral` is removed, use `askLog`
+- typo renames (`defineAwsDynamoOverrideForKvs`, `getVirtualNetworkConfigs`, `performNetworkRequest` and others)
+- settings under an application with no `environment` now count as `production`
+- `defineStateMachine` returns a `QPQConfig` instead of `QPQConfigSetting[]`
+
 ## 0.3.0
 
 - features/actionprocessor-aws: move to zod 4 and drop `zod-validation-error`; vitest 4, plus bumps to undici, adm-zip, postal-mime and module-federation node

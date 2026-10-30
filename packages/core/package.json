@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Actions, stories and the runtime at the heart of quidproquo.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,8 +45,8 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@qpqjs/testing": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
+    "@qpqjs/testing": "0.4.0",
+    "@qpqjs/tsconfig": "0.4.0",
     "@types/node": "^24.2.1",
     "typescript": "^5.8.2"
   },
