@@ -2,7 +2,7 @@ name: ci-scaffold
 
 # Reusable: scaffolds an app with create-qpq-app and checks it still builds.
 # This is the create-qpq-app template rot guard, not to be confused with the
-# post-deploy smoke run (the "deployed smoke" step in deploy-site.yml).
+# post-deploy smoke run (the "deployed smoke" step in ci-deploy-site.yml).
 #
 # Called by deploy-site.yml alongside the tests on every push. It never gates
 # a deploy; it is meant to block merging to main.

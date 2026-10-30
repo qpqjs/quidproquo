@@ -3,16 +3,16 @@ name: ci-local-smoke
 # Reusable: runs the smoke suite against a dev server started on the runner.
 #
 # The same probes, over the same routes, with the same OIDC token as the
-# deployed smoke run at the end of deploy-site.yml. Only the backend differs:
+# deployed smoke run at the end of ci-deploy-site.yml. Only the backend differs:
 # the dev server's local implementations instead of AWS. So this catches a
 # broken probe, or the dev server drifting from deployed behaviour, before a
 # deploy rather than after one. It cannot catch what the deployed run exists
 # for (iam grants, resource naming, cdk wiring, api gateway base path mapping),
 # so it is a pre-flight check and not a replacement for it.
 #
-# Called by deploy-site.yml alongside the tests. Not called by test.yml: a
-# fork's OIDC token carries a different repository id and would be rejected,
-# and every push already runs this.
+# Called by ci-deploy-site.yml alongside the tests, as a deploy gate. Not
+# called by test.yml: a fork's OIDC token carries a different repository id and
+# would be rejected, and every deploying push already runs this.
 on:
   workflow_call:
 

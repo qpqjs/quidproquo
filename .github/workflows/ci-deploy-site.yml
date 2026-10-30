@@ -1,0 +1,189 @@
+name: ci-deploy-site
+
+# Reusable: build quidproquojs.com, gate it, deploy it to one environment and
+# smoke test the result. The caller says which environment; this file says
+# how a deploy is done, so every path to an environment (a push, a manual run,
+# a future release step) is the same deploy.
+#
+# The environment name is used three ways, and they have to agree:
+#   - the GitHub Environment, which supplies DEPLOY_ROLE_ARN + AWS_REGION and
+#     is where required reviewers gate production behind a manual approval
+#   - the deployment in apps/qpqjs/deploy.config.json, which owns the AWS
+#     account, region and root domains
+#   - the `environment:` claim in the OIDC token the deployed smoke sends,
+#     which the smoke route checks against the service's own environment
+#
+# The deploy is split in two so the slow half overlaps the gates: the build job
+# runs alongside the tests and saves everything the deploy ships, and the
+# deploy job, once the gates pass, only pushes that saved build to AWS and
+# smoke tests it.
+#
+# Called by deploy-site.yml, which maps branches to environments. A caller has
+# to grant `id-token: write`: a reusable workflow can narrow what it is given,
+# never widen it.
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: The environment to deploy (development, staging, production)
+        type: string
+        required: true
+
+jobs:
+  # Deploy gate: the unit tests on the node version the deploy runs on. When
+  # quidproquojs.com/.nvmrc moves to a new major, move this with it. The newer
+  # node versions run in deploy-site.yml, where a break does not hold up a
+  # deploy.
+  test:
+    uses: ./.github/workflows/ci-test.yml
+    with:
+      node-versions: '[24]'
+
+  # Deploy gate: the same probes the deployed smoke runs, but against a dev
+  # server on the runner. Runs alongside the tests rather than after them,
+  # since it shares nothing with them but the build, and it finishes first.
+  #
+  # A gate because a probe that cannot pass locally has no business being
+  # deployed and then run again against AWS: the deployed smoke would just
+  # find the same break, minutes later and after a real deploy.
+  local-smoke:
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/ci-local-smoke.yml
+
+  # Builds everything the deploy ships while the gates run: the site's
+  # packages, every service's bundles, and one CDK assembly per service. It is
+  # not in the deploy concurrency group, so a push's build overlaps the
+  # previous push's deploy; building changes nothing in AWS.
+  #
+  # It still needs the environment's AWS role, because `cdk synth` looks up
+  # hosted zones and VPCs. On an environment with required reviewers that
+  # means approving this job as well as the deploy.
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: quidproquojs.com/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            quidproquojs.com/package-lock.json
+
+      # Build the monorepo first: quidproquojs.com pulls the @qpqjs/*
+      # packages via file: refs, which resolve to each package's built lib/.
+      - run: npm ci
+      - run: npm run build
+
+      - run: npm ci
+        working-directory: quidproquojs.com
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          # Set per GitHub Environment (Settings -> Environments -> <env> ->
+          # Variables), so each account/region supplies its own role + region.
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # The build half of go:docker. It builds the site's packages too,
+      # docusaurus included, which the web stack packages as an asset.
+      # The GitHub environment name doubles as the deployment name in
+      # apps/qpqjs/deploy.config.json, which owns account/region/identity.
+      - run: npx qpq go:docker all all --build-only --app qpqjs --deployment ${{ inputs.environment }}
+        working-directory: quidproquojs.com
+
+      # One tarball for the deploy job: the monorepo libs, so it can run qpq
+      # without building, and the saved build (the layout is listed at the top
+      # of @qpqjs/cli's goDocker.ts). A tarball rather than a zipped
+      # artifact because it keeps file permissions, which zipping resets.
+      - name: pack the saved build
+        run: |
+          shopt -s nullglob
+          tar -I 'zstd -T0' -cf deploy-build.tar.zst -- packages/*/lib \
+            quidproquojs.com/dist/qpq/go-docker/qpqjs \
+            quidproquojs.com/dist/apps/qpqjs/services/*/views \
+            quidproquojs.com/dist/apps/qpqjs/services/*/service-remote-published
+
+      - uses: actions/upload-artifact@v7
+        with:
+          path: deploy-build.tar.zst
+          archive: false
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    needs: [test, local-smoke, build]
+    runs-on: ubuntu-latest
+    # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
+    permissions:
+      id-token: write
+      contents: read
+    # The GitHub Environment supplies the per-account role ARN + region, and is
+    # where required reviewers go to gate production behind a manual approval.
+    environment: ${{ inputs.environment }}
+    # Serialize deploys per environment so rapid pushes queue instead of racing.
+    # Never cancel a running deploy: a half-applied CloudFormation stack is
+    # worse than waiting.
+    concurrency:
+      group: deploy-site-${{ inputs.environment }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: quidproquojs.com/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            quidproquojs.com/package-lock.json
+
+      - run: npm ci
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: deploy-build.tar.zst
+
+      # Unpacked before the site install, which links quidproquojs.com to the
+      # monorepo libs and runs qpq's postinstall hooks.
+      - run: tar -I zstd -xf deploy-build.tar.zst && rm deploy-build.tar.zst
+
+      - run: npm ci
+        working-directory: quidproquojs.com
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Fully non-interactive deploy of the saved build: all services, all
+      # stacks (inf -> api -> web -> views), in parallel via docker. The AWS_*
+      # creds set by the step above are passed through to the deploy containers.
+      - run: npx qpq go:docker all all --from-build --app qpqjs --deployment ${{ inputs.environment }}
+        working-directory: quidproquojs.com
+
+      # Verify the deployment end to end: mint a GitHub OIDC token with the
+      # qpq-smoke audience, start a smoke run on the deployed test service,
+      # poll it to completion. The smoke endpoint validates the token against
+      # this repo's immutable id and this job's `environment:` claim, so only
+      # this workflow can call it. Non-production only: prod has no CI smoke
+      # path.
+      #
+      # Deliberately a step of THIS job, not a job of its own: the per
+      # environment concurrency lock above is held until the job ends, so a
+      # queued deploy for the next push cannot start until this one has both
+      # deployed and been verified. As a separate job the smoke would run
+      # against an environment the next deploy was already replacing.
+      - name: deployed smoke
+        if: inputs.environment != 'production'
+        run: node scripts/deployedSmoke.mjs
+        working-directory: quidproquojs.com
+        env:
+          SMOKE_ENVIRONMENT: ${{ inputs.environment }}

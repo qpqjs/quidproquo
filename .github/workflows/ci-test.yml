@@ -2,9 +2,9 @@ name: ci-test
 
 # Reusable: the monorepo unit suite across supported node versions.
 #
-# Called by test.yml on pull requests (every version), and by deploy-site.yml on
-# every push, which gates the deploy on the version it deploys with and runs the
-# rest alongside. Both paths run this one definition, so a deploy is guarded by
+# Called by test.yml on pull requests (every version), by ci-deploy-site.yml as
+# a deploy gate on the version it deploys with, and by deploy-site.yml for the
+# rest alongside. Every path runs this one definition, so a deploy is guarded by
 # the same suite that runs on a pull request.
 on:
   workflow_call:

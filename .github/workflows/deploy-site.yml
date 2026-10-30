@@ -1,20 +1,19 @@
 name: deploy-site
 
-# Deploy quidproquojs.com.
-#   push to main    -> production (NOT yet: see the resolve job)
-#   push to uat     -> staging
+# Deploy quidproquojs.com on push. This file only maps a push to an
+# environment; the deploy itself (gates, build, deploy, smoke) is the reusable
+# ci-deploy-site.yml, so a branch push, a manual run and any later caller all
+# deploy the same way.
+#   push to main    -> staging
 #   push elsewhere  -> development (every feature branch, serialized, last writer wins)
-# Pushes made by a bot (claude[bot], github-actions[bot], ...) run the test,
-# scaffold and local-smoke jobs but never build for or deploy to AWS: the issue
-# automation pushes plan edits and WIP commits to issue-{n} branches, and none
-# of that should hit AWS. See the resolve job.
-# Any environment can also be deployed by hand from the Actions tab
-# ("Run workflow"), the way to redeploy an environment out of band.
+# Production is not on any branch yet: deploy it by hand from the Actions tab
+# ("Run workflow"), which is also the way to redeploy any environment out of
+# band.
 #
-# The deploy is split in two so the slow half overlaps the gates: the build job
-# runs alongside the tests and saves everything the deploy ships, and the
-# deploy job, once the gates pass, only pushes that saved build to AWS and
-# smoke tests it.
+# Pushes made by a bot (claude[bot], github-actions[bot], ...) run the
+# advisory checks but never build for or deploy to AWS: the issue automation
+# pushes plan edits and WIP commits to issue-{n} branches, and none of that
+# should hit AWS. See the resolve job.
 on:
   push:
     branches:
@@ -28,71 +27,25 @@ on:
         default: production
         options: [development, staging, production]
 
-# Default for every job, including the reusable test/scaffold workflows called below.
-# Only the build and deploy jobs widen this to mint an OIDC token.
+# Default for every job, including the reusable workflows called below. Only
+# the deploy job widens this, so ci-deploy-site.yml can mint an OIDC token.
 permissions:
   contents: read
 
 jobs:
-  # Deploy gate: the unit tests on the node version the deploy runs on. When
-  # quidproquojs.com/.nvmrc moves to a new major, move this list with it.
-  test:
-    uses: ./.github/workflows/ci-test.yml
-    with:
-      node-versions: '[24]'
-
-  # The same unit tests on the newer node versions. Not a deploy gate: a break
-  # that only shows on a newer node should block merging to main (branch
-  # protection, to come), not a development deploy.
-  test-newer-node:
-    uses: ./.github/workflows/ci-test.yml
-    with:
-      node-versions: '[25, 26]'
-
-  # The create-qpq-app scaffold check (template rot guard). Runs alongside the
-  # tests so every push gets one workflow run, but it is deliberately NOT in
-  # deploy's `needs`: it must never hold up deploying a branch. Its job is to
-  # block merging to main (branch protection, to come). Not to be confused
-  # with the "deployed smoke" step at the end of the deploy job.
-  scaffold:
-    uses: ./.github/workflows/ci-scaffold.yml
-
-  # Deploy gate: the same probes the deployed smoke runs, but against a dev
-  # server on the runner. Runs alongside the tests rather than after them,
-  # since it shares nothing with them but the build, and it finishes first.
-  #
-  # A gate rather than advisory (unlike scaffold above) because a probe that
-  # cannot pass locally has no business being deployed and then run again
-  # against AWS: the deployed smoke would just find the same break, minutes
-  # later and after a real deploy.
-  #
-  # The permissions block is required here, not just in the called workflow: a
-  # reusable workflow can only narrow what its caller grants, and the
-  # repository default above is contents-read only.
-  local-smoke:
-    permissions:
-      id-token: write
-      contents: read
-    uses: ./.github/workflows/ci-local-smoke.yml
-
   # The target environment, and whether this run touches AWS at all, are
-  # resolved once, in their own job, because neither `environment:` nor
-  # job-level `concurrency:` can read step outputs, so each would otherwise
-  # need its own copy of the branch mapping. Copies that can drift are how a
-  # deploy ends up running against production while holding the development
-  # concurrency lock.
+  # resolved once, in their own job, so the branch mapping exists in exactly
+  # one place: `uses:` cannot read step outputs, so without this job the
+  # mapping would be copied wherever it is needed, and copies that drift are
+  # how a deploy ends up in the wrong environment.
   #
-  # `deploy` gates the build and deploy jobs:
-  # - The production account is not set up yet, so a push to main runs the
-  #   gates but does not deploy. Production can still be deployed by hand via
-  #   "Run workflow" once it is. Remove the `main` clause to turn it on.
-  # - Bot-authored pushes (any actor ending in `[bot]`) never deploy either:
-  #   the issue automation pushes plan edits and WIP commits to issue-{n}
-  #   branches, and a development deploy for each of those is pure waste.
-  #   Same "skip bots" intent as the `!dependabot/**` exclusion on the push
-  #   trigger. A manual "Run workflow" is not affected, since the actor there
-  #   is whoever clicked the button. Deploying bot-authored work on purpose (a
-  #   deploy label, an approved PR) is a later change.
+  # `deploy` is false for bot-authored pushes (any actor ending in `[bot]`):
+  # the issue automation pushes plan edits and WIP commits to issue-{n}
+  # branches, and a development deploy for each of those is pure waste. Same
+  # "skip bots" intent as the `!dependabot/**` exclusion on the push trigger.
+  # A manual "Run workflow" is not affected, since the actor there is whoever
+  # clicked the button. Deploying bot-authored work on purpose (a deploy
+  # label, an approved PR) is a later change.
   resolve:
     runs-on: ubuntu-latest
     outputs:
@@ -101,144 +54,38 @@ jobs:
     steps:
       - id: pick
         run: |
-          echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'production' || (github.ref_name == 'uat' && 'staging' || 'development')) }}" >> "$GITHUB_OUTPUT"
-          echo "deploy=${{ github.event_name == 'workflow_dispatch' || (github.ref_name != 'main' && !endsWith(github.actor, '[bot]')) }}" >> "$GITHUB_OUTPUT"
+          echo "env=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || (github.ref_name == 'main' && 'staging' || 'development') }}" >> "$GITHUB_OUTPUT"
+          echo "deploy=${{ github.event_name == 'workflow_dispatch' || !endsWith(github.actor, '[bot]') }}" >> "$GITHUB_OUTPUT"
 
-  # Builds everything the deploy ships while the gates run: the site's
-  # packages, every service's bundles, and one CDK assembly per service. It is
-  # not in the deploy concurrency group, so a push's build overlaps the
-  # previous push's deploy; building changes nothing in AWS.
-  #
-  # It still needs the environment's AWS role, because `cdk synth` looks up
-  # hosted zones and VPCs. On an environment with required reviewers that
-  # means approving this job as well as the deploy.
-  build:
+  # The unit tests on the node versions the deploy does not run on. Not a
+  # deploy gate: a break that only shows on a newer node should block merging
+  # to main (branch protection, to come), not a deploy. The deploy's own node
+  # version is tested inside ci-deploy-site.yml, so when nothing deploys (a
+  # bot push) this runs every version instead, and no push goes untested.
+  test-newer-node:
+    needs: resolve
+    uses: ./.github/workflows/ci-test.yml
+    with:
+      node-versions: ${{ needs.resolve.outputs.deploy == 'true' && '[25, 26]' || '[24, 25, 26]' }}
+
+  # The create-qpq-app scaffold check (template rot guard). Runs alongside the
+  # deploy so every push gets one workflow run, but it is deliberately NOT a
+  # deploy gate: it must never hold up deploying a branch. Its job is to block
+  # merging to main (branch protection, to come). Not to be confused with the
+  # "deployed smoke" step at the end of ci-deploy-site.yml.
+  scaffold:
+    uses: ./.github/workflows/ci-scaffold.yml
+
+  # The whole deploy: gates, build, deploy and smoke, for the environment the
+  # resolve job picked. The permissions block is required here, not just in
+  # the called workflow: a reusable workflow can only narrow what its caller
+  # grants, and the repository default above is contents-read only.
+  deploy:
     needs: resolve
     if: needs.resolve.outputs.deploy == 'true'
-    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-    environment: ${{ needs.resolve.outputs.env }}
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: quidproquojs.com/.nvmrc
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            quidproquojs.com/package-lock.json
-
-      # Build the monorepo first: quidproquojs.com pulls the @qpqjs/*
-      # packages via file: refs, which resolve to each package's built lib/.
-      - run: npm ci
-      - run: npm run build
-
-      - run: npm ci
-        working-directory: quidproquojs.com
-
-      - uses: aws-actions/configure-aws-credentials@v6
-        with:
-          # Set per GitHub Environment (Settings -> Environments -> <env> ->
-          # Variables), so each account/region supplies its own role + region.
-          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      # The build half of go:docker. It builds the site's packages too,
-      # docusaurus included, which the web stack packages as an asset.
-      # The GitHub environment name doubles as the deployment name in
-      # apps/qpqjs/deploy.config.json, which owns account/region/identity.
-      - run: npx qpq go:docker all all --build-only --app qpqjs --deployment ${{ needs.resolve.outputs.env }}
-        working-directory: quidproquojs.com
-
-      # One tarball for the deploy job: the monorepo libs, so it can run qpq
-      # without building, and the saved build (the layout is listed at the top
-      # of @qpqjs/cli's goDocker.ts). A tarball rather than a zipped
-      # artifact because it keeps file permissions, which zipping resets.
-      - name: pack the saved build
-        run: |
-          shopt -s nullglob
-          tar -I 'zstd -T0' -cf deploy-build.tar.zst -- packages/*/lib \
-            quidproquojs.com/dist/qpq/go-docker/qpqjs \
-            quidproquojs.com/dist/apps/qpqjs/services/*/views \
-            quidproquojs.com/dist/apps/qpqjs/services/*/service-remote-published
-
-      - uses: actions/upload-artifact@v7
-        with:
-          path: deploy-build.tar.zst
-          archive: false
-          retention-days: 1
-          if-no-files-found: error
-
-  deploy:
-    needs: [resolve, test, local-smoke, build]
-    if: needs.resolve.outputs.deploy == 'true'
-    runs-on: ubuntu-latest
-    # Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
-    permissions:
-      id-token: write
-      contents: read
-    # The GitHub Environment supplies the per-account role ARN + region, and is
-    # where required reviewers go to gate production behind a manual approval.
-    environment: ${{ needs.resolve.outputs.env }}
-    # Serialize deploys per environment so rapid pushes queue instead of racing.
-    # Never cancel a running deploy: a half-applied CloudFormation stack is
-    # worse than waiting.
-    concurrency:
-      group: deploy-site-${{ needs.resolve.outputs.env }}
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: quidproquojs.com/.nvmrc
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            quidproquojs.com/package-lock.json
-
-      - run: npm ci
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: deploy-build.tar.zst
-
-      # Unpacked before the site install, which links quidproquojs.com to the
-      # monorepo libs and runs qpq's postinstall hooks.
-      - run: tar -I zstd -xf deploy-build.tar.zst && rm deploy-build.tar.zst
-
-      - run: npm ci
-        working-directory: quidproquojs.com
-
-      - uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      # Fully non-interactive deploy of the saved build: all services, all
-      # stacks (inf -> api -> web -> views), in parallel via docker. The AWS_*
-      # creds set by the step above are passed through to the deploy containers.
-      - run: npx qpq go:docker all all --from-build --app qpqjs --deployment ${{ needs.resolve.outputs.env }}
-        working-directory: quidproquojs.com
-
-      # Verify the deployment end to end: mint a GitHub OIDC token with the
-      # qpq-smoke audience, start a smoke run on the deployed test service,
-      # poll it to completion. The smoke endpoint validates the token against
-      # this repo's immutable id and this job's `environment:` claim, so only
-      # this workflow can call it. Non-production only: prod has no CI smoke
-      # path.
-      #
-      # Deliberately a step of THIS job, not a job of its own: the per
-      # environment concurrency lock above is held until the job ends, so a
-      # queued deploy for the next push cannot start until this one has both
-      # deployed and been verified. As a separate job the smoke would run
-      # against an environment the next deploy was already replacing.
-      - name: deployed smoke
-        if: needs.resolve.outputs.env != 'production'
-        run: node scripts/deployedSmoke.mjs
-        working-directory: quidproquojs.com
-        env:
-          SMOKE_ENVIRONMENT: ${{ needs.resolve.outputs.env }}
+    uses: ./.github/workflows/ci-deploy-site.yml
+    with:
+      environment: ${{ needs.resolve.outputs.env }}
