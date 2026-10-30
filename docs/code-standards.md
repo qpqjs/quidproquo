@@ -338,6 +338,8 @@ export const create = tenantedRoute(
 
 **T6. Vitest config is one line**: `defineQpqVitestConfig(import.meta.url)` builds the `@qpqjs/*` source aliases from the package's dependencies.
 
+**T6a. Isolation follows `vi.mock`.** A package with no `vi.mock` in its tests passes `{ test: { isolate: false } }` so its files share one module cache per worker (core runs about four times faster). A package with any `vi.mock` keeps the default: under a shared cache a mock only applies to modules nothing has loaded yet, so which files pass depends on run order. Adding the first `vi.mock` to a package means removing its `isolate: false`.
+
 **T7. Smoke suites.** One folder per suite: `<domain>SmokeSuite.ts`, `config/`, `logic/askRun<Domain>Test.ts`, `entry/`, `index.ts`. A suite is registered by appending one line; a cross-service half mirrors the folder name in the probe service.
 
 ---

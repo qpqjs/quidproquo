@@ -14,6 +14,9 @@ export type RunUserScriptInChildInput = {
   env: NodeJS.ProcessEnv;
   // Command-line arguments for the child, for a module that serves more than one service.
   args?: readonly string[];
+  // Where the child's stdout and stderr go. `inherit` (the default) passes them through to this
+  // process, so a script's output lands in the runner's logs; `ignore` drops them.
+  output?: 'inherit' | 'ignore';
 };
 
 const failed = (type: string, errorText: string): UserScriptRunnerResult => ({ success: false, error: { errorType: type, errorText } });
@@ -45,7 +48,7 @@ export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<
     const child = fork(input.modulePath, [...(input.args ?? [])], {
       env: input.env,
       serialization: 'json',
-      stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
+      stdio: ['ignore', input.output ?? 'inherit', input.output ?? 'inherit', 'ipc'],
       // Its own process group, so the kill below reaches what the script spawned too.
       detached: true,
     });

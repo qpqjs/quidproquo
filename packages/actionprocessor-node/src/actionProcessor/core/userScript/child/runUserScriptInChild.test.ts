@@ -75,11 +75,14 @@ describe('runUserScriptInChild', () => {
   });
 
   it('reports RunnerUnavailable when the module cannot be started', async () => {
+    // The child prints node's "cannot find module" error before exiting; that is the failure under
+    // test, not noise worth seeing in the run.
     const result = await runUserScriptInChild({
       modulePath: path.join(__dirname, 'nowhere.js'),
       event: eventFor('echo'),
       timeoutMs: 5000,
       env: process.env,
+      output: 'ignore',
     });
 
     expect(result.success).toBe(false);
