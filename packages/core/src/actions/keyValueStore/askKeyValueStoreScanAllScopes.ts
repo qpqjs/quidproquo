@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqPagedData } from '../../types/QpqPagedData';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsQueryOperation } from './types';
 
@@ -22,7 +22,7 @@ export type KeyValueStoreScanAllScopesOptions = {
 export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedData<KvsScopedItem<unknown>>>()({
   actionType: KeyValueStoreActionType.ScanAllScopes,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
   ],
@@ -48,17 +48,17 @@ export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedD
  *
  * So: reach for this only from a migration or an equivalent whole-store operation, never on a
  * request path. Nothing in the framework calls it, and a caller with a user's request in hand
- * has no business using it — scope is what keeps tenants apart, and this steps over it.
+ * has no business using it, scope is what keeps tenants apart, and this steps over it.
  *
  * The scope comes back per row rather than being discarded, so a caller can write each row
  * back where it came from.
  *
  * DRAIN THE PAGE KEY: loop until `nextPageKey` comes back undefined. Every backend pages,
- * including the local one, deliberately so — a backend that returned everything in one call
+ * including the local one, deliberately so, a backend that returned everything in one call
  * would let a caller stop after the first page, be right locally, and silently skip most of
  * the data deployed. A local run has to be able to prove the loop.
  */
-export function* askKeyValueStoreScanAllScopes<KvsItem>(
+function* askKeyValueStoreScanAllScopesTyped<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
@@ -66,3 +66,8 @@ export function* askKeyValueStoreScanAllScopes<KvsItem>(
 ): AskResponse<QpqPagedData<KvsScopedItem<KvsItem>>> {
   return (yield* askKeyValueStoreScanAllScopesBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<KvsScopedItem<KvsItem>>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreScanAllScopes = Object.assign(askKeyValueStoreScanAllScopesTyped, {
+  errorType: askKeyValueStoreScanAllScopesBase.errorType,
+});

@@ -1,19 +1,16 @@
 import {
   askKeyValueStoreGetAllBase,
-  buildTestQpqConfig,
-  createActionProcessor,
   defineKeyValueStore,
   KeyValueStoreActionType,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -24,7 +21,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 const getProcessor = async () => {
   const config = buildTestQpqConfig([
@@ -42,7 +39,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockResolvedValue([{ id: 'a' }, { id: 'b' }]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(repo.getAll).toHaveBeenCalledWith('store', undefined);
     expect(resolveActionResult(result)).toEqual([{ id: 'a' }, { id: 'b' }]);
@@ -52,7 +49,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockResolvedValue([]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'tenant-a' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', options: { scope: 'tenant-a' } });
 
     expect(repo.getAll).toHaveBeenCalledWith('tenantStore', 'tenant-a');
     expect(resolveActionResult(result)).toEqual([]);
@@ -61,7 +58,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
   it('rejects a malformed scope with InvalidScope', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'tenantStore', options: { scope: 'bad/scope' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'tenantStore', options: { scope: 'bad/scope' } });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.InvalidScope);
     expect(repo.getAll).not.toHaveBeenCalled();
@@ -71,7 +68,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     repo.getAll.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.StoreNotFound);
   });

@@ -1,0 +1,24 @@
+import { Action, AssociateSoftwareTokenResult, ConfigActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
+
+import { describe, expect, it } from 'vitest';
+
+import { askAuthAssociateSoftwareToken } from './askAuthAssociateSoftwareToken';
+
+describe('askAuthAssociateSoftwareToken', () => {
+  it('associates a token against the resolved directory and returns the result', () => {
+    const tokenResult = { secretCode: 'abc123' } as AssociateSoftwareTokenResult;
+    let captured: Action<any> | undefined;
+
+    const result = runStory(askAuthAssociateSoftwareToken('session-1'), {
+      [ConfigActionType.GetGlobal]: 'my-directory',
+      [UserDirectoryActionType.AssociateSoftwareToken]: (action: Action<any>) => {
+        captured = action;
+        return tokenResult;
+      },
+    });
+
+    expect(captured?.payload).toEqual({ userDirectoryName: 'my-directory', session: 'session-1' });
+    expect(result).toBe(tokenResult);
+  });
+});

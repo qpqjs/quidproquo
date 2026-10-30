@@ -53,7 +53,7 @@ export const getFederatedRemoteInfoForQpqConfig = (qpqConfig: QPQConfig): Federa
   // Every story the service can run, from core (queues/schedules/inline fns/...) and
   // webserver (routes/service functions/websockets/...).
   const allRuntimes = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)];
-  const configRoot = qpqCoreUtils.getApplicationConfigRoot(qpqConfig);
+  const configRoot = qpqCoreUtils.getConfigRoot(qpqConfig);
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   const exposes: Record<string, string> = {};

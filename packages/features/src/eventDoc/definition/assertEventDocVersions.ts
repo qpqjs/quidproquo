@@ -11,22 +11,22 @@ export const assertEventDocVersions = (versions: EventDocVersions, schemaVersion
   versions.forEach((version, index) => {
     if (version.version !== index + 1) {
       throw new Error(
-        `Event doc versions must be contiguous from 1 with no gaps or repeats, oldest first — found version ${version.version} at position ${index + 1} (declared: ${versions.map((entry) => entry.version).join(', ')}).`,
+        `Event doc versions must be contiguous from 1 with no gaps or repeats, oldest first, found version ${version.version} at position ${index + 1} (declared: ${versions.map((entry) => entry.version).join(', ')}).`,
       );
     }
   });
 
-  const latest = versions[versions.length - 1].version;
+  const latest = versions[versions.length - 1]?.version;
   if (latest !== schemaVersion) {
     throw new Error(
-      `Event doc schemaVersion is ${schemaVersion} but the newest declared version is ${latest} — add the missing version to \`versions\`, or correct schemaVersion.`,
+      `Event doc schemaVersion is ${schemaVersion} but the newest declared version is ${latest}, add the missing version to \`versions\`, or correct schemaVersion.`,
     );
   }
 
   const viewNames = Object.keys(base.views);
 
   if (!viewNames.includes(EVENT_DOC_PRIMARY_VIEW)) {
-    throw new Error(`Every saved event doc must declare a '${EVENT_DOC_PRIMARY_VIEW}' view — found: ${viewNames.join(', ') || 'none'}.`);
+    throw new Error(`Every saved event doc must declare a '${EVENT_DOC_PRIMARY_VIEW}' view, found: ${viewNames.join(', ') || 'none'}.`);
   }
 
   // An explicit no-op migration is evidence someone decided the view was unaffected; a defaulted one is evidence of nothing.
@@ -38,8 +38,8 @@ export const assertEventDocVersions = (versions: EventDocVersions, schemaVersion
     if (missing.length > 0 || extra.length > 0) {
       throw new Error(
         `Event doc version ${version.version} must declare exactly the same views as version 1 (${viewNames.join(', ')})` +
-          `${missing.length > 0 ? ` — missing: ${missing.join(', ')}` : ''}` +
-          `${extra.length > 0 ? ` — unexpected: ${extra.join(', ')}` : ''}.` +
+          `${missing.length > 0 ? `, missing: ${missing.join(', ')}` : ''}` +
+          `${extra.length > 0 ? `, unexpected: ${extra.join(', ')}` : ''}.` +
           ` A view whose shape did not change at this version still declares itself, with migrateFromPrevious: (state) => state.`,
       );
     }

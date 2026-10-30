@@ -8,25 +8,25 @@ import { QpqIsoDateTime } from './QpqIsoDateTime';
 // One original source file the trace maps into. When the traced bundle shipped source
 // maps with sourcesContent (the federated remote build does), `content` is the original
 // TypeScript text, so a viewer can render annotated source with no access to the repo.
-export interface QpqExecutionTraceSource {
+export type QpqExecutionTraceSource = {
   // Original source path from the source map (e.g. webpack://service/src/story.ts), or
   // the generated script's url when no map was available.
   path: string;
 
   content?: string;
-}
+};
 
-// One captured variable value. `preview` is always present — a short single-line display
+// One captured variable value. `preview` is always present, a short single-line display
 // string (used for inline annotations). `json` is present for object values that could be
 // fully serialized: a JSON string of the value walked to the capture depth/size caps
 // (strings clamped, circular refs and overflow marked with «...» placeholders), for
 // expandable inspection in a viewer.
-export interface QpqExecutionTraceValue {
+export type QpqExecutionTraceValue = {
   preview: string;
   json?: string;
-}
+};
 
-export interface QpqExecutionTraceStep {
+export type QpqExecutionTraceStep = {
   // Index into QpqExecutionTrace.sources
   sourceIndex: number;
 
@@ -43,9 +43,9 @@ export interface QpqExecutionTraceStep {
   // Present when this step paused at a function's return point: the value being
   // returned (V8 exposes it on the call frame at return break positions)
   returnValue?: QpqExecutionTraceValue;
-}
+};
 
-export interface QpqExecutionTraceStats {
+export type QpqExecutionTraceStats = {
   // Total debugger pauses, including non-story pauses that were resumed through
   pauses: number;
 
@@ -60,18 +60,18 @@ export interface QpqExecutionTraceStats {
   instrumentMs?: number;
 
   // Urls of every script that received breakpoints (steps can only be recorded in
-  // these) — the first thing to check when expected code is missing from a trace
+  // these), the first thing to check when expected code is missing from a trace
   instrumentedScriptUrls?: string[];
-}
+};
 
-export interface QpqExecutionTrace {
+export type QpqExecutionTrace = {
   // The log (StoryResult) that was replayed
   correlation: string;
   moduleName: string;
 
   tracedAt: QpqIsoDateTime;
 
-  // True when the step budget was hit — the replay still ran to completion, but steps
+  // True when the step budget was hit, the replay still ran to completion, but steps
   // beyond the budget were not recorded.
   truncated: boolean;
 
@@ -79,4 +79,4 @@ export interface QpqExecutionTrace {
   steps: QpqExecutionTraceStep[];
 
   stats: QpqExecutionTraceStats;
-}
+};

@@ -1,5 +1,5 @@
 import { defineAwsGithubDeployRole, defineAwsServiceAccountInfo, defineDomainCertificate } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineEmailReceivingDomain } from '@qpqjs/webserver';
 
 import { App } from 'aws-cdk-lib';
@@ -100,7 +100,7 @@ describe('BootstrapQpqServiceStack email receiving domain', () => {
     ]);
     const app = new App();
     return Template.fromStack(
-      new BootstrapQpqServiceStack(app, 'test-bs', { qpqConfig, env: { account: '123456789012', region: 'ap-southeast-2' } }),
+      new BootstrapQpqServiceStack(app, 'test-bs', { qpqConfig, env: { account: '123456789012', region: 'ap-southeast-2' } } as any),
     );
   };
 
@@ -127,7 +127,7 @@ describe('BootstrapQpqServiceStack email receiving domain', () => {
     for (const cname of cnames) {
       const name = JSON.stringify(cname.Properties.Name);
       expect(name).toMatch(/DkimDNSTokenName/);
-      expect(name).toMatch(/\.\"\]\]\}$/);
+      expect(name).toMatch(/\."\]\]\}$/);
       expect(name).not.toMatch(/development\.example/);
     }
   });

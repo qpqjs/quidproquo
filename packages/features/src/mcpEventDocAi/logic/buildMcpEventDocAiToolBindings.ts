@@ -1,4 +1,4 @@
-import { AiToolDefinition } from '@qpqjs/core';
+import { AiToolDefinition, unique } from '@qpqjs/core';
 
 import { buildMcpToolInputSchema } from '../../mcp/logic/buildMcpToolInputSchema';
 import { MCP_DOC_ID_ARG } from '../constants/mcpDocIdArg';
@@ -42,7 +42,7 @@ const buildListDocsBinding = (eventDocAis: McpEventDocAi[]): McpEventDocAiToolBi
 
 // Tool names two of the service's AIs both use. Each AI's copy is then offered under its doc type, so neither is lost.
 const findSharedToolNames = (eventDocAis: McpEventDocAi[]): Set<string> => {
-  const names = eventDocAis.flatMap((eventDocAi) => [...new Set(eventDocAi.tools.filter(hasExecutor).map(({ name }) => name))]);
+  const names = eventDocAis.flatMap((eventDocAi) => unique(eventDocAi.tools.filter(hasExecutor).map(({ name }) => name)));
 
   return new Set(names.filter((name, index) => names.indexOf(name) !== index));
 };

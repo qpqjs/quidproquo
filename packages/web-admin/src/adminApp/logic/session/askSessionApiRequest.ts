@@ -1,16 +1,20 @@
-import { askContextRead, askNetworkRequest, AskResponse, HTTPMethod, HTTPNetworkResponse } from '@qpqjs/core';
+import { askNetworkRequest, AskResponse, HTTPMethod, HTTPNetworkResponse } from '@qpqjs/core';
 
 import { askLoadAuthToken } from '../../../platformLogic/config/askLoadAuthToken';
-import { baseUrlsContext } from '../../../platformLogic/contexts/baseUrlContext';
+import { askBaseUrlsRead } from '../../../platformLogic/context';
 
 // Quiet API request for session persistence: authorised like askPlatformRequest
-// but with no global loading spinner or error toast — the flush is background
+// but with no global loading spinner or error toast, the flush is background
 // bookkeeping, not user-facing navigation.
-export function* askSessionApiRequest<TBody, TResponse>(method: HTTPMethod, url: string, body?: TBody): AskResponse<HTTPNetworkResponse<TResponse>> {
-  const baseUrls = yield* askContextRead(baseUrlsContext);
+export function* askSessionApiRequest<TResult, TPayload = unknown>(
+  method: HTTPMethod,
+  url: string,
+  body?: TPayload,
+): AskResponse<HTTPNetworkResponse<TResult>> {
+  const baseUrls = yield* askBaseUrlsRead();
   const authInfo = yield* askLoadAuthToken();
 
-  return yield* askNetworkRequest<TBody, TResponse>(method, url, {
+  return yield* askNetworkRequest<TResult, TPayload>(method, url, {
     body,
     headers: authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {},
     basePath: baseUrls.api,

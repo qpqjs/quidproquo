@@ -6,5 +6,5 @@ import { askTenantApiRequest } from './askTenantApiRequest';
 
 /** DELETE myTenants/{id}/members/{userId}: remove a member (or leave, when it is the caller). */
 export function* askTenantMemberRemoveDelete(target: TenantClientTarget, tenantId: TenantId, userId: string): AskResponse<void> {
-  yield* askTenantApiRequest<void, { ok: boolean }>(target, 'DELETE', `/${tenantId}/members/${userId}`);
+  yield* askTenantApiRequest<{ ok: boolean }, void>(target, 'DELETE', `/${tenantId}/members/${userId}`);
 }

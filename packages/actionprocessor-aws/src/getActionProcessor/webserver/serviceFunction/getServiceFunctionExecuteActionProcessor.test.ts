@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, buildTestStorySession } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 import { ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getServiceFunctionExecuteActionProcessor } from './getServiceFunctionExecuteActionProcessor';
 
 vi.mock('../../../logic/lambda/executeLambdaByName', () => ({
@@ -48,11 +47,11 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
       functionGlobals: { apiKey: 'k' },
     } as any;
 
-    await invokeProcessor(processor, { functionName: 'doThing', service: 'auth', payload: [1], isAsync: false }, { session });
+    await invokeProcessor(processor!, { functionName: 'doThing', service: 'auth', payload: [1], isAsync: false }, { session });
 
     const payload = vi
       .mocked(executeLambdaByName)
-      .mock.calls[0].find((arg) => arg && typeof arg === 'object' && 'storySession' in (arg as any)) as any;
+      .mock.calls[0].find((arg: any) => arg && typeof arg === 'object' && 'storySession' in (arg as any)) as any;
     expect(payload.storySession.accessToken).toBeUndefined();
     expect(payload.storySession.localContext).toBeUndefined();
     expect(payload.storySession.functionGlobals).toBeUndefined();

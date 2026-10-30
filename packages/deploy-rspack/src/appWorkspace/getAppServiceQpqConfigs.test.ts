@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getAppServiceNames } from './getAppServiceNames';
+import { getAppServiceNames } from './discovery/getAppServiceNames';
 import { getAppServiceQpqConfigs } from './getAppServiceQpqConfigs';
 import { requireQpqConfig } from './requireQpqConfig';
 
-vi.mock('./getAppServiceNames', () => ({ getAppServiceNames: vi.fn() }));
+vi.mock('./discovery/getAppServiceNames', () => ({ getAppServiceNames: vi.fn() }));
 vi.mock('./requireQpqConfig', () => ({ requireQpqConfig: vi.fn() }));
 
 beforeEach(() => {
@@ -15,7 +15,7 @@ beforeEach(() => {
 describe('getAppServiceQpqConfigs', () => {
   it('loads a config per service', () => {
     vi.mocked(getAppServiceNames).mockReturnValue(['test', 'testa']);
-    vi.mocked(requireQpqConfig).mockImplementation((infra) => [{ infra }] as never);
+    vi.mocked(requireQpqConfig).mockImplementation((infra: any) => [{ infra }] as never);
 
     expect(getAppServiceQpqConfigs('/root', 'qpqjs')).toHaveLength(2);
   });
@@ -24,7 +24,7 @@ describe('getAppServiceQpqConfigs', () => {
     // The rest of the app still runs, which is the point of not throwing per
     // service.
     vi.mocked(getAppServiceNames).mockReturnValue(['test', 'testa']);
-    vi.mocked(requireQpqConfig).mockImplementation((infra) => {
+    vi.mocked(requireQpqConfig).mockImplementation((infra: any) => {
       if (infra.includes('testa')) {
         throw new Error('boom');
       }

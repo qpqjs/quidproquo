@@ -1,11 +1,12 @@
 import { ActionHistory, StoryResult } from '@qpqjs/core';
+import { buildStoryResult } from '@qpqjs/testing';
 import { EmailActionType, EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
 import { emailSendActionSearchDefinition } from './emailSendActionSearchDefinition';
 
-const storyResult = { correlation: 'corr-1', history: [] } as unknown as StoryResult<any>;
+const storyResult = buildStoryResult({ correlation: 'corr-1' });
 
 const emailEntry = (res: unknown): ActionHistory => ({
   act: {

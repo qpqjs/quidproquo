@@ -1,4 +1,4 @@
-import { AuthenticationInfo } from '@qpqjs/core';
+import { AuthenticationInfo, Nullable } from '@qpqjs/core';
 
 import { memo } from 'react';
 
@@ -11,7 +11,7 @@ export type WebSocketAuthSyncProps = {
 
   // Active storage scope (e.g. tenant id) to claim on the connection; the
   // server validates it before any scoped work runs. Null/undefined = Personal.
-  activeScope?: string | null;
+  activeScope?: Nullable<string>;
 };
 
 const WebSocketAuthSyncComponent: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken, activeScope }) => {

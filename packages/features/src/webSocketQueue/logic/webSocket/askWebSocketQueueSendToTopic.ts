@@ -1,15 +1,15 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askWebsocketProvideConnectionInfo } from '../../context/websocketConnectionInfoContext';
+import { askWebsocketConnectionInfoProvide } from '../../context';
 import { webSocketSubscriptionData } from '../../data/subscriptionData';
 import { AnyWebSocketQueueEventMessage } from '../../types/AnyWebSocketQueueEventMessage';
-import { askSendToConnectionCleaningUpStale } from './askSendToConnectionCleaningUpStale';
+import { askWebSocketQueueSendToConnectionCleaningUpStale } from './askWebSocketQueueSendToConnectionCleaningUpStale';
 
 function* askSendToSubscribers(scopedTopic: string, message: AnyWebSocketQueueEventMessage): AskResponse<void> {
   const subscriptions = yield* webSocketSubscriptionData.askGetByTopic(scopedTopic);
 
   for (const subscription of subscriptions) {
-    yield* askSendToConnectionCleaningUpStale(subscription.connectionId, message);
+    yield* askWebSocketQueueSendToConnectionCleaningUpStale(subscription.connectionId, message);
   }
 }
 
@@ -23,5 +23,5 @@ export function* askWebSocketQueueSendToTopic<E extends AnyWebSocketQueueEventMe
   scopedTopic: string,
   message: E,
 ): AskResponse<void> {
-  yield* askWebsocketProvideConnectionInfo({ apiName: websocketApiName }, askSendToSubscribers(scopedTopic, message));
+  yield* askWebsocketConnectionInfoProvide({ apiName: websocketApiName }, askSendToSubscribers(scopedTopic, message));
 }

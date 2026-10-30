@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, buildTestStorySession, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -7,7 +8,7 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 const invoke = async (eventStorySession: any, sessionCorrelation: string) => {
   const processors = await getEventGetStorySessionActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.GetStorySession];
-  return process(
+  return process!(
     { eventParams: [{ storySession: eventStorySession }] } as any,
     buildTestStorySession({ correlation: sessionCorrelation }),
     {},

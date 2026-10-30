@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqPagedData } from '../../types/QpqPagedData';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsQueryOperation } from './types';
 
@@ -16,7 +16,7 @@ export type KeyValueStoreScanOptions = {
 export const askKeyValueStoreScanBase = createActionRequester<QpqPagedData<unknown>>()({
   actionType: KeyValueStoreActionType.Scan,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
@@ -31,7 +31,7 @@ export const askKeyValueStoreScanBase = createActionRequester<QpqPagedData<unkno
 
 // The stored item shape is only known to the caller, so the base returns unknown items
 // and this story casts the page to what the caller declared.
-export function* askKeyValueStoreScan<KvsItem>(
+function* askKeyValueStoreScanTyped<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
@@ -39,3 +39,6 @@ export function* askKeyValueStoreScan<KvsItem>(
 ): AskResponse<QpqPagedData<KvsItem>> {
   return (yield* askKeyValueStoreScanBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<KvsItem>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreScan = Object.assign(askKeyValueStoreScanTyped, { errorType: askKeyValueStoreScanBase.errorType });

@@ -37,5 +37,5 @@ export default createUseStyles(
       backgroundColor: '#555',
     },
   },
-  { name: 'adminGrid' }
+  { name: 'adminGrid' },
 );

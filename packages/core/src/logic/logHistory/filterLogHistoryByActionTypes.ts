@@ -1,5 +1,5 @@
 import { Action, ActionHistory, ActionProcessorResult, EitherActionResult } from '../../types';
-import { actionResult, actionResultError, isErroredActionResult, resolveActionResult } from '../actionLogic';
+import { actionResult, actionResultError, isErroredActionResult, resolveActionResult } from '../actionResult';
 import { isBatchAction } from '../actionValidators';
 
 // Rebuild the ActionProcessorResult a nested action would have produced on its own,

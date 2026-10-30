@@ -9,7 +9,7 @@ Client-side story that creates a new chat for the current document and switches 
 
 One of the four client stories exposed as `sharedEventDocAiApi`.
 
-- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatCreateRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiUpsertChat` / `askUIEventDocAiSetActiveChat` / `askUIEventDocAiSetMessages` / `askUIEventDocAiClearStream` / `askUIEventDocAiSetError` UI actions.
+- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatCreateRequest](./ask-event-doc-ai-chat-requests.md), and the `askEventDocAiUpsertChat` / `askEventDocAiSetActiveChat` / `askEventDocAiSetMessages` / `askEventDocAiClearStream` / `askEventDocAiSetError` UI actions.
 
 ```typescript
 import { askEventDocAiNewChat } from '@qpqjs/features';
@@ -30,7 +30,7 @@ function* askEventDocAiNewChat(): AskResponse<Nullable<EventDocAiChatSummary>>;
 
 ## Returns
 
-`Nullable<EventDocAiChatSummary>` — the created chat summary, or `null` if creation failed (in which case the error text is dispatched via `askUIEventDocAiSetError`). On success it also dispatches: upsert the chat into the list, set it active, empty the message list, and clear the stream buffer.
+`Nullable<EventDocAiChatSummary>` — the created chat summary, or `null` if creation failed (in which case the error text is dispatched via `askEventDocAiSetError`). On success it also dispatches: upsert the chat into the list, set it active, empty the message list, and clear the stream buffer.
 
 ## Notes
 

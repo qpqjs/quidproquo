@@ -1,6 +1,6 @@
-export interface QPQBinaryData {
+export type QPQBinaryData = {
   base64Data: string;
   filename: string;
   mimetype?: string;
   contentDisposition?: string;
-}
+};

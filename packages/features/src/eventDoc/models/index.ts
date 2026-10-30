@@ -9,6 +9,7 @@ export * from './EventDocDocumentStateAtEvent';
 export * from './EventDocEffect';
 export * from './EventDocEvent';
 export * from './EventDocEventActor';
+export * from './EventDocEventAppendOptions';
 export * from './EventDocEventBootstrapPage';
 export * from './EventDocEventInput';
 export * from './EventDocEventMetadata';

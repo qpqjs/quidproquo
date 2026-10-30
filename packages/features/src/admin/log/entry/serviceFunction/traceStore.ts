@@ -2,7 +2,7 @@ import { askFileWriteTextContents, AskResponse, QPQ_LOG_REPORTS_STORAGE_DRIVE_NA
 import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { QpqStoreTraceResultPayload } from '../../config/traceLogServiceFunction';
-import { askSendTraceDoneToAdmins } from '../../logic/webSocket/askSendTraceDoneToAdmins';
+import { askLogSendTraceDoneToAdmins } from '../../logic/webSocket/askLogSendTraceDoneToAdmins';
 
 // The reply half of the async trace handshake (see traceLogServiceFunction.ts): the
 // owning service calls this on the LOG service when a trace finishes. Stores the trace
@@ -14,5 +14,5 @@ export function* qpqStoreTraceResult(event: ExecuteServiceFunctionEvent<QpqStore
     yield* askFileWriteTextContents(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, `${correlation}.trace.json`, JSON.stringify(trace));
   }
 
-  yield* askSendTraceDoneToAdmins(correlation, !!trace, errorText);
+  yield* askLogSendTraceDoneToAdmins(correlation, !!trace, errorText);
 }

@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils, SigningKeyQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_kms } from 'aws-cdk-lib';
@@ -9,9 +9,9 @@ import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreSigningKeyConstructProps extends QpqConstructBlockProps {
+export type QpqCoreSigningKeyConstructProps = {
   signingKeyConfig: SigningKeyQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // An asymmetric RSA-2048 KMS key for RS256 signing. The private half is generated
 // inside KMS and can never be exported, so there is nothing to seed or rotate by
@@ -20,20 +20,22 @@ export interface QpqCoreSigningKeyConstructProps extends QpqConstructBlockProps 
 export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements QpqResource {
   key: aws_kms.IKey;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.key.grantVerify(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.key.grantSign(grantee);
   }
 
-  public grantAll(grantee: aws_iam.IGrantable): void {
+  public override grantAll(grantee: aws_iam.IGrantable): void {
     this.key.grantSignVerify(grantee);
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreSigningKeyConstructProps) {
     super(scope, id, props);
+
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
 
     this.key = new aws_kms.Key(this, 'key', {
       alias: `alias/${this.resourceName(props.signingKeyConfig.keyName)}`,
@@ -47,9 +49,9 @@ export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements Qpq
       // next public-key refresh.
       enableKeyRotation: false,
 
-      // DESTROY schedules deletion with KMS's mandatory waiting period rather
-      // than orphaning the key
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Follows the data-store removal policy: a retained store is unreadable without the
+      // key that encrypts or signs for it. DESTROY still goes through KMS's waiting period.
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.key, props.qpqConfig);
@@ -61,7 +63,7 @@ export class QpqCoreSigningKeyConstruct extends QpqConstructBlock implements Qpq
     }
 
     const toAliasName = (signingKeyConfig: SigningKeyQPQConfigSetting): string =>
-      `alias/${awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(signingKeyConfig.keyName, qpqConfig, signingKeyConfig.owner)}`;
+      `alias/${awsNamingUtils.resolveOwnedResourceName(signingKeyConfig.keyName, qpqConfig, signingKeyConfig.owner)}`;
 
     // Only the owning service may sign: that is the whole point of the
     // issuer/verifier split, so a foreign declaration (owner: another module)

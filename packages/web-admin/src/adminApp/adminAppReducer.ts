@@ -1,7 +1,7 @@
 import { combineQpqReducers } from '@qpqjs/core';
 
 import { liftQpqReducer } from './logic/liftQpqReducer';
-import { AdminAppState } from './AdminAppState';
+import { AdminAppState } from './types/AdminAppState';
 import { sessionLogReducer } from './sessionLogReducer';
 import { volatileReducer } from './volatileReducer';
 

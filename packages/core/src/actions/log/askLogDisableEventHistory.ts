@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { LogActionType } from './LogActionType';
 
 export type LogDisableEventHistoryActionPayload = {

@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
@@ -10,9 +10,9 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic/SubdomainName';
 
-export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverSubdomainRedirectConstructProps = {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // An absolute url redirects as-is. A declared root redirects to that root's site root under
 // the resolver (so `www` -> `development.example.com` in dev), keeping the request path. Any
@@ -35,15 +35,16 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
     const { redirectBaseUrl, appendPath } = resolveRedirectTarget(props.qpqConfig, props.subdomainRedirectConfig.redirectUrl);
 
     const func = new Function(this, 'redirect', {
-      functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
-      functionType: 'apiGatewayEventHandler_redirect',
-      executorName: 'apiGatewayEventHandler_redirect',
+      functionName: this.resourceName(
+        awsNamingUtils.getLambdaBaseName(props.subdomainRedirectConfig.subdomain, awsNamingUtils.QpqLambdaKind.Redirect),
+      ),
+      handler: 'apiGatewayEventHandler_redirect',
 
       qpqConfig: props.qpqConfig,
 
       environment: {
-        redirectBaseUrl: JSON.stringify(redirectBaseUrl),
-        appendPath: JSON.stringify(appendPath),
+        redirectBaseUrl,
+        appendPath: String(appendPath),
       },
 
       role: this.getServiceRole(),

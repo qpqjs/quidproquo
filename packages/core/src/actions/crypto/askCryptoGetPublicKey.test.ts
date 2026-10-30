@@ -22,7 +22,7 @@ describe('askCryptoGetPublicKey', () => {
     expect(askCryptoGetPublicKey.errorType).toEqual({
       KeyNotConfigured: `${CryptoActionType.GetPublicKey}-KeyNotConfigured`,
       KeyUnavailable: `${CryptoActionType.GetPublicKey}-KeyUnavailable`,
-      Throttling: `${CryptoActionType.GetPublicKey}-Throttling`,
+      Throttled: `${CryptoActionType.GetPublicKey}-Throttled`,
     });
   });
 });

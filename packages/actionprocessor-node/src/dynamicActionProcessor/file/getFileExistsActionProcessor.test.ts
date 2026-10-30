@@ -3,7 +3,7 @@ import { askFileExists, ErrorTypeEnum, FileActionType, isErroredActionResult, re
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 
 vi.mock('fs/promises');

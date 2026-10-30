@@ -6,7 +6,7 @@
 // single-file lambda bundles. `@scope/*` resolves via workspace node_modules
 // symlinks to built dist, so no tsconfig-paths plugin is needed.
 import { getLambdaEntries } from '@qpqjs/actionprocessor-aws';
-import { QPQConfig } from '@qpqjs/core';
+import { getServiceBundleDistPath, QPQConfig } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration } from '@rspack/core';
@@ -17,7 +17,7 @@ import { serviceTsRules } from './serviceTsRules';
 
 export const getServiceRspackConfig = (qpqConfig: QPQConfig, serviceDir: string): Configuration => {
   const { root, appName, serviceName } = parseServiceDir(serviceDir, 'service');
-  const outputPath = path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service');
+  const outputPath = getServiceBundleDistPath(root, appName, serviceName);
   const nodeModulePath = path.join(root, 'node_modules');
 
   const qpqRspack = getAllRspackConfig(qpqConfig, getLambdaEntries(), outputPath, nodeModulePath);

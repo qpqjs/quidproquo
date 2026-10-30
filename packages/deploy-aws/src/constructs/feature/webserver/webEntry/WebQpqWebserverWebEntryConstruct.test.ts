@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig } from '@qpqjs/core';
+import { defineStorageDrive, QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineWebEntry, QPQConfigAdvancedWebEntrySettings, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
@@ -23,7 +24,7 @@ const synth = (options: Partial<QPQConfigAdvancedWebEntrySettings> = {}) => {
   ]);
   const stack = new Stack(new App(), 'web', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
-  new WebQpqWebserverWebEntryConstruct(stack, 'entry', { qpqConfig, webEntryConfig: qpqWebServerUtils.getWebEntryConfigs(qpqConfig)[0] });
+  new WebQpqWebserverWebEntryConstruct(stack, 'entry', { qpqConfig, webEntryConfig: qpqWebServerUtils.getWebEntryConfigs(qpqConfig)[0]! });
 
   return Template.fromStack(stack);
 };

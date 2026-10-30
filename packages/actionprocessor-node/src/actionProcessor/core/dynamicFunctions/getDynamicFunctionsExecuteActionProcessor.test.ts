@@ -1,18 +1,15 @@
 import {
   actionResult,
   actionResultError,
-  buildTestQpqConfig,
-  createActionProcessor,
+  askDynamicFunctionExecute,
   createStreamRegistry,
-  createStubLogger,
   defineDynamicFunctions,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   ErrorTypeEnum,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -146,7 +143,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     const result = await invoke({ dynamicFunctionsName: 'missingFunctions', functionName: 'anything', args: [] }, {}, async () => ({}));
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound);
+    expect(error.errorType).toBe(askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound);
     expect(error.errorText).toContain('missingFunctions');
   });
 
@@ -154,7 +151,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName: 'anything', args: [] }, {}, async () => null);
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed);
+    expect(error.errorType).toBe(askDynamicFunctionExecute.errorType.ModuleLoadFailed);
     expect(error.errorText).toContain('templateEventDoc');
   });
 
@@ -162,7 +159,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName: 'nope', args: [] }, {}, async () => ({}));
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
+    expect(error.errorType).toBe(askDynamicFunctionExecute.errorType.FunctionNotFound);
     expect(error.errorText).toContain('templateEventDoc.nope');
   });
 
@@ -171,16 +168,16 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
       notCallable: 42,
     }));
 
-    expect(resolveActionResultError(result).errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askDynamicFunctionExecute.errorType.FunctionNotFound);
   });
 
   // Security regression: a caller names the member, so Object.prototype names must never resolve to callables.
   it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty', 'valueOf'])(
     'returns FunctionNotFound for the prototype name %s',
-    async (functionName) => {
+    async (functionName: any) => {
       const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName, args: [] }, {}, async () => ({ real() {} }));
 
-      expect(resolveActionResultError(result).errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
+      expect(resolveActionResultError(result).errorType).toBe(askDynamicFunctionExecute.errorType.FunctionNotFound);
     },
   );
 
@@ -197,7 +194,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
       async () => new WithProtoMember(),
     );
 
-    expect(resolveActionResultError(result).errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askDynamicFunctionExecute.errorType.FunctionNotFound);
   });
 
   it('returns FunctionThrew when a plain member throws synchronously', async () => {
@@ -210,7 +207,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName: 'explodes', args: [] }, {}, async () => functionsObject);
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew);
+    expect(error.errorType).toBe(askDynamicFunctionExecute.errorType.FunctionThrew);
     expect(error.errorText).toContain('kaboom');
   });
 
@@ -224,7 +221,7 @@ describe('getDynamicFunctionsExecuteActionProcessor', () => {
     const result = await invoke({ dynamicFunctionsName: 'templateEventDoc', functionName: 'rejects', args: [] }, {}, async () => functionsObject);
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew);
+    expect(error.errorType).toBe(askDynamicFunctionExecute.errorType.FunctionThrew);
     expect(error.errorText).toContain('async kaboom');
   });
 });

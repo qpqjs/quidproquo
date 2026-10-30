@@ -7,7 +7,7 @@ description: Map an array with bounded concurrency — a fixed number of items r
 
 Iterates an array and builds a new array from the result of a per-item callback, running a **bounded number of items concurrently at a time**. The array is sliced into batches of `numBatch`; each batch runs fully in parallel (via [askMapParallel](./ask-map-parallel.md)), and only when a batch finishes does the next batch start. This is the safe middle ground between [askMap](./ask-map.md) (one at a time) and [askMapParallel](./ask-map-parallel.md) (all at once) — you get concurrency without overwhelming a rate-limited downstream.
 
-- **Built from:** repeated calls to [askMapParallel](./ask-map-parallel.md) over successive slices of the array, with an optional [askDelay](../platform/ask-delay.md) between batches.
+- **Built from:** repeated calls to [askMapParallel](./ask-map-parallel.md) over successive slices of the array, with an optional [askPlatformDelay](../platform/ask-delay.md) between batches.
 
 ```typescript
 import { askMapParallelBatch } from '@qpqjs/core';
@@ -47,7 +47,7 @@ function* askMapParallelBatch<T, R>(
 | `items` | `T[]` | — | The array to iterate. |
 | `numBatch` | `number` | — | Batch size — the maximum number of items that run **concurrently** at once. The array is consumed `numBatch` items at a time; each slice runs in parallel and must finish before the next slice begins. Must be at least `1`; anything lower (including `NaN`) throws an `InvalidBatchSizeError` (code `notPositive`) rather than looping forever. |
 | `askCallback` | `(item: T, index: number, srcArray: T[]) => AskResponse<R>` | — | A generator called once per item. Receives the item, its zero-based index in the **original** `items` array, and the original array itself (not the batch slice). |
-| `delayAfterEachBatchMs` | `number` | `0` | Optional pause (in milliseconds) inserted **after every batch**, including the last. When greater than `0`, the helper `yield*`s [askDelay](../platform/ask-delay.md) between batches — useful for spacing out calls to a throttled service. |
+| `delayAfterEachBatchMs` | `number` | `0` | Optional pause (in milliseconds) inserted **after every batch**, including the last. When greater than `0`, the helper `yield*`s [askPlatformDelay](../platform/ask-delay.md) between batches — useful for spacing out calls to a throttled service. |
 
 ## Returns
 
@@ -64,4 +64,4 @@ function* askMapParallelBatch<T, R>(
 - [askMap](./ask-map.md) — fully sequential (one item at a time).
 - [askMapParallel](./ask-map-parallel.md) — fully parallel (all items at once, unbounded).
 - [askFlatMapParallelBatch](./ask-flat-map-parallel-batch.md) — the same batching, then flatten the results one level.
-- [askDelay](../platform/ask-delay.md) — the delay yielded between batches.
+- [askPlatformDelay](../platform/ask-delay.md) — the delay yielded between batches.

@@ -1,18 +1,18 @@
-export interface AiTextPart {
+export type AiTextPart = {
   type: 'text';
   text: string;
-}
+};
 
-export interface AiFileUrlPart {
+export type AiFileUrlPart = {
   type: 'file';
   url: string;
   mediaType: string;
   filename?: string;
-}
+};
 
-// References a file on a storage drive — resolved to file contents by the action
+// References a file on a storage drive, resolved to file contents by the action
 // processor at prompt time, so no presigned url ever enters logs or session state.
-export interface AiFileDrivePart {
+export type AiFileDrivePart = {
   type: 'file';
   drive: string;
   filepath: string;
@@ -21,30 +21,30 @@ export interface AiFileDrivePart {
   scope?: string;
   mediaType: string;
   filename?: string;
-}
+};
 
 export type AiFilePart = AiFileUrlPart | AiFileDrivePart;
 
-export interface AiToolCallPart {
+export type AiToolCallPart = {
   type: 'tool-call';
   toolCallId: string;
   toolName: string;
   input: unknown;
-}
+};
 
-export interface AiReasoningPart {
+export type AiReasoningPart = {
   type: 'reasoning';
   text: string;
   providerOptions?: Record<string, Record<string, unknown>>;
-}
+};
 
-export interface AiToolResultPart {
+export type AiToolResultPart = {
   type: 'tool-result';
   toolCallId: string;
   toolName: string;
   output: unknown;
   isError?: boolean;
-}
+};
 
 export type AiUserMessagePart = AiTextPart | AiFilePart;
 export type AiAssistantMessagePart = AiTextPart | AiFilePart | AiToolCallPart | AiReasoningPart;

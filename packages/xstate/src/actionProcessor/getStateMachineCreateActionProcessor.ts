@@ -1,8 +1,17 @@
-import { actionResult, actionResultError, askKeyValueStoreUpsert, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  askKeyValueStoreUpsert,
+  createActionProcessor,
+  ErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
+  storyResultToActionResult,
+} from '@qpqjs/core';
 
 import { createActor, createMachine } from 'xstate';
 
-import { askStateMachineCreateBase, StateMachineActionType } from '../actions';
+import { askStateMachineCreateBase } from '../actions';
 import { getStateMachineByName } from '../config';
 import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createFiredActionRecorder } from './utils/createFiredActionRecorder';
@@ -46,12 +55,12 @@ const getProcessStateMachineCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof
       yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity);
     }, []);
     if (upsertResult.error) {
-      return actionResultError(upsertResult.error.errorType, upsertResult.error.errorText);
+      return storyResultToActionResult(upsertResult, 'StateMachine Create persist');
     }
 
     const sideEffectError = await runFiredActionStories(resolveStory, dynamicModuleLoader, smConfig, firedActions, [entity]);
     if (sideEffectError) {
-      return actionResultError(sideEffectError.errorType, sideEffectError.errorText);
+      return sideEffectError;
     }
 
     return actionResult(entity);

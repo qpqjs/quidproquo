@@ -1,4 +1,4 @@
-import { captureRequester } from '@qpqjs/core';
+import { captureRequester } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -6,9 +6,9 @@ import { askEmailReceivingHosts } from './askEmailReceivingHosts';
 import { EmailActionType } from './EmailActionType';
 
 describe('askEmailReceivingHosts', () => {
-  it('yields a ReceivingHosts action with an empty payload', () => {
+  it('yields a ReceivingHosts action with no payload', () => {
     const { action } = captureRequester(askEmailReceivingHosts());
 
-    expect(action).toEqual({ type: EmailActionType.ReceivingHosts, payload: {} });
+    expect(action).toEqual({ type: EmailActionType.ReceivingHosts });
   });
 });

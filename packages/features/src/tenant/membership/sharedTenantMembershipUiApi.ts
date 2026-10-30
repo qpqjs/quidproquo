@@ -1,4 +1,4 @@
-import { askUITenantMembershipReset } from './actionCreators/askUITenantMembershipReset';
+import { askTenantMembershipReset } from './actionCreators/askTenantMembershipReset';
 import { askTenantMembershipUiAddMember } from './logic/askTenantMembershipUiAddMember';
 import { askTenantMembershipUiLoad } from './logic/askTenantMembershipUiLoad';
 import { askTenantMembershipUiLoadMembers } from './logic/askTenantMembershipUiLoadMembers';
@@ -14,5 +14,5 @@ export const sharedTenantMembershipUiApi = {
   askTenantMembershipUiAddMember,
   askTenantMembershipUiSetMemberDisabled,
   askTenantMembershipUiRemoveMember,
-  askUITenantMembershipReset,
+  askTenantMembershipReset,
 };

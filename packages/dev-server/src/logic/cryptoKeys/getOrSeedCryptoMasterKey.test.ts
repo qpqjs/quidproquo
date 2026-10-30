@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineCryptoKey } from '@qpqjs/core';
+import { defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { promises as fs } from 'fs';
 import * as os from 'os';

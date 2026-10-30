@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { askConfigGetParameter } from './askConfigGetParameter';
 import { ConfigActionType } from './ConfigActionType';
 
@@ -59,22 +59,22 @@ describe('askConfigGetParameter', () => {
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askConfigGetParameter('some-param'), {
-          [ConfigActionType.GetParameter]: throwsError(askConfigGetParameter.errorType.Throttling, 'Rate exceeded'),
+          [ConfigActionType.GetParameter]: throwsError(askConfigGetParameter.errorType.Throttled, 'Rate exceeded'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${askConfigGetParameter.errorType.Throttling}: Rate exceeded`);
+      expect(runFailingStory).toThrow(`${askConfigGetParameter.errorType.Throttled}: Rate exceeded`);
     });
   });
 
   describe('errorType', () => {
-    it('should have Throttling error type', () => {
-      expect(askConfigGetParameter.errorType.Throttling).toBeDefined();
-      expect(askConfigGetParameter.errorType.Throttling).toContain('Throttling');
+    it('should have Throttled error type', () => {
+      expect(askConfigGetParameter.errorType.Throttled).toBeDefined();
+      expect(askConfigGetParameter.errorType.Throttled).toContain('Throttled');
     });
 
     it('should be prefixed with the action type', () => {
-      expect(askConfigGetParameter.errorType.Throttling).toContain(ConfigActionType.GetParameter);
+      expect(askConfigGetParameter.errorType.Throttled).toContain(ConfigActionType.GetParameter);
     });
   });
 });

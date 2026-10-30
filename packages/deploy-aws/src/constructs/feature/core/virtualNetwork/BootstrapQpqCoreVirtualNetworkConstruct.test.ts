@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo, defineAwsVirtualNetworkSettings } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineVirtualNetwork, QPQConfigSetting } from '@qpqjs/core';
+import { defineVirtualNetwork, QPQConfigSetting } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';

@@ -9,7 +9,8 @@ import { Auth } from '../Auth/Auth';
 import { MainLayout } from '../components';
 import { LoadFederatedAddons } from '../FederatedAddon';
 import { FederatedAddonProvider } from '../FederatedAddonProvider';
-import { BaseUrls, baseUrlsContext } from '../platformLogic/contexts';
+import { baseUrlsContext } from '../platformLogic/context';
+import { BaseUrls } from '../platformLogic/types/BaseUrls';
 import { LoadingProvider } from '../view';
 import { WebSocketAuthProvider } from '../WebSocketAuthProvider';
 

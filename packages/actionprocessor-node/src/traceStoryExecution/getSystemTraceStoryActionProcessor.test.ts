@@ -8,6 +8,7 @@ import {
   StoryResult,
   SystemActionType,
 } from '@qpqjs/core';
+import { buildStoryResult } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';
@@ -33,24 +34,19 @@ function* askAddTax(amount) {
 module.exports = { askAddTax };
 `;
 
-const buildRecordedResult = (): StoryResult<any> => ({
-  input: [100],
-  session: { depth: 0, context: {} },
-  history: [{ res: actionResult(0.5) }] as any,
-  startedAt: '2024-01-01T00:00:00.000Z',
-  finishedAt: '2024-01-01T00:00:00.000Z',
-  tags: [],
-  moduleName: 'test-module',
-  correlation: 'corr-proc-1',
-  runtimeType: QpqRuntimeType.UNIT_TEST,
-  qpqFunctionRuntimeInfo: '/stories/addTax::askAddTax',
-});
+const buildRecordedResult = (): StoryResult<any> =>
+  buildStoryResult({
+    input: [100],
+    history: [{ res: actionResult(0.5) }] as any,
+    correlation: 'corr-proc-1',
+    qpqFunctionRuntimeInfo: '/stories/addTax::askAddTax',
+  });
 
 const runProcessor = async (storyResult: StoryResult<any>, dynamicModuleLoader: any) => {
   const processors = await getSystemTraceStoryActionProcessor()({} as any, dynamicModuleLoader);
   const processor = processors[SystemActionType.TraceStory];
 
-  return processor(
+  return processor!(
     { storyResult } as any,
     { depth: 0, context: {} } as any,
     processors,

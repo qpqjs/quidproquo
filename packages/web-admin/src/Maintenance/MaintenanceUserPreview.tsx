@@ -3,7 +3,7 @@ import { MaintenanceLevel, MaintenancePublicState } from '@qpqjs/features';
 import { Box, Chip, Paper, Typography } from '@mui/material';
 
 type MaintenanceUserPreviewProps = {
-  /** The PUBLIC projection — never the raw fold, so internal notes physically cannot render here. */
+  /** The PUBLIC projection, never the raw fold, so internal notes physically cannot render here. */
   publicState: MaintenancePublicState;
   /** Whether users can currently see this maintenance at all (open draft, has updates, not Internal). */
   visible: boolean;
@@ -17,7 +17,7 @@ const etaText = (etaEndsAt: string): string => {
 };
 
 // A stylised mock of the end-user surface, rendered ONLY from the public
-// projection — its whole job is letting the editor confirm nothing private
+// projection, its whole job is letting the editor confirm nothing private
 // landed in a user-visible field. Not pixel-faithful: a banner strip over
 // either the app (Info/Low) or the lock screen breakdown (High).
 export function MaintenanceUserPreview({ publicState, visible }: MaintenanceUserPreviewProps) {
@@ -43,7 +43,7 @@ export function MaintenanceUserPreview({ publicState, visible }: MaintenanceUser
           ))}
         </Box>
 
-        {/* The banner strip — only while the maintenance is publicly visible. */}
+        {/* The banner strip, only while the maintenance is publicly visible. */}
         {visible && (
           <Box
             sx={{

@@ -1,12 +1,12 @@
-import { askChromeSetHelpOpen } from './actionCreators/askChromeSetHelpOpen';
-import { askChromeSetHistoryAssetUrls } from './actionCreators/askChromeSetHistoryAssetUrls';
-import { askChromeSetHistoryOpen } from './actionCreators/askChromeSetHistoryOpen';
-import { askChromeSetHistorySlotKey } from './actionCreators/askChromeSetHistorySlotKey';
+import { askEventDocWorkspaceChromeSetHelpOpen } from './actionCreators/askEventDocWorkspaceChromeSetHelpOpen';
+import { askEventDocWorkspaceChromeSetHistoryAssetUrls } from './actionCreators/askEventDocWorkspaceChromeSetHistoryAssetUrls';
+import { askEventDocWorkspaceChromeSetHistoryOpen } from './actionCreators/askEventDocWorkspaceChromeSetHistoryOpen';
+import { askEventDocWorkspaceChromeSetHistorySlotKey } from './actionCreators/askEventDocWorkspaceChromeSetHistorySlotKey';
 
 /** The chrome slot's api surface. */
 export const eventDocWorkspaceChromeApi = {
-  askChromeSetHistoryOpen,
-  askChromeSetHelpOpen,
-  askChromeSetHistorySlotKey,
-  askChromeSetHistoryAssetUrls,
+  askEventDocWorkspaceChromeSetHistoryOpen,
+  askEventDocWorkspaceChromeSetHelpOpen,
+  askEventDocWorkspaceChromeSetHistorySlotKey,
+  askEventDocWorkspaceChromeSetHistoryAssetUrls,
 };

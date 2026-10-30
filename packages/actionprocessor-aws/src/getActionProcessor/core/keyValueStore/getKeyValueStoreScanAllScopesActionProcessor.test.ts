@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { scan } from '../../../logic/dynamo';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 
 vi.mock('../../../logic/dynamo', () => ({
@@ -35,7 +35,7 @@ describe('getKeyValueStoreScanAllScopesActionProcessor', () => {
     } as any);
     const processor = await resolveProcessor();
 
-    const [result] = await invokeProcessor(processor, { keyValueStoreName: 'orders' });
+    const [result] = await invokeProcessor(processor!, { keyValueStoreName: 'orders' });
 
     expect(result).toEqual({
       items: [

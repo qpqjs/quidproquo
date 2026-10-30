@@ -1,4 +1,5 @@
-import { ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -6,9 +7,9 @@ import { HTTPEvent } from '../types/HTTPEvent';
 import {
   askFromJsonEventRequest,
   askFromValidJsonEventRequest,
-  fromJsonEventRequest,
   rawFromJsonEventRequest,
   readUriQueryParamFromEvent,
+  requireStringFields,
   toCdnResponse,
   toHtmlResponse,
   toJsonEventResponse,
@@ -27,20 +28,6 @@ describe('rawFromJsonEventRequest', () => {
   it('decodes a base64 encoded body', () => {
     const body = Buffer.from('{"a":1}').toString('base64');
     expect(rawFromJsonEventRequest(buildEvent({ body, isBase64Encoded: true }))).toBe('{"a":1}');
-  });
-});
-
-describe('fromJsonEventRequest', () => {
-  it('parses the JSON body', () => {
-    expect(fromJsonEventRequest(buildEvent({ body: '{"a":1}' }))).toEqual({ a: 1 });
-  });
-
-  it('throws when the body is missing', () => {
-    expect(() => fromJsonEventRequest(buildEvent({}))).toThrow('Unable to parse undefined json body from event.');
-  });
-
-  it('throws when the body is not valid JSON', () => {
-    expect(() => fromJsonEventRequest(buildEvent({ body: 'nope' }))).toThrow('Unable to parse incoming json body from event.');
   });
 });
 
@@ -160,5 +147,19 @@ describe('http event responses', () => {
 
   it('builds a CDN fallback response', () => {
     expect(toCdnResponse()).toEqual({ status: 200, fallbackToCDN: true });
+  });
+});
+
+describe('requireStringFields', () => {
+  it('returns the data when every field is a non-empty string', () => {
+    expect(requireStringFields('a', 'b')({ a: 'x', b: 'y', c: 1 })).toEqual({ a: 'x', b: 'y', c: 1 });
+  });
+
+  it('throws naming each missing, empty or non-string field', () => {
+    expect(() => requireStringFields('a', 'b', 'c')({ a: '', b: 2 })).toThrow('Missing or invalid fields: a, b, c');
+  });
+
+  it('treats a null body as having no fields', () => {
+    expect(() => requireStringFields('a')(null)).toThrow('Missing or invalid fields: a');
   });
 });

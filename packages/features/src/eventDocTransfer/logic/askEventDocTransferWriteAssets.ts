@@ -1,6 +1,6 @@
 import { askFileWriteBinaryContents, AskResponse } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../../eventDoc/context';
+import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocBundleAsset } from '../models';
 
@@ -13,7 +13,7 @@ export function* askEventDocTransferWriteAssets(docId: string, assets: EventDocB
     return 0;
   }
 
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const existing = yield* askEventDocListAssets(docId);

@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { CrossModuleMessage } from '../../types';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { EventBusActionType } from './EventBusActionType';
 
 export type EventBusMessage<T> = CrossModuleMessage<T> & {
@@ -11,22 +11,25 @@ export type EventBusMessage<T> = CrossModuleMessage<T> & {
   deduplicationId?: string;
 };
 
-export interface EventBusSendMessageOptions<T> {
+export type EventBusSendMessageOptions<T> = {
   eventBusName: string;
   eventBusMessages: EventBusMessage<T>[];
-}
+};
 
 export const askEventBusSendMessagesBase = createActionRequester<void>()({
-  actionType: EventBusActionType.SendMessages,
+  actionType: EventBusActionType.SendMessage,
   errorTypes: [
     'AccessDenied', // caller lacks permission to publish to the topic
-    'TopicNotFound', // the SNS topic does not exist
-    'ServiceUnavailable', // SNS internal error / throttling
+    'TopicNotFound', // the bus's topic does not exist
+    'Throttled', // the bus is throttling or failed internally; transient
   ],
   getPayload: (eventBusSendMessageOptions: EventBusSendMessageOptions<unknown>) => eventBusSendMessageOptions,
 });
 
 // Generic so callers can pin the message body shape at the call site.
-export function* askEventBusSendMessages<T>(eventBusSendMessageOptions: EventBusSendMessageOptions<T>): AskResponse<void> {
+function* askEventBusSendMessagesTyped<T>(eventBusSendMessageOptions: EventBusSendMessageOptions<T>): AskResponse<void> {
   return yield* askEventBusSendMessagesBase(eventBusSendMessageOptions as EventBusSendMessageOptions<unknown>);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askEventBusSendMessages = Object.assign(askEventBusSendMessagesTyped, { errorType: askEventBusSendMessagesBase.errorType });

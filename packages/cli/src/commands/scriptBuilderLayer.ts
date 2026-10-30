@@ -1,4 +1,4 @@
-// `qpq script:builder-layer [--arch arm64|x86_64]` — produce the lambda layer that gives
+// `qpq script:builder-layer [--arch arm64|x86_64]`, produce the lambda layer that gives
 // a service rspack, for services that registered defineUserScriptBuilder. The directory
 // is the one getUserScriptBuilderApiLayer points at, so nothing is told a path. Run from
 // the app's qpq:predeploy hook, which go:docker fires before the workspace is built, so
@@ -8,7 +8,10 @@ import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 import { getUserScriptBuilderLayerDir } from '@qpqjs/user-script';
 
 import { getArgValue } from '../lib/args';
+import { createOutput } from '../lib/out';
 import { buildUserScriptBuilderLayer } from '../lib/userScriptBuilderLayer';
+
+const out = createOutput('script:builder-layer');
 
 const ARCH_FLAG = '--arch';
 const DEFAULT_ARCHITECTURE = JavascriptRuntimeArchitecture.Arm64;
@@ -22,7 +25,7 @@ const parseArchitecture = (argv: string[]): JavascriptRuntimeArchitecture => {
   const requested = getArgValue(argv, ARCH_FLAG) ?? DEFAULT_ARCHITECTURE;
   const known = Object.values(JavascriptRuntimeArchitecture);
   if (!known.includes(requested as JavascriptRuntimeArchitecture)) {
-    console.error(`script:builder-layer: unknown ${ARCH_FLAG} [${requested}]; expected one of ${known.join(', ')}`);
+    out.error(`script:builder-layer: unknown ${ARCH_FLAG} [${requested}]; expected one of ${known.join(', ')}`);
     process.exit(1);
   }
   return requested as JavascriptRuntimeArchitecture;
@@ -33,7 +36,7 @@ export const scriptBuilderLayerCommand = async (argv: string[]): Promise<void> =
   const rspackVersion = getRspackVersion();
   const outDir = getUserScriptBuilderLayerDir();
 
-  console.log(`script:builder-layer: installing @rspack/core@${rspackVersion} for linux ${architecture} into ${outDir}`);
+  out.log(`script:builder-layer: installing @rspack/core@${rspackVersion} for linux ${architecture} into ${outDir}`);
   const nodeDir = buildUserScriptBuilderLayer({ outDir, architecture, rspackVersion });
-  console.log(`script:builder-layer: wrote ${nodeDir}`);
+  out.log(`script:builder-layer: wrote ${nodeDir}`);
 };

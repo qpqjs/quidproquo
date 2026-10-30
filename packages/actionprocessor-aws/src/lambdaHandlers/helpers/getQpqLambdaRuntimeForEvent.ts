@@ -3,6 +3,7 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   askProcessEvent,
+  composeActionProcessorLayers,
   createRuntime,
   DynamicModuleLoader,
   QPQConfig,
@@ -46,14 +47,14 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
 ) => {
   // Built per invoke: the lambda context (and so the execution deadline) is not
   // known until the handler runs.
-  const getResolveActionProcessorList = (context: Context) => async (): Promise<ActionProcessorList> => ({
-    ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
-    ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
-    ...getLambdaRuntimeRemainingTimeActionProcessor(context),
-
-    // Always done last, so they can override the default ones if the user wants.
-    ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
-  });
+  const getResolveActionProcessorList = (context: Context) => (): Promise<ActionProcessorList> =>
+    composeActionProcessorLayers(qpqConfig, dynamicModuleLoader, [
+      getAwsActionProcessors,
+      getActionProcessorList,
+      getLambdaRuntimeRemainingTimeActionProcessor(context),
+      // Always last, so a service's own processors can override the defaults.
+      getCustomActionActionProcessor,
+    ]);
 
   return async (event: E, context: Context) => {
     const logger = getLogger(qpqConfig);
@@ -86,7 +87,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       // A warmer ping arrives as its own single-record SNS event; any warmer
       // present means this invoke exists only to keep the sandbox warm.
       if (recordsNoWarm.length !== event.Records.length) {
-        // TODO: Warm qpq things with dynamic functions
+        // TODO: @joe-coady: Warm qpq things with dynamic functions
         // federate in dynamic modules
         await dynamicModuleLoaderWarmer();
 

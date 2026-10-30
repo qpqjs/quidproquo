@@ -1,4 +1,4 @@
-import { askNewGuid, AskResponse, askStorageScopeProvide } from '@qpqjs/core';
+import { askGuidNew, AskResponse, askStorageScopeProvide } from '@qpqjs/core';
 
 import { askEventDocCreate } from '../../eventDoc/logic/askEventDocCreate';
 import { EventDocEventActor, EventDocSummary } from '../../eventDoc/models';
@@ -16,7 +16,7 @@ import { composeTenantScope } from './storageScope';
 export function* askTenantCreate(name: string, actor: EventDocEventActor): AskResponse<EventDocSummary> {
   const tenantId = yield* askTenantGenerateNewId();
   // Non-user-facing unique filler required by the eventDoc INIT contract.
-  const code = yield* askNewGuid();
+  const code = yield* askGuidNew();
 
   const summary = yield* askStorageScopeProvide(composeTenantScope(tenantId), askEventDocCreate(name, code, actor, tenantId));
 

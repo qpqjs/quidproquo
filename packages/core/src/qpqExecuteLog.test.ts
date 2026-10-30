@@ -1,21 +1,13 @@
+import { buildStoryResult } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { actionResult } from './logic/actionLogic';
+import { actionResult } from './logic/actionResult';
 import { AskResponse, QpqRuntimeType, StoryResult } from './types/StorySession';
 import { createDebugLogActionProcessor, qpqExecuteLog } from './qpqExecuteLog';
 
-const buildRecordedResult = (history: Array<{ res: any }>): StoryResult<any> => ({
-  input: ['seed'],
-  session: { depth: 0, context: {} },
-  history: history as any,
-  startedAt: '2024-01-01T00:00:00.000Z',
-  finishedAt: '2024-01-01T00:00:00.000Z',
-  tags: [],
-  moduleName: 'test-module',
-  correlation: 'corr-1',
-  fromCorrelation: 'corr-0',
-  runtimeType: QpqRuntimeType.UNIT_TEST,
-});
+const buildRecordedResult = (history: Array<{ res: any }>): StoryResult<any> =>
+  buildStoryResult({ input: ['seed'], history: history as any, fromCorrelation: 'corr-0' });
 
 describe('createDebugLogActionProcessor', () => {
   it('returns undefined for the then property', async () => {
@@ -30,10 +22,10 @@ describe('createDebugLogActionProcessor', () => {
     const proxy = await resolver({} as any);
 
     expect(
-      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+      await proxy!.Anything!(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
     ).toEqual(actionResult('one'));
     expect(
-      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+      await proxy!.Anything!(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
     ).toEqual(actionResult('two'));
   });
 

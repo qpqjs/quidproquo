@@ -1,9 +1,10 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askKeyValueStoreUpsertBase } from '../../actions/keyValueStore/askKeyValueStoreUpsert';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
-import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { askKeyValueStoreUpsertWithRetry } from './askKeyValueStoreUpsertWithRetry';
 
 const item = { id: '1', name: 'widget' };
@@ -17,13 +18,12 @@ describe('askKeyValueStoreUpsertWithRetry', () => {
     expect(upsert).toHaveBeenCalledWith(expect.objectContaining({ payload: expect.objectContaining({ keyValueStoreName: 'widgets', item }) }));
   });
 
-  it('retries ServiceUnavailable failures until the upsert succeeds', () => {
+  it('retries Throttled failures until the upsert succeeds', () => {
     let attempt = 0;
     const delay = vi.fn();
 
     runStory(askKeyValueStoreUpsertWithRetry('widgets', item), {
-      [KeyValueStoreActionType.Upsert]: () =>
-        ++attempt < 3 ? throwsError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'down') : undefined,
+      [KeyValueStoreActionType.Upsert]: () => (++attempt < 3 ? throwsError(askKeyValueStoreUpsertBase.errorType.Throttled, 'down') : undefined),
       [PlatformActionType.Delay]: delay,
     });
 
@@ -34,7 +34,7 @@ describe('askKeyValueStoreUpsertWithRetry', () => {
   it('throws once retries are exhausted', () => {
     expect(() =>
       runStory(askKeyValueStoreUpsertWithRetry('widgets', item, { maxRetries: 1 }), {
-        [KeyValueStoreActionType.Upsert]: throwsError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'down'),
+        [KeyValueStoreActionType.Upsert]: throwsError(askKeyValueStoreUpsertBase.errorType.Throttled, 'down'),
         [PlatformActionType.Delay]: undefined,
       }),
     ).toThrow(StoryError);

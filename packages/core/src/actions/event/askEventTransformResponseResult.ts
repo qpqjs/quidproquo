@@ -1,12 +1,12 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { EitherActionResult } from '../../types/Action';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { EventActionType } from './EventActionType';
 
-export interface EventTransformResponseResultActionPayload<EventParams extends Array<unknown>, QpqEventRecordResponse> {
+export type EventTransformResponseResultActionPayload<EventParams extends Array<unknown>, QpqEventRecordResponse> = {
   qpqEventRecordResponses: EitherActionResult<QpqEventRecordResponse>[];
   eventParams: EventParams;
-}
+};
 
 export const askEventTransformResponseResultBase = createActionRequester<unknown>()({
   actionType: EventActionType.TransformResponseResult,

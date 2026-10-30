@@ -1,5 +1,5 @@
 import { VolatileSearchStartedPayload } from '../../effects/volatile/VolatileSearchStartedPayload';
-import { VolatileState } from '../../VolatileState';
+import { VolatileState } from '../../types/VolatileState';
 
 export const logSearchStarted = (state: VolatileState, payload: VolatileSearchStartedPayload): VolatileState => ({
   ...state,

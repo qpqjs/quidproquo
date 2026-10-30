@@ -6,9 +6,9 @@ import {
   askFileGenerateTemporarySecureUrl,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { generatePresignedUrl } from '../../../logic/s3/generatePresignedUrl';
@@ -40,6 +40,7 @@ const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig): Process
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of @qpqjs/core.
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidScopeError: (error) => actionResultError(askFileGenerateTemporarySecureUrl.errorType.InvalidScope, error.message),
       });
     }

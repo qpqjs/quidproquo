@@ -21,10 +21,8 @@ export function Hero() {
           </h1>
 
           <p className="hero__sub">
-            Your logic is a generator function (a <em>story</em>) that yields
-            typed actions, never a platform API. A processor per platform
-            decides how each action actually runs: Lambda, a container, the
-            browser.
+            Your logic is a generator function (a <em>story</em>) that yields typed actions, never a platform API. A processor per platform decides
+            how each action actually runs: Lambda, a container, the browser.
           </p>
 
           <div className="hero__cta">

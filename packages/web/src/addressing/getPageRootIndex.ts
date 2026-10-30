@@ -14,7 +14,7 @@ export const getPageRootIndex = (addressing: WebAddressing, hostname: string): n
   addressing.rootDomains.forEach((root, index) => {
     const rootName = root.toLowerCase();
     const matches = page === rootName || page.endsWith(`.${rootName}`);
-    if (matches && (best === -1 || rootName.length > addressing.rootDomains[best].length)) {
+    if (matches && (best === -1 || rootName.length > (addressing.rootDomains[best]?.length ?? 0))) {
       best = index;
     }
   });

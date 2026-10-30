@@ -1,6 +1,6 @@
 import { AskResponse, askStateRead } from '@qpqjs/core';
 
-import { askUIEventDocListSetPageIndex } from '../actionCreators/askUIEventDocListSetPageIndex';
+import { askEventDocListSetPageIndex } from '../actionCreators/askEventDocListSetPageIndex';
 import type { EventDocListState } from '../types/EventDocListState';
 import { askEventDocListLoad } from './askEventDocListLoad';
 
@@ -14,6 +14,6 @@ export function* askEventDocListPreviousPage(): AskResponse<void> {
 
   const previousIndex = state.pageIndex - 1;
 
-  yield* askUIEventDocListSetPageIndex(previousIndex, state.cursors[previousIndex] ?? null);
+  yield* askEventDocListSetPageIndex(previousIndex, state.cursors[previousIndex] ?? null);
   yield* askEventDocListLoad(state.serviceName, state.listBasePath || state.basePath);
 }

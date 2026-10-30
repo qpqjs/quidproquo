@@ -4,7 +4,7 @@ import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
 import { logLogLogic } from '../../logic/logLog';
 
-export interface GetLogLogSearchParams {
+export type GetLogLogSearchParams = {
   logLevel: LogLevelEnum;
 
   startIsoDateTime: string;
@@ -14,13 +14,13 @@ export interface GetLogLogSearchParams {
   serviceFilter: string;
 
   nextPageKey?: string;
-}
+};
 
 export function* getLogLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
   const { nextPageKey, logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter } =
     yield* askFromJsonEventRequest<GetLogLogSearchParams>(event);
 
-  const logs = yield* logLogLogic.askGetLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, nextPageKey);
+  const logs = yield* logLogLogic.askLogLogGetAll(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, nextPageKey);
 
   return toJsonEventResponse(logs);
 }

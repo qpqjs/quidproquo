@@ -1,9 +1,9 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords =
-  (_qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> =>
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> =>
   async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.

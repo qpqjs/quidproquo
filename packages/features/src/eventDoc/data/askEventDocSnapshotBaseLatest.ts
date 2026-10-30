@@ -1,6 +1,6 @@
 import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual, kvsLessThanOrEqual, Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EVENT_DOC_PRIMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSnapshotBase } from '../models';
 import { eventDocSnapshotPk, EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
@@ -18,7 +18,7 @@ export function* askEventDocSnapshotBaseLatest(
   upToEventId: number,
   snapshotCacheKey: string,
 ): AskResponse<Nullable<EventDocSnapshotBase>> {
-  const { snapshotsStoreName } = yield* askEventDocResolveStore();
+  const { snapshotsStoreName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const documentPage = yield* askKeyValueStoreQuery<EventDocStoredSnapshot>(

@@ -1,13 +1,14 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
-import { runStory } from '../../testing/storyTesting';
 import { askExecuteIf } from './askExecuteIf';
 
 describe('askExecuteIf', () => {
   it('runs the story when the condition is true', () => {
-    const result = runStory(askExecuteIf(askRandomNumber(), true), { [MathActionType.RandomNumber]: 0.5 });
+    const result = runStory(askExecuteIf(askMathRandomNumber(), true), { [MathActionType.RandomNumber]: 0.5 });
 
     expect(result).toBe(0.5);
   });
@@ -15,7 +16,7 @@ describe('askExecuteIf', () => {
   it('skips the story and returns undefined when the condition is false', () => {
     const random = vi.fn();
 
-    const result = runStory(askExecuteIf(askRandomNumber(), false), { [MathActionType.RandomNumber]: random });
+    const result = runStory(askExecuteIf(askMathRandomNumber(), false), { [MathActionType.RandomNumber]: random });
 
     expect(result).toBeUndefined();
     expect(random).not.toHaveBeenCalled();
@@ -29,7 +30,7 @@ describe('askExecuteIf', () => {
     const random = vi.fn();
 
     // e.g. yield* askExecuteIf(user.isNew && askSendWelcomeEmail(user));
-    const result = runStory(askExecuteIf(isNew && askRandomNumber()), { [MathActionType.RandomNumber]: random });
+    const result = runStory(askExecuteIf(isNew && askMathRandomNumber()), { [MathActionType.RandomNumber]: random });
 
     expect(result).toBeUndefined();
     expect(random).not.toHaveBeenCalled();

@@ -20,7 +20,7 @@ describe('defineUserScriptModule', () => {
     expect(setting.typesRuntime).toBe('/../sdk/src/v1/index.ts?qpq-user-script-module-types::declarations');
   });
 
-  it.each(['relative/a.ts', '/a.ts?x', '/a.ts::b'])('refuses [%s] as a types path', (types) => {
+  it.each(['relative/a.ts', '/a.ts?x', '/a.ts::b'])('refuses [%s] as a types path', (types: any) => {
     expect(() => defineUserScriptModule('my-sdk/v1', '/x::y', { types: types as `/${string}` })).toThrow('plain file path');
   });
 
@@ -28,13 +28,13 @@ describe('defineUserScriptModule', () => {
     expect(() => defineUserScriptModule('@qpqjs/core', '/x::y')).toThrow('shared framework package');
   });
 
-  it.each(['', './local', '/abs', 'node:fs'])('refuses [%s] as an import name', (name) => {
+  it.each(['', './local', '/abs', 'node:fs'])('refuses [%s] as an import name', (name: any) => {
     expect(() => defineUserScriptModule(name, '/x::y')).toThrow('package-style');
   });
 
   // Security regression: a module name is an import specifier the sandbox allowlists; a path-shaped or node: name
   // would let a script reach outside the module map.
-  it.each(['', './local', '../up', '/abs/path', 'node:fs', 'node:child_process'])('refuses the import name %j', (moduleName) => {
+  it.each(['', './local', '../up', '/abs/path', 'node:fs', 'node:child_process'])('refuses the import name %j', (moduleName: any) => {
     expect(() => defineUserScriptModule(moduleName, '/entry/mod::mod')).toThrow('not a package-style import name');
   });
 });

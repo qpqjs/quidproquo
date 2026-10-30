@@ -1,4 +1,4 @@
-// `qpq go:dev` — the whole local dev stack in one process: the API dev server
+// `qpq go:dev`, the whole local dev stack in one process: the API dev server
 // (go:dev:api) plus every views dev server (go:dev:web), so a single ctrl+c
 // tears it all down. A background tsc watcher keeps workspace declaration
 // output fresh for the editor (--no-types to skip it). The app is resolved
@@ -7,11 +7,14 @@
 import { getAllViews } from '@qpqjs/deploy-rspack';
 
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { startTypeWatcher } from '../lib/typeWatcher';
 import { goDevApiCommand } from './goDevApi';
 import { goDevWebCommand } from './goDevWeb';
+
+const out = createOutput('go:dev');
 
 export const goDevCommand = async (argv: string[]): Promise<void> => {
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
@@ -30,7 +33,7 @@ export const goDevCommand = async (argv: string[]): Promise<void> => {
   await goDevApiCommand(argv);
 
   if (getAllViews(getRoot(), appName).length === 0) {
-    console.log('No views projects found. Running the API dev server only.');
+    out.log('No views projects found. Running the API dev server only.');
     return;
   }
 

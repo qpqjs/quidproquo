@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askKeyValueStoreGetBase, buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { askKeyValueStoreGetBase, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getItem } from '../../../logic/dynamo';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 
 vi.mock('../../../logic/dynamo', () => ({
@@ -26,7 +26,7 @@ describe('getKeyValueStoreGetActionProcessor', () => {
     vi.mocked(getItem).mockResolvedValue({ id: '1' } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', key: '1' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: '1' });
 
     expect(result).toEqual([{ id: '1' }]);
     expect(getItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', 'pk', '1');
@@ -42,8 +42,8 @@ describe('getKeyValueStoreGetActionProcessor', () => {
     ]);
     const processor = (await getKeyValueStoreGetActionProcessor(config, {} as any))[KeyValueStoreActionType.Get];
 
-    const [, scopedWithout] = await invokeProcessor(processor, { keyValueStoreName: 'tenants', key: '1' });
-    const [, unscopedWith] = await invokeProcessor(processor, { keyValueStoreName: 'users', key: '1', options: { scope: 'tenant-a' } });
+    const [, scopedWithout] = await invokeProcessor(processor!, { keyValueStoreName: 'tenants', key: '1' });
+    const [, unscopedWith] = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: '1', options: { scope: 'tenant-a' } });
 
     expect(scopedWithout?.errorType).toBe(askKeyValueStoreGetBase.errorType.InvalidScope);
     expect(unscopedWith?.errorType).toBe(askKeyValueStoreGetBase.errorType.InvalidScope);
@@ -58,7 +58,7 @@ describe('getKeyValueStoreGetActionProcessor', () => {
     ]);
     const processor = (await getKeyValueStoreGetActionProcessor(config, {} as any))[KeyValueStoreActionType.Get];
 
-    await invokeProcessor(processor, { keyValueStoreName: 'tenants', key: '1', options: { scope: 'tenant-a' } });
+    await invokeProcessor(processor!, { keyValueStoreName: 'tenants', key: '1', options: { scope: 'tenant-a' } });
 
     expect(vi.mocked(getItem).mock.calls[0][3]).toBe('tenant-a@@QPQSCOPE@@1');
   });

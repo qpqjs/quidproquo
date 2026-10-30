@@ -1,7 +1,7 @@
 import { AskResponse, DeployEvent, DeployEventResponse } from '@qpqjs/core';
 
-import * as onDeployLogic from '../../logic/onDeployLogic';
+import { askSeedProcessDeploy } from '../../logic/askSeedProcessDeploy';
 
 export function* onDeploy(event: DeployEvent): AskResponse<DeployEventResponse> {
-  yield* onDeployLogic.onDeploy(event.deployEventType, event.deployEventStatusType);
+  yield* askSeedProcessDeploy(event.deployEventType, event.deployEventStatusType);
 }

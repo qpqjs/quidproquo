@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsCoreDataType, KvsQueryOperation, KvsUpdate } from './types';
 
@@ -15,7 +15,7 @@ export type KeyValueStoreUpdateOptions = {
 export const askKeyValueStoreUpdateBase = createActionRequester<unknown>()({
   actionType: KeyValueStoreActionType.Update,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
@@ -35,7 +35,7 @@ export const askKeyValueStoreUpdateBase = createActionRequester<unknown>()({
 
 // The updated item's shape is only known to the caller, so the base returns unknown and
 // this story casts it to what the caller declared.
-export function* askKeyValueStoreUpdate<Value>(
+function* askKeyValueStoreUpdateTyped<Value>(
   keyValueStoreName: string,
 
   updates: KvsUpdate,
@@ -47,3 +47,6 @@ export function* askKeyValueStoreUpdate<Value>(
 ): AskResponse<Value> {
   return (yield* askKeyValueStoreUpdateBase(keyValueStoreName, updates, key, sortKey, options)) as Value;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreUpdate = Object.assign(askKeyValueStoreUpdateTyped, { errorType: askKeyValueStoreUpdateBase.errorType });

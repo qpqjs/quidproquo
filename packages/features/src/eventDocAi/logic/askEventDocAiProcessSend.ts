@@ -19,7 +19,7 @@ export function* askEventDocAiProcessSend(
   message: string,
   attachments: EventDocAiAttachment[] = [],
 ): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
-  // Attachments are doc assets — they live on the collection's storage drive
+  // Attachments are doc assets, they live on the collection's storage drive
   // (uploaded via the eventDoc asset routes), not the chat-history drive.
   const docStorageDrive = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
 

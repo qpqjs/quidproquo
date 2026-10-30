@@ -16,6 +16,6 @@ export const defineEventBusSmoke = (): QPQConfig => [
         functionName: 'onSmokeProbeEvent',
       },
     },
-    { eventBusSubscriptions: [SMOKE_PROBE_EVENT_BUS] }
+    { eventBusSubscriptions: [SMOKE_PROBE_EVENT_BUS] },
   ),
 ];

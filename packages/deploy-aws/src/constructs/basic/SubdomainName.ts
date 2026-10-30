@@ -1,5 +1,5 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
+import { DomainTarget } from '@qpqjs/webserver';
 
 import { aws_apigateway, aws_certificatemanager, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -8,10 +8,10 @@ import { lookupHostedZone, resolveDeployHostForRoot, resolveHostedZoneForHost } 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { lookupDomainCertificate } from './DomainCertificateLookup';
 
-export interface SubdomainNameProps extends QpqConstructBlockProps {
+export type SubdomainNameProps = {
   target: DomainTarget;
   rootDomain: string;
-}
+} & QpqConstructBlockProps;
 
 /** A regional API Gateway custom domain plus its A record, for one target on one root. */
 export class SubdomainName extends QpqConstructBlock {

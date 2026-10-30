@@ -1,25 +1,28 @@
-// `qpq setup` — takes a cloud environment from empty to deployed, in order, with
+// `qpq setup`, takes a cloud environment from empty to deployed, in order, with
 // every step checked first so the menu shows what is already in place and a
 // rerun on a half-set-up account is safe. The platform (from the deployment's
 // entry in deploy.config.json) contributes the steps.
 //   --check      print each step's status and exit, run nothing
 //   --yes        run every step without the menu
 //   --only a,b   run only the named step ids (no menu)
+import { Nullable } from '@qpqjs/core';
+
 import { getArgValue } from '../lib/args';
+import { createOutput } from '../lib/out';
 import { promptCheckbox } from '../lib/prompts';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
-import { resolveDeployment } from '../lib/resolveDeployment';
+import { resolveCommandContext } from '../lib/resolveCommandContext';
 import { SetupCheckResult, SetupStep } from '../lib/setupStep';
-import { getPlatformDriver } from '../platforms';
 
-type CheckedStep = { step: SetupStep; result: SetupCheckResult | null };
+const out = createOutput('setup');
 
-const statusLabel = (result: SetupCheckResult | null): string => (result === null ? '?' : result.done ? 'done' : 'todo');
+type CheckedStep = { step: SetupStep; result: Nullable<SetupCheckResult> };
+
+const statusLabel = (result: Nullable<SetupCheckResult>): string => (result === null ? '?' : result.done ? 'done' : 'todo');
 
 const printChecklist = (checked: CheckedStep[]): void => {
   for (const { step, result } of checked) {
     const detail = result?.detail ? `  ${result.detail}` : '';
-    console.log(`  [${statusLabel(result).padEnd(4)}] ${step.name}${detail}`);
+    out.log(`  [${statusLabel(result).padEnd(4)}] ${step.name}${detail}`);
   }
 };
 
@@ -51,7 +54,7 @@ const chooseSteps = async (checked: CheckedStep[]): Promise<SetupStep[]> => {
   return checked.map(({ step }) => step).filter((step) => chosen.includes(step));
 };
 
-const selectFromArgs = (steps: SetupStep[], argv: string[]): SetupStep[] | null => {
+const selectFromArgs = (steps: SetupStep[], argv: string[]): Nullable<SetupStep[]> => {
   if (argv.includes('--yes')) {
     return steps;
   }
@@ -64,7 +67,7 @@ const selectFromArgs = (steps: SetupStep[], argv: string[]): SetupStep[] | null 
   const ids = only.split(',').map((id) => id.trim());
   const unknown = ids.filter((id) => !steps.some((step) => step.id === id));
   if (unknown.length > 0) {
-    console.error(`Unknown setup step id(s): ${unknown.join(', ')}. Known: ${steps.map((step) => step.id).join(', ')}`);
+    out.error(`Unknown setup step id(s): ${unknown.join(', ')}. Known: ${steps.map((step) => step.id).join(', ')}`);
     process.exit(1);
   }
 
@@ -72,21 +75,20 @@ const selectFromArgs = (steps: SetupStep[], argv: string[]): SetupStep[] | null 
 };
 
 export const setupCommand = async (argv: string[]): Promise<void> => {
-  const appName = await resolveAppSelection({ argv, envVar: 'DEPLOY_APP_NAME' });
-  const { deploymentName, deployment } = await resolveDeployment(argv, appName);
-  const driver = getPlatformDriver(deployment.platform);
+  const { appName, deploymentName, deployment, driver } = await resolveCommandContext(argv);
 
+  // Nothing to set up is a normal outcome here, not a refused command.
   if (!driver.setupSteps) {
-    console.log(`The '${deployment.platform}' platform has nothing to set up for deployment '${deploymentName}'.`);
+    out.log(`The '${deployment.platform}' platform has nothing to set up for deployment '${deploymentName}'.`);
     return;
   }
 
   const steps = await driver.setupSteps(appName, deploymentName);
 
-  console.log(`\nSetup for app '${appName}', deployment '${deploymentName}' (${deployment.platform})\n`);
+  out.log(`\nSetup for app '${appName}', deployment '${deploymentName}' (${deployment.platform})\n`);
   const checked = await checkAll(steps);
   printChecklist(checked);
-  console.log('');
+  out.log('');
 
   if (argv.includes('--check')) {
     return;
@@ -94,16 +96,16 @@ export const setupCommand = async (argv: string[]): Promise<void> => {
 
   const toRun = selectFromArgs(steps, argv) ?? (await chooseSteps(checked));
   if (toRun.length === 0) {
-    console.log('Nothing selected.');
+    out.log('Nothing selected.');
     return;
   }
 
   for (const step of toRun) {
-    console.log(`\n== ${step.name}\n`);
+    out.log(`\n== ${step.name}\n`);
     await step.run();
   }
 
-  console.log('\nSetup complete. Final state:\n');
+  out.log('\nSetup complete. Final state:\n');
   printChecklist(await checkAll(steps));
-  console.log(`\nNext: deploy the services with  npx qpq go:docker all all --app ${appName} --deployment ${deploymentName}`);
+  out.log(`\nNext: deploy the services with  npx qpq go:docker all all --app ${appName} --deployment ${deploymentName}`);
 };

@@ -1,4 +1,4 @@
-export * from './askNewGuid';
-export * from './askNewSortableGuid';
-export * from './askNewSortableGuids';
+export * from './askGuidNew';
+export * from './askGuidNewSortable';
+export * from './askGuidNewSortableMany';
 export * from './GuidActionType';

@@ -1,10 +1,1 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
-
-import { getServiceFunctionExecuteActionProcessor } from './getServiceFunctionExecuteActionProcessor';
-
-export const getServiceFunctionActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-  dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => ({
-  ...(await getServiceFunctionExecuteActionProcessor(qpqConfig, dynamicModuleLoader)),
-});
+export * from './getServiceFunctionActionProcessor';

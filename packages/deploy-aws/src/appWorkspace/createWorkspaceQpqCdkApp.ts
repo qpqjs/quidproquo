@@ -54,7 +54,7 @@ export const createWorkspaceQpqCdkApp = (): cdk.App => {
     qpqConfig: getWorkspaceAccountQpqConfig(ctx),
   });
 
-  // Bootstrapping stacks — deploy when their config changes.
+  // Bootstrapping stacks, deploy when their config changes.
   const bootstrapQpqConfig = getWorkspaceBootstrapQpqConfig(ctx);
 
   new DomainQpqServiceStack(app, qpqDeployAwsUtils.getDomainStackName(bootstrapQpqConfig), {
@@ -65,8 +65,9 @@ export const createWorkspaceQpqCdkApp = (): cdk.App => {
     qpqConfig: bootstrapQpqConfig,
   });
 
-  if (process.env.DEPLOY_SERVICE_NAME) {
-    const qpqConfig = getWorkspaceServiceQpqConfig(root, deployAppName, process.env.DEPLOY_SERVICE_NAME);
+  const deployServiceName = process.env[QpqDeployEnvVar.deployServiceName];
+  if (deployServiceName) {
+    const qpqConfig = getWorkspaceServiceQpqConfig(root, deployAppName, deployServiceName);
 
     new InfQpqServiceStack(app, qpqDeployAwsUtils.getInfStackName(qpqConfig), {
       qpqConfig,

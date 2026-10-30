@@ -1,7 +1,7 @@
 import { AskResponse, askStateRead } from '@qpqjs/core';
 import { askEventDocAiLoadChats, askEventDocAiSelectChat, EventDocAiState } from '@qpqjs/features';
 
-// Resume the most recently active chat for this log, if one exists — no
+// Resume the most recently active chat for this log, if one exists, no
 // chat-list picker UI; the first message on a fresh log implicitly starts one
 // (see askEventDocAiSendMessage).
 export function* askEventDocAiLogChatBoot(): AskResponse<void> {

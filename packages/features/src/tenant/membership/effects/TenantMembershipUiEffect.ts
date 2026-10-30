@@ -1,9 +1,9 @@
 /** Effect types on the tenant membership module. */
 export enum TenantMembershipUiEffect {
-  SetLoading = 'tenantMembershipSetLoading',
-  SetError = 'tenantMembershipSetError',
-  SetMembership = 'tenantMembershipSetMembership',
-  SetRoles = 'tenantMembershipSetRoles',
-  SetMembers = 'tenantMembershipSetMembers',
-  Reset = 'tenantMembershipReset',
+  SetLoading = 'TenantMembershipUi/SetLoading',
+  SetError = 'TenantMembershipUi/SetError',
+  SetMembership = 'TenantMembershipUi/SetMembership',
+  SetRoles = 'TenantMembershipUi/SetRoles',
+  SetMembers = 'TenantMembershipUi/SetMembers',
+  Reset = 'TenantMembershipUi/Reset',
 }

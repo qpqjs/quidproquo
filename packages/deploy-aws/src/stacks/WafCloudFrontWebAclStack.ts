@@ -1,5 +1,5 @@
-import { BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { awsNamingUtils, BootstrapWafQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm, aws_wafv2, Stack } from 'aws-cdk-lib';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
@@ -7,12 +7,12 @@ import { Construct } from 'constructs';
 
 import { buildWebAclRules } from '../constructs/feature/config/waf/wafRules';
 
-export interface WafCloudFrontWebAclStackProps {
+export type WafCloudFrontWebAclStackProps = {
   qpqConfig: QPQConfig;
   wafConfig: BootstrapWafQPQConfigSetting;
 
   stackName?: string;
-}
+};
 
 // CLOUDFRONT-scope web acls must live in us-east-1 regardless of the deploy region, so this
 // is a sibling stack spawned by the bootstrap stack (mirroring DomainCertificateStack). The
@@ -31,17 +31,16 @@ export class WafCloudFrontWebAclStack extends Stack {
       },
     });
 
-    const application = qpqCoreUtils.getApplicationName(props.qpqConfig);
-    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
+    const webAclName = awsNamingUtils.getWafWebAclName('cloudfront', props.qpqConfig);
 
     const webAcl = new aws_wafv2.CfnWebACL(this, 'web-acl', {
-      name: `qpq-waf-cloudfront-${application}-${environment}`,
+      name: webAclName,
       scope: 'CLOUDFRONT',
       defaultAction: { allow: {} },
       rules: buildWebAclRules(props.wafConfig),
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: `qpq-waf-cloudfront-${application}-${environment}`,
+        metricName: webAclName,
         sampledRequestsEnabled: true,
       },
     });
@@ -71,7 +70,7 @@ export class WafCloudFrontWebAclStack extends Stack {
       };
 
       new AwsCustomResource(this, 'web-acl-arn-param-xregion', {
-        // Plain SSM put/deleteParameter — Lambda's built-in SDK is plenty; don't
+        // Plain SSM put/deleteParameter, Lambda's built-in SDK is plenty; don't
         // npm-install the latest SDK at runtime (slow cold starts, needs internet).
         installLatestAwsSdk: false,
         onCreate: sdkCall,

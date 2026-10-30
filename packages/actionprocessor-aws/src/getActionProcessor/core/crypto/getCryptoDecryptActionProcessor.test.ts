@@ -1,12 +1,12 @@
 import { envelopeEncrypt } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askCryptoDecrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { askCryptoDecrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCachedUnwrappedDataKey } from '../../../logic/kms/getCachedUnwrappedDataKey';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getCryptoDecryptActionProcessor } from './getCryptoDecryptActionProcessor';
 
 vi.mock('../../../logic/kms/getCachedUnwrappedDataKey', () => ({
@@ -40,7 +40,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     vi.mocked(getCachedUnwrappedDataKey).mockResolvedValue(dataKey);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-a' } });
+    const result = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-a' } });
 
     expect(result).toEqual(['shhh']);
     expect(getCachedUnwrappedDataKey).toHaveBeenCalledWith(Buffer.from('wrapped-key-bytes'), { tenantId: 'tenant-a' }, 'eu-west-1');
@@ -50,7 +50,7 @@ describe('getCryptoDecryptActionProcessor', () => {
     const ciphertext = await buildCiphertext('shhh', { tenantId: 'tenant-a' }, randomBytes(32));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.ContextMismatch);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('getCryptoDecryptActionProcessor', () => {
   it('returns MalformedCiphertext for a non-blob input', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext: 'not-a-blob' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext: 'not-a-blob' });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.MalformedCiphertext);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('getCryptoDecryptActionProcessor', () => {
   it('returns KeyNotConfigured when the key is not in config', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', ciphertext: 'anything' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'unknown-key', ciphertext: 'anything' });
 
     expect(error?.errorType).toBe(askCryptoDecrypt.errorType.KeyNotConfigured);
   });
@@ -80,13 +80,13 @@ describe('getCryptoDecryptActionProcessor', () => {
     ['DisabledException', askCryptoDecrypt.errorType.KeyUnavailable],
     ['KMSInvalidStateException', askCryptoDecrypt.errorType.KeyUnavailable],
     ['AccessDeniedException', askCryptoDecrypt.errorType.KeyUnavailable],
-    ['ThrottlingException', askCryptoDecrypt.errorType.Throttling],
+    ['ThrottlingException', askCryptoDecrypt.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     const ciphertext = await buildCiphertext('shhh', undefined, randomBytes(32));
     vi.mocked(getCachedUnwrappedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', ciphertext });
 
     expect(error?.errorType).toBe(expectedType);
   });

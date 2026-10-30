@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { awsNamingUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import {
   ContentSecurityPolicyEntry,
@@ -20,7 +19,7 @@ import * as cdk from 'aws-cdk-lib';
 
 import { requireDomainResolver } from '../../../../../appWorkspace/requireDomainResolver';
 
-export const convertStrictTransportSecurity = (
+const convertStrictTransportSecurity = (
   strictTransportSecurity?: ResponseHeadersStrictTransportSecurity,
 ): aws_cloudfront.ResponseHeadersStrictTransportSecurity | undefined => {
   if (!strictTransportSecurity) {
@@ -47,12 +46,8 @@ export const convertStrictTransportSecurity = (
 // `QpqCoreStorageDriveConstruct.authorizeActionsForRole`. This replaces the previous
 // `https://*.amazonaws.com` wildcard, which allowed connections to any AWS endpoint.
 const getStorageDriveConnectSrcDomains = (qpqConfig: QPQConfig): string[] => {
-  const domains = qpqCoreUtils.getStorageDrives(qpqConfig).map((cfg) => {
-    const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-      cfg.owner?.resourceNameOverride || cfg.storageDrive,
-      qpqConfig,
-      cfg.owner?.module,
-    );
+  const domains = qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig).map((cfg) => {
+    const bucketName = awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner);
     const { awsRegion } = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
 
     return `https://${bucketName}.s3.${awsRegion}.amazonaws.com`;
@@ -83,21 +78,16 @@ export const convertContentSecurityPolicy = (
   };
 
   return {
-    contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
-      .map((directive) =>
-        [
-          directive,
-          ...contentSecurityPolicyCopy[directive].flatMap((entry) =>
-            qpqWebServerUtils.resolveContentSecurityPolicyEntry(qpqConfig, entry, domainResolver),
-          ),
-        ].join(' '),
+    contentSecurityPolicy: Object.entries(contentSecurityPolicyCopy)
+      .map(([directive, entries]) =>
+        [directive, ...entries.flatMap((entry) => qpqWebServerUtils.resolveContentSecurityPolicyEntry(qpqConfig, entry, domainResolver))].join(' '),
       )
       .join('; '),
     override: contentSecurityPolicy.override,
   };
 };
 
-export const convertContentTypeOptions = (
+const convertContentTypeOptions = (
   contentTypeOptions?: ResponseHeadersContentTypeOptions,
 ): aws_cloudfront.ResponseHeadersContentTypeOptions | undefined => {
   if (!contentTypeOptions) {
@@ -111,7 +101,7 @@ export const convertContentTypeOptions = (
   };
 };
 
-export const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
+const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
   if (!frameOptions) {
     return {
       frameOption: aws_cloudfront.HeadersFrameOption.DENY,
@@ -130,7 +120,7 @@ export const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions):
   };
 };
 
-export const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPolicy): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
+const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPolicy): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
   if (!referrerPolicy) {
     return {
       referrerPolicy: aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
@@ -155,7 +145,7 @@ export const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPo
   };
 };
 
-export const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
+const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
   if (!xssProtection) {
     return {
       protection: true,

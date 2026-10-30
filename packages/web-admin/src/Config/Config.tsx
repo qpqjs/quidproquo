@@ -61,9 +61,10 @@ export function Config() {
             fullWidth
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setSearch(filteredServices[0]?.label);
-                handleServiceClick(filteredServices[0]?.label);
+              const first = filteredServices[0];
+              if (e.key === 'Enter' && first) {
+                setSearch(first.label);
+                handleServiceClick(first.label);
               }
             }}
             placeholder="Search services"

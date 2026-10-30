@@ -1,8 +1,9 @@
-import { buildTestQpqConfig, InlineFunctionActionType } from '@qpqjs/core';
+import { InlineFunctionActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getInlineFunctionActionProcessor } from './index';
+import { getInlineFunctionActionProcessor } from './getInlineFunctionActionProcessor';
 
 describe('getInlineFunctionActionProcessor', () => {
   it('registers the inline function execute processor', async () => {

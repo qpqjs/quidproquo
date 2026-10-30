@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 import { Grid } from '@mui/material';
 
-interface GridContainerProps {
+type GridContainerProps = {
   children: ReactNode;
   spacing?: number;
   xs?: 'auto' | number;
-}
+};
 
 export const GridContainer: React.FC<GridContainerProps> = ({ children, spacing = 2, xs = 'auto' }: GridContainerProps) => {
   return (

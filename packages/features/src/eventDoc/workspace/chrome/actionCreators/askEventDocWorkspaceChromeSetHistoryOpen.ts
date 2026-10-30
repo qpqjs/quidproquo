@@ -1,0 +1,10 @@
+import { AskResponse } from '@qpqjs/core';
+
+import { askApplyEventDocEvent } from '../../../actions/askApplyEventDocEvent';
+import { EventDocWorkspaceChromeEffect } from '../effects/EventDocWorkspaceChromeEffect';
+import { EventDocWorkspaceChromeSetHistoryOpenEffect } from '../effects/EventDocWorkspaceChromeSetHistoryOpenEffect';
+
+/** Opens or closes the history panel on whichever slot this verb is bound to. */
+export function* askEventDocWorkspaceChromeSetHistoryOpen(open: boolean): AskResponse<void> {
+  yield* askApplyEventDocEvent<EventDocWorkspaceChromeSetHistoryOpenEffect>(EventDocWorkspaceChromeEffect.SetHistoryOpen, { open });
+}

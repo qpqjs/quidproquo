@@ -1,0 +1,8 @@
+import { AskResponse, askStateDispatchEffect } from '@qpqjs/core';
+
+import { VolatileEffect } from '../../effects/volatile/VolatileEffect';
+import { VolatileLogLogSearchCompletedEffect } from '../../effects/volatile/VolatileLogLogSearchCompletedEffect';
+
+export function* askVolatileLogLogSearchCompleted(searchKey: string, fetchedAt: string): AskResponse<void> {
+  yield* askStateDispatchEffect<VolatileLogLogSearchCompletedEffect>(VolatileEffect.logLogSearchCompleted, { searchKey, fetchedAt });
+}

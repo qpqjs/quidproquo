@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { FileActionType } from './FileActionType';
 
 export const askFileReadObjectJsonBase = createActionRequester<object>()({
@@ -15,6 +15,9 @@ export const askFileReadObjectJsonBase = createActionRequester<object>()({
 
 // The stored document's shape is only known to the caller, so the base returns a bare
 // object and this story casts it to what the caller declared.
-export function* askFileReadObjectJson<T extends object>(drive: string, filepath: string, scope?: string): AskResponse<T> {
+function* askFileReadObjectJsonTyped<T extends object>(drive: string, filepath: string, scope?: string): AskResponse<T> {
   return (yield* askFileReadObjectJsonBase(drive, filepath, scope)) as T;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askFileReadObjectJson = Object.assign(askFileReadObjectJsonTyped, { errorType: askFileReadObjectJsonBase.errorType });

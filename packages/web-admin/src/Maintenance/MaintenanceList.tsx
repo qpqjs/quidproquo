@@ -1,4 +1,4 @@
-import { generateUuid } from '@qpqjs/core';
+import { generateUuid, Nullable } from '@qpqjs/core';
 import { EventDocSummary, MaintenanceEffect, MaintenanceLevel, MaintenanceType, toEventDocListItem } from '@qpqjs/features';
 import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
 
@@ -23,7 +23,7 @@ type MaintenanceListProps = {
   onOpen: (docId: string) => void;
 };
 
-// All maintenances, newest first — active (open draft) vs closed (published).
+// All maintenances, newest first, active (open draft) vs closed (published).
 // "New maintenance" BEGINS one: the doc is created, its initial settings are
 // appended (level last, so a High lock only engages once the reason/type/eta
 // are already in the broadcast state), and the editor opens.
@@ -33,7 +33,7 @@ export function MaintenanceList({ onOpen }: MaintenanceListProps) {
 
   const [summaries, setSummaries] = useState<EventDocSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Nullable<string>>(null);
   const [creating, setCreating] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -55,7 +55,7 @@ export function MaintenanceList({ onOpen }: MaintenanceListProps) {
   }, []);
 
   // Create = the first update: one doc, one ADD_UPDATE carrying the full status
-  // snapshot — the maintenance is live (and broadcast) from that single append.
+  // snapshot, the maintenance is live (and broadcast) from that single append.
   const onCreate = async (values: MaintenanceUpdateFormValues) => {
     setCreating(true);
     setError(null);

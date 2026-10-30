@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, QpqRuntimeType } from '@qpqjs/core';
+import { QpqRuntimeType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

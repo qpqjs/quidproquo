@@ -1,4 +1,5 @@
-import { Action, AskResponse, ContextActionType, QueueEvent, QueueMessage, runStory } from '@qpqjs/core';
+import { Action, AskResponse, ContextActionType, QueueEvent, QueueMessage } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

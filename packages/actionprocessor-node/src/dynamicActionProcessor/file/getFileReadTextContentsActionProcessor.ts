@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askFileReadTextContents,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';

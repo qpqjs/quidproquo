@@ -1,11 +1,5 @@
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import {
-  askKeyValueStoreDelete,
-  askKeyValueStoreUpsert,
-  askNewGuid,
-  AskResponse,
-  KvsStreamEventType,
-} from 'quidproquo';
+import { askKeyValueStoreDelete, askKeyValueStoreUpsert, askGuidNew, AskResponse, KvsStreamEventType } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokePollForMarker } from '../../../harness/assert/askSmokePollForMarker';
@@ -19,7 +13,7 @@ import { smokeStreamMarkerId } from './smokeStreamMarkerId';
 // with the key stripped and the hidden copy dropped, the same as the dev
 // server does.
 export function* askRunKeyValueStoreStreamTest(): AskResponse<void> {
-  const probeId = yield* askNewGuid();
+  const probeId = yield* askGuidNew();
   const scope = `smoke-st-${probeId}`;
 
   const record: SmokeProbeRecord = {
@@ -27,42 +21,20 @@ export function* askRunKeyValueStoreStreamTest(): AskResponse<void> {
     category: 'stream',
     value: 1,
   };
-  yield* askKeyValueStoreUpsert<SmokeProbeRecord>(
-    SMOKE_STREAM_PROBE_STORE,
-    record,
-    { scope }
-  );
+  yield* askKeyValueStoreUpsert<SmokeProbeRecord>(SMOKE_STREAM_PROBE_STORE, record, { scope });
 
-  const inserted = yield* askSmokePollForMarker(
-    smokeStreamMarkerId(probeId, KvsStreamEventType.Insert),
-    'the kvs stream insert'
-  );
+  const inserted = yield* askSmokePollForMarker(smokeStreamMarkerId(probeId, KvsStreamEventType.Insert), 'the kvs stream insert');
+  yield* askSmokeAssert(inserted.scope === scope, `stream insert carried scope [${inserted.scope}], expected [${scope}]`);
+  yield* askSmokeAssert(inserted.path === probeId, `stream insert key [${inserted.path}] was not the raw key`);
   yield* askSmokeAssert(
-    inserted.scope === scope,
-    `stream insert carried scope [${inserted.scope}], expected [${scope}]`
-  );
-  yield* askSmokeAssert(
-    inserted.path === probeId,
-    `stream insert key [${inserted.path}] was not the raw key`
-  );
-  yield* askSmokeAssert(
-    !!inserted.imageAttributes?.includes('category') &&
-      inserted.imageAttributes.every(
-        (attribute) => !attribute.includes('@@QPQ')
-      ),
-    `stream insert image attributes [${inserted.imageAttributes}] missed category or leaked a reserved @@QPQ attribute`
+    !!inserted.imageAttributes?.includes('category') && inserted.imageAttributes.every((attribute) => !attribute.includes('@@QPQ')),
+    `stream insert image attributes [${inserted.imageAttributes}] missed category or leaked a reserved @@QPQ attribute`,
   );
 
   yield* askKeyValueStoreDelete(SMOKE_STREAM_PROBE_STORE, probeId, undefined, {
     scope,
   });
 
-  const removed = yield* askSmokePollForMarker(
-    smokeStreamMarkerId(probeId, KvsStreamEventType.Remove),
-    'the kvs stream remove'
-  );
-  yield* askSmokeAssert(
-    removed.scope === scope && removed.path === probeId,
-    'stream remove did not carry the scope and raw key'
-  );
+  const removed = yield* askSmokePollForMarker(smokeStreamMarkerId(probeId, KvsStreamEventType.Remove), 'the kvs stream remove');
+  yield* askSmokeAssert(removed.scope === scope && removed.path === probeId, 'stream remove did not carry the scope and raw key');
 }

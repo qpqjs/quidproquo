@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { verifyUserEmail } from '../../../logic/cognito/verifyUserEmail';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryConfirmEmailVerificationActionProcessor } from './getUserDirectoryConfirmEmailVerificationActionProcessor';
 
 vi.mock('../../../logic/cognito/verifyUserEmail', () => ({
@@ -25,7 +25,7 @@ describe('getUserDirectoryConfirmEmailVerificationActionProcessor', () => {
   it('verifies the email with the confirmation code', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { code: '123', accessToken: 'tok' });
+    const result = await invokeProcessor(processor!, { code: '123', accessToken: 'tok' });
 
     expect(result).toEqual([undefined]);
     expect(verifyUserEmail).toHaveBeenCalledWith('eu-west-1', 'tok', '123');

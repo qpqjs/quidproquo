@@ -1,9 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, DynamicFunctionsActionType, FileActionType, noopDynamicModuleLoader, UserScriptActionType } from '@qpqjs/core';
+import { DynamicFunctionsActionType, FileActionType, UserScriptActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getAwsActionProcessors } from './index';
+import { getAwsActionProcessors } from './getAwsActionProcessors';
 
 const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1')]);
 

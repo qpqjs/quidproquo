@@ -3,12 +3,7 @@ import { Nullable } from 'quidproquo';
 import { createPublicKey, JsonWebKey as NodeJsonWebKey } from 'crypto';
 import jwt from 'jsonwebtoken';
 
-import {
-  GITHUB_OIDC_AUDIENCE,
-  GITHUB_OIDC_ISSUER,
-  GITHUB_OIDC_JWKS_URL,
-  GITHUB_REPOSITORY_ID,
-} from '../../constants/githubOidc';
+import { GITHUB_OIDC_AUDIENCE, GITHUB_OIDC_ISSUER, GITHUB_OIDC_JWKS_URL, GITHUB_REPOSITORY_ID } from '../../constants/githubOidc';
 import { GithubOidcClaims } from '../../models/GithubOidcClaims';
 
 type JwksKey = { kid: string } & Record<string, unknown>;
@@ -20,8 +15,7 @@ let cachedJwksFetchedAt = 0;
 const JWKS_CACHE_TTL_MS = 10 * 60 * 1000;
 
 const getJwksKeys = async (): Promise<JwksKey[]> => {
-  const cacheIsFresh =
-    cachedJwksKeys && Date.now() - cachedJwksFetchedAt < JWKS_CACHE_TTL_MS;
+  const cacheIsFresh = cachedJwksKeys && Date.now() - cachedJwksFetchedAt < JWKS_CACHE_TTL_MS;
   if (cachedJwksKeys && cacheIsFresh) {
     return cachedJwksKeys;
   }
@@ -55,10 +49,7 @@ const getJwksKeyByKid = async (kid: string): Promise<Nullable<JwksKey>> => {
 // Verifies a GitHub Actions OIDC token and pins it to this repo and the given
 // environment. Returns the claims when everything holds, null otherwise; the
 // caller never learns why a token failed (nor does the response).
-export const verifyGithubOidcToken = async (
-  token: string,
-  expectedEnvironment: string
-): Promise<Nullable<GithubOidcClaims>> => {
+export const verifyGithubOidcToken = async (token: string, expectedEnvironment: string): Promise<Nullable<GithubOidcClaims>> => {
   try {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded || typeof decoded === 'string' || !decoded.header.kid) {

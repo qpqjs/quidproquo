@@ -1,6 +1,7 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { runStory } from '../../testing/storyTesting';
 import { AskResponse, EitherActionResult, ErrorTypeEnum } from '../../types';
 import { askCatch } from '../system/askCatch';
 import { askDecodeJson } from './askDecodeJson';

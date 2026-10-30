@@ -1,4 +1,5 @@
-import { runStory, StateActionType } from '@qpqjs/core';
+import { StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { ApiActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

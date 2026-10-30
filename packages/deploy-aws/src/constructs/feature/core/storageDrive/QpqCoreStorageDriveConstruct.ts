@@ -1,18 +1,24 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from '@qpqjs/core';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import {
+  QPQConfig,
+  qpqCoreUtils,
+  StorageDriveLifecycleRule,
+  StorageDriveQPQConfigSetting,
+  StorageDriveTier,
+  StorageDriveTransition,
+} from '@qpqjs/core';
 
 import { aws_iam, aws_kms, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqAwsCdkPathUtils } from '../../../../utils';
+import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../../webserver/emailReceiving/emailReceiptRuleSetName';
 
-export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
+export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
 
   /**
@@ -46,33 +52,51 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * may put objects and nothing else. Resolved by the (web-aware) caller from the receiver configs.
    */
   emailReceiptRuleNames?: string[];
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
   abstract bucket: aws_s3.IBucket;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.bucket.grantRead(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.bucket.grantWrite(grantee);
-  }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
   }
 }
 
+// Each tier's S3 class is the one its enum doc names. REGULAR is the class objects
+// start in, so it is never a transition target.
+const convertStorageDriveTierToAwsS3StorageClass = (storageDriveTier: StorageDriveTier): aws_s3.StorageClass => {
+  switch (storageDriveTier) {
+    case StorageDriveTier.OCCASIONAL_ACCESS:
+      return aws_s3.StorageClass.INFREQUENT_ACCESS;
+    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
+      return aws_s3.StorageClass.ONE_ZONE_INFREQUENT_ACCESS;
+    case StorageDriveTier.COLD_STORAGE:
+      return aws_s3.StorageClass.GLACIER;
+    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
+      return aws_s3.StorageClass.GLACIER_INSTANT_RETRIEVAL;
+    case StorageDriveTier.DEEP_COLD_STORAGE:
+      return aws_s3.StorageClass.DEEP_ARCHIVE;
+    case StorageDriveTier.SMART_TIERING:
+      return aws_s3.StorageClass.INTELLIGENT_TIERING;
+    case StorageDriveTier.REGULAR:
+    default:
+      throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
+  }
+};
+
 const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
-  storageClass: aws_s3.StorageClass.DEEP_ARCHIVE,
+  storageClass: convertStorageDriveTierToAwsS3StorageClass(storageDriveTransition.storageDriveTier),
   transitionAfter:
     typeof storageDriveTransition.transitionAfterDays === 'number' ? cdk.Duration.days(storageDriveTransition.transitionAfterDays) : undefined,
   transitionDate: typeof storageDriveTransition.transitionDate === 'string' ? new Date(storageDriveTransition.transitionDate) : undefined,
 });
 
 const convertStorageDriveLifecycleRuleToAwsS3LifecycleRule = (lifecycleRule: StorageDriveLifecycleRule): aws_s3.LifecycleRule => ({
+  enabled: lifecycleRule.enabled,
   prefix: lifecycleRule.prefix,
   expiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(lifecycleRule.deleteAfterDays) : undefined,
   objectSizeGreaterThan: lifecycleRule.fileSizeGreaterThan,
@@ -90,7 +114,11 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     storageDriveConfig: StorageDriveQPQConfigSetting,
   ): QpqCoreStorageDriveConstructBase {
     class Import extends QpqCoreStorageDriveConstructBase {
-      bucket = aws_s3.Bucket.fromBucketName(scope, `${id}-${storageDriveConfig.uniqueKey}`, this.resourceName(storageDriveConfig.storageDrive));
+      bucket = aws_s3.Bucket.fromBucketName(
+        scope,
+        `${id}-${storageDriveConfig.uniqueKey}`,
+        awsNamingUtils.resolveOwnedResourceName(storageDriveConfig.storageDrive, qpqConfig, storageDriveConfig.owner),
+      );
     }
 
     return new Import(scope, id, { qpqConfig });
@@ -151,7 +179,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     // Account-scoped distribution/* (not the exact distribution ARN) is the ceiling
     // here: the consuming distribution lives in the web phase (its AWS-generated id
     // is unknowable at inf synth), and a bucket resource policy is a single document
-    // owned by this stack — the web stack can't append to it later the way it can an
+    // owned by this stack, the web stack can't append to it later the way it can an
     // IAM role policy.
     if (props.allowCloudFrontRead) {
       this.bucket.addToResourcePolicy(
@@ -184,7 +212,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
             StringEquals: {
               'AWS:SourceAccount': awsAccountId,
               'AWS:SourceArn': props.emailReceiptRuleNames.map(
-                (ruleName) => `arn:aws:ses:${region}:${awsAccountId}:receipt-rule-set/${QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/${ruleName}`,
+                (ruleName) =>
+                  `arn:aws:ses:${region}:${awsAccountId}:receipt-rule-set/${awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME}:receipt-rule/${ruleName}`,
               ),
             },
           },
@@ -258,37 +287,18 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: driveActions,
-        resources: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
+    grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverStorageDriveAccess',
+      actions: driveActions,
+      ownedResourceArns: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
+      ownedByTag: false,
+      // The same naming path as `resolveStorageDriveBucketName`, so no CDK cross-stack ref is created.
+      foreignArns: getForeignConfigs(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+        const bucketArn = `arn:aws:s3:::${awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner)}`;
+
+        return [bucketArn, `${bucketArn}/*`];
       }),
-    );
-
-    // Deterministically-computed ARNs for drives declared in this service's
-    // config but owned by another service. Uses the same naming path as
-    // `resolveStorageDriveBucketName` so no CDK cross-stack ref is created.
-    // Cross-service access stays as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const allDriveConfigs = qpqCoreUtils.getStorageDrives(qpqConfig);
-    const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDrives(qpqConfig);
-    const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
-
-    const foreignArns = foreignDriveConfigs.flatMap((cfg) => {
-      const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-        cfg.owner?.resourceNameOverride || cfg.storageDrive,
-        qpqConfig,
-        cfg.owner?.module,
-      );
-      const bucketArn = `arn:aws:s3:::${bucketName}`;
-      return [bucketArn, `${bucketArn}/*`];
     });
-
-    if (foreignArns.length > 0) {
-      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverStorageDriveAccess', driveActions, foreignArns);
-    }
 
     // KMS use for a drive's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
     // which covers every crypto key declared in this config.

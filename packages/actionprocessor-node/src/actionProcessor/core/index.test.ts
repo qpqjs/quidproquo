@@ -1,8 +1,9 @@
-import { buildTestQpqConfig, DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from '@qpqjs/core';
+import { DynamicFunctionsActionType, InlineFunctionActionType, StreamActionType, UserScriptActionType } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getCoreActionProcessor } from './index';
+import { getCoreActionProcessor } from './getCoreActionProcessor';
 
 describe('getCoreActionProcessor', () => {
   it('merges the js core processors with the node-specific stream, function and user-script processors', async () => {

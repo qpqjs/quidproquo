@@ -1,7 +1,7 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocUpsert } from '../data/askEventDocUpsert';
 import { EventDocEventActor, EventDocSummary, eventDocSummaryViewSchema } from '../models';
 import { applyEventDocSummaryEvent, createEventDocSummarySeed } from '../summary';
@@ -14,7 +14,7 @@ import { askEventDocSeedInitState } from './askEventDocSeedInitState';
  * write, e.g. to provide a storage scope derived from it.
  */
 export function* askEventDocCreate(name: string, code: string, actor: EventDocEventActor, id?: string): AskResponse<EventDocSummary> {
-  const { type } = yield* askEventDocResolveStore();
+  const { type } = yield* askEventDocStoreReadOrThrow();
   const docId = id ?? (yield* askEventDocGenerateNewId());
 
   const initEvent = yield* askEventDocSeedInitState(docId, code, name, actor);

@@ -10,7 +10,7 @@ import {
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';

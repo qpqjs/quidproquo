@@ -14,12 +14,12 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqAccountSecurityServicesConstructProps extends QpqConstructBlockProps {
+export type QpqAccountSecurityServicesConstructProps = {
   securityServicesConfig: AccountSecurityServicesQPQConfigSetting;
 
   /** The account CloudTrail's CloudWatch log group - required for cognitoAuthFailureAlert. */
   cloudTrailLogGroup?: aws_logs.ILogGroup;
-}
+} & QpqConstructBlockProps;
 
 // GuardDuty detectors and Security Hub hubs are one-per-account+region, which is exactly
 // why they live in the account stack rather than any app's bootstrap - an app teardown

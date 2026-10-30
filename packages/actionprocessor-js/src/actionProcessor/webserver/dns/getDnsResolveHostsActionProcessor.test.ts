@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, resolveActionResult } from '@qpqjs/core';
+import { resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineApi, defineDns, DnsActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

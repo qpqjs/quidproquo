@@ -6,7 +6,7 @@ import { EventDocTransferPlanRow } from '../../models';
 
 /** POST /transfer/import: applies the uploaded bundle and returns a row per doc. */
 export function* askEventDocImportFetch(serviceName: string, transferId: string, force = false): AskResponse<EventDocTransferPlanRow[]> {
-  const response = yield* askApiRequest<{ transferId: string; force: boolean }, EventDocTransferPlanRow[]>(
+  const response = yield* askApiRequest<EventDocTransferPlanRow[], { transferId: string; force: boolean }>(
     serviceName,
     'POST',
     eventDocTransferEndpoint('import'),

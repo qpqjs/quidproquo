@@ -6,6 +6,7 @@ import {
   askUserScriptListExports,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
   isErroredActionResult,
   QPQConfig,
   QpqLogger,
@@ -18,15 +19,13 @@ import {
   UserScriptRunnerResult,
 } from '@qpqjs/core';
 
-import { randomUUID } from 'crypto';
-
-import { getUserScriptRunnerActionProcessors } from '../getUserScriptRunnerActionProcessors';
-import { getUserScriptModuleMap } from '../logic/getUserScriptModuleMap';
-import { listUserScriptExports } from '../logic/listUserScriptExports';
-import { loadUserScriptHostModules } from '../logic/loadUserScriptHostModules';
-import { runUserScript } from '../logic/runUserScript';
-import { UserScriptModuleMap } from '../logic/UserScriptModuleMap';
-import { UserScriptModuleNotFoundError } from '../logic/UserScriptModuleNotFoundError';
+import { getUserScriptRunnerActionProcessor } from '../getUserScriptRunnerActionProcessor';
+import { getUserScriptModuleMap } from '../utils/getUserScriptModuleMap';
+import { isUserScriptModuleNotFoundError } from '../utils/isUserScriptModuleNotFoundError';
+import { listUserScriptExports } from '../utils/listUserScriptExports';
+import { loadUserScriptHostModules } from '../utils/loadUserScriptHostModules';
+import { runUserScript } from '../utils/runUserScript';
+import { UserScriptModuleMap } from '../utils/UserScriptModuleMap';
 import { fetchUserScriptSource } from './fetchUserScriptSource';
 
 const { errorType } = askUserScriptExecuteBase;
@@ -46,7 +45,7 @@ const listExports = (filename: string, source: string, modules: UserScriptModule
   try {
     return actionResult(listUserScriptExports(filename, source, modules));
   } catch (error) {
-    if (error instanceof UserScriptModuleNotFoundError) {
+    if (isUserScriptModuleNotFoundError(error)) {
       return actionResultError(askUserScriptListExports.errorType.ModuleNotFound, error.message);
     }
     return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, getErrorMessage(error));
@@ -94,10 +93,10 @@ export const handleUserScriptRunnerEvent = async (
           resolveStory: createRuntime(
             qpqConfig,
             event.storySession,
-            getUserScriptRunnerActionProcessors,
+            getUserScriptRunnerActionProcessor,
             () => new Date().toISOString(),
             silentLogger,
-            `${event.filename}::${randomUUID()}`,
+            `${event.filename}::${generateUuid()}`,
             QpqRuntimeType.EXECUTE_STORY,
             dynamicModuleLoader,
           ),

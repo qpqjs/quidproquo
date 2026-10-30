@@ -4,23 +4,19 @@ import {
   askEventMatchStoryBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from '@qpqjs/core';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { MatchResult } from './types';
 
-// TODO: Don't use Globals like this
-const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
+const getProcessMatchStory = (qpqConfig: QPQConfig, userDirectoryName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
   return async ({ qpqEventRecord }) => {
     if (!userDirectoryConfig?.customAuthRuntime?.verifyAuthChallenge) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.verifyAuthChallenge in [${GLOBAL_USER_DIRECTORY_NAME}]`);
+      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.verifyAuthChallenge in [${userDirectoryName}]`);
     }
 
     return actionResult<MatchResult>({
@@ -29,4 +25,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The user directory the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (userDirectoryName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, userDirectoryName));

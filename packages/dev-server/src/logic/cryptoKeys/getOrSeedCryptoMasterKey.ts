@@ -2,6 +2,7 @@ import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { randomBytes } from 'crypto';
 
+import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
 // Offline stand-in for a KMS CMK: a 32-byte master key per configured crypto
@@ -15,17 +16,15 @@ import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 const CRYPTO_KEYS_STORE_DIRECTORY = 'cryptoKeys';
 
 export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyName: string, qpqConfig: QPQConfig): Promise<Buffer> => {
-  const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
+  const cryptoKeyConfig = qpqCoreUtils.resolveCryptoKeyOrThrow(cryptoKeyName, qpqConfig);
 
-  // Mirrors the AWS runtime's resolveCryptoKeyAlias: a cross-module owner
-  // redirects storage to the owning service's file
-  const serviceName = cryptoKeyConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const key = cryptoKeyConfig.owner?.resourceNameOverride || cryptoKeyName;
+  const { serviceName, key } = resolveOwnedStoreLocation(cryptoKeyName, cryptoKeyConfig.owner, qpqConfig);
 
   const keys = await readJsonFileStore<string>(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName);
 
-  if (key in keys) {
-    return Buffer.from(keys[key], 'base64');
+  const existing = keys[key];
+  if (existing !== undefined) {
+    return Buffer.from(existing, 'base64');
   }
 
   const masterKey = randomBytes(32);

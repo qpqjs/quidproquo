@@ -1,9 +1,9 @@
 import { EventDocEventPayload } from '@qpqjs/features';
 
-import { AdminSessionState } from '../../AdminSessionState';
-import { TabChangedData } from '../../effects/session/TabChangedEvent';
+import { AdminSessionTabChangedData } from '../../effects/session/AdminSessionTabChangedEffect';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
-export const tabChanged = (state: AdminSessionState, { data }: EventDocEventPayload<TabChangedData>): AdminSessionState => ({
+export const tabChanged = (state: AdminSessionState, { data }: EventDocEventPayload<AdminSessionTabChangedData>): AdminSessionState => ({
   ...state,
   tab: data.tab,
 });

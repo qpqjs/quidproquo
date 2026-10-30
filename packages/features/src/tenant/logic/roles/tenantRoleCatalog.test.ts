@@ -50,7 +50,7 @@ describe('buildTenantRoleCatalog', () => {
     const catalog = buildTenantRoleCatalog(appCatalog);
 
     expect(Object.keys(catalog).sort()).toEqual(['approver', 'investigator', TENANT_ADMIN_ROLE]);
-    expect(catalog[TENANT_ADMIN_ROLE].permissions).toEqual(
+    expect(catalog![TENANT_ADMIN_ROLE]!.permissions).toEqual(
       expect.arrayContaining([TenantPermission.MembersManage, TenantPermission.RolesAssign, 'eventDoc:tenants:write']),
     );
   });

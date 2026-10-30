@@ -1,9 +1,8 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigatewayv2, aws_iam, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigatewayv2, aws_iam } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { importStackValue } from '../../../../utils';
@@ -12,10 +11,9 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { SubdomainName } from '../../../basic';
 import { Function } from '../../../basic/Function';
 
-export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
+export type QpqApiWebserverWebsocketConstructProps = {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiWebserverWebsocketConstructProps) {
@@ -42,13 +40,10 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     const func = new Function(this, 'api-function', {
-      functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
-      functionType: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
-      executorName: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.websocketConfig.apiName, awsNamingUtils.QpqLambdaKind.Websocket)),
+      handler: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         websocketApiName: props.websocketConfig.apiName,
@@ -59,16 +54,13 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    // Let api gateway invoke this ok
-    func.lambdaFunction.grantInvoke(
-      new aws_iam.ServicePrincipal('apigateway.amazonaws.com', {
-        conditions: {
-          ArnLike: {
-            'aws:SourceArn': `arn:aws:execute-api:${region}:${awsAccountId}:${apiId}/*`,
-          },
-        },
-      }),
-    );
+    // A fixed construct id: grantInvoke derives one from the principal, and the imported api id
+    // token renders differently on every synth, which would replace the permission on every deploy.
+    func.lambdaFunction.addPermission('api-gateway-invoke', {
+      principal: new aws_iam.ServicePrincipal('apigateway.amazonaws.com'),
+      action: 'lambda:InvokeFunction',
+      sourceArn: `arn:aws:execute-api:${region}:${awsAccountId}:${apiId}/*`,
+    });
 
     const integration = new aws_apigatewayv2.CfnIntegration(this, 'websocket-integration', {
       apiId,
@@ -76,7 +68,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       integrationUri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${func.lambdaFunction.functionArn}/invocations`,
     });
 
-    // Create the route and associate it with the integration
     const connectRoute = new aws_apigatewayv2.CfnRoute(this, 'connect-route', {
       apiId,
       routeKey: '$connect',
@@ -86,7 +77,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       operationName: 'connect',
     });
 
-    // Create the route and associate it with the integration
     const disconnectRoute = new aws_apigatewayv2.CfnRoute(this, 'disconnect-route', {
       apiId,
       routeKey: '$disconnect',
@@ -96,7 +86,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       operationName: 'disconnect',
     });
 
-    // Create the route and associate it with the integration
     const defaultRoute = new aws_apigatewayv2.CfnRoute(this, 'default-route', {
       apiId,
       routeKey: '$default',

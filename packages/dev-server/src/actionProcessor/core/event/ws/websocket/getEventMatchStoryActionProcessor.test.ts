@@ -1,17 +1,9 @@
-import {
-  buildTestQpqConfig,
-  ErrorTypeEnum,
-  EventActionType,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { defineWebsocket, WebSocketEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
 const onConnect = '/entry::onConnect' as const;
@@ -23,7 +15,7 @@ const buildConfig = () => buildTestQpqConfig([defineWebsocket('ws', { onConnect,
 const invoke = async (eventType: string) => {
   const processors = await getEventMatchStoryActionProcessor(buildConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.MatchStory];
-  return invokeProcessor(process, { qpqEventRecord: { apiName: 'api', eventType }, eventParams: [] } as any);
+  return invokeProcessor(process!, { qpqEventRecord: { apiName: 'api', eventType }, eventParams: [] } as any);
 };
 
 describe('getEventMatchStoryActionProcessor (websocket)', () => {

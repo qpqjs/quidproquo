@@ -11,11 +11,7 @@ export default [
   defineDevServerOptions({ views: { port: 3084 } }),
 
   // never change the app name, it will result in a new stack!
-  defineQpqjsService(
-    QpqjsServiceEnum.TestA,
-    __dirname,
-    '../../../../../../dist/apps/qpqjs/services/testa/service'
-  ),
+  defineQpqjsService(QpqjsServiceEnum.TestA, __dirname, '../../../../../../dist/apps/qpqjs/services/testa/service'),
 
   defineSmokeProbes(),
 ];

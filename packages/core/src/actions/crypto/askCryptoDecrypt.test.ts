@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { askCryptoDecrypt } from './askCryptoDecrypt';
 import { CryptoActionType } from './CryptoActionType';
 
@@ -51,7 +51,7 @@ describe('askCryptoDecrypt', () => {
         ContextMismatch: `${CryptoActionType.Decrypt}-ContextMismatch`,
         MalformedCiphertext: `${CryptoActionType.Decrypt}-MalformedCiphertext`,
         KeyUnavailable: `${CryptoActionType.Decrypt}-KeyUnavailable`,
-        Throttling: `${CryptoActionType.Decrypt}-Throttling`,
+        Throttled: `${CryptoActionType.Decrypt}-Throttled`,
       });
     });
   });

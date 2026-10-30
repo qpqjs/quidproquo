@@ -1,17 +1,16 @@
 import {
-  buildTestQpqConfig,
   defineEventBus,
   defineKeyValueStore,
   defineQueue,
   EventBusActionType,
   KeyValueStoreActionType,
   LogActionType,
-  noopDynamicModuleLoader,
   PlatformActionType,
   QueueActionType,
   resolveActionResult,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -43,8 +42,8 @@ describe('getCoreActionProcessor', () => {
     const processors = await getCoreActionProcessor(config, noopDynamicModuleLoader, devServerConfig);
 
     expect(processors[KeyValueStoreActionType.Get]).toBeDefined();
-    expect(processors[EventBusActionType.SendMessages]).toBeDefined();
-    expect(processors[QueueActionType.SendMessages]).toBeDefined();
+    expect(processors[EventBusActionType.SendMessage]).toBeDefined();
+    expect(processors[QueueActionType.SendMessage]).toBeDefined();
     expect(processors[LogActionType.Create]).toBeDefined();
     expect(processors[UserDirectoryActionType.DecodeAccessToken]).toBeDefined();
   });

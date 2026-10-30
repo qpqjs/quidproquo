@@ -70,6 +70,9 @@ jobs:
           npm version "$LEVEL" --ws --no-workspaces-update
           npx tsx ./scripts/applyPatch.ts
           npm install
+          # The site has its own lockfile over file: links to the packages, so it is
+          # resolved locally here and never waits on the registry.
+          npm install --package-lock-only --ignore-scripts --prefix quidproquojs.com
           version=$(node -p "require('./packages/core/package.json').version")
           if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
             echo "::error::$version is already tagged"

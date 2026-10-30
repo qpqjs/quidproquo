@@ -1,14 +1,6 @@
-import {
-  actionResult,
-  askEventGetStorySessionBase,
-  createActionProcessor,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-  storageScopeContext,
-} from '@qpqjs/core';
+import { actionResult, askEventGetStorySessionBase, createActionProcessor, ProcessorFor, QPQConfig, storageScopeContext } from '@qpqjs/core';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord } from './types';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
@@ -23,7 +15,7 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof as
       });
     }
 
-    return actionResult(void 0);
+    return actionResult(null);
   };
 };
 

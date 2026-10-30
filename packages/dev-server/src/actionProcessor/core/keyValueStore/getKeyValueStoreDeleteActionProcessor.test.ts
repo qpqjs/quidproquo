@@ -1,22 +1,19 @@
 import {
   askKeyValueStoreDelete,
-  buildTestQpqConfig,
-  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
   kvsKey,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -27,7 +24,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 // The processors resolve the store's config up front (scope gate), so the
 // store under test must be declared.
@@ -45,7 +42,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     repo.delete.mockResolvedValue(true);
     const process = await getProcessor();
 
-    await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a', sortKey: 'b' });
+    await invokeProcessor(process!, { keyValueStoreName: 'store', key: 'a', sortKey: 'b' });
 
     expect(repo.delete).toHaveBeenCalledWith('store', 'a#b', undefined);
   });
@@ -54,7 +51,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     repo.delete.mockResolvedValue(true);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 'a' });
 
     expect(repo.delete).toHaveBeenCalledWith('store', 'a', undefined);
     expect(resolveActionResult(result)).toBeUndefined();
@@ -64,7 +61,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     repo.delete.mockResolvedValue(false);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 'a' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
@@ -75,7 +72,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     repo.delete.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 'a' });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreDelete.errorType.StoreNotFound);
   });
@@ -84,7 +81,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     repo.delete.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', key: 'a' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

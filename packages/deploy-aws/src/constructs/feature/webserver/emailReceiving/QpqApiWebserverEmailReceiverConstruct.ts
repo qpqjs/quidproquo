@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { EmailReceiverQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
@@ -5,13 +6,11 @@ import { aws_ses } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { emailReceiptRuleName } from './emailReceiptRuleName';
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from './emailReceiptRuleSetName';
 import { resolveEmailReceivingHosts } from './resolveEmailReceivingHosts';
 
-export interface QpqApiWebserverEmailReceiverConstructProps extends QpqConstructBlockProps {
+export type QpqApiWebserverEmailReceiverConstructProps = {
   emailReceiverConfig: EmailReceiverQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The app's rule in the account's shared receipt rule set: mail to the receiving host of any
 // root lands in the receiver's own drive. The set is referenced by name (the account stack owns
@@ -31,14 +30,14 @@ export class QpqApiWebserverEmailReceiverConstruct extends QpqConstructBlock {
     }
 
     // defineEmailReceiver declares the drive beside the receiver, so it is always owned here.
-    if (!qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).some((drive) => drive.storageDrive === storageDriveName)) {
+    if (!qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).some((drive) => drive.storageDrive === storageDriveName)) {
       throw new Error(`Email receiver "${name}" has no storage drive "${storageDriveName}" in this service; declare it with defineEmailReceiver`);
     }
 
     new aws_ses.CfnReceiptRule(this, 'rule', {
-      ruleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
+      ruleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME,
       rule: {
-        name: emailReceiptRuleName(props.qpqConfig, name),
+        name: awsNamingUtils.getEmailReceiptRuleName(name, props.qpqConfig),
         enabled: true,
         recipients,
         scanEnabled: true,

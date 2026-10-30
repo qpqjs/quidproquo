@@ -11,16 +11,16 @@ import { TraceViewer } from '../../../TraceViewer';
 import { AsyncStoryState } from '../../hooks';
 import { MovedToColdStorage } from '../../MovedToColdStorage';
 
-interface TraceTabProps {
+type TraceTabProps = {
   log: AsyncStoryState;
   isVisible: boolean;
-}
+};
 
 // Backstop for a missed TraceDone websocket message (reconnect gaps, dev servers
 // without the admin socket). checkOnly polls never trigger trace runs.
 const PENDING_POLL_MS = 15_000;
 
-// Async trace flow: the first open only checks for a stored trace — found ones load
+// Async trace flow: the first open only checks for a stored trace, found ones load
 // immediately, otherwise an explainer with a Begin Trace button is shown. Beginning a
 // trace kicks off a fire-and-forget run in the owning service and this tab waits for
 // its TraceDone websocket push (with a slow checkOnly poll as a fallback). See
@@ -35,10 +35,10 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
   const [hasRequested, setHasRequested] = useState(false);
   const [hasCheckedForStoredTrace, setHasCheckedForStoredTrace] = useState(false);
 
-  // "My code only" — held here so Begin Trace / Re-run Trace can send it: a trace with
+  // "My code only", held here so Begin Trace / Re-run Trace can send it: a trace with
   // it on sets no breakpoints outside the user's own code. Every step pause freezes the
   // replay for several inspector round trips, so full traces of real bundles burn the
-  // whole wall-clock budget on framework glue — own-code-only is the sane default.
+  // whole wall-clock budget on framework glue, own-code-only is the sane default.
   const [hideExternalSteps, setHideExternalSteps] = useState(true);
 
   // The request a stale async response must not clobber (rapid re-runs, dialog reuse)
@@ -61,8 +61,8 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
         setTrace(result.trace);
         setIsWaiting(false);
       } else if (result.pending && !options.checkOnly) {
-        // check=true reports pending whenever no trace is stored — the server can't
-        // tell idle from in-flight — so only a real trace request may start waiting
+        // check=true reports pending whenever no trace is stored, the server can't
+        // tell idle from in-flight, so only a real trace request may start waiting
         setIsWaiting(true);
       } else if (!options.checkOnly) {
         setTraceError('No trace was produced for this log');
@@ -80,14 +80,14 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
   useEffect(() => {
     if (isVisible && !hasRequested && !log.isLoading && !log.isLogInColdStorage) {
       setHasRequested(true);
-      // First open never starts a trace — it only loads a stored one; starting one is
+      // First open never starts a trace, it only loads a stored one; starting one is
       // the explicit Begin Trace action below
       requestTrace({ checkOnly: true }).finally(() => setHasCheckedForStoredTrace(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, hasRequested, log.isLoading, log.isLogInColdStorage]);
 
-  // The owning service finished tracing — the log service pushed the result
+  // The owning service finished tracing, the log service pushed the result
   useSubscribeToWebSocketEvent(
     WebSocketQueueQpqAdminServerMessageEventType.TraceDone,
     (webSocketService, message: WebSocketQueueQpqAdminServerEventMessageTraceDone) => {
@@ -104,7 +104,7 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
     },
   );
 
-  // Poll fallback while waiting — checkOnly, so it can never stack trace runs
+  // Poll fallback while waiting, checkOnly, so it can never stack trace runs
   useEffect(() => {
     if (!isWaiting) {
       return;
@@ -156,7 +156,7 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
       return null;
     }
 
-    // No stored trace — explain what tracing is and let the user start one explicitly.
+    // No stored trace, explain what tracing is and let the user start one explicitly.
     // Begin Trace deliberately leaves refresh false so a trace that landed since the
     // check is served straight from storage instead of re-running.
     const isTraceable = log.log?.runtimeType === QpqRuntimeType.EXECUTE_STORY;

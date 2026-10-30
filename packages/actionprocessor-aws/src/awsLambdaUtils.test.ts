@@ -2,17 +2,7 @@ import { StorageDriveTier } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { findApiRoute, getS3BucketStorageClassFromStorageDriveTier, matchRoutePath, matchUrl, randomGuid } from './awsLambdaUtils';
-
-describe('randomGuid', () => {
-  it('returns a v4-shaped uuid', () => {
-    expect(randomGuid()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-  });
-
-  it('returns a different value each call', () => {
-    expect(randomGuid()).not.toBe(randomGuid());
-  });
-});
+import { findApiRoute, getS3BucketStorageClassFromStorageDriveTier, matchRoutePath, matchUrl } from './awsLambdaUtils';
 
 describe('matchUrl', () => {
   it('matches a templated path and extracts its params', () => {

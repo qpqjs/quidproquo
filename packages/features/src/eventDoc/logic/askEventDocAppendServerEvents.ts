@@ -1,29 +1,12 @@
-import {
-  askCatch,
-  askDateNow,
-  askKeyValueStoreUpsertManyBase,
-  askNewSortableGuids,
-  AskResponse,
-  askRetry,
-  askThrowError,
-  ErrorTypeEnum,
-} from '@qpqjs/core';
+import { askCatch, askDateNow, askGuidNewSortableMany, askKeyValueStoreUpsertManyBase, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
-import {
-  EVENT_DOC_APPEND_MAX_RETRIES,
-  EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
-  EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS,
-} from '../constants/eventDocAppendRetry';
+import { EVENT_DOC_APPEND_MAX_RETRIES } from '../constants/eventDocAppendRetry';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { askEventDocEventWriteMany } from '../data/askEventDocEventWriteMany';
-import { EventDocAppendBase, EventDocEffect, EventDocEvent, EventDocEventActor, EventDocServerEventInput } from '../models';
-import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
-import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
-import { EventDocEventAppendOptions } from './askEventDocEventAppend';
+import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventAppendOptions, EventDocServerEventInput } from '../models';
+import { askEventDocAppendRefold } from './askEventDocAppendRefold';
+import { askEventDocAppendRetrying } from './askEventDocAppendRetrying';
 import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
-import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
-import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
-import { isEventDocReservedEffect } from './isEventDocReservedEffect';
 
 /**
  * Append a burst of server-authored events as one conditional transaction claiming head + 1 .. head + n
@@ -31,9 +14,6 @@ import { isEventDocReservedEffect } from './isEventDocReservedEffect';
  * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt. A batch
  * holding a reserved lifecycle event brings the summary row up to its last event before returning.
  */
-const isSlotRaceError = (errorType: string): boolean =>
-  errorType === askKeyValueStoreUpsertManyBase.errorType.Conflict || errorType === askKeyValueStoreUpsertManyBase.errorType.WriteContention;
-
 export function* askEventDocAppendServerEvents(
   modelId: string,
   inputs: EventDocServerEventInput[],
@@ -57,67 +37,35 @@ export function* askEventDocAppendServerEvents(
   }
 
   const now = yield* askDateNow();
-  const clientMessageIds = yield* askNewSortableGuids(inputs.length);
+  const clientMessageIds = yield* askGuidNewSortableMany(inputs.length);
 
-  let base: EventDocAppendBase = yield* askEventDocAppendBaseResolve(modelId, options.validate);
-  let lostLaps = 0;
-
-  function* askAppendLap(): AskResponse<EventDocEvent[]> {
-    if (lostLaps > 0) {
-      base = yield* askEventDocAppendBaseAdvance(modelId, base);
-    }
-    lostLaps += 1;
-
-    const events: EventDocEvent[] = inputs.map((input, index) => ({
-      type: input.type,
-      payload: {
-        data: input.data,
-        metadata: {
-          version: input.version,
-          clientMessageId: clientMessageIds[index],
-          createdBy: actor,
-          createdAt: now,
-          eventId: base.headEventId + 1 + index,
+  const events = yield* askEventDocAppendRetrying(modelId, options.validate, {
+    buildEvents: (base) =>
+      inputs.map((input, index) => ({
+        type: input.type,
+        payload: {
+          data: input.data,
+          metadata: {
+            version: input.version,
+            clientMessageId: clientMessageIds[index] ?? '',
+            createdBy: actor,
+            createdAt: now,
+            eventId: base.headEventId + 1 + index,
+          },
         },
-      },
-    }));
+      })),
+    askWrite: askEventDocEventWriteMany,
+    slotRaceErrorTypes: [askKeyValueStoreUpsertManyBase.errorType.Conflict, askKeyValueStoreUpsertManyBase.errorType.WriteContention],
+    contentionText: `Could not append ${inputs.length} events to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - another writer is on this document.`,
+  });
 
-    if (base.state) {
-      yield* askEventDocValidateAppendRun(events, base.state.state);
-    }
-
-    yield* askEventDocEventWriteMany(modelId, events);
-
-    return events;
-  }
-
-  const result = yield* askRetry(
-    askAppendLap,
-    EVENT_DOC_APPEND_MAX_RETRIES,
-    EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
-    [askKeyValueStoreUpsertManyBase.errorType.Conflict, askKeyValueStoreUpsertManyBase.errorType.WriteContention],
-    { linearBackoff: true, maxJitterMs: EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS },
-  );
-
-  if (!result.success) {
-    if (isSlotRaceError(result.error.errorType)) {
-      return yield* askThrowError(
-        ErrorTypeEnum.Conflict,
-        `Could not append ${inputs.length} events to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - another writer is on this document.`,
-      );
-    }
-
-    return yield* askThrowError(result.error.errorType, result.error.errorText, result.error.errorStack);
-  }
-
-  const events = result.result;
-
-  if (events.some((event) => isEventDocReservedEffect(event.type))) {
-    yield* askEventDocSummaryRefold(modelId, events[events.length - 1].payload.metadata.eventId);
-  }
+  yield* askEventDocAppendRefold(modelId, events);
 
   // One push for the batch, at its last event. Best-effort, as in the single append.
-  yield* askCatch(askEventDocSendHeadMoved(modelId, events[events.length - 1]));
+  const lastEvent = events[events.length - 1];
+  if (lastEvent) {
+    yield* askCatch(askEventDocSendHeadMoved(modelId, lastEvent));
+  }
 
   return events;
 }

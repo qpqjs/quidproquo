@@ -7,10 +7,11 @@ describe('defineCertificate', () => {
   it('builds a Certificate setting keyed by onRootDomain and subdomain', () => {
     expect(defineCertificate(true, 'example.com', 'app')).toEqual({
       configSettingType: QPQWebServerConfigSettingType.Certificate,
-      uniqueKey: 'trueapp',
+      uniqueKey: 'true:app',
       onRootDomain: true,
       subdomain: 'app',
       rootDomain: 'example.com',
+      deprecated: false,
     });
   });
 
@@ -18,6 +19,6 @@ describe('defineCertificate', () => {
     const setting = defineCertificate(false, 'example.com');
 
     expect(setting.subdomain).toBeUndefined();
-    expect(setting.uniqueKey).toBe('falseundefined');
+    expect(setting.uniqueKey).toBe('false:');
   });
 });

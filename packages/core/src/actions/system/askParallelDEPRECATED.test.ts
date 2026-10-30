@@ -1,20 +1,21 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { AskResponse } from '../../types';
-import { askNewGuid } from '../guid/askNewGuid';
+import { askGuidNew } from '../guid/askGuidNew';
 import { GuidActionType } from '../guid/GuidActionType';
-import { askRandomNumber } from '../math/askRandomNumber';
+import { askMathRandomNumber } from '../math/askMathRandomNumber';
 import { MathActionType } from '../math/MathActionType';
 import { askParallelDEPRECATED } from './askParallelDEPRECATED';
 
 describe('askParallelDEPRECATED', () => {
   it('runs each story and returns their results positionally', () => {
     function* storyA(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
     function* storyB(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
 
     const result = runStory(askParallelDEPRECATED([[storyA], [storyB]]), {
@@ -27,7 +28,7 @@ describe('askParallelDEPRECATED', () => {
 
   it('passes the trailing tuple entries as story arguments', () => {
     function* echo(prefix: string): AskResponse<string> {
-      const guid = yield* askNewGuid();
+      const guid = yield* askGuidNew();
       return `${prefix}-${guid}`;
     }
 
@@ -45,15 +46,15 @@ describe('askParallelDEPRECATED', () => {
   });
 
   it('keeps stepping longer stories after shorter ones finish', () => {
-    // Regression: a finished story used to leave a null hole in the batch sent to the
-    // runtime, which crashed the batch processor. The pending action must be batched
-    // alone and its result routed back to the right story.
+    // A finished story must not leave a null hole in the batch sent to the runtime (that
+    // crashes the batch processor): the pending action is batched alone and its result
+    // routed back to the right story.
     function* shortStory(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
     function* longStory(): AskResponse<string> {
-      const first = yield* askNewGuid();
-      const second = yield* askNewGuid();
+      const first = yield* askGuidNew();
+      const second = yield* askGuidNew();
       return `${first}+${second}`;
     }
 
@@ -67,10 +68,10 @@ describe('askParallelDEPRECATED', () => {
 
   it('propagates a failing action in one of the stories as a thrown error', () => {
     function* storyA(): AskResponse<number> {
-      return yield* askRandomNumber();
+      return yield* askMathRandomNumber();
     }
     function* storyB(): AskResponse<string> {
-      return yield* askNewGuid();
+      return yield* askGuidNew();
     }
 
     const run = () =>

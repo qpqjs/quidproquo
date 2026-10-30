@@ -1,13 +1,11 @@
 import { ContextActionType, StoryResult } from '@qpqjs/core';
+import { buildStoryResult } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { processLog } from './processLog';
 
-const buildLog = (...types: string[]): StoryResult<any> =>
-  ({
-    history: types.map((type) => ({ act: { type } })),
-  }) as unknown as StoryResult<any>;
+const buildLog = (...types: string[]): StoryResult<any> => buildStoryResult({ history: types.map((type) => ({ act: { type } })) as any });
 
 describe('processLog', () => {
   it('returns an empty array when there is no log', () => {

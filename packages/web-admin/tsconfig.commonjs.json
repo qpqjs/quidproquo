@@ -1,10 +1,17 @@
 {
   "extends": "@qpqjs/tsconfig/tsconfig.commonjs.json",
   "compilerOptions": {
-    "skipLibCheck": true,
     "outDir": "./lib/commonjs",
     "jsx": "react-jsx"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__fixtures__/**",
+    "**/testing/**"
+  ]
 }

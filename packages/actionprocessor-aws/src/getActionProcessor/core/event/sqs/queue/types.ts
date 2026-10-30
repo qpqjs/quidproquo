@@ -1,4 +1,4 @@
-import { MatchStoryResult, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from '@qpqjs/core';
+import { MatchStoryResult, Nullable, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from '@qpqjs/core';
 
 import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 
@@ -17,9 +17,9 @@ export type InternalEventOutput = QueueEventResponse;
 export type MatchResult = MatchStoryResult<any, any>;
 
 // Special types
-export interface CloudWatchAlarmNotification {
+export type CloudWatchAlarmNotification = {
   AlarmName: string;
-  AlarmDescription: string | null;
+  AlarmDescription: Nullable<string>;
   AWSAccountId: string;
   AlarmConfigurationUpdatedTimestamp: string;
   NewStateValue: 'OK' | 'ALARM' | 'INSUFFICIENT_DATA';
@@ -36,7 +36,7 @@ export interface CloudWatchAlarmNotification {
     Namespace: string;
     StatisticType: string;
     Statistic: string;
-    Unit: string | null;
+    Unit: Nullable<string>;
     Dimensions: any[];
     Period: number;
     EvaluationPeriods: number;
@@ -45,4 +45,7 @@ export interface CloudWatchAlarmNotification {
     TreatMissingData: string;
     EvaluateLowSampleCountPercentile: string;
   };
-}
+};
+
+/** How a runtime learns which queue an event belongs to: the lambda knows from its environment, the dev server reads it off the message. */
+export type ResolveQueueName = (eventParams: unknown[]) => string;

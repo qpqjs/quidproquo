@@ -7,7 +7,6 @@ import * as packageRoot from './index';
 describe('@qpqjs/actionprocessor-aws', () => {
   it('exposes the public api from the package root', () => {
     expect(packageRoot.awsLambdaUtils.matchUrl).toBeTypeOf('function');
-    expect(packageRoot.awsNamingUtils.getQpqRuntimeResourceNameFromConfig).toBeTypeOf('function');
     expect(packageRoot.getAwsActionProcessors).toBeTypeOf('function');
     expect(packageRoot.getLambdaEntries).toBeTypeOf('function');
     expect(packageRoot.getLogExtensionLayerPath).toBeTypeOf('function');

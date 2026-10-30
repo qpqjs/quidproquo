@@ -1,22 +1,14 @@
-import {
-  actionResult,
-  askEventGetRecordsBase,
-  createActionProcessor,
-  EventActionType,
-  HTTPMethod,
-  ProcessorFor,
-  QPQConfig,
-  qpqCoreUtils,
-} from '@qpqjs/core';
-import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
+import { getAwsFileUploadSettings } from '@qpqjs/config-aws';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, HTTPMethod, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { FileUploadErrorTypeEnum, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
-import { getApiRecordPath } from './getApiRecordPath';
 import { EventInput, InternalEventRecord } from './types';
+import { getApiRecordPath } from './utils';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const fileUploadSettings = qpqWebServerUtils.getFileUploadSettings(qpqConfig);
+  const fileUploadSettings = getAwsFileUploadSettings(qpqConfig);
 
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's

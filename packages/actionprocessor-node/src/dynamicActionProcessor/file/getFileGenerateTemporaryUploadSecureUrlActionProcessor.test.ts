@@ -2,9 +2,9 @@ import { askFileGenerateTemporaryUploadSecureUrl, ErrorTypeEnum, FileActionType,
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
-import { verifySecureUrlToken } from './secureUrlUtils';
+import { verifySecureUrlToken } from './utils';
 
 const invoke = (filepath: string, expirationMs: number = 60_000) =>
   runFileAction(getFileGenerateTemporaryUploadSecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporaryUploadSecureUrl, {
@@ -29,7 +29,7 @@ describe('getFileGenerateTemporaryUploadSecureUrlActionProcessor', () => {
     expect(url.startsWith('http://localhost:4000/secure-upload?token=')).toBe(true);
 
     const token = url.split('token=')[1];
-    const decoded = verifySecureUrlToken(token, fileConfig.secureUrlSecret);
+    const decoded = verifySecureUrlToken(token!, fileConfig.secureUrlSecret);
     expect(decoded?.operation).toBe('upload');
     expect(decoded?.contentType).toBe('image/png');
   });

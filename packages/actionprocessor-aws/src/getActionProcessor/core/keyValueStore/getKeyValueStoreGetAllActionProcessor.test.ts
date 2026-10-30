@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsQueryOperationType } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType, KvsQueryOperationType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getAllItems } from '../../../logic/dynamo';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 
 vi.mock('../../../logic/dynamo', () => ({
@@ -26,7 +26,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     vi.mocked(getAllItems).mockResolvedValue([{ id: '1' }] as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users' });
 
     expect(result).toEqual([[{ id: '1' }]]);
     expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', {

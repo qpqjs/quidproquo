@@ -1,10 +1,11 @@
-import { DynamicFunctionsActionType, ErrorTypeEnum, runStory, throwsError } from '@qpqjs/core';
+import { DynamicFunctionsActionType, ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
-import { EventDocStoreOptions } from '../context/buildEventDocStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent, EventDocEventActor } from '../models';
+import { EventDocStoreOptions } from '../types/EventDocStoreOptions';
 import { askEventDocValidateAppend } from './askEventDocValidateAppend';
 
 // The gate's load-bearing guarantee (#554): an event the fold cannot read never reaches the
@@ -39,7 +40,7 @@ const buildMocks = ({ verdict = null as string | null } = {}) => {
       }
       if (functionName === 'foldDocumentState') {
         const [events, seed] = args as [EventDocEvent[], { body: string }];
-        const { version } = events[0].payload.metadata;
+        const { version } = events![0]!.payload.metadata;
         if (version !== 1 && version !== 2) {
           return throwsError(ErrorTypeEnum.GenericError, `No event-doc fold reducer for schema version ${version} (registered: 1, 2).`);
         }
@@ -53,7 +54,7 @@ const buildMocks = ({ verdict = null as string | null } = {}) => {
 };
 
 const run = (candidate: EventDocEvent, mocks: object, state: unknown = { body: '' }) =>
-  runStory(askEventDocProvideStore(STORE, askEventDocValidateAppend(candidate, state)), mocks);
+  runStory(askEventDocStoreProvide(buildEventDocStore(STORE), askEventDocValidateAppend(candidate, state)), mocks);
 
 describe('askEventDocValidateAppend', () => {
   it('validates, then folds the candidate and returns the state after it', () => {

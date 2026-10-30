@@ -1,3 +1,4 @@
+import { Nullable } from '@qpqjs/core';
 import { useAuthAccessToken, useBaseUrlResolvers } from '@qpqjs/web-react';
 import { useFastCallback } from '@qpqjs/web-react';
 
@@ -12,7 +13,7 @@ import { AnyAsyncFunction } from '../types';
  * @param {string} path - The API path for the GET request.
  * @returns {AnyAsyncFunction<[], T>} - The asynchronous function for making the API request with loading trigger.
  */
-export const usePlatformApiGet = <T>(path?: string | null): AnyAsyncFunction<[], T> => {
+export const usePlatformApiGet = <T>(path?: Nullable<string>): AnyAsyncFunction<[], T> => {
   const accessToken = useAuthAccessToken();
   const baseUrlResolvers = useBaseUrlResolvers();
 
@@ -32,7 +33,7 @@ export const usePlatformApiGet = <T>(path?: string | null): AnyAsyncFunction<[],
  * @param {string} path - The API path for the POST request.
  * @returns {AnyAsyncFunction<[body: object], T>} - The asynchronous function taking the request body, with loading trigger.
  */
-export const usePlatformApiPost = <T>(path?: string | null): AnyAsyncFunction<[body: object], T> => {
+export const usePlatformApiPost = <T>(path?: Nullable<string>): AnyAsyncFunction<[body: object], T> => {
   const accessToken = useAuthAccessToken();
   const baseUrlResolvers = useBaseUrlResolvers();
 
@@ -52,7 +53,7 @@ export const usePlatformApiPost = <T>(path?: string | null): AnyAsyncFunction<[b
  * @param {string} path - The API path for the GET request.
  * @returns {AnyAsyncFunction<[], T>} - The asynchronous function for making the API request with loading trigger.
  */
-export const useExternalApiGet = <T>(url?: string | null): AnyAsyncFunction<[], T> => {
+export const useExternalApiGet = <T>(url?: Nullable<string>): AnyAsyncFunction<[], T> => {
   const requestFunc = useFastCallback(async (): Promise<T> => {
     return await externalRequestGet<T>(url!);
   });

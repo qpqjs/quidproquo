@@ -1,6 +1,6 @@
-import { askFileWriteBinaryContents, askNewGuid, AskResponse, QPQBinaryData } from '@qpqjs/core';
+import { askFileWriteBinaryContents, askGuidNew, AskResponse, QPQBinaryData } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocAssetRef } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
@@ -11,9 +11,9 @@ const FALLBACK_MIMETYPE = 'application/octet-stream';
  * the presigned upload flow. Assumes the store context is provided.
  */
 export function* askEventDocWriteAsset(docId: string, binary: QPQBinaryData): AskResponse<EventDocAssetRef> {
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
-  const guid = yield* askNewGuid();
+  const guid = yield* askGuidNew();
 
   yield* askFileWriteBinaryContents(storageDriveName, `${docId}/assets/${guid}`, binary, undefined, scope);
 

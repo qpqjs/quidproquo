@@ -1,4 +1,5 @@
-import { FileActionType, runStory } from '@qpqjs/core';
+import { FileActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -9,7 +10,7 @@ describe('askUserScriptPublishOutput', () => {
     const writes: unknown[] = [];
 
     runStory(askUserScriptPublishOutput('scripts', 'doc-1/assets/abc', 'js text', 'tenant-1'), {
-      [FileActionType.WriteTextContents]: (action) => {
+      [FileActionType.WriteTextContents]: (action: any) => {
         writes.push(action.payload);
         return undefined;
       },

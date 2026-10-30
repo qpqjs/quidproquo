@@ -1,8 +1,8 @@
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface EnvironmentSettingsQPQConfigSetting extends QPQConfigSetting {
+export type EnvironmentSettingsQPQConfigSetting = {
   settingsByEnvironment: Record<string, QPQConfig>;
-}
+} & QPQConfigSetting;
 
 export const defineEnvironmentSettings = (settingsByEnvironment: Record<string, QPQConfig>): EnvironmentSettingsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.environmentSettings,

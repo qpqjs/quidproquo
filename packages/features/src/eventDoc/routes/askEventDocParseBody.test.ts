@@ -1,4 +1,5 @@
-import { ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -16,7 +17,7 @@ describe('askEventDocParseBody', () => {
     expect(runStory(askEventDocParseBody(event(undefined)), {})).toEqual({});
   });
 
-  it.each(['{not json', '"a string"', '42', 'null', 'true', ''])('throws BadRequest for the body %j', (body) => {
+  it.each(['{not json', '"a string"', '42', 'null', 'true', ''])('throws BadRequest for the body %j', (body: any) => {
     const run = () => runStory(askEventDocParseBody(event(body)), {});
 
     expect(run).toThrow(StoryError);

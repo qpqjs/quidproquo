@@ -1,13 +1,15 @@
-import { askContextRead, askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
+import { askNetworkRequest, HTTPMethod, HTTPRequestOptions } from '@qpqjs/core';
 
+import { askSystemShowError } from '../actionCreators/askSystemShowError';
+import { askSystemStartLoading } from '../actionCreators/askSystemStartLoading';
+import { askSystemStopLoading } from '../actionCreators/askSystemStopLoading';
 import { askLoadAuthToken } from '../config';
-import { baseUrlsContext } from '../contexts';
-import { askUIShowError, askUIStartLoading, askUIStopLoading } from '../effects';
+import { askBaseUrlsRead } from '../context';
 
-export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<T>) {
-  const baseUrls = yield* askContextRead(baseUrlsContext);
+export function* askPlatformRequest<TResult, TPayload = unknown>(method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<TPayload>) {
+  const baseUrls = yield* askBaseUrlsRead();
 
-  yield* askUIStartLoading();
+  yield* askSystemStartLoading();
 
   const authInfo = yield* askLoadAuthToken();
 
@@ -16,17 +18,17 @@ export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpR
     ...(authInfo.authenticationInfo?.accessToken ? { Authorization: `Bearer ${authInfo.authenticationInfo.accessToken}` } : {}),
   };
 
-  const response = yield* askNetworkRequest<T, R>(method, url, {
+  const response = yield* askNetworkRequest<TResult, TPayload>(method, url, {
     ...httpRequestOptions,
     headers,
     basePath: baseUrls.api,
   });
 
   if (response.status < 200 || response.status >= 300) {
-    yield* askUIShowError(`Request Failed: ${method}::${url}`);
+    yield* askSystemShowError(`Request Failed: ${method}::${url}`);
   }
 
-  yield* askUIStopLoading();
+  yield* askSystemStopLoading();
 
   return response;
 }

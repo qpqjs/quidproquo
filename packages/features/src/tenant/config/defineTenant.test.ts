@@ -37,9 +37,9 @@ const ownerRoutes = (): { method: string; path: string }[] => {
     settingsByService: Record<string, unknown[]>;
   };
 
-  return serviceSettings.settingsByService['owner-svc']
-    .flat(Infinity)
-    .filter((s) => (s as { configSettingType: string }).configSettingType === QPQWebServerConfigSettingType.Route) as {
+  return serviceSettings!.settingsByService['owner-svc']!.flat(Infinity).filter(
+    (s) => (s as { configSettingType: string }).configSettingType === QPQWebServerConfigSettingType.Route,
+  ) as {
     method: string;
     path: string;
   }[];
@@ -54,7 +54,7 @@ describe('defineTenant', () => {
     ) as unknown as { value: { catalog: Record<string, { permissions: string[] }>; creatorRoles: string[] } };
 
     expect(Object.keys(rolesGlobal.value.catalog).sort()).toEqual(['approver', TENANT_ADMIN_ROLE]);
-    expect(rolesGlobal.value.catalog[TENANT_ADMIN_ROLE].permissions).toContain('tenant:roles:assign');
+    expect(rolesGlobal!.value.catalog[TENANT_ADMIN_ROLE]!.permissions).toContain('tenant:roles:assign');
     expect(rolesGlobal.value.creatorRoles).toEqual([TENANT_ADMIN_ROLE, 'approver']);
   });
 
@@ -116,7 +116,7 @@ describe('defineTenant', () => {
       (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
     ) as unknown as { settingsByService: Record<string, unknown[]> };
 
-    const ownerSettings = serviceSettings.settingsByService['owner-svc'].flat(Infinity) as {
+    const ownerSettings = serviceSettings!.settingsByService['owner-svc']!.flat(Infinity) as {
       configSettingType: string;
       dynamicFunctionsName?: string;
       onStream?: { runtime: { globals?: Record<string, unknown> } };
@@ -129,7 +129,7 @@ describe('defineTenant', () => {
     expect(registration).toBeDefined();
 
     // ...and the event log's stream projector wired to fold tenant snapshots through
-    // it (the map rides the stream runtime's globals — see defineEventDocSummary).
+    // it (the map rides the stream runtime's globals, see defineEventDocSummary).
     const snapshotMaps = ownerSettings
       .map((s) => s.onStream?.runtime.globals?.[EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL] as Record<string, string> | undefined)
       .filter(Boolean);
@@ -177,8 +177,8 @@ describe('defineTenant', () => {
   it('mounts no literal route that a tenant id could be mistaken for', () => {
     // The regression this layout exists to prevent: `{basePath}/{id}` matches any
     // single segment, so a sibling `{basePath}/<literal>` is ambiguous with that id
-    // and the router picks by path-length precedence, not by intent. ('/tenants/docs'
-    // used to resolve to the tenant record get with id='docs' -> Forbidden.)
+    // and the router picks by path-length precedence, not by intent ('/tenants/docs'
+    // would resolve to the tenant record get with id='docs' and come back Forbidden).
     const idRoutes = ownerRoutes().filter((r) => r.path.endsWith('/{id}'));
     expect(idRoutes.length).toBeGreaterThan(0);
 

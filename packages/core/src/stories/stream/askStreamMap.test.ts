@@ -1,7 +1,8 @@
+import { expectError, runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { StreamActionType } from '../../actions/stream/StreamActionType';
-import { expectError, runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { StreamChunk, StreamHandle } from '../../types/StreamRegistry';
 import { askCatch } from '../system/askCatch';

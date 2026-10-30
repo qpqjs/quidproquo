@@ -1,5 +1,4 @@
-import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsCoreDataType } from './types';
 
@@ -11,7 +10,7 @@ export type KeyValueStoreDeleteOptions = {
 export const askKeyValueStoreDelete = createActionRequester<void>()({
   actionType: KeyValueStoreActionType.Delete,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)

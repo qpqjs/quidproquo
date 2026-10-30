@@ -1,5 +1,6 @@
-import { createActionRequester } from '../../types';
-import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { createActionRequester } from '../../logic/actions';
+import { FileActionType } from './FileActionType';
+import { StorageDriveAdvancedWriteOptions } from './types';
 
 export const askFileWriteTextContents = createActionRequester<void>()({
   actionType: FileActionType.WriteTextContents,

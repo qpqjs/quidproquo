@@ -1,24 +1,23 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreQueryBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveKvsQueryIndex,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';
 import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreQueryBase> => {
   return async ({ keyValueStoreName, keyCondition, options }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
@@ -48,7 +47,8 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof
       return actionResult(items);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreQueryBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ...transientErrorMap(),
+        InternalServerError: () => actionResultError(askKeyValueStoreQueryBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreQueryBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.StoreNotFound, error.message),

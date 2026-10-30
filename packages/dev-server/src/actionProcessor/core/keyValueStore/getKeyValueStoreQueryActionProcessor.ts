@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreQueryBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveKvsQueryIndex,
@@ -49,7 +48,7 @@ const getProcessKeyValueStoreQuery = (
       );
 
       return actionResult(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.StoreNotFound, error.message),

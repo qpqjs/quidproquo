@@ -13,7 +13,7 @@ import { generateDtsBundle } from 'dts-bundle-generator';
 import path from 'path';
 import type { LoaderContext } from '@rspack/core';
 
-// TODO: Fix this. A type the harness pulls from any other package (@qpqjs/features, zod)
+// TODO: @joe-coady: Fix this. A type the harness pulls from any other package (@qpqjs/features, zod)
 // is left as an import the browser editor cannot follow, so it shows as `any`. The generator
 // matches package names exactly, so build this list in the loader instead: every dependency
 // of the nearest package.json to the entry, plus the quidproquo packages.
@@ -25,7 +25,7 @@ export default function userScriptModuleTypesLoader(this: LoaderContext): void {
   const entryPath = this.resourcePath;
   this.addContextDependency(path.dirname(entryPath));
 
-  let declarations: string;
+  let declarations: string | undefined;
   try {
     // The nearest tsconfig to the entry supplies the compiler options, as for the entry's own build.
     [declarations] = generateDtsBundle([
@@ -37,6 +37,11 @@ export default function userScriptModuleTypesLoader(this: LoaderContext): void {
     ]);
   } catch (error) {
     this.callback(new Error(`Could not generate the user script module types for [${entryPath}]:\n${getErrorMessage(error)}`));
+    return;
+  }
+
+  if (declarations === undefined) {
+    this.callback(new Error(`Could not generate the user script module types for [${entryPath}]: the bundle came back empty`));
     return;
   }
 

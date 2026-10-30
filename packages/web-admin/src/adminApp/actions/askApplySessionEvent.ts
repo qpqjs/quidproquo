@@ -1,20 +1,20 @@
 import { AskResponse, createActionRequester } from '@qpqjs/core';
 
-import { AdminSessionEventType } from '../effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from '../effects/session/AdminSessionEffect';
 import { AdminSessionActionType } from './AdminSessionActionType';
 
 export type ApplySessionEventActionPayload = {
-  type: AdminSessionEventType;
+  type: AdminSessionEffect;
   data: unknown;
 };
 
 export const askApplySessionEventBase = createActionRequester<void>()({
   actionType: AdminSessionActionType.applyEvent,
-  getPayload: (type: AdminSessionEventType, data: unknown): ApplySessionEventActionPayload => ({ type, data }),
+  getPayload: (type: AdminSessionEffect, data: unknown): ApplySessionEventActionPayload => ({ type, data }),
 });
 
-// Pure: only yields the declarative ApplyEvent action — the registered
+// Pure: only yields the declarative ApplyEvent action, the registered
 // processor decides HOW (optimistic local append + background flush).
-export function* askApplySessionEvent<T>(type: AdminSessionEventType, data: T): AskResponse<void> {
+export function* askApplySessionEvent<T>(type: AdminSessionEffect, data: T): AskResponse<void> {
   return yield* askApplySessionEventBase(type, data);
 }

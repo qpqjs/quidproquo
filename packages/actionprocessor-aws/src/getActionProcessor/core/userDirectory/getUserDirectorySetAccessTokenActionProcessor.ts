@@ -7,7 +7,6 @@ import {
   ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { decodeAccessToken } from '../../../logic/cognito';

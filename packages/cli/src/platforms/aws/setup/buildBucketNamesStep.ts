@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
@@ -10,7 +10,7 @@ import { AwsSetupContext } from './awsSetupContext';
 // Every bucket a service deploy creates, named the way the constructs name them.
 const getServiceBucketNames = (qpqConfig: QPQConfig): string[] => [
   ...qpqCoreUtils
-    .getOwnedItems(qpqCoreUtils.getStorageDrives(qpqConfig), qpqConfig)
+    .getOwnedStorageDriveConfigs(qpqConfig)
     .map((drive) => awsNamingUtils.getConfigRuntimeResourceNameFromConfig(drive.storageDrive, qpqConfig)),
   ...qpqWebServerUtils
     .getWebEntryConfigs(qpqConfig)

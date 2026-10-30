@@ -22,6 +22,7 @@ describe('defineAwsAlarm', () => {
       uniqueKey: 'errors',
       name: 'errors',
       alarmSettings,
+      deprecated: false,
     });
   });
 });

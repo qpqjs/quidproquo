@@ -8,6 +8,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { createKmsDataKeyProvider, resolveCryptoKeyAlias } from './utils';
@@ -29,6 +30,7 @@ const getProcessCryptoDecrypt = (qpqConfig: QPQConfig): ProcessorFor<typeof askC
       return actionResult(plaintext);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         // Named errors from the shared envelope logic, keyed by error.code
         QpqCryptoContextMismatch: (e) => actionResultError(askCryptoDecrypt.errorType.ContextMismatch, e.message),
         QpqCryptoMalformedCiphertext: (e) => actionResultError(askCryptoDecrypt.errorType.MalformedCiphertext, e.message),
@@ -44,7 +46,7 @@ const getProcessCryptoDecrypt = (qpqConfig: QPQConfig): ProcessorFor<typeof askC
         KMSInvalidStateException: () =>
           actionResultError(askCryptoDecrypt.errorType.KeyUnavailable, `Crypto key is in an unusable state: [${keyName}]`),
         AccessDeniedException: () => actionResultError(askCryptoDecrypt.errorType.KeyUnavailable, `Access denied to crypto key: [${keyName}]`),
-        ThrottlingException: () => actionResultError(askCryptoDecrypt.errorType.Throttling, 'Throttling: Rate exceeded'),
+        ThrottlingException: () => actionResultError(askCryptoDecrypt.errorType.Throttled, 'Throttling: Rate exceeded'),
       });
     }
   };

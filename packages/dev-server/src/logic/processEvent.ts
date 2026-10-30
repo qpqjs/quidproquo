@@ -4,6 +4,8 @@ import {
   askProcessEvent,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
@@ -11,15 +13,10 @@ import {
   StorySession,
 } from '@qpqjs/core';
 
-import { randomUUID } from 'crypto';
-
-import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
+import { getDevServerActionProcessors } from '../actionProcessor';
 import { getDevServerLogger } from '../implementations/logger';
 import { ResolvedDevServerConfig } from '../types';
 import { withProcessorDelay } from './withProcessorDelay';
-
-// TODO: Make this a util or something based on server time or something..
-const getDateNow = () => new Date().toISOString();
 
 export const processEvent = async <E, ER>(
   expressEvent: E,
@@ -51,7 +48,7 @@ export const processEvent = async <E, ER>(
       ),
     getDateNow,
     logger,
-    `${serviceName}::${randomUUID()}`,
+    `${serviceName}::${generateUuid()}`,
     qpqRuntimeType,
     dynamicModuleLoader,
     undefined,

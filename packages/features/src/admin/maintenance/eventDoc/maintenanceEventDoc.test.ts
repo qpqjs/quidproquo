@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 
 import { EventDocEvent } from '../../../eventDoc/models/EventDocEvent';
 import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
+import { isMaintenancePubliclyVisible } from './logic/isMaintenancePubliclyVisible';
 import { toMaintenancePublicState } from './logic/toMaintenancePublicState';
 import { MaintenanceEffect } from './v1/events/effects/MaintenanceEffect';
 import { MaintenanceUpdateData } from './v1/events/effects/MaintenanceUpdateData';
 import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
 import { MaintenanceType } from './v1/types/MaintenanceType';
-import { isMaintenancePubliclyVisible } from './isMaintenancePubliclyVisible';
 import { maintenanceEventDoc } from './maintenanceEventDoc';
 
 const eventId = (n: number): number => n;
@@ -54,7 +54,7 @@ describe('maintenanceEventDoc', () => {
         T0,
         1,
       ),
-      // No eta on this one — the 30min clock anchored at T0 must carry over.
+      // No eta on this one, the 30min clock anchored at T0 must carry over.
       buildEvent(
         MaintenanceEffect.AddUpdate,
         update({ updateId: 'up2', reason: 'Fix deploying', level: MaintenanceLevel.Low, affectedServices: ['template'] }),
@@ -64,7 +64,7 @@ describe('maintenanceEventDoc', () => {
     ]);
 
     expect(state.reason).toBe('Fix deploying');
-    // No explicit banner text — the banner falls back to the newest reason.
+    // No explicit banner text, the banner falls back to the newest reason.
     expect(state.bannerText).toBe('Fix deploying');
     expect(state.level).toBe(MaintenanceLevel.Low);
     expect(state.affectedServices).toEqual(['template']);
@@ -108,7 +108,7 @@ describe('maintenanceEventDoc', () => {
     ]);
     expect(textEdit.reason).toBe('Investigating hard');
     expect(textEdit.etaEndsAt).toBe('2026-07-24T10:30:00.000Z');
-    expect(textEdit.updates[0].updatedAt).toBe(T1);
+    expect(textEdit!.updates[0]!.updatedAt).toBe(T1);
 
     // Edit WITH an eta: fresh announcement anchored to the edit's own time.
     const etaEdit = maintenanceEventDoc.views.document.fold([
@@ -181,7 +181,7 @@ describe('maintenanceEventDoc', () => {
         'updates',
       ].sort(),
     );
-    expect(Object.keys(publicState.updates[0]).sort()).toEqual(['createdAt', 'displayText', 'id']);
+    expect(Object.keys(publicState!.updates[0]!).sort()).toEqual(['createdAt', 'displayText', 'id']);
   });
 
   it('strips internal notes and authors from the public projection; the public update text is the reason', () => {

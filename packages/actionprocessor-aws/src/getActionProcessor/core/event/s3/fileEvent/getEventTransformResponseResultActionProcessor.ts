@@ -4,12 +4,11 @@ import {
   askEventTransformResponseResultBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventOutput } from './types';
 
 const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // We might need to JSON.stringify the body.

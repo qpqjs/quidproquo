@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/core",
   "version": "0.3.0",
-  "description": "",
+  "description": "Actions, stories and the runtime at the heart of quidproquo.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -13,7 +21,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.commonjs.json -w",
@@ -25,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/core"
   },
   "keywords": [],
   "author": "",
@@ -35,11 +45,15 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@types/node": "^24.2.1",
+    "@qpqjs/testing": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
+    "@types/node": "^24.2.1",
     "typescript": "^5.8.2"
   },
   "dependencies": {
     "immer": "^10.1.1"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

@@ -1,4 +1,5 @@
-import { ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';

@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { askConfigSetParameter } from './askConfigSetParameter';
 import { ConfigActionType } from './ConfigActionType';
 
@@ -94,7 +94,7 @@ line3`;
   describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
       expect(askConfigSetParameter.errorType).toEqual({
-        Throttling: `${ConfigActionType.SetParameter}-Throttling`,
+        Throttled: `${ConfigActionType.SetParameter}-Throttled`,
         QuotaExceeded: `${ConfigActionType.SetParameter}-QuotaExceeded`,
       });
     });

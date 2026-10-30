@@ -6,10 +6,10 @@ import React, { useMemo } from 'react';
 // a collapsible tree (native <details>, so state survives without bookkeeping); values
 // without one fall back to their preview string.
 
-interface LocalValueTreeProps {
+type LocalValueTreeProps = {
   name: string;
   value: QpqExecutionTraceValue;
-}
+};
 
 const primitiveStyle: React.CSSProperties = { color: 'rgba(70, 140, 200, 1)' };
 const markerStyle: React.CSSProperties = { color: 'rgba(150, 150, 150, 1)', fontStyle: 'italic' };
@@ -17,7 +17,7 @@ const nameStyle: React.CSSProperties = { fontWeight: 600 };
 const branchStyle: React.CSSProperties = { paddingLeft: 20 };
 
 // Capture-time placeholders («circular», «function fn», «+3 more», …) come through as
-// strings — render them dim/italic so they read as markers, not data.
+// strings, render them dim/italic so they read as markers, not data.
 const isMarkerString = (value: string): boolean => value.startsWith('«') && value.endsWith('»');
 
 const renderPrimitive = (value: unknown): React.ReactNode => {

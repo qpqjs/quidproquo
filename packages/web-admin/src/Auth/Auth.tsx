@@ -7,12 +7,12 @@ import { AuthChallengeMfaSetup } from './AuthChallengeMfaSetup/AuthChallengeMfaS
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 import { AuthChallengeSoftwareTokenMfa } from './AuthChallengeSoftwareTokenMfa/AuthChallengeSoftwareTokenMfa';
 import { isLoggedOn } from './logic/isLoggedOn';
-import { authRuntime } from './logic';
+import { authRuntime } from './authRuntime';
 import { Login } from './Login';
 
-interface AuthProps {
+type AuthProps = {
   children?: ReactNode;
-}
+};
 
 export function Auth({ children }: AuthProps) {
   const [api, state] = useQpqRuntime(authRuntime);
@@ -49,8 +49,8 @@ export function Auth({ children }: AuthProps) {
         <Login
           onLogin={api.authLogin}
           password={state.password}
-          setPassword={api.authUISetPassword}
-          setUsername={api.authUISetUsername}
+          setPassword={api.authSetPassword}
+          setUsername={api.authSetUsername}
           username={state.username}
         />
       )}

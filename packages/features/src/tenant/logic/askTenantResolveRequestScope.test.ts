@@ -1,4 +1,5 @@
-import { ConfigActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from '@qpqjs/core';
+import { ConfigActionType, KeyValueStoreActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -71,7 +72,7 @@ describe('askTenantResolveRequestScope', () => {
   // Security regression: a header that is not a plain scope segment is refused before the membership store is read.
   it.each(['tenant/../other', 'tenant-a/x', 'a\u0000b', 't'.repeat(200)])(
     'refuses the malformed tenant header %j without reading the store',
-    (header) => {
+    (header: any) => {
       const query = vi.fn(() => ({ items: [], nextPageKey: undefined }));
 
       expect(() =>

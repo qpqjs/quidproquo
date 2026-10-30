@@ -5,10 +5,10 @@ import {
   askDynamicFunctionExecuteBase,
   createActionProcessor,
   createNestedRuntime,
-  DynamicFunctionsActionType,
   DynamicFunctionsExecuteActionPayload,
-  DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -20,11 +20,7 @@ import {
   StreamRegistry,
 } from '@qpqjs/core';
 
-import { randomUUID } from 'crypto';
-
-import { isStoryIterator } from '../logic/isStoryIterator';
-
-const getDateNow = () => new Date().toISOString();
+import { isStoryIterator } from '../utils/isStoryIterator';
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
@@ -43,7 +39,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (!dynamicFunctionsSetting) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+        askDynamicFunctionExecuteBase.errorType.DynamicFunctionsNotFound,
         `Dynamic functions not found: [${payload.dynamicFunctionsName}]`,
       );
     }
@@ -52,7 +48,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (!functionsObject) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
+        askDynamicFunctionExecuteBase.errorType.ModuleLoadFailed,
         `Unable to dynamically load dynamic functions: [${payload.dynamicFunctionsName}]`,
       );
     }
@@ -64,7 +60,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
 
     if (typeof member !== 'function') {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound,
+        askDynamicFunctionExecuteBase.errorType.FunctionNotFound,
         `Function not found: [${payload.dynamicFunctionsName}.${payload.functionName}]`,
       );
     }
@@ -74,7 +70,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
       invocationResult = member(...payload.args);
     } catch (error) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew,
+        askDynamicFunctionExecuteBase.errorType.FunctionThrew,
         `[${payload.dynamicFunctionsName}.${payload.functionName}] threw: ${getErrorMessage(error)}`,
       );
     }
@@ -86,7 +82,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
         actionProcessors,
         getDateNow,
         logger,
-        randomUUID,
+        generateUuid,
         QpqRuntimeType.EXECUTE_STORY,
         dynamicModuleLoader,
         dynamicFunctionsSetting.runtime,
@@ -105,7 +101,7 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDyna
       return actionResult<R>((await invocationResult) as R);
     } catch (error) {
       return actionResultError(
-        DynamicFunctionsExecuteErrorTypeEnum.FunctionThrew,
+        askDynamicFunctionExecuteBase.errorType.FunctionThrew,
         `[${payload.dynamicFunctionsName}.${payload.functionName}] threw: ${getErrorMessage(error)}`,
       );
     }

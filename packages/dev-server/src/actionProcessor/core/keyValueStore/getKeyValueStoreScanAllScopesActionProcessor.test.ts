@@ -1,21 +1,14 @@
-import {
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  isErroredActionResult,
-  KeyValueStoreActionType,
-  kvsKey,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-} from '@qpqjs/core';
+import { defineKeyValueStore, isErroredActionResult, KeyValueStoreActionType, kvsKey, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 
 // The point of this action is that it sees what an ordinary scan deliberately cannot. If it
 // ever quietly stops crossing scopes, or stops short, a migration would report success having
-// skipped data — so completeness is what these pin down.
+// skipped data, so completeness is what these pin down.
 
 const { repo } = vi.hoisted(() => ({
   repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn(), getAll: vi.fn(), listScopes: vi.fn() },
@@ -25,13 +18,13 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const qpqConfig = buildTestQpqConfig([defineKeyValueStore('store', kvsKey('id', 'string'))]);
 
 const rawScanPage = async (nextPageKey?: string) => {
   const processors = await getKeyValueStoreScanAllScopesActionProcessor(devServerConfig)(qpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.ScanAllScopes], { keyValueStoreName: 'store', nextPageKey });
+  return invokeProcessor(processors![KeyValueStoreActionType.ScanAllScopes]!, { keyValueStoreName: 'store', nextPageKey });
 };
 
 const scanPage = async (nextPageKey?: string) => resolveActionResult(await rawScanPage(nextPageKey)) as any;

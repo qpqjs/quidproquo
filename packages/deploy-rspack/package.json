@@ -1,13 +1,22 @@
 {
   "name": "@qpqjs/deploy-rspack",
   "version": "0.3.0",
-  "description": "",
+  "description": "Rspack bundling for quidproquo backends, views and federated remotes.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "!lib/**/__fixtures__/**"
   ],
   "publishConfig": {
     "access": "public"
@@ -26,7 +35,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/deploy-rspack"
   },
   "keywords": [],
   "author": "",
@@ -42,7 +52,6 @@
     "dts-bundle-generator": "9.5.1",
     "path-browserify": "^1.0.1",
     "@qpqjs/actionprocessor-aws": "0.3.0",
-    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/config-aws": "0.3.0",
     "@qpqjs/core": "0.3.0",
     "@qpqjs/deploy-aws": "0.3.0",
@@ -51,13 +60,17 @@
     "react-refresh": "^0.18.0"
   },
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@rspack/core": "^2.1.2",
     "@types/node": "^22.13.13",
     "@types/path-browserify": "^1.0.3",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "@rspack/core": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

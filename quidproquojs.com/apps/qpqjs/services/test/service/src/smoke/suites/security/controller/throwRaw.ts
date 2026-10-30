@@ -11,5 +11,5 @@ export const throwRaw = dynamicRoute(
 
   function* (): AskResponse<HTTPEventResponse> {
     throw new Error(`${SECURITY_PROBE_LEAK_MARKER} table=internal-table-name`);
-  }
+  },
 );

@@ -1,5 +1,5 @@
 import { HTTPNetworkResponse } from '@qpqjs/core';
-import { preformNetworkRequest } from '@qpqjs/webserver';
+import { performNetworkRequest } from '@qpqjs/webserver';
 
 const getHeaders = (accessToken?: string) => ({
   'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ const unwrap = <T>(response: HTTPNetworkResponse<T>): T => {
 };
 
 export const apiRequestPost = async <T = any>(path: string, body: object, apiBaseUrl: string, accessToken?: string): Promise<T> => {
-  const response = await preformNetworkRequest<T>({
+  const response = await performNetworkRequest<T>({
     method: 'POST',
     url: path,
     basePath: apiBaseUrl,
@@ -28,7 +28,7 @@ export const apiRequestPost = async <T = any>(path: string, body: object, apiBas
 };
 
 export const apiRequestGet = async <T = any>(path: string, apiBaseUrl: string, accessToken?: string): Promise<T> => {
-  const response = await preformNetworkRequest<T>({
+  const response = await performNetworkRequest<T>({
     method: 'GET',
     url: path,
     basePath: apiBaseUrl,
@@ -40,7 +40,7 @@ export const apiRequestGet = async <T = any>(path: string, apiBaseUrl: string, a
 };
 
 export const externalRequestGet = async <T = any>(path: string): Promise<T> => {
-  const response = await preformNetworkRequest<T>({
+  const response = await performNetworkRequest<T>({
     method: 'GET',
     url: path,
     headers: getHeaders(),

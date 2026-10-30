@@ -1,22 +1,23 @@
 import {
-  buildTestQpqConfig,
+  defineUserDirectory,
   ErrorTypeEnum,
   isErroredActionResult,
-  noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getUserDirectoryDecodeAccessTokenActionProcessor } from './getUserDirectoryDecodeAccessTokenActionProcessor';
 
 vi.mock('../../../logic/auth/decodeAccessTokenForDev', () => ({
   decodeAccessTokenForDev: vi.fn(),
 }));
+vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));
 
 const mockedDecode = vi.mocked(decodeAccessTokenForDev);
 
@@ -26,7 +27,10 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
   });
 
   const getProcess = async () => {
-    const processors = await getUserDirectoryDecodeAccessTokenActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
+    const processors = await getUserDirectoryDecodeAccessTokenActionProcessor(buildTestDevServerConfig())(
+      buildTestQpqConfig([defineUserDirectory('pool')]),
+      noopDynamicModuleLoader,
+    );
     return processors[UserDirectoryActionType.DecodeAccessToken];
   };
 
@@ -35,9 +39,9 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     mockedDecode.mockReturnValue(decoded);
     const process = await getProcess();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'pool', accessToken: 'token-abc', ignoreExpiration: true });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'pool', accessToken: 'token-abc', ignoreExpiration: true });
 
-    expect(mockedDecode).toHaveBeenCalledWith('pool', 'token-abc', true);
+    expect(mockedDecode).toHaveBeenCalledWith('test-secret', 'pool', 'token-abc', true);
     expect(resolveActionResult(result)).toBe(decoded);
   });
 
@@ -45,7 +49,7 @@ describe('getUserDirectoryDecodeAccessTokenActionProcessor', () => {
     mockedDecode.mockReturnValue(null as any);
     const process = await getProcess();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'pool', accessToken: 'bad', ignoreExpiration: false });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'pool', accessToken: 'bad', ignoreExpiration: false });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);

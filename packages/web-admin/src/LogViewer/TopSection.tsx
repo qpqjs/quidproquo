@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Autocomplete, IconButton, Menu } from '@mui/material';
@@ -16,9 +18,9 @@ import { AsyncButton } from '../components/AsyncButton';
 import { RuntimeTypes } from './constants';
 import { useServiceNames } from './hooks';
 
-export interface TopSectionProps {
+export type TopSectionProps = {
   onSearch: () => Promise<any>;
-}
+};
 
 export function TopSection({ onSearch }: TopSectionProps) {
   const serviceOptions = useServiceNames();
@@ -43,7 +45,7 @@ export function TopSection({ onSearch }: TopSectionProps) {
     updateStartAndEndTimeSpan,
   } = useSearchFields();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<Nullable<HTMLElement>>(null);
 
   const handleQuickTimeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

@@ -1,6 +1,6 @@
 import { askKeyValueStoreUpsertMany, AskResponse } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocEvent } from '../models';
 import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredEvent';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
@@ -10,7 +10,7 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
  * UpsertMany Conflict error with nothing written; askEventDocAppendServerEvents owns the re-lap.
  */
 export function* askEventDocEventWriteMany(modelId: string, events: EventDocEvent[]): AskResponse<void> {
-  const { eventsStoreName, type } = yield* askEventDocResolveStore();
+  const { eventsStoreName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   yield* askKeyValueStoreUpsertMany(

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { QueryParamsActionType } from '@qpqjs/web';
 
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -65,7 +65,7 @@ describe('getQueryParamsSetActionProcessor', () => {
     ['../../admin', 'path'],
     ['<script>alert(1)</script>', 'q'],
     ['a&b=c#hash', 'q'],
-  ])('keeps the hostile value %j under key %j inside the query string', async (value, key) => {
+  ])('keeps the hostile value %j under key %j inside the query string', async (value: any, key: any) => {
     window.history.replaceState(null, '', '/page?keep=1#top');
     const processor = await getProcessor();
 

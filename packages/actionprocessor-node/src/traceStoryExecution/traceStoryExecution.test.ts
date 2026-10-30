@@ -1,4 +1,5 @@
 import { actionResult, QpqRuntimeType, StoryResult } from '@qpqjs/core';
+import { buildStoryResult } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { createRequire } from 'module';
@@ -9,7 +10,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 
 import { traceStoryExecution } from './traceStoryExecution';
 
-// NOTE: these tests exercise a REAL V8 inspector session against the current thread —
+// NOTE: these tests exercise a REAL V8 inspector session against the current thread ,
 // they require the vitest 'forks' pool (the default), where each test file runs on the
 // main thread of a forked process. Fixtures are written to a temp dir at runtime so the
 // traced code is a genuine on-disk script with real line numbers, untouched by vitest's
@@ -24,18 +25,8 @@ afterAll(() => {
   fs.rmSync(fixtureDirectory, { recursive: true, force: true });
 });
 
-const buildRecordedResult = (input: any[], history: Array<{ res: any }>): StoryResult<any> => ({
-  input,
-  session: { depth: 0, context: {} },
-  history: history as any,
-  startedAt: '2024-01-01T00:00:00.000Z',
-  finishedAt: '2024-01-01T00:00:00.000Z',
-  tags: [],
-  moduleName: 'test-module',
-  correlation: 'corr-trace-1',
-  fromCorrelation: 'corr-trace-0',
-  runtimeType: QpqRuntimeType.UNIT_TEST,
-});
+const buildRecordedResult = (input: any[], history: Array<{ res: any }>): StoryResult<any> =>
+  buildStoryResult({ input, history: history as any, correlation: 'corr-trace-1', fromCorrelation: 'corr-trace-0' });
 
 const plainStorySource = `
 function formatName(user) {
@@ -97,7 +88,7 @@ describe('traceStoryExecution', () => {
 
     // No source map on the fixture -> the generated script itself is the source
     expect(trace.sources.some((source) => source.path.includes(storyPath))).toBe(true);
-    expect(trace.sources[0].content).toContain('askOnboardUsers');
+    expect(trace!.sources[0]!.content).toContain('askOnboardUsers');
 
     // Locals captured with real names and values (strings are JSON stringified)
     const idStep = trace.steps.find((step) => step.locals.id?.preview === '"guid-123"');
@@ -110,7 +101,7 @@ describe('traceStoryExecution', () => {
     // Object values also carry a deep json serialization for expandable inspection
     const userStep = trace.steps.find((step) => step.locals.user?.json !== undefined);
     expect(userStep).toBeDefined();
-    expect(JSON.parse(userStep!.locals.user.json!)).toEqual({ first: ' First0 ', last: 'Last0' });
+    expect(JSON.parse(userStep!.locals.user!.json!)).toEqual({ first: ' First0 ', last: 'Last0' });
 
     // Helper functions in the same script are traced too
     expect(trace.steps.some((step) => step.functionName === 'formatName')).toBe(true);
@@ -151,7 +142,7 @@ describe('traceStoryExecution', () => {
 
   it('traces a story exported through a factory wrapper defined in a different module (sibling chunks)', async () => {
     // Mirrors the dynamicRoute pattern: the exported story is a wrapper CREATED inside
-    // a shared/vendor module, so [[FunctionLocation]] points at the wrapper's file — the
+    // a shared/vendor module, so [[FunctionLocation]] points at the wrapper's file, the
     // real story body lives in a sibling file that must still be traced.
     const wrapperFactorySource = `
 function wrapRoute(runtime) {
@@ -186,7 +177,7 @@ module.exports = { generate: wrapRoute(askGenerateSecret) };
     const story = fixtureRequire(path.join(fixtureDirectory, 'route.js')).generate;
     const recording = buildRecordedResult(['seed-1'], [{ res: actionResult('guid-9') }]);
 
-    // Deliberately NO scriptPatterns — sibling-directory detection must cover it
+    // Deliberately NO scriptPatterns, sibling-directory detection must cover it
     const { trace, replay } = await traceStoryExecution(recording, story);
 
     expect(replay.result).toEqual({ wrapped: 'ca_guid-9_seed-1' });
@@ -195,7 +186,7 @@ module.exports = { generate: wrapRoute(askGenerateSecret) };
     expect(trace.stats.instrumentedScriptUrls?.some((url) => url.includes('wrapperFactory.js'))).toBe(true);
     expect(trace.stats.instrumentedScriptUrls?.some((url) => url.includes('innerStory.js'))).toBe(true);
 
-    // The inner story's statements were recorded — the secret's birth step is findable
+    // The inner story's statements were recorded, the secret's birth step is findable
     const secretStep = trace.steps.find((step) => step.locals.secret?.preview === '"ca_guid-9_seed-1"');
     expect(secretStep).toBeDefined();
     expect(secretStep?.functionName).toBe('askGenerateSecret');
@@ -206,7 +197,7 @@ module.exports = { generate: wrapRoute(askGenerateSecret) };
 
   it('traces code beyond the getPossibleBreakpoints response cap (huge bundle chunks)', async () => {
     // Debugger.getPossibleBreakpoints caps its response (~1000 locations), so on a real
-    // bundle chunk a single call covers only the top of the file — code below the cap
+    // bundle chunk a single call covers only the top of the file, code below the cap
     // silently got no breakpoints. Bury the story under enough LIVE statements (exported,
     // so V8 keeps them and reports their positions) to blow the cap and assert the
     // story's steps still get recorded (the worker must paginate).
@@ -270,7 +261,7 @@ module.exports = { askBuried, fillers: [${fillerRefs}] };
     // Steps resolve to the ORIGINAL .ts source, with its content embedded from the map
     const tsSourceIndex = trace.sources.findIndex((source) => source.path.endsWith('mappedStory.ts'));
     expect(tsSourceIndex).toBeGreaterThanOrEqual(0);
-    expect(trace.sources[tsSourceIndex].content).toContain('const total = seed * 2 + bonus;');
+    expect(trace!.sources[tsSourceIndex]!.content).toContain('const total = seed * 2 + bonus;');
 
     // `const total = ...` is line 3 (1-based) of the original TS
     const totalLine = 3;

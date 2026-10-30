@@ -1,12 +1,10 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   askEventBusSendMessagesBase,
   createActionProcessor,
-  ErrorTypeEnum,
-  EventBusActionType,
   EventBusMessage,
   generateUuid,
   ProcessorFor,
@@ -14,12 +12,12 @@ import {
   qpqCoreUtils,
   StorySession,
   toCrossServiceSession,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';
 
-// TODO: Unify this once the lambda code moves from CDK to awslambda
+// TODO: @joe-coady: Unify this once the lambda code moves from CDK to awslambda
 type AnyEventBusMessageWithSession = EventBusMessage<any> & {
   storySession: StorySession;
 };
@@ -28,23 +26,13 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
   return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
 
     if (!eventBusConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Event bus ${eventBusName} not found`);
+      return actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus ${eventBusName} not found`);
     }
 
-    const topicArn = getEventBusSnsTopicArn(
-      eventBusConfig.owner?.resourceNameOverride || eventBusName,
-      qpqConfig,
-
-      eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-
-      eventBusConfig.isFifo,
-    );
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusName, qpqConfig, eventBusConfig);
 
     // Each entry carries the caller's session so the consuming service resumes
     // with the same correlation/context.
@@ -71,14 +59,15 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
     try {
       await publishMessage(topicArn, region, eventBusMessages.map(toSnsEntry));
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AuthorizationErrorException: () =>
           actionResultError(askEventBusSendMessagesBase.errorType.AccessDenied, 'Access denied publishing to event bus'),
         NotFoundException: () => actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus topic not found: ${eventBusName}`),
-        InternalErrorException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus service unavailable'),
-        ThrottledException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus throttled'),
+        InternalErrorException: () => actionResultError(askEventBusSendMessagesBase.errorType.Throttled, 'Event bus service unavailable'),
+        ThrottledException: () => actionResultError(askEventBusSendMessagesBase.errorType.Throttled, 'Event bus throttled'),
       });
     }
   };

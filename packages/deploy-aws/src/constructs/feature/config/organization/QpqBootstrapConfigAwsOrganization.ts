@@ -1,17 +1,16 @@
 import { AwsOrganizationQPQConfigSetting } from '@qpqjs/config-aws';
 
-import * as cdk from 'aws-cdk-lib';
-import { aws_iam, aws_organizations, aws_sso } from 'aws-cdk-lib';
+import { aws_organizations } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigAwsOrganizationConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapConfigAwsOrganizationConstructProps = {
   awsOrganizationConfig: AwsOrganizationQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 function getEmailForAccount(baseEmailAddress: string, orgName: string, accountName: string): string {
-  const [mainEmail, domainEmail] = baseEmailAddress.split('@');
+  const [mainEmail = '', domainEmail] = baseEmailAddress.split('@');
   const [mainEmailNoPlus] = mainEmail.split('@');
 
   return `${mainEmailNoPlus}+${orgName}-${accountName}@${domainEmail}`;
@@ -23,13 +22,11 @@ export class QpqBootstrapConfigAwsOrganizationConstruct extends QpqConstructBloc
 
     const { organizationName, accountNames, baseEmailAddress } = props.awsOrganizationConfig;
 
-    // Create an Organizational Unit (OU) under the Organization
     const organizationalUnit = new aws_organizations.CfnOrganizationalUnit(this, 'OrganizationalUnit', {
       name: organizationName,
       parentId: props.awsOrganizationConfig.rootAwsOrganizationalUnitId,
     });
 
-    // Create AWS accounts and place them in the Organizational Unit (OU)
     const accounts: { [name: string]: aws_organizations.CfnAccount } = {};
     accountNames.forEach((accountName) => {
       accounts[accountName] = new aws_organizations.CfnAccount(this, accountName, {

@@ -4,21 +4,20 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqWebserverCertificateConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverCertificateConstructProps = {
   certificateConfig: CertificateQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 /**
- * No-op shim kept for backwards compatibility with user configs that still call `defineCertificate`.
+ * No-op kept so user configs that still call `defineCertificate` assemble cleanly.
  *
- * Certificates are now created centrally by `DomainCertificateStack` via `defineDomainCertificate`
+ * Certificates are created centrally by `DomainCertificateStack` via `defineDomainCertificate`
  * in the bootstrap qpqConfig, and consumed by service constructs via `lookupDomainCertificate`.
- * This construct no longer creates any AWS resources. It exists only so that existing calls to
- * `defineCertificate` in downstream configs do not cause the inf stack's construct assembly to fail.
+ * This construct creates no AWS resources.
  */
 export class QpqWebserverCertificateConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverCertificateConstructProps) {
     super(scope, id, props);
-    // Intentionally empty — see class docstring.
+    // Intentionally empty: see class docstring.
   }
 }

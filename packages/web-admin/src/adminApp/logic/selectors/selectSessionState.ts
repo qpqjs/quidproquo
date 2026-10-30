@@ -1,14 +1,15 @@
+import { Nullable } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
 
-import { AdminAppState } from '../../AdminAppState';
 import { foldAdminSessionLog } from '../../adminSessionFoldReducer';
-import { AdminSessionState } from '../../AdminSessionState';
+import { AdminAppState } from '../../types/AdminAppState';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
 // The session state IS the fold of the log (acked + pending). Memoized on log
-// identity — the arrays are replaced immutably, so reference equality is exact.
-let memoEvents: EventDocEvent[] | null = null;
-let memoPendingEvents: EventDocEvent[] | null = null;
-let memoSessionState: AdminSessionState | null = null;
+// identity, the arrays are replaced immutably, so reference equality is exact.
+let memoEvents: Nullable<EventDocEvent[]> = null;
+let memoPendingEvents: Nullable<EventDocEvent[]> = null;
+let memoSessionState: Nullable<AdminSessionState> = null;
 
 export const selectSessionState = (state: AdminAppState): AdminSessionState => {
   const { events, pendingEvents } = state.sessionLog;

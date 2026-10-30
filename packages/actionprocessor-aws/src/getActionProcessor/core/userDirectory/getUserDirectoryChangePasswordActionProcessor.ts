@@ -7,7 +7,7 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { changePassword } from '../../../logic/cognito/changePassword';
@@ -19,9 +19,10 @@ const getProcessChangePassword = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
     try {
       await changePassword(accessToken, oldPassword, newPassword, region);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () => actionResultError(askUserDirectoryChangePassword.errorType.IncorrectPassword, 'Current password is incorrect'),
         InvalidPasswordException: () =>
           actionResultError(askUserDirectoryChangePassword.errorType.InvalidNewPassword, 'New password does not meet the password policy'),

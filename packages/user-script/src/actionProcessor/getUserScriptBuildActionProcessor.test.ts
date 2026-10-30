@@ -6,14 +6,13 @@ import {
   askFileListDirectory,
   askUserScriptBuild,
   askUserScriptListExports,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   FileActionType,
   resolveActionResult,
   resolveActionResultError,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import fs from 'fs';
 import os from 'os';
@@ -38,7 +37,7 @@ const createDrive = (initial: Record<string, string>, missingDirectoryIsError = 
     for (const key of Object.keys(files)) {
       if (!key.startsWith(prefix)) continue;
       const [head, ...tail] = key.slice(prefix.length).split('/');
-      seen.set(head, { filepath: `${folderPath}/${head}`, drive, isDir: tail.length > 0 });
+      seen.set(head!, { filepath: `${folderPath}/${head}`, drive, isDir: tail.length > 0 });
     }
     return [...seen.values()];
   };
@@ -62,7 +61,7 @@ const createDrive = (initial: Record<string, string>, missingDirectoryIsError = 
       // The runner's part, done in-process here: load what was published and report its exports.
       [UserScriptActionType.ListExports]: async ({ drive, filepath }: { drive: string; filepath: string }) => {
         try {
-          return actionResult(listUserScriptExports(filepath, files[`${drive}:${filepath}`], getUserScriptModuleMap()));
+          return actionResult(listUserScriptExports(filepath, files![`${drive}:${filepath}`]!, getUserScriptModuleMap()));
         } catch (error) {
           return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, String(error));
         }
@@ -102,7 +101,7 @@ beforeEach(() => {
   tempDirsCreated = [];
   vi.spyOn(console, 'log').mockImplementation(() => undefined);
   const realMkdtemp = fs.mkdtempSync;
-  vi.spyOn(fs, 'mkdtempSync').mockImplementation((prefix) => {
+  vi.spyOn(fs, 'mkdtempSync').mockImplementation((prefix: any) => {
     const created = realMkdtemp(prefix);
     tempDirsCreated.push(created);
     return created;
@@ -125,11 +124,11 @@ describe('getUserScriptBuildActionProcessor', () => {
     expect(drive.files['scripts:a/built.js']).toContain('require("@qpqjs/core")');
     expect(drive.files['scripts:a/built.js']).not.toContain('sourceMappingURL');
 
-    const scriptExports = loadUserScriptModule('built.js', drive.files['scripts:a/built.js'], getUserScriptModuleMap());
+    const scriptExports = loadUserScriptModule('built.js', drive!.files['scripts:a/built.js']!, getUserScriptModuleMap());
     expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');
     expect(tempDirsCreated).toHaveLength(1);
-    expect(fs.existsSync(tempDirsCreated[0])).toBe(false);
-    expect(tempDirsCreated[0].startsWith(os.tmpdir())).toBe(true);
+    expect(fs.existsSync(tempDirsCreated![0]!)).toBe(false);
+    expect(tempDirsCreated![0]!.startsWith(os.tmpdir())).toBe(true);
   }, 60_000);
 
   it('returns SourceNotFound when the listing is empty (an S3 drive)', async () => {
@@ -163,7 +162,7 @@ describe('getUserScriptBuildActionProcessor', () => {
 
     expect(error.errorType).toBe(askUserScriptBuild.errorType.BuildFailed);
     expect(error.errorText).toContain('[fs]');
-    expect(fs.existsSync(tempDirsCreated[0])).toBe(false);
+    expect(fs.existsSync(tempDirsCreated![0]!)).toBe(false);
     expect(drive.files['scripts:a/built.js']).toBeUndefined();
   }, 60_000);
 

@@ -6,5 +6,5 @@ import { askTenantApiRequest } from './askTenantApiRequest';
 
 /** GET myTenants: the caller's tenants. */
 export function* askTenantsFetch(target: TenantClientTarget): AskResponse<EventDocSummary[]> {
-  return yield* askTenantApiRequest<void, EventDocSummary[]>(target, 'GET', '');
+  return yield* askTenantApiRequest<EventDocSummary[], void>(target, 'GET', '');
 }

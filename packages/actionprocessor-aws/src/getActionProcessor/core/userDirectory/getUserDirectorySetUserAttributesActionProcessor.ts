@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -7,10 +7,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 import { setUserAttributes } from '../../../logic/cognito/setUserAttributes';
@@ -19,16 +18,17 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): ProcessorFor<typeof 
   return async ({ userDirectoryName, username, userAttributes }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
     try {
       await setUserAttributes(userPoolId, region, resolvedUsername, userAttributes);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectorySetUserAttributes.errorType.UserNotFound, 'No account found for this user'),
         InvalidParameterException: () =>
           actionResultError(askUserDirectorySetUserAttributes.errorType.InvalidAttributes, 'One or more attributes are invalid'),

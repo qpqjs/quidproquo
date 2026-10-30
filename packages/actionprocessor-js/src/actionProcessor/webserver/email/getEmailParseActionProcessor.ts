@@ -1,7 +1,7 @@
 import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { askEmailParse } from '@qpqjs/webserver';
 
-import { parseEmailMessage } from './parseEmailMessage';
+import { parseEmailMessage } from './utils';
 
 const getProcessEmailParse = (qpqConfig: QPQConfig): ProcessorFor<typeof askEmailParse> => {
   return async ({ rawBase64 }) => {

@@ -7,39 +7,63 @@ import {
   QpqFunctionRuntime,
   QpqRuntimeType,
   QueueActionType,
+  QueueQPQConfigSetting,
+  StoryResult,
 } from '@qpqjs/core';
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
-import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
-import { eventBus, processEvent, trackInFlight } from '../logic';
+import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/types';
+import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, sleep, trackInFlight } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
+
+// A retry waits ttRetryInSeconds on AWS (the visibility timeout). Locally the same wait is kept
+// but capped, so a queue declared with the 15 minute default does not stall a dev session.
+const LOCAL_MAX_RETRY_DELAY_MS = 5_000;
+
+// The queue setting for a message, looked up in the config of the service it targets.
+const resolveQueueConfig = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): Nullable<QueueQPQConfigSetting> => {
+  const targetConfig = qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.targetModule);
+
+  return targetConfig ? qpqCoreUtils.getQueueByName(payload.queueName, targetConfig) : null;
+};
+
+const resolveQueueConcurrencyLimit = (qpqConfigs: QPQConfig[], payload: AnyQueueMessageWithSession): number | undefined => {
+  const limit = resolveQueueConfig(qpqConfigs, payload)?.maxConcurrentExecutions;
+
+  return typeof limit === 'number' && limit > 0 ? limit : undefined;
+};
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessageWithSession, devServerConfig: ResolvedDevServerConfig) => {
+// Runs the message through this service when the message targets it; null when it does not.
+const processQueueMessages = async (
+  qpqConfig: QPQConfig,
+  payload: AnyQueueMessageWithSession,
+  devServerConfig: ResolvedDevServerConfig,
+): Promise<Nullable<StoryResult<[AnyQueueMessageWithSession], any>>> => {
   if (payload.targetEnvironment !== qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig)) {
-    return;
+    return null;
   }
 
   if (payload.targetApplication !== qpqCoreUtils.getApplicationName(qpqConfig)) {
-    return;
+    return null;
   }
 
   if (payload.targetModule !== qpqCoreUtils.getApplicationModuleName(qpqConfig)) {
-    return;
+    return null;
   }
 
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
   if ((!!payload.targetFeature || !!feature) && payload.targetFeature !== feature) {
-    return;
+    return null;
   }
 
-  await processEvent<AnyQueueMessageWithSession, any>(
+  return processEvent<AnyQueueMessageWithSession, any>(
     payload,
     qpqConfig,
     getDynamicModuleLoader(qpqConfig, devServerConfig),
@@ -51,60 +75,26 @@ const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessa
 };
 
 const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage: AnyEventBusMessageWithSession) => {
-  const thisServiceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  // console.log('------------------------');
-  // console.log(`Service trying to process message [${thisServiceName}]`);
-  // console.log('Processing event bus message', ebMessage.type);
-
   const allEventBuses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => {
-    const srcApplication = ebc.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-    const srcEnvironment = ebc.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-    const srcFeature = ebc.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-    const srcModule = ebc.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+    const source = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, ebc.owner);
 
     return (
-      srcApplication === ebMessage.targetApplication &&
-      srcEnvironment === ebMessage.targetEnvironment &&
-      srcModule === ebMessage.targetModule &&
-      ((!srcFeature && !ebMessage.targetFeature) || srcFeature === ebMessage.targetFeature)
+      source.application === ebMessage.targetApplication &&
+      source.environment === ebMessage.targetEnvironment &&
+      source.module === ebMessage.targetModule &&
+      ((!source.feature && !ebMessage.targetFeature) || source.feature === ebMessage.targetFeature)
     );
   });
-  //  console.log(
-  //   'All event buses',
-  //   JSON.stringify(
-  //     allEventBuses.map((eb) => eb.name),
-  //     null,
-  //     2,
-  //   ),
-  // );
-
-  // All the queues that we should publish to
+  // The queues this service owns (getOwnedQueueConfigs already keeps only those) that
+  // subscribe to the message's bus, where that bus is one of the matching ones above.
   const queues = qpqCoreUtils
-    .getOwnedQueues(qpqConfig)
-    .filter((q) => {
-      return !!q.eventBusSubscriptions.find((ebsub) => {
-        return allEventBuses.some((eb) => ebsub === eb.name);
-      });
-    })
-    .filter(
-      (q) =>
-        // The target is this service
-        (!q.owner?.module || q.owner?.module === thisServiceName) &&
-        // And we are subed to the message that its trying to get to
-        q.eventBusSubscriptions.includes(ebMessage.eventBusName),
-    );
-
-  // console.log(
-  //   'All queues',
-  //   JSON.stringify(
-  //     queues.map((eb) => eb.name),
-  //     null,
-  //     2,
-  //   ),
-  // );
+    .getOwnedQueueConfigs(qpqConfig)
+    .filter((q) => q.eventBusSubscriptions.some((subscription) => allEventBuses.some((eb) => subscription === eb.name)))
+    .filter((q) => q.eventBusSubscriptions.includes(ebMessage.eventBusName));
 
   for (const queue of queues) {
+    const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, queue.owner);
+
     const queueMessage: AnyQueueMessageWithSession = {
       payload: ebMessage.payload,
       type: ebMessage.type,
@@ -116,20 +106,16 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       // FIFO: carry the bus message's group through to the queue, like SNS FIFO -> SQS FIFO
       groupId: queue.isFifo ? ebMessage.groupId : undefined,
 
-      targetApplication: queue.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      targetEnvironment: queue.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      targetFeature: queue.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      targetModule: queue.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      targetApplication: target.application,
+      targetEnvironment: target.environment,
+      targetFeature: target.feature,
+      targetModule: target.module,
 
       messageId: generateUuid(),
     };
 
-    // console.log(JSON.stringify(queueMessage, null, 2));
-
-    eventBus.publish(QueueActionType.SendMessages, queueMessage);
+    eventBus.publish(QueueActionType.SendMessage, queueMessage);
   }
-
-  // console.log('------------------------');
 };
 
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
@@ -143,16 +129,68 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
   // There is no local redelivery/DLQ, so a failed message just logs and the group moves on.
   const fifoGroupTails: Map<string, Promise<void>> = new Map();
 
-  eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
-    const processAll = async () => {
+  // Per-queue concurrency: AWS caps a queue's consumer at maxConcurrentExecutions (migrations
+  // rely on 1 to run serially), so the same cap is applied here.
+  const queueGates: Map<string, ConcurrencyGate> = new Map();
+  const getQueueGate = (payload: AnyQueueMessageWithSession): ConcurrencyGate | undefined => {
+    const limit = resolveQueueConcurrencyLimit(devServerConfig.qpqConfigs, payload);
+    if (limit === undefined) {
+      return undefined;
+    }
+
+    const gateKey = `${payload.targetModule}:${payload.queueName}`;
+    const existing = queueGates.get(gateKey);
+    if (existing) {
+      return existing;
+    }
+
+    const gate = createConcurrencyGate(limit);
+    queueGates.set(gateKey, gate);
+    return gate;
+  };
+
+  eventBus.on(QueueActionType.SendMessage, async (payload: AnyQueueMessageWithSession, correlation: string) => {
+    // One delivery: the first failure (a thrown error or a failed story) is what a retry answers.
+    const processOnce = async (): Promise<Nullable<unknown>> => {
       try {
         for (const qpqConfig of devServerConfig.qpqConfigs) {
-          await processQueueMessages(qpqConfig, payload, devServerConfig);
+          const result = await processQueueMessages(qpqConfig, payload, devServerConfig);
+          if (result?.error) {
+            return result.error.errorText;
+          }
         }
       } catch (error) {
-        console.error(`Queue [${payload.queueName}] message [${payload.messageId}] failed:`, error);
+        return error;
+      }
+
+      return null;
+    };
+
+    // Redelivery as AWS does it: up to maxTries, waiting ttRetryInSeconds between tries. There is
+    // no local dead-letter queue, so the last failure is logged and the message dropped.
+    const processAllUngated = async () => {
+      const queueConfig = resolveQueueConfig(devServerConfig.qpqConfigs, payload);
+      const maxTries = Math.max(1, queueConfig?.maxTries ?? 1);
+      const retryDelayMs = Math.min((queueConfig?.ttRetryInSeconds ?? 0) * 1000, LOCAL_MAX_RETRY_DELAY_MS);
+      const label = `Queue [${payload.queueName}] message [${payload.messageId}]`;
+
+      for (let attempt = 1; attempt <= maxTries; attempt += 1) {
+        const failure = await processOnce();
+        if (failure === null) {
+          return;
+        }
+
+        if (attempt < maxTries) {
+          console.warn(`${label} failed on try ${attempt} of ${maxTries}, retrying in ${retryDelayMs / 1000}s:`, failure);
+          await sleep(retryDelayMs);
+        } else {
+          console.error(`${label} failed after ${maxTries} ${maxTries === 1 ? 'try' : 'tries'}; no local dead-letter queue, dropped:`, failure);
+        }
       }
     };
+
+    const gate = getQueueGate(payload);
+    const processAll = gate ? () => gate.run(processAllUngated) : processAllUngated;
 
     if (payload.groupId === undefined) {
       await trackInFlight(processAll());
@@ -171,7 +209,7 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     }
   });
 
-  eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
+  eventBus.on(EventBusActionType.SendMessage, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
     for (const qpqConfig of devServerConfig.qpqConfigs) {
       await processQueueEventBusSubscriptions(qpqConfig, payload);
     }

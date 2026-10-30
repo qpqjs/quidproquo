@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, LogActionType, resolveActionResult } from '@qpqjs/core';
+import { LogActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

@@ -2,10 +2,20 @@ name: ci-test
 
 # Reusable: the monorepo unit suite across supported node versions.
 #
-# Called by test.yml on pull requests (every version), and by deploy-site.yml on
-# every push, which gates the deploy on the version it deploys with and runs the
-# rest alongside. Both paths run this one definition, so a deploy is guarded by
+# Called by test.yml on pull requests (every version), by ci-deploy-site.yml as
+# a deploy gate on the version it deploys with, and by deploy-site.yml for the
+# rest alongside. Every path runs this one definition, so a deploy is guarded by
 # the same suite that runs on a pull request.
+#
+# Every version runs the suite as three shards on three runners. The suite is
+# import-bound (1400 files each loading the framework from source) and a
+# standard runner has four cores, so one runner takes five minutes where three
+# take under two. vitest splits the file list evenly across the shards.
+#
+# Only the lint, dependency and type checks need the whole monorepo built; they
+# run once in ci-check.yml. The tests resolve every @qpqjs/* import to source
+# (the vitest configs alias them), so a shard builds just what the configs
+# themselves load from lib/: @qpqjs/testing and its one dependency, core.
 on:
   workflow_call:
     inputs:
@@ -21,7 +31,8 @@ jobs:
       fail-fast: false
       matrix:
         node: ${{ fromJSON(inputs.node-versions) }}
-    name: node ${{ matrix.node }}
+        shard: [1, 2, 3]
+    name: node ${{ matrix.node }} shard ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -29,7 +40,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      # Cross-package imports resolve to each package's built lib/, so the
-      # suite needs the monorepo built before vitest can load the test files.
-      - run: npm run build
-      - run: npm test
+      # In dependency order: testing's build type-checks against core's lib/.
+      - run: npm run build -w @qpqjs/core -w @qpqjs/testing
+      # The shard count here and in the matrix above must agree.
+      - run: npm test -- --shard=${{ matrix.shard }}/3

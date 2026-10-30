@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateError, show, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateError, show, Spec } from './spec';
 
 // Error-reachability matrix: every composition of askCatch + askRunParallel + ok/fail leaves
 // up to depth 2, run through the REAL runtime, asserted against the contract oracle.

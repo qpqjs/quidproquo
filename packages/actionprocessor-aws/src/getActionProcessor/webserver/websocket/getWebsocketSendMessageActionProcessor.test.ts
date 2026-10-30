@@ -1,12 +1,11 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, createActionProcessor, ProcessorFor } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 import { askWebsocketSendMessageBase, defineWebsocket, WebsocketActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
 vi.mock('../../../logic/apiGateway/sendMessageToWebSocketConnection', () => ({
@@ -19,10 +18,7 @@ vi.mock('../../../logic/cloudformation/getExportedValue', () => ({
 const websocketEventProcessors = { onConnect: undefined, onDisconnect: undefined } as any;
 
 const resolveProcessor = async () => {
-  const config = buildTestQpqConfig([
-    defineAwsServiceAccountInfo('111', 'eu-west-1'),
-    defineWebsocket('ws', 'example.com', websocketEventProcessors),
-  ]);
+  const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), defineWebsocket('ws', websocketEventProcessors)]);
   const processors = await getWebsocketSendMessageActionProcessor(config, {} as any);
   return processors[WebsocketActionType.SendMessage];
 };

@@ -1,5 +1,5 @@
 // AWS sequential deploy (`qpq go`). Per service it: synths the QPQ config,
-// rspack-bundles the backend (programmatic — no per-service rspack.config.ts),
+// rspack-bundles the backend (programmatic, no per-service rspack.config.ts),
 // deploys the inf/api/web CDK stacks (cdk runs the generic workspace app via
 // --app), bundles views (rspack, production) and syncs them to S3. Finally, any
 // service that opts into module federation has its federated remote published
@@ -16,6 +16,7 @@ import { DeployPlan } from '../../lib/deployPrompts';
 import { getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
+import { createOutput } from '../../lib/out';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { assertNoFailures } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
@@ -24,6 +25,8 @@ import { isAwsCredentialsValid } from './awsCredentials';
 import { awsPublish } from './publish';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack, deployServiceStack } from './stacks';
 import { syncViewsToS3 } from './viewsSync';
+
+const out = createOutput('aws:go');
 
 const buildAndDeploy = async (
   serviceName: string,
@@ -36,34 +39,34 @@ const buildAndDeploy = async (
   appName: string,
 ): Promise<void> => {
   if (needsSynth) {
-    console.log('Synth QPQ Configs');
+    out.log('Synth QPQ Configs');
     await synthCommand([serviceName, '--app', appName]);
   }
 
   const qpqConfigForService = loadServiceQpqConfig(appName, serviceName);
 
   if (needsBuildApi) {
-    console.log('Building Api: ', serviceName);
+    out.log('Building Api: ', serviceName);
     await runRspack(getServiceRspackConfig(qpqConfigForService, path.join(getServiceDirectory(appName, serviceName), 'service')));
   }
 
   if (needsInfStack) {
-    console.log('Deploy Inf: ', serviceName);
+    out.log('Deploy Inf: ', serviceName);
     await deployServiceStack(serviceName, qpqDeployAwsUtils.getInfStackName(qpqConfigForService), appName);
   }
 
   if (needsApiStack) {
-    console.log('Deploy Api: ', serviceName);
+    out.log('Deploy Api: ', serviceName);
     await deployServiceStack(serviceName, qpqDeployAwsUtils.getApiStackName(qpqConfigForService), appName);
   }
 
   if (needsWebStack) {
-    console.log('Deploy Web: ', serviceName);
+    out.log('Deploy Web: ', serviceName);
     await deployServiceStack(serviceName, qpqDeployAwsUtils.getWebStackName(qpqConfigForService), appName);
   }
 
   if (needsViewStack && getServiceNamesWithViews(appName).includes(serviceName)) {
-    console.log('Building Views: ', serviceName);
+    out.log('Building Views: ', serviceName);
     await bundleViews(appName, serviceName);
     await syncViewsToS3(appName, serviceName);
   }
@@ -83,10 +86,10 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   }
 
   if (plan.kind === 'bootstrap') {
-    // Feature bootstraps deploy into a shared account — leave the account-level
+    // Feature bootstraps deploy into a shared account, leave the account-level
     // guardrails stack alone (deploy it explicitly via the 'account' option).
     if (process.env[QpqDeployEnvVar.featureName]) {
-      console.log('Skipping account stack for feature deploy');
+      out.log('Skipping account stack for feature deploy');
     } else {
       await deployAccountStack(plan.appName);
     }
@@ -101,12 +104,12 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   const { services, stacks } = plan;
   const shouldBuildApi = stacks !== 'views';
 
-  console.log('\n\nRunning automated deploy\n\n');
-  console.log('Executing for services');
-  console.log(services.join(', '));
+  out.log('\n\nRunning automated deploy\n\n');
+  out.log('Executing for services');
+  out.log(services.join(', '));
 
   if ((await isAwsCredentialsValid()) === false) {
-    console.log('Credentials are expired or invalid.');
+    out.log('Credentials are expired or invalid.');
     return;
   }
 
@@ -116,7 +119,7 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
 
   // Workspace packages resolve through their built dist/ (package.json main),
   // so bundles would ship stale code unless every lib is tsc'd first.
-  console.log('Building workspace packages');
+  out.log('Building workspace packages');
   assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // Views uploads resolve bucket names from the shell service's config.
@@ -146,7 +149,7 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
   if (allStacks || stacks === 'api') {
     const federatedServices = getServiceNamesWithFederation(appName, services);
     if (federatedServices.length > 0) {
-      console.log('\n\nPublishing federated backends\n');
+      out.log('\n\nPublishing federated backends\n');
       await awsPublish(appName, federatedServices);
     }
   }

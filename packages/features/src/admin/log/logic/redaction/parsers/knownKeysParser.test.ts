@@ -12,8 +12,8 @@ describe('knownKeysParser', () => {
 
     const { redactedLog, redactions } = knownKeysParser(log);
 
-    expect(redactedLog.history[0].act.payload.headers).toEqual({ Authorization: REDACTED_STRING, 'x-api-key': REDACTED_STRING });
-    expect(redactedLog.history[0].res).toEqual({ accessToken: REDACTED_STRING, id: 'keep' });
+    expect(redactedLog!.history[0]!.act.payload.headers).toEqual({ Authorization: REDACTED_STRING, 'x-api-key': REDACTED_STRING });
+    expect(redactedLog!.history[0]!.res).toEqual({ accessToken: REDACTED_STRING, id: 'keep' });
     expect(redactions.sort()).toEqual(['Bearer abc', 'k1', 't1']);
   });
 
@@ -25,7 +25,7 @@ describe('knownKeysParser', () => {
 
     const { redactedLog, redactions } = knownKeysParser(log);
 
-    expect(redactedLog.history[0].act.payload.body).toEqual({
+    expect(redactedLog!.history[0]!.act.payload.body).toEqual({
       api_key: REDACTED_STRING,
       'api-key': REDACTED_STRING,
       private_key: REDACTED_STRING,
@@ -70,7 +70,11 @@ describe('knownKeysParser', () => {
 
     const decoded = JSON.parse(Buffer.from(redactedLog.input[0].body, 'base64').toString());
     expect(decoded).toEqual({ username: 'joe', password: REDACTED_STRING, accessToken: REDACTED_STRING });
-    expect(JSON.parse(redactedLog.history[0].act.payload.body)).toEqual({ username: 'joe', password: REDACTED_STRING, accessToken: REDACTED_STRING });
+    expect(JSON.parse(redactedLog!.history[0]!.act.payload.body)).toEqual({
+      username: 'joe',
+      password: REDACTED_STRING,
+      accessToken: REDACTED_STRING,
+    });
     expect(redactions).toEqual(['tok-1', 'tok-1']);
   });
 });

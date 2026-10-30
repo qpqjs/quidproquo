@@ -1,15 +1,16 @@
-import { askNetworkRequestBase, buildTestQpqConfig, NetworkActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { askNetworkRequestBase, NetworkActionType, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { NetworkRequestError, NetworkRequestErrorCode } from '@qpqjs/webserver';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getNetworkRequestActionProcessor } from './getNetworkRequestActionProcessor';
 
-const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
+const { performNetworkRequest } = vi.hoisted(() => ({ performNetworkRequest: vi.fn() }));
 
 vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => ({
   ...(await importOriginal<typeof import('@qpqjs/webserver')>()),
-  preformNetworkRequest,
+  performNetworkRequest,
 }));
 
 describe('getNetworkRequestActionProcessor', () => {
@@ -20,24 +21,24 @@ describe('getNetworkRequestActionProcessor', () => {
     ) => Promise<any>;
 
   const rejectWith = async (error: unknown) => {
-    preformNetworkRequest.mockRejectedValue(error);
+    performNetworkRequest.mockRejectedValue(error);
     const processor = await resolve();
     return resolveActionResultError(await processor({ method: 'GET', url: '/x', responseType: 'json' }));
   };
 
   afterEach(() => {
     vi.restoreAllMocks();
-    preformNetworkRequest.mockReset();
+    performNetworkRequest.mockReset();
   });
 
   it('wraps the network response in a successful action result', async () => {
     const response = { headers: { 'content-type': 'application/json' }, status: 200, statusText: 'OK', data: { hello: 'world' } };
-    preformNetworkRequest.mockResolvedValue(response);
+    performNetworkRequest.mockResolvedValue(response);
     const processor = await resolve();
 
     const result = await processor({ method: 'GET', url: '/users', responseType: 'json' });
 
-    expect(preformNetworkRequest).toHaveBeenCalledWith({ method: 'GET', url: '/users', responseType: 'json' });
+    expect(performNetworkRequest).toHaveBeenCalledWith({ method: 'GET', url: '/users', responseType: 'json' });
     expect(resolveActionResult(result)).toEqual(response);
   });
 

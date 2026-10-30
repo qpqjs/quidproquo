@@ -1,0 +1,10 @@
+import { AskResponse, askStateDispatchEffect, Nullable } from '@qpqjs/core';
+
+import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
+import { EventDocWorkspaceSetFullHistoryEffect } from '../effects/EventDocWorkspaceSetFullHistoryEffect';
+import { EventDocWorkspaceHistoryPage } from '../types/EventDocWorkspaceHistoryPage';
+
+/** Replaces a slot's display history (null clears it). */
+export function* askEventDocWorkspaceSetFullHistory(slotKey: string, history: Nullable<EventDocWorkspaceHistoryPage>): AskResponse<void> {
+  yield* askStateDispatchEffect<EventDocWorkspaceSetFullHistoryEffect>(EventDocWorkspaceEffect.SetFullHistory, { slotKey, history });
+}

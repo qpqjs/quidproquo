@@ -3,7 +3,7 @@ import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 import { askWebSocketQueueBroadcastMessage } from '../../../webSocketQueue/logic/webSocket/askWebSocketQueueBroadcastMessage';
 import { WebSocketQueueServerMessageEventType } from '../../../webSocketQueue/types/serverMessages/WebSocketQueueServerMessageEventType';
 import { QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL } from '../config/maintenanceWebsocketApiGlobal';
-import { MaintenancePublicState } from '../eventDoc/MaintenancePublicState';
+import { MaintenancePublicState } from '../eventDoc/types/MaintenancePublicState';
 import { MaintenanceServerEventMessage } from '../models/MaintenanceServerEventMessage';
 
 // Push the authoritative active-maintenance set to every connection on the

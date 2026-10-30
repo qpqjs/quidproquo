@@ -1,16 +1,16 @@
-import { formatDuration, getTimeBounds, getTotalExecutionTime, StoryResultMetadataWithChildren } from '@qpqjs/core';
+import { formatDuration, getTimeBounds, getTotalExecutionTime, Nullable, StoryResultMetadataWithChildren } from '@qpqjs/core';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
 import { TreeApi } from './hooks';
 
-interface EventTimelineProps {
+type EventTimelineProps = {
   logCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
   treeApi: TreeApi;
-}
+};
 
 const EVENT_HEIGHT = 30;
 const EVENT_COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8c00', '#ff0080'];
@@ -81,7 +81,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({ logCorrelation, se
   const [scaleOffset, setScaleOffset] = useState(0.0);
   const [handleOnWheel, setHandleWheel] = useState<any>(() => () => {});
 
-  const [timelineRef, setTimelineRef] = useState<HTMLDivElement | null>(null);
+  const [timelineRef, setTimelineRef] = useState<Nullable<HTMLDivElement>>(null);
 
   useEffect(() => {
     const handleWheel = (event: any) => {

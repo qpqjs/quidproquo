@@ -1,6 +1,8 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
+import { Nullable } from '../../types/Nullable';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
-import { AnyMatchStoryResult, EventActionType } from './EventActionType';
+import { EventActionType } from './EventActionType';
+import { AnyMatchStoryResult } from './types';
 
 export const askEventAutoRespondBase = createActionRequester<unknown>()({
   actionType: EventActionType.AutoRespond,
@@ -12,6 +14,6 @@ export const askEventAutoRespondBase = createActionRequester<unknown>()({
 export function* askEventAutoRespond<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse>(
   qpqEventRecord: QpqEventRecord,
   matchResult: MSR,
-): AskResponse<QpqEventRecordResponse | null> {
-  return (yield* askEventAutoRespondBase(qpqEventRecord, matchResult)) as QpqEventRecordResponse | null;
+): AskResponse<Nullable<QpqEventRecordResponse>> {
+  return (yield* askEventAutoRespondBase(qpqEventRecord, matchResult)) as Nullable<QpqEventRecordResponse>;
 }

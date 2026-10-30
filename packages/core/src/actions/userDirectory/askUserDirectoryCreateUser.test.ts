@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askUserDirectoryCreateUser } from './askUserDirectoryCreateUser';
 import { CreateUserRequest } from './askUserDirectoryCreateUser';
 import { UserDirectoryActionType } from './UserDirectoryActionType';

@@ -1,12 +1,12 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askCryptoEncrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { askCryptoEncrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCachedGeneratedDataKey } from '../../../logic/kms/getCachedGeneratedDataKey';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getCryptoEncryptActionProcessor } from './getCryptoEncryptActionProcessor';
 
 vi.mock('../../../logic/kms/getCachedGeneratedDataKey', () => ({
@@ -32,7 +32,7 @@ describe('getCryptoEncryptActionProcessor', () => {
     });
     const processor = await resolveProcessor();
 
-    const [ciphertext, error] = await invokeProcessor(processor, { keyName: 'my-key', plaintext: 'shhh', context: { tenantId: 'tenant-a' } });
+    const [ciphertext, error] = await invokeProcessor(processor!, { keyName: 'my-key', plaintext: 'shhh', context: { tenantId: 'tenant-a' } });
 
     expect(error).toBeUndefined();
     expect(ciphertext!.startsWith(CRYPTO_BLOB_PREFIX_V1)).toBe(true);
@@ -43,7 +43,7 @@ describe('getCryptoEncryptActionProcessor', () => {
   it('returns KeyNotConfigured without touching KMS when the key is not in config', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', plaintext: 'shhh' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'unknown-key', plaintext: 'shhh' });
 
     expect(error?.errorType).toBe(askCryptoEncrypt.errorType.KeyNotConfigured);
     expect(getCachedGeneratedDataKey).not.toHaveBeenCalled();
@@ -54,12 +54,12 @@ describe('getCryptoEncryptActionProcessor', () => {
     ['DisabledException', askCryptoEncrypt.errorType.KeyUnavailable],
     ['KMSInvalidStateException', askCryptoEncrypt.errorType.KeyUnavailable],
     ['AccessDeniedException', askCryptoEncrypt.errorType.KeyUnavailable],
-    ['ThrottlingException', askCryptoEncrypt.errorType.Throttling],
+    ['ThrottlingException', askCryptoEncrypt.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getCachedGeneratedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { keyName: 'my-key', plaintext: 'shhh' });
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', plaintext: 'shhh' });
 
     expect(error?.errorType).toBe(expectedType);
   });

@@ -1,4 +1,4 @@
-import { EventDocStoreOptions } from '../../../eventDoc/context/buildEventDocStore';
+import { EventDocStoreOptions } from '../../../eventDoc/types/EventDocStoreOptions';
 import { maintenanceDocType, maintenanceStoreName, QPQ_MAINTENANCE_ON_APPEND_FN } from '../constants/maintenanceConstants';
 
 // The maintenance collection's store identity for code running OUTSIDE the mounted

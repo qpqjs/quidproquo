@@ -25,10 +25,16 @@ export const buildEventDocViewFoldConfig = (
   validators?: EventDocEventValidators<EventDocDocument>,
 ): FoldEventDocLogConfig<EventDocDocument> => {
   const [base, ...rest] = versions;
+  if (!base) {
+    throw new Error(`View [${viewName}] has no versions`);
+  }
 
   const reducersByVersion: Record<number, QpqReducer<EventDocDocument, EventDocEvent>> = {};
   versions.forEach((version) => {
-    reducersByVersion[version.version] = version.views[viewName].foldReducer;
+    const view = version.views[viewName];
+    if (view) {
+      reducersByVersion[version.version] = view.foldReducer;
+    }
   });
 
   const migrations: EventDocMigrations = {};

@@ -1,5 +1,4 @@
 import {
-  buildTestQpqConfig,
   ConfigActionType,
   ContextActionType,
   DateActionType,
@@ -12,10 +11,11 @@ import {
   PlatformActionType,
   SystemActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getCoreActionProcessor } from './index';
+import { getCoreActionProcessor } from './getCoreActionProcessor';
 
 describe('getCoreActionProcessor', () => {
   it('exposes a processor for every core action domain', async () => {

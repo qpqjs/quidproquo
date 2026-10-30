@@ -1,19 +1,21 @@
 import {
-  buildTestQpqConfig,
-  buildTestStorySession,
   DecodedAccessToken,
+  defineUserDirectory,
   ErrorTypeEnum,
   isErroredActionResult,
-  noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
+import { signDevJwt } from '../../../logic/auth/devJwt';
 import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirectoryReadAccessTokenActionProcessor';
+
+vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));
 
 const nowInSeconds = Math.floor(Date.now() / 1000);
 
@@ -25,11 +27,13 @@ const buildDecodedToken = (exp: number): DecodedAccessToken => ({
   userDirectory: 'directory',
 });
 
-const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
-const buildJwtWithPayload = (payload: object): string => `${base64UrlEncode({ alg: 'none' })}.${base64UrlEncode(payload)}.dev-signature`;
+const buildJwtWithPayload = (payload: object): string => signDevJwt('test-secret', payload);
 
 const getProcessor = async () => {
-  const processors = await getUserDirectoryReadAccessTokenActionProcessor(buildTestQpqConfig([]), noopDynamicModuleLoader);
+  const processors = await getUserDirectoryReadAccessTokenActionProcessor(buildTestDevServerConfig())(
+    buildTestQpqConfig([defineUserDirectory('directory')]),
+    noopDynamicModuleLoader,
+  );
   return processors[UserDirectoryActionType.ReadAccessToken];
 };
 
@@ -39,9 +43,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -52,9 +56,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(isErroredActionResult(result)).toBe(true);
@@ -66,9 +70,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(isErroredActionResult(result)).toBe(true);
@@ -80,9 +84,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: true },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -93,9 +97,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ decodedAccessToken }),
+      { session: buildTestStorySession({ decodedAccessToken }) },
     );
 
     expect(resolveActionResult(result)).toEqual(decodedAccessToken);
@@ -106,9 +110,9 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
     const process = await getProcessor();
 
     const result = await invokeProcessor(
-      process,
+      process!,
       { userDirectoryName: 'directory', ignoreExpiration: false },
-      buildTestStorySession({ accessToken }),
+      { session: buildTestStorySession({ accessToken }) },
     );
 
     expect(resolveActionResult(result).username).toBe('joe@example.com');
@@ -117,7 +121,7 @@ describe('getUserDirectoryReadAccessTokenActionProcessor', () => {
   it('returns Unauthorized when the session carries no token at all', async () => {
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', ignoreExpiration: false }, buildTestStorySession());
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', ignoreExpiration: false }, { session: buildTestStorySession() });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.Unauthorized);

@@ -1,26 +1,19 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  DynamicModuleLoader,
+  loadActionProcessorList,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqFunctionRuntime,
+} from '@qpqjs/core';
 
 function getActionProcessorListLoader(dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) {
   return async function loadModule(qpqFunctionRuntime: QpqFunctionRuntime): Promise<ActionProcessorList> {
     try {
-      const possibleModule: ActionProcessorListResolver = await dynamicModuleLoader(qpqFunctionRuntime);
-
-      if (typeof possibleModule !== 'function') {
-        throw new Error(`Expected module to be a function, but got ${typeof possibleModule}`);
-      }
-
-      const apl: ActionProcessorList = await possibleModule(qpqConfig, dynamicModuleLoader);
-
-      if (typeof apl !== 'object') {
-        throw new Error(`Expected action processor list to be an object, but got ${typeof apl}`);
-      }
-
-      if (Object.values(apl).some((aplv) => typeof aplv !== 'function')) {
-        throw new Error('Expected all action processors to be functions');
-      }
-
-      return apl;
+      return await loadActionProcessorList(qpqFunctionRuntime, qpqConfig, dynamicModuleLoader);
     } catch (e) {
+      // eslint-disable-next-line no-console -- the resolver runs before any logger exists, and the caller settles every loader.
       console.log(`Unable to dynamically load action processors: [${e}] ${JSON.stringify(qpqFunctionRuntime)}`);
 
       throw e;
@@ -42,7 +35,7 @@ const getProcessCustomAction = async (qpqConfig: QPQConfig, dynamicModuleLoader:
 
     return actionProcessorLists.reduce((acc, cur) => ({ ...acc, ...cur }), {});
   } catch (e) {
-    // This should never get hit, but just in case
+    // eslint-disable-next-line no-console -- see above; this path should be unreachable.
     console.log(`Unable to dynamically load action processors: [${e}]`);
 
     return {};

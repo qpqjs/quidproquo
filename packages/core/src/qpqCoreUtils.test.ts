@@ -1,9 +1,10 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   defineActionProcessors,
   defineAi,
-  defineApiBuildPath,
   defineApplication,
   defineDeployEvent,
   defineEnvironmentSettings,
@@ -35,13 +36,14 @@ import {
   getAllEventBusConfigs,
   getAllGraphDatabaseConfigs,
   getAllInlineFunctions,
-  getAllKeyValueStores,
+  getAllKeyValueStoreConfigs,
   getAllParameterConfigs,
   getAllSecretConfigs,
   getAllSrcEntries,
+  getAllStorageDriveConfigs,
+  getAllUserDirectoryConfigs,
   getAllUserScriptModules,
   getApiBuildPath,
-  getApplicationConfigRoot,
   getApplicationConfigSetting,
   getApplicationModuleEnvironment,
   getApplicationModuleFeature,
@@ -51,7 +53,7 @@ import {
   getConfigSetting,
   getConfigSettings,
   getDeployEventConfigs,
-  getEventBusConfigByName,
+  getEventBusByName,
   getFullUrlFromConfigUrl,
   getFullyQualifiedResourceName,
   getGlobalConfigValue,
@@ -62,36 +64,33 @@ import {
   getOwnedGraphDatabases,
   getOwnedInlineFunctions,
   getOwnedItems,
-  getOwnedKeyValueStores,
+  getOwnedKeyValueStoreConfigs,
   getOwnedParameterConfigs,
-  getOwnedQueues,
   getOwnedScheduleEvents,
-  getOwnedSecrets,
-  getOwnedStorageDrives,
-  getOwnedUserDirectories,
-  getParameterConfig,
-  getQueueByName,
+  getOwnedSecretConfigs,
+  getOwnedStorageDriveConfigs,
+  getOwnedUserDirectoryConfigs,
+  getParameterByName,
   getQueueQueueProcessors,
-  getQueues,
   getQueueSrcEntries,
   getScheduleEvents,
   getSecretByName,
   getSrcFilenameFromQpqFunctionRuntime,
   getStorageDriveByName,
   getStorageDriveNames,
-  getStorageDrives,
   getUniqueKeyForSetting,
-  getUserDirectories,
   getUserDirectoryByName,
   getUserDirectoryEmailTemplates,
   getUserDirectorySrcEntries,
-  getUserScriptRunner,
-  getVirualNetworkConfigs,
+  getVirtualNetworkConfigs,
   isSameResource,
   resolveCrossServiceResourceName,
   resolveGlobalValue,
+  resolveOwnerModuleName,
+  resolveParameterOrThrow,
+  resolveSecretOrThrow,
+  resolveUserDirectoryOrThrow,
 } from './qpqCoreUtils';
-import { buildTestQpqConfig } from './testing';
 
 describe('qpqCoreUtils', () => {
   describe('flattenQpqConfig', () => {
@@ -174,7 +173,6 @@ describe('qpqCoreUtils', () => {
 
       expect(getApplicationName(config)).toBe('my-app');
       expect(getApplicationModuleName(config)).toBe('my-module');
-      expect(getApplicationConfigRoot(config)).toBe('/root');
       expect(getConfigRoot(config)).toBe('/root');
       expect(getApplicationModuleFeature(config)).toBe('beta');
       expect(getApplicationConfigSetting(config).applicationName).toBe('my-app');
@@ -208,13 +206,13 @@ describe('qpqCoreUtils', () => {
     const config = buildTestQpqConfig([defineStorageDrive('uploads'), defineStorageDrive('cache')]);
 
     it('lists storage drives and their names', () => {
-      expect(getStorageDrives(config)).toHaveLength(2);
+      expect(getAllStorageDriveConfigs(config)).toHaveLength(2);
       expect(getStorageDriveNames(config)).toEqual(['uploads', 'cache']);
     });
 
     it('finds a storage drive by name', () => {
       expect(getStorageDriveByName('uploads', config)?.storageDrive).toBe('uploads');
-      expect(getStorageDriveByName('missing', config)).toBeUndefined();
+      expect(getStorageDriveByName('missing', config)).toBeNull();
     });
 
     it('returns only owned storage drives', () => {
@@ -223,18 +221,12 @@ describe('qpqCoreUtils', () => {
         defineStorageDrive('theirs', { owner: { module: 'other-module', storageDriveName: 'theirs' } }),
       ]);
 
-      expect(getOwnedStorageDrives(mixed).map((s) => s.storageDrive)).toEqual(['mine']);
+      expect(getOwnedStorageDriveConfigs(mixed).map((s) => s.storageDrive)).toEqual(['mine']);
     });
   });
 
   describe('queues', () => {
     const config = buildTestQpqConfig([defineQueue('jobs', { created: '/q/created::run' })]);
-
-    it('lists queues and finds by name', () => {
-      expect(getQueues(config)).toHaveLength(1);
-      expect(getQueueByName(config, 'jobs')?.name).toBe('jobs');
-      expect(getQueueByName(config, 'missing')).toBeUndefined();
-    });
 
     it('returns queue processors, or empty for unknown queues', () => {
       expect(getQueueQueueProcessors('jobs', config)).toEqual({ created: '/q/created::run' });
@@ -243,11 +235,6 @@ describe('qpqCoreUtils', () => {
 
     it('collects queue processor runtimes as src entries', () => {
       expect(getQueueSrcEntries(config)).toEqual(['/q/created::run']);
-    });
-
-    it('returns owned queues (queues carry no owner so all are owned)', () => {
-      const config = buildTestQpqConfig([defineQueue('a', {}), defineQueue('b', {})]);
-      expect(getOwnedQueues(config).map((q) => q.name)).toEqual(['a', 'b']);
     });
   });
 
@@ -307,9 +294,9 @@ describe('qpqCoreUtils', () => {
     const config = buildTestQpqConfig([defineKeyValueStore('users', 'id'), defineKeyValueStore('sessions', 'id')]);
 
     it('lists all key value stores and finds by name', () => {
-      expect(getAllKeyValueStores(config)).toHaveLength(2);
-      expect(getKeyValueStoreByName(config, 'users')?.keyValueStoreName).toBe('users');
-      expect(getKeyValueStoreByName(config, 'missing')).toBeUndefined();
+      expect(getAllKeyValueStoreConfigs(config)).toHaveLength(2);
+      expect(getKeyValueStoreByName('users', config)?.keyValueStoreName).toBe('users');
+      expect(getKeyValueStoreByName('missing', config)).toBeNull();
     });
 
     it('returns only owned key value stores', () => {
@@ -318,7 +305,7 @@ describe('qpqCoreUtils', () => {
         defineKeyValueStore('theirs', 'id', [], { owner: { module: 'other-module' } }),
       ]);
 
-      expect(getOwnedKeyValueStores(mixed).map((k) => k.keyValueStoreName)).toEqual(['mine']);
+      expect(getOwnedKeyValueStoreConfigs(mixed).map((k) => k.keyValueStoreName)).toEqual(['mine']);
     });
 
     it('builds a fully qualified resource name for a store', () => {
@@ -397,6 +384,16 @@ describe('qpqCoreUtils', () => {
     });
   });
 
+  describe('resolveOwnerModuleName', () => {
+    it('answers the declared owner module, else the executing module', () => {
+      const config = buildTestQpqConfig();
+
+      expect(resolveOwnerModuleName({ module: 'other-module' }, config)).toBe('other-module');
+      expect(resolveOwnerModuleName(undefined, config)).toBe('test-module');
+      expect(resolveOwnerModuleName({ module: '' }, config)).toBe('test-module');
+    });
+  });
+
   describe('secrets', () => {
     const config = buildTestQpqConfig([
       defineSecret('apiKey'),
@@ -405,15 +402,20 @@ describe('qpqCoreUtils', () => {
 
     it('lists all secrets and finds one by name', () => {
       expect(getAllSecretConfigs(config)).toHaveLength(2);
-      expect(getSecretByName('apiKey', config).key).toBe('apiKey');
+      expect(resolveSecretOrThrow('apiKey', config).key).toBe('apiKey');
     });
 
     it('throws when a secret is not found', () => {
-      expect(() => getSecretByName('missing', config)).toThrow(/Can not find secret/);
+      expect(() => resolveSecretOrThrow('missing', config)).toThrow(/Can not find secret/);
+    });
+
+    it('getSecretByName answers null for a missing secret', () => {
+      expect(getSecretByName('apiKey', config)?.key).toBe('apiKey');
+      expect(getSecretByName('missing', config)).toBeNull();
     });
 
     it('returns only owned secrets', () => {
-      expect(getOwnedSecrets(config).map((s) => s.key)).toEqual(['apiKey']);
+      expect(getOwnedSecretConfigs(config).map((s) => s.key)).toEqual(['apiKey']);
     });
   });
 
@@ -425,11 +427,16 @@ describe('qpqCoreUtils', () => {
 
     it('lists all parameters and finds one by name', () => {
       expect(getAllParameterConfigs(config)).toHaveLength(2);
-      expect(getParameterConfig('region', config).value).toBe('us-east-1');
+      expect(resolveParameterOrThrow('region', config).value).toBe('us-east-1');
     });
 
     it('throws when a parameter is not found', () => {
-      expect(() => getParameterConfig('missing', config)).toThrow(/not found/);
+      expect(() => resolveParameterOrThrow('missing', config)).toThrow(/not found/);
+    });
+
+    it('getParameterByName answers null for a missing parameter', () => {
+      expect(getParameterByName('region', config)?.value).toBe('us-east-1');
+      expect(getParameterByName('missing', config)).toBeNull();
     });
 
     it('returns only owned parameters', () => {
@@ -463,16 +470,21 @@ describe('qpqCoreUtils', () => {
     ]);
 
     it('lists directories and finds one by name', () => {
-      expect(getUserDirectories(config)).toHaveLength(2);
-      expect(getUserDirectoryByName('main', config).name).toBe('main');
+      expect(getAllUserDirectoryConfigs(config)).toHaveLength(2);
+      expect(resolveUserDirectoryOrThrow('main', config).name).toBe('main');
     });
 
     it('throws when a directory is not found', () => {
-      expect(() => getUserDirectoryByName('missing', config)).toThrow(/UserDirectory not found/);
+      expect(() => resolveUserDirectoryOrThrow('missing', config)).toThrow(/UserDirectory not found/);
+    });
+
+    it('getUserDirectoryByName answers null for a missing directory', () => {
+      expect(getUserDirectoryByName('main', config)?.name).toBe('main');
+      expect(getUserDirectoryByName('missing', config)).toBeNull();
     });
 
     it('returns only owned directories', () => {
-      expect(getOwnedUserDirectories(config).map((u) => u.name)).toEqual(['main']);
+      expect(getOwnedUserDirectoryConfigs(config).map((u) => u.name)).toEqual(['main']);
     });
 
     it('maps email templates keyed by directory name', () => {
@@ -494,9 +506,9 @@ describe('qpqCoreUtils', () => {
     it('finds an event bus by local name or by resource name override', () => {
       const config = buildTestQpqConfig([defineEventBus('local', { owner: { eventBusName: 'sharedBus' } })]);
 
-      expect(getEventBusConfigByName('sharedBus', config)?.name).toBe('local');
-      expect(getEventBusConfigByName('local', config)?.name).toBe('local');
-      expect(getEventBusConfigByName('missing', config)).toBeUndefined();
+      expect(getEventBusByName('sharedBus', config)?.name).toBe('local');
+      expect(getEventBusByName('local', config)?.name).toBe('local');
+      expect(getEventBusByName('missing', config)).toBeNull();
     });
 
     it('returns only owned event buses', () => {
@@ -531,7 +543,7 @@ describe('qpqCoreUtils', () => {
       ]);
 
       expect(getAllAiConfigs(config).map((a) => a.aiName)).toEqual(['assistant']);
-      expect(getVirualNetworkConfigs(config).map((v) => v.name)).toEqual(['vpc']);
+      expect(getVirtualNetworkConfigs(config).map((v) => v.name)).toEqual(['vpc']);
       expect(getNotifyErrorConfigs(config).map((n) => n.name)).toEqual(['alarms']);
       expect(getDeployEventConfigs(config).map((d) => d.name)).toEqual(['postDeploy']);
     });
@@ -605,20 +617,13 @@ describe('qpqCoreUtils', () => {
 
     it("includes a store's change-stream handler", () => {
       // Anything missing here is never bundled, so its handler cannot be resolved at runtime
-      // and simply never runs. Nothing throws — the only symptom is whatever it maintained
+      // and simply never runs. Nothing throws, the only symptom is whatever it maintained
       // quietly going stale, which is how this was found.
       const withStream = buildTestQpqConfig([
         defineKeyValueStore('events', 'pk', [], { onStream: { runtime: '/entry/kvsStream/project::project' } }),
       ]);
 
       expect(getAllSrcEntries(withStream)).toContain('/entry/kvsStream/project::project');
-    });
-  });
-
-  describe('getUserScriptRunner', () => {
-    it('returns the declared runner, or null when the service has none', () => {
-      expect(getUserScriptRunner(buildTestQpqConfig())).toBeNull();
-      expect(getUserScriptRunner(buildTestQpqConfig([defineUserScriptRunner({ timeoutInSeconds: 30 })]))).toMatchObject({ timeoutInSeconds: 30 });
     });
   });
 

@@ -11,7 +11,9 @@ export function bindApi<ApiDeps, ApiFunctions extends Record<string, (deps: ApiD
 
   const boundFunctions = Object.keys(apiFunctions).reduce((acc, key) => {
     const func = apiFunctions[key];
-    acc[key as keyof ApiFunctions] = bindApiFunction(dependencies, func) as BoundFunctions[keyof ApiFunctions];
+    if (func) {
+      acc[key as keyof ApiFunctions] = bindApiFunction(dependencies, func) as BoundFunctions[keyof ApiFunctions];
+    }
     return acc;
   }, {} as BoundFunctions);
 

@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types/utils/createActionRequester';
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { UserScriptActionType } from './UserScriptActionType';
 import { UserScriptModuleExports } from './UserScriptModuleExports';
 
@@ -21,7 +21,7 @@ export const askUserScriptListExports = createActionRequester<UserScriptModuleEx
     'ModuleNotFound', // the script required a module outside the shared package list
     'ScriptInvalid', // the script threw while its module body was being loaded
     'RunnerUnavailable', // the sandboxed runner could not be invoked, or answered with something other than a result
-    'TimedOut', // the runner did not finish within the service's configured runner timeout
+    'Timeout', // the runner did not finish within the service's configured runner timeout
   ],
   getPayload: (drive: string, filepath: string, scope?: string) => ({ drive, filepath, scope }),
 });

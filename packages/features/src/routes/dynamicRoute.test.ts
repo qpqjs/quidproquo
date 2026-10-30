@@ -1,4 +1,5 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';

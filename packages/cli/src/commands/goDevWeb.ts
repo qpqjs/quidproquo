@@ -1,7 +1,7 @@
-// `qpq go:dev:web` — boots every views microfrontend's Rspack dev server
+// `qpq go:dev:web`, boots every views microfrontend's Rspack dev server
 // in-process (shell is the MF host app, plus all remotes on their own ports).
 // Everything is served dynamically; remotes resolve at runtime via
-// mf-manifest.json on localhost ports. Programmatic — no per-views
+// mf-manifest.json on localhost ports. Programmatic, no per-views
 // rspack.config.ts or npm serve script needed.
 //
 // Usage:
@@ -20,9 +20,12 @@ import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { setWebAddressingEnv } from '../lib/webAddressingEnv';
+
+const out = createOutput('go:dev:web');
 
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
@@ -56,7 +59,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   let views = getAllViews(root, appName);
   if (only) views = views.filter((v) => only.includes(v.service));
   if (views.length === 0) {
-    console.error('No views projects found.');
+    out.error('No views projects found.');
     process.exit(1);
   }
 
@@ -71,15 +74,15 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   }
 
   // Every RspackDevServer.start() registers its own SIGINT/SIGTERM handler on
-  // process — with a dozen views servers in one process that trips node's
+  // process, with a dozen views servers in one process that trips node's
   // default 10-listener warning. Size the limit to the fleet.
   process.setMaxListeners(Math.max(process.getMaxListeners(), views.length * 2 + 10));
 
   // Service names are padded to a common width so the "(started)" chips align.
   const serviceColumnWidth = Math.max(...views.map((v) => v.service.length));
 
-  console.log(`Starting ${views.length} views dev servers for [${appName}]:`);
-  for (const v of views) console.log(`  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}`);
+  out.log(`Starting ${views.length} views dev servers for [${appName}]:`);
+  for (const v of views) out.log(`  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}`);
 
   const servers: RspackDevServer[] = [];
   let shuttingDown = false;
@@ -97,12 +100,13 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
   let linesBelowList = 0;
 
   const logBelowList = (line: string): void => {
-    console.log(line);
+    out.log(line);
     linesBelowList += 1;
   };
 
   const markStarted = (index: number): void => {
     const v = views[index];
+    if (!v) return;
     if (!process.stdout.isTTY) {
       logBelowList(`  ${v.service} started`);
       return;
@@ -118,7 +122,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
       const req = http.get(
         {
           host: 'localhost',
-          port: views[index].port,
+          port: views[index]?.port,
           path: '/',
           timeout: 1000,
         },

@@ -9,11 +9,3 @@ export type EventDocWorkspaceChromeState = {
   // Short-lived links to assets the history panel shows (e.g. an adopted signature), by asset id.
   historyAssetUrls: Record<string, string>;
 };
-
-/** Initial chrome state. */
-export const createInitialEventDocWorkspaceChromeState = (): EventDocWorkspaceChromeState => ({
-  historyOpen: false,
-  helpOpen: false,
-  historySlotKey: null,
-  historyAssetUrls: {},
-});

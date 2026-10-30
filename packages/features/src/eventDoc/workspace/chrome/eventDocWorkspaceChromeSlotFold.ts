@@ -1,6 +1,7 @@
 import { EventDocWorkspaceLocalSlotFoldConfig } from '../types/EventDocWorkspaceLocalSlotFoldConfig';
 import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
-import { createInitialEventDocWorkspaceChromeState, EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
+import { createInitialEventDocWorkspaceChromeState } from './logic/createInitialEventDocWorkspaceChromeState';
+import { EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
 import { eventDocWorkspaceChromeFoldReducer } from './eventDocWorkspaceChromeFoldReducer';
 
 /** The chrome slot's fold config type. */

@@ -3,6 +3,9 @@ import {
   askExecuteStory,
   createRuntime,
   DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
+  Nullable,
   QPQConfig,
   qpqCoreUtils,
   QpqRuntimeType,
@@ -12,7 +15,6 @@ import {
 } from '@qpqjs/core';
 
 import * as chokidar from 'chokidar';
-import { randomUUID } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -23,8 +25,6 @@ import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerLogger } from '../logger';
 import { FileEventPayload } from './FileEventPayload';
 import { toStorageDriveEvent } from './toStorageDriveEvent';
-
-const getDateNow = () => new Date().toISOString();
 
 export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<DevServerPluginStop> => {
   const storagePath = devServerConfig.fileStorageConfig.storagePath;
@@ -38,7 +38,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
 
   // Create a watcher for the storage directory. Requires chokidar v3: on macOS
   // v3 watches via FSEvents (one fd for the whole tree), while v4 dropped
-  // FSEvents and holds a kqueue fd PER FILE — high-churn drives (qpq-logs
+  // FSEvents and holds a kqueue fd PER FILE, so high-churn drives (qpq-logs
   // writes a file per story execution) then grow the fd table until
   // child_process.spawn fails with EBADF (~80k fds), killing anything that
   // launches a subprocess (e.g. puppeteer).
@@ -59,7 +59,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
   });
 
   // Parse file path to extract service, drive, and relative filepath
-  const parseFilePath = (fullPath: string): FileEventPayload | null => {
+  const parseFilePath = (fullPath: string): Nullable<FileEventPayload> => {
     try {
       const relativePath = path.relative(storagePath, fullPath);
       const parts = relativePath.split(path.sep);
@@ -70,6 +70,9 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       }
 
       const [service, drive, ...filePathParts] = parts;
+      if (service === undefined || drive === undefined) {
+        return null;
+      }
       const filepath = filePathParts.join(path.sep);
 
       return {
@@ -130,7 +133,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       }),
       getDateNow,
       logger,
-      `${serviceName}::storage-event::${randomUUID()}`,
+      `${serviceName}::storage-event::${generateUuid()}`,
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
       dynamicModuleLoaderForService,
       undefined,
@@ -214,7 +217,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       if (stats.isFile()) {
         await handleFileCreate(filePath);
       }
-    } catch (error) {
+    } catch {
       // File might have been deleted already
       console.debug('Could not stat file:', filePath);
     }

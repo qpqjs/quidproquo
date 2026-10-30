@@ -1,8 +1,10 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { StateActionType } from '../../actions/state';
-import { StateDispatchAction } from '../../actions/state/askStateDispatch';
-import { runStory } from '../../testing';
+import { askStateDispatchBase } from '../../actions/state/askStateDispatch';
+import { ActionOf } from '../../types';
 import { askStateDispatchEffect } from './askStateDispatchEffect';
 import { Effect } from './Effect';
 
@@ -14,7 +16,7 @@ describe('askStateDispatchEffect', () => {
     let dispatched: unknown;
 
     runStory(askStateDispatchEffect<AddEffect>('counter/Add', 5), {
-      [StateActionType.Dispatch]: (action: StateDispatchAction<AddEffect>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched = action.payload.action;
       },
     });
@@ -26,7 +28,7 @@ describe('askStateDispatchEffect', () => {
     let dispatched: unknown;
 
     runStory(askStateDispatchEffect<IncrementEffect>('counter/Increment'), {
-      [StateActionType.Dispatch]: (action: StateDispatchAction<IncrementEffect>) => {
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
         dispatched = action.payload.action;
       },
     });

@@ -1,8 +1,0 @@
-{
-  "extends": "@qpqjs/tsconfig/tsconfig.amd.json",
-  "compilerOptions": {
-    "outDir": "./lib/amd"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
-}

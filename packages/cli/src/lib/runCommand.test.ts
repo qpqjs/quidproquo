@@ -1,7 +1,6 @@
+import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { spawn } from 'child_process';
 
 import { runCommand } from './runCommand';
 

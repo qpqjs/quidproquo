@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askFileReadBinaryContents } from './askFileReadBinaryContents';
 import { FileActionType } from './FileActionType';
 

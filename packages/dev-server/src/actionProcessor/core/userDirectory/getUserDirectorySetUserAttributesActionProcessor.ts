@@ -5,7 +5,6 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
@@ -21,9 +20,10 @@ const getProcessSetUserAttributes = (
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       await upsertDevUser(devServerConfig.runtimePath, userDirectory, username, userAttributes);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

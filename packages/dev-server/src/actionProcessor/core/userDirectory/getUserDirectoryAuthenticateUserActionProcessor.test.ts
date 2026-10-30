@@ -1,15 +1,9 @@
-import {
-  AuthenticateUserChallenge,
-  buildTestQpqConfig,
-  defineUserDirectory,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { AuthenticateUserChallenge, defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getUserDirectoryAuthenticateUserActionProcessor } from './getUserDirectoryAuthenticateUserActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -18,7 +12,7 @@ const { userStore } = vi.hoisted(() => ({
 
 vi.mock('../../../logic/auth/jsonUserStore', () => userStore);
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const resolvedDirectory = { serviceName: 'test-module', directoryName: 'directory' };
 
 const getProcessor = async () => {
@@ -36,7 +30,7 @@ describe('getUserDirectoryAuthenticateUserActionProcessor', () => {
     userStore.upsertDevUser.mockResolvedValue({});
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       authenticateUserRequest: { email: 'joe@example.com', password: 'anything', isCustom: false },
     });

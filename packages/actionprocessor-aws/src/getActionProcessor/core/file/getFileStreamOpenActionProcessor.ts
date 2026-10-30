@@ -6,16 +6,15 @@ import {
   askFileStreamOpenBase,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  ErrorTypeEnum,
-  FileActionType,
+  generateUuid,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { Readable } from 'stream';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-import { randomGuid } from '../../../awsLambdaUtils';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
@@ -62,10 +61,10 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       );
 
       if (!response.Body) {
-        return actionResultError(ErrorTypeEnum.GenericError, `Empty response body for: ${filepath}`);
+        return actionResultError(askFileStreamOpenBase.errorType.NoContent, `Empty response body for: ${filepath}`);
       }
 
-      const streamId = `s3-${randomGuid()}`;
+      const streamId = `s3-${generateUuid()}`;
       const isText = encoding === 'text';
       const size = chunkSize ?? 65536;
       const transform = isText ? (buf: Buffer) => buf.toString('utf8') : (buf: Buffer) => buf.toString('base64');
@@ -75,6 +74,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidObjectState: () => actionResultError(askFileStreamOpenBase.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),

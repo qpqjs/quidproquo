@@ -1,19 +1,10 @@
-import {
-  actionResult,
-  actionResultError,
-  askEventMatchStoryBase,
-  createActionProcessor,
-  ErrorTypeEnum,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askEventMatchStoryBase, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, WebSocketEventType } from '@qpqjs/webserver';
 
-import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqWebServerUtils.getWebsocketEntryByApiName(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
+const getProcessMatchStory = (qpqConfig: QPQConfig, websocketApiName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const userDirectoryConfig = qpqWebServerUtils.resolveWebsocketOrThrow(websocketApiName, qpqConfig);
 
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
@@ -39,4 +30,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The api the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (websocketApiName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, websocketApiName));

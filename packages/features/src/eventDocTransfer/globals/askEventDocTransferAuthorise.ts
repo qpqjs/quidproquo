@@ -1,6 +1,6 @@
 import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../../eventDoc/context';
+import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { EventDocAuthoriseInput } from '../../eventDoc/types/EventDocAuthoriseInput';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
@@ -10,13 +10,13 @@ import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
  * own routes would. A transfer declared without an authoriser is gated by scope alone. Requires the store context.
  */
 export function* askEventDocTransferAuthorise(action: EventDocPermissionAction): AskResponse<void> {
-  // Routes registered before the global existed have none at all.
+  // A transfer with no authoriser global is gated by scope alone.
   const authorise = yield* askCatch(askConfigGetGlobal<string>(EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL));
   if (!authorise.success || !authorise.result) {
     return;
   }
 
-  const { storeName } = yield* askEventDocResolveStore();
+  const { storeName } = yield* askEventDocStoreReadOrThrow();
 
   yield* askInlineFunctionExecute<void, EventDocAuthoriseInput>(authorise.result, { storeName, action });
 }

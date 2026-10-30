@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askFileReadBinaryContents,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQBinaryData,
   QPQConfig,

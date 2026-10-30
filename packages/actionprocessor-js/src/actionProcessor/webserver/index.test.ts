@@ -1,9 +1,9 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { DnsActionType, OpenApiActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { getWebserverActionProcessor } from './index';
+import { getWebserverActionProcessor } from './getWebserverActionProcessor';
 
 describe('getWebserverActionProcessor', () => {
   it('exposes the dns and openApi action processors', async () => {

@@ -1,24 +1,26 @@
-import { describe, expect, it, vi } from 'vitest';
+import { NetworkRequestActionPayload } from '@qpqjs/core';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-
-const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
-
-vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => {
-  const original = await importOriginal<typeof import('@qpqjs/webserver')>();
-  return { ...original, preformNetworkRequest };
-});
 
 import { useNetworkRequest } from './useNetworkRequest';
 
+// The real performNetworkRequest runs; only the fetch transport underneath it is stubbed.
+const fetchMock = vi.fn();
+
+beforeEach(() => vi.stubGlobal('fetch', fetchMock));
+afterEach(() => vi.unstubAllGlobals());
+
 describe('useNetworkRequest', () => {
-  it('returns a requester that performs the network request with the payload', async () => {
-    preformNetworkRequest.mockResolvedValue({ status: 200 });
-    const payload = { url: 'https://api/thing', verb: 'GET' } as any;
+  it('returns a requester that sends the payload over fetch', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const payload = { url: 'https://api/thing', method: 'GET' } as NetworkRequestActionPayload<any>;
 
     const { result } = renderHook(() => useNetworkRequest(payload));
     const response = await result.current();
 
-    expect(preformNetworkRequest).toHaveBeenCalledWith(payload);
-    expect(response).toEqual({ status: 200 });
+    expect(fetchMock).toHaveBeenCalledWith('https://api/thing', expect.objectContaining({ method: 'GET' }));
+    expect(response.status).toBe(200);
+    expect(response.data).toEqual({ ok: true });
   });
 });

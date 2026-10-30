@@ -1,5 +1,10 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsDataStoreRemovalPolicy, getLocalServiceAccountInfo, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import {
+  AwsDataStoreRemovalPolicy,
+  awsNamingUtils,
+  getLocalServiceAccountInfo,
+  qpqConfigAwsUtils,
+  resolveAwsServiceAccountInfo,
+} from '@qpqjs/config-aws';
 import {
   CrossModuleOwner,
   QPQConfig,
@@ -8,22 +13,21 @@ import {
   UserDirectoryMfaSecondFactor,
   UserDirectoryQPQConfigSetting,
 } from '@qpqjs/core';
-import { qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
+import { aws_cognito, aws_iam, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { lookupHostedZone, resolveDeployPrimaryHost, resolveHostedZoneForHost } from '../../../../utils/domain';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { Function } from '../../../basic/Function';
+import { LambdaLayers } from '../../../basic/LambdaLayers';
 
-export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
+export type QpqInfCoreUserDirectoryConstructProps = {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
   switch (mode) {
@@ -40,12 +44,12 @@ const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
 // The identity tags applyEnvironmentTags stamps on the owner's resources, with each
 // field falling back to this deployment's when the owner does not override it.
 const getOwnerResourceTagConditions = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): Record<string, string> => {
-  const feature = owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, module, environment, feature } = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, owner);
 
   return {
-    'aws:ResourceTag/application': owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-    'aws:ResourceTag/module': owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-    'aws:ResourceTag/environment': owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    'aws:ResourceTag/application': application,
+    'aws:ResourceTag/module': module,
+    'aws:ResourceTag/environment': environment,
     ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
   };
 };
@@ -115,6 +119,8 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
     this.userPool = userPool;
 
+    // Trigger lambdas run story code, so they carry the same layers as the api functions.
+    // Built on first use so a directory with no triggers publishes no layer versions.
     if (
       props.userDirectoryConfig.emailTemplates.resetPassword ||
       props.userDirectoryConfig.emailTemplates.resetPasswordAdmin ||
@@ -122,8 +128,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     ) {
       const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
-        functionType: 'customMessageTriggerEvent_customMessage',
-        executorName: 'customMessageTriggerEvent_customMessage',
+        handler: 'customMessageTriggerEvent_customMessage',
 
         qpqConfig: props.qpqConfig,
 
@@ -140,8 +145,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     if (props.userDirectoryConfig.customAuthRuntime) {
       const defAuthChallengeTrigger = new Function(this, 'def-auth-challenge', {
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-define'),
-        functionType: 'customMessageTriggerEvent_defineAuthChallenge',
-        executorName: 'customMessageTriggerEvent_defineAuthChallenge',
+        handler: 'customMessageTriggerEvent_defineAuthChallenge',
 
         qpqConfig: props.qpqConfig,
 
@@ -157,8 +161,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       if (props.userDirectoryConfig.customAuthRuntime.createAuthChallenge) {
         const createAuthChallengeTrigger = new Function(this, 'create-auth-challenge', {
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-create'),
-          functionType: 'customMessageTriggerEvent_createAuthChallenge',
-          executorName: 'customMessageTriggerEvent_createAuthChallenge',
+          handler: 'customMessageTriggerEvent_createAuthChallenge',
 
           qpqConfig: props.qpqConfig,
 
@@ -174,8 +177,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       if (props.userDirectoryConfig.customAuthRuntime.verifyAuthChallenge) {
         const verifyAuthChallengeTrigger = new Function(this, 'verify-auth-challenge', {
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-verify'),
-          functionType: 'customMessageTriggerEvent_verifyAuthChallenge',
-          executorName: 'customMessageTriggerEvent_verifyAuthChallenge',
+          handler: 'customMessageTriggerEvent_verifyAuthChallenge',
 
           qpqConfig: props.qpqConfig,
 
@@ -284,7 +286,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
   }
 
   // Grants admin Cognito actions for pools this service owns. Services that
-  // only reference a foreign user directory get only the read grant above —
+  // only reference a foreign user directory get only the read grant above:
   // token validation runs against the pool's public JWKs over HTTPS and needs
   // no IAM. Call sites must pass only owned directories (see
   // `qpqCoreUtils.getOwnedUserDirectories`).
@@ -318,10 +320,13 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
             'cognito-idp:DescribeUserPool',
             'cognito-idp:DescribeUserPoolClient',
           ],
-          resources: userDirectoryConfigs.map((userDirectoryConfig, index) => {
+          resources: userDirectoryConfigs.flatMap((userDirectoryConfig, index) => {
             const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner);
 
-            const userpoolId = userDirectoryConstructs[index].userPool.userPoolId;
+            const userpoolId = userDirectoryConstructs[index]?.userPool.userPoolId;
+            if (userpoolId === undefined) {
+              return [];
+            }
 
             return `arn:aws:cognito-idp:${awsRegion}:${awsAccountId}:userpool/${userpoolId}`;
           }),

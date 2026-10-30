@@ -2,14 +2,14 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
 
-export interface AccountCloudTrailQPQConfigSetting extends QPQConfigSetting {
+export type AccountCloudTrailQPQConfigSetting = {
   name: string;
   retentionDays?: number;
   enableLogFileValidation?: boolean;
   multiRegion?: boolean;
   includeGlobalServiceEvents?: boolean;
   cloudWatchLogs?: { retentionDays?: number };
-}
+} & QPQConfigSetting;
 
 /**
  * Account-level CloudTrail audit trail, declared in the account config and deployed by

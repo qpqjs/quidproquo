@@ -44,7 +44,7 @@ type EventDocAiChatSummary = {
 
 ---
 
-## askUIEventDocAiSetChats
+## askEventDocAiSetChats
 
 Replaces the entire chat list — typically called after loading the list from the backend.
 
@@ -52,18 +52,18 @@ Replaces the entire chat list — typically called after loading the list from t
 - **State change:** sets `chats` to the provided array (wholesale replace).
 
 ```typescript
-import { askUIEventDocAiSetChats } from '@qpqjs/features';
+import { askEventDocAiSetChats } from '@qpqjs/features';
 import type { EventDocAiChatSummary } from '@qpqjs/features';
 
 export function* onChatsLoaded(chats: EventDocAiChatSummary[]) {
-  yield* askUIEventDocAiSetChats(chats);
+  yield* askEventDocAiSetChats(chats);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetChats(
+function* askEventDocAiSetChats(
   chats: EventDocAiChatSummary[],
 ): AskResponse<void>;
 ```
@@ -74,7 +74,7 @@ function* askUIEventDocAiSetChats(
 
 ---
 
-## askUIEventDocAiUpsertChat
+## askEventDocAiUpsertChat
 
 Inserts or updates a single chat in the list without replacing the rest — used when a new chat is created or an existing one is renamed/touched.
 
@@ -82,18 +82,18 @@ Inserts or updates a single chat in the list without replacing the rest — used
 - **State change:** removes any existing chat with the same `chatId`, then prepends the provided chat — so `chats` stays de-duplicated and the upserted chat moves to the front of the list.
 
 ```typescript
-import { askUIEventDocAiUpsertChat } from '@qpqjs/features';
+import { askEventDocAiUpsertChat } from '@qpqjs/features';
 import type { EventDocAiChatSummary } from '@qpqjs/features';
 
 export function* onChatCreated(chat: EventDocAiChatSummary) {
-  yield* askUIEventDocAiUpsertChat(chat);
+  yield* askEventDocAiUpsertChat(chat);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiUpsertChat(
+function* askEventDocAiUpsertChat(
   chat: EventDocAiChatSummary,
 ): AskResponse<void>;
 ```
@@ -104,7 +104,7 @@ function* askUIEventDocAiUpsertChat(
 
 ---
 
-## askUIEventDocAiSetActiveChat
+## askEventDocAiSetActiveChat
 
 Selects (or clears) the currently open chat. This is the value the message pane keys off of.
 
@@ -112,21 +112,21 @@ Selects (or clears) the currently open chat. This is the value the message pane 
 - **State change:** sets `activeChatId` to the given id, or `null` to deselect.
 
 ```typescript
-import { askUIEventDocAiSetActiveChat } from '@qpqjs/features';
+import { askEventDocAiSetActiveChat } from '@qpqjs/features';
 
 export function* openChat(chatId: string) {
-  yield* askUIEventDocAiSetActiveChat(chatId);
+  yield* askEventDocAiSetActiveChat(chatId);
 }
 
 export function* closeChat() {
-  yield* askUIEventDocAiSetActiveChat(null);
+  yield* askEventDocAiSetActiveChat(null);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetActiveChat(
+function* askEventDocAiSetActiveChat(
   chatId: Nullable<string>,
 ): AskResponse<void>;
 ```
@@ -137,7 +137,7 @@ function* askUIEventDocAiSetActiveChat(
 
 ---
 
-## askUIEventDocAiSetLoadingChats
+## askEventDocAiSetLoadingChats
 
 Toggles the "loading the chat list" flag so the UI can show a spinner while the list is fetched.
 
@@ -145,19 +145,19 @@ Toggles the "loading the chat list" flag so the UI can show a spinner while the 
 - **State change:** sets `isLoadingChats`.
 
 ```typescript
-import { askUIEventDocAiSetLoadingChats, askUIEventDocAiSetChats } from '@qpqjs/features';
+import { askEventDocAiSetLoadingChats, askEventDocAiSetChats } from '@qpqjs/features';
 
 export function* loadChats() {
-  yield* askUIEventDocAiSetLoadingChats(true);
+  yield* askEventDocAiSetLoadingChats(true);
   // ...fetch the list, then...
-  yield* askUIEventDocAiSetLoadingChats(false);
+  yield* askEventDocAiSetLoadingChats(false);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetLoadingChats(
+function* askEventDocAiSetLoadingChats(
   isLoading: boolean,
 ): AskResponse<void>;
 ```

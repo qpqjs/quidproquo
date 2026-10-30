@@ -1,17 +1,16 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   QPQError,
 } from '@qpqjs/core';
-import { HttpEventHeaders } from '@qpqjs/webserver';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.BadRequest]: 400,
@@ -19,7 +18,7 @@ const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.PaymentRequired]: 402,
   [ErrorTypeEnum.Forbidden]: 403,
   [ErrorTypeEnum.NotFound]: 404,
-  [ErrorTypeEnum.TimeOut]: 408,
+  [ErrorTypeEnum.Timeout]: 408,
   [ErrorTypeEnum.Conflict]: 409,
   [ErrorTypeEnum.UnsupportedMediaType]: 415,
   [ErrorTypeEnum.OutOfResources]: 500,
@@ -27,16 +26,6 @@ const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.NotImplemented]: 501,
   [ErrorTypeEnum.NoContent]: 204,
   [ErrorTypeEnum.Invalid]: 422,
-};
-
-const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
-  headers: HttpEventHeaders,
-): {
-  [header: string]: boolean | number | string;
-} => {
-  return Object.keys(headers)
-    .filter((header) => !!headers[header])
-    .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
 };
 
 const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
@@ -61,12 +50,16 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
 
     const [cloudFrontRequestEvent] = eventParams;
     const [seoEventResponse] = qpqEventRecordResponses;
+    if (!seoEventResponse) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
     const successRecord = seoEventResponse.success ? seoEventResponse.result : getResponseFromErrorResult(seoEventResponse.error);
 
-    if (successRecord.fallbackToCDN) {
-      return actionResult(cloudFrontRequestEvent.Records[0].cf.request);
+    const originalRequest = cloudFrontRequestEvent.Records[0]?.cf.request;
+    if (successRecord.fallbackToCDN && originalRequest) {
+      return actionResult(originalRequest);
     }
 
     const headers = successRecord.headers || {};
@@ -78,7 +71,6 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
       body: successRecord.body,
       headers: responseHeaders,
 
-      // TODO: Revist this.
       bodyEncoding: successRecord.bodyEncoding === 'base64' ? 'base64' : 'text',
     };
 

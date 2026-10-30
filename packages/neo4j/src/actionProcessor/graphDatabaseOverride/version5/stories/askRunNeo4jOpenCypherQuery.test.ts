@@ -1,13 +1,12 @@
 import {
   ActionOf,
+  askGraphDatabaseExecuteOpenCypherQuery,
   askNetworkRequestBase,
   ConfigActionType,
-  ErrorTypeEnum,
   GraphDatabaseInstanceType,
   NetworkActionType,
-  runStory,
-  StoryError,
 } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -57,6 +56,6 @@ describe('askRunNeo4jOpenCypherQuery', () => {
       });
 
     expect(run).toThrow(StoryError);
-    expect(run).toThrow(ErrorTypeEnum.GenericError);
+    expect(run).toThrow(askGraphDatabaseExecuteOpenCypherQuery.errorType.QueryFailed);
   });
 });

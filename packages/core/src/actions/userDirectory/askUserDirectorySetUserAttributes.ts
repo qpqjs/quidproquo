@@ -1,5 +1,6 @@
-import { createActionRequester } from '../../types';
-import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { createActionRequester } from '../../logic/actions';
+import { UserAttributes } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectorySetUserAttributes = createActionRequester<void>()({
   actionType: UserDirectoryActionType.SetUserAttributes,

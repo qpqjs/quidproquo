@@ -1,16 +1,17 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
-  EventActionType,
+  ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
 import { SQSBatchItemFailure } from 'aws-lambda';
 
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // We might need to JSON.stringify the body.
@@ -25,9 +26,10 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
     const batchItemFailures: SQSBatchItemFailure[] = qpqEventRecordResponses
       .map((record, index) => ({ record, index }))
       .filter(({ record }) => !record.success)
-      .map(({ index }) => ({
-        itemIdentifier: sqsEvent.Records[index].messageId,
-      }));
+      .flatMap(({ index }) => {
+        const messageId = sqsEvent.Records[index]?.messageId;
+        return messageId === undefined ? [] : [{ itemIdentifier: messageId }];
+      });
 
     // Transform back to api gateway
     return actionResult<EventOutput>({

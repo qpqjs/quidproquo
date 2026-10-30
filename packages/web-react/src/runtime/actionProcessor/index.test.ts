@@ -2,7 +2,7 @@ import { StateActionType } from '@qpqjs/core';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getStateActionProcessor } from './index';
+import { getStateActionProcessor } from './getStateActionProcessor';
 
 describe('getStateActionProcessor', () => {
   it('resolves both the Read and Dispatch processors', async () => {
@@ -11,8 +11,8 @@ describe('getStateActionProcessor', () => {
 
     expect(Object.keys(processors).sort()).toEqual([StateActionType.Dispatch, StateActionType.Read].sort());
 
-    const readResult = await processors[StateActionType.Read]({} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
-    await processors[StateActionType.Dispatch]({ action: { type: 'x' } }, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
+    const readResult = await processors![StateActionType.Read]!({} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
+    await processors![StateActionType.Dispatch]!({ action: { type: 'x' } }, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
 
     expect(readResult).toEqual([{ count: 1 }]);
     expect(dispatch).toHaveBeenCalledWith({ type: 'x' });

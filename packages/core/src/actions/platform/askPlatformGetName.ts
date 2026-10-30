@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { PlatformActionType } from './PlatformActionType';
 
 /**
@@ -9,5 +9,4 @@ import { PlatformActionType } from './PlatformActionType';
  */
 export const askPlatformGetName = createActionRequester<string>()({
   actionType: PlatformActionType.GetName,
-  getPayload: () => ({}),
 });

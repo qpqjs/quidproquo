@@ -21,7 +21,7 @@ import {
 import { useServiceNames } from '../LogViewer/hooks';
 import { etaOptions } from './logic';
 
-// What the dialog hands back — the full status snapshot one update carries.
+// What the dialog hands back, the full status snapshot one update carries.
 // `etaDurationMins` undefined = no announcement (keep the running clock).
 export type MaintenanceUpdateFormValues = {
   bannerText: string;
@@ -51,7 +51,7 @@ type UpdateDialogProps = {
   initialValues: MaintenanceUpdateFormPrefill;
   /**
    * The running clock's end time, shown as a badge beside the blank ETA field.
-   * When set, a blank ETA means "keep this clock"; when absent (create/reopen —
+   * When set, a blank ETA means "keep this clock"; when absent (create/reopen,
    * there is no live clock), blank means Unknown.
    */
   currentEtaEndsAt?: Nullable<string>;
@@ -64,7 +64,7 @@ const ETA_UNKNOWN = 'unknown';
 
 // The ONE maintenance mutation: a full status snapshot. Every field prefills
 // from the previous update except the ETA (blank, with the current end time as
-// a badge — picking a block always restarts the clock from now) and the
+// a badge, picking a block always restarts the clock from now) and the
 // internal note (fresh each update).
 export function UpdateDialog({ open, busy, title, confirmLabel, initialValues, currentEtaEndsAt, onCancel, onSave }: UpdateDialogProps) {
   const serviceOptions = useServiceNames();

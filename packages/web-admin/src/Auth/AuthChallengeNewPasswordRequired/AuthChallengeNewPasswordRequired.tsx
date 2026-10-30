@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { createQpqRuntimeDefinition, useQpqRuntime } from '@qpqjs/web-react';
 
 import LockIcon from '@mui/icons-material/Lock';
@@ -8,17 +7,19 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
-import { AuthState } from '../logic';
-import { authChallengeInitalState, authChallengeLogic, authChallengeReducer } from './logic';
+import { AuthState } from '../types/AuthState';
+import { createInitialAuthChallengeState } from './logic/createInitialAuthChallengeState';
+import { authChallengeReducer } from './authChallengeReducer';
+import { frontendAuthChallengeApi } from './frontendAuthChallengeApi';
 
-interface AuthChallengeNewPasswordRequiredProps {
+type AuthChallengeNewPasswordRequiredProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeNewPasswordRequired',
-  api: authChallengeLogic,
-  initialState: authChallengeInitalState,
+  api: frontendAuthChallengeApi,
+  initialState: createInitialAuthChallengeState(),
   reducer: authChallengeReducer,
 });
 
@@ -29,6 +30,8 @@ export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNew
   if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {
     return <div>Error, missing challenge / session</div>;
   }
+
+  const { challenge, session } = authState.authenticateUserResponse;
 
   return (
     <Box
@@ -74,16 +77,7 @@ export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNew
             />
           </Grid>
           <Grid item xs={12}>
-            <AsyncButton
-              disabled={!arePasswordsMatching}
-              onClick={() =>
-                api.authChallengeSendPasswords(
-                  authState.authenticateUserResponse?.challenge!,
-                  authState.authenticateUserResponse?.session!,
-                  authState.username,
-                )
-              }
-            >
+            <AsyncButton disabled={!arePasswordsMatching} onClick={() => api.authChallengeSendPasswords(challenge, session, authState.username)}>
               Update Password
             </AsyncButton>
           </Grid>

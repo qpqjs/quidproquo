@@ -1,9 +1,9 @@
 import { createQpqRuntimeDefinition } from '@qpqjs/web-react';
 
-import { getApplySessionEventActionProcessor } from './actions/getApplySessionEventActionProcessor';
 import { askAdminAppMain } from './logic/askAdminAppMain';
+import { createInitialAdminAppState } from './logic/createInitialAdminAppState';
+import { getApplySessionEventActionProcessor } from './actionProcessor';
 import { adminAppReducer } from './adminAppReducer';
-import { createInitialAdminAppState } from './AdminAppState';
 import { sharedAdminAppApi } from './sharedAdminAppApi';
 
 export const adminAppRuntime = createQpqRuntimeDefinition({

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
+import { StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { Context, SNSEvent } from 'aws-lambda';
 import path from 'path';
@@ -54,7 +55,7 @@ describe('getUserScriptRunnerEvent_userScript', () => {
 
     const result = await handler(event, { getRemainingTimeInMillis: () => 1800 } as Context);
 
-    expect(result).toMatchObject({ success: false, error: { errorType: expect.stringContaining('TimedOut') } });
+    expect(result).toMatchObject({ success: false, error: { errorType: expect.stringContaining('Timeout') } });
   });
 });
 

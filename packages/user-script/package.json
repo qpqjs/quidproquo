@@ -5,9 +5,18 @@
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "!lib/**/__fixtures__/**"
   ],
   "publishConfig": {
     "access": "public"
@@ -21,11 +30,13 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/user-script"
   },
   "keywords": [],
   "author": "",
@@ -42,11 +53,15 @@
     "yauzl": "^3.4.0"
   },
   "devDependencies": {
+    "@qpqjs/actionprocessor-js": "0.3.0",
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@types/node": "^22.13.13",
     "@types/yauzl": "^3.4.0",
     "fflate": "^0.8.3",
-    "@qpqjs/actionprocessor-js": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

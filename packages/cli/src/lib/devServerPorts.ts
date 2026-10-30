@@ -1,3 +1,4 @@
+import { requireModuleDefault } from '@qpqjs/deploy-aws';
 import { DevServerConfigOverrides, DevServerPorts } from '@qpqjs/dev-server';
 
 import fs from 'fs';
@@ -29,9 +30,7 @@ export const readDevServerPorts = (appName: string): ResolvedDevServerPorts => {
     return DEFAULT_DEV_SERVER_PORTS;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const loaded = require(configPath.replace(/\.ts$/, ''));
-  const overrides = (loaded.default ?? loaded) as DevServerConfigOverrides;
+  const overrides = requireModuleDefault<DevServerConfigOverrides>(configPath.replace(/\.ts$/, ''));
 
   return { ...DEFAULT_DEV_SERVER_PORTS, ...overrides.ports };
 };

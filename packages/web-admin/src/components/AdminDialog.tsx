@@ -1,23 +1,6 @@
-import { useState } from 'react';
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material';
 
-export const useAdminDialog = (tabs: string[], defaultTab: string) => {
-  const [open, setIsOpen] = useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<string>(defaultTab);
-
-  return {
-    open,
-    tabs,
-    selectedTab,
-    openDialog: () => setIsOpen(true),
-    onSelectTab: (tab: string) => {
-      setSelectedTab(tab);
-    },
-    handleClose: () => setIsOpen(false),
-  };
-};
-
-interface AdminDialogProps {
+type AdminDialogProps = {
   open: boolean;
   handleClose: () => void;
 
@@ -34,12 +17,15 @@ interface AdminDialogProps {
   }[];
 
   children: React.ReactNode;
-}
+};
 
 export const AdminDialog = ({ open, handleClose, title, selectedTab, onSelectTab, tabs, buttons, children }: AdminDialogProps) => {
   const selectedTabIndex = tabs.findIndex((t) => t === selectedTab);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    onSelectTab(tabs[newValue]);
+    const tab = tabs[newValue];
+    if (tab !== undefined) {
+      onSelectTab(tab);
+    }
   };
 
   return (

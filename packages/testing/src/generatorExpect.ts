@@ -4,7 +4,8 @@ type GeneratorStep = {
   input?: any;
 };
 
-export class GeneratorExpectChain<T = any> {
+// The parameter is a phantom: it names the generator's type for callers and is never read here.
+export class GeneratorExpectChain<_T = any> {
   private steps: GeneratorStep[] = [];
   private lastInput: any;
   // `any` because this is the host test framework's expect function; typing it

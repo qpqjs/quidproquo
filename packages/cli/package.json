@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/cli",
   "version": "0.3.0",
-  "description": "The qpq CLI — build, dev and deploy orchestration for QPQ apps",
+  "description": "The qpq CLI: build, dev and deploy orchestration for quidproquo apps.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*",
@@ -24,11 +32,13 @@
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "build:bin-perms": "node -e \"require('fs').chmodSync('lib/commonjs/bin/qpq.js', 0o755)\""
+    "build:bin-perms": "node -e \"require('fs').chmodSync('lib/commonjs/bin/qpq.js', 0o755)\"",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/cli"
   },
   "keywords": [],
   "author": "",
@@ -45,18 +55,18 @@
     "@aws-sdk/client-s3": "^3.1093.0",
     "@aws-sdk/client-sts": "^3.1093.0",
     "@inquirer/prompts": "^8.5.2",
-    "@rspack/dev-server": "^2.1.0",
-    "aws-cdk": "^2.1132.1",
-    "madge": "^8.0.0",
-    "quidproquo": "0.3.0",
     "@qpqjs/actionprocessor-aws": "0.3.0",
+    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/config-aws": "0.3.0",
     "@qpqjs/core": "0.3.0",
     "@qpqjs/deploy-aws": "0.3.0",
     "@qpqjs/deploy-rspack": "0.3.0",
-    "@qpqjs/user-script": "0.3.0",
     "@qpqjs/dev-server": "0.3.0",
+    "@qpqjs/user-script": "0.3.0",
     "@qpqjs/webserver": "0.3.0",
+    "@rspack/dev-server": "^2.1.0",
+    "aws-cdk": "^2.1146.1",
+    "madge": "^8.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.2"
   },
@@ -70,5 +80,8 @@
   },
   "peerDependencies": {
     "@rspack/core": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

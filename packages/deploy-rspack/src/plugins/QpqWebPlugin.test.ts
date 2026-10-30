@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineGlobal, defineSecret } from '@qpqjs/core';
+import { defineGlobal, defineSecret } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,7 +38,7 @@ describe('QpqWebPlugin', () => {
     new QpqWebPlugin({ qpqConfig }).apply(compiler);
 
     expect(definitions).toHaveLength(1);
-    const baked = Object.values(definitions[0]).map((value) => JSON.parse(value));
+    const baked = Object.values(definitions![0]!).map((value) => JSON.parse(value));
     for (const info of baked) {
       expect(['environment', 'feature', 'module', 'name']).toEqual(expect.arrayContaining(Object.keys(info)));
       expect(info).toMatchObject({ environment: expect.any(String), module: expect.any(String), name: expect.any(String) });

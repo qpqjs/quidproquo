@@ -4,11 +4,11 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { Box, Chip, Typography } from '@mui/material';
 
-interface EventDocAiSegmentsProps {
+type EventDocAiSegmentsProps = {
   segments: EventDocAiMessageSegment[];
-}
+};
 
-// Renders one message's segments — text (markdown), reasoning (dimmed), tool
+// Renders one message's segments, text (markdown), reasoning (dimmed), tool
 // calls (a chip per tool, showing input and, once it arrives, output), and
 // file attachments. Used for both finalized messages and the live stream
 // preview (the live stream is folded into the same segment shape).

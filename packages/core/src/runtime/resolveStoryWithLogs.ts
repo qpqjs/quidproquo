@@ -1,13 +1,14 @@
 import { QPQConfig } from '../config';
 import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { ActionProcessorList } from '../types/Action';
-import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
+import { Nullable } from '../types/Nullable';
+import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession } from '../types/StorySession';
 import { resolveStory } from './resolveStory';
 
 // Stories run concurrently in one process (overlapping requests, nested runtimes for
 // AI tools / file resolvers), so a per-story `old = console.log; ...; console.log = old`
 // interleaves badly: the outer story's restore clobbers the inner story's patch, and the
-// inner story's restore then reinstalls the outer story's wrapper — leaking one wrapper
+// inner story's restore then reinstalls the outer story's wrapper, leaking one wrapper
 // per overlap until console.log is a chain deep enough to blow the stack. Instead, keep
 // ONE global patch with a stack of active collectors; every active story captures every
 // log (same semantics as the chained wrappers), and the true original is restored only
@@ -15,7 +16,7 @@ import { resolveStory } from './resolveStory';
 type ConsoleLogCollector = { logs: qpqConsoleLog[]; getTimeNow: () => string };
 
 let activeLogCollectors: ConsoleLogCollector[] = [];
-let unpatchedConsoleLog: typeof console.log | null = null;
+let unpatchedConsoleLog: Nullable<typeof console.log> = null;
 
 const pushLogCollector = (collector: ConsoleLogCollector): void => {
   if (unpatchedConsoleLog === null) {

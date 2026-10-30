@@ -11,7 +11,7 @@
 //      classic script, so the window property is non-configurable and delete throws;
 //      the runtime's short-circuit is a truthiness check, so undefined is enough.
 //   3. The bundler's chunk-loading global (`rspackChunk<name>` / `webpackChunk<name>`):
-//      shared by BUILD NAME: every chunk file of every previously loaded copy of the
+//      shared by BUILD NAME: every chunk file of every copy loaded so far of the
 //      remote pushed its modules into it, and a fresh container drains that array on
 //      boot. Chunk ids are stable across builds, so without a reset the new container
 //      sees the old build's chunks as already loaded and NEVER fetches its own files:
@@ -107,7 +107,7 @@ export const forceReloadFederatedRemote = (runtimeApi: FederationRuntimeApi, rem
   (globalThis as Record<string, unknown>)[`rspackChunk${remote.name}`] = undefined;
   (globalThis as Record<string, unknown>)[`webpackChunk${remote.name}`] = undefined;
 
-  const baseEntry = remote.entry.split('?')[0];
+  const baseEntry = remote.entry.split('?')[0] ?? remote.entry;
   const entryDir = baseEntry.slice(0, baseEntry.lastIndexOf('/'));
 
   // Layer 4: sweep ALL of this remote's script tags (entry AND chunks).

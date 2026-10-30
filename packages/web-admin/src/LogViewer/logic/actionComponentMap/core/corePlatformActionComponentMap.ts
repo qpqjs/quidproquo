@@ -1,7 +1,7 @@
 import { PlatformActionType } from '@qpqjs/core';
 
 const corePlatformActionComponentMap: Record<string, string[]> = {
-  [PlatformActionType.Delay]: ['askDelay', 'timeMs'],
+  [PlatformActionType.Delay]: ['askPlatformDelay', 'timeMs'],
   [PlatformActionType.GetName]: ['askPlatformGetName'],
 };
 

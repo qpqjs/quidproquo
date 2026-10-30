@@ -1,7 +1,7 @@
 import { askUserScriptExecute, StorySession, UserScriptRunnerEvent, UserScriptRunnerRequestKind } from '@qpqjs/core';
 
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { runUserScriptInChild } from './runUserScriptInChild';
 
@@ -27,13 +27,12 @@ const isAlive = (pid: number): boolean => {
 
 // Polls because the kill is delivered asynchronously and the grandchild is reaped by init.
 const waitUntilDead = async (pids: number[]): Promise<boolean> => {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    if (pids.every((pid) => !isAlive(pid))) {
-      return true;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 50));
+  try {
+    await vi.waitFor(() => expect(pids.every((pid) => !isAlive(pid))).toBe(true), { timeout: 2000, interval: 50 });
+    return true;
+  } catch {
+    return false;
   }
-  return false;
 };
 
 describe('runUserScriptInChild', () => {
@@ -53,11 +52,11 @@ describe('runUserScriptInChild', () => {
     expect(env).not.toContain('HOME');
   });
 
-  it('kills a child that does not answer in time and reports TimedOut', async () => {
+  it('kills a child that does not answer in time and reports Timeout', async () => {
     const result = await runUserScriptInChild({ modulePath, event: eventFor('hang'), timeoutMs: 300, env: process.env });
 
     expect(result.success).toBe(false);
-    expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.TimedOut);
+    expect(result.error?.errorType).toBe(askUserScriptExecute.errorType.Timeout);
   });
 
   it('kills the child and what it spawned once it has answered, even when they ignore SIGTERM', async () => {
@@ -76,11 +75,14 @@ describe('runUserScriptInChild', () => {
   });
 
   it('reports RunnerUnavailable when the module cannot be started', async () => {
+    // The child prints node's "cannot find module" error before exiting; that is the failure under
+    // test, not noise worth seeing in the run.
     const result = await runUserScriptInChild({
       modulePath: path.join(__dirname, 'nowhere.js'),
       event: eventFor('echo'),
       timeoutMs: 5000,
       env: process.env,
+      output: 'ignore',
     });
 
     expect(result.success).toBe(false);

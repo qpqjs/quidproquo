@@ -1,4 +1,4 @@
-// THIS version's number — not the doc type's latest.
+// THIS version's number, not the doc type's latest.
 //
 // The distinction matters once there is a v2: MAINTENANCE_SCHEMA_VERSION (in the doc
 // type's own constants) is the latest, stamped on newly authored events and used as the

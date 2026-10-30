@@ -1,0 +1,39 @@
+import { getPlatformActionProcessor } from '@qpqjs/actionprocessor-js';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
+import { getRouteAuthValidationActionProcessor } from '@qpqjs/webserver';
+
+import { getAiActionProcessor } from './ai';
+import { getApiKeyValidationActionProcessor } from './apiKeyValidation';
+import { getConfigActionProcessor } from './config';
+import { getCryptoActionProcessor } from './crypto';
+import { getEventBusActionProcessor } from './eventBus';
+import { getFileActionProcessor } from './file';
+import { getGraphDatabaseActionProcessor } from './graphDatabase';
+import { getKeyValueStoreActionProcessor } from './keyValueStore';
+import { getMetricActionProcessor } from './metric';
+import { getQueueActionProcessor } from './queue';
+import { getSystemActionProcessor } from './system';
+import { getUserDirectoryActionProcessor } from './userDirectory';
+import { getUserScriptActionProcessor } from './userScript';
+
+export const getCoreActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getPlatformActionProcessor('aws')(qpqConfig, dynamicModuleLoader)),
+  ...(await getAiActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getApiKeyValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getFileActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getKeyValueStoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getMetricActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getCryptoActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
+  // Overrides the node package's in-process execute: on lambda a script only ever runs in the runner.
+  ...(await getUserScriptActionProcessor(qpqConfig, dynamicModuleLoader)),
+});

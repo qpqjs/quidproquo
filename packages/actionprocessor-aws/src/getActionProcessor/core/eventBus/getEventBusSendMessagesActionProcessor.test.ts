@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, buildTestStorySession, defineEventBus, ErrorTypeEnum, EventBusActionType } from '@qpqjs/core';
+import { askEventBusSendMessagesBase, defineEventBus, EventBusActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { publishMessage } from '../../../logic/sns/publishMessage';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getEventBusSendMessagesActionProcessor } from './getEventBusSendMessagesActionProcessor';
 
 vi.mock('../../../logic/sns/publishMessage', () => ({
@@ -14,7 +14,7 @@ vi.mock('../../../logic/sns/publishMessage', () => ({
 const resolveProcessor = async (extraSettings: any[] = []) => {
   const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), ...extraSettings]);
   const processors = await getEventBusSendMessagesActionProcessor(config, {} as any);
-  return processors[EventBusActionType.SendMessages];
+  return processors[EventBusActionType.SendMessage];
 };
 
 describe('getEventBusSendMessagesActionProcessor', () => {
@@ -25,16 +25,16 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('returns a NotFound error when the event bus is not configured', async () => {
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { eventBusName: 'missing', eventBusMessages: [] }, { session: buildTestStorySession() });
+    const [, error] = await invokeProcessor(processor!, { eventBusName: 'missing', eventBusMessages: [] }, { session: buildTestStorySession() });
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(askEventBusSendMessagesBase.errorType.TopicNotFound);
   });
 
   it('publishes each message to the resolved sns topic arn', async () => {
     const processor = await resolveProcessor([defineEventBus('orders')]);
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] },
       { session: buildTestStorySession() },
     );
@@ -51,7 +51,11 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('resolves a .fifo topic arn and defaults groupId/deduplicationId for a FIFO bus', async () => {
     const processor = await resolveProcessor([defineEventBus('orders', { isFifo: true })]);
 
-    await invokeProcessor(processor, { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] }, { session: buildTestStorySession() });
+    await invokeProcessor(
+      processor!,
+      { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] },
+      { session: buildTestStorySession() },
+    );
 
     const [topicArn, , entries] = vi.mocked(publishMessage).mock.calls[0];
     expect(topicArn).toBe('arn:aws:sns:eu-west-1:111:orders-test-app-test-module-development.fifo');
@@ -63,7 +67,7 @@ describe('getEventBusSendMessagesActionProcessor', () => {
     const processor = await resolveProcessor([defineEventBus('orders', { isFifo: true })]);
 
     await invokeProcessor(
-      processor,
+      processor!,
       { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true }, groupId: 'user-42', deduplicationId: 'dedup-1' }] },
       { session: buildTestStorySession() },
     );

@@ -13,9 +13,9 @@ type IncrementEffect = Effect<CounterEffect.Increment>;
 type AddEffect = Effect<CounterEffect.Add, number>;
 type CounterEffects = IncrementEffect | AddEffect;
 
-interface CounterState {
+type CounterState = {
   count: number;
-}
+};
 
 const counterReducer = buildMutableEffectReducer<CounterState, CounterEffects>({
   [CounterEffect.Increment]: (state) => {

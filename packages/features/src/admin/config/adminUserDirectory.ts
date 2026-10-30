@@ -1,11 +1,11 @@
 import { defineUserDirectory, QPQConfig, QPQConfigAdvancedUserDirectorySettings } from '@qpqjs/core';
 
-export const adminUserDirectoryResourceName = 'qpq-admin';
+import { ADMIN_USER_DIRECTORY_NAME } from '../constants';
 
 type QPQConfigAdvancedAdminUserDirectorySettings = Required<Pick<QPQConfigAdvancedUserDirectorySettings, 'owner'>>;
 
 export const defineAdminUserDirectory = (options?: QPQConfigAdvancedAdminUserDirectorySettings): QPQConfig => {
-  const configs = [defineUserDirectory(adminUserDirectoryResourceName, options)];
+  const configs = [defineUserDirectory(ADMIN_USER_DIRECTORY_NAME, options)];
 
   return configs;
 };

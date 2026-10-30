@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askKeyValueStoreUpsertMany, askKeyValueStoreUpsertManyBase } from './askKeyValueStoreUpsertMany';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 

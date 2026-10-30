@@ -1,18 +1,19 @@
+import { Nullable } from '@qpqjs/core';
 export enum EmailSendEventType {
   ResetPassword = 'ResetPassword',
   ResetPasswordAdmin = 'ResetPasswordAdmin',
   VerifyEmail = 'VerifyEmail',
 }
 
-export interface EmailSendEvent {
+export type EmailSendEvent = {
   eventType: EmailSendEventType;
   code: string;
   link: string;
-  username: string | null;
+  username: Nullable<string>;
   attributes: Record<string, string>;
-}
+};
 
-export interface EmailSendEventResponse {
+export type EmailSendEventResponse = {
   body: string;
   subject: string;
-}
+};

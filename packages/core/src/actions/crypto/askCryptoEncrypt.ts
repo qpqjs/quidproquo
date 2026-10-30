@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { CryptoActionType } from './CryptoActionType';
 import { CryptoContext } from './CryptoContext';
 
@@ -7,7 +7,7 @@ export const askCryptoEncrypt = createActionRequester<string>()({
   errorTypes: [
     'KeyNotConfigured', // no defineCryptoKey for keyName in the service config
     'KeyUnavailable', // key disabled, deleted, or access denied
-    'Throttling', // request rate exceeded
+    'Throttled', // request rate exceeded
   ],
   getPayload: (keyName: string, plaintext: string, context?: CryptoContext) => ({ keyName, plaintext, context }),
 });

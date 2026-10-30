@@ -1,1 +1,1 @@
-export * as qpqWebServerUtils from './utils';
+export * as qpqWebServerUtils from './qpqWebServerUtilsLib';

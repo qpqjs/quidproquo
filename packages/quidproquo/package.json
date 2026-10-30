@@ -1,10 +1,18 @@
 {
   "name": "quidproquo",
   "version": "0.3.0",
-  "description": "",
+  "description": "Build web applications out of pure functions.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -26,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/quidproquo"
   },
   "keywords": [],
   "author": "",
@@ -42,5 +51,8 @@
   "dependencies": {
     "@qpqjs/core": "0.3.0",
     "@qpqjs/webserver": "0.3.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

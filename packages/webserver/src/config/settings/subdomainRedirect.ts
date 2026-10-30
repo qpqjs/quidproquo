@@ -2,20 +2,16 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedSubdomainRedirectSettings extends QPQConfigAdvancedSettings {
-  cloudflareApiKeySecretName?: string;
-}
+export type QPQConfigAdvancedSubdomainRedirectSettings = QPQConfigAdvancedSettings;
 
-export interface SubdomainRedirectQPQWebServerConfigSetting extends QPQConfigSetting {
+export type SubdomainRedirectQPQWebServerConfigSetting = {
   subdomain: string;
   redirectUrl: string;
   apiBuildPath: string;
   onRootDomain: boolean;
   addEnvironment: boolean;
   addFeatureEnvironment: boolean;
-
-  cloudflareApiKeySecretName?: string;
-}
+} & QPQConfigSetting;
 
 export const defineSubdomainRedirect = (
   subdomain: string,
@@ -37,6 +33,4 @@ export const defineSubdomainRedirect = (
   addEnvironment,
   addFeatureEnvironment,
   onRootDomain,
-
-  cloudflareApiKeySecretName: options.cloudflareApiKeySecretName,
 });

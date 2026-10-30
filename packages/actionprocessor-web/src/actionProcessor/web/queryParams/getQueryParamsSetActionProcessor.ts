@@ -1,5 +1,5 @@
 import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { askQueryParamsSet, QueryParamsActionType } from '@qpqjs/web';
+import { askQueryParamsSet } from '@qpqjs/web';
 
 const getProcessQueryParamsSet = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueryParamsSet> => {
   return async ({ key, values, createHistoryEntry }) => {
@@ -20,7 +20,7 @@ const getProcessQueryParamsSet = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       window.history.replaceState(null, '', newUrl);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

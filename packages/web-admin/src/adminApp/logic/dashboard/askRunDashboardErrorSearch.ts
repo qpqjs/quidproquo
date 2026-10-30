@@ -1,12 +1,12 @@
-import { askDateNow, askNewGuid, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
+import { askDateNow, askGuidNew, AskResponse, askRunParallel, QpqRuntimeType } from '@qpqjs/core';
 
-import { askUIVolatileLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogSearchCompleted';
-import { askUIVolatileLogSearchStarted } from '../../actionCreators/volatile/askUIVolatileLogSearchStarted';
+import { askVolatileLogSearchCompleted } from '../../actionCreators/volatile/askVolatileLogSearchCompleted';
+import { askVolatileLogSearchStarted } from '../../actionCreators/volatile/askVolatileLogSearchStarted';
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { createDefaultAdminSearchParams } from '../../AdminSessionState';
 import { dashboardErrorsSearchKey } from '../../constants/dashboardErrorsSearchKey';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SearchRequestedData } from '../../effects/session/SearchRequestedEvent';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionSearchRequestedData } from '../../effects/session/AdminSessionSearchRequestedEffect';
+import { createDefaultAdminSearchParams } from '../../logic/createDefaultAdminSearchParams';
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 import { SearchOrigin } from '../../types/SearchOrigin';
 import { askFetchLogSearchPart } from '../search/askFetchLogSearchPart';
@@ -27,14 +27,18 @@ export function* askRunDashboardErrorSearch(): AskResponse<void> {
     endIsoDateTime: new Date(now.getTime() + DAY_MS).toISOString(),
   };
 
-  const requestId = yield* askNewGuid();
-  yield* askApplySessionEvent<SearchRequestedData>(AdminSessionEventType.searchRequested, { search, requestId, origin: SearchOrigin.dashboard });
+  const requestId = yield* askGuidNew();
+  yield* askApplySessionEvent<AdminSessionSearchRequestedData>(AdminSessionEffect.SearchRequested, {
+    search,
+    requestId,
+    origin: SearchOrigin.dashboard,
+  });
 
   const runtimeTypes = Object.keys(QpqRuntimeType).sort();
-  yield* askUIVolatileLogSearchStarted(dashboardErrorsSearchKey, runtimeTypes.length);
+  yield* askVolatileLogSearchStarted(dashboardErrorsSearchKey, runtimeTypes.length);
 
   yield* askRunParallel(runtimeTypes.map((type) => askFetchLogSearchPart(dashboardErrorsSearchKey, search, type, nowIso, true)));
 
   const fetchedAt = yield* askDateNow();
-  yield* askUIVolatileLogSearchCompleted(dashboardErrorsSearchKey, fetchedAt);
+  yield* askVolatileLogSearchCompleted(dashboardErrorsSearchKey, fetchedAt);
 }

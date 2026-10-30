@@ -3,22 +3,24 @@ import {
   ActionProcessorList,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   askFileReadBinaryContents,
   askUserScriptBuildFromZip,
   createActionProcessor,
   createNestedRuntime,
   DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
   QpqLogger,
   QpqRuntimeType,
+  storyResultToActionResult,
   StorySession,
   StorySessionUpdater,
   StreamRegistry,
   UserScriptBuildFromZipActionPayload,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { UserScriptBuildError } from '../build/UserScriptBuildError';
 import { askUserScriptCheckPublishedOutput } from './logic/askUserScriptCheckPublishedOutput';
@@ -31,8 +33,6 @@ import { USER_SCRIPT_SOURCE_LIMITS } from './logic/USER_SCRIPT_SOURCE_LIMITS';
 import { UserScriptArchiveError } from './logic/UserScriptArchiveError';
 
 const { errorType } = askUserScriptBuildFromZip;
-
-const getDateNow = () => new Date().toISOString();
 
 // Drive failures while reading the zip, re-labelled into this action's catalog; any other
 // failure passes through with its own type.
@@ -60,7 +60,7 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       actionProcessors,
       getDateNow,
       logger,
-      randomUUID,
+      generateUuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       undefined,
@@ -96,25 +96,24 @@ const getProcessBuildFromZip = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
         payload.sourceMap,
         hostModules,
       );
-    } catch (error) {
-      if (error instanceof UserScriptArchiveError) {
-        return actionResultError(getArchiveErrorType(error), `[${payload.drive}:${payload.zipFilepath}] ${error.message}`);
-      }
-      if (error instanceof UserScriptBuildError) {
-        return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
-      }
-      throw error;
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserScriptArchiveError: (error) =>
+          actionResultError(getArchiveErrorType(error as UserScriptArchiveError), `[${payload.drive}:${payload.zipFilepath}] ${error.message}`),
+        UserScriptBuildError: (error) =>
+          actionResultError(getUserScriptBuildErrorType((error as UserScriptBuildError).code, errorType), error.message),
+      });
     }
 
     const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
     if (published.error) {
-      return actionResultError(published.error.errorType, published.error.errorText);
+      return storyResultToActionResult(published, 'UserScript Build publish');
     }
 
     // The output contract is judged where the script's top-level code cannot reach the host.
     const checked = await resolveStory(() => askUserScriptCheckPublishedOutput(payload.drive, payload.outputFilepath, payload.scope, errorType), []);
     if (checked.error) {
-      return actionResultError(checked.error.errorType, checked.error.errorText);
+      return storyResultToActionResult(checked, 'UserScript Build check output');
     }
 
     return actionResult({ exports: checked.result });

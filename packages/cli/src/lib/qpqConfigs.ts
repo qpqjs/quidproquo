@@ -9,15 +9,15 @@ import { getRoot, getServiceNames } from './discovery';
 export const loadServiceQpqConfig = (appName: string, service: string): QPQConfig => getWorkspaceServiceQpqConfig(getRoot(), appName, service);
 
 export const getAppPrefix = (appName: string): string => {
-  const services = getServiceNames(appName);
-  if (services.length === 0) throw new Error(`No services found for app ${appName}`);
-  return qpqCoreUtils.getApplicationName(loadServiceQpqConfig(appName, services[0]));
+  const [firstService] = getServiceNames(appName);
+  if (firstService === undefined) throw new Error(`No services found for app ${appName}`);
+  return qpqCoreUtils.getApplicationName(loadServiceQpqConfig(appName, firstService));
 };
 
 // The subset of the given services that opt into module-federation publishing,
 // i.e. declare defineFederatedModuleStore(...). Federation is a config setting,
 // not a directory convention (unlike views/ backends), so detecting it means
-// loading each service's config — which is why this lives here and not in the
+// loading each service's config, which is why this lives here and not in the
 // directory-only discovery module. Used by the deploy drivers to decide which
 // backends to publish federated remotes for after a deploy.
 export const getServiceNamesWithFederation = (appName: string, serviceNames: string[]): string[] =>

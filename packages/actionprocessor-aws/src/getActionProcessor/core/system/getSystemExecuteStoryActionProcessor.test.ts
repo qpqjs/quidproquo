@@ -2,21 +2,18 @@ import {
   Action,
   ActionProcessor,
   actionResult,
-  buildTestQpqConfig,
-  buildTestStorySession,
+  askExecuteStoryBase,
   createStreamRegistry,
-  createStubLogger,
   DecodedAccessToken,
-  ErrorTypeEnum,
+  getDateNow,
   StorySession,
   StreamRegistry,
   SystemActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
-import { getDateNow } from './getDateNow';
 import { getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
 
 const PROBE = 'Test/Probe';
@@ -57,12 +54,12 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loader = vi.fn().mockResolvedValue(null);
 
     const [, error] = await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
     );
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(askExecuteStoryBase.errorType.NotFound);
   });
 
   it('runs the loaded story and returns its result', async () => {
@@ -73,7 +70,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const loader = vi.fn().mockResolvedValue(story);
 
     const result = await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
     );
@@ -87,7 +84,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const streamRegistry = createStreamRegistry();
 
     await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [] },
       {
         session: buildTestStorySession({ functionGlobals: { routeGlobal: 'caller' } }),
@@ -118,7 +115,7 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     };
 
     await invokeProcessor(
-      processor,
+      processor!,
       { runtime: 'a/b::fn', params: [], storySession: wireSession },
       {
         session: buildTestStorySession({ localContext: { local: 'receiver' } }),

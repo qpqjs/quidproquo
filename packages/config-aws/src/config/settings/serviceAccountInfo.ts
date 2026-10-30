@@ -3,7 +3,7 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 import { ApiLayer, ServiceAccountInfo } from '../../types';
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedAwsServiceAccountInfoSettings = {
   apiLayers?: ApiLayer[];
   lambdaMaxMemoryInMiB?: number;
 
@@ -18,9 +18,9 @@ export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfi
   disableReservedConcurrency?: boolean;
   disableTracing?: boolean;
   instantLogs?: boolean;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
+export type AwsServiceAccountInfoQPQConfigSetting = {
   deployAccountId: string;
   deployRegion: string;
 
@@ -37,7 +37,7 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   disableReservedConcurrency: boolean;
   disableTracing: boolean;
   instantLogs: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineAwsServiceAccountInfo = (
   deployAccountId: string,
@@ -55,6 +55,7 @@ export const defineAwsServiceAccountInfo = (
   serviceInfoMap: serviceInfoMap ?? [],
   apiLayers: options?.apiLayers ?? [],
 
+  // Zero is not a valid memory size or retention period, so it means unset here, hence || rather than ??.
   lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024,
   cloudWatchLogRetentionDays: options?.cloudWatchLogRetentionDays || 7,
 

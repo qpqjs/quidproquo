@@ -1,22 +1,21 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
 import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreScanBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
@@ -32,7 +31,8 @@ const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       return actionResult(items);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreScanBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ...transientErrorMap(),
+        InternalServerError: () => actionResultError(askKeyValueStoreScanBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreScanBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.InvalidScope, error.message),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.StoreNotFound, error.message),

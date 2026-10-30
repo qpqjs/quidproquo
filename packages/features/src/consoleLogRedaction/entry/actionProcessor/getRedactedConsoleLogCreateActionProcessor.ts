@@ -17,7 +17,7 @@ const getProcessRedactedConsoleLogCreate = (qpqConfig: QPQConfig): ProcessorFor<
       console.log(message);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

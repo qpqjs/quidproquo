@@ -14,7 +14,7 @@ import {
 } from '@qpqjs/core';
 
 import { ResolvedDevServerConfig } from '../../../types';
-import { requestUserScriptChild } from './logic/requestUserScriptChild';
+import { requestUserScriptChild } from './utils/requestUserScriptChild';
 
 const getProcessExecute =
   (devServerConfig: ResolvedDevServerConfig) =>

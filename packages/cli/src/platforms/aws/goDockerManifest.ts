@@ -2,7 +2,7 @@
 // deploys from. Per service it is the CDK cloud assembly plus a manifest under
 // dist/qpq/go-docker/<app>/<service>, with the views bundle and the federated
 // remote left where their bundlers write them and pointed at from the manifest.
-import { Nullable } from '@qpqjs/core';
+import { getGoDockerBuildPath, Nullable } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
@@ -41,8 +41,7 @@ export type GoDockerBuildManifest = {
 const MANIFEST_FILE = 'deploy.json';
 
 /** The per-service directory the build half owns: the cloud assembly and the manifest. */
-export const getGoDockerBuildDir = (appName: string, serviceName: string): string =>
-  path.join(getRoot(), 'dist', 'qpq', 'go-docker', appName, serviceName);
+export const getGoDockerBuildDir = (appName: string, serviceName: string): string => getGoDockerBuildPath(getRoot(), appName, serviceName);
 
 /** Where `cdk synth --output` writes the service's self-contained cloud assembly. */
 export const getGoDockerAssemblyDir = (appName: string, serviceName: string): string =>

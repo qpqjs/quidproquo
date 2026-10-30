@@ -1,9 +1,5 @@
 import { EchoRequest, EchoResponse } from '@qpqjs/test-models';
-import {
-  askNetworkRequest,
-  askOpenApiGetDocument,
-  AskResponse,
-} from 'quidproquo';
+import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -17,28 +13,14 @@ export function* askRunEchoRoundTripTest(runId: string): AskResponse<void> {
   yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
 
   const valid: EchoRequest = { bodyValue: runId };
-  const ok = yield* askNetworkRequest<EchoRequest, EchoResponse>(
-    'POST',
-    `${baseUrl}/v1/echo/${runId}`,
-    { body: valid }
-  );
-  yield* askSmokeAssert(
-    ok.status === 200,
-    `echo returned [${ok.status}] for a valid body`
-  );
+  const ok = yield* askNetworkRequest<EchoResponse, EchoRequest>('POST', `${baseUrl}/v1/echo/${runId}`, { body: valid });
+  yield* askSmokeAssert(ok.status === 200, `echo returned [${ok.status}] for a valid body`);
   yield* askSmokeAssert(
     ok.data.pathValue === runId && ok.data.bodyValue === runId,
-    `echo returned [${JSON.stringify(ok.data)}], expected both values to be [${runId}]`
+    `echo returned [${JSON.stringify(ok.data)}], expected both values to be [${runId}]`,
   );
 
   // An empty bodyValue fails the min(1) on the schema; the route must 422, not 200
-  const invalid = yield* askNetworkRequest<EchoRequest, unknown>(
-    'POST',
-    `${baseUrl}/v1/echo/${runId}`,
-    { body: { bodyValue: '' } }
-  );
-  yield* askSmokeAssert(
-    invalid.status === 422,
-    `echo returned [${invalid.status}] for an invalid body, expected 422`
-  );
+  const invalid = yield* askNetworkRequest<unknown, EchoRequest>('POST', `${baseUrl}/v1/echo/${runId}`, { body: { bodyValue: '' } });
+  yield* askSmokeAssert(invalid.status === 422, `echo returned [${invalid.status}] for an invalid body, expected 422`);
 }

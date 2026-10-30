@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineGraphDatabase, GraphDatabaseActionType, noopDynamicModuleLoader } from '@qpqjs/core';
+import { defineGraphDatabase, GraphDatabaseActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

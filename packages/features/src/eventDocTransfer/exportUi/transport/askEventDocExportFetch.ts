@@ -6,7 +6,7 @@ import { EventDocDocRef, EventDocTransferExportResult } from '../../models';
 
 /** POST /transfer/export: stages the bundle and returns a short-lived download url. */
 export function* askEventDocExportFetch(serviceName: string, docs: EventDocDocRef[]): AskResponse<EventDocTransferExportResult> {
-  const response = yield* askApiRequest<{ docs: EventDocDocRef[] }, EventDocTransferExportResult>(
+  const response = yield* askApiRequest<EventDocTransferExportResult, { docs: EventDocDocRef[] }>(
     serviceName,
     'POST',
     eventDocTransferEndpoint('export'),

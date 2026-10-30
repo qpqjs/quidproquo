@@ -1,9 +1,12 @@
 import { EventDocEventPayload } from '@qpqjs/features';
 
-import { AdminSessionState } from '../../AdminSessionState';
-import { ConfigServiceSelectedData } from '../../effects/session/ConfigServiceSelectedEvent';
+import { AdminSessionConfigServiceSelectedData } from '../../effects/session/AdminSessionConfigServiceSelectedEffect';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
-export const configServiceSelected = (state: AdminSessionState, { data }: EventDocEventPayload<ConfigServiceSelectedData>): AdminSessionState => ({
+export const configServiceSelected = (
+  state: AdminSessionState,
+  { data }: EventDocEventPayload<AdminSessionConfigServiceSelectedData>,
+): AdminSessionState => ({
   ...state,
   configSelectedService: data.service,
 });

@@ -46,7 +46,7 @@ type EventDocAiMessageSegment =
 
 ---
 
-## askUIEventDocAiSetMessages
+## askEventDocAiSetMessages
 
 Replaces the active chat's message list wholesale — typically called after loading a chat's history, or when switching chats.
 
@@ -54,18 +54,18 @@ Replaces the active chat's message list wholesale — typically called after loa
 - **State change:** sets `chatMessages` to the provided array.
 
 ```typescript
-import { askUIEventDocAiSetMessages } from '@qpqjs/features';
+import { askEventDocAiSetMessages } from '@qpqjs/features';
 import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* onHistoryLoaded(messages: EventDocAiChatMessage[]) {
-  yield* askUIEventDocAiSetMessages(messages);
+  yield* askEventDocAiSetMessages(messages);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetMessages(
+function* askEventDocAiSetMessages(
   messages: EventDocAiChatMessage[],
 ): AskResponse<void>;
 ```
@@ -76,7 +76,7 @@ function* askUIEventDocAiSetMessages(
 
 ---
 
-## askUIEventDocAiAppendChatMessage
+## askEventDocAiAppendChatMessage
 
 Appends a single finalized message to the end of the current thread — used to add the user's message when they send, and to commit the assistant's reply once its stream finishes.
 
@@ -84,7 +84,7 @@ Appends a single finalized message to the end of the current thread — used to 
 - **State change:** pushes `message` onto the end of `chatMessages`.
 
 ```typescript
-import { askUIEventDocAiAppendChatMessage } from '@qpqjs/features';
+import { askEventDocAiAppendChatMessage } from '@qpqjs/features';
 import type { EventDocAiChatMessage } from '@qpqjs/features';
 
 export function* addUserTurn(text: string) {
@@ -93,14 +93,14 @@ export function* addUserTurn(text: string) {
     segments: [{ type: 'text', text }],
   };
 
-  yield* askUIEventDocAiAppendChatMessage(message);
+  yield* askEventDocAiAppendChatMessage(message);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiAppendChatMessage(
+function* askEventDocAiAppendChatMessage(
   message: EventDocAiChatMessage,
 ): AskResponse<void>;
 ```
@@ -111,7 +111,7 @@ function* askUIEventDocAiAppendChatMessage(
 
 ---
 
-## askUIEventDocAiSetLoadingHistory
+## askEventDocAiSetLoadingHistory
 
 Toggles the "loading this chat's history" flag so the message pane can show a spinner while a chat's messages are fetched.
 
@@ -119,19 +119,19 @@ Toggles the "loading this chat's history" flag so the message pane can show a sp
 - **State change:** sets `isLoadingHistory`.
 
 ```typescript
-import { askUIEventDocAiSetLoadingHistory, askUIEventDocAiSetMessages } from '@qpqjs/features';
+import { askEventDocAiSetLoadingHistory, askEventDocAiSetMessages } from '@qpqjs/features';
 
 export function* openChatHistory() {
-  yield* askUIEventDocAiSetLoadingHistory(true);
+  yield* askEventDocAiSetLoadingHistory(true);
   // ...fetch this chat's messages, then...
-  yield* askUIEventDocAiSetLoadingHistory(false);
+  yield* askEventDocAiSetLoadingHistory(false);
 }
 ```
 
 ### Signature
 
 ```typescript
-function* askUIEventDocAiSetLoadingHistory(
+function* askEventDocAiSetLoadingHistory(
   isLoading: boolean,
 ): AskResponse<void>;
 ```

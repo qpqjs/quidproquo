@@ -1,9 +1,9 @@
-import { askProcessOnError } from './askProcessOnError';
-import { askProcessOnThrottle } from './askProcessOnThrottle';
-import { askProcessOnTimeout } from './askProcessOnTimeout';
+import { askNotifyErrorProcessError } from './askNotifyErrorProcessError';
+import { askNotifyErrorProcessThrottle } from './askNotifyErrorProcessThrottle';
+import { askNotifyErrorProcessTimeout } from './askNotifyErrorProcessTimeout';
 
 export const notifyErrorLogic = {
-  askProcessOnError,
-  askProcessOnTimeout,
-  askProcessOnThrottle,
+  askNotifyErrorProcessError,
+  askNotifyErrorProcessTimeout,
+  askNotifyErrorProcessThrottle,
 };

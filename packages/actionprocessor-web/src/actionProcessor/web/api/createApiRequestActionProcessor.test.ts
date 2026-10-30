@@ -5,11 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createApiRequestActionProcessor, getApiRequestActionProcessor } from './createApiRequestActionProcessor';
 
-const preformNetworkRequest = vi.hoisted(() => vi.fn());
+const performNetworkRequest = vi.hoisted(() => vi.fn());
 
 vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => ({
   ...(await importOriginal<typeof import('@qpqjs/webserver')>()),
-  preformNetworkRequest,
+  performNetworkRequest,
 }));
 
 const buildRequest = () => ({
@@ -29,7 +29,7 @@ const getProcessor = async (resolver = getApiRequestActionProcessor) => {
 
 describe('createApiRequestActionProcessor', () => {
   beforeEach(() => {
-    preformNetworkRequest.mockResolvedValue({ status: 200, data: 'ok' });
+    performNetworkRequest.mockResolvedValue({ status: 200, data: 'ok' });
     window.history.replaceState(null, '', '/');
   });
 
@@ -51,7 +51,7 @@ describe('createApiRequestActionProcessor', () => {
 
     await processor(buildRequest());
 
-    expect(preformNetworkRequest).toHaveBeenCalledWith(
+    expect(performNetworkRequest).toHaveBeenCalledWith(
       expect.objectContaining({ basePath: `${protocol}//api.${hostname}${port ? `:${port}` : ''}` }),
     );
   });
@@ -63,7 +63,7 @@ describe('createApiRequestActionProcessor', () => {
     await processor(buildRequest());
 
     expect(resolveServiceBaseUrl).toHaveBeenCalledWith('orders');
-    expect(preformNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ basePath: 'https://orders.test' }));
+    expect(performNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ basePath: 'https://orders.test' }));
   });
 
   it('merges per-call headers with the provided getHeaders, letting getHeaders win', async () => {
@@ -72,11 +72,11 @@ describe('createApiRequestActionProcessor', () => {
 
     await processor(buildRequest());
 
-    expect(preformNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ headers: { 'x-call': 'override', authorization: 'Bearer t' } }));
+    expect(performNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ headers: { 'x-call': 'override', authorization: 'Bearer t' } }));
   });
 
   const rejectWith = async (error: unknown) => {
-    preformNetworkRequest.mockRejectedValue(error);
+    performNetworkRequest.mockRejectedValue(error);
     const processor = await getProcessor();
     const [, actionError] = await processor(buildRequest());
     return actionError;
@@ -89,7 +89,7 @@ describe('createApiRequestActionProcessor', () => {
 
     await processor(buildRequest());
 
-    const sent = preformNetworkRequest.mock.calls[0][0];
+    const sent = performNetworkRequest.mock.calls[0][0];
     expect(Object.keys(sent.headers).map((name) => name.toLowerCase())).toEqual(['x-call']);
   });
 

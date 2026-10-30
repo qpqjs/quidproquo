@@ -49,7 +49,7 @@ export declare enum HeadersReferrerPolicy {
   UNSAFE_URL = 'unsafe-url',
 }
 
-export interface QpqServiceContentSecurityPolicy {
+export type QpqServiceContentSecurityPolicy = {
   /**
    * The name of the api subdomain name for the given service
    */
@@ -67,7 +67,7 @@ export interface QpqServiceContentSecurityPolicy {
    * The protocol to use, defaults to https
    */
   protocol?: 'http' | 'https' | 'ws' | 'wss';
-}
+};
 
 /**
  * CSP Entry ~ a string or a complex service type
@@ -77,7 +77,7 @@ export type ContentSecurityPolicyEntry = QpqServiceContentSecurityPolicy | strin
 /**
  * The policy directives and their values that CDN includes as values for the Content-Security-Policy HTTP response header.
  */
-export interface ResponseHeadersContentSecurityPolicy {
+export type ResponseHeadersContentSecurityPolicy = {
   /**
    * The policy directives and their values that CDN includes as values for the Content-Security-Policy HTTP response header.
    */
@@ -87,23 +87,23 @@ export interface ResponseHeadersContentSecurityPolicy {
    * received from the origin with the one specified in this response headers policy.
    */
   readonly override: boolean;
-}
+};
 
 /**
  * Determines whether CDN includes the X-Content-Type-Options HTTP response header with its value set to nosniff.
  */
-export interface ResponseHeadersContentTypeOptions {
+export type ResponseHeadersContentTypeOptions = {
   /**
    * A Boolean that determines whether CDN overrides the X-Content-Type-Options HTTP response header
    * received from the origin with the one specified in this response headers policy.
    */
   readonly override: boolean;
-}
+};
 
 /**
  * Determines whether CDN includes the X-Frame-Options HTTP response header and the header’s value.
  */
-export interface ResponseHeadersFrameOptions {
+export type ResponseHeadersFrameOptions = {
   /**
    * The value of the X-Frame-Options HTTP response header.
    */
@@ -113,12 +113,12 @@ export interface ResponseHeadersFrameOptions {
    * received from the origin with the one specified in this response headers policy.
    */
   readonly override: boolean;
-}
+};
 
 /**
  * Determines whether CDN includes the Referrer-Policy HTTP response header and the header’s value.
  */
-export interface ResponseHeadersReferrerPolicy {
+export type ResponseHeadersReferrerPolicy = {
   /**
    * The value of the Referrer-Policy HTTP response header.
    */
@@ -128,12 +128,12 @@ export interface ResponseHeadersReferrerPolicy {
    * received from the origin with the one specified in this response headers policy.
    */
   readonly override: boolean;
-}
+};
 
 /**
  * Determines whether CDN includes the Strict-Transport-Security HTTP response header and the header’s value.
  */
-export interface ResponseHeadersStrictTransportSecurity {
+export type ResponseHeadersStrictTransportSecurity = {
   /**
    * A number that CDN uses as the value for the max-age directive in the Strict-Transport-Security HTTP response header.
    */
@@ -155,12 +155,12 @@ export interface ResponseHeadersStrictTransportSecurity {
    * @default false
    */
   readonly preload?: boolean;
-}
+};
 
 /**
  * Determines whether CDN includes the X-XSS-Protection HTTP response header and the header’s value.
  */
-export interface ResponseHeadersXSSProtection {
+export type ResponseHeadersXSSProtection = {
   /**
    * A Boolean that determines whether CDN includes the mode=block directive in the X-XSS-Protection header.
    *
@@ -185,14 +185,14 @@ export interface ResponseHeadersXSSProtection {
    * @default - no report uri
    */
   readonly reportUri?: string;
-}
+};
 
 /**
  * Configuration for a set of security-related HTTP response headers.
  * CDN adds these headers to HTTP responses that it sends for requests that match a cache behavior
  * associated with this response headers policy.
  */
-export interface ResponseSecurityHeaders {
+export type ResponseSecurityHeaders = {
   /**
    * The policy directives and their values that CDN includes as values for the Content-Security-Policy HTTP response header.
    *
@@ -229,4 +229,4 @@ export interface ResponseSecurityHeaders {
    * @default - no xss protection
    */
   readonly xssProtection?: ResponseHeadersXSSProtection;
-}
+};

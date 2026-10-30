@@ -1,4 +1,5 @@
-import { FileUploadErrorTypeEnum, FileUploadSettings } from '@qpqjs/webserver';
+import { AwsFileUploadSettings } from '@qpqjs/config-aws';
+import { FileUploadErrorTypeEnum } from '@qpqjs/webserver';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';
@@ -17,7 +18,7 @@ const fieldPart = (name: string, value: string): string => `Content-Disposition:
 const buildEvent = (body: string, headers: Record<string, string>, isBase64Encoded = false): APIGatewayEvent =>
   ({ body, headers, isBase64Encoded }) as unknown as APIGatewayEvent;
 
-const defaultSettings: FileUploadSettings = {
+const defaultSettings: AwsFileUploadSettings = {
   maxFileSizeBytes: 10 * 1024 * 1024,
   maxFileCount: 10,
   maxFieldCount: 100,
@@ -57,7 +58,7 @@ describe('parseMultipartFormData', () => {
     const files = await parseMultipartFormData(buildEvent(body, multipartHeaders), defaultSettings);
 
     expect(files).toHaveLength(1);
-    expect(files[0].filename).toBe('a.txt');
+    expect(files![0]!.filename).toBe('a.txt');
   });
 
   it('skips empty files', async () => {
@@ -73,7 +74,7 @@ describe('parseMultipartFormData', () => {
 
     const files = await parseMultipartFormData(buildEvent(body, { 'Content-Type': `multipart/form-data; boundary=${BOUNDARY}` }), defaultSettings);
 
-    expect(files[0].filename).toBe('cased.txt');
+    expect(files![0]!.filename).toBe('cased.txt');
   });
 
   it('decodes a base64 encoded event body', async () => {
@@ -82,7 +83,7 @@ describe('parseMultipartFormData', () => {
 
     const files = await parseMultipartFormData(buildEvent(body, multipartHeaders, true), defaultSettings);
 
-    expect(files[0].base64Data).toBe(Buffer.from('payload').toString('base64'));
+    expect(files![0]!.base64Data).toBe(Buffer.from('payload').toString('base64'));
   });
 
   it('rejects with fileTooLarge when a file exceeds maxFileSizeBytes', async () => {
@@ -141,7 +142,7 @@ describe('parseMultipartFormData', () => {
 
     const files = await parseMultipartFormData(buildEvent(body, multipartHeaders), defaultSettings);
 
-    expect(files[0].filename).toBe('passwd');
+    expect(files![0]!.filename).toBe('passwd');
   });
 
   it('rejects a malformed multipart body', async () => {

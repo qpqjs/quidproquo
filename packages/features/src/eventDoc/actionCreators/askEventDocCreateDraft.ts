@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askApplyEventDocEvent } from '../actions/eventDocEvent/askApplyEventDocEvent';
+import { askApplyEventDocEvent } from '../actions/askApplyEventDocEvent';
 import { EventDocCreateDraftEffect } from '../effects/EventDocCreateDraftEffect';
 import { EventDocEffect } from '../models';
 

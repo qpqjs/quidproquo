@@ -13,12 +13,9 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-  QpqContextIdentifier,
-  runStory,
-  storageScopeContext,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -33,7 +30,7 @@ import {
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
 } from '../eventDoc/constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
-import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
+import { EventDocEffect, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
 import { toQpqPermission } from '../permission/logic/toQpqPermission';
@@ -48,7 +45,7 @@ import {
   TENANT_RECORD_STORE,
   TENANT_SCOPE_RESOLVER_FN,
 } from './constants/tenantStoreNames';
-import { TenantEffect } from './fold/TenantEffect';
+import { TenantEffect } from './fold/effects/TenantEffect';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
 import { buildTenantRolesConfig } from './logic/roles/buildTenantRolesConfig';
@@ -322,7 +319,7 @@ describe('tenant feature', () => {
       appendEvent(
         httpEvent(
           {
-            type: TenantEffect.setBrand,
+            type: TenantEffect.SetBrand,
             payload: {
               data: {
                 brandColors: { primary: '#123456', secondary: '#abcdef' },
@@ -359,14 +356,14 @@ describe('tenant feature', () => {
     // exact payload it received. In production the inline function executes inside the
     // append's session, so the store context is inherited; here it is mocked.
     expect(inlinePayloads).toHaveLength(1);
-    runStory(askTenantOnPublish(inlinePayloads[0]), {
+    runStory(askTenantOnPublish(inlinePayloads![0]!), {
       ...mocks,
       [ContextActionType.Read]: store,
     });
 
     const records = tables[TENANT_RECORD_STORE];
     expect(records).toHaveLength(1);
-    expect(records[0]).toMatchObject({
+    expect(records![0]).toMatchObject({
       tenantId: summary.id,
       name: 'credit-corp',
       brandColors: { primary: '#123456', secondary: '#abcdef' },
@@ -394,7 +391,7 @@ describe('tenant feature', () => {
     const summary = JSON.parse(createResponse.body!);
 
     // Soft-delete the summary row directly (the remove route folds to the same shape).
-    const summaryRow = tables[TENANT_EVENTDOC_STORE].find((row) => row.id === summary.id)!;
+    const summaryRow = tables![TENANT_EVENTDOC_STORE]!.find((row) => row.id === summary.id)!;
     summaryRow.deletedAt = '2026-07-11T01:00:00.000Z';
 
     const listResponse = runStory(list(httpEvent(undefined)), mocks);
@@ -541,7 +538,7 @@ describe('tenant feature', () => {
       // A second admin makes the first removable; disabling the only remaining one is refused.
       runStory(addMember(httpEvent({ email: 'sam@example.com' }), { id: summary.id }), mocks);
       expect(() => runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks)).toThrow(/last member who can assign/);
-      tables[TENANT_MEMBERSHIPS_STORE].find((row) => row.userId === 'user-2')!.roles = [TENANT_ADMIN_ROLE];
+      tables![TENANT_MEMBERSHIPS_STORE]!.find((row) => row.userId === 'user-2')!.roles = [TENANT_ADMIN_ROLE];
       runStory(removeMember(httpEvent(undefined), { id: summary.id, userId: 'user-1' }), mocks);
       expect(tables[TENANT_MEMBERSHIPS_STORE]).toEqual([expect.objectContaining({ userId: 'user-2' })]);
     });
@@ -656,7 +653,7 @@ describe('tenant feature', () => {
         runStory(setMemberRoles(rolesEvent([TENANT_ADMIN_ROLE]), { id: 'tenant-a', userId: 'user-2' }), mocks);
         runStory(setMemberRoles(rolesEvent([]), { id: 'tenant-a', userId: 'user-1' }), mocks);
         runStory(removeMember(httpEvent(undefined), { id: 'tenant-a', userId: 'user-1' }), mocks);
-        expect(tables[TENANT_MEMBERSHIPS_STORE].filter((row) => row.tenantId === 'tenant-a')).toEqual([
+        expect(tables![TENANT_MEMBERSHIPS_STORE]!.filter((row) => row.tenantId === 'tenant-a')).toEqual([
           expect.objectContaining({ userId: 'user-2' }),
         ]);
 
@@ -667,7 +664,7 @@ describe('tenant feature', () => {
           /permission to manage members/,
         );
         runStory(removeMember(httpEvent(undefined), { id: 'tenant-c', userId: 'user-1' }), mocks);
-        expect(tables[TENANT_MEMBERSHIPS_STORE].filter((row) => row.tenantId === 'tenant-c')).toEqual([
+        expect(tables![TENANT_MEMBERSHIPS_STORE]!.filter((row) => row.tenantId === 'tenant-c')).toEqual([
           expect.objectContaining({ userId: 'user-2' }),
         ]);
       });

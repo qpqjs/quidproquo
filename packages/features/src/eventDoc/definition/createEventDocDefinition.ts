@@ -5,8 +5,8 @@ import { collectEventDocReferences } from '../fold/collectEventDocReferences';
 import { foldEventDocLog, foldEventDocLogAccepted, foldEventDocLogAsWritten, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { migrateEventDocDocumentTo } from '../fold/migrateEventDocDocumentTo';
 import { EventDocDocument, EventDocEvent, EventDocSnapshotViews, EventDocSummaryView } from '../models';
-import { applyEventDocSummaryEvent } from '../summary/applyEventDocSummaryEvent';
-import { foldEventDocSummary } from '../summary/foldEventDocSummary';
+import { applyEventDocSummaryEvent } from '../summary/logic/applyEventDocSummaryEvent';
+import { foldEventDocSummary } from '../summary/logic/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { withEventDocSchemaVersionCeiling } from '../validation/withEventDocSchemaVersionCeiling';
@@ -90,7 +90,7 @@ export function createEventDocDefinition(
   Object.keys(versions[0].views).forEach((viewName) => {
     if (viewName === EVENT_DOC_SUMMARY_VIEW) {
       throw new Error(
-        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name — every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
+        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name, every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
       );
     }
 
@@ -156,7 +156,7 @@ export function createEventDocDefinition(
     storeName,
     type,
     sync,
-    // TODO: This seems like the wrong place for a workspace slot kind...
+    // TODO: @joe-coady: This seems like the wrong place for a workspace slot kind...
     // likely should be defined at the workspace, when we define the slots.
     kind: EventDocWorkspaceSlotKind.document,
     // The workspace mounts the primary view: an editor edits a document, never a summary.

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { QueryParamsActionType } from '@qpqjs/web';
 
 import { beforeEach, describe, expect, it } from 'vitest';

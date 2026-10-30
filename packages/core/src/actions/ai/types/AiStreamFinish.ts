@@ -6,7 +6,7 @@ import { AiStreamUsage } from './AiStreamUsage';
  * Emitted once at the very end of the response with the aggregate finish reason and total usage
  * across every step. Use this (not `FinishStep`) for end-of-response accounting.
  */
-export interface AiStreamFinish {
+export type AiStreamFinish = {
   type: AiStreamPartType.Finish;
   /** Why the model stopped. `toolCalls` here means the loop was halted early and is resumable. */
   finishReason: AiStreamFinishReasonEnum;
@@ -14,4 +14,4 @@ export interface AiStreamFinish {
   rawFinishReason?: string;
   /** Aggregate token usage across all steps. */
   usage: AiStreamUsage;
-}
+};

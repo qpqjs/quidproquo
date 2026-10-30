@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   ErrorTypeEnum,
   FileActionType,
   GuidActionType,
@@ -15,10 +15,9 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
   QPQBinaryData,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -206,7 +205,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
     [DynamicFunctionsActionType.Execute]: (action: { payload: { dynamicFunctionsName: string; functionName: string; args: [EventDocEvent[]] } }) => {
       if (!REGISTERED_FUNCTIONS.has(action.payload.dynamicFunctionsName)) {
         return throwsError(
-          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
           `Dynamic functions not found: [${action.payload.dynamicFunctionsName}]`,
         );
       }
@@ -383,7 +382,6 @@ const seedDiamond = (environment: TestEnvironment): void => {
 
 const secondTemplateRef = { service: SERVICE, type: TEMPLATE_TYPE, id: 'template-2' };
 const templateRef = { service: SERVICE, type: TEMPLATE_TYPE, id: 'template-1' };
-const contentRef = { service: SERVICE, type: CONTENT_TYPE, id: 'content-1' };
 
 const eventsFor = (environment: TestEnvironment, type: string, docId: string): EventDocEvent[] =>
   (environment.tables[eventDocEventsStoreName(storeNameForType(type))] ?? [])
@@ -543,7 +541,7 @@ describe('eventDoc transfer round trip', () => {
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1').updatedBy).toBe('uat-importer');
 
     // Publish history survived: the summary the target derived carries the published version.
-    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1').versions[0].publishedAt).toBeDefined();
+    expect(summaryFor!(target, TEMPLATE_TYPE, 'template-1').versions[0]!.publishedAt).toBeDefined();
 
     // Assets landed at their original guids, so the events' EventDocAssetRefs still resolve.
     expect(target.files[`${eventDocStorageDriveName(TEMPLATES_STORE)}/${eventDocAssetPath('template-1', 'logo-1')}`]).toEqual(asset('logo.png'));
@@ -558,7 +556,7 @@ describe('eventDoc transfer round trip', () => {
     // The source's build worker recorded a build on the template; the import must carry it across even though a
     // client could never append it, since the whole log is replayed as it was written at its origin.
     const built = event(4, 'SET_BUILD', { assetId: 'build-1' });
-    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({ pk: 'template-1', sk: eventId(4), data: built });
+    source!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({ pk: 'template-1', sk: eventId(4), data: built });
 
     const exportResult = runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
     expect(exportResult.status).toBe(200);
@@ -614,7 +612,7 @@ describe('eventDoc transfer round trip', () => {
     // The source keeps working on the template: two more events after the promotion.
     const templateEvents = source.tables[eventDocEventsStoreName(TEMPLATES_STORE)];
     const extra = event(4, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content'));
-    templateEvents.push({ pk: 'template-1', sk: eventId(4), data: extra });
+    templateEvents!.push({ pk: 'template-1', sk: eventId(4), data: extra });
     const sourceSummaryRow = summaryFor(source, TEMPLATE_TYPE, 'template-1');
     Object.assign(sourceSummaryRow, { ...foldEventDocSummary(eventsFor(source, TEMPLATE_TYPE, 'template-1')), type: TEMPLATE_TYPE });
 
@@ -637,7 +635,7 @@ describe('eventDoc transfer round trip', () => {
     expect(withoutActorIds(eventsFor(target, TEMPLATE_TYPE, 'template-1'))).toEqual(withoutActorIds(eventsFor(source, TEMPLATE_TYPE, 'template-1')));
 
     // Now someone edits the target directly: the next promotion of that doc must refuse.
-    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
+    target!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({
       pk: 'template-1',
       sk: eventId(5),
       data: event(5, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-shared')),
@@ -708,10 +706,10 @@ describe('eventDoc transfer round trip', () => {
     });
 
     const targetEvents = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)];
-    const templateRows = targetEvents.filter((row) => row.pk === 'template-1');
-    templateRows.filter((row) => (row.sk as number) >= eventId(2)).forEach((row) => targetEvents.splice(targetEvents.indexOf(row), 1));
-    targetEvents.push({ pk: 'template-1', sk: eventId(2), data: targetEdit(2, 'style-content') });
-    targetEvents.push({ pk: 'template-1', sk: eventId(3), data: targetEdit(3, 'style-shared') });
+    const templateRows = targetEvents!.filter((row) => row.pk === 'template-1');
+    templateRows.filter((row) => (row.sk as number) >= eventId(2)).forEach((row) => targetEvents!.splice(targetEvents!.indexOf(row), 1));
+    targetEvents!.push({ pk: 'template-1', sk: eventId(2), data: targetEdit(2, 'style-content') });
+    targetEvents!.push({ pk: 'template-1', sk: eventId(3), data: targetEdit(3, 'style-shared') });
 
     const upload2 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
     target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload2.transferId)}`] = bundle;
@@ -757,7 +755,7 @@ describe('eventDoc transfer round trip', () => {
     target.seedDoc(TEMPLATE_TYPE, [initEvent('template-other', 'receipt', 'Receipt')]);
 
     // dev renames its template onto the sibling's code.
-    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
+    source!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({
       pk: 'template-1',
       sk: eventId(1),
       data: event(1, EventDocEffect.SetCode, { code: 'receipt' }),
@@ -828,7 +826,7 @@ describe('eventDoc transfer import validation', () => {
     const source = buildEnvironment('dev');
     const target = buildEnvironment('uat');
     seedDiamond(source);
-    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({ pk: 'template-1', sk: eventId(4), data: event(4, REJECTED_EVENT_TYPE, {}) });
+    source!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({ pk: 'template-1', sk: eventId(4), data: event(4, REJECTED_EVENT_TYPE, {}) });
 
     const transferId = stageBundle(source, target, [templateRef]);
 
@@ -887,10 +885,10 @@ describe('eventDoc transfer authorise', () => {
     seedDiamond(source);
     seedDiamond(target);
     // The target edited the template directly, so the logs diverge at event 3.
-    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)] = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].filter(
+    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)] = target!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.filter(
       (row) => !(row.pk === 'template-1' && row.sk === 3),
     );
-    target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
+    target!.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({
       pk: 'template-1',
       sk: eventId(3),
       data: event(3, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content')),

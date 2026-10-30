@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types/utils/createActionRequester';
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { UserScriptActionType } from './UserScriptActionType';
 import { UserScriptModuleTypes } from './UserScriptModuleTypes';
 
@@ -13,5 +13,4 @@ export const askUserScriptModuleTypes = createActionRequester<UserScriptModuleTy
   errorTypes: [
     'TypesNotFound', // a declared types entry did not load as declarations (a bundling problem)
   ],
-  getPayload: () => undefined,
 });

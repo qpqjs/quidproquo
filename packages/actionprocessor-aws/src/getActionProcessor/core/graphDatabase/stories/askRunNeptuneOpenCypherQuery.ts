@@ -1,8 +1,8 @@
 import {
+  askGraphDatabaseExecuteOpenCypherQuery,
   askNetworkRequest,
   AskResponse,
   askThrowError,
-  ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
   GraphDatabaseInstanceType,
@@ -23,7 +23,7 @@ export function* askRunNeptuneOpenCypherQuery({
   const graphEndpoint = instance === GraphDatabaseInstanceType.Read ? graphEndpoints.readEndpoint : graphEndpoints.writeEndpoint;
 
   if (!graphEndpoint) {
-    return yield* askThrowError(ErrorTypeEnum.GenericError, `No [${instance}] endpoint found`);
+    return yield* askThrowError(askGraphDatabaseExecuteOpenCypherQuery.errorType.EndpointNotFound, `No [${instance}] endpoint found`);
   }
 
   const neptuneQuery = convertQpqQueryToNeptune(openCypherQuery);
@@ -34,13 +34,13 @@ export function* askRunNeptuneOpenCypherQuery({
   const body = JSON.stringify(request);
   const signedHeaders = yield* askGraphDatabaseForNeptuneSignRequest(url, body);
 
-  const response = yield* askNetworkRequest<string, NeptuneCypherResponse>('POST', url, {
+  const response = yield* askNetworkRequest<NeptuneCypherResponse, string>('POST', url, {
     body,
     headers: signedHeaders,
   });
 
   if (response.status < 200 || response.status >= 300) {
-    return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to query database');
+    return yield* askThrowError(askGraphDatabaseExecuteOpenCypherQuery.errorType.QueryFailed, 'Unable to query database');
   }
 
   return yield* askConvertNeptuneCypherResponseToCypherResponse(response.data);

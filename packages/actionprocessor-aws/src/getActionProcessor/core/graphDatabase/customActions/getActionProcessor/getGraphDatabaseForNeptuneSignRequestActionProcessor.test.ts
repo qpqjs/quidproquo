@@ -1,23 +1,23 @@
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/processorTestHelpers';
 import { GraphDatabaseForNeptuneActionType } from '../actions';
 import { getGraphDatabaseForNeptuneSignRequestActionProcessor } from './getGraphDatabaseForNeptuneSignRequestActionProcessor';
-
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 
 // A fixed key, so the signature is a function of the request alone.
 vi.mock('@aws-sdk/credential-provider-node', () => ({
   defaultProvider: () => async () => ({ accessKeyId: 'AKIATESTKEY', secretAccessKey: 'test-secret', sessionToken: 'test-session' }),
 }));
 
+const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
+
 const invoke = async (url: string, body: string) => {
-  const processor = (await getGraphDatabaseForNeptuneSignRequestActionProcessor({} as never, null as any))[
+  const processor = (await getGraphDatabaseForNeptuneSignRequestActionProcessor(qpqConfig, null as any))[
     GraphDatabaseForNeptuneActionType.SignRequest
   ];
-  const [headers, error] = await invokeProcessor<Record<string, string>>(processor, { url, body });
+  const [headers, error] = await invokeProcessor<Record<string, string>>(processor!, { url, body });
   expect(error).toBeUndefined();
   return headers!;
 };

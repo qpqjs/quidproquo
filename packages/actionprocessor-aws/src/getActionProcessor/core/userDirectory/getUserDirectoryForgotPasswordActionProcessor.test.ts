@@ -1,12 +1,12 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askUserDirectoryForgotPassword, buildTestQpqConfig, defineUserDirectory, UserDirectoryActionType } from '@qpqjs/core';
+import { askUserDirectoryForgotPassword, defineUserDirectory, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryForgotPasswordActionProcessor } from './getUserDirectoryForgotPasswordActionProcessor';
 
 vi.mock('../../../logic/cloudformation/getExportedValue', () => ({ getExportedValue: vi.fn() }));
@@ -26,7 +26,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
     vi.mocked(getExportedValue).mockReset().mockResolvedValue('POOL');
     vi.mocked(resolveUsernameByPreferredUsername)
       .mockReset()
-      .mockImplementation(async (_pool, _region, username) => username);
+      .mockImplementation(async (_pool: any, _region: any, username: any) => username);
     vi.mocked(forgotPassword).mockReset();
   });
 
@@ -34,7 +34,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(forgotPassword).mockResolvedValue({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'j***@e***' });
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'j***@e***' });
@@ -47,7 +47,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(forgotPassword).mockRejectedValue(cognitoError('UserNotFoundException'));
 
-    const [result, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'nobody@example.com' });
+    const [result, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'nobody@example.com' });
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'n***@e***' });
@@ -57,7 +57,7 @@ describe('getUserDirectoryForgotPasswordActionProcessor', () => {
     const processor = await resolveProcessor();
     vi.mocked(forgotPassword).mockRejectedValue(cognitoError('LimitExceededException'));
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', username: 'joe@example.com' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', username: 'joe@example.com' });
 
     expect(error?.errorType).toBe(askUserDirectoryForgotPassword.errorType.LimitExceeded);
   });

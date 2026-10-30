@@ -1,20 +1,20 @@
-import { askFileListDirectory, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileListDirectory, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { listFiles } from '../../../logic/s3/s3Utils';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
+import { listFiles } from '../../../logic/s3';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ listFiles: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ listFiles: vi.fn() }));
 
 const invoke = async (payload: { drive: string; folderPath: string; maxFiles?: number; pageToken?: string }) => {
-  const processor = (await getFileListDirectoryActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ListDirectory];
-  return invokeProcessor(processor, payload);
+  const processor = (
+    await getFileListDirectoryActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.ListDirectory];
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileListDirectory', () => {
@@ -41,7 +41,7 @@ describe('getProcessFileListDirectory', () => {
     const [result] = await invoke({ drive: 'assets', folderPath: 'sub', scope: 'tenant-a' } as any);
 
     expect(vi.mocked(listFiles).mock.calls.at(-1)?.[2]).toBe('tenant-a/sub');
-    expect(result?.fileInfos.map((file) => file.filepath)).toEqual(['sub/a.txt']);
+    expect(result?.fileInfos.map((file: any) => file.filepath)).toEqual(['sub/a.txt']);
   });
 
   it('refuses a traversal folder path under a scope before touching S3', async () => {

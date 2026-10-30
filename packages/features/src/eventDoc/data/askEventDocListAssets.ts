@@ -1,17 +1,17 @@
 import { askCatch, askFileListAllDirectory, askFileListDirectory, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { eventDocAssetFolderPath } from './eventDocAssetPath';
 
-const assetGuidFromFilepath = (filepath: string): string => filepath.split('/').slice(-1)[0];
+const assetGuidFromFilepath = (filepath: string): string => filepath.split('/').slice(-1)[0] ?? '';
 
 /**
  * Every asset guid under a doc's `<docId>/assets/` prefix. Guids only: filename and mimetype live in the event that
  * recorded the EventDocAssetRef.
  */
 export function* askEventDocListAssets(docId: string): AskResponse<string[]> {
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const listed = yield* askCatch(askFileListAllDirectory(storageDriveName, eventDocAssetFolderPath(docId), scope));

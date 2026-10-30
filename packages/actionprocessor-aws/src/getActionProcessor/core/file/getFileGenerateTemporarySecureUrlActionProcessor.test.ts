@@ -1,24 +1,25 @@
-import { askFileGenerateTemporarySecureUrl, buildTestQpqConfig, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { generatePresignedUrl } from '../../../logic/s3/generatePresignedUrl';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('../../../logic/s3/generatePresignedUrl', () => ({ generatePresignedUrl: vi.fn() }));
 
 const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
 const invoke = async (payload: { drive: string; filepath: string; expirationMs: number }) => {
-  const processor = (await getFileGenerateTemporarySecureUrlActionProcessor(buildTestQpqConfig(), null as any))[
-    FileActionType.GenerateTemporarySecureUrl
-  ];
-  return invokeProcessor(processor, payload);
+  const processor = (
+    await getFileGenerateTemporarySecureUrlActionProcessor(
+      buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]),
+      null as any,
+    )
+  )[FileActionType.GenerateTemporarySecureUrl];
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileGenerateTemporarySecureUrl', () => {

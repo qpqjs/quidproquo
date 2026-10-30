@@ -65,18 +65,18 @@ describe('defineEventDocTransfer', () => {
   it('normalizes a live functions object to its bare identity in the registry', () => {
     const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections: [templateFunctions] }));
 
-    expect(globals[0][EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
+    expect(globals![0]![EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
   });
 
   it('accepts a collection-list entry carrying its functions object, unmapped', () => {
     const listEntry = { functions: templateFunctions, runtime: '/entry/eventDocs::templateEventDoc', basePath: '/templates' };
     const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections: [listEntry] }));
 
-    expect(globals[0][EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
+    expect(globals![0]![EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
   });
 
   it('provisions the staging drive', () => {
-    const config = defineEventDocTransfer({ service: 'template', collections }).flat(Infinity) as { configSettingType: string }[];
+    const config = (defineEventDocTransfer({ service: 'template', collections }) as any[]).flat(Infinity) as { configSettingType: string }[];
 
     expect(config.some((setting) => setting.configSettingType === QPQCoreConfigSettingType.storageDrive)).toBe(true);
   });

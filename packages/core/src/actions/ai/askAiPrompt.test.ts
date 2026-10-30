@@ -1,6 +1,7 @@
+import { captureRequester, runStory, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
 import { AiCacheTtl } from './AiCacheTtl';
 import { AiModel } from './AiModel';

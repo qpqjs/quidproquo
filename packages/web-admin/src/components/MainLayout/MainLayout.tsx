@@ -5,7 +5,7 @@ import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui
 import Box from '@mui/material/Box';
 
 import { useAdminApp, useSessionState } from '../../adminApp';
-import { authRuntime } from '../../Auth/logic';
+import { authRuntime } from '../../Auth/authRuntime';
 import { useTabs } from './hooks/useTabs';
 
 export function MainLayout() {
@@ -27,7 +27,7 @@ export function MainLayout() {
         sx={{
           flexGrow: 1,
           overflow: 'auto',
-          pb: '56px', // <— prevent content from being hidden behind bottom nav
+          pb: '56px', // keeps content clear of the bottom nav
         }}
       >
         {tabs
@@ -40,8 +40,9 @@ export function MainLayout() {
       <BottomNavigation
         onChange={(event, newValue) => {
           // The trailing Logout / Loading actions are not tabs
-          if (newValue < tabs.length) {
-            adminApi.applyTabChanged(newValue, tabs[newValue].name);
+          const tab = tabs[newValue];
+          if (tab) {
+            adminApi.applyTabChanged(newValue, tab.name);
           }
         }}
         showLabels

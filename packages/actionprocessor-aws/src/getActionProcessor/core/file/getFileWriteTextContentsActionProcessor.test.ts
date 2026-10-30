@@ -1,22 +1,21 @@
-import { askFileWriteTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileWriteTextContents, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
-import { writeTextFile } from '../../../logic/s3/s3Utils';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
+import { writeTextFile } from '../../../logic/s3';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ writeTextFile: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ writeTextFile: vi.fn() }));
 vi.mock('../../../awsLambdaUtils', () => ({ getS3BucketStorageClassFromStorageDriveTier: vi.fn(() => 'STANDARD') }));
 
 const invoke = async (payload: Record<string, unknown>) => {
-  const processor = (await getFileWriteTextContentsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.WriteTextContents];
-  return invokeProcessor(processor, payload);
+  const processor = (
+    await getFileWriteTextContentsActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.WriteTextContents];
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileWriteTextContents', () => {

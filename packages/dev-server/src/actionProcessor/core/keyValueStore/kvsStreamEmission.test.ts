@@ -1,13 +1,14 @@
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, kvsKey, KvsStreamEventType, noopDynamicModuleLoader } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType, kvsKey, KvsStreamEventType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
 // The dev server stands in for a change stream, and the thing worth pinning is that a write
-// actually reaches the handler — otherwise `go:dev` silently stops projecting and everything
+// actually reaches the handler, otherwise `go:dev` silently stops projecting and everything
 // looks healthy right up until someone reads a stale summary.
 
 const { repo } = vi.hoisted(() => ({
@@ -27,7 +28,7 @@ vi.mock('../../../logic/kvsStream', () => ({
   },
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 const STREAMED = 'streamed';
 const PLAIN = 'plain';
@@ -49,13 +50,13 @@ const testQpqConfig = buildTestQpqConfig([
 const upsert = async (keyValueStoreName: string, item: Record<string, unknown>, scope?: string) => {
   const processors = await getKeyValueStoreUpsertActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.Upsert], { keyValueStoreName, item, options: scope ? { scope } : undefined });
+  return invokeProcessor(processors![KeyValueStoreActionType.Upsert]!, { keyValueStoreName, item, options: scope ? { scope } : undefined });
 };
 
 const remove = async (keyValueStoreName: string, key: string, sortKey?: string) => {
   const processors = await getKeyValueStoreDeleteActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
 
-  return invokeProcessor(processors[KeyValueStoreActionType.Delete], { keyValueStoreName, key, sortKey });
+  return invokeProcessor(processors![KeyValueStoreActionType.Delete]!, { keyValueStoreName, key, sortKey });
 };
 
 // emitKvsStreamEvent(qpqConfig, session, emission)

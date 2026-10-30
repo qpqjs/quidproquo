@@ -13,7 +13,7 @@ import {
 } from '../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide } from '../context/askEventDocStoreProvide';
-import { toSyncWebsocketApiNames } from '../context/buildEventDocStore';
+import { toSyncWebsocketApiNames } from '../context/toSyncWebsocketApiNames';
 
 // A missing optional hook global must read as "not configured" ('') rather than throw; routes registered before the
 // key existed have no global at all.
@@ -44,7 +44,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
     {
       storeName,
       eventsStoreName,
-      // Derived rather than read from a global so routes registered before snapshots existed still resolve it.
+      // Derived from the store name rather than read from a global, so every route resolves it.
       snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
       type,
       storageDriveName,

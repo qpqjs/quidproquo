@@ -4,9 +4,9 @@ import { toQpqPermission } from '../../permission/logic/toQpqPermission';
 import { toTenantId } from '../logic/toTenantId';
 import { TenantCallerMembership } from '../models/TenantCallerMembership';
 import { TenantMembershipUiEffect } from './effects/TenantMembershipUiEffect';
+import { createInitialTenantMembershipUiState } from './logic/createInitialTenantMembershipUiState';
 import { createTenantHasPermissionSelector } from './selectors/createTenantHasPermissionSelector';
 import { selectTenantMembershipPermissions } from './selectors/selectTenantMembershipPermissions';
-import { createInitialTenantMembershipUiState } from './types/TenantMembershipUiState';
 import { tenantMembershipUiReducer } from './tenantMembershipUiReducer';
 
 const approve = toQpqPermission('case:approve');

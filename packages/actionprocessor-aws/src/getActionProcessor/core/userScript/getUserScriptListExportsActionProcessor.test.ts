@@ -2,19 +2,16 @@ import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import {
   actionResult,
   askUserScriptListExports,
-  buildTestQpqConfig,
-  buildTestStorySession,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserScriptListExportsActionProcessor } from './getUserScriptListExportsActionProcessor';
 
 vi.mock('../../../logic/lambda/executeLambdaByName', () => ({
@@ -33,7 +30,7 @@ const urlProcessors = {
 const invoke = async (config = withRunner) => {
   const processors = await getUserScriptListExportsActionProcessor(config, async () => null);
   return invokeProcessor(
-    processors[UserScriptActionType.ListExports],
+    processors![UserScriptActionType.ListExports]!,
     { drive: 'scripts', filepath: 'a/main.js', scope: 'tenant-a' },
     {
       session: buildTestStorySession(),
@@ -72,6 +69,6 @@ describe('getUserScriptListExportsActionProcessor (lambda)', () => {
 
     const [, error] = await invoke();
 
-    expect(error?.errorType).toBe(askUserScriptListExports.errorType.TimedOut);
+    expect(error?.errorType).toBe(askUserScriptListExports.errorType.Timeout);
   });
 });

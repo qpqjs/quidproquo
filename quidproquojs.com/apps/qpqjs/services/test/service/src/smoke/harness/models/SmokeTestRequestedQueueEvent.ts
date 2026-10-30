@@ -7,6 +7,4 @@ export type SmokeTestRequestedPayload = {
   testName: string;
 };
 
-export type SmokeTestRequestedQueueEvent = QueueEvent<
-  QueueMessage<SmokeTestRequestedPayload>
->;
+export type SmokeTestRequestedQueueEvent = QueueEvent<QueueMessage<SmokeTestRequestedPayload>>;

@@ -6,12 +6,12 @@ import {
   askFileReadTextContents,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { readTextFile } from '../../../logic/s3/s3Utils';
+import { readTextFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadTextContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadTextContents> => {
@@ -23,6 +23,7 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig): ProcessorFor<type
       return actionResult(await readTextFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidObjectState: () => actionResultError(askFileReadTextContents.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(askFileReadTextContents.errorType.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(askFileReadTextContents.errorType.FileNotFound, `File not found: ${filepath}`),

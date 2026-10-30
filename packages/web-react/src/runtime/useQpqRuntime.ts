@@ -22,12 +22,12 @@ export function useQpqRuntime<TState, TAction, TApi extends QpqApi>(
     const wrapped: Record<string, any> = {};
     for (const key in memoedApiGenerators) {
       if (Object.prototype.hasOwnProperty.call(memoedApiGenerators, key)) {
-        // Remove the 'ask' prefix and lower-case the first character.
-        const withoutAsk = key.slice(3); // e.g., "FetchTodos"
-        const newKey = withoutAsk.charAt(0).toLowerCase() + withoutAsk.slice(1); // "fetchTodos"
-        // We know newKey matches our mapped type so we can assign.
-        // (A type assertion is used here to quiet the compiler.)
-        wrapped[newKey] = resolver(memoedApiGenerators[key as any]) as any;
+        const withoutAsk = key.slice(3);
+        const newKey = withoutAsk.charAt(0).toLowerCase() + withoutAsk.slice(1);
+        const generator = memoedApiGenerators[key as any];
+        if (generator) {
+          wrapped[newKey] = resolver(generator) as any;
+        }
       }
     }
     return wrapped;

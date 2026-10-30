@@ -15,7 +15,10 @@ export function* askConvertNeo4jCypherResponseToCypherResponse(neo4jCypherRespon
     const graphQueryResult: GraphQueryResult = {};
 
     for (const [columnIndex, value] of row.entries()) {
-      graphQueryResult[fields[columnIndex]] = yield* askConvertAnyNeo4jResultToAnyGraphResult(value);
+      const field = fields[columnIndex];
+      if (field !== undefined) {
+        graphQueryResult[field] = yield* askConvertAnyNeo4jResultToAnyGraphResult(value);
+      }
     }
 
     results.push(graphQueryResult);

@@ -6,6 +6,4 @@ import { defineSigningKey, QPQConfig } from 'quidproquo';
  * alias-conditioned grant. testa declares the same key foreign (see its
  * smoke/suites/signingKey) for the cross-service verify test.
  */
-export const defineSigningKeySmoke = (): QPQConfig => [
-  defineSigningKey(SMOKE_PROBE_SIGNING_KEY),
-];
+export const defineSigningKeySmoke = (): QPQConfig => [defineSigningKey(SMOKE_PROBE_SIGNING_KEY)];

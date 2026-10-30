@@ -1,16 +1,9 @@
-import {
-  buildTestQpqConfig,
-  ConfigActionType,
-  ErrorTypeEnum,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { ConfigActionType, ErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getConfigGetParametersActionProcessor } from './getConfigGetParametersActionProcessor';
 
 const { configStore } = vi.hoisted(() => ({
@@ -19,7 +12,7 @@ const { configStore } = vi.hoisted(() => ({
 
 vi.mock('../../../logic/config', () => configStore);
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 const getProcessor = async () => {
   const processors = await getConfigGetParametersActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);
@@ -33,7 +26,7 @@ describe('getConfigGetParametersActionProcessor', () => {
     configStore.getOrSeedParameterValue.mockImplementation(async (_runtimePath: string, parameterName: string) => `${parameterName}-value`);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { parameterNames: ['a', 'b'] });
+    const result = await invokeProcessor(process!, { parameterNames: ['a', 'b'] });
 
     expect(configStore.getOrSeedParameterValue).toHaveBeenCalledTimes(2);
     expect(resolveActionResult(result)).toEqual(['a-value', 'b-value']);
@@ -43,7 +36,7 @@ describe('getConfigGetParametersActionProcessor', () => {
     configStore.getOrSeedParameterValue.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { parameterNames: ['a'] });
+    const result = await invokeProcessor(process!, { parameterNames: ['a'] });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

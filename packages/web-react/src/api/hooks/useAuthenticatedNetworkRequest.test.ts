@@ -1,18 +1,23 @@
+import { NetworkRequestActionPayload } from '@qpqjs/core';
+
 import { createElement, ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import { authContext } from '../../auth/authContext';
 import { AuthState } from '../../auth/types';
-
-const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn().mockResolvedValue({ status: 200 }) }));
-
-vi.mock('@qpqjs/webserver', async (importOriginal: <T>() => Promise<T>) => {
-  const original = await importOriginal<typeof import('@qpqjs/webserver')>();
-  return { ...original, preformNetworkRequest };
-});
-
 import { useAuthenticatedNetworkRequest } from './useAuthenticatedNetworkRequest';
+
+// The real performNetworkRequest runs; only the fetch transport underneath it is stubbed.
+const fetchMock = vi.fn();
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', fetchMock);
+  fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+});
+afterEach(() => vi.unstubAllGlobals());
+
+const sentHeaders = (): Record<string, string> => fetchMock.mock.calls.at(-1)![1].headers;
 
 const wrapperFor = (state: AuthState) =>
   function Wrapper({ children }: { children: ReactNode }) {
@@ -21,26 +26,23 @@ const wrapperFor = (state: AuthState) =>
 
 describe('useAuthenticatedNetworkRequest', () => {
   it('sends the request unchanged when there is no auth token', async () => {
-    const payload = { url: 'https://api', verb: 'GET' } as any;
+    const payload = { url: 'https://api', method: 'GET' } as unknown as NetworkRequestActionPayload<any>;
     const { result } = renderHook(() => useAuthenticatedNetworkRequest(payload));
 
     await result.current();
 
-    expect(preformNetworkRequest).toHaveBeenLastCalledWith(payload);
+    expect(fetchMock).toHaveBeenCalledWith('https://api/', expect.objectContaining({ method: 'GET' }));
+    expect(sentHeaders()).toEqual({});
   });
 
   it('adds a bearer Authorization header when a token is present', async () => {
-    const payload = { url: 'https://api', verb: 'GET', headers: { 'X-A': '1' } } as any;
+    const payload = { url: 'https://api', method: 'GET', headers: { 'X-A': '1' } } as unknown as NetworkRequestActionPayload<any>;
     const { result } = renderHook(() => useAuthenticatedNetworkRequest(payload), {
-      wrapper: wrapperFor({ username: '', password: '', authenticationInfo: { accessToken: 'tok' } as any }),
+      wrapper: wrapperFor({ username: '', authenticationInfo: { accessToken: 'tok' } as any }),
     });
 
     await result.current();
 
-    expect(preformNetworkRequest).toHaveBeenLastCalledWith({
-      url: 'https://api',
-      verb: 'GET',
-      headers: { 'X-A': '1', Authorization: 'Bearer tok' },
-    });
+    expect(sentHeaders()).toEqual({ 'X-A': '1', Authorization: 'Bearer tok' });
   });
 });

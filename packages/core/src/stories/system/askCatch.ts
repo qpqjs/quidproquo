@@ -25,7 +25,6 @@ export function* askCatch<T extends AskResponse<any>>(
       nextResult = storyIterator.next(nextResult.value.returnErrors ? nextInput : nextInput.result);
     }
 
-    // Return the successful final result of the generator
     return {
       success: true,
       result: nextResult.value,

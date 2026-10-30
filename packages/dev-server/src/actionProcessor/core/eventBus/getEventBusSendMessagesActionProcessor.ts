@@ -3,7 +3,6 @@ import {
   actionResultError,
   askEventBusSendMessagesBase,
   createActionProcessor,
-  ErrorTypeEnum,
   EventBusActionType,
   generateUuid,
   ProcessorFor,
@@ -16,24 +15,14 @@ import {
 
 import { eventBus } from '../../../logic/eventBus';
 import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';
-
-export type AnyEventBusMessageWithSession = QueueMessage<any> & {
-  storySession: StorySession;
-
-  eventBusName: string;
-
-  targetApplication: string;
-  targetEnvironment: string;
-  targetModule: string;
-  targetFeature?: string;
-};
+import { AnyEventBusMessageWithSession } from './types';
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventBusSendMessagesBase> => {
   return async ({ eventBusName, eventBusMessages }, session) => {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       return actionResultError(
-        ErrorTypeEnum.NotFound,
+        askEventBusSendMessagesBase.errorType.TopicNotFound,
         `Event bus ${eventBusName} not found for service [${qpqCoreUtils.getApplicationModuleName(qpqConfig)}]`,
       );
     }
@@ -47,6 +36,8 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         }
       }
 
+      const target = qpqCoreUtils.resolveOwnerDeploymentContext(qpqConfig, eventBusConfig.owner);
+
       const eventBusEvent: AnyEventBusMessageWithSession = {
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
@@ -59,16 +50,16 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeo
         // per-entity groups via groupId on the message
         groupId: eventBusConfig.isFifo ? (eventBusMessage.groupId ?? eventBusName) : undefined,
 
-        targetApplication: eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-        targetEnvironment: eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-        targetFeature: eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-        targetModule: eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+        targetApplication: target.application,
+        targetEnvironment: target.environment,
+        targetFeature: target.feature,
+        targetModule: target.module,
       };
 
-      eventBus.publish(EventBusActionType.SendMessages, eventBusEvent);
+      eventBus.publish(EventBusActionType.SendMessage, eventBusEvent);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 import { Box } from '@mui/material';
 
-interface TabViewBoxProps {
+type TabViewBoxProps = {
   children?: ReactNode;
   header?: () => ReactNode;
   body?: () => ReactNode;
-}
+};
 
 export const TabViewBox: React.FC<TabViewBoxProps> = ({ children, header, body }: TabViewBoxProps) => {
   return (

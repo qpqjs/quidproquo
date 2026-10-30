@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineWebEntry } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -24,8 +24,8 @@ describe('getWebEntryPlacements', () => {
     const { hosts, routes } = getWebEntryPlacements([shell]);
 
     expect(hosts.map((host) => [host.entryName, host.port])).toEqual([['docs', 3090]]);
-    expect(hosts[0].webEntry.buildPath).toBe('../docs/build');
-    expect(hosts[0].configRoot).toBe('/repo/shell');
+    expect(hosts![0]!.webEntry.buildPath).toBe('../docs/build');
+    expect(hosts![0]!.configRoot).toBe('/repo/shell');
 
     expect(routes.map((route) => [route.entryName, route.path])).toEqual([
       ['views', '/views'],

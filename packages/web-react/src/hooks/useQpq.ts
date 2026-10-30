@@ -5,6 +5,8 @@ import {
   AskResponseReturnType,
   createRuntime,
   defineModule,
+  generateUuid,
+  getDateNow,
   QpqFunctionRuntime,
   QpqRuntimeType,
   Story,
@@ -17,7 +19,11 @@ import { useActionProcessors } from '../actionProcessor';
 import { useQpqContextValues } from '../qpqContext/useQpqContextValues';
 import { useEffectCallback } from './useEffectCallback';
 
-function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {
+function* askUseQpqWithVersionCheck<R>(
+  story: AskResponse<R>,
+  versionRef: React.RefObject<number>,
+  capturedVersion: number,
+): AskResponse<R | undefined> {
   let nextValue: any = undefined;
 
   while (true) {
@@ -58,7 +64,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
   }, []);
 
   // Stable identities so the runtime memo can list them as dependencies
-  // without being recreated every render — the runtime always calls the
+  // without being recreated every render; the runtime always calls the
   // latest processors through these wrappers.
   const stableContextGetActionProcessors = useEffectCallback(contextGetActionProcessors);
   const stableGetActionProcessors = useEffectCallback(getActionProcessors);
@@ -76,9 +82,9 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
           ...(await stableContextGetActionProcessors(qpqConfig, dynamicModuleLoader)),
           ...(await stableGetActionProcessors(qpqConfig, dynamicModuleLoader)),
         }),
-        () => new Date().toISOString(),
+        getDateNow,
         logger,
-        `frontend::${'uuid'}`,
+        `frontend::${generateUuid()}`,
         QpqRuntimeType.UI,
         async (_runtime: QpqFunctionRuntime) => {
           // noop
@@ -91,7 +97,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
     function getStoryExecutor<S extends Story<any, any>>(story: S): (...args: Parameters<S>) => Promise<AskResponseReturnType<ReturnType<S>>> {
       return async (...args: Parameters<S>) => {
         const capturedVersion = versionRef.current;
-        const wrappedStory = (...storyArgs: Parameters<S>) => withVersionCheck(story(...storyArgs), versionRef, capturedVersion);
+        const wrappedStory = (...storyArgs: Parameters<S>) => askUseQpqWithVersionCheck(story(...storyArgs), versionRef, capturedVersion);
         const result = await resolveStory(wrappedStory, args);
 
         if (result.error) {

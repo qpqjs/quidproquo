@@ -1,7 +1,4 @@
-import {
-  CrossServiceProbePayload,
-  CrossServiceStorageDriveProbeResult,
-} from '@qpqjs/testa-models';
+import { CrossServiceProbePayload, CrossServiceStorageDriveProbeResult } from '@qpqjs/testa-models';
 import { AskResponse, ExecuteServiceFunctionEvent } from 'quidproquo';
 
 import { askProbeForeignStorageDrive } from '../../logic/askProbeForeignStorageDrive';
@@ -9,7 +6,7 @@ import { askProbeForeignStorageDrive } from '../../logic/askProbeForeignStorageD
 // Service function entry, called cross-service by the test service's
 // crossServiceStorageDrive smoke test.
 export function* smokeCrossServiceStorageDriveProbe(
-  event: ExecuteServiceFunctionEvent<CrossServiceProbePayload>
+  event: ExecuteServiceFunctionEvent<CrossServiceProbePayload>,
 ): AskResponse<CrossServiceStorageDriveProbeResult> {
   return yield* askProbeForeignStorageDrive(event.payload.probeId);
 }

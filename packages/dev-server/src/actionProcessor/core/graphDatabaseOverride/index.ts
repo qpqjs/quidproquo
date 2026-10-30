@@ -1,10 +1,1 @@
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
-
-import { getGraphDatabaseExecuteOpenCypherQueryActionProcessor } from './getGraphDatabaseExecuteOpenCypherQueryActionProcessor';
-
-export const getGraphDatabaseActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-  dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => ({
-  ...(await getGraphDatabaseExecuteOpenCypherQueryActionProcessor(qpqConfig, dynamicModuleLoader)),
-});
+export * from './getGraphDatabaseActionProcessor';

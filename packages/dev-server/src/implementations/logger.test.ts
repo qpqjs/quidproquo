@@ -1,9 +1,12 @@
-import { QPQAwsConfigSettingType } from '@qpqjs/config-aws';
-import { QPQ_LOGS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
+import { buildStoryResult, buildTestQpqConfig } from '@qpqjs/testing';
 
 import * as fs from 'fs/promises';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../__fixtures__/buildTestDevServerConfig';
+import { ResolvedDevServerConfig } from '../types';
 import { getDevServerLogger } from './logger';
 
 vi.mock('fs/promises', () => ({
@@ -11,13 +14,10 @@ vi.mock('fs/promises', () => ({
   writeFile: vi.fn(async () => undefined),
 }));
 
-const buildDevServerConfig = (overrides: any = {}): any => ({
-  logServiceName: 'svc-a',
-  fileStorageConfig: { storagePath: '/tmp/qpq-storage' },
-  ...overrides,
-});
+const buildDevServerConfig = (overrides: Partial<ResolvedDevServerConfig> = {}) =>
+  buildTestDevServerConfig({ logServiceName: 'svc-a', ...overrides });
 
-const buildResult = (overrides: any = {}) => ({ correlation: 'corr-123', history: [], ...overrides });
+const buildResult = (overrides: Partial<StoryResult<unknown[]>> = {}) => buildStoryResult({ correlation: 'corr-123', ...overrides });
 
 describe('getDevServerLogger', () => {
   const originalStorageDriveName = process.env.storageDriveName;
@@ -36,7 +36,7 @@ describe('getDevServerLogger', () => {
   it('returns a no-op logger that never writes when logServiceName is missing', async () => {
     const logger = getDevServerLogger([], buildDevServerConfig({ logServiceName: undefined }));
 
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.enableLogs(true, 'reason', 'corr-123');
     await logger.waitToFinishWriting();
     await logger.moveToPermanentStorage();
@@ -45,20 +45,20 @@ describe('getDevServerLogger', () => {
   });
 
   it('returns a no-op logger when the service turns its logs off with disableLogs', async () => {
-    const qpqConfig = [{ configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo, disableLogs: true }] as any;
+    const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1', [], { disableLogs: true })]);
     const logger = getDevServerLogger(qpqConfig, buildDevServerConfig());
 
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.waitToFinishWriting();
 
     expect(fs.writeFile).not.toHaveBeenCalled();
   });
 
   it('keeps writing when the service leaves disableLogs off', async () => {
-    const qpqConfig = [{ configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo, disableLogs: false }] as any;
+    const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1', [], { disableLogs: false })]);
     const logger = getDevServerLogger(qpqConfig, buildDevServerConfig());
 
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.waitToFinishWriting();
 
     expect(fs.writeFile).toHaveBeenCalledTimes(1);
@@ -68,7 +68,7 @@ describe('getDevServerLogger', () => {
     const storySession = { depth: 0, context: { storageEvent: { drive: QPQ_LOGS_STORAGE_DRIVE_NAME } } } as any;
     const logger = getDevServerLogger([], buildDevServerConfig(), storySession);
 
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.waitToFinishWriting();
 
     expect(fs.writeFile).not.toHaveBeenCalled();
@@ -78,7 +78,7 @@ describe('getDevServerLogger', () => {
     process.env.storageDriveName = QPQ_LOGS_STORAGE_DRIVE_NAME;
     const logger = getDevServerLogger([], buildDevServerConfig());
 
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.waitToFinishWriting();
 
     expect(fs.writeFile).not.toHaveBeenCalled();
@@ -99,7 +99,7 @@ describe('getDevServerLogger', () => {
     const logger = getDevServerLogger([], buildDevServerConfig());
 
     await logger.enableLogs(false, 'noisy', 'corr-123');
-    logger.log(buildResult() as any);
+    logger.log(buildResult());
     await logger.waitToFinishWriting();
 
     expect(fs.writeFile).toHaveBeenCalledTimes(1);

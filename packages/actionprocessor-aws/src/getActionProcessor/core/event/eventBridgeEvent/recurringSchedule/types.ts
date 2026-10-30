@@ -10,5 +10,5 @@ export type EventOutput = void;
 export type InternalEventRecord = ScheduledEventParams<any>;
 export type InternalEventOutput = void;
 
-// TODO: Get rid of {} and any types
+// TODO: @joe-coady: Get rid of {} and any types
 export type MatchResult = MatchStoryResult<{}, any>;

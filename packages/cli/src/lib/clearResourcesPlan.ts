@@ -8,9 +8,12 @@
 import { qpqCoreUtils } from '@qpqjs/core';
 
 import { getServiceNames } from './discovery';
-import { promptCheckbox, promptSelect, promptText } from './prompts';
-import { loadServiceQpqConfig } from './qpqConfigs';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
+import { promptCheckbox, promptSelect, promptTypedConfirmation } from './prompts';
+import { loadServiceQpqConfig } from './qpqConfigs';
+import { createOutput } from './out';
+
+const out = createOutput('clear-resources-plan');
 
 export type ClearableResourceKind = 'storageDrive' | 'keyValueStore';
 
@@ -28,17 +31,17 @@ export type ClearResourcesPlan =
   | { kind: 'resources'; appName: string; resources: ClearableResource[] };
 
 // Every owned data resource across the app's services, in service order.
-export const getClearableResources = (appName: string): ClearableResource[] => {
+const getClearableResources = (appName: string): ClearableResource[] => {
   const resources: ClearableResource[] = [];
 
   for (const service of getServiceNames(appName)) {
     const qpqConfig = loadServiceQpqConfig(appName, service);
 
-    for (const drive of qpqCoreUtils.getOwnedStorageDrives(qpqConfig)) {
+    for (const drive of qpqCoreUtils.getOwnedStorageDriveConfigs(qpqConfig)) {
       resources.push({ service, kind: 'storageDrive', resourceName: drive.storageDrive });
     }
 
-    for (const store of qpqCoreUtils.getOwnedKeyValueStores(qpqConfig)) {
+    for (const store of qpqCoreUtils.getOwnedKeyValueStoreConfigs(qpqConfig)) {
       resources.push({ service, kind: 'keyValueStore', resourceName: store.keyValueStoreName });
     }
   }
@@ -79,7 +82,7 @@ export const promptClearResourcesPlan = async (appName: string): Promise<ClearRe
   const clearable = getClearableResources(appName);
 
   if (clearable.length === 0) {
-    console.log('No storage drives or key value stores found in this app.');
+    out.log('No storage drives or key value stores found in this app.');
     return { kind: 'cancelled' };
   }
 
@@ -88,19 +91,16 @@ export const promptClearResourcesPlan = async (appName: string): Promise<ClearRe
   const resources = mode === BY_SERVICE ? await pickByService(clearable) : await pickByResource(clearable);
 
   if (resources.length === 0) {
-    console.log('Nothing selected. Exiting!');
+    out.log('Nothing selected. Exiting!');
     return { kind: 'cancelled' };
   }
 
-  console.log(`\nThis will EMPTY (delete all stored data from) ${resources.length} resource(s) in [${deployInfo}]:`);
+  out.log(`\nThis will EMPTY (delete all stored data from) ${resources.length} resource(s) in [${deployInfo}]:`);
   for (const resource of resources) {
-    console.log(`  ${resource.service} — ${resource.resourceName} (${resource.kind === 'storageDrive' ? 'bucket' : 'table'})`);
+    out.log(`  ${resource.service} — ${resource.resourceName} (${resource.kind === 'storageDrive' ? 'bucket' : 'table'})`);
   }
 
-  const confirmation = await promptText(`Type '${deployInfo}' to confirm`);
-
-  if (confirmation !== deployInfo) {
-    console.log('Confirmation did not match. Exiting!');
+  if (!(await promptTypedConfirmation(deployInfo))) {
     return { kind: 'cancelled' };
   }
 

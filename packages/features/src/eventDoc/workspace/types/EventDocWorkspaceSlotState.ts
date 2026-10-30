@@ -10,11 +10,3 @@ export type EventDocWorkspaceSlotState = {
   isSaving: boolean;
   error: Nullable<EventDocWorkspaceSlotError>;
 };
-
-/** Initial slot status. */
-export const createInitialEventDocWorkspaceSlotState = (): EventDocWorkspaceSlotState => ({
-  documentIdentity: null,
-  isLoading: false,
-  isSaving: false,
-  error: null,
-});

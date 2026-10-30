@@ -1,0 +1,27 @@
+import { ActionOf, askStateDispatchBase, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
+import { askQueryParamsSet, QueryParamsActionType } from '@qpqjs/web';
+
+import { describe, expect, it } from 'vitest';
+
+import { SharedQueryParamsEffect } from '../effects/SharedQueryParamsEffect';
+import { askSetParam } from './askSetParam';
+
+describe('askSetParam', () => {
+  it('writes the query param then dispatches the UI SetParam effect', () => {
+    const setPayloads: unknown[] = [];
+    const dispatched: unknown[] = [];
+
+    runStory(askSetParam('tab', ['one', 'two']), {
+      [QueryParamsActionType.Set]: (action: ActionOf<typeof askQueryParamsSet>) => {
+        setPayloads.push(action.payload);
+      },
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
+        dispatched.push(action.payload.action);
+      },
+    });
+
+    expect(setPayloads).toEqual([{ key: 'tab', values: ['one', 'two'], createHistoryEntry: false }]);
+    expect(dispatched).toEqual([{ type: SharedQueryParamsEffect.SetParam, payload: { key: 'tab', values: ['one', 'two'] } }]);
+  });
+});

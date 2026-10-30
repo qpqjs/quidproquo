@@ -1,22 +1,14 @@
-import {
-  buildTestQpqConfig,
-  ErrorTypeEnum,
-  EventActionType,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
 const invoke = async (qpqEventRecordResponses: any) => {
   const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.TransformResponseResult];
-  return invokeProcessor(process, { eventParams: [], qpqEventRecordResponses } as any);
+  return invokeProcessor(process!, { eventParams: [], qpqEventRecordResponses } as any);
 };
 
 describe('getEventTransformResponseResultActionProcessor (node service function)', () => {

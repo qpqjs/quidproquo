@@ -3,17 +3,16 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import pluginJs from '@eslint/js';
 
+import { jsdocConfigs } from './config/jsdoc.mjs';
 import { overrides } from './config/overrides.mjs';
 import { prettierConfigs } from './config/prettier.mjs';
 import { reactConfigs } from './config/react.mjs';
+import { restrictedSyntaxConfigs } from './config/restrictedSyntax.mjs';
+import { testingConfigs } from './config/testing.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
-// Standalone use, without adopting the whole shared config:
-//   import { qpqPlugin } from '@qpqjs/eslint-config';
-//   export default [qpqPlugin.configs.recommended];
-export { qpqPlugin };
-
 export default [
+  // lib/ is always build output (esm, commonjs and the bundled lambda layers).
   { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
@@ -61,9 +60,17 @@ export default [
   },
 
   qpqPlugin.configs.recommended,
+  {
+    // Entry handlers are named after their trigger (C1), not ask*.
+    files: ['**/entry/**'],
+    rules: { 'qpq/ask-prefix-generator-only': 'off' },
+  },
 
   ...reactConfigs,
+  ...restrictedSyntaxConfigs,
+  ...testingConfigs,
+  ...jsdocConfigs,
   ...prettierConfigs,
 
-  overrides,
+  ...overrides,
 ];

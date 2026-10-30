@@ -1,12 +1,13 @@
-import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
-import { createInitialAdminAppState } from '../../AdminAppState';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { VolatileEffect } from '../../effects/volatile/VolatileEffect';
+import { createInitialAdminAppState } from '../../logic/createInitialAdminAppState';
 import { askRunLogSearch } from './askRunLogSearch';
 
 describe('askRunLogSearch', () => {
@@ -41,11 +42,11 @@ describe('askRunLogSearch', () => {
     });
 
     expect(applied).toHaveLength(1);
-    expect(applied[0].type).toBe(AdminSessionEventType.searchRequested);
+    expect(applied![0]!.type).toBe(AdminSessionEffect.SearchRequested);
 
     expect(requestBodies).toHaveLength(2);
-    expect(requestBodies[1].nextPageKey).toBe('page-2');
-    expect(requestBodies[0].runtimeType).toBe('EXECUTE_STORY');
+    expect(requestBodies![1]!.nextPageKey).toBe('page-2');
+    expect(requestBodies![0]!.runtimeType).toBe('EXECUTE_STORY');
 
     const volatileTypes = dispatched.map((effect) => effect.type);
     expect(volatileTypes).toContain(VolatileEffect.logSearchStarted);

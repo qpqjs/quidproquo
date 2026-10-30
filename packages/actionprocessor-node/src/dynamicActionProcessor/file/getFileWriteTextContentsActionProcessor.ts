@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askFileWriteTextContents,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -20,7 +19,7 @@ const getProcessFileWriteTextContents = (qpqConfig: QPQConfig, config: FileStora
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
       await ensureParentDirectoryExists(fullPath);
       await fs.writeFile(fullPath, data, 'utf8');
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(askFileWriteTextContents.errorType.InvalidScope, error.message),

@@ -1,7 +1,6 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { DecodedAccessToken, QPQConfig } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../awsNamingUtils';
 import { getExportedValue } from '../cloudformation/getExportedValue';
 import { decodeValidJwt } from './decodeValidJwt';
 
@@ -31,7 +30,7 @@ export const decodeAccessToken = async (
   ignoreExpiration: boolean = false,
 ): Promise<DecodedAccessToken> => {
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-  const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+  const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
   const decodedAuthToken = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 

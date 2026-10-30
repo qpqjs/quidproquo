@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { askConfigGetGlobal } from './askConfigGetGlobal';
 import { ConfigActionType } from './ConfigActionType';
@@ -32,11 +32,11 @@ describe('askConfigGetGlobal', () => {
     });
 
     it('should handle typed globals', () => {
-      interface MyGlobalType {
+      type MyGlobalType = {
         id: number;
         name: string;
         active: boolean;
-      }
+      };
 
       const globalName = 'typedGlobal';
       const mockValue: MyGlobalType = { id: 1, name: 'Test', active: true };

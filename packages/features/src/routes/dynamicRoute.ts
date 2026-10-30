@@ -24,12 +24,12 @@ export type DynamicRouteRuntime<S extends string, TBody = undefined, TQuery = un
 ) => AskResponse<HTTPEventResponse>;
 
 // The route config carried alongside the handler, harvested by defineDynamicRoutes
-export interface DynamicRouteMeta {
+export type DynamicRouteMeta = {
   method: HTTPMethod;
   path: string;
   options?: RouteOptions;
   version: number;
-}
+};
 
 // A story handler branded with its own route config. The `S` param keeps the
 // path-param typing available to anyone calling the handler directly; the brand
@@ -64,7 +64,7 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
     return yield* runtime(event, params, input);
   }
 
-  const wrapper = function* wrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
+  const askDynamicRouteWrapper = function* askDynamicRouteWrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
     const res = yield* askCatch(askRunWithInput(event, params));
 
     if (!res.success) {
@@ -75,8 +75,8 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
         [ErrorTypeEnum.Invalid]: 422,
       };
 
-      if (allKnownErrors[res.error.errorType]) {
-        const errorInfo = allKnownErrors[res.error.errorType];
+      const errorInfo = allKnownErrors[res.error.errorType];
+      if (errorInfo) {
         if (isDynamicRouteErrorCode(errorInfo)) {
           return qpqWebServerUtils.toJsonEventResponse(
             {
@@ -105,7 +105,7 @@ export const dynamicRoute = <S extends string, TBody = undefined, TQuery = undef
     return res.result;
   };
 
-  return Object.assign(wrapper, {
+  return Object.assign(askDynamicRouteWrapper, {
     dynamicRoute: { method, path, options: withSchema(options, config), version: version || 1 },
   });
 };

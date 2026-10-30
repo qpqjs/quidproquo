@@ -2,9 +2,9 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedStorageDriveCorsSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedStorageDriveCorsSettings = {} & QPQConfigAdvancedSettings;
 
-export interface StorageDriveCorsSettingsQPQWebServerConfigSetting extends QPQConfigSetting {
+export type StorageDriveCorsSettingsQPQWebServerConfigSetting = {
   storageDriveName: string;
 
   /**
@@ -14,7 +14,8 @@ export interface StorageDriveCorsSettingsQPQWebServerConfigSetting extends QPQCo
    * is declared for a drive, its CORS defaults to this service's own domain.
    */
   allowedOrigins: string[];
-}
+  deprecated: boolean;
+} & QPQConfigSetting;
 
 /**
  * Web-layer CORS policy for a (core) storage drive, keyed by the drive's name.
@@ -32,4 +33,5 @@ export const defineStorageDriveCorsSettings = (
   storageDriveName,
 
   allowedOrigins,
+  deprecated: options?.deprecated ?? false,
 });

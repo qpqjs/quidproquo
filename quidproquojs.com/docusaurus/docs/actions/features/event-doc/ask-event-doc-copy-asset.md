@@ -8,7 +8,7 @@ description: Copy an asset from another collection's document onto one of this c
 Copies an asset from a document in another collection (`sourceStoreName`) onto `targetDocId` in **this** collection (the provided store context) as a new immutable asset, and returns its ref. The bytes never cross the story — it's a server-side copy — and the stored mimetype comes with them. Both sides resolve under the ambient storage scope, so a copy never crosses a tenant partition.
 
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) / [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals). The target drive is resolved from that context; the source drive is derived from `sourceStoreName`.
-- **Built from:** [askFileCopy](../../core/file/ask-file-copy.md) plus [askNewGuid](../../core/guid/ask-new-guid.md) — not a single action.
+- **Built from:** [askFileCopy](../../core/file/ask-file-copy.md) plus [askGuidNew](../../core/guid/ask-new-guid.md) — not a single action.
 - Also reachable as `EventDocBackend.askCopyAssetFrom` on a backend created by `createEventDocBackend`, which runs it under that backend's own store.
 
 ```typescript

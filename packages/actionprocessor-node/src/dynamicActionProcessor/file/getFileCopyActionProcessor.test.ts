@@ -3,7 +3,7 @@ import { askFileCopy, FileActionType, isErroredActionResult, resolveActionResult
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileCopyActionProcessor } from './getFileCopyActionProcessor';
 
 vi.mock('fs/promises');

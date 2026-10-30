@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/features",
   "version": "0.3.0",
-  "description": "",
+  "description": "Ready-made features for quidproquo apps: admin, tenants, event docs and more.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -21,11 +29,13 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/features"
   },
   "keywords": [],
   "author": "",
@@ -40,7 +50,11 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

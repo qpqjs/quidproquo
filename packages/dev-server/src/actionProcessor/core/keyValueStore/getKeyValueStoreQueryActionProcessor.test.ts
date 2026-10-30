@@ -1,7 +1,5 @@
 import {
   askKeyValueStoreQueryBase,
-  buildTestQpqConfig,
-  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
@@ -9,15 +7,14 @@ import {
   kvsKey,
   KvsQueryOperationType,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -28,7 +25,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 // A real KvsQueryOperation: the processor walks the condition tree (scope
 // gate validation), so a stand-in string would throw before reaching the repo.
@@ -50,7 +47,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockResolvedValue({ items: [] });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       keyValueStoreName: 'store',
       keyCondition,
       options: { filter: 'f', nextPageKey: 'np', limit: 10, sortAscending: false },
@@ -64,7 +61,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockResolvedValue({ items: [] });
     const process = await getProcessor();
 
-    await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
+    await invokeProcessor(process!, { keyValueStoreName: 'store', keyCondition });
 
     expect(repo.query).toHaveBeenCalledWith('store', keyCondition, undefined, undefined, undefined, undefined, true, undefined);
   });
@@ -73,7 +70,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', keyCondition });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreQueryBase.errorType.StoreNotFound);
   });
@@ -82,7 +79,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', keyCondition });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

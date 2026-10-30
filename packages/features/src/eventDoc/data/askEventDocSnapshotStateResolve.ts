@@ -1,6 +1,6 @@
 import { askCatch, askFileReadTextContents, AskResponse, Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { eventDocSnapshotPath } from './eventDocSnapshotPath';
@@ -19,7 +19,7 @@ export function* askEventDocSnapshotStateResolve(
     return { state: row.data.snapshot };
   }
 
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const read = yield* askCatch(askFileReadTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, row.sk, snapshotCacheKey), scope));

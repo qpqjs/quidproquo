@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 import { createAwsClient } from '../createAwsClient';
@@ -6,7 +8,7 @@ import { buildCognitoUserFilter, InvalidCognitoFilterError } from './utils/build
 // A value that cannot be embedded in a Cognito filter cannot be anyone's
 // preferred_username, so we skip the lookup and treat the input as an actual
 // username (the same fallback as a no-match lookup).
-const buildPreferredUsernameFilter = (preferredUsername: string): string | null => {
+const buildPreferredUsernameFilter = (preferredUsername: string): Nullable<string> => {
   try {
     return buildCognitoUserFilter('preferred_username', preferredUsername);
   } catch (error) {

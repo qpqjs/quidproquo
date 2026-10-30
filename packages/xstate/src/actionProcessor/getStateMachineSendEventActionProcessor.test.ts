@@ -2,16 +2,12 @@ import {
   ActionProcessor,
   actionResult,
   actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStubLogger,
   DynamicModuleLoader,
   ErrorTypeEnum,
   KeyValueStoreActionType,
-  noopDynamicModuleLoader,
   QPQConfig,
 } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 import { createActor, createMachine } from 'xstate';
@@ -109,7 +105,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns a NotFound error when the state machine is not configured', async () => {
     const processor = await getProcessor(buildTestQpqConfig());
 
-    const [, error] = await invoke(processor, { stateMachineName: 'missing', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(new Map()));
+    const [, error] = await invoke(processor!, { stateMachineName: 'missing', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(new Map()));
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -118,7 +114,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
 
     const [, error] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } },
       {
         [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
@@ -131,7 +127,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns a NotFound error when the entity does not exist', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(new Map()));
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(new Map()));
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -140,7 +136,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(toggleConfig) }]]);
 
-    const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(store));
+    const [entity] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(store));
 
     expect(stateValueOf(toggleConfig, entity.__machineState)).toBe('active');
     expect(store.get('order-1')).toEqual(entity);
@@ -150,7 +146,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
     const store = new Map<string, any>([['order-1', { id: 'order-1' }]]);
 
-    const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(store));
+    const [entity] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(store));
 
     expect(stateValueOf(toggleConfig, entity.__machineState)).toBe('active');
   });
@@ -166,7 +162,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         ran++;
       };
 
-    const [entity, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'PING' } }, kvsStore(store), loader);
+    const [entity, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'PING' } }, kvsStore(store), loader);
 
     expect(error).toBeUndefined();
     expect(entity).toBeDefined();
@@ -177,7 +173,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: finalConfig })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(finalConfig, [{ type: 'FINISH' }]) }]]);
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'FINISH' } }, kvsStore(store));
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'FINISH' } }, kvsStore(store));
 
     expect(error?.errorType).toBe(ErrorTypeEnum.BadRequest);
   });
@@ -186,7 +182,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(toggleConfig) }]]);
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'UNKNOWN' } }, kvsStore(store));
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'UNKNOWN' } }, kvsStore(store));
 
     expect(error?.errorType).toBe(ErrorTypeEnum.BadRequest);
   });
@@ -199,7 +195,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         return true;
       };
 
-    const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
+    const [entity] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
     expect(stateValueOf(guardedConfig, entity.__machineState)).toBe('b');
   });
@@ -212,7 +208,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         return false;
       };
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
     expect(error?.errorType).toBe(ErrorTypeEnum.BadRequest);
   });
@@ -225,7 +221,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         throw new Error('guard failed');
       };
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
     expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
     expect(error?.errorText).toBe('An unexpected error occurred [Error].');
@@ -240,7 +236,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         ran++;
       };
 
-    await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
+    await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
     expect(ran).toBe(1);
   });
@@ -253,7 +249,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
         throw new Error('side effect failed');
       };
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
     expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
     expect(error?.errorText).toBe('An unexpected error occurred [Error].');
@@ -263,7 +259,7 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
 
     const [, error] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } },
       {
         [KeyValueStoreActionType.Get]: async () => actionResult({ id: 'order-1', __machineState: makeSnapshot(toggleConfig) }),

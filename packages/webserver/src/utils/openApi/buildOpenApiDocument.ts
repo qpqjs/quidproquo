@@ -1,10 +1,11 @@
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
+import { getAllApiConfigs } from '../../config/settings/api/logic';
 import { resolveHosts } from '../../domain/logic/host/resolveHosts';
 import { DomainResolver } from '../../domain/types/DomainResolver';
 import { OpenApiDocument, OpenApiPathItem, OpenApiSecurityScheme } from '../../types/OpenApiDocument';
 import { mergeAllRouteOptions } from '../mergeRouteUtils';
-import { getAllRoutes, getApiConfigs } from '../qpqConfigAccessorsUtils';
+import { getAllRoutes } from '../qpqConfigAccessorsUtils';
 import { buildOpenApiOperation } from './buildOpenApiOperation';
 import { openApiSecuritySchemes } from './buildOpenApiSecurity';
 import { OpenApiDocumentOptions } from './OpenApiDocumentOptions';
@@ -18,7 +19,7 @@ type HttpVerb = keyof OpenApiPathItem;
 const buildServers = (qpqConfig: QPQConfig, resolver?: DomainResolver): { url: string }[] => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  return getApiConfigs(qpqConfig)
+  return getAllApiConfigs(qpqConfig)
     .filter((api) => !api.deprecated)
     .flatMap((api) => resolveHosts(qpqConfig, { subdomain: api.apiSubdomain }, resolver).map((host) => ({ url: `https://${host}/${serviceName}` })));
 };

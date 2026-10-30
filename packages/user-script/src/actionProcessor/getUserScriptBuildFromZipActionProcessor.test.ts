@@ -5,9 +5,7 @@ import {
   askFileReadBinaryContents,
   askUserScriptBuildFromZip,
   askUserScriptListExports,
-  buildTestQpqConfig,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptModule,
   DynamicModuleLoader,
   FileActionType,
@@ -15,6 +13,7 @@ import {
   resolveActionResultError,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, createStubLogger } from '@qpqjs/testing';
 
 import { zipSync } from 'fflate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -40,7 +39,7 @@ const createDrive = (binaries: Record<string, Buffer>, hostModules: UserScriptMo
     processors: {
       [UserScriptActionType.ListExports]: async ({ drive, filepath }: { drive: string; filepath: string }) => {
         try {
-          return actionResult(listUserScriptExports(filepath, files[`${drive}:${filepath}`], getUserScriptModuleMap(hostModules)));
+          return actionResult(listUserScriptExports(filepath, files![`${drive}:${filepath}`]!, getUserScriptModuleMap(hostModules)));
         } catch (error) {
           return actionResultError(askUserScriptListExports.errorType.ScriptInvalid, String(error));
         }
@@ -121,7 +120,7 @@ describe('getUserScriptBuildFromZipActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual({ exports: ['run'] });
     const built = drive.files['scripts:doc-1/assets/built'];
     expect(built).toContain('require("my-sdk/v1")');
-    const scriptExports = loadUserScriptModule('built', built, getUserScriptModuleMap({ 'my-sdk/v1': await sdkLoader(SDK_RUNTIME) }));
+    const scriptExports = loadUserScriptModule('built', built!, getUserScriptModuleMap({ 'my-sdk/v1': await sdkLoader(SDK_RUNTIME) }));
     expect((scriptExports.run as (value: string) => string)('hi')).toBe('HI!');
   }, 60_000);
 
@@ -144,7 +143,7 @@ describe('getUserScriptBuildFromZipActionProcessor', () => {
     const built = drive.files['scripts:doc-1/assets/built'];
     expect(built).toContain('require("@qpqjs/core")');
     expect(built).not.toContain('sourceMappingURL');
-    const scriptExports = loadUserScriptModule('built', built, getUserScriptModuleMap());
+    const scriptExports = loadUserScriptModule('built', built!, getUserScriptModuleMap());
     expect((scriptExports.greet as (name: string) => string)('smoke')).toBe('hello smoke');
   }, 60_000);
 

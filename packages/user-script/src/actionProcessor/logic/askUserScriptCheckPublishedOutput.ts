@@ -1,7 +1,8 @@
 import { askCatch, AskResponse, askThrowError, askUserScriptListExports } from '@qpqjs/core';
 
 import { assertUserScriptExports } from '../../build/assertUserScriptExports';
-import { UserScriptBuildError, UserScriptBuildErrorCode } from '../../build/UserScriptBuildError';
+import { isUserScriptBuildError } from '../../build/isUserScriptBuildError';
+import { UserScriptBuildErrorCode } from '../../build/UserScriptBuildError';
 import { UserScriptBuildErrorCatalog } from './getUserScriptBuildErrorType';
 
 /**
@@ -26,7 +27,7 @@ export function* askUserScriptCheckPublishedOutput(
   try {
     return assertUserScriptExports(filepath, listed.result);
   } catch (error) {
-    if (error instanceof UserScriptBuildError) {
+    if (isUserScriptBuildError(error)) {
       const code = error.code as UserScriptBuildErrorCode.NoExports | UserScriptBuildErrorCode.NonFunctionExport;
       return yield* askThrowError(errorType[code], error.message);
     }

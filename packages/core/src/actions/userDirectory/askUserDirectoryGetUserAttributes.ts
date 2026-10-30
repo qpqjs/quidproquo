@@ -1,8 +1,11 @@
-import { createActionRequester } from '../../types';
-import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { createActionRequester } from '../../logic/actions';
+import { UserAttributes } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryGetUserAttributes = createActionRequester<UserAttributes>()({
   actionType: UserDirectoryActionType.GetUserAttributes,
-  errorTypes: ['UserNotFound'],
+  errorTypes: [
+    'UserNotFound', // no user with that id in the directory
+  ],
   getPayload: (userDirectoryName: string, username: string) => ({ userDirectoryName, username }),
 });

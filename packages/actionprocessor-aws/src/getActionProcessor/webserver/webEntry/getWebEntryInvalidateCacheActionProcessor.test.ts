@@ -1,12 +1,11 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 import { WebEntryActionType } from '@qpqjs/webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { invalidateCache } from '../../../logic/cloudFront/invalidateCache';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getWebEntryInvalidateCacheActionProcessor } from './getWebEntryInvalidateCacheActionProcessor';
 
 vi.mock('../../../logic/cloudformation/getExportedValue', () => ({
@@ -32,7 +31,7 @@ describe('getWebEntryInvalidateCacheActionProcessor', () => {
     vi.mocked(getExportedValue).mockResolvedValue('DIST123');
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { webEntryName: 'web', paths: ['/*'] });
+    const result = await invokeProcessor(processor!, { webEntryName: 'web', paths: ['/*'] });
 
     expect(result).toEqual([undefined]);
     expect(getExportedValue).toHaveBeenCalledWith('web-test-app-test-module-development-qpqdistribution-id-export', 'eu-west-1');

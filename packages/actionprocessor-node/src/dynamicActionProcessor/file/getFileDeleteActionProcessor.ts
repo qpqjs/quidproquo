@@ -1,13 +1,4 @@
-import {
-  actionResult,
-  actionResultError,
-  askFileDelete,
-  createActionProcessor,
-  ErrorTypeEnum,
-  FileActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askFileDelete, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import * as fs from 'fs/promises';
 
@@ -50,7 +41,7 @@ const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): 
         return actionResultError(askFileDelete.errorType.AccessDenied, 'Access denied deleting files');
       }
       return actionResultError(
-        ErrorTypeEnum.GenericError,
+        askFileDelete.errorType.DeleteFailed,
         `Failed to delete files: ${errors.map(({ filepath, error }) => `Failed to delete ${filepath}: ${error.message}`).join(', ')}`,
       );
     }

@@ -1,3 +1,4 @@
+export * from './composeActionProcessorLayers';
 export * from './createNestedRuntime';
 export * from './createRuntime';
 export * from './loadRuntimeActionProcessors';

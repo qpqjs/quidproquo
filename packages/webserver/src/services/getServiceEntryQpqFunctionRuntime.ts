@@ -3,10 +3,10 @@ import { QpqFunctionRuntimeAdvanced } from '@qpqjs/core';
 export const getServiceEntryQpqFunctionRuntime = (
   serviceName: string,
   entryType: string,
-  // TODO: runtime should maybe be QpqFunctionRuntimeRelativePath
+  // TODO: @joe-coady: runtime should maybe be QpqFunctionRuntimeRelativePath
   runtime: `${string}::${string}`,
 ): QpqFunctionRuntimeAdvanced => {
-  const [src, methodName] = runtime.split('::');
+  const [src = '', methodName = ''] = runtime.split('::');
 
   return {
     basePath: __dirname,

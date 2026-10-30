@@ -1,7 +1,11 @@
+export * from './actionResult';
+export * from './actions';
 export * from './actionValidators';
+export * from './config';
 export * from './context';
 export * from './decomposedString';
 export * from './error';
+export * from './graphDatabase';
 export * from './keyValueStore';
 export * from './logHistory';
 export * from './lookup';
@@ -9,4 +13,3 @@ export * from './qpqPackage';
 export * from './scope';
 export * from './stateEffects';
 export * from './stream';
-export * from './transientErrorNames';

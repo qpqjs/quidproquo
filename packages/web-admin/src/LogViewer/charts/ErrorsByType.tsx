@@ -3,9 +3,9 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 
 import { useErrorsByType } from '../hooks/useErrorsByType';
 
-interface ErrorsByTypeProps {
+type ErrorsByTypeProps = {
   logs: any[];
-}
+};
 
 export const ErrorsByType = ({ logs }: ErrorsByTypeProps) => {
   const data = useErrorsByType(logs);

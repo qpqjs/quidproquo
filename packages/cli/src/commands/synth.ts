@@ -1,56 +1,52 @@
-// `qpq synth [service]` — synthesizes each backend service's QPQ config to
+// `qpq synth [service]`, synthesizes each backend service's QPQ config to
 // dist/apps/<app>/infrastructure/<module>-config.json.
 //
 // Runs with ts-node hooks registered (see runCli), which transpiles each
 // service's infrastructure.ts on require. Cross-package `@scope/*` imports
 // resolve through the workspace node_modules symlinks to already-built dist.
-import { qpqCoreUtils } from '@qpqjs/core';
+import { getInfrastructureConfigPath, qpqCoreUtils, QpqDeployEnvVar } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
-import { resolveAppSelection } from '../lib/resolveAppSelection';
+import { getRequestedAppName, resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 
+const out = createOutput('synth');
+
 const processConfig = (folderName: string, appName: string): void => {
-  console.log(`Processing infrastructure: [${folderName}] for app [${appName}]`);
+  out.log(`Processing infrastructure: [${folderName}] for app [${appName}]`);
   const qpqConfig = loadServiceQpqConfig(appName, folderName);
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  const directoryPath = path.join(getRoot(), 'dist', 'apps', appName, 'infrastructure');
+  const directoryPath = getInfrastructureConfigPath(getRoot(), appName);
   fs.mkdirSync(directoryPath, { recursive: true });
   fs.writeFileSync(path.join(directoryPath, `${moduleName}-config.json`), JSON.stringify(qpqConfig, null, 2));
-  console.log(`  -> ${appName}/infrastructure/${moduleName}-config.json`);
+  out.log(`  -> ${appName}/infrastructure/${moduleName}-config.json`);
 };
 
 export const synthCommand = async (argv: string[]): Promise<void> => {
   const [specifiedServiceName] = getPositionalArgs(argv, ['--app', '--deployment']);
 
-  const hasExplicitApp =
-    argv.includes('--app') || argv.some((a) => a.startsWith('--app=')) || !!process.env.npm_config_app || !!process.env.DEPLOY_APP_NAME;
-
   let appNames: string[];
-  if (specifiedServiceName && !hasExplicitApp) {
-    // A bare service name is unambiguous — synth it in whichever app owns it.
+  if (specifiedServiceName && !getRequestedAppName(argv, QpqDeployEnvVar.deployAppName)) {
+    // A bare service name is unambiguous, synth it in whichever app owns it.
     const appWithService = getAvailableApps().find((appName) => getServiceNamesWithSubdir(appName, 'service').includes(specifiedServiceName));
     if (!appWithService) {
-      console.error(`Service '${specifiedServiceName}' not found in any app`);
+      out.error(`Service '${specifiedServiceName}' not found in any app`);
       process.exit(1);
     }
     appNames = [appWithService];
   } else {
-    const selection = await resolveAppSelection({
-      argv,
-      envVar: 'DEPLOY_APP_NAME',
-      allowAll: true,
-    });
+    const selection = await resolveAppSelection({ argv, envVar: QpqDeployEnvVar.deployAppName, allowAll: true });
     appNames = selection === 'all' ? getAvailableApps() : [selection];
   }
 
-  console.log(`QPQ synthesizing apps: ${appNames.join(', ')}`);
+  out.log(`QPQ synthesizing apps: ${appNames.join(', ')}`);
 
   for (const appName of appNames) {
     // Service configs read the deployment env vars at require time, so the
@@ -58,13 +54,12 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     await resolveDeployment(argv, appName);
 
     // Validate a specified service against the app's discovered services before it
-    // reaches loadServiceQpqConfig -> require. The bare-service-name branch above
-    // already checks this; the --app/env branch used to skip it, letting a typo hit
-    // a cryptic module-resolution error and a `../` value normalize into an arbitrary
-    // require target. Both paths now validate identically.
+    // reaches loadServiceQpqConfig -> require, exactly as the bare-service-name branch
+    // above does: an unchecked typo hits a cryptic module-resolution error and a `../`
+    // value normalizes into an arbitrary require target.
     const appServices = getServiceNamesWithSubdir(appName, 'service');
     if (specifiedServiceName && !appServices.includes(specifiedServiceName)) {
-      console.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);
+      out.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);
       process.exitCode = 1;
       continue;
     }
@@ -75,7 +70,7 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
       try {
         processConfig(folderName, appName);
       } catch (error) {
-        console.error(`Failed to process ${folderName} in ${appName}:`, error);
+        out.error(`Failed to process ${folderName} in ${appName}:`, error);
         process.exitCode = 1;
       }
     }

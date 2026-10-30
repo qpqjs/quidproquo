@@ -1,6 +1,6 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 
-import { askUIShowError } from '../../platformLogic/effects/system/systemActionCreators';
+import { askSystemShowError } from '../../platformLogic/actionCreators/askSystemShowError';
 import { askRunSessionFlushLoop } from './session/askRunSessionFlushLoop';
 import { askStartSession } from './session/askStartSession';
 import { askProjectSessionToUrl } from './url/askProjectSessionToUrl';
@@ -12,7 +12,7 @@ export function* askAdminAppMain(): AskResponse<void> {
   const started = yield* askCatch(askStartSession());
 
   if (!started.success) {
-    yield* askUIShowError('Failed to start the admin audit session — activity will not be recorded.');
+    yield* askSystemShowError('Failed to start the admin audit session — activity will not be recorded.');
     return;
   }
 

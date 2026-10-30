@@ -2,7 +2,8 @@
 // relative expose paths, dedupe of multiple runtimes in one file, and (critically) that
 // advanced-runtime manifest keys are machine-INDEPENDENT (no absolute basePath), so a
 // remote published on one machine matches a lambda shell built on another.
-import { buildTestQpqConfig, defineInlineFunction } from '@qpqjs/core';
+import { defineInlineFunction } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import path from 'path';
 import { describe, expect, it } from 'vitest';

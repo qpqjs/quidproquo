@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material';
 
-interface ActionHistoryItemTimeStampProps {
+type ActionHistoryItemTimeStampProps = {
   startedAt: string;
   finishedAt: string;
-}
+};
 
 export const ActionHistoryItemTimeStamp = ({ startedAt, finishedAt }: ActionHistoryItemTimeStampProps) => {
   const startDate = new Date(startedAt);

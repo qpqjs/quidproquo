@@ -1,30 +1,27 @@
 import { LambdaRuntimeConfig } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { resolveScheduleFields, ScheduleQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
+import { aws_events, aws_events_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 import { renderAwsCronExpression } from './renderAwsCronExpression';
 
-export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
+export type QpqCoreRecurringScheduleConstructProps = {
   scheduleConfig: ScheduleQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreRecurringScheduleConstructProps) {
     super(scope, id, props);
 
     const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
-      functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
-      functionType: 'eventBridgeEvent_recurringSchedule',
-      executorName: 'eventBridgeEvent_recurringSchedule',
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.scheduleConfig.uniqueKey, awsNamingUtils.QpqLambdaKind.Schedule)),
+      handler: 'eventBridgeEvent_recurringSchedule',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         lambdaRuntimeConfig: JSON.stringify({
@@ -47,7 +44,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       schedule: aws_events.Schedule.expression(`cron(${renderAwsCronExpression(resolveScheduleFields(props.scheduleConfig.recurrence))})`),
     });
 
-    // Set the target as lambda function.
     //
     // fromObject REPLACES the event payload rather than adding to it, so
     // anything the handler needs has to be listed here: without `time` the

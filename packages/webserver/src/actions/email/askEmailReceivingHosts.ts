@@ -9,5 +9,4 @@ import { EmailActionType } from './EmailActionType';
  */
 export const askEmailReceivingHosts = createActionRequester<string[]>()({
   actionType: EmailActionType.ReceivingHosts,
-  getPayload: () => ({}),
 });

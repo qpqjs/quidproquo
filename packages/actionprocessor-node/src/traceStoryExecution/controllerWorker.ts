@@ -1,4 +1,6 @@
-// The debug controller — runs on a WORKER THREAD and drives the V8 inspector against
+import { Nullable } from '@qpqjs/core';
+
+// The debug controller: runs on a WORKER THREAD and drives the V8 inspector against
 // the MAIN thread, which is executing the story replay (see traceStoryExecution).
 //
 // Strategy (chosen by the phase-0 spike, see trace-replay-plan.md): set a breakpoint on
@@ -8,7 +10,7 @@
 // internals (unlike blackbox + stepInto).
 //
 // SHIPPING CONSTRAINT: lambdas are single-file webpack bundles, so this can't be loaded
-// as a worker FILE — traceStoryExecution serializes this function with
+// as a worker FILE, traceStoryExecution serializes this function with
 // Function.prototype.toString() and runs it via new Worker(source, { eval: true }).
 // It must therefore be fully self-contained:
 //   - builtin require()s only, nothing captured from module scope
@@ -27,7 +29,7 @@
 // parent before spawning): Runtime.evaluate -> [[FunctionLocation]] -> scriptId. Extra
 // scripts (other bundle chunks, dynamically loaded ones) are matched by scriptPatterns.
 
-export interface TraceControllerWorkerData {
+export type TraceControllerWorkerData = {
   // Regex sources matched against script urls; matching scripts are traced in addition
   // to the story function's own script.
   scriptPatterns: string[];
@@ -42,28 +44,28 @@ export interface TraceControllerWorkerData {
   maxProperties: number;
   maxValueDepth: number;
   maxSerializedLength: number;
-}
+};
 
-interface TraceRawValue {
+type TraceRawValue = {
   preview: string;
   json?: string;
-}
+};
 
-interface TraceRawStep {
+type TraceRawStep = {
   scriptId: string;
   line: number; // 0-based (CDP)
   column: number;
   functionName: string;
   locals: Record<string, TraceRawValue>;
   returnValue?: TraceRawValue;
-}
+};
 
 export function traceControllerWorkerMain(): void {
-  // require, not import: this function body is the ENTIRE worker source (eval mode) —
+  // require, not import: this function body is the ENTIRE worker source (eval mode) ,
   // imports at module scope wouldn't exist when it runs. And eval('require'), not a
   // bare require: bundlers rewrite require() calls at build time (webpack lambda builds
   // turn them into __webpack_require__, which doesn't exist when this string is eval'd
-  // in the worker) — eval is opaque to them, so the worker's REAL cjs require survives.
+  // in the worker), eval is opaque to them, so the worker's REAL cjs require survives.
   const dynamicRequire = eval('require');
   const inspector = dynamicRequire('node:inspector');
   const workerThreads = dynamicRequire('node:worker_threads');
@@ -76,7 +78,7 @@ export function traceControllerWorkerMain(): void {
 
   const post = (method: string, params?: object): Promise<any> =>
     new Promise((resolve, reject) =>
-      session.post(method, params || {}, (error: Error | null, result: unknown) =>
+      session.post(method, params || {}, (error: Nullable<Error>, result: unknown) =>
         error ? reject(new Error(method + ': ' + error.message)) : resolve(result),
       ),
     );
@@ -98,12 +100,12 @@ export function traceControllerWorkerMain(): void {
   // The directory of the story function's own script (set during init). Bundles are
   // chunk-SPLIT: a story exported through a factory wrapper (export const x = wrap(story))
   // has its function object created in the FACTORY's chunk, while the code it runs lives
-  // in sibling chunks — so every script in the same directory is traced too. This covers
+  // in sibling chunks, so every script in the same directory is traced too. This covers
   // any bundle layout (federated /tmp cache, lambda shell, dev-server dist) without
   // needing an environment-specific pattern.
   let storyScriptDirUrl = '';
 
-  // CJS require() scripts get plain-path urls, ESM imports get file:// urls — the same
+  // CJS require() scripts get plain-path urls, ESM imports get file:// urls, the same
   // directory can appear both ways in one process, so compare scheme-stripped.
   const normalizeScriptUrl = (url: string): string => url.replace(/^file:\/\//, '').replace(/\\/g, '/');
 
@@ -149,11 +151,11 @@ export function traceControllerWorkerMain(): void {
 
   // ── Deep serialization ──────────────────────────────────────────────────────
   // Runs IN THE DEBUGGEE (Runtime.callFunctionOn with `this` = the value) at the pause,
-  // returning a JSON string of the value walked to the caps — what powers expandable
+  // returning a JSON string of the value walked to the caps, what powers expandable
   // object inspection in the viewer. Property reads are try/catch'd (getters can throw);
   // circular refs and overflow become «...» placeholder strings. Same serialization
   // constraints as this whole file: no async/generators/spread (it ships via toString).
-  function qpqSerializeValue(this: any, maxDepth: number, maxString: number, maxProps: number, maxTotal: number): string | null {
+  function qpqSerializeValue(this: any, maxDepth: number, maxString: number, maxProps: number, maxTotal: number): Nullable<string> {
     const seen: any[] = [];
 
     const walk = (value: any, depth: number): any => {
@@ -179,7 +181,7 @@ export function traceControllerWorkerMain(): void {
         for (let i = 0; i < value.length && i < maxProps; i += 1) {
           try {
             result.push(walk(value[i], depth + 1));
-          } catch (error) {
+          } catch {
             result.push('«threw»');
           }
         }
@@ -188,10 +190,12 @@ export function traceControllerWorkerMain(): void {
         result = {};
         const keys = Object.keys(value);
         for (let i = 0; i < keys.length && i < maxProps; i += 1) {
+          const key = keys[i];
+          if (key === undefined) continue;
           try {
-            result[keys[i]] = walk(value[keys[i]], depth + 1);
-          } catch (error) {
-            result[keys[i]] = '«threw»';
+            result[key] = walk(value[key], depth + 1);
+          } catch {
+            result[key] = '«threw»';
           }
         }
         if (keys.length > maxProps) result['«more»'] = '+' + (keys.length - maxProps) + ' properties';
@@ -204,7 +208,7 @@ export function traceControllerWorkerMain(): void {
     try {
       const json = JSON.stringify(walk(this, 0));
       return json && json.length <= maxTotal ? json : null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -214,7 +218,7 @@ export function traceControllerWorkerMain(): void {
 
   // ── Value capture ───────────────────────────────────────────────────────────
   // Every value gets a short preview; object values also get a deep JSON serialization
-  // (in the debuggee, see qpqSerializeValue). Never fails — a value that can't be
+  // (in the debuggee, see qpqSerializeValue). Never fails, a value that can't be
   // serialized keeps its preview.
   const captureRemoteValue = (remoteObject: any): { captured: TraceRawValue; work: Promise<unknown> } => {
     const captured: TraceRawValue = { preview: summarizeValue(remoteObject) };
@@ -245,10 +249,10 @@ export function traceControllerWorkerMain(): void {
     return { captured, work };
   };
 
-  interface CapturedStepValues {
+  type CapturedStepValues = {
     locals: Record<string, TraceRawValue>;
     returnValue?: TraceRawValue;
-  }
+  };
 
   // Local + block scopes only, outermost first so inner scopes win name collisions.
   // At a return break position the frame also carries the value being returned.
@@ -288,7 +292,7 @@ export function traceControllerWorkerMain(): void {
 
   // ── Script instrumentation ──────────────────────────────────────────────────
   // onlyOwnCode: the parent (traceStoryExecution) filters candidate locations through
-  // the script's source map — only positions originating in the service's own code
+  // the script's source map, only positions originating in the service's own code
   // (not node_modules) get breakpoints. Round-tripped over parentPort because this
   // worker can't load the source-map library (see the shipping constraint above).
   let filterRequestSeq = 0;
@@ -305,7 +309,7 @@ export function traceControllerWorkerMain(): void {
     });
   };
 
-  // getPossibleBreakpoints CAPS its response (~1000 locations) when the range is large —
+  // getPossibleBreakpoints CAPS its response (~1000 locations) when the range is large ,
   // on a real bundle chunk (tens of thousands of lines) a single call covers only the
   // top of the file and everything below it silently gets no breakpoints. Page through
   // the script, restarting just past the last returned location, until a page comes back
@@ -347,7 +351,7 @@ export function traceControllerWorkerMain(): void {
         // instrumentation the dominant setup cost (it blew the ready timeout on real
         // services). The session queues the posts; the backend processes them in order.
         // Per-location failures are tolerated: nearby candidate positions can RESOLVE to
-        // the same actual breakpoint ("already exists") — one lost position must not
+        // the same actual breakpoint ("already exists"), one lost position must not
         // abort the whole trace.
         return Promise.all(
           locations.map((location: any) =>
@@ -367,7 +371,7 @@ export function traceControllerWorkerMain(): void {
     scriptUrlsById.set(message.params.scriptId, url);
     scriptEndById.set(message.params.scriptId, { lineNumber: message.params.endLine, columnNumber: message.params.endColumn });
 
-    // A traced bundle chunk loaded mid-story (async-node chunk loading) — instrument it
+    // A traced bundle chunk loaded mid-story (async-node chunk loading), instrument it
     // as it appears so its statements are traced too.
     if (ready && isTraceTargetUrl(url)) {
       instrumentScript(message.params.scriptId).catch(fatal);
@@ -380,13 +384,13 @@ export function traceControllerWorkerMain(): void {
     if (!firstPauseAt) firstPauseAt = Date.now();
     const frame = message.params.callFrames[0];
 
-    // Non-traced pause (e.g. the debugger; statement in qpqExecuteLog) — just resume.
+    // A pause outside the instrumented scripts is not a traced step: just resume.
     if (!instrumentedScriptIds.has(frame.location.scriptId)) {
       return post('Debugger.resume');
     }
 
     // Step budget AND wall-clock budget: locals capture costs several CDP round trips
-    // per step, so a big story can take MINUTES against maxSteps alone — long-running
+    // per step, so a big story can take MINUTES against maxSteps alone, long-running
     // invocations stress their whole sandbox (a >5min trace exposed a 300s long-poll
     // timeout bug in the qpq-log-extension, killing the lambda). Past either budget,
     // stop pausing entirely so the replay finishes at full speed.
@@ -416,7 +420,7 @@ export function traceControllerWorkerMain(): void {
     onPaused(message).catch(fatal);
   });
 
-  // ── Parent protocol (also keeps the worker's event loop alive — an inspector
+  // ── Parent protocol (also keeps the worker's event loop alive, an inspector
   // session alone does not, the worker would silently exit) ────────────────────
   parentPort.on('message', (message: any) => {
     if (message && message.type === 'filteredLocations') {
@@ -460,7 +464,7 @@ export function traceControllerWorkerMain(): void {
         return location ? location.scriptId : null;
       });
     })
-    .then((storyFunctionScriptId: string | null) => {
+    .then((storyFunctionScriptId: Nullable<string>) => {
       const targetScriptIds = new Set<string>();
       if (storyFunctionScriptId) {
         targetScriptIds.add(storyFunctionScriptId);

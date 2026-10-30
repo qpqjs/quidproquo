@@ -11,7 +11,7 @@ export function InstallChip() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      // clipboard unavailable — the command is still visible to copy by hand
+      // clipboard unavailable: the command is still visible to copy by hand
     }
   };
 
@@ -19,9 +19,7 @@ export function InstallChip() {
     <button className="install-chip" onClick={copyInstall} type="button">
       <span className="install-chip__prompt">$</span>
       <span className="install-chip__cmd">{INSTALL_COMMAND}</span>
-      <span className={`install-chip__copy${copied ? ' is-copied' : ''}`}>
-        {copied ? 'copied' : 'copy'}
-      </span>
+      <span className={`install-chip__copy${copied ? ' is-copied' : ''}`}>{copied ? 'copied' : 'copy'}</span>
     </button>
   );
 }

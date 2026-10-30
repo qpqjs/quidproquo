@@ -8,20 +8,21 @@ export type StreamDataType<E extends StreamEncoding, T = unknown> = E extends 't
       ? T
       : never;
 
-export interface StreamHandle<E extends StreamEncoding = StreamEncoding, T = unknown> {
+// The second parameter is a phantom: it carries the chunk type for callers and is never read here.
+export type StreamHandle<E extends StreamEncoding = StreamEncoding, _T = unknown> = {
   id: string;
   encoding: E;
-}
+};
 
-export interface StreamChunk<T = unknown> {
+export type StreamChunk<T = unknown> = {
   done: boolean;
   skipped?: boolean;
   data?: T;
-}
+};
 
-export interface StreamRegistry {
+export type StreamRegistry = {
   register(id: string, iterator: AsyncIterableIterator<string>): void;
   read(id: string, noWait?: boolean): Promise<StreamChunk<string>>;
   close(id: string): void;
   has(id: string): boolean;
-}
+};

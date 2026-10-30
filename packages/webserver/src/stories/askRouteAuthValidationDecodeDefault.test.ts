@@ -1,4 +1,5 @@
-import { runStory, throwsError, UserDirectoryActionType } from '@qpqjs/core';
+import { UserDirectoryActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

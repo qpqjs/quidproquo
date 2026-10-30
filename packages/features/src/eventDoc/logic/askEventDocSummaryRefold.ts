@@ -1,12 +1,12 @@
 import { askCatch, askLogCreate, AskResponse, LogLevelEnum, Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite';
 import { EventDocSummary, EventDocSummaryView } from '../models';
-import { applyEventDocSummaryEvent } from '../summary/applyEventDocSummaryEvent';
-import { foldEventDocSummary } from '../summary/foldEventDocSummary';
+import { applyEventDocSummaryEvent } from '../summary/logic/applyEventDocSummaryEvent';
+import { foldEventDocSummary } from '../summary/logic/foldEventDocSummary';
 
 // The stored row carried through the events after it, up to `eventId`. From the whole log when there is no row to carry,
 // or one from before the view said where it was up to. A row already at or past the event is returned as it is.
@@ -38,7 +38,7 @@ function* askRefoldAndWrite(modelId: string, eventId: number): AskResponse<Event
  * client retry of a failed append would only double-append. Returns the summary as written, or null when it was not.
  */
 export function* askEventDocSummaryRefold(modelId: string, eventId: number): AskResponse<Nullable<EventDocSummary>> {
-  const { type } = yield* askEventDocResolveStore();
+  const { type } = yield* askEventDocStoreReadOrThrow();
 
   const refolded = yield* askCatch(askRefoldAndWrite(modelId, eventId));
 

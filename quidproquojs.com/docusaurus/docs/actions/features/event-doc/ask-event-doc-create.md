@@ -109,4 +109,4 @@ Prefer the higher-level lifecycle actions over calling `askEventDocUpsert` direc
 - [askEventDocSoftDelete](./ask-event-doc-soft-delete.md) — retire a document.
 - **Appending events after create:** `askEventDocEventAppend` (@qpqjs/features) applies each later event through the same reducer.
 - [defineEventDocSummary](../../../config/features/event-doc-summary.md) — declares the store this writes to.
-- [askNewGuid](../../core/guid/ask-new-guid.md) / [askDateNow](../../core/date/ask-date-now.md) — the core actions the create path uses for id and timestamps.
+- [askGuidNew](../../core/guid/ask-new-guid.md) / [askDateNow](../../core/date/ask-date-now.md) — the core actions the create path uses for id and timestamps.

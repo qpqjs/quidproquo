@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { CryptoActionType } from './CryptoActionType';
 
 // Returns the public half of a signing key as an SPKI PEM string. Not sensitive:
@@ -9,7 +9,7 @@ export const askCryptoGetPublicKey = createActionRequester<string>()({
   errorTypes: [
     'KeyNotConfigured', // no defineSigningKey for keyName in the service config
     'KeyUnavailable', // key disabled, deleted, or access denied
-    'Throttling', // request rate exceeded
+    'Throttled', // request rate exceeded
   ],
   getPayload: (keyName: string) => ({ keyName }),
 });

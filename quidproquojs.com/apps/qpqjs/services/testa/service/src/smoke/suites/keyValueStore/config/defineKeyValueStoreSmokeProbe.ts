@@ -1,14 +1,6 @@
-import {
-  QpqjsServiceEnum,
-  SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME,
-  SMOKE_PROBE_STORE,
-} from '@qpqjs/constants';
+import { QpqjsServiceEnum, SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME, SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import {
-  defineKeyValueStore,
-  defineServiceFunction,
-  QPQConfig,
-} from 'quidproquo';
+import { defineKeyValueStore, defineServiceFunction, QPQConfig } from 'quidproquo';
 
 /**
  * The test service's probe store declared FOREIGN (owned by test), which is
@@ -23,10 +15,9 @@ export const defineKeyValueStoreSmokeProbe = (): QPQConfig => [
   defineServiceFunction(
     {
       basePath: __dirname,
-      relativePath:
-        '../entry/serviceFunction/smokeCrossServiceKeyValueStoreProbe',
+      relativePath: '../entry/serviceFunction/smokeCrossServiceKeyValueStoreProbe',
       functionName: 'smokeCrossServiceKeyValueStoreProbe',
     },
-    { functionName: SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME }
+    { functionName: SMOKE_CROSS_SERVICE_KEY_VALUE_STORE_PROBE_FUNCTION_NAME },
   ),
 ];

@@ -12,7 +12,7 @@ import {
   kvsSet,
 } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocSummary, EventDocSummaryView } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
@@ -22,7 +22,7 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
  * after a newer one can never move the row backwards; false means it was refused.
  */
 export function* askEventDocSummaryViewWrite(modelId: string, view: EventDocSummaryView): AskResponse<boolean> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const written = yield* askCatch(

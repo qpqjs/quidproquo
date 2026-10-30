@@ -1,18 +1,19 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askKeyValueStoreUpdateBase } from '../../actions/keyValueStore/askKeyValueStoreUpdate';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
-import { runStory } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
-import { askKeyValueStoreUpdatePartialProperties, InvalidKvsPartialPropertyError } from './askKeyValueStoreUpdatePartialProperties';
+import { askKeyValueStoreUpdatePartialProperties } from './askKeyValueStoreUpdatePartialProperties';
 
-interface Widget {
+type Widget = {
   id: string;
   name: string;
   count: number;
   note?: string;
-}
+};
 
 describe('askKeyValueStoreUpdatePartialProperties', () => {
   it('sets valid properties, removes undefined ones, and skips the partition key', () => {
@@ -57,7 +58,7 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
     expect(update.mock.calls[0][0].payload.options).toEqual({ scope: 'scope-a' });
   });
 
-  it('throws InvalidKvsPartialPropertyError instead of silently dropping an unstorable value', () => {
+  it('throws Invalid instead of silently dropping an unstorable value', () => {
     const update = vi.fn((action: ActionOf<typeof askKeyValueStoreUpdateBase>) => action.payload);
 
     const act = () =>
@@ -65,7 +66,7 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
         [KeyValueStoreActionType.Update]: update,
       });
 
-    expect(act).toThrowError(InvalidKvsPartialPropertyError);
+    expect(act).toThrowError(/not a supported kvs data type/);
     expect(update).not.toHaveBeenCalled();
   });
 });

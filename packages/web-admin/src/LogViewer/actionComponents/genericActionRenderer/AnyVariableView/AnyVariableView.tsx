@@ -239,13 +239,13 @@ export const AnyVariableView = ({ value, expanded, hideStringQuotes }: VariableV
   return <span>{value.toString()}</span>;
 };
 
-interface GenericFunctionRendererProps {
+type GenericFunctionRendererProps = {
   functionName: string;
   args: { [key: string]: any }; // Object containing argument names and their values
   tooltipMap?: string[]; // Optional tooltips corresponding to args
   argRenderer?: (arg: string, value: any) => JSX.Element;
   expanded: boolean;
-}
+};
 
 const renderBasicArg = (arg: string, value: any, index: number, expanded: boolean, tooltip?: string): JSX.Element => {
   const tooltipText = `${tooltip || arg}\n\nvalue: ${JSON.stringify(value, null, 2)}`;

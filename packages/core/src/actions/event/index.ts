@@ -8,3 +8,4 @@ export * from './askEventTransformEventRecord';
 export * from './askEventTransformEventRecordResponse';
 export * from './askEventTransformResponseResult';
 export * from './EventActionType';
+export * from './types';

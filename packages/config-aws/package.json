@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/config-aws",
   "version": "0.3.0",
-  "description": "",
+  "description": "AWS-specific config settings and accessors for quidproquo apps.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -13,7 +21,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.esm.json -w",
@@ -25,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/config-aws"
   },
   "keywords": [],
   "author": "",
@@ -35,9 +45,15 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@qpqjs/core": "0.3.0",
+    "@qpqjs/testing": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
-    "@qpqjs/webserver": "0.3.0",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@qpqjs/core": "0.3.0",
+    "@qpqjs/webserver": "0.3.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

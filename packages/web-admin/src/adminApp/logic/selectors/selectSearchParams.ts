@@ -1,4 +1,4 @@
-import { AdminAppState } from '../../AdminAppState';
+import { AdminAppState } from '../../types/AdminAppState';
 import { AdminSearchParams } from '../../types/AdminSearchParams';
 import { selectSessionState } from './selectSessionState';
 

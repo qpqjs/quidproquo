@@ -1,12 +1,5 @@
-import {
-  Action,
-  ConfigActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  LogActionType,
-  runStory,
-  storageScopeContext,
-} from '@qpqjs/core';
+import { Action, ConfigActionType, InlineFunctionActionType, KeyValueStoreActionType, LogActionType, storageScopeContext } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { EmailMessage } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -64,8 +57,8 @@ describe('askTenantEmailRoute', () => {
     expect(executes.map((action) => action.payload?.functionName)).toEqual(['on-email-fn', 'on-email-fn']);
     expect(executes.map((action) => action.payload?.payload.inbox.tenantId)).toEqual(['t-commbank', 't-anz']);
     expect(executes.map((action) => action.context?.[storageScopeContext.uniqueName])).toEqual(['TENANT#t-commbank', 'TENANT#t-anz']);
-    expect(executes[0].payload?.payload.recipient).toBe('Finance.CommBank@inbox.development.example.com');
-    expect(executes[0].payload?.payload.message.subject).toBe('hi');
+    expect(executes![0]!.payload?.payload.recipient).toBe('Finance.CommBank@inbox.development.example.com');
+    expect(executes![0]!.payload?.payload.message.subject).toBe('hi');
   });
 
   it('logs and skips an unregistered recipient without throwing', () => {

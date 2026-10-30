@@ -12,6 +12,6 @@ describe('definePromiseMode', () => {
     const [setting] = config as any[];
     expect(setting.configSettingType).toBe(QPQCoreConfigSettingType.actionProcessors);
     expect(setting.runtime.functionName).toBe('getSystemExecuteStoryActionProcessor');
-    expect(setting.runtime.relativePath).toBe('../../proiseify/getSystemExecuteStoryActionProcessor');
+    expect(setting.runtime.relativePath).toBe('../../promiseify/getSystemExecuteStoryActionProcessor');
   });
 });

@@ -6,15 +6,15 @@ type GeneratorTestSequence = import('./types').GeneratorTestSequence;
 // Extend Vitest's expect with custom matchers for generators.
 // An interface (not a type) because it participates in declaration merging
 // with vitest's Assertion/AsymmetricMatchersContaining below.
-interface CustomMatchers<R = unknown> {
+type CustomMatchers<R = unknown> = {
   toYieldValue(expected: any): R;
   toCompleteWith(expected: any): R;
   toYieldSequence(sequence: GeneratorTestSequence): R;
-}
+};
 
 declare module 'vitest' {
-  interface Assertion<T = any> extends CustomMatchers<T> {}
-  interface AsymmetricMatchersContaining extends CustomMatchers {}
+  type Assertion<T = any> = {} & CustomMatchers<T>;
+  type AsymmetricMatchersContaining = {} & CustomMatchers;
 }
 
 // Only register matchers if expect is available

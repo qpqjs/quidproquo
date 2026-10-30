@@ -1,6 +1,5 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../awsNamingUtils';
 
 /**
  * Resolves a parameter name to its deployed SSM parameter key, honouring
@@ -8,11 +7,7 @@ import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../aw
  * can read a parameter another module owns.
  */
 export const resolveParameterKey = (parameterName: string, qpqConfig: QPQConfig) => {
-  const parameterConfig = qpqCoreUtils.getParameterConfig(parameterName, qpqConfig);
+  const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
-  return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    parameterConfig.owner?.resourceNameOverride || parameterName,
-    qpqConfig,
-    parameterConfig.owner?.module,
-  );
+  return awsNamingUtils.resolveOwnedResourceName(parameterName, qpqConfig, parameterConfig.owner);
 };

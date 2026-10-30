@@ -1,15 +1,17 @@
 import {
   actionResult,
+  actionResultError,
   actionResultErrorFromCaughtError,
   askUserDirectoryRefreshToken,
   createActionProcessor,
+  ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
-import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
+import { verifyDevJwt } from '../../../logic/auth/devJwt';
+import { getOrSeedDevJwtSecret } from '../../../logic/auth/devJwtSecret';
 import { getDevUserByUserId, upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
@@ -19,9 +21,14 @@ const getProcessRefreshToken = (
 ): ProcessorFor<typeof askUserDirectoryRefreshToken> => {
   return async ({ userDirectoryName, refreshToken }) => {
     try {
-      // Keep the same user the refresh token was minted for, falling back to the dev user
+      // Keep the same user the refresh token was minted for, falling back to the dev user. The
+      // token has to be one this directory signed, as a pool would insist.
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
-      const decoded = qpqWebServerUtils.unsafeDecodeJWTPayload<{ username?: string; email?: string; sub?: string }>(refreshToken);
+      const secret = await getOrSeedDevJwtSecret(devServerConfig.runtimePath, userDirectory);
+      const decoded = verifyDevJwt<{ username?: string; email?: string; sub?: string }>(secret, refreshToken);
+      if (!decoded) {
+        return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid refresh token');
+      }
 
       // A token carrying only a sub (userId) resolves back to its email through the user store
       let username = decoded?.username || decoded?.email;
@@ -31,9 +38,10 @@ const getProcessRefreshToken = (
 
       await upsertDevUser(devServerConfig.runtimePath, userDirectory, username);
 
-      return actionResult(createDevAuthResponse(userDirectory, username));
+      return actionResult(createDevAuthResponse(secret, userDirectory, username));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

@@ -1,7 +1,7 @@
 import { AskResponse } from '@qpqjs/core';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
-import { askUIVolatileServiceNamesLoaded } from '../../actionCreators/volatile/askUIVolatileServiceNamesLoaded';
+import { askVolatileServiceNamesLoaded } from '../../actionCreators/volatile/askVolatileServiceNamesLoaded';
 
 type GetServiceNamesResponse = {
   services: string[];
@@ -9,11 +9,11 @@ type GetServiceNamesResponse = {
 };
 
 export function* askLoadServiceNames(): AskResponse<void> {
-  const response = yield* askPlatformRequest<undefined, GetServiceNamesResponse>('GET', '/admin/services');
+  const response = yield* askPlatformRequest<GetServiceNamesResponse, undefined>('GET', '/admin/services');
 
   if (response.status < 200 || response.status >= 300) {
     return;
   }
 
-  yield* askUIVolatileServiceNamesLoaded(response.data.services, response.data.logServiceName);
+  yield* askVolatileServiceNamesLoaded(response.data.services, response.data.logServiceName);
 }

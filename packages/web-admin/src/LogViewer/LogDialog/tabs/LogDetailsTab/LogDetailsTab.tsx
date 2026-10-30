@@ -5,12 +5,12 @@ import { LogDetails } from '../../../LogDetails';
 import { AsyncStoryState, LogDialogState, LogDialogStateApi } from '../../hooks';
 import { MovedToColdStorage } from '../../MovedToColdStorage';
 
-interface LogDetailsTabProps {
+type LogDetailsTabProps = {
   log: AsyncStoryState;
 
   logDialogState: LogDialogState;
   logDialogStateApi: LogDialogStateApi;
-}
+};
 
 export const LogDetailsTab: React.FC<LogDetailsTabProps> = ({
   log,

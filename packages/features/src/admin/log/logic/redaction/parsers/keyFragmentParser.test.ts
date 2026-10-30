@@ -15,8 +15,8 @@ describe('keyFragmentParser', () => {
 
     const { redactedLog, redactions } = keyFragmentParser(log);
 
-    expect(redactedLog.history[0].act.payload).toEqual({ headers: { 'X-Webhook-Secret': REDACTED_STRING }, callbackSecret: REDACTED_STRING });
-    expect(redactedLog.history[0].res).toEqual({ client_secret: REDACTED_STRING, name: 'keep' });
+    expect(redactedLog!.history[0]!.act.payload).toEqual({ headers: { 'X-Webhook-Secret': REDACTED_STRING }, callbackSecret: REDACTED_STRING });
+    expect(redactedLog!.history[0]!.res).toEqual({ client_secret: REDACTED_STRING, name: 'keep' });
     expect(redactions.sort()).toEqual(['cb-1', 'cs-1', 'wh-1']);
   });
 
@@ -34,7 +34,7 @@ describe('keyFragmentParser', () => {
 
     const redacted = redactStoryResult(log);
 
-    expect(redacted.history[0].res[0]).toEqual({ secretCode: REDACTED_STRING, session: 's2' });
+    expect(redacted!.history[0]!.res[0]).toEqual({ secretCode: REDACTED_STRING, session: 's2' });
     expect(JSON.stringify(redacted)).not.toContain(seed);
   });
 
@@ -56,7 +56,7 @@ describe('keyFragmentParser', () => {
 
     const { redactedLog, redactions } = keyFragmentParser(log);
 
-    expect(JSON.parse(redactedLog.history[0].act.payload.body)).toEqual({ appSecret: REDACTED_STRING, id: 'keep' });
+    expect(JSON.parse(redactedLog!.history[0]!.act.payload.body)).toEqual({ appSecret: REDACTED_STRING, id: 'keep' });
     expect(redactions).toEqual(['app-1']);
   });
 
@@ -77,7 +77,7 @@ describe('keyFragmentParser', () => {
 
     const { redactedLog, redactions } = keyFragmentParser(log);
 
-    expect(redactedLog.history[0].act.payload).toEqual({ secretName: 'db-password', secretId: '2294a78c-a16c-4e64-ab98-89bec610613a' });
+    expect(redactedLog!.history[0]!.act.payload).toEqual({ secretName: 'db-password', secretId: '2294a78c-a16c-4e64-ab98-89bec610613a' });
     expect(redactions).toEqual([]);
   });
 
@@ -91,7 +91,7 @@ describe('keyFragmentParser', () => {
     const { redactedLog, redactions } = keyFragmentParser(log);
 
     expect(JSON.parse(redactedLog.input[0].body)).toEqual({ linkToken: REDACTED_STRING });
-    expect(redactedLog.history[0].res[0]).toEqual({ sessionToken: REDACTED_STRING, access_token: REDACTED_STRING });
+    expect(redactedLog!.history[0]!.res[0]).toEqual({ sessionToken: REDACTED_STRING, access_token: REDACTED_STRING });
     expect(redactions.sort()).toEqual(['acc-1', 'link-1', 'sess-1']);
   });
 

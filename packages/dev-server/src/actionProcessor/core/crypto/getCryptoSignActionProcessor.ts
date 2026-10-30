@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoSign> => {
   return async ({ keyName, message }) => {
-    const signingKeyConfig = qpqCoreUtils.getAllSigningKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
+    const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(keyName, qpqConfig);
     if (!signingKeyConfig) {
       return actionResultError(
         askCryptoSign.errorType.KeyNotConfigured,
@@ -34,7 +34,8 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
 
       return actionResult(rs256Sign(privateKeyPem, message));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

@@ -9,17 +9,16 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
   PlatformActionType,
-  runStory,
-  throwsError,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
-import { EventDocStoreOptions } from '../context/buildEventDocStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocServerEventInput } from '../models';
+import { EventDocStoreOptions } from '../types/EventDocStoreOptions';
 import { askEventDocAppendServerEvents } from './askEventDocAppendServerEvents';
 
 // The batch append's load-bearing guarantees live in this composition, not in the
@@ -41,7 +40,7 @@ const INPUTS: EventDocServerEventInput[] = [
   { type: 'RUN_COMPLETED', data: { at: '2026-08-03T00:00:00.300Z' }, version: 3 },
 ];
 
-// The log the head reads see: INIT, an edit, then a PUBLISH — so a batch whose base was
+// The log the head reads see: INIT, an edit, then a PUBLISH, so a batch whose base was
 // head 0 and which loses its slots to the publish must be re-judged against a published
 // document.
 const LOG_TYPES: Record<number, string> = { 0: EventDocEffect.InitState, 1: 'SET_X', 2: EventDocEffect.Publish };
@@ -100,7 +99,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
       counts.delays += 1;
       return undefined;
     },
-    // A registered definition whose fold tracks one fact — is the document published —
+    // A registered definition whose fold tracks one fact, is the document published ,
     // and whose validator refuses anything after a publish. Only reached with validate.
     [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: unknown[] } }) => {
       const { functionName, args } = action.payload;
@@ -144,7 +143,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
       if (options?.limit === 1 && options.sortAscending === false) {
         const head = heads[Math.min(counts.headReads, heads.length - 1)];
         counts.headReads += 1;
-        return { items: [logRow(head)], nextPageKey: undefined };
+        return { items: [logRow(head!)], nextPageKey: undefined };
       }
 
       const { after = -1, upTo = 2 } = skBounds(keyCondition);
@@ -165,7 +164,7 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
 };
 
 const runAppend = (inputs: EventDocServerEventInput[], store: EventDocStoreOptions, mocks: object, options?: { validate: boolean }) =>
-  runStory(askEventDocProvideStore(store, askEventDocAppendServerEvents(DOC_ID, inputs, ACTOR, options)), mocks);
+  runStory(askEventDocStoreProvide(buildEventDocStore(store), askEventDocAppendServerEvents(DOC_ID, inputs, ACTOR, options)), mocks);
 
 describe('askEventDocAppendServerEvents', () => {
   it('lands the whole burst above the head in one conditional write: consecutive ids, shared createdAt', () => {
@@ -178,12 +177,12 @@ describe('askEventDocAppendServerEvents', () => {
     expect(events.every((event) => event.payload.metadata.createdAt === NOW)).toBe(true);
     expect(events.map((event) => event.payload.metadata.clientMessageId)).toEqual(['cmid-0', 'cmid-1', 'cmid-2']);
 
-    // One clock read, one guid mint, one consistent head read, one write — the whole point of the batch.
+    // One clock read, one guid mint, one consistent head read, one write, the whole point of the batch.
     expect(counts).toEqual({ dateNow: 1, guidMints: 1, headReads: 1, delays: 0, functionCalls: {} });
     expect(upserts).toHaveLength(1);
-    expect(upserts[0].keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));
-    expect(upserts[0].options?.ifNotExists).toBe(true);
-    expect(upserts[0].items.map((item: { pk: string; sk: number }) => [item.pk, item.sk])).toEqual([
+    expect(upserts![0]!.keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));
+    expect(upserts![0]!.options?.ifNotExists).toBe(true);
+    expect(upserts![0]!.items.map((item: { pk: string; sk: number }) => [item.pk, item.sk])).toEqual([
       [DOC_ID, 5],
       [DOC_ID, 6],
       [DOC_ID, 7],
@@ -218,7 +217,7 @@ describe('askEventDocAppendServerEvents', () => {
   it('with validate, refuses a run carrying a schema version the fold cannot read, writing nothing (#554)', () => {
     const { mocks, upserts } = buildMocks({ heads: [1] });
 
-    const withBadVersion: EventDocServerEventInput[] = [INPUTS[0], { ...INPUTS[1], version: 99 }, INPUTS[2]];
+    const withBadVersion: EventDocServerEventInput[] = [INPUTS![0]!, { ...INPUTS![1]!, version: 99 }, INPUTS![2]!];
 
     expect(() => runAppend(withBadVersion, STORE, mocks, { validate: true })).toThrow(/No event-doc fold reducer for schema version 99/);
     expect(upserts).toHaveLength(0);

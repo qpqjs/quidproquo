@@ -4,10 +4,10 @@ import { Typography } from '@mui/material';
 import { useErrorsOverTime } from '../hooks/useErrorsOverTime';
 import { SearchParams } from '../types';
 
-interface ErrorsOverTimeProps {
+type ErrorsOverTimeProps = {
   logs: any[];
   searchParams: SearchParams;
-}
+};
 
 export const ErrorsOverTime = ({ logs, searchParams }: ErrorsOverTimeProps) => {
   const data = useErrorsOverTime(logs, searchParams);

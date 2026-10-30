@@ -149,7 +149,7 @@ Effects the reducer doesn't handle leave the state unchanged and are skipped. Us
 ## Notes
 
 - The inner story runs with **no live State runtime**: because every state action is captured here, a `story` that only dispatches/reads state completes synchronously (the generator finishes on the first `next()`).
-- Non-state actions are **not** captured — they bubble to the outer runtime as normal, so a story can freely mix state dispatches with other actions like `askRandomNumber` or `askNetworkRequest`.
+- Non-state actions are **not** captured — they bubble to the outer runtime as normal, so a story can freely mix state dispatches with other actions like `askMathRandomNumber` or `askNetworkRequest`.
 - `askReduceState` nests: an inner call owns its own state and reducer, and effects its reducer doesn't handle bubble up to the enclosing `askReduceState`. Reads always resolve against the nearest enclosing call's state.
 - Dispatch and read outcomes are correctly shaped for `askCatch` (they wrap exactly once), so wrapping `askStateDispatch`/`askStateRead` in `askCatch` behaves as expected.
 

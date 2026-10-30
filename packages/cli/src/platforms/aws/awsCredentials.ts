@@ -1,5 +1,9 @@
 import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 
+import { createOutput } from '../../lib/out';
+
+const out = createOutput('aws:aws-credentials');
+
 export const isAwsCredentialsValid = async (): Promise<boolean> => {
   try {
     const client = new STSClient({
@@ -8,7 +12,7 @@ export const isAwsCredentialsValid = async (): Promise<boolean> => {
     await client.send(new GetCallerIdentityCommand({}));
     return true;
   } catch (error) {
-    console.log('Error validating AWS credentials:', error);
+    out.log('Error validating AWS credentials:', error);
     return false;
   }
 };

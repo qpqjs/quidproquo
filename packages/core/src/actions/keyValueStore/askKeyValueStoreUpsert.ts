@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsItemRecord } from './types';
 
@@ -8,7 +8,7 @@ export type KeyValueStoreUpsertOptions = {
 
   // Conditional insert: only write when no item with the same key exists.
   // A losing concurrent writer gets ErrorTypeEnum.Conflict instead of silently
-  // overwriting — the primitive for optimistic-concurrency schemes (e.g.
+  // overwriting, the primitive for optimistic-concurrency schemes (e.g.
   // append-only event logs where the sort key is a claimed index).
   ifNotExists?: boolean;
 
@@ -19,7 +19,7 @@ export type KeyValueStoreUpsertOptions = {
 export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
   actionType: KeyValueStoreActionType.Upsert,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     // A conditional (ifNotExists) write lost to an existing item. Final: the slot is taken.
     // Namespaced, not ErrorTypeEnum.Conflict, so retry logic can target the write race
@@ -36,6 +36,9 @@ export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the item shape they are writing at the call site.
-export function* askKeyValueStoreUpsert<KvsItem>(keyValueStoreName: string, item: KvsItem, options?: KeyValueStoreUpsertOptions): AskResponse<void> {
+function* askKeyValueStoreUpsertTyped<KvsItem>(keyValueStoreName: string, item: KvsItem, options?: KeyValueStoreUpsertOptions): AskResponse<void> {
   return yield* askKeyValueStoreUpsertBase(keyValueStoreName, item as KvsItemRecord, options);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreUpsert = Object.assign(askKeyValueStoreUpsertTyped, { errorType: askKeyValueStoreUpsertBase.errorType });

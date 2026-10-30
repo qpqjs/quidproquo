@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deleteItem } from '../../../logic/dynamo';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 
 vi.mock('../../../logic/dynamo', () => ({
@@ -25,7 +25,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
   it('deletes the item using the store partition and sort keys', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', key: 'k1', sortKey: 's1' });
 
     expect(result).toEqual([undefined]);
     expect(deleteItem).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', 'k1', 'pk', 's1', 'sk');

@@ -1,9 +1,9 @@
 import { AskResponse, EitherActionResult } from '@qpqjs/core';
 
-import { askWebsocketReadConnectionInfo } from '../../context';
+import { askWebsocketConnectionInfoRead } from '../../context';
 import { WebSocketQueueServerEventMessageServiceRequestResponse } from '../../types/serverMessages/WebSocketQueueServerEventMessageServiceRequestResponse';
 import { WebSocketQueueServerMessageEventType } from '../../types/serverMessages/WebSocketQueueServerMessageEventType';
-import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
+import { askWebSocketQueueSendEventMessageWithCorrelationToFrontend } from '../webSocket/askWebSocketQueueSendEventMessageWithCorrelationToFrontend';
 
 /**
  * Sends a service request's result to the connection and correlation in context.
@@ -11,12 +11,12 @@ import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '.
  * the request first landed on.
  */
 export function* askServiceRequestRespond(result: EitherActionResult<unknown>): AskResponse<void> {
-  const { connectionId, correlationId } = yield* askWebsocketReadConnectionInfo();
+  const { connectionId, correlationId } = yield* askWebsocketConnectionInfoRead();
 
   const response: WebSocketQueueServerEventMessageServiceRequestResponse = {
     type: WebSocketQueueServerMessageEventType.ServiceRequestResponse,
     payload: result,
   };
 
-  yield* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
+  yield* askWebSocketQueueSendEventMessageWithCorrelationToFrontend({ ...response, correlationId }, connectionId);
 }

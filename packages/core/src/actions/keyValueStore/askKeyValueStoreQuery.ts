@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { QpqPagedData } from '../../types/QpqPagedData';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsQueryOperation } from './types';
 
@@ -23,7 +23,7 @@ export type KeyValueStoreQueryOptions = {
   // Default reads are EVENTUALLY consistent, which is right for a viewer and wrong for a caller that just
   // wrote and is now reading back to decide something. That case is not hypothetical: a flow run appends
   // its terminal event and immediately re-lists the log to fold the outcome, and under load the terminal
-  // event is intermittently not yet visible — so a run that succeeded reads back as having no outcome at
+  // event is intermittently not yet visible, so a run that succeeded reads back as having no outcome at
   // all, with nothing recorded to explain it.
   //
   // Use it for read-your-own-writes and for any fold used as a COORDINATION primitive (deciding "am I
@@ -34,7 +34,7 @@ export type KeyValueStoreQueryOptions = {
 export const askKeyValueStoreQueryBase = createActionRequester<QpqPagedData<unknown>>()({
   actionType: KeyValueStoreActionType.Query,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
@@ -49,7 +49,7 @@ export const askKeyValueStoreQueryBase = createActionRequester<QpqPagedData<unkn
 
 // The stored item shape is only known to the caller, so the base returns unknown items
 // and this story casts the page to what the caller declared.
-export function* askKeyValueStoreQuery<KvsItem>(
+function* askKeyValueStoreQueryTyped<KvsItem>(
   keyValueStoreName: string,
 
   keyCondition: KvsQueryOperation,
@@ -57,3 +57,6 @@ export function* askKeyValueStoreQuery<KvsItem>(
 ): AskResponse<QpqPagedData<KvsItem>> {
   return (yield* askKeyValueStoreQueryBase(keyValueStoreName, keyCondition, options)) as QpqPagedData<KvsItem>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreQuery = Object.assign(askKeyValueStoreQueryTyped, { errorType: askKeyValueStoreQueryBase.errorType });

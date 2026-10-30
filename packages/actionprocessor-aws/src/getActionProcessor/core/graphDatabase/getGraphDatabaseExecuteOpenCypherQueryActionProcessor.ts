@@ -2,13 +2,13 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   askGraphDatabaseExecuteOpenCypherQuery,
+  generateUuid,
   getProcessCustomImplementation,
   GraphDatabaseActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { randomGuid } from '../../../awsLambdaUtils';
 import { getGraphDatabaseForNeptuneActionProcessor } from './customActions';
 import { askRunNeptuneOpenCypherQuery } from './stories';
 
@@ -21,6 +21,6 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
     'Neptune Cypher Query',
     getGraphDatabaseForNeptuneActionProcessor,
     () => new Date().toISOString(),
-    randomGuid,
+    generateUuid,
   ),
 });

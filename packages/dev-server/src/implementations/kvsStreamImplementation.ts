@@ -24,7 +24,9 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
 export const kvsStreamImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   const runStreamHandlers = async (message: KvsStreamMessageWithSession): Promise<void> => {
     for (const qpqConfig of devServerConfig.qpqConfigs) {
-      const ownsStore = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig).some((store) => store.keyValueStoreName === message.record.keyValueStoreName);
+      const ownsStore = qpqCoreUtils
+        .getOwnedKeyValueStoreConfigs(qpqConfig)
+        .some((store) => store.keyValueStoreName === message.record.keyValueStoreName);
 
       if (!ownsStore) {
         continue;

@@ -20,7 +20,7 @@ export function* askEventDocListFetch(
     params.nextPageKey = options.nextPageKey;
   }
 
-  const response = yield* askApiRequest<void, QpqPagedData<EventDocSummary>>(
+  const response = yield* askApiRequest<QpqPagedData<EventDocSummary>, void>(
     serviceName,
     'GET',
     eventDocListCollectionEndpoint(basePath),

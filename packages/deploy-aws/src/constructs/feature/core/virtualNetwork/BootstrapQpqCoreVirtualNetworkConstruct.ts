@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, AwsVpcFlowLogTrafficType, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { VirtualNetworkQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_ec2, aws_logs } from 'aws-cdk-lib';
@@ -9,9 +8,9 @@ import { Construct } from 'constructs';
 import { getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface BootstrapQpqCoreVirtualNetworkConstructProps extends QpqConstructBlockProps {
+export type BootstrapQpqCoreVirtualNetworkConstructProps = {
   virtualNetworkConfig: VirtualNetworkQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const flowLogTrafficTypeMap: Record<AwsVpcFlowLogTrafficType, aws_ec2.FlowLogTrafficType> = {
   [AwsVpcFlowLogTrafficType.all]: aws_ec2.FlowLogTrafficType.ALL,
@@ -34,13 +33,13 @@ export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
       maxAzs: settings.maxAzs,
       vpcName: vpcName,
 
-      // undefined = CDK default (one per AZ) — must pass through untouched so
+      // undefined = CDK default (one per AZ), must pass through untouched so
       // already-deployed VPCs see no subnet/NAT churn
       natGateways: settings.natGateways,
     });
 
     // Every lambda qpq places in this network carries this group, and in-VPC
-    // data stores (e.g. Neptune) allow ingress from it only — membership is the
+    // data stores (e.g. Neptune) allow ingress from it only, membership is the
     // trust boundary, not "anything in the VPC". No ingress rules: lambdas
     // receive no inbound. Egress stays open: stories make arbitrary outbound
     // network calls. Later phases look it up by its deterministic name.
@@ -79,7 +78,7 @@ export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
     for (const serviceName of settings.interfaceEndpoints) {
       // CDK defaults are what we want: one ENI per AZ in the private subnets,
       // an auto-created security group allowing HTTPS from the VPC CIDR, and
-      // private DNS on — lambdas resolve the service to the endpoint with no
+      // private DNS on, lambdas resolve the service to the endpoint with no
       // code changes.
       this.vpc.addInterfaceEndpoint(`interface-endpoint-${serviceName}`, {
         service: new aws_ec2.InterfaceVpcEndpointAwsService(serviceName),

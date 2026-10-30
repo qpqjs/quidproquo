@@ -1,7 +1,8 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { DateActionType } from '../../actions/date/DateActionType';
-import { runStory } from '../../testing/storyTesting';
 import { askGetCurrentEpoch } from './askGetCurrentEpoch';
 
 describe('askGetCurrentEpoch', () => {

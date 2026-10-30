@@ -3,7 +3,8 @@ import {
   askExecuteStoryBase,
   createActionProcessor,
   createNestedRuntime,
-  ErrorTypeEnum,
+  generateUuid,
+  getDateNow,
   getUniqueKeyFromQpqFunctionRuntime,
   ProcessorFor,
   QPQConfig,
@@ -12,15 +13,12 @@ import {
   StorySession,
 } from '@qpqjs/core';
 
-import { randomGuid } from '../../../awsLambdaUtils';
-import { getDateNow } from './getDateNow';
-
 const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askExecuteStoryBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const story = await dynamicModuleLoader(payload.runtime);
 
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
+      return actionResultError(askExecuteStoryBase.errorType.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
     // A payload session can come off the wire (askProcessEvent passes the incoming message's session).
@@ -40,7 +38,7 @@ const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEx
       actionProcessors,
       getDateNow,
       logger,
-      randomGuid,
+      generateUuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       payload.runtime,

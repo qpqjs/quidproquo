@@ -1,5 +1,6 @@
 import { getUserScriptModuleMap, loadUserScriptModule } from '@qpqjs/actionprocessor-node';
-import { FileActionType, runStory } from '@qpqjs/core';
+import { FileActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import fs from 'fs';
 import os from 'os';
@@ -59,7 +60,7 @@ describe('buildUserScript', () => {
 
     const written: unknown[] = [];
     const sum = runStory((scriptExports.add as (...args: unknown[]) => any)('drive', 'out.txt', 20, 22), {
-      [FileActionType.WriteTextContents]: (action) => {
+      [FileActionType.WriteTextContents]: (action: any) => {
         written.push(action.payload);
         return undefined;
       },

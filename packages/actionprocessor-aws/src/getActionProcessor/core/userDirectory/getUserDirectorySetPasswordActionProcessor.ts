@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -7,10 +7,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 import { setUserPassword } from '../../../logic/cognito/setUserPassword';
@@ -19,16 +18,17 @@ const getProcessSetPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUse
   return async ({ userDirectoryName, newPassword, username }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
     try {
       await setUserPassword(region, userPoolId, resolvedUsername, newPassword);
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectorySetPassword.errorType.UserNotFound, 'No account found for this user'),
         InvalidPasswordException: () =>
           actionResultError(askUserDirectorySetPassword.errorType.InvalidNewPassword, 'Password does not meet the password policy'),

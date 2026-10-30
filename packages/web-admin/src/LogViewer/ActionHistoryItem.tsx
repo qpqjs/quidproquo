@@ -2,11 +2,11 @@ import { Action } from '@qpqjs/core';
 
 import TruncatedText from './TruncatedText';
 
-interface ActionHistoryItemProps {
+type ActionHistoryItemProps = {
   action: Action<any>;
   result: any;
   expanded: boolean;
-}
+};
 
 export const ActionHistoryItem = ({ action, result, expanded }: ActionHistoryItemProps) => {
   const inputText = JSON.stringify(action.payload, null, 2);

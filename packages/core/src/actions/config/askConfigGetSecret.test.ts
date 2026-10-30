@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { askConfigGetSecret } from './askConfigGetSecret';
 import { ConfigActionType } from './ConfigActionType';
 
@@ -70,7 +70,7 @@ describe('askConfigGetSecret', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
       expect(askConfigGetSecret.errorType).toEqual({
         ResourceNotFound: `${ConfigActionType.GetSecret}-ResourceNotFound`,
-        Throttling: `${ConfigActionType.GetSecret}-Throttling`,
+        Throttled: `${ConfigActionType.GetSecret}-Throttled`,
       });
     });
   });

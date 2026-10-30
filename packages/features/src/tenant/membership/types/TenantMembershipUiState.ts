@@ -14,13 +14,3 @@ export type TenantMembershipUiState = {
   isLoading: boolean;
   error: Nullable<string>;
 };
-
-/** Initial (no tenant selected) state. */
-export const createInitialTenantMembershipUiState = (): TenantMembershipUiState => ({
-  tenantId: null,
-  membership: null,
-  roles: [],
-  members: [],
-  isLoading: false,
-  error: null,
-});

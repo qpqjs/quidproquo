@@ -3,14 +3,14 @@ import { USER_SCRIPT_MODULE_TYPES_EXPORT, USER_SCRIPT_MODULE_TYPES_QUERY } from 
 import { QpqFunctionRuntime } from '../../types';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface UserScriptModuleQPQConfigSetting extends QPQConfigSetting {
+export type UserScriptModuleQPQConfigSetting = {
   // The import specifier a user script uses, e.g. `my-app-sdk/v1`.
   moduleName: string;
   runtime: QpqFunctionRuntime;
   // Where the module's bundled type declarations load from, when it declared `types`: an
   // ordinary runtime, so the bundler ships it like any other.
   typesRuntime?: QpqFunctionRuntime;
-}
+} & QPQConfigSetting;
 
 export type UserScriptModuleOptions = {
   /**

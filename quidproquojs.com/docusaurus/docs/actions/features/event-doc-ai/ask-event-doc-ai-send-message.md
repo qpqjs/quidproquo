@@ -5,11 +5,11 @@ description: Client story — send a chat message and stream the assistant's rep
 
 # askEventDocAiSendMessage
 
-Client-side story that sends a user message and drives the streamed reply into UI state. If no chat is active it creates one implicitly via [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md). It optimistically appends the user message, flips the "sending" flag, and issues [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md) — the assistant's reply streams in through `askUIEventDocAiAppendStreamChunk` dispatches while the request is in flight, and the finalized message is dispatched by the backend before the request resolves.
+Client-side story that sends a user message and drives the streamed reply into UI state. If no chat is active it creates one implicitly via [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md). It optimistically appends the user message, flips the "sending" flag, and issues [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md) — the assistant's reply streams in through `askEventDocAiAppendStreamChunk` dispatches while the request is in flight, and the finalized message is dispatched by the backend before the request resolves.
 
 The primary entry point a chat composer calls. One of the four client stories exposed as `sharedEventDocAiApi`.
 
-- Built from [askCatch](../../core/system/ask-catch.md), [askStateRead](../../core/state/ask-state-read.md), [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md), [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiAppendChatMessage` / `askUIEventDocAiClearStream` / `askUIEventDocAiSetSending` / `askUIEventDocAiSetError` UI actions.
+- Built from [askCatch](../../core/system/ask-catch.md), [askStateRead](../../core/state/ask-state-read.md), [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md), [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md), and the `askEventDocAiAppendChatMessage` / `askEventDocAiClearStream` / `askEventDocAiSetSending` / `askEventDocAiSetError` UI actions.
 
 ```typescript
 import { askEventDocAiSendMessage } from '@qpqjs/features';
@@ -41,7 +41,7 @@ function* askEventDocAiSendMessage(
 
 - Reads `activeChatId` from state ([askStateRead](../../core/state/ask-state-read.md)); if there is none, creates a chat with [askEventDocAiNewChat](./ask-event-doc-ai-new-chat.md) and aborts silently if creation fails.
 - Clears any prior error, optimistically appends the user message, clears the stream buffer, and sets the sending flag.
-- Issues [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md); the reply streams in via UI dispatches during the request. On failure the error text is dispatched via `askUIEventDocAiSetError`. The sending flag and stream buffer are cleared afterwards.
+- Issues [askEventDocAiChatSendRequest](./ask-event-doc-ai-chat-requests.md); the reply streams in via UI dispatches during the request. On failure the error text is dispatched via `askEventDocAiSetError`. The sending flag and stream buffer are cleared afterwards.
 
 ## Related
 

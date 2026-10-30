@@ -1,4 +1,4 @@
-import { Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
+import { generateUuid, Nullable, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from '@qpqjs/core';
 import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { createServer } from 'http';
@@ -42,7 +42,7 @@ const startServer = (
   webSocketServer.on('connection', (ws, req) => {
     // Server-minted, like API Gateway's: the handshake key is chosen by the client, so two
     // sockets presenting the same key would otherwise share (and steal) one registry entry.
-    const connectionId: string = crypto.randomUUID();
+    const connectionId: string = generateUuid();
     const sourceIp = req.socket.remoteAddress === '::1' || !req.socket.remoteAddress ? '127.0.0.1' : req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown agent';
 
@@ -82,7 +82,7 @@ const startServer = (
       service: settingsMap.service,
       eventType: WebSocketEventType.Connect,
       body: undefined,
-      messageId: crypto.randomUUID(),
+      messageId: generateUuid(),
       connectionId: connectionId,
       requestTimeEpoch: Date.now(),
       sourceIp: sourceIp,
@@ -99,7 +99,7 @@ const startServer = (
         service: settingsMap.service,
         eventType: WebSocketEventType.Message,
         body: data,
-        messageId: crypto.randomUUID(),
+        messageId: generateUuid(),
         connectionId: connectionId,
         requestTimeEpoch: Date.now(),
         sourceIp: sourceIp,
@@ -117,7 +117,7 @@ const startServer = (
         service: settingsMap.service,
         eventType: WebSocketEventType.Disconnect,
         body: undefined,
-        messageId: crypto.randomUUID(),
+        messageId: generateUuid(),
         connectionId: connectionId,
         requestTimeEpoch: Date.now(),
         sourceIp: sourceIp,
@@ -137,23 +137,24 @@ const startServer = (
 };
 
 const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): WebSocketQPQWebServerConfigSettingMap[] => {
-  return qpqConfigs
-    .flatMap((qpqConfig) => {
-      const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-      return qpqWebServerUtils.getWebsocketSettings(qpqConfig).flatMap((wsc) => {
-        const item: WebSocketQPQWebServerConfigSettingMap = {
-          apiName: wsc.apiName,
-          service,
-          setting: wsc,
-          qpqConfig,
-        };
+  return (
+    qpqConfigs
+      .flatMap((qpqConfig) => {
+        const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+        return qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).flatMap((wsc) => {
+          const item: WebSocketQPQWebServerConfigSettingMap = {
+            apiName: wsc.apiName,
+            service,
+            setting: wsc,
+            qpqConfig,
+          };
 
-        return item;
-      });
-    })
-    .filter(
-      (item, index, arr) => arr[index].apiName !== item.apiName || !item.setting.owner?.module || arr[index].service === item.setting.owner?.module,
-    );
+          return item;
+        });
+      })
+      // Only the websockets this service owns are served here; a foreign one is reached through its owner.
+      .filter((item) => qpqCoreUtils.resolveOwnerModuleName(item.setting.owner, item.qpqConfig) === item.service)
+  );
 };
 
 export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {

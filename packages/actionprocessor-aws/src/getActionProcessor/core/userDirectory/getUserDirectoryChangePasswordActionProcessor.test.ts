@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { changePassword } from '../../../logic/cognito/changePassword';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryChangePasswordActionProcessor } from './getUserDirectoryChangePasswordActionProcessor';
 
 vi.mock('../../../logic/cognito/changePassword', () => ({
@@ -25,7 +25,7 @@ describe('getUserDirectoryChangePasswordActionProcessor', () => {
   it('changes the password using the access token', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { oldPassword: 'old', newPassword: 'new', accessToken: 'tok' });
+    const result = await invokeProcessor(processor!, { oldPassword: 'old', newPassword: 'new', accessToken: 'tok' });
 
     expect(result).toEqual([undefined]);
     expect(changePassword).toHaveBeenCalledWith('tok', 'old', 'new', 'eu-west-1');

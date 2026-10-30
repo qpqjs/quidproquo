@@ -1,5 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
+import { Nullable } from '../../types/Nullable';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 export type KeyValueStoreGetOptions = {
@@ -10,7 +11,7 @@ export type KeyValueStoreGetOptions = {
 export const askKeyValueStoreGetBase = createActionRequester<unknown>()({
   actionType: KeyValueStoreActionType.Get,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
@@ -20,6 +21,9 @@ export const askKeyValueStoreGetBase = createActionRequester<unknown>()({
 
 // The stored item's shape is only known to the caller, so the base returns unknown and
 // this story casts it to what the caller declared.
-export function* askKeyValueStoreGet<Value>(keyValueStoreName: string, key: string, options?: KeyValueStoreGetOptions): AskResponse<Value | null> {
-  return (yield* askKeyValueStoreGetBase(keyValueStoreName, key, options)) as Value | null;
+function* askKeyValueStoreGetTyped<Value>(keyValueStoreName: string, key: string, options?: KeyValueStoreGetOptions): AskResponse<Nullable<Value>> {
+  return (yield* askKeyValueStoreGetBase(keyValueStoreName, key, options)) as Nullable<Value>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreGet = Object.assign(askKeyValueStoreGetTyped, { errorType: askKeyValueStoreGetBase.errorType });

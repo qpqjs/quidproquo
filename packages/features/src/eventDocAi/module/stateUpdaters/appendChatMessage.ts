@@ -1,5 +1,5 @@
 import type { AppendChatMessagePayload } from '../effects/EventDocAiAppendChatMessageEffect';
-import type { EventDocAiState } from '../EventDocAiState';
+import type { EventDocAiState } from '../types/EventDocAiState';
 
 export const appendChatMessage = (state: EventDocAiState, { message }: AppendChatMessagePayload): EventDocAiState => ({
   ...state,

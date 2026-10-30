@@ -1,12 +1,13 @@
 import { askCatch, AskResponse } from '@qpqjs/core';
 
 import { EventDocEvent } from '../../models';
-import { askUIEventDocWorkspaceAppendHistoryEvent } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvent';
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceCompact } from '../actionCreators/askUIEventDocWorkspaceCompact';
-import { askUIEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askUIEventDocWorkspaceRemovePendingEvent';
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
-import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDocWorkspaceSetSaving';
+import { askEventDocWorkspaceAppendHistoryEvent } from '../actionCreators/askEventDocWorkspaceAppendHistoryEvent';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceCompact } from '../actionCreators/askEventDocWorkspaceCompact';
+import { askEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askEventDocWorkspaceRemovePendingEvent';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
+import { askEventDocWorkspaceSetSaving } from '../actionCreators/askEventDocWorkspaceSetSaving';
+import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
@@ -37,9 +38,28 @@ export function* askEventDocWorkspaceSaveSlot(
     return;
   }
 
-  yield* askUIEventDocWorkspaceSetSaving(slotKey, true);
-  yield* askUIEventDocWorkspaceClearError(slotKey);
+  yield* askEventDocWorkspaceSetSaving(slotKey, true);
+  yield* askEventDocWorkspaceClearError(slotKey);
 
+  // The saving flag is cleared in askCatch's finally so a throw mid-batch (a resync that
+  // fails to rebase, for example) cannot leave the slot stuck in isSaving forever.
+  const saveResult = yield* askCatch(
+    askEventDocWorkspaceSavePendingEvents(transport, slots, slotKey, documentIdentity, pendingEvents),
+    askEventDocWorkspaceSetSaving(slotKey, false),
+  );
+
+  if (!saveResult.success) {
+    yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.save, error: saveResult.error });
+  }
+}
+
+function* askEventDocWorkspaceSavePendingEvents(
+  transport: EventDocWorkspaceTransport,
+  slots: EventDocWorkspaceSlotFoldsConfig,
+  slotKey: string,
+  documentIdentity: EventDocWorkspaceDocumentIdentity,
+  pendingEvents: EventDocEvent[],
+): AskResponse<void> {
   for (const pending of pendingEvents) {
     // A resync below rebases pending, so a later event in this batch may have been dropped since the loop started.
     if (!isStillPending(getSlotPending(yield* askEventDocWorkspaceReadState(), slotKey), pending.payload.metadata.clientMessageId)) {
@@ -49,7 +69,7 @@ export function* askEventDocWorkspaceSaveSlot(
     const result = yield* askCatch(transport.askAppendEvent(documentIdentity, toEventDocEventInput(pending)));
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.save, error: result.error });
+      yield* askEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.save, error: result.error });
       break;
     }
 
@@ -57,14 +77,12 @@ export function* askEventDocWorkspaceSaveSlot(
     // another writer landed events in between: the bootstrap brings them (and this ack) in, and the next pending event
     // saves on top of the corrected base.
     if (isContiguousWithSlotHead(yield* askEventDocWorkspaceReadState(), slotKey, [result.result])) {
-      yield* askUIEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
-      yield* askUIEventDocWorkspaceCompact(slotKey);
+      yield* askEventDocWorkspaceAppendHistoryEvent(slotKey, result.result);
+      yield* askEventDocWorkspaceCompact(slotKey);
     } else {
       yield* askEventDocWorkspaceResync(transport, slots, slotKey);
     }
 
-    yield* askUIEventDocWorkspaceRemovePendingEvent(slotKey, result.result.payload.metadata.clientMessageId);
+    yield* askEventDocWorkspaceRemovePendingEvent(slotKey, result.result.payload.metadata.clientMessageId);
   }
-
-  yield* askUIEventDocWorkspaceSetSaving(slotKey, false);
 }

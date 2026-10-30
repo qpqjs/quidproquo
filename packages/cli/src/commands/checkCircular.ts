@@ -1,10 +1,13 @@
-// `qpq check:circular` — scan every workspace's src for circular imports (the
+// `qpq check:circular`, scan every workspace's src for circular imports (the
 // class of bug that TDZ-crashes ESM bundles and silently drops exports under
-// CJS). Cycles fail the command (exit 1) — they are never acceptable; --warn or
+// CJS). Cycles fail the command (exit 1), they are never acceptable; --warn or
 // QPQ_CIRCULAR_DEPS_WARN=1 is a temporary escape hatch that reports without
 // failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
+
+const out = createOutput('check:circular');
 
 type CycleGroup = { files: string[]; chainCount: number };
 
@@ -25,14 +28,18 @@ const groupCycles = (cycles: ImportCycle[]): CycleGroup[] => {
   };
 
   for (const cycle of cycles) {
+    const [first] = cycle;
+    if (first === undefined) continue;
     for (const file of cycle) {
-      parent.set(find(file), find(cycle[0]));
+      parent.set(find(file), find(first));
     }
   }
 
   const groups = new Map<string, CycleGroup>();
   for (const cycle of cycles) {
-    const key = find(cycle[0]);
+    const [first] = cycle;
+    if (first === undefined) continue;
+    const key = find(first);
     const group = groups.get(key) ?? { files: [], chainCount: 0 };
     group.chainCount += 1;
     group.files = [...new Set([...group.files, ...cycle])];
@@ -48,7 +55,7 @@ export const checkCircularCommand = async (argv: string[]): Promise<void> => {
   const cycles = await findWorkspaceImportCycles(getRoot());
 
   if (cycles.length === 0) {
-    console.log('check:circular: no circular imports found');
+    out.log('check:circular: no circular imports found');
     return;
   }
 
@@ -57,9 +64,9 @@ export const checkCircularCommand = async (argv: string[]): Promise<void> => {
   const colour = warnOnly ? '\x1b[33m' : '\x1b[31m';
   for (const group of groups) {
     const chainNote = group.chainCount > 1 ? `, ${group.chainCount} distinct loops` : '';
-    console.warn(`${colour}Circular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
+    out.warn(`${colour}Circular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
   }
-  console.warn(`${colour}check:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
+  out.warn(`${colour}check:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
 
   if (!warnOnly) {
     process.exitCode = 1;

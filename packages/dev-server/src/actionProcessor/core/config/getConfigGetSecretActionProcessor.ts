@@ -9,7 +9,8 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: Resolv
       const secretValue = await getOrSeedSecretValue(devServerConfig.runtimePath, secretName, qpqConfig);
       return actionResult(secretValue);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

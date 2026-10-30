@@ -1,23 +1,22 @@
-import { buildTestQpqConfig, defineStorageDrive } from '@qpqjs/core';
+import { defineStorageDrive } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
 import { resolveStorageDriveBucketName } from './resolveStorageDriveBucketName';
 import { StorageDriveNotFoundError } from './StorageDriveNotFoundError';
 
-vi.mock('../../../../awsNamingUtils', () => ({
-  getConfigRuntimeResourceNameFromConfigWithServiceOverride: vi.fn(() => 'resolved-bucket'),
-}));
-
 describe('resolveStorageDriveBucketName', () => {
-  it('resolves the runtime bucket name for a known drive', () => {
+  it('resolves the runtime bucket name for an owned drive', () => {
     const config = buildTestQpqConfig([defineStorageDrive('assets')]);
 
-    const result = resolveStorageDriveBucketName('assets', config);
+    expect(resolveStorageDriveBucketName('assets', config)).toBe('assets-test-app-test-module-development');
+  });
 
-    expect(result).toBe('resolved-bucket');
-    expect(getConfigRuntimeResourceNameFromConfigWithServiceOverride).toHaveBeenCalledWith('assets', config, undefined);
+  it('resolves a cross-module drive under the owner context and override name', () => {
+    const config = buildTestQpqConfig([defineStorageDrive('assets', { owner: { module: 'media', feature: 'beta', storageDriveName: 'files' } })]);
+
+    expect(resolveStorageDriveBucketName('assets', config)).toBe('files-test-app-media-development-beta');
   });
 
   it('throws the named StorageDriveNotFoundError when the storage drive config is missing', () => {

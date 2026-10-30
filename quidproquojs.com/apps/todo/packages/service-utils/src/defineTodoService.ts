@@ -1,9 +1,4 @@
-import {
-  ApiLayer,
-  AwsDataStoreRemovalPolicy,
-  defineAwsDataStoreRemovalPolicy,
-  defineAwsServiceAccountInfo,
-} from '@qpqjs/config-aws';
+import { ApiLayer, AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineAdminSettings, defineAdminUserDirectory } from '@qpqjs/features';
 import {
   defineApi,
@@ -19,16 +14,12 @@ import {
 } from 'quidproquo';
 
 import { execSync } from 'child_process';
-import {
-  TODO_USER_DIRECTORY,
-  TodoServiceEnum,
-  todoServiceNames,
-} from '@todo/constants';
+import { TODO_USER_DIRECTORY, TodoServiceEnum, todoServiceNames } from '@todo/constants';
 
 // Identity comes from the selected deployment in deploy.config.json, primed by the CLI.
 const modulePrefix = process.env.APPLICATION_NAME!;
 
-// The deployed version tag — git sha when available, so a fresh checkout
+// The deployed version tag, git sha when available, so a fresh checkout
 // (or a scaffold that skipped git init) still loads.
 const getVersionTag = (): string => {
   try {
@@ -42,7 +33,7 @@ const getVersionTag = (): string => {
   }
 };
 
-// The shared config every todo service starts from — app identity, dns,
+// The shared config every todo service starts from, app identity, dns,
 // auth, admin, api and caching. Each service's infrastructure.ts layers its
 // own resources on top of this.
 export const defineTodoService = (
@@ -50,16 +41,9 @@ export const defineTodoService = (
   configRoot: string,
   apiBuildPath: string,
   apiLayers: ApiLayer[] = [],
-  lambdaMemoryInMiB = 1024
+  lambdaMemoryInMiB = 1024,
 ): QPQConfig => [
-  defineApplicationModule(
-    modulePrefix,
-    service,
-    process.env.ENVIRONMENT!,
-    configRoot,
-    apiBuildPath,
-    process.env.FEATURE_NAME
-  ),
+  defineApplicationModule(modulePrefix, service, process.env.ENVIRONMENT!, configRoot, apiBuildPath, process.env.FEATURE_NAME),
 
   defineApplicationVersion(`${getVersionTag()}-${new Date().toISOString()}`),
 
@@ -75,22 +59,17 @@ export const defineTodoService = (
   defineAuthSystem(TodoServiceEnum.Auth, TODO_USER_DIRECTORY),
 
   // Both todo deployments are docker images, so there's no cross-account
-  // service map — identity comes from the deployment when an aws target is
+  // service map, identity comes from the deployment when an aws target is
   // ever added.
-  defineAwsServiceAccountInfo(
-    process.env.AWS_DEFAULT_ACCOUNT!,
-    process.env.AWS_DEFAULT_REGION!,
-    [],
-    {
-      apiLayers,
-      lambdaMaxMemoryInMiB: lambdaMemoryInMiB,
-      logServiceName: TodoServiceEnum.Admin,
+  defineAwsServiceAccountInfo(process.env.AWS_DEFAULT_ACCOUNT!, process.env.AWS_DEFAULT_REGION!, [], {
+    apiLayers,
+    lambdaMaxMemoryInMiB: lambdaMemoryInMiB,
+    logServiceName: TodoServiceEnum.Admin,
 
-      disableLogs: [TodoServiceEnum.Admin].includes(service),
-      disableLambdaWarming: true,
-      instantLogs: true,
-    }
-  ),
+    disableLogs: [TodoServiceEnum.Admin].includes(service),
+    disableLambdaWarming: true,
+    instantLogs: true,
+  }),
 
   // Module-federation singletons beyond the react and @qpqjs/web defaults.
   defineFrontendBundleOptions({
@@ -123,7 +102,7 @@ export const defineTodoService = (
       owner: {
         module: TodoServiceEnum.Shell,
       },
-    }
+    },
   ),
 
   defineAdminSettings(TodoServiceEnum.Admin, {

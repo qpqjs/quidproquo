@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, DateActionType, resolveActionResult } from '@qpqjs/core';
+import { DateActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

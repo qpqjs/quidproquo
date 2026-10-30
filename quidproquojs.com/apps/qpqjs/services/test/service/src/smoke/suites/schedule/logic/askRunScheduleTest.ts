@@ -1,11 +1,4 @@
-import {
-  askDateNow,
-  askDelay,
-  askKeyValueStoreGet,
-  askKeyValueStoreUpsert,
-  AskResponse,
-  Nullable,
-} from 'quidproquo';
+import { askDateNow, askPlatformDelay, askKeyValueStoreGet, askKeyValueStoreUpsert, AskResponse, Nullable } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { SCHEDULE_TICK_NAME } from '../constants/scheduleTickName';
@@ -21,10 +14,7 @@ const POLL_INTERVAL_MS = 3000;
 // Which link stalled, from the state the chain left behind. Worth the few
 // lines: "the schedule never fired" and "the stream never fired" send you to
 // completely different places, and a bare timeout says neither.
-const describeStall = (
-  tick: Nullable<ScheduleTickRecord>,
-  runId: string
-): string => {
+const describeStall = (tick: Nullable<ScheduleTickRecord>, runId: string): string => {
   if (!tick) {
     return 'the seeded tick row is gone, so something else deleted it';
   }
@@ -69,20 +59,14 @@ export function* askRunScheduleTest(runId: string): AskResponse<void> {
   let tick: Nullable<ScheduleTickRecord> = null;
 
   for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt += 1) {
-    yield* askDelay(POLL_INTERVAL_MS);
+    yield* askPlatformDelay(POLL_INTERVAL_MS);
 
-    tick = yield* askKeyValueStoreGet<ScheduleTickRecord>(
-      SCHEDULE_TICK_STORE,
-      SCHEDULE_TICK_NAME
-    );
+    tick = yield* askKeyValueStoreGet<ScheduleTickRecord>(SCHEDULE_TICK_STORE, SCHEDULE_TICK_NAME);
 
     if (tick?.runId === runId && tick.acknowledgedAt) {
       return;
     }
   }
 
-  yield* askSmokeAssert(
-    false,
-    `no acknowledgement within ${(POLL_ATTEMPTS * POLL_INTERVAL_MS) / 1000}s: ${describeStall(tick, runId)}`
-  );
+  yield* askSmokeAssert(false, `no acknowledgement within ${(POLL_ATTEMPTS * POLL_INTERVAL_MS) / 1000}s: ${describeStall(tick, runId)}`);
 }

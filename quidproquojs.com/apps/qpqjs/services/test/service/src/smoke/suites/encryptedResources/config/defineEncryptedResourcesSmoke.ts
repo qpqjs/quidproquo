@@ -1,10 +1,5 @@
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import {
-  defineCryptoKey,
-  defineKeyValueStore,
-  defineStorageDrive,
-  QPQConfig,
-} from 'quidproquo';
+import { defineCryptoKey, defineKeyValueStore, defineStorageDrive, QPQConfig } from 'quidproquo';
 
 import { SMOKE_CRYPTO_KEY } from '../constants/SMOKE_CRYPTO_KEY';
 import { SMOKE_ENCRYPTED_PROBE_DRIVE } from '../constants/SMOKE_ENCRYPTED_PROBE_DRIVE';
@@ -16,12 +11,7 @@ import { SMOKE_ENCRYPTED_PROBE_STORE } from '../constants/SMOKE_ENCRYPTED_PROBE_
  */
 export const defineEncryptedResourcesSmoke = (): QPQConfig => [
   defineCryptoKey(SMOKE_CRYPTO_KEY),
-  defineKeyValueStore<SmokeProbeRecord>(
-    SMOKE_ENCRYPTED_PROBE_STORE,
-    'probeId',
-    [],
-    { cryptoKeyName: SMOKE_CRYPTO_KEY }
-  ),
+  defineKeyValueStore<SmokeProbeRecord>(SMOKE_ENCRYPTED_PROBE_STORE, 'probeId', [], { cryptoKeyName: SMOKE_CRYPTO_KEY }),
   defineStorageDrive(SMOKE_ENCRYPTED_PROBE_DRIVE, {
     cryptoKeyName: SMOKE_CRYPTO_KEY,
   }),

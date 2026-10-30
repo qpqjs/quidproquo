@@ -1,9 +1,10 @@
-import { StorySession } from '../../types';
+import { createActionRequester } from '../../logic/actions/createActionRequester';
+import { Nullable, StorySession } from '../../types';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
-import { AnyMatchStoryResult, EventActionType } from './EventActionType';
+import { EventActionType } from './EventActionType';
+import { AnyMatchStoryResult } from './types';
 
-export const askEventGetStorySessionBase = createActionRequester<StorySession | undefined>()({
+export const askEventGetStorySessionBase = createActionRequester<Nullable<StorySession>>()({
   actionType: EventActionType.GetStorySession,
   getPayload: (eventParams: unknown[], qpqEventRecord: unknown, matchStoryResult: AnyMatchStoryResult) => ({
     eventParams,
@@ -16,6 +17,6 @@ export function* askEventGetStorySession<EventParams extends Array<unknown>, Qpq
   eventParams: EventParams,
   qpqEventRecord: QpqEventRecord,
   matchStoryResult: MSR,
-): AskResponse<StorySession | undefined> {
+): AskResponse<Nullable<StorySession>> {
   return yield* askEventGetStorySessionBase(eventParams, qpqEventRecord, matchStoryResult);
 }

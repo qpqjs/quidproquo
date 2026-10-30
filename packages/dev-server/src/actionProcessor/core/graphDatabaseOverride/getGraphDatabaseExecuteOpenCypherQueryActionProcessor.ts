@@ -5,7 +5,7 @@ import {
   askGraphDatabaseExecuteOpenCypherQuery,
   AskResponse,
   askThrowError,
-  ErrorTypeEnum,
+  generateUuid,
   getProcessCustomImplementation,
   GraphCypherResponse,
   GraphDatabaseActionType,
@@ -15,8 +15,6 @@ import {
   qpqCoreUtils,
 } from '@qpqjs/core';
 import { askServiceFunctionExecute } from '@qpqjs/webserver';
-
-import { randomUUID } from 'crypto';
 
 const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
   return function* askRunNeptuneOpenCypherQuery(
@@ -30,12 +28,12 @@ const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
 
     if (!graphDatabaseConfig) {
       return yield* askThrowError(
-        ErrorTypeEnum.GenericError,
+        askGraphDatabaseExecuteOpenCypherQuery.errorType.GraphDatabaseNotFound,
         `Invalid graph config for [${graphDatabaseExecuteOpenCypherQueryActionPayload.graphDatabaseName}]`,
       );
     }
 
-    const functionName = `graphQuery${graphDatabaseConfig.virualNetworkName}`;
+    const functionName = `graphQuery${graphDatabaseConfig.virtualNetworkName}`;
 
     return yield* askServiceFunctionExecute<GraphCypherResponse, GraphDatabaseExecuteOpenCypherQueryActionPayload>(
       serviceName,
@@ -57,7 +55,7 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
       // as we use the service functions to proxy the queries though the VPC
       getServiceFunctionActionProcessor,
       () => new Date().toISOString(),
-      randomUUID,
+      generateUuid,
     ),
   };
 };

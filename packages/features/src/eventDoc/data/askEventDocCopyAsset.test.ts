@@ -1,14 +1,15 @@
-import { askStorageScopeProvide, FileActionType, GuidActionType, runStory } from '@qpqjs/core';
+import { askStorageScopeProvide, FileActionType, GuidActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { askEventDocCopyAsset } from './askEventDocCopyAsset';
 
 const source = { guid: 'asset-1', filename: 'render.pdf', mimetype: 'application/pdf' };
 
-const underPackBuilds = <T>(story: Parameters<typeof askEventDocProvideStore<T>>[1]) =>
-  askEventDocProvideStore({ storeName: 'packBuilds', type: 'packBuild' }, story);
+const underPackBuilds = (story: Parameters<typeof askEventDocStoreProvide>[1]) =>
+  askEventDocStoreProvide(buildEventDocStore({ storeName: 'packBuilds', type: 'packBuild' }), story);
 
 describe('askEventDocCopyAsset', () => {
   it('copies from the source collection drive to this collection drive under the ambient scope', () => {
@@ -49,6 +50,6 @@ describe('askEventDocCopyAsset', () => {
     });
 
     expect(ref.filename).toBe('render.pdf');
-    expect(copies[0].scope).toBeUndefined();
+    expect(copies![0]!.scope).toBeUndefined();
   });
 });

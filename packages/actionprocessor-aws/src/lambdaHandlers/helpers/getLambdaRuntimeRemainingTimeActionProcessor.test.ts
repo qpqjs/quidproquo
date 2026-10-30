@@ -1,4 +1,5 @@
-import { buildTestStorySession, resolveActionResult, SystemActionType } from '@qpqjs/core';
+import { resolveActionResult, SystemActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { Context } from 'aws-lambda';
 import { describe, expect, it } from 'vitest';
@@ -10,36 +11,13 @@ describe('getLambdaRuntimeRemainingTimeActionProcessor', () => {
     let remaining = 9000;
     const context = { getRemainingTimeInMillis: () => remaining } as unknown as Context;
 
-    const processor = getLambdaRuntimeRemainingTimeActionProcessor(context)[SystemActionType.GetRuntimeRemainingTime];
+    const processors = await getLambdaRuntimeRemainingTimeActionProcessor(context)(buildTestQpqConfig(), noopDynamicModuleLoader);
+    const processor = processors[SystemActionType.GetRuntimeRemainingTime]!;
 
-    expect(
-      resolveActionResult(
-        await processor(
-          undefined,
-          buildTestStorySession(),
-          {},
-          {} as any,
-          () => {},
-          async () => null,
-          {} as any,
-        ),
-      ),
-    ).toBe(9000);
+    expect(resolveActionResult(await invokeProcessor(processor, undefined))).toBe(9000);
 
     remaining = 1500;
 
-    expect(
-      resolveActionResult(
-        await processor(
-          undefined,
-          buildTestStorySession(),
-          {},
-          {} as any,
-          () => {},
-          async () => null,
-          {} as any,
-        ),
-      ),
-    ).toBe(1500);
+    expect(resolveActionResult(await invokeProcessor(processor, undefined))).toBe(1500);
   });
 });

@@ -1,4 +1,4 @@
-import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { CrossModuleOwner, Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import {
   AccountBudgetQPQConfigSetting,
@@ -7,7 +7,9 @@ import {
   AwsAlarmQPQConfigSetting,
   AwsDataStoreRemovalPolicy,
   AwsDataStoreRemovalPolicyQPQConfigSetting,
-  AwsDyanmoOverrideForKvsQPQConfigSetting,
+  AwsDomainProxyViewerProtocolPolicy,
+  AwsDomainProxyViewerProtocolPolicyQPQConfigSetting,
+  AwsDynamoOverrideForKvsQPQConfigSetting,
   AwsGithubDeployRoleQPQConfigSetting,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
@@ -21,16 +23,18 @@ import {
   EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
-import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
+import { resolveDeploymentFromConfig } from '../naming/resolveDeploymentFromConfig';
+import { withFeatureSuffix } from '../naming/withFeatureSuffix';
+import { LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
+
+/** Every defineAwsServiceAccountInfo in the config: one for an AWS service, none for a config that never deploys there. */
+export const getAllAwsServiceAccountInfoConfigs = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAccountInfo);
 
 export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
-  const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsServiceAccountInfo,
-  );
+  const serviceAccountInfos = getAllAwsServiceAccountInfoConfigs(qpqConfig);
 
   if (serviceAccountInfos.length === 0) {
-    console.log(JSON.stringify(qpqConfig, null, 2));
     throw new Error('use defineAwsServiceAccountInfo to define aws deployment config');
   }
 
@@ -38,7 +42,12 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
     throw new Error('max one entry of defineAwsServiceAccountInfo can be used');
   }
 
-  return serviceAccountInfos[0];
+  const [serviceAccountInfo] = serviceAccountInfos;
+  if (!serviceAccountInfo) {
+    throw new Error('defineAwsServiceAccountInfo is required');
+  }
+
+  return serviceAccountInfo;
 };
 
 /**
@@ -48,12 +57,9 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
  * still be bundled.
  */
 export const getLayerProvidedModules = (qpqConfig: QPQConfig): string[] => {
-  const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsServiceAccountInfo,
+  return getAllAwsServiceAccountInfoConfigs(qpqConfig).flatMap((serviceAccountInfo) =>
+    serviceAccountInfo.apiLayers.flatMap((layer) => layer.modules ?? []),
   );
-
-  return serviceAccountInfos.flatMap((serviceAccountInfo) => serviceAccountInfo.apiLayers.flatMap((layer) => layer.modules ?? []));
 };
 
 /**
@@ -121,13 +127,9 @@ export const isWafProtectionEnabled = (qpqConfig: QPQConfig): boolean =>
 // config that creates them and the service configs that attach them are separate arrays -
 // both sides can derive this name from their own app/env/feature.
 export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig): string => {
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, environment, feature } = resolveDeploymentFromConfig(qpqConfig);
 
-  const deploymentName = feature ? `${application}-${environment}-${feature}` : `${application}-${environment}`;
-
-  return `/qpq/waf/web-acl-arn/${wafScope}/${deploymentName}`;
+  return `/qpq/waf/web-acl-arn/${wafScope}/${withFeatureSuffix(`${application}-${environment}`, feature)}`;
 };
 
 export const getAccountCloudTrailConfigs = (qpqConfig: QPQConfig): AccountCloudTrailQPQConfigSetting[] =>
@@ -255,11 +257,6 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
       return Object.keys(b.info).length - Object.keys(a.info).length;
     });
 
-  // if (printInfo) {
-  //   console.log(`getMatchWeight: targetModule: [${targetModule}], targetEnvironment: [${targetEnvironment}], targetFeature: [${targetFeature}], targetApplication: [${targetApplication}]`);
-  //   console.log(JSON.stringify(sortedAwsServiceAccountInfos.slice(0, 5), null, 2));
-  // }
-
   const serviceAccountInfo = sortedAwsServiceAccountInfos.find((info) => info.weight > 0);
 
   if (!serviceAccountInfo) {
@@ -305,14 +302,13 @@ export const getDomainCertificateArnSsmParameterName = (region: string, qpqConfi
   return `/qpq/domain/certificate-arn/${region}/${[application, environment, feature].filter(Boolean).join('-')}`;
 };
 
-export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
-  // Get the key value store config
+export const getDynamoTableNameOverride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
   const resource = qpqCoreUtils.getKeyValueStoreFullyQualifiedResourceName(srcKvsName, qpqConfig);
 
   // Grab all the overrides that do exist
-  const dynamoOverrides = qpqCoreUtils.getConfigSettings<AwsDyanmoOverrideForKvsQPQConfigSetting>(
+  const dynamoOverrides = qpqCoreUtils.getConfigSettings<AwsDynamoOverrideForKvsQPQConfigSetting>(
     qpqConfig,
-    QPQAwsConfigSettingType.awsDyanmoOverrideForKvs,
+    QPQAwsConfigSettingType.awsDynamoOverrideForKvs,
   );
 
   // Find an override that matches the resource
@@ -326,3 +322,9 @@ export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQCo
   // No override found, return empty string
   return '';
 };
+
+/** The viewer protocol policy declared for a domain proxy (defineAwsDomainProxyViewerProtocolPolicy), else redirect-to-https. */
+export const getAwsDomainProxyViewerProtocolPolicy = (domainProxyName: string, qpqConfig: QPQConfig): AwsDomainProxyViewerProtocolPolicy =>
+  qpqCoreUtils
+    .getConfigSettings<AwsDomainProxyViewerProtocolPolicyQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsDomainProxyViewerProtocolPolicy)
+    .find((setting) => setting.domainProxyName === domainProxyName)?.viewerProtocolPolicy ?? AwsDomainProxyViewerProtocolPolicy.redirectToHttps;

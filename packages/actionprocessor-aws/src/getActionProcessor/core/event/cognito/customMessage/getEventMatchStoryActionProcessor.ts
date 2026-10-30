@@ -4,20 +4,16 @@ import {
   askEventMatchStoryBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from '@qpqjs/core';
 import { EmailSendEventType } from '@qpqjs/webserver';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
-// TODO: Don't use Globals like this
-const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
+const getProcessMatchStory = (qpqConfig: QPQConfig, userDirectoryName: string): ProcessorFor<typeof askEventMatchStoryBase> => {
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
   return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
@@ -43,4 +39,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** The user directory the lambda serves comes from the handler, which reads it from the lambda environment once. */
+export const getEventMatchStoryActionProcessor = (userDirectoryName: string) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, userDirectoryName));

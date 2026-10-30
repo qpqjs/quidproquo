@@ -1,13 +1,5 @@
-import {
-  AiModel,
-  ConfigActionType,
-  ContextActionType,
-  FileActionType,
-  QueueEvent,
-  QueueMessage,
-  runStory,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { AiModel, ConfigActionType, ContextActionType, FileActionType, QueueEvent, QueueMessage, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -63,7 +55,7 @@ const serveHistory = (sendUsageToFrontend: boolean): EventDocAiChatMessage[] => 
 
   expect(sentMessages).toHaveLength(1);
 
-  return sentMessages[0].payload.result;
+  return sentMessages![0]!.payload.result;
 };
 
 describe('onChatHistory', () => {

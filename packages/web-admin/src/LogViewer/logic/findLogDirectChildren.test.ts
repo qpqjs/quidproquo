@@ -1,19 +1,20 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { fineLogDirectChildren } from './findLogDirectChildren';
+import { findLogDirectChildren } from './findLogDirectChildren';
 
 const apiRequestGet = vi.fn();
 
-vi.mock('../../logic', () => ({
-  cache: (fn: unknown) => fn,
+// Only the network wrapper is replaced; the memoising `cache` is real, so each test uses its own correlation.
+vi.mock('../../logic/platform/apiRequest', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
 }));
 
-describe('fineLogDirectChildren', () => {
+describe('findLogDirectChildren', () => {
   it('returns the items from the children endpoint', async () => {
     apiRequestGet.mockResolvedValue({ items: [{ correlation: 'c1' }] });
 
-    const result = await fineLogDirectChildren('corr-children-ok', 'https://api', 'token');
+    const result = await findLogDirectChildren('corr-children-ok', 'https://api', 'token');
 
     expect(apiRequestGet).toHaveBeenCalledWith('/log/children/corr-children-ok', 'https://api', 'token');
     expect(result).toEqual([{ correlation: 'c1' }]);
@@ -23,7 +24,7 @@ describe('fineLogDirectChildren', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     apiRequestGet.mockRejectedValue(new Error('boom'));
 
-    const result = await fineLogDirectChildren('corr-children-fail', 'https://api');
+    const result = await findLogDirectChildren('corr-children-fail', 'https://api');
 
     expect(result).toEqual([]);
   });

@@ -1,5 +1,5 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsItemRecord } from './types';
 
@@ -19,15 +19,14 @@ export type KeyValueStoreUpsertManyOptions = {
 export const askKeyValueStoreUpsertManyBase = createActionRequester<void>()({
   actionType: KeyValueStoreActionType.UpsertMany,
   errorTypes: [
-    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'Throttled', // the store is throttling or failed internally; transient
     'ResourceNotFound', // the underlying table does not exist
     'InvalidScope', // scope is malformed or the store's partition key is not string-typed
     'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
     // Two items in one batch share a primary key. Rejected up front on every
-    // runtime, before anything is written: DynamoDB rejects same-key duplicates
-    // only when they land in the same 25-item BatchWriteItem chunk (across chunks
-    // the later write silently wins), so without this check the outcome would
-    // depend on item position and never reproduce locally.
+    // runtime, before anything is written: a store that writes in chunks would
+    // otherwise let the later duplicate silently win depending on item position,
+    // and the outcome would never reproduce locally.
     'DuplicateKey',
     // A conditional (ifNotExists) batch lost to an existing item; none of the batch was
     // written. Final: a slot is taken. Namespaced, not ErrorTypeEnum.Conflict, so retry
@@ -45,10 +44,13 @@ export const askKeyValueStoreUpsertManyBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the item shape they are writing at the call site.
-export function* askKeyValueStoreUpsertMany<KvsItem>(
+function* askKeyValueStoreUpsertManyTyped<KvsItem>(
   keyValueStoreName: string,
   items: KvsItem[],
   options?: KeyValueStoreUpsertManyOptions,
 ): AskResponse<void> {
   return yield* askKeyValueStoreUpsertManyBase(keyValueStoreName, items as KvsItemRecord[], options);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askKeyValueStoreUpsertMany = Object.assign(askKeyValueStoreUpsertManyTyped, { errorType: askKeyValueStoreUpsertManyBase.errorType });

@@ -1,7 +1,9 @@
-import { buildTestQpqConfig, KeyValueStoreActionType, noopDynamicModuleLoader } from '@qpqjs/core';
+import { KeyValueStoreActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreActionProcessor } from './getKeyValueStoreActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -12,7 +14,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 describe('getKeyValueStoreActionProcessor', () => {
   it('aggregates a processor for every key value store action type', async () => {

@@ -1,16 +1,16 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
+export type QpqCoreKeyValueStoreConstructProps = {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
 
   /**
@@ -18,20 +18,20 @@ export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockPro
    * resolveCryptoKeyForResource). Required when the store names one.
    */
   cryptoKey?: aws_kms.IKey;
-}
+} & QpqConstructBlockProps;
 
 export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBlock {
   abstract table: aws_dynamodb.ITable;
 
-  public grantRead(grantee: aws_iam.IGrantable) {
+  public override grantRead(grantee: aws_iam.IGrantable) {
     this.table.grantReadData(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable) {
+  public override grantWrite(grantee: aws_iam.IGrantable) {
     this.table.grantWriteData(grantee);
   }
 
-  public grantAll(grantee: aws_iam.IGrantable) {
+  public override grantAll(grantee: aws_iam.IGrantable) {
     this.table.grantFullAccess(grantee);
   }
 }
@@ -62,7 +62,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   table: aws_dynamodb.ITable;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, keyValueStoreName: string): QpqCoreKeyValueStoreConstructBase {
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqCoreKeyValueStoreConstructBase {
       table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
@@ -100,7 +100,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: !props.keyValueStoreConfig.disablePointInTimeRecovery },
       encryption: tableEncryption,
       encryptionKey,
-      // Change data capture, only when a handler is configured — a stream on a table
+      // Change data capture, only when a handler is configured, a stream on a table
       // nothing consumes is pure cost. NEW_AND_OLD_IMAGES so a handler can see what a
       // change actually did, including on a delete, where the new image does not exist.
       stream: props.keyValueStoreConfig.onStream ? aws_dynamodb.StreamViewType.NEW_AND_OLD_IMAGES : undefined,
@@ -126,9 +126,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     });
 
     // Do local secondary indexes
-    for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {
-      let sortKey = props.keyValueStoreConfig.sortKeys[i];
-
+    for (const sortKey of props.keyValueStoreConfig.sortKeys.slice(1)) {
       table.addLocalSecondaryIndex({
         indexName: sortKey.key,
         sortKey: convertKvsKeyToDynamodbAttribute(sortKey),
@@ -150,7 +148,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     // Publish the stream ARN for the API stack's handler to pick up.
     //
     // A DynamoDB stream ARN ends in a creation timestamp, so unlike every other resource
-    // here it CANNOT be recomputed from naming conventions — which is how the API stack
+    // here it CANNOT be recomputed from naming conventions, which is how the API stack
     // reaches every other table (fromOtherStack). Passing the table object across stacks
     // would work but creates a CloudFormation export, the coupling this codebase avoids
     // everywhere else. So it goes through SSM and is resolved at deploy time, the same
@@ -164,9 +162,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     // If we have an override, lets use it instead
     // we still want to keep the above table created.
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
     if (tableNameOverride) {
-      console.log('tableNameOverride', tableNameOverride);
       this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
   }
@@ -185,41 +182,23 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
 
-    // Owned tables are granted as a single tag-conditioned statement instead of one ARN
-    // pair per table: applyEnvironmentTags stamps every owned table, and DynamoDB ABAC
-    // evaluates the table's tags for its index sub-resources too. This keeps the policy
-    // a fixed size no matter how many KVSs (eventDoc collections especially) the service
-    // accumulates. A table brought in via getDynamoTableNameOverrride is imported, not
-    // created here, so it only matches if whoever created it applied the same tags.
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: kvsActions,
-        resources: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
-        conditions: {
-          StringEquals: qpqDeployAwsUtils.getOwnedResourceTagConditions(qpqConfig),
-        },
+    grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverKeyValueStoreAccess',
+      actions: kvsActions,
+      // applyEnvironmentTags stamps every owned table, and DynamoDB ABAC evaluates the table's
+      // tags for its index sub-resources too. A table brought in via getDynamoTableNameOverride
+      // is imported, not created here, so it only matches if whoever created it applied the same tags.
+      ownedResourceArns: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
+      ownedByTag: true,
+      // The same naming path as `getKvsDynamoTableNameFromConfig`, so no CDK cross-stack ref is created.
+      foreignArns: getForeignConfigs(qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+        const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
+        const owner = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
+        const tableArn = `arn:aws:dynamodb:${owner.awsRegion}:${owner.awsAccountId}:table/${tableName}`;
+
+        return [tableArn, `${tableArn}/index/*`];
       }),
-    );
-
-    // Deterministically-computed ARNs for KVSs declared in this service's
-    // config but owned by another service. Uses the same naming path as
-    // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
-    // Cross-service access stays as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStores(qpqConfig);
-    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig);
-    const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
-
-    const foreignArns = foreignKvsConfigs.flatMap((cfg) => {
-      const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
-      const tableArn = `arn:aws:dynamodb:*:*:table/${tableName}`;
-      return [tableArn, `${tableArn}/index/*`];
     });
-
-    if (foreignArns.length > 0) {
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverKeyValueStoreAccess', kvsActions, foreignArns);
-    }
 
     // KMS use for a store's cryptoKeyName comes from QpqCoreCryptoKeyConstruct.authorizeActionsForRole,
     // which covers every crypto key declared in this config.

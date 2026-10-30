@@ -1,17 +1,9 @@
-import {
-  buildTestQpqConfig,
-  ErrorTypeEnum,
-  EventActionType,
-  isErroredActionResult,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  resolveActionResultError,
-} from '@qpqjs/core';
+import { ErrorTypeEnum, EventActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { defineRoute } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 
 const runtime = '/entry::onGet' as const;
@@ -21,7 +13,7 @@ const buildConfigWithRoute = () => buildTestQpqConfig([defineRoute('GET', '/user
 const invoke = async (qpqConfig: any, qpqEventRecord: any) => {
   const processors = await getEventMatchStoryActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const process = processors[EventActionType.MatchStory];
-  return invokeProcessor(process, { qpqEventRecord, eventParams: [{ headers: {} }] } as any);
+  return invokeProcessor(process!, { qpqEventRecord, eventParams: [{ headers: {} }] } as any);
 };
 
 describe('getEventMatchStoryActionProcessor (express)', () => {

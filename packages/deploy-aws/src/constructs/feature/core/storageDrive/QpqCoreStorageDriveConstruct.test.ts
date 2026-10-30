@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
@@ -96,7 +97,7 @@ describe('QpqCoreStorageDriveConstruct transport', () => {
   it.each([
     ['plain drive', defineStorageDrive('uploads')],
     ['lockedDown drive', defineStorageDrive('logs', { lockedDown: true })],
-  ])('denies plain http on a %s', (_name, drive) => {
+  ])('denies plain http on a %s', (_name: any, drive: any) => {
     synth(drive).hasResourceProperties('AWS::S3::BucketPolicy', {
       PolicyDocument: {
         Statement: Match.arrayWith([
@@ -104,5 +105,37 @@ describe('QpqCoreStorageDriveConstruct transport', () => {
         ]),
       },
     });
+  });
+});
+
+describe('QpqCoreStorageDriveConstruct lifecycle rules', () => {
+  it('maps each tier to its S3 storage class and honours enabled', () => {
+    const template = synth(
+      defineStorageDrive('archive', {
+        lifecycleRules: [
+          { prefix: 'logs/', transitions: [{ storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE, transitionAfterDays: 30 }] },
+          { prefix: 'tmp/', deleteAfterDays: 7, enabled: false },
+          { transitions: [{ storageDriveTier: StorageDriveTier.SMART_TIERING, transitionAfterDays: 1 }] },
+        ],
+      }),
+    );
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: Match.arrayWith([
+          Match.objectLike({ Prefix: 'logs/', Status: 'Enabled', Transitions: [{ StorageClass: 'DEEP_ARCHIVE', TransitionInDays: 30 }] }),
+          Match.objectLike({ Prefix: 'tmp/', Status: 'Disabled', ExpirationInDays: 7 }),
+          Match.objectLike({ Status: 'Enabled', Transitions: [{ StorageClass: 'INTELLIGENT_TIERING', TransitionInDays: 1 }] }),
+        ]),
+      },
+    });
+  });
+
+  it('refuses a transition to the REGULAR tier at synth', () => {
+    expect(() =>
+      synth(
+        defineStorageDrive('bad', { lifecycleRules: [{ transitions: [{ storageDriveTier: StorageDriveTier.REGULAR, transitionAfterDays: 30 }] }] }),
+      ),
+    ).toThrow('not supported');
   });
 });

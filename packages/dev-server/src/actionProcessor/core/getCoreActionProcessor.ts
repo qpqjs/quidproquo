@@ -16,9 +16,9 @@ import { getUserDirectoryActionProcessor } from './userDirectory';
 import { getUserScriptActionProcessor } from './userScriptOverride';
 
 // The dev server bundles every hosted service plus the whole framework (aliased to
-// workspace src/, not node_modules) into one script — the tracer's default "not
-// node_modules" own-code heuristic can't tell them apart there, so onlyOwnCode traces
-// would otherwise instrument the entire bundle instead of just the traced service.
+// workspace src/, not node_modules) into one script, so the tracer's default "not
+// node_modules" own-code heuristic can't tell them apart there, and onlyOwnCode traces
+// would instrument the entire bundle instead of just the traced service.
 // Resolve the traced story's own source root and narrow to it.
 const resolveDevServerOwnCodeMarkers = (qpqFunctionRuntimeInfo: QpqFunctionRuntime | undefined, qpqConfig: QPQConfig): string[] | undefined => {
   if (!qpqFunctionRuntimeInfo) {
@@ -26,13 +26,11 @@ const resolveDevServerOwnCodeMarkers = (qpqFunctionRuntimeInfo: QpqFunctionRunti
   }
 
   try {
-    const root = isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo)
-      ? qpqFunctionRuntimeInfo.basePath
-      : qpqCoreUtils.getApplicationConfigRoot(qpqConfig);
+    const root = isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.basePath : qpqCoreUtils.getConfigRoot(qpqConfig);
 
     return root ? getOwnCodeMarkersFromRoot(root) : undefined;
   } catch {
-    // No configRoot resolvable — fall back to the plain node_modules heuristic.
+    // No configRoot resolvable: fall back to the plain node_modules heuristic.
     return undefined;
   }
 };

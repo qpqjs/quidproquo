@@ -6,7 +6,6 @@ import { Construct } from 'constructs';
 
 import {
   ApiQpqWebserverApiConstruct,
-  LambdaLayers,
   QpqApiCoreKeyValueStoreStreamConstruct,
   QpqApiCoreQueueConstruct,
   QpqApiCoreStorageDriveConstruct,
@@ -25,59 +24,50 @@ import {
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
-export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
+export type ApiQpqServiceStackProps = {
   infQpqServiceStack?: InfQpqServiceStack;
-}
+} & QpqServiceStackProps;
 
 export class ApiQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: ApiQpqServiceStackProps) {
     super(scope, id, props);
 
-    // Add the inf stack as a dependency so it builds first
     if (props.infQpqServiceStack) {
       this.addDependency(props.infQpqServiceStack);
     }
 
-    // Build Lambda Layers
-    const layers = new LambdaLayers(this, 'lambda-layers', {
-      qpqConfig: props.qpqConfig,
-    });
-
     // Schedule Events
-    const scheduleEvent = qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).map(
+    qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreRecurringScheduleConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
 
           scheduleConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
     // Api - routes
-    const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).forEach(
       (setting) =>
         new ApiQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
     // Queues
-    const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
+    qpqCoreUtils.getAllQueueConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
 
           queueConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
     // Redirects
-    const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
+    qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverSubdomainRedirectConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -87,28 +77,27 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Service Functions
-    const serviceFunctions = qpqWebServerUtils.getOwnedServiceFunctions(props.qpqConfig).map(
+    qpqWebServerUtils.getOwnedServiceFunctions(props.qpqConfig).forEach(
       (setting) =>
         new QpqWebserverServiceFunctionConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
 
           serviceFunctionConfig: setting,
-          apiLayerVersions: layers.layers,
         }),
     );
 
     // User script runner: the sandbox that askUserScriptExecute hands scripts to
-    const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunner(props.qpqConfig);
-    const userScriptRunner = userScriptRunnerConfig
-      ? new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
-          qpqConfig: props.qpqConfig,
+    const userScriptRunnerConfig = qpqCoreUtils.getUserScriptRunnerConfig(props.qpqConfig);
+    if (userScriptRunnerConfig) {
+      new QpqCoreUserScriptRunnerConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(userScriptRunnerConfig), {
+        qpqConfig: props.qpqConfig,
 
-          userScriptRunnerConfig,
-        })
-      : undefined;
+        userScriptRunnerConfig,
+      });
+    }
 
     // Build websocket apis
-    const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
+    qpqWebServerUtils.getOwnedWebsocketConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -119,7 +108,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     QpqWebserverWebsocketConstruct.authorizeManageConnectionsForReferencedWebsockets(this, props.qpqConfig);
 
     // migrations
-    const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreDeployEventConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -129,7 +118,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Storage Drives
-    const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
+    qpqCoreUtils.getAllStorageDriveConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -141,7 +130,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     // Email receivers: the app's rule in the account's receipt rule set. Here rather than on
     // the Inf stack for the same reason as the drive events: SES validates the bucket and its
     // write policy when the rule is created, and both exist once Inf has deployed.
-    qpqWebServerUtils.getEmailReceiverConfigs(props.qpqConfig).map(
+    qpqWebServerUtils.getAllEmailReceiverConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqApiWebserverEmailReceiverConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -150,10 +139,10 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    // Key value store streams — the projector lambda + event source for any store that
+    // Key value store streams, the projector lambda + event source for any store that
     // declares onStream. Lives here rather than on the Inf stack because that stack builds
     // no lambdas; the stream ARN crosses via SSM (see the construct).
-    const keyValueStoreStreams = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(
+    qpqCoreUtils.getAllKeyValueStoreConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqApiCoreKeyValueStoreStreamConstruct(this, `kvs-stream-${qpqCoreUtils.getUniqueKeyForSetting(setting)}`, {
           qpqConfig: props.qpqConfig,
@@ -164,7 +153,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
 
     // alarms
     // create alarms inside the api stack because we want sns topics to be already made
-    const alarms = qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).map(
+    qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqConfigAwsAlarmConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
@@ -173,7 +162,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    const notifyErrors = qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).map(
+    qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqCoreNotifyErrorConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

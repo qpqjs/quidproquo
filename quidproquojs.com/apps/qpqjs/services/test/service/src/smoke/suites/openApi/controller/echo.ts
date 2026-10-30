@@ -1,9 +1,5 @@
 import { dynamicRoute } from '@qpqjs/features';
-import {
-  EchoRequestSchema,
-  EchoResponse,
-  EchoResponseSchema,
-} from '@qpqjs/test-models';
+import { EchoRequestSchema, EchoResponse, EchoResponseSchema } from '@qpqjs/test-models';
 import { AskResponse, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo';
 
 // POST /echo/{pathValue}. Public. Exists to prove a value survives the trip
@@ -21,11 +17,10 @@ export const echo = dynamicRoute(
   {
     schema: {
       summary: 'Echo a path and body value',
-      description:
-        'Returns the {pathValue} url segment and the bodyValue from the JSON body, untouched. Public, for trying the docs UI.',
+      description: 'Returns the {pathValue} url segment and the bodyValue from the JSON body, untouched. Public, for trying the docs UI.',
       tags: ['echo'],
       body: EchoRequestSchema,
       response: EchoResponseSchema,
     },
-  }
+  },
 );

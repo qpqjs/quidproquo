@@ -1,7 +1,7 @@
-import { AdminAppState } from '../../AdminAppState';
+import { AdminAppState } from '../../types/AdminAppState';
 import { selectSessionState } from './selectSessionState';
 
-// The URL is a projection of session state — never a source of truth after
+// The URL is a projection of session state, never a source of truth after
 // boot. Empty values clear their param.
 export const selectUrlProjection = (state: AdminAppState): Record<string, string[]> => {
   const session = selectSessionState(state);

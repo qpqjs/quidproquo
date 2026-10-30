@@ -11,10 +11,7 @@ const DENIED_NAMES = ['AccessDenied', 'AccessDeniedException'];
 
 // Run one AWS call and record how it ended. A 403 (or an AccessDenied error name) means IAM
 // refused signed credentials; the SDK's own CredentialsProviderError means it had none.
-export const recordAwsProbeAttempt = async (
-  name: string,
-  call: () => Promise<unknown>
-): Promise<SmokeAwsProbeAttempt> => {
+export const recordAwsProbeAttempt = async (name: string, call: () => Promise<unknown>): Promise<SmokeAwsProbeAttempt> => {
   try {
     const value = await call();
     return {
@@ -29,10 +26,7 @@ export const recordAwsProbeAttempt = async (
     if (error.name === 'CredentialsProviderError') {
       return { name, outcome: SmokeAwsProbeOutcome.noCredentials, detail };
     }
-    if (
-      error.$metadata?.httpStatusCode === 403 ||
-      DENIED_NAMES.includes(error.name ?? '')
-    ) {
+    if (error.$metadata?.httpStatusCode === 403 || DENIED_NAMES.includes(error.name ?? '')) {
       return { name, outcome: SmokeAwsProbeOutcome.denied, detail };
     }
     return { name, outcome: SmokeAwsProbeOutcome.failed, detail };

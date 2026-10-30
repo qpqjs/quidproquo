@@ -10,12 +10,12 @@ import { requireDomainResolver } from '../appWorkspace/requireDomainResolver';
 import { lookupHostedZone, resolveHostedZoneForHost } from '../utils/domain';
 import { applyApplicationTags } from '../utils/qpqDeployAwsUtils';
 
-export interface DomainCertificateStackProps {
+export type DomainCertificateStackProps = {
   qpqConfig: QPQConfig;
   certificateConfig: DomainCertificateQPQConfigSetting;
 
   stackName?: string;
-}
+};
 
 // ACM's default quota for names on one certificate; a synth error beats a deploy failure.
 const acmDomainNamesPerCertificateQuota = 10;
@@ -70,9 +70,14 @@ export class DomainCertificateStack extends Stack {
       this.domainNames.map((domainName) => [domainName, lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainName))]),
     );
 
+    const [primaryDomainName, ...alternativeNames] = this.domainNames;
+    if (primaryDomainName === undefined) {
+      throw new Error(`The ${certRegion} certificate has no domain names`);
+    }
+
     const certificate = new aws_certificatemanager.Certificate(this, 'cert', {
-      domainName: this.domainNames[0],
-      subjectAlternativeNames: this.domainNames.slice(1),
+      domainName: primaryDomainName,
+      subjectAlternativeNames: alternativeNames,
       validation: aws_certificatemanager.CertificateValidation.fromDnsMultiZone(hostedZones),
     });
     // ACM certificate names are immutable, so adding, removing or reshaping a root replaces

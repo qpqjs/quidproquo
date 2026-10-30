@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { EventBusQuickSubscriptionType, getAwsAccountIds, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, EventBusQuickSubscriptionType, getAwsAccountIds, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
@@ -8,9 +7,9 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
+export type QpqCoreEventBusConstructProps = {
   eventBusConfig: EventBusQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // `*-<app>-*-<env>[-<feature>]` in every app account, plain and FIFO: the queue naming scheme
 // with the queue and service segments wildcarded.
@@ -32,15 +31,10 @@ const resolveSubscriberQueueArnPatterns = (qpqConfig: QPQConfig): string[] => {
 export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
   abstract topic: aws_sns.ITopic;
 
-  public grantRead(grantee: aws_iam.IGrantable) {}
+  public override grantRead(grantee: aws_iam.IGrantable) {}
 
-  public grantWrite(grantee: aws_iam.IGrantable): void {
+  public override grantWrite(grantee: aws_iam.IGrantable): void {
     this.topic.grantPublish(grantee);
-  }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
   }
 }
 
@@ -48,17 +42,9 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
   topic: aws_sns.ITopic;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, eventBusSubscription: string): QpqCoreEventBusConstructBase {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusSubscription, qpqConfig);
 
-    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusConfig?.owner?.resourceNameOverride || eventBusSubscription,
-      qpqConfig,
-      eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-      eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      eventBusConfig?.isFifo,
-    );
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusSubscription, qpqConfig, eventBusConfig);
 
     class Import extends QpqCoreEventBusConstructBase {
       topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);
@@ -139,9 +125,8 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       }
     });
 
-    // TODO: remove this, its deprecated
+    // TODO: @joe-coady: @joe-coady: remove this deprecated export.
     const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(props.eventBusConfig.name, props.qpqConfig);
     qpqDeployAwsUtils.exportStackValue(this, exportName, this.topic.topicArn);
-    // ///////// end todo
   }
 }

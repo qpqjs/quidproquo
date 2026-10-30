@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertManyBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   KvsStreamEventType,
   ProcessorFor,
   QPQConfig,
@@ -67,8 +66,8 @@ const getProcessKeyValueStoreUpsertMany = (
         });
       }
 
-      return actionResult(void 0);
-    } catch (error: any) {
+      return actionResult(undefined);
+    } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),

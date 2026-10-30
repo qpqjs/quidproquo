@@ -5,7 +5,7 @@ import { EventDocWorkspaceStoryApi } from '../types/EventDocWorkspaceStoryApi';
 import { askRunInEventDocWorkspaceSlot } from './askRunInEventDocWorkspaceSlot';
 
 const bindVerb = (binding: EventDocWorkspaceSlotBinding, verb: (...args: any[]) => AskResponse<any>) =>
-  function* boundVerb(...args: any[]): AskResponse<any> {
+  function* askEventDocWorkspaceBoundVerb(...args: any[]): AskResponse<any> {
     return yield* askRunInEventDocWorkspaceSlot(binding, verb(...args));
   };
 

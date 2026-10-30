@@ -4,24 +4,27 @@ import path from 'path';
 import { getAppDirectory, getAppsDirectory, getAvailableApps, getRoot } from './discovery';
 import { nextPrefixColor, runCommand, runCommandPrefixed } from './runCommand';
 import { runDependencyTasks, TaskFailure } from './runTasks';
+import { createOutput } from './out';
 
-interface HookPackageJson {
+const out = createOutput('hooks');
+
+type HookPackageJson = {
   name?: string;
   scripts?: Record<string, string>;
   workspaces?: string[];
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-}
+};
 
 // A directory whose package.json can carry qpq:<hook> scripts: either an app
 // (apps/<app>/package.json, which need not be an npm workspace) or any package
 // matched by the consumer root's `workspaces` globs.
-interface HookPackage {
+type HookPackage = {
   dir: string;
   label: string; // app name or package name, for display
   pkg: HookPackageJson;
-}
+};
 
 // App lifecycle hooks: apps/<app>/package.json scripts named `qpq:<hook>`
 // (e.g. qpq:postinstall, qpq:prebuild). The CLI invokes them when present;
@@ -38,7 +41,7 @@ export const runAppHook = async (appName: string, hook: string): Promise<boolean
     return false;
   }
 
-  console.log(`Running ${scriptName} for [${appName}]`);
+  out.log(`Running ${scriptName} for [${appName}]`);
   await runCommand('npm', ['run', scriptName], { cwd: getAppDirectory(appName) });
   return true;
 };
@@ -168,7 +171,7 @@ const runHookForPackages = async (candidates: HookPackage[], hook: string, jobs:
     .filter((candidate): candidate is HookPackage & { scriptName: string } => candidate.scriptName !== undefined);
 
   if (hookPackages.length === 0) {
-    console.log(`No app or workspace package defines a "qpq:${hook}" or "${hook}" script, nothing to run.`);
+    out.log(`No app or workspace package defines a "qpq:${hook}" or "${hook}" script, nothing to run.`);
     return [];
   }
 
@@ -183,7 +186,7 @@ const runHookForPackages = async (candidates: HookPackage[], hook: string, jobs:
     run: () => runCommandPrefixed(hookPackage.label, 'npm', ['run', hookPackage.scriptName], { cwd: hookPackage.dir, color: nextPrefixColor() }),
   }));
 
-  console.log(`Running ${hook} hooks in ${tasks.length} package(s) (${jobs} jobs, dependency ordered)`);
+  out.log(`Running ${hook} hooks in ${tasks.length} package(s) (${jobs} jobs, dependency ordered)`);
   return runDependencyTasks(tasks, jobs);
 };
 

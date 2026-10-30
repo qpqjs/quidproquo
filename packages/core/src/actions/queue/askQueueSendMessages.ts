@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { CrossModuleMessage } from '../../types';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { QueueActionType } from './QueueActionType';
 
 export type QueueMessage<T> = CrossModuleMessage<T> & {
@@ -12,16 +12,19 @@ export type QueueMessage<T> = CrossModuleMessage<T> & {
 };
 
 export const askQueueSendMessagesBase = createActionRequester<void>()({
-  actionType: QueueActionType.SendMessages,
+  actionType: QueueActionType.SendMessage,
   errorTypes: [
     'AccessDenied', // caller lacks permission to send to the queue
-    'QueueNotFound', // the SQS queue does not exist
-    'ServiceUnavailable', // SQS internal error / throttling
+    'QueueNotFound', // the queue does not exist
+    'Throttled', // the queue is throttling or failed internally; transient
   ],
   getPayload: (queueName: string, queueMessages: QueueMessage<any>[]) => ({ queueMessages, queueName }),
 });
 
 // Generic so callers can pin the message body shape at the call site.
-export function* askQueueSendMessages<T extends QueueMessage<any>>(queueName: string, ...queueMessages: T[]): AskResponse<void> {
+function* askQueueSendMessagesTyped<T extends QueueMessage<any>>(queueName: string, ...queueMessages: T[]): AskResponse<void> {
   return yield* askQueueSendMessagesBase(queueName, queueMessages);
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askQueueSendMessages = Object.assign(askQueueSendMessagesTyped, { errorType: askQueueSendMessagesBase.errorType });

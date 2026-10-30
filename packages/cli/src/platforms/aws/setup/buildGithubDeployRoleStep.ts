@@ -1,10 +1,12 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import { GetRoleCommand, IAMClient } from '@aws-sdk/client-iam';
 
+import { createOutput } from '../../../lib/out';
 import { SetupCheckResult, SetupStep } from '../../../lib/setupStep';
 import { AwsSetupContext } from './awsSetupContext';
+
+const out = createOutput('aws:build-github-deploy-role-step');
 
 // The role itself is deployed by the bootstrap stack; this step tells you whether the config
 // declares it, whether it exists yet, and what to put in the GitHub Environment once it does.
@@ -40,6 +42,6 @@ export const buildGithubDeployRoleStep = (ctx: AwsSetupContext): SetupStep => ({
     if (!result.done) {
       throw new Error(result.detail ?? 'deploy role missing');
     }
-    console.log(result.detail);
+    out.log(result.detail);
   },
 });

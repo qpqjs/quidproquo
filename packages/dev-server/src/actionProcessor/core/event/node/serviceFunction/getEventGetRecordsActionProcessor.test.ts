@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 describe('getEventGetRecordsActionProcessor (node service function)', () => {
@@ -10,7 +10,7 @@ describe('getEventGetRecordsActionProcessor (node service function)', () => {
     const processors = await getEventGetRecordsActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[EventActionType.GetRecords];
 
-    const result = await invokeProcessor(process, { eventParams: [{ functionName: 'doThing', payload: [1, 2] }] } as any);
+    const result = await invokeProcessor(process!, { eventParams: [{ functionName: 'doThing', payload: [1, 2] }] } as any);
 
     expect(resolveActionResult(result)).toEqual([{ functionName: 'doThing', payload: [1, 2] }]);
   });

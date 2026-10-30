@@ -4,7 +4,7 @@ import { HTTPEvent } from '@qpqjs/webserver';
 import { eventDocRouteAction } from '../../eventDoc/constants/eventDocRouteAction';
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';
 import { askEventDocGetById } from '../../eventDoc/data/askEventDocGetById';
-import { askEventDocAiContextProvide } from '../../eventDocAi/module/qpqContexts/eventDocAiContext';
+import { askEventDocAiProvide } from '../../eventDocAi/context';
 import { McpEventDocAi } from '../models/McpEventDocAi';
 import { askMcpEventDocAiAuthorise } from './askMcpEventDocAiAuthorise';
 
@@ -36,7 +36,7 @@ export function* askMcpEventDocAiDocToolRun(
     yield* askEventDocStoreProvide(eventDocAi.store, askAssertDocReadable(eventDocAi, event, docId));
   }
 
-  return yield* askEventDocAiContextProvide(
+  return yield* askEventDocAiProvide(
     { serviceName: eventDocAi.serviceName, type: eventDocAi.type, docId: docId ?? '' },
     askInlineFunctionExecute(executor, args),
   );

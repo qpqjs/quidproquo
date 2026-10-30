@@ -6,7 +6,7 @@ import { EventDocTransferPlanResult } from '../../models';
 
 /** POST /transfer/plan: what importing the uploaded bundle would do. Writes nothing. */
 export function* askEventDocPlanFetch(serviceName: string, transferId: string): AskResponse<EventDocTransferPlanResult> {
-  const response = yield* askApiRequest<{ transferId: string }, EventDocTransferPlanResult>(serviceName, 'POST', eventDocTransferEndpoint('plan'), {
+  const response = yield* askApiRequest<EventDocTransferPlanResult, { transferId: string }>(serviceName, 'POST', eventDocTransferEndpoint('plan'), {
     body: { transferId },
   });
 

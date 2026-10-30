@@ -1,16 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import {
-  askUserDirectoryRequestEmailVerification,
-  buildTestQpqConfig,
-  createActionProcessor,
-  ProcessorFor,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { askUserDirectoryRequestEmailVerification, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requestEmailVerificationCode } from '../../../logic/cognito/requestEmailVerificationCode';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryRequestEmailVerificationActionProcessor } from './getUserDirectoryRequestEmailVerificationActionProcessor';
 
 vi.mock('../../../logic/cognito/requestEmailVerificationCode', () => ({
@@ -44,7 +38,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     });
     const processor = await resolveProcessor();
 
-    const [details, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+    const [details, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'tok' });
 
     expect(error).toBeUndefined();
     expect(details).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'a***@b.com' });
@@ -55,7 +49,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('NotAuthorizedException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'bad' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'bad' });
 
     expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.Unauthorized);
   });
@@ -64,7 +58,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
     vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('CodeDeliveryFailureException'));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+    const [, error] = await invokeProcessor(processor!, { userDirectoryName: 'users', accessToken: 'tok' });
 
     expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.CodeDeliveryFailed);
   });

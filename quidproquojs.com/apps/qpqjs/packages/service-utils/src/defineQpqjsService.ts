@@ -6,16 +6,8 @@ import {
   defineWafProtection,
   getAwsServiceAccountInfosForDeployments,
 } from '@qpqjs/config-aws';
-import {
-  QPQJS_USER_DIRECTORY,
-  QpqjsServiceEnum,
-  qpqjsServiceNames,
-} from '@qpqjs/constants';
-import {
-  defineAdminSettings,
-  defineAdminUserDirectory,
-  defineOpenApiRoutes,
-} from '@qpqjs/features';
+import { QPQJS_USER_DIRECTORY, QpqjsServiceEnum, qpqjsServiceNames } from '@qpqjs/constants';
+import { defineAdminSettings, defineAdminUserDirectory, defineOpenApiRoutes } from '@qpqjs/features';
 import {
   defineApi,
   defineApplicationModule,
@@ -44,22 +36,11 @@ export const defineQpqjsService = (
   configRoot: string,
   apiBuildPath: string,
   apiLayers: ApiLayer[] = [],
-  lambdaMemoryInMiB = 1024
+  lambdaMemoryInMiB = 1024,
 ): QPQConfig => [
-  defineApplicationModule(
-    modulePrefix,
-    service,
-    process.env.ENVIRONMENT!,
-    configRoot,
-    apiBuildPath,
-    process.env.FEATURE_NAME
-  ),
+  defineApplicationModule(modulePrefix, service, process.env.ENVIRONMENT!, configRoot, apiBuildPath, process.env.FEATURE_NAME),
 
-  defineApplicationVersion(
-    `${execSync('git rev-parse --short HEAD')
-      .toString()
-      .trim()}-${new Date().toISOString()}`
-  ),
+  defineApplicationVersion(`${execSync('git rev-parse --short HEAD').toString().trim()}-${new Date().toISOString()}`),
 
   // Root domains come from the deployment's ROOT_DOMAINS setting, primary first.
   defineDns(getDeploySettingList('ROOT_DOMAINS')),
@@ -79,10 +60,7 @@ export const defineQpqjsService = (
     process.env.AWS_DEFAULT_ACCOUNT!,
     process.env.AWS_DEFAULT_REGION!,
 
-    getAwsServiceAccountInfosForDeployments(
-      crossDeploymentNames,
-      qpqjsServiceNames
-    ),
+    getAwsServiceAccountInfosForDeployments(crossDeploymentNames, qpqjsServiceNames),
     {
       apiLayers,
       lambdaMaxMemoryInMiB: lambdaMemoryInMiB,
@@ -91,7 +69,7 @@ export const defineQpqjsService = (
       disableLogs: [QpqjsServiceEnum.Admin].includes(service),
       disableLambdaWarming: true,
       instantLogs: true,
-    }
+    },
   ),
 
   defineWafProtection(),
@@ -125,7 +103,7 @@ export const defineQpqjsService = (
       owner: {
         module: QpqjsServiceEnum.Shell,
       },
-    }
+    },
   ),
 
   defineAdminSettings(QpqjsServiceEnum.Admin, {

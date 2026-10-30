@@ -4,13 +4,12 @@ import {
   actionResultErrorFromCaughtError,
   askFileGenerateTemporarySecureUrl,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
 import { FileStorageConfig } from './types';
+import { createSecureUrlToken, getSecureUrlBaseUrl } from './utils';
 import { resolveFilePath } from './utils';
 
 // Mirror the AWS processor's SigV4 limit (7 days) so a story that would fail
@@ -40,7 +39,6 @@ const getProcessFileGenerateTemporarySecureUrl = (
         config.secureUrlSecret,
       );
 
-      // Build the secure URL
       const baseUrl = getSecureUrlBaseUrl(config);
       const url = `${baseUrl}/secure-download?token=${token}`;
 

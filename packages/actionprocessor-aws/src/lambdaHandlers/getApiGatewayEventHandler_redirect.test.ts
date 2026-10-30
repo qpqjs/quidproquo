@@ -12,7 +12,7 @@ describe('getApiGatewayEventHandler_redirect', () => {
   });
 
   it('redirects straight to an absolute url', async () => {
-    process.env.redirectBaseUrl = JSON.stringify('https://example.com/go');
+    process.env.redirectBaseUrl = 'https://example.com/go';
 
     const response = await runHandler({ path: '/ignored', queryStringParameters: null });
 
@@ -21,8 +21,8 @@ describe('getApiGatewayEventHandler_redirect', () => {
   });
 
   it('preserves the request path for a domain redirect', async () => {
-    process.env.redirectBaseUrl = JSON.stringify('https://staging.example.com');
-    process.env.appendPath = JSON.stringify(true);
+    process.env.redirectBaseUrl = 'https://staging.example.com';
+    process.env.appendPath = 'true';
 
     const response = await runHandler({ path: '/page', queryStringParameters: null });
 
@@ -30,7 +30,7 @@ describe('getApiGatewayEventHandler_redirect', () => {
   });
 
   it('appends query string parameters to the redirect url', async () => {
-    process.env.redirectBaseUrl = JSON.stringify('https://example.com');
+    process.env.redirectBaseUrl = 'https://example.com';
 
     const response = await runHandler({ path: '/', queryStringParameters: { a: '1', b: 'two' } });
 
@@ -40,8 +40,8 @@ describe('getApiGatewayEventHandler_redirect', () => {
   // Security regression: the request contributes only a path and encoded query values, so no request can move the
   // redirect to another host or break the Location header with a line break.
   it('keeps a protocol-relative or user-info shaped path on the configured host', async () => {
-    process.env.redirectBaseUrl = JSON.stringify('https://staging.example.com');
-    process.env.appendPath = JSON.stringify(true);
+    process.env.redirectBaseUrl = 'https://staging.example.com';
+    process.env.appendPath = 'true';
 
     for (const path of ['//evil.example/x', '/@evil.example/x', '/\\evil.example']) {
       const response = await runHandler({ path, queryStringParameters: null });
@@ -51,7 +51,7 @@ describe('getApiGatewayEventHandler_redirect', () => {
   });
 
   it('encodes line breaks and separators out of query values', async () => {
-    process.env.redirectBaseUrl = JSON.stringify('https://example.com');
+    process.env.redirectBaseUrl = 'https://example.com';
 
     const response = await runHandler({ path: '/', queryStringParameters: { next: 'x\r\nSet-Cookie: a=b', 'a&b': '1#2' } });
 

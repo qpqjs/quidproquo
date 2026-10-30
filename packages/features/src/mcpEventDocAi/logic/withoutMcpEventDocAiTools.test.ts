@@ -25,6 +25,6 @@ describe('withoutMcpEventDocAiTools', () => {
   });
 
   it('leaves every tool when nothing is excluded', () => {
-    expect(withoutMcpEventDocAiTools([ai('template')], [])[0].tools.map(({ name }) => name)).toEqual(['whatIsHere', 'edit_template']);
+    expect(withoutMcpEventDocAiTools!([ai('template')], [])[0]!.tools.map(({ name }) => name)).toEqual(['whatIsHere', 'edit_template']);
   });
 });

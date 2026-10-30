@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, UserDirectoryActionType } from '@qpqjs/core';
+import { UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { associateSoftwareToken } from '../../../logic/cognito/associateSoftwareToken';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryAssociateSoftwareTokenActionProcessor } from './getUserDirectoryAssociateSoftwareTokenActionProcessor';
 
 vi.mock('../../../logic/cognito/associateSoftwareToken', () => ({
@@ -26,7 +26,7 @@ describe('getUserDirectoryAssociateSoftwareTokenActionProcessor', () => {
     vi.mocked(associateSoftwareToken).mockResolvedValue({ secretCode: 'abc' } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { session: 'sess' });
+    const result = await invokeProcessor(processor!, { session: 'sess' });
 
     expect(result).toEqual([{ secretCode: 'abc' }]);
     expect(associateSoftwareToken).toHaveBeenCalledWith('eu-west-1', 'sess');

@@ -3,6 +3,11 @@
   "version": "0.3.0",
   "description": "eslint config for quidproquo projects.",
   "main": "eslint.config.mjs",
+  "exports": {
+    ".": "./eslint.config.mjs",
+    "./prettier": "./prettier.config.mjs",
+    "./plugin": "./plugin/index.mjs"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -11,22 +16,25 @@
     "clean": "",
     "build": "",
     "watch": "",
-    "lint": "",
-    "lint:fix": "",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": ""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/eslint-config"
   },
   "keywords": [
     "eslint"
   ],
   "author": "joecoady",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@eslint/js": "^9.13.0",
+    "@vitest/eslint-plugin": "^1.6.28",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsdoc": "^65.4.2",
     "eslint-plugin-jsx-a11y": "^6.10.0",
     "eslint-plugin-prettier": "^5.2.0",
     "eslint-plugin-react": "^7.37.0",
@@ -42,5 +50,12 @@
   "devDependencies": {
     "eslint": "^9.13.0",
     "prettier": "^3.0.3"
-  }
+  },
+  "files": [
+    "eslint.config.mjs",
+    "prettier.config.mjs",
+    "config",
+    "plugin",
+    "README.md"
+  ]
 }

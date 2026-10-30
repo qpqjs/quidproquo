@@ -1,4 +1,5 @@
-import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, KeyValueStoreActionType, runStory } from '@qpqjs/core';
+import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, KeyValueStoreActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

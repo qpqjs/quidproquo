@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 const getProcess = async () => {
@@ -12,7 +12,7 @@ const getProcess = async () => {
 
 const invoke = async (wsEvent: any) => {
   const process = await getProcess();
-  return invokeProcessor(process, { eventParams: [wsEvent] } as any);
+  return invokeProcessor(process!, { eventParams: [wsEvent] } as any);
 };
 
 const baseEvent = {

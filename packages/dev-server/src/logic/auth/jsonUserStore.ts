@@ -1,4 +1,4 @@
-import { UserAttributes } from '@qpqjs/core';
+import { Nullable, UserAttributes } from '@qpqjs/core';
 
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 import { createDevUserId, DevUserDirectory, resolveDevUsername } from './devAuth';
@@ -20,7 +20,7 @@ const readUsers = (runtimePath: string, userDirectory: DevUserDirectory): Promis
 export const upsertDevUser = async (
   runtimePath: string,
   userDirectory: DevUserDirectory,
-  email?: string | null,
+  email?: Nullable<string>,
   attributes: UserAttributes = {},
 ): Promise<UserAttributes> => {
   const resolvedEmail = resolveDevUsername(email).trim();
@@ -43,7 +43,7 @@ export const upsertDevUser = async (
   return user;
 };
 
-export const getDevUserByUserId = async (runtimePath: string, userDirectory: DevUserDirectory, userId: string): Promise<UserAttributes | null> => {
+export const getDevUserByUserId = async (runtimePath: string, userDirectory: DevUserDirectory, userId: string): Promise<Nullable<UserAttributes>> => {
   const users = await readUsers(runtimePath, userDirectory);
 
   return users[userId] || null;

@@ -1,7 +1,7 @@
 import { AskResponse, createDynamicFunctionCaller } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocDocumentStateAtEvent } from '../models';
@@ -11,7 +11,7 @@ import { EventDocDocumentStateAtEvent } from '../models';
  * (consistent read: the caller is racing a writer whose event just landed). Returns the base unchanged when nothing landed.
  */
 export function* askEventDocDocumentStateAdvance(modelId: string, base: EventDocDocumentStateAtEvent): AskResponse<EventDocDocumentStateAtEvent> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const gap = yield* askEventDocEventListAll(modelId, { afterEventId: base.eventId, consistentRead: true });
@@ -22,5 +22,5 @@ export function* askEventDocDocumentStateAdvance(modelId: string, base: EventDoc
 
   const state = yield* functionsCaller.foldDocumentState(gap, base.state);
 
-  return { eventId: gap[gap.length - 1].payload.metadata.eventId, state };
+  return { eventId: gap[gap.length - 1]?.payload.metadata.eventId ?? base.eventId, state };
 }

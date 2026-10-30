@@ -1,3 +1,4 @@
+export * from './distPaths';
 export * from './getActionProcessorsFromQpqFunctionRuntime';
 export * from './getFederatedKeyFromQpqFunctionRuntime';
 export * from './getGlobalsFromQpqFunctionRuntime';

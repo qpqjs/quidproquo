@@ -6,13 +6,13 @@ import {
   askFileWriteObjectJsonBase,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
-import { writeTextFile } from '../../../logic/s3/s3Utils';
+import { writeTextFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteObjectJsonBase> => {
@@ -29,9 +29,10 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeo
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
       );
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(askFileWriteObjectJsonBase.errorType.DriveNotFound, `Storage drive not found: ${drive}`),

@@ -5,10 +5,10 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
+import { getOrSeedDevJwtSecret } from '../../../logic/auth/devJwtSecret';
 import { upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
@@ -22,9 +22,12 @@ const getProcessConfirmForgotPassword = (
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       await upsertDevUser(devServerConfig.runtimePath, userDirectory, username);
 
-      return actionResult(createDevAuthResponse(userDirectory, username));
+      const secret = await getOrSeedDevJwtSecret(devServerConfig.runtimePath, userDirectory);
+
+      return actionResult(createDevAuthResponse(secret, userDirectory, username));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

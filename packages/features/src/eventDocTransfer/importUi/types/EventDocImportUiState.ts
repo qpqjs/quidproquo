@@ -12,14 +12,3 @@ export type EventDocImportUiState = {
   isApplied: boolean;
   error: Nullable<string>;
 };
-
-/** Initial (empty) import screen state. */
-export const createInitialEventDocImportUiState = (): EventDocImportUiState => ({
-  transferId: null,
-  source: null,
-  rows: [],
-  isLoading: false,
-  isApplying: false,
-  isApplied: false,
-  error: null,
-});

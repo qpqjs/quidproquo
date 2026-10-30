@@ -4,7 +4,7 @@ import { getValidCognitoUserAttributes } from './getValidCognitoUserAttributes';
 
 describe('getValidCognitoUserAttributes', () => {
   it('keeps only attributes with both a name and a value', () => {
-    expect(getValidCognitoUserAttributes([{ Name: 'email', Value: 'a@b.com' }, { Name: 'given_name' }, { Value: 'orphan' }, {}])).toEqual([
+    expect(getValidCognitoUserAttributes([{ Name: 'email', Value: 'a@b.com' }, { Name: 'given_name' }, { Value: 'orphan' }, {}] as any)).toEqual([
       { Name: 'email', Value: 'a@b.com' },
     ]);
   });

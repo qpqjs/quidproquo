@@ -9,7 +9,7 @@ Lets user scripts built and run on this service import a module the service prov
 
 ```typescript
 // in a user script
-import { askNewGuid } from 'my-app-sdk/v1';
+import { askGuidNew } from 'my-app-sdk/v1';
 ```
 
 - **On AWS:** deploys **no dedicated infrastructure**. The module is bundled with the service like any other runtime and loaded only when a script is built or run.

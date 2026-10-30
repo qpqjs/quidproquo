@@ -1,16 +1,15 @@
-import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
+import { aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 import { QpqCoreStorageDriveConstruct } from './QpqCoreStorageDriveConstruct';
 
-export interface QpqApiCoreStorageDriveConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiCoreStorageDriveConstructProps) {
@@ -18,7 +17,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     // Event handlers live on the owner's API stack only. Skipping foreign drives
     // avoids attaching a bucket notification to another service's bucket
-    const isOwnedHere = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).some((d) => d.uniqueKey === props.storageDriveConfig.uniqueKey);
+    const isOwnedHere = qpqCoreUtils.getOwnedStorageDriveConfigs(props.qpqConfig).some((d) => d.uniqueKey === props.storageDriveConfig.uniqueKey);
 
     if (!isOwnedHere) {
       return;
@@ -31,12 +30,9 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Create'),
 
-        functionType: 's3Event_fileEvent',
-        executorName: 's3Event_fileEvent',
+        handler: 's3Event_fileEvent',
 
         qpqConfig: props.qpqConfig,
-
-        apiLayerVersions: props.apiLayerVersions,
 
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive
@@ -55,12 +51,9 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Delete'),
 
-        functionType: 's3Event_fileEvent',
-        executorName: 's3Event_fileEvent',
+        handler: 's3Event_fileEvent',
 
         qpqConfig: props.qpqConfig,
-
-        apiLayerVersions: props.apiLayerVersions,
 
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive

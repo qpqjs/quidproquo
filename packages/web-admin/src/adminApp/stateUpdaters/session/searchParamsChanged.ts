@@ -1,9 +1,12 @@
 import { EventDocEventPayload } from '@qpqjs/features';
 
-import { AdminSessionState } from '../../AdminSessionState';
-import { SearchParamsChangedData } from '../../effects/session/SearchParamsChangedEvent';
+import { AdminSessionSearchParamsChangedData } from '../../effects/session/AdminSessionSearchParamsChangedEffect';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
-export const searchParamsChanged = (state: AdminSessionState, { data }: EventDocEventPayload<SearchParamsChangedData>): AdminSessionState => ({
+export const searchParamsChanged = (
+  state: AdminSessionState,
+  { data }: EventDocEventPayload<AdminSessionSearchParamsChangedData>,
+): AdminSessionState => ({
   ...state,
   search: data.search,
 });

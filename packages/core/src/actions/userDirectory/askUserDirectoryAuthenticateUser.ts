@@ -1,7 +1,8 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { askThrowError } from '../error/askThrowError';
-import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export type AuthenticateUserRequest = {
   email: string;
@@ -18,7 +19,10 @@ export type AuthenticateUserRequest = {
 
 export const askUserDirectoryAuthenticateUserBase = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.AuthenticateUser,
-  errorTypes: ['UserNotFound', 'InvalidPassword'],
+  errorTypes: [
+    'UserNotFound', // no user with that username or email in the directory
+    'InvalidPassword', // the password does not match
+  ],
   getPayload: (userDirectoryName: string, authenticateUserRequest: AuthenticateUserRequest) => ({ userDirectoryName, authenticateUserRequest }),
 });
 

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -14,8 +14,8 @@ const toggleConfig = {
 describe('getAllStateMachines', () => {
   it('returns every state machine setting in the config', () => {
     const config = buildTestQpqConfig([
-      ...defineStateMachine('order', { config: toggleConfig }),
-      ...defineStateMachine('payment', { config: toggleConfig }),
+      defineStateMachine('order', { config: toggleConfig }),
+      defineStateMachine('payment', { config: toggleConfig }),
     ]);
 
     expect(getAllStateMachines(config).map((sm) => sm.stateMachineName)).toEqual(['order', 'payment']);

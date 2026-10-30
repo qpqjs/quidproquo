@@ -32,7 +32,7 @@ const isPkCondition = (condition: KvsQueryCondition, storeConfig: KeyValueStoreQ
   condition.key === storeConfig.partitionKey.key || condition.key === 'pk';
 
 const isSkCondition = (condition: KvsQueryCondition, storeConfig: KeyValueStoreQPQConfigSetting): boolean =>
-  storeConfig.sortKeys.length > 0 && (condition.key === storeConfig.sortKeys[0].key || condition.key === 'sk');
+  condition.key === storeConfig.sortKeys[0]?.key || (storeConfig.sortKeys.length > 0 && condition.key === 'sk');
 
 const SK_COMPARISON_SQL: Partial<Record<KvsQueryOperationType, string>> = {
   [KvsQueryOperationType.Equal]: 'sk = ?',

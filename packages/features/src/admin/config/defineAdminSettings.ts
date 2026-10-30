@@ -16,7 +16,7 @@ import {
   QPQConfigAdvancedSettings,
   StorageDriveTier,
 } from '@qpqjs/core';
-import { defineServiceFunction } from '@qpqjs/webserver';
+import { AUTH_USER_DIRECTORY_GLOBAL_KEY, defineAuthServiceRoute, defineServiceFunction } from '@qpqjs/webserver';
 
 import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
@@ -26,9 +26,16 @@ import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunct
 import { defineWebSocketQueue } from '../../webSocketQueue';
 import { defineAdminServiceActionSearchRoute } from '../actionSearch/config/defineAdminServiceActionSearchRoute';
 import { QPQ_LOG_ACTIONS_KVS_NAME, QPQ_LOG_ENTITIES_KVS_NAME, QPQ_LOG_ENTITY_LOOKUP_KVS_NAME } from '../actionSearch/constants';
+import {
+  ADMIN_LOG_RETENTION_DAYS_GLOBAL,
+  ADMIN_LOG_SERVICE_NAME_GLOBAL,
+  ADMIN_SERVICE_NAMES_GLOBAL,
+  ADMIN_USER_DIRECTORY_NAME,
+  ADMIN_WEBSOCKET_API_NAME,
+  ADMIN_WEBSOCKET_QUEUE_NAME,
+} from '../constants';
 import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import {
-  defineAdminServiceAuthRoute,
   defineAdminServiceLogLogRoute,
   defineAdminServiceLogRoute,
   QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
@@ -45,11 +52,10 @@ import {
   QPQ_MAINTENANCE_ON_APPEND_FN,
   QPQ_MAINTENANCE_WS_SYNC_FN,
 } from '../maintenance/constants/maintenanceConstants';
-import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
 
-export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedLogSettings = {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
@@ -58,7 +64,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   // The APPLICATION websocket api (defineWebSocketQueue apiName) maintenance
   // state broadcasts on. Unset = maintenance mutations skip broadcasting.
   maintenanceWebsocketApiName?: string;
-}
+} & QPQConfigAdvancedSettings;
 
 // Retention defaults to undefined (no expiry) unless `logRetentionDays` is set.
 // If `coldStorageAfterDays` is set, retention is padded by 180 days so logs
@@ -72,16 +78,16 @@ const calculateLogRetentionDays = (advancedSettings?: QPQConfigAdvancedLogSettin
 export const defineAdminSettings = (logServiceName: string, advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
-      userDirectoryName: adminUserDirectoryResourceName,
+      userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
     },
   };
 
   const logRetentionDays = calculateLogRetentionDays(advancedSettings);
 
   return [
-    // Owner-stamped resources — materialise as owned on the admin deploy,
+    // Owner-stamped resources, materialise as owned on the admin deploy,
     // and as foreign refs elsewhere. Owner resolution runs at IAM-scoping time.
-    defineEventBus('qpq-admin-wsq', {
+    defineEventBus(ADMIN_WEBSOCKET_QUEUE_NAME, {
       owner: { module: logServiceName },
     }),
 
@@ -95,12 +101,12 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
         },
       },
       {
-        eventBusSubscriptions: ['qpq-admin-wsq'],
+        eventBusSubscriptions: [ADMIN_WEBSOCKET_QUEUE_NAME],
       },
     ),
 
-    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', {
-      userDirectoryName: adminUserDirectoryResourceName,
+    defineWebSocketQueue(ADMIN_WEBSOCKET_QUEUE_NAME, ADMIN_WEBSOCKET_API_NAME, {
+      userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
       owner: { module: logServiceName },
     }),
 
@@ -109,7 +115,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
     defineGlobal(QPQ_ADMIN_SERVICE_NAME_GLOBAL, logServiceName),
 
     // The app websocket's connect-time maintenance sync (see
-    // defineWebSocketQueue's onConnected — pre-auth, maintenance is public).
+    // defineWebSocketQueue's onConnected, pre-auth, maintenance is public).
     // Registered unowned so it resolves inside whichever service owns the
     // websocket, not just the admin service.
     defineInlineFunction(
@@ -158,7 +164,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
       ],
     }),
 
-    // Admin-only resources — only flatten out when the deploying service is the log service.
+    // Admin-only resources, only flatten out when the deploying service is the log service.
     defineServiceSettings({
       [logServiceName]: [
         defineStorageDrive(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, {
@@ -209,9 +215,11 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           deprecated: advancedSettings?.deprecated,
         }),
 
-        defineAdminServiceAuthRoute('POST', '/login', 'login'),
-        defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
-        defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
+        // The login flow is the webserver auth controller pointed at the admin user pool.
+        defineGlobal(AUTH_USER_DIRECTORY_GLOBAL_KEY, ADMIN_USER_DIRECTORY_NAME),
+        defineAuthServiceRoute('POST', '/login', 'login'),
+        defineAuthServiceRoute('POST', '/refreshToken', 'refreshToken'),
+        defineAuthServiceRoute('POST', '/challenge', 'respondToAuthChallenge'),
 
         defineAdminServiceLogLogRoute('POST', '/loglog/list', 'getLogLogs', routeAuthSettings),
 
@@ -247,7 +255,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           storeName: maintenanceStoreName,
           type: maintenanceDocType,
           basePath: maintenanceBasePath,
-          routeAuthSettings: { userDirectoryName: adminUserDirectoryResourceName },
+          routeAuthSettings: { userDirectoryName: ADMIN_USER_DIRECTORY_NAME },
           onAppend: QPQ_MAINTENANCE_ON_APPEND_FN,
         }),
 
@@ -258,7 +266,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           },
         ),
 
-        // The cross-service read of the active maintenance folds — the websocket
+        // The cross-service read of the active maintenance folds, the websocket
         // lambda's connect-time sync calls this.
         defineServiceFunction(
           getFeatureEntryQpqFunctionRuntime('admin/maintenance', 'serviceFunction', 'qpqGetActiveMaintenances::qpqGetActiveMaintenances'),
@@ -273,8 +281,8 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           storeName: 'log',
           type: 'log',
           serviceName: logServiceName,
-          eventBusName: 'qpq-admin-wsq',
-          userDirectoryName: adminUserDirectoryResourceName,
+          eventBusName: ADMIN_WEBSOCKET_QUEUE_NAME,
+          userDirectoryName: ADMIN_USER_DIRECTORY_NAME,
           model: AiModel.ClaudeSonnet46,
           systemPrompt: adminLogAiSystemPrompt,
           tools: adminLogAiTools,
@@ -296,7 +304,7 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
             ),
           },
           {
-            eventBusSubscriptions: ['qpq-admin-wsq'],
+            eventBusSubscriptions: [ADMIN_WEBSOCKET_QUEUE_NAME],
           },
         ),
 
@@ -319,13 +327,13 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
         ),
 
         defineGlobal(QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL, advancedSettings?.maintenanceWebsocketApiName ?? ''),
-        defineGlobal('qpq-serviceNames', advancedSettings?.services ?? []),
-        defineGlobal('qpq-log-retention-days', logRetentionDays),
-        defineGlobal('qpq-log-service-name', logServiceName),
+        defineGlobal(ADMIN_SERVICE_NAMES_GLOBAL, advancedSettings?.services ?? []),
+        defineGlobal(ADMIN_LOG_RETENTION_DAYS_GLOBAL, logRetentionDays),
+        defineGlobal(ADMIN_LOG_SERVICE_NAME_GLOBAL, logServiceName),
       ],
     }),
 
-    // The admin UI's audited session event doc — one doc per login.
-    ...defineAdminSessionEventDoc(logServiceName),
+    // The admin UI's audited session event doc, one doc per login.
+    defineAdminSessionEventDoc(logServiceName),
   ];
 };

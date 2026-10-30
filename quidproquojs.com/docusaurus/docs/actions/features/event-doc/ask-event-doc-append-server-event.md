@@ -7,7 +7,7 @@ description: Append a server-authored event to a document's log, building the ev
 
 Appends a **server-authored** event to a document's log. It is the backend analog of the editor's client-side action creators: callers pass the effect `type`, the typed `data`, and the schema `version`, and it builds the `EventDocEventInput` envelope (minting a fresh `clientMessageId` for dedup) before delegating to [askEventDocEventAppend](./ask-event-doc-event-append.md). Use it for the rarer case where the server itself authors an event — for example recording a generated secret or a rendered artifact — rather than a client POSTing one.
 
-- **Built from:** `askNewGuid` + [askEventDocEventAppend](./ask-event-doc-event-append.md). Not a single action.
+- **Built from:** `askGuidNew` + [askEventDocEventAppend](./ask-event-doc-event-append.md). Not a single action.
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) or [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals).
 
 ```typescript

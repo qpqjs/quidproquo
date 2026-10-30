@@ -1,7 +1,6 @@
 import { Nullable } from '@qpqjs/core';
 
 import { EventDocSummary } from '../../models';
-import { EVENT_DOC_LIST_PAGE_SIZE } from '../constants/eventDocListPageSize';
 import { EventDocListConfig } from './EventDocListConfig';
 
 /** A cursor-paged list: `items` is the current page only, and pages are walked (next/previous), not addressed. */
@@ -18,23 +17,3 @@ export type EventDocListState = EventDocListConfig & {
   nextPageKey: Nullable<string>;
   pageSize: number;
 };
-
-/** Initial list state; the host fills the config via SetConfig. */
-export const createInitialEventDocListState = (): EventDocListState => ({
-  serviceName: '',
-  basePath: '',
-  editService: '',
-  editModule: '',
-  entityLabel: '',
-  editBasePath: '',
-  listBasePath: '',
-  canTransfer: false,
-  canCreate: false,
-  items: [],
-  isLoading: false,
-  error: null,
-  pageIndex: 0,
-  cursors: [null],
-  nextPageKey: null,
-  pageSize: EVENT_DOC_LIST_PAGE_SIZE,
-});

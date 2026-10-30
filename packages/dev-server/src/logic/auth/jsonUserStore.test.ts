@@ -106,7 +106,7 @@ describe('jsonUserStore', () => {
       const users = await findDevUsersByAttribute(runtimePath, DIRECTORY, 'email', 'Joe@Example.com');
 
       expect(users).toHaveLength(1);
-      expect(users[0].email).toBe('joe@example.com');
+      expect(users![0]!.email).toBe('joe@example.com');
     });
 
     it('matches other attributes exactly', async () => {

@@ -1,14 +1,9 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildActionProcessorResolver, buildTestStorySession, createStubLogger, getTestTimeNow, noopDynamicModuleLoader } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult } from '../logic/actionLogic';
-import { buildTestQpqConfig } from '../testing/configTesting';
-import {
-  buildActionProcessorResolver,
-  buildTestStorySession,
-  createStubLogger,
-  getTestTimeNow,
-  noopDynamicModuleLoader,
-} from '../testing/runtimeTesting';
+import { actionResult } from '../logic/actionResult';
 import { AskResponse, QpqRuntimeType } from '../types/StorySession';
 import { resolveStoryWithLogs } from './resolveStoryWithLogs';
 
@@ -68,8 +63,8 @@ describe('resolveStoryWithLogs', () => {
     console.log = silentConsoleLog;
 
     // A processor that parks until released, so two stories can overlap
-    // out of order: A starts, B starts, A finishes, B finishes — the
-    // interleaving that used to leak A's wrapper into console.log forever.
+    // out of order: A starts, B starts, A finishes, B finishes, the
+    // interleaving that leaks A's wrapper into console.log forever if restores run out of order.
     const makeParkedStory = () => {
       let release!: () => void;
       const parked = new Promise<void>((resolve) => {

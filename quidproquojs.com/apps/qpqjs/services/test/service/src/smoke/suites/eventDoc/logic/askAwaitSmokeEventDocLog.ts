@@ -1,5 +1,5 @@
 import { askEventDocEventListAll, EventDocEvent } from '@qpqjs/features';
-import { askDelay, AskResponse } from 'quidproquo';
+import { askPlatformDelay, AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
@@ -11,10 +11,7 @@ const POLL_INTERVAL_MS = 2000;
 // consistently read so a just-landed append is never missed. Fails the test if the
 // writers have not all landed in time - a stuck writer (one that lost the slot race
 // past its retry cap) shows up here as a short log. Assumes the store context.
-export function* askAwaitSmokeEventDocLog(
-  docId: string,
-  expectedLength: number
-): AskResponse<EventDocEvent[]> {
+export function* askAwaitSmokeEventDocLog(docId: string, expectedLength: number): AskResponse<EventDocEvent[]> {
   let events: EventDocEvent[] = [];
 
   for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt += 1) {
@@ -24,13 +21,10 @@ export function* askAwaitSmokeEventDocLog(
       break;
     }
 
-    yield* askDelay(POLL_INTERVAL_MS);
+    yield* askPlatformDelay(POLL_INTERVAL_MS);
   }
 
-  yield* askSmokeAssert(
-    events.length === expectedLength,
-    `expected ${expectedLength} events on doc [${docId}], found ${events.length}`
-  );
+  yield* askSmokeAssert(events.length === expectedLength, `expected ${expectedLength} events on doc [${docId}], found ${events.length}`);
 
   return events;
 }

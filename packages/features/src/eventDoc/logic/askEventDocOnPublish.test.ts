@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
@@ -12,10 +12,9 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -105,7 +104,7 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
     // No functions object registered for this collection: the hook-state derivation
     // falls back to the reserved base fold (see askEventDocHookStates).
     [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
       'Dynamic functions not found: [test-tenants#tenant#eventDocFunctions]',
     ),
 
@@ -193,15 +192,15 @@ describe('eventDoc onPublish hook', () => {
     expect(response.status).toBe(200);
 
     expect(inlineInvocations).toHaveLength(1);
-    expect(inlineInvocations[0].functionName).toBe('syncTenantRecord');
-    expect(inlineInvocations[0].payload.docId).toBe(summary.id);
-    expect(inlineInvocations[0].payload.event.type).toBe(EventDocEffect.Publish);
-    expect(inlineInvocations[0].payload.summary.id).toBe(summary.id);
+    expect(inlineInvocations![0]!.functionName).toBe('syncTenantRecord');
+    expect(inlineInvocations![0]!.payload.docId).toBe(summary.id);
+    expect(inlineInvocations![0]!.payload.event.type).toBe(EventDocEffect.Publish);
+    expect(inlineInvocations![0]!.payload.summary.id).toBe(summary.id);
 
     // The folded state pair rides along so the hook never re-reads or re-folds the log:
     // published after the event, still a draft before it.
-    expect(inlineInvocations[0].payload.state.status).toBe(EventDocStatus.Published);
-    expect(inlineInvocations[0].payload.previousState.status).toBe(EventDocStatus.Draft);
+    expect(inlineInvocations![0]!.payload.state.status).toBe(EventDocStatus.Published);
+    expect(inlineInvocations![0]!.payload.previousState.status).toBe(EventDocStatus.Draft);
   });
 
   it('does not invoke the hook for non-Publish events', () => {
@@ -255,12 +254,12 @@ describe('eventDoc onPublish hook', () => {
     expect(inlineInvocations).toHaveLength(2);
 
     // The retry is written rather than deduped (the append reads nothing), so the hook
-    // fires again with the state as of the retried event — the duplicate is dropped by
+    // fires again with the state as of the retried event, the duplicate is dropped by
     // the fold's clientMessageId window, so the state is identical. Hooks must be
     // idempotent, and re-firing is exactly how a read model left stale by a failed first
     // hook gets repaired.
-    expect(inlineInvocations[1].payload.state.status).toBe(EventDocStatus.Published);
-    expect(inlineInvocations[1].payload.summary.id).toBe(summary.id);
+    expect(inlineInvocations![1]!.payload.state.status).toBe(EventDocStatus.Published);
+    expect(inlineInvocations![1]!.payload.summary.id).toBe(summary.id);
 
     const events = tables[store.eventsStoreName] ?? [];
     expect(events).toHaveLength(3);

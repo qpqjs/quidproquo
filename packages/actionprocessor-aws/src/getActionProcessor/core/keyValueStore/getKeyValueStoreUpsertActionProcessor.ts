@@ -1,23 +1,22 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { putItem } from '../../../logic/dynamo';
 import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpsertBase> => {
   return async ({ keyValueStoreName, item, options }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
@@ -45,10 +44,11 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): ProcessorFor<typeo
         region,
       );
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ...transientErrorMap(),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Conflict, 'KVS item already exists'),
         TransactionConflictException: () =>

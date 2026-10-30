@@ -1,5 +1,5 @@
 import { GraphQueryResult } from './GraphQueryResult';
 
-export interface GraphCypherResponse {
+export type GraphCypherResponse = {
   results: GraphQueryResult[];
-}
+};

@@ -8,7 +8,7 @@ import { DomainQpqWebserverApiConstruct } from '../constructs/feature/webserver/
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { createDomainCertificateStacks } from './createDomainCertificateStacks';
 
-export interface DomainQpqServiceStackProps extends QpqServiceStackProps {}
+export type DomainQpqServiceStackProps = {} & QpqServiceStackProps;
 
 export class DomainQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: DomainQpqServiceStackProps) {
@@ -27,7 +27,7 @@ export class DomainQpqServiceStack extends QpqServiceStack {
     });
 
     // Regional API Gateway custom DomainName + A record, one per defineApi entry.
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).map((setting) => {
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).map((setting) => {
       const api = new DomainQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
         qpqConfig: props.qpqConfig,
 

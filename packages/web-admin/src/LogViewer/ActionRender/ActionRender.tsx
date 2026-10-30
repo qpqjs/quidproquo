@@ -11,17 +11,17 @@ import customActionsMap from '../actionComponents/customActionsMap';
 import { ActionHistoryItem } from '../ActionHistoryItem';
 import actionComponentMap from '../logic/actionComponentMap';
 
-interface AnyActionHistoryItemProps {
+type AnyActionHistoryItemProps = {
   action: Action<any>;
   result: ActionProcessorResult<any>;
-}
+};
 
-interface ActionRenderProps {
+type ActionRenderProps = {
   action: Action<any>;
   result: any;
   isLegacy: boolean;
   expanded: boolean;
-}
+};
 
 export const CoreBatchCustomAction: ActionComponent<SystemBatchActionPayload, any[]> = ({ action, expanded, result }) => {
   if (!action.payload) {
@@ -60,13 +60,13 @@ export const ActionRender = ({ action, result, isLegacy, expanded }: ActionRende
     return <CoreBatchCustomAction action={action} expanded={expanded} result={result} />;
   }
 
+  const customComponent = customActionsMap[action.type];
   const ActionComponent = isLegacy
     ? ActionHistoryItem
-    : customActionsMap[action.type]
-      ? customActionsMap[action.type]
-      : actionComponentConfig
+    : (customComponent ??
+      (actionComponentConfig && actionComponentConfig[0] !== undefined
         ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
-        : AnyCustomAction;
+        : AnyCustomAction));
 
   return (
     <>

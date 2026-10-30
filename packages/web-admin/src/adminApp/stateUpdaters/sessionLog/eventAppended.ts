@@ -1,8 +1,8 @@
 import { EventDocEvent } from '@qpqjs/features';
 
 import { coalesceEventTypes } from '../../constants/coalesceEventTypes';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SessionLogState } from '../../SessionLogState';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { SessionLogState } from '../../types/SessionLogState';
 
 // Event ids are contiguous positions in the log, so an optimistic append has to
 // guess the next one: head + 1, or 0 for the first event of a fresh doc.
@@ -13,14 +13,13 @@ const nextLocalEventId = (state: SessionLogState): number => {
 
 // Optimistic append with coalescing: while the previous event of the same
 // coalescable type is still pending, the new one replaces it (latest value
-// wins). The head is never coalesced while the flush has it in flight — the
+// wins). The head is never coalesced while the flush has it in flight, the
 // POSTed clientMessageId must stay matchable for the save ack.
 export const eventAppended = (state: SessionLogState, event: EventDocEvent): SessionLogState => {
   const last = state.pendingEvents[state.pendingEvents.length - 1];
 
   const lastIsInFlightHead = state.pendingEvents.length === 1 && state.flush.inFlight;
-  const shouldCoalesce =
-    !!last && !lastIsInFlightHead && last.type === event.type && coalesceEventTypes.includes(event.type as AdminSessionEventType);
+  const shouldCoalesce = !!last && !lastIsInFlightHead && last.type === event.type && coalesceEventTypes.includes(event.type as AdminSessionEffect);
 
   if (shouldCoalesce) {
     const coalesced: EventDocEvent = {

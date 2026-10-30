@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateContext, show, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateContext, show, Spec } from './spec';
 
 // Context-resolution matrix: every composition of askContextProvideValue + askContextRead,
 // wrapped in askCatch / askRunParallel, run through the REAL runtime, asserted against the

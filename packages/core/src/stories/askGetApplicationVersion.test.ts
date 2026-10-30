@@ -1,7 +1,8 @@
+import { runStory, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { ConfigActionType } from '../actions/config/ConfigActionType';
-import { runStory, throwsError } from '../testing/storyTesting';
 import { askGetApplicationVersion } from './askGetApplicationVersion';
 
 describe('askGetApplicationVersion', () => {

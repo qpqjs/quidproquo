@@ -1,19 +1,12 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import {
-  askUserDirectoryAuthenticateUserBase,
-  buildTestQpqConfig,
-  createActionProcessor,
-  defineUserDirectory,
-  ProcessorFor,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { askUserDirectoryAuthenticateUserBase, defineUserDirectory, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserDirectoryAuthenticateUserActionProcessor } from './getUserDirectoryAuthenticateUserActionProcessor';
 
 vi.mock('../../../logic/cloudformation/getExportedValue', () => ({ getExportedValue: vi.fn() }));

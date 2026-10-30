@@ -19,9 +19,9 @@ export type NotifyErrorQueueBaseEventPayload = {
 
 export type NotifyErrorQueueErrorEventPayload = NotifyErrorQueueBaseEventPayload;
 
-export interface NotifyErrorQueueErrorEventMessage extends QueueMessage<NotifyErrorQueueErrorEventPayload> {
+export type NotifyErrorQueueErrorEventMessage = {
   type: NotifyErrorQueueEvents.Error;
-}
+} & QueueMessage<NotifyErrorQueueErrorEventPayload>;
 
 export type NotifyErrorQueueErrorQueueEvent = QueueEvent<NotifyErrorQueueErrorEventMessage>;
 
@@ -29,9 +29,9 @@ export type NotifyErrorQueueErrorQueueEvent = QueueEvent<NotifyErrorQueueErrorEv
 
 export type NotifyErrorQueueTimeoutEventPayload = NotifyErrorQueueBaseEventPayload;
 
-export interface NotifyErrorQueueTimeoutEventMessage extends QueueMessage<NotifyErrorQueueTimeoutEventPayload> {
+export type NotifyErrorQueueTimeoutEventMessage = {
   type: NotifyErrorQueueEvents.Timeout;
-}
+} & QueueMessage<NotifyErrorQueueTimeoutEventPayload>;
 
 export type NotifyErrorQueueTimeoutQueueEvent = QueueEvent<NotifyErrorQueueTimeoutEventMessage>;
 
@@ -39,8 +39,8 @@ export type NotifyErrorQueueTimeoutQueueEvent = QueueEvent<NotifyErrorQueueTimeo
 
 export type NotifyErrorQueueThrottleEventPayload = NotifyErrorQueueBaseEventPayload;
 
-export interface NotifyErrorQueueThrottleEventMessage extends QueueMessage<NotifyErrorQueueThrottleEventPayload> {
+export type NotifyErrorQueueThrottleEventMessage = {
   type: NotifyErrorQueueEvents.Throttle;
-}
+} & QueueMessage<NotifyErrorQueueThrottleEventPayload>;
 
 export type NotifyErrorQueueThrottleQueueEvent = QueueEvent<NotifyErrorQueueThrottleEventMessage>;

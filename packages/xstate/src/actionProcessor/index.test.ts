@@ -1,9 +1,9 @@
-import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { StateMachineActionType } from '../actions';
-import { getStateMachineActionProcessor } from './index';
+import { getStateMachineActionProcessor } from './getStateMachineActionProcessor';
 
 describe('getStateMachineActionProcessor', () => {
   it('exposes a processor for every state machine action type', async () => {

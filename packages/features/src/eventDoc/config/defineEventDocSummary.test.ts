@@ -11,17 +11,17 @@ import { defineEventDocSummary } from './defineEventDocSummary';
 // from the row it is handed.
 describe('defineEventDocSummary', () => {
   it('declares the summary, events and snapshot stores with recovery on and one shared scoped flag', () => {
-    const stores = qpqCoreUtils.getAllKeyValueStores(defineEventDocSummary('memos', { scoped: true }));
+    const stores = qpqCoreUtils.getAllKeyValueStoreConfigs(defineEventDocSummary('memos', { scoped: true }));
 
     expect(stores).toHaveLength(3);
     expect(stores.every((kvs) => kvs.disablePointInTimeRecovery === false)).toBe(true);
     expect(stores.every((kvs) => kvs.scoped === true)).toBe(true);
-    expect(qpqCoreUtils.getStorageDrives(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
   });
 
   it('hands the projector its store name and snapshot map as config globals', () => {
     const config = defineEventDocSummary('memos', { snapshotFunctions: { memo: 'memos-memo-functions' } });
-    const eventsStore = qpqCoreUtils.getAllKeyValueStores(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'));
+    const eventsStore = qpqCoreUtils.getAllKeyValueStoreConfigs(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'));
     const runtime = eventsStore?.onStream?.runtime;
 
     expect(runtime && typeof runtime === 'object' ? runtime.globals : undefined).toEqual({

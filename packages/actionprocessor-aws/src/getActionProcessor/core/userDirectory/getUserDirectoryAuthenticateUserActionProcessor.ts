@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -7,10 +7,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
@@ -18,8 +17,11 @@ import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resol
 const getProcessAuthenticateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAuthenticateUserBase> => {
   return async (payload) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(
+      awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
+      region,
+    );
 
     try {
       const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, payload.authenticateUserRequest.email);
@@ -36,6 +38,7 @@ const getProcessAuthenticateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof a
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         UserNotFoundException: () => actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),

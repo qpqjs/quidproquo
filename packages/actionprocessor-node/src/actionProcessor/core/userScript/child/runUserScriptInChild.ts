@@ -14,6 +14,9 @@ export type RunUserScriptInChildInput = {
   env: NodeJS.ProcessEnv;
   // Command-line arguments for the child, for a module that serves more than one service.
   args?: readonly string[];
+  // Where the child's stdout and stderr go. `inherit` (the default) passes them through to this
+  // process, so a script's output lands in the runner's logs; `ignore` drops them.
+  output?: 'inherit' | 'ignore';
 };
 
 const failed = (type: string, errorText: string): UserScriptRunnerResult => ({ success: false, error: { errorType: type, errorText } });
@@ -28,6 +31,7 @@ const killProcessGroup = (child: ChildProcess): void => {
   try {
     process.kill(-child.pid, 'SIGKILL');
   } catch {
+    // Deliberate: no process group here (or it is already gone), so fall back to killing the child alone.
     child.kill('SIGKILL');
   }
 };
@@ -37,14 +41,14 @@ const killProcessGroup = (child: ChildProcess): void => {
  * gets only the given environment, and it and everything it started are killed once it has
  * answered or when `timeoutMs` passes, so nothing a script does can outlive the call or
  * leak into the next one. The answer is only resolved once the child is gone. Never rejects:
- * every failure of the child itself becomes a TimedOut or RunnerUnavailable result.
+ * every failure of the child itself becomes a Timeout or RunnerUnavailable result.
  */
 export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<UserScriptRunnerResult> =>
   new Promise((resolve) => {
     const child = fork(input.modulePath, [...(input.args ?? [])], {
       env: input.env,
       serialization: 'json',
-      stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
+      stdio: ['ignore', input.output ?? 'inherit', input.output ?? 'inherit', 'ipc'],
       // Its own process group, so the kill below reaches what the script spawned too.
       detached: true,
     });
@@ -62,7 +66,7 @@ export const runUserScriptInChild = (input: RunUserScriptInChildInput): Promise<
 
     const timer = setTimeout(() => {
       killProcessGroup(child);
-      settle(answer ?? failed(errorType.TimedOut, `User script did not finish within ${input.timeoutMs}ms`));
+      settle(answer ?? failed(errorType.Timeout, `User script did not finish within ${input.timeoutMs}ms`));
     }, input.timeoutMs);
 
     child.on('message', (message) => {

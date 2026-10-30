@@ -1,4 +1,4 @@
-import { getFederatedKeyFromQpqFunctionRuntime, isQpqFunctionRuntimeAdvanced, StoryResult } from '@qpqjs/core';
+import { getFederatedKeyFromQpqFunctionRuntime, getMillisecondsBetween, isQpqFunctionRuntimeAdvanced, StoryResult } from '@qpqjs/core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -7,16 +7,16 @@ import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from './actionComponents/genericActionRenderer/AnyVariableView';
 
-interface LogSummaryDetailsProps {
+type LogSummaryDetailsProps = {
   log: StoryResult<any>;
-}
+};
 
 const runtimeTypeToCamelCase = (runtimeType: string): string => runtimeType.toLowerCase().replace(/_(\w)/g, (_, char) => char.toUpperCase());
 
 export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
+  const totalRuntime = getMillisecondsBetween(log.startedAt, log.finishedAt);
   const functionKey = log.qpqFunctionRuntimeInfo
     ? getFederatedKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo)
     : runtimeTypeToCamelCase(log.runtimeType);

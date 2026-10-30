@@ -2,27 +2,27 @@ import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface ApiKey {
+export type ApiKey = {
   name: string;
   value?: string;
   description?: string;
-}
+};
 
-export interface ApiKeyReference {
+export type ApiKeyReference = {
   name: string;
 
   applicationName?: string;
   serviceName?: string;
-}
+};
 
-export interface QPQConfigAdvancedApiKeySettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedApiKeySettings = {
   value?: string;
   description?: string;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface ApiKeyQPQWebServerConfigSetting extends QPQConfigSetting {
+export type ApiKeyQPQWebServerConfigSetting = {
   apiKey: ApiKey;
-}
+} & QPQConfigSetting;
 
 export const defineApiKey = (apiKeyName: string, options?: QPQConfigAdvancedApiKeySettings): ApiKeyQPQWebServerConfigSetting => {
   return {

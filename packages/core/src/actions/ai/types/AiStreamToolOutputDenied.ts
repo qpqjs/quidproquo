@@ -5,10 +5,10 @@ import { AiStreamPartType } from './AiStreamPartType';
  *
  * The model will see the denial and continue without the tool's output.
  */
-export interface AiStreamToolOutputDenied {
+export type AiStreamToolOutputDenied = {
   type: AiStreamPartType.ToolOutputDenied;
   /** Id of the tool call that was denied. */
   toolCallId: string;
   /** Name of the tool that was denied. */
   toolName: string;
-}
+};

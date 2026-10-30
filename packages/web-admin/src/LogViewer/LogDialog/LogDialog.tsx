@@ -1,23 +1,20 @@
-import { useBaseUrlResolvers, useStateUpdater } from '@qpqjs/web-react';
+import { useBaseUrlResolvers } from '@qpqjs/web-react';
 
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Tab, Tabs } from '@mui/material';
 
 import { apiRequestPost } from '../../logic';
-import { EventTimeline } from '../EventTimeline'; // Add this import
+// Add this import
 import { useLogTreeData } from '../hooks';
-import { LogCorrelations } from '../LogCorrelations';
-import { LogRawJson } from '../LogRawJson';
-import { LogSummary } from '../LogSummary';
 import { useLoadedStoryResult, useLogDialogStateManagement } from './hooks';
 import { HelpTab, LogDetailsTab, NotesTab, RawTab, TimelineTab, TraceTab, TreeTab } from './tabs';
 
-interface LogDialogProps {
+type LogDialogProps = {
   open: boolean;
   logCorrelation: string;
   handleClose: () => void;
   storyResultMetadatas: any[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
-}
+};
 
 function downloadJson(json: string, filename: string): void {
   const blob = new Blob([json], { type: 'application/json' });

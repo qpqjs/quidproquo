@@ -1,11 +1,5 @@
-import {
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStreamRegistry,
-  createStubLogger,
-  noopDynamicModuleLoader,
-} from '@qpqjs/core';
+import { createStreamRegistry } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -18,7 +12,7 @@ describe('getRouteAuthValidationResolveContextActionProcessor', () => {
     const processors = await getRouteAuthValidationResolveContextActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const processor = processors[RouteAuthValidationActionType.ResolveContext];
 
-    const [result, error] = await processor(
+    const [result, error] = await processor!(
       { event: { headers: {} } as unknown as HTTPEvent, routeAuthSettings: {}, decodedAccessToken: null },
       buildTestStorySession(),
       buildActionProcessorList({}),

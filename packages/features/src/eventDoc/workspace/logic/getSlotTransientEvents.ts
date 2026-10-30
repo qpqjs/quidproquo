@@ -13,7 +13,7 @@ export const getSlotTransientEvents = (state: EventDocWorkspaceState, slotKey: s
   // Keys sorted so the merge (and the stable sort's tie-break) does not depend on insertion order.
   const merged = Object.keys(slotTransient)
     .sort()
-    .flatMap((transientKey) => slotTransient[transientKey]);
+    .flatMap((transientKey) => slotTransient[transientKey] ?? []);
 
   if (merged.length === 0) {
     return noEvents;

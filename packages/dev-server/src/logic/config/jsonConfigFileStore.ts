@@ -1,8 +1,7 @@
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
+import { generateUuid, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { resolveOwnedStoreLocation } from './resolveOwnedStoreLocation';
 
 // Offline stand-in for SSM Parameter Store / Secrets Manager. Values live in
 // hand-editable JSON files under the dev server runtime path, one file per
@@ -16,30 +15,23 @@ export enum ConfigStoreDirectory {
   secrets = 'secrets',
 }
 
-interface ConfigStorageLocation {
+type ConfigStorageLocation = {
   serviceName: string;
   key: string;
-}
+};
 
-// Mirrors the AWS runtime's resolveParameterKey / resolveSecretResourceName:
-// a cross-module owner redirects storage to the owning service's file, and
-// resourceNameOverride renames the key within it.
+// Owner handling is resolveOwnedStoreLocation's: a cross-module owner redirects to the owning
+// service's file and its override renames the key within it, as the AWS runtime does.
 const resolveParameterStorageLocation = (parameterName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
-  const parameterConfig = qpqCoreUtils.getParameterConfig(parameterName, qpqConfig);
+  const parameterConfig = qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig);
 
-  return {
-    serviceName: parameterConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-    key: parameterConfig.owner?.resourceNameOverride || parameterName,
-  };
+  return resolveOwnedStoreLocation(parameterName, parameterConfig.owner, qpqConfig);
 };
 
 const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig): ConfigStorageLocation => {
-  const secretConfig = qpqCoreUtils.getSecretByName(secretName, qpqConfig);
+  const secretConfig = qpqCoreUtils.resolveSecretOrThrow(secretName, qpqConfig);
 
-  return {
-    serviceName: secretConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-    key: secretConfig.owner?.resourceNameOverride || secretName,
-  };
+  return resolveOwnedStoreLocation(secretName, secretConfig.owner, qpqConfig);
 };
 
 export const readConfigStoreFile = async (
@@ -71,8 +63,9 @@ const getOrSeedConfigStoreValue = async (
 ): Promise<string> => {
   const values = await readConfigStoreFile(runtimePath, storeDirectory, serviceName);
 
-  if (key in values) {
-    return values[key];
+  const existing = values[key];
+  if (existing !== undefined) {
+    return existing;
   }
 
   const seededValue = buildSeedValue();
@@ -91,7 +84,7 @@ export const getOrSeedParameterValue = async (runtimePath: string, parameterName
     ConfigStoreDirectory.parameters,
     serviceName,
     key,
-    () => qpqCoreUtils.getParameterConfig(parameterName, qpqConfig).value,
+    () => qpqCoreUtils.resolveParameterOrThrow(parameterName, qpqConfig).value,
   );
 };
 
@@ -106,5 +99,5 @@ export const setParameterValue = async (runtimePath: string, parameterName: stri
 export const getOrSeedSecretValue = async (runtimePath: string, secretName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveSecretStorageLocation(secretName, qpqConfig);
 
-  return getOrSeedConfigStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => randomUUID());
+  return getOrSeedConfigStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => generateUuid());
 };

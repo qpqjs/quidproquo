@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -9,12 +9,11 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { respondToAuthChallenge } from '../../../logic/cognito/respondToAuthChallenge';
 import { verifySoftwareToken } from '../../../logic/cognito/verifySoftwareToken';
@@ -36,7 +35,7 @@ const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): R
         SOFTWARE_TOKEN_MFA_CODE: authChallenge.mfaCode,
       };
 
-    // MFA_SETUP completes with just USERNAME/SESSION — the TOTP code is consumed
+    // MFA_SETUP completes with just USERNAME/SESSION, the TOTP code is consumed
     // by the preceding VerifySoftwareToken call, not by RespondToAuthChallenge.
     case AuthenticateUserChallenge.MFA_SETUP:
       return {};
@@ -69,9 +68,9 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): ProcessorFor<ty
   return async ({ userDirectoryName, authChallenge }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
     // MFA_SETUP must verify the TOTP code first; Cognito returns a fresh session
     // that is then used to complete the challenge and issue tokens.
@@ -95,6 +94,7 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): ProcessorFor<ty
       return actionResult(response);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         CodeMismatchException: () =>
           actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.InvalidCode, 'The supplied code is incorrect'),
         EnableSoftwareTokenMFAException: () =>

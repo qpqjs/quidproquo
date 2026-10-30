@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { KeyValueStoreQPQConfigSetting, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_lambda, aws_lambda_event_sources, aws_ssm, Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -7,10 +7,9 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 import { kvsStreamArnSsmParameterName } from './QpqCoreKeyValueStoreConstruct';
 
-export interface QpqApiCoreKeyValueStoreStreamConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreKeyValueStoreStreamConstructProps = {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 // A failing batch is retried, and by DEFAULT a DynamoDB stream keeps retrying the SAME
 // batch until it succeeds or the records expire (24 hours), which stalls the whole shard
@@ -33,7 +32,7 @@ const DEFAULT_STREAM_BATCHING_WINDOW_SECONDS = 5;
 
 /**
  * Wires a key-value store's stream to its handler. Created only for stores declaring
- * `onStream`, and only on the owning service's stack — attaching an event source to
+ * `onStream`, and only on the owning service's stack, attaching an event source to
  * another service's table would have two services processing the same records.
  */
 export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
@@ -45,7 +44,9 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       return;
     }
 
-    const isOwnedHere = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
+    const isOwnedHere = qpqCoreUtils
+      .getOwnedKeyValueStoreConfigs(props.qpqConfig)
+      .some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
 
     if (!isOwnedHere) {
       return;
@@ -78,12 +79,9 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       // shortening rule in Function.ts rather than more characters shaved off here.
       functionName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'ks'),
 
-      functionType: 'dynamoStreamEvent_kvsStreamEvent',
-      executorName: 'dynamoStreamEvent_kvsStreamEvent',
+      handler: 'dynamoStreamEvent_kvsStreamEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         // Never change: keyValueStoreName ~ hard coded to stop logs being recursive,

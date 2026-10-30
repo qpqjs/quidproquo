@@ -3,9 +3,9 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 
 const COST_PER_MS = 0.0000000167;
 
-interface CostPerServiceProps {
+type CostPerServiceProps = {
   logs: any[];
-}
+};
 
 export const CostPerService = ({ logs }: CostPerServiceProps) => {
   const data = useMemo(() => {

@@ -1,18 +1,17 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_apigatewayv2, aws_iam, aws_lambda, aws_ssm } from 'aws-cdk-lib';
+import { aws_apigatewayv2, aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { exportStackValue } from '../../../../utils';
+import { applyEnvironmentTags, exportStackValue } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqServiceRole } from '../../../base/QpqServiceRole';
 
-export interface QpqWebserverWebsocketConstructProps extends QpqConstructBlockProps {
+export type QpqWebserverWebsocketConstructProps = {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
   public api: aws_apigatewayv2.CfnApi;
@@ -25,6 +24,7 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
       protocolType: 'WEBSOCKET',
       routeSelectionExpression: '$request.body.type',
     });
+    applyEnvironmentTags(this.api, props.qpqConfig);
 
     exportStackValue(this, awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig), this.api.ref);
 
@@ -69,8 +69,8 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
   // first (publishing their api-id SSM params), so the deploy-time SSM dynamic references
   // here always resolve. No-op when the config references no unowned websockets.
   public static authorizeManageConnectionsForReferencedWebsockets(scope: Construct, qpqConfig: QPQConfig): void {
-    const ownedApiNames = new Set(qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((setting) => setting.apiName));
-    const unownedWebsocketSettings = qpqWebServerUtils.getWebsocketSettings(qpqConfig).filter((setting) => !ownedApiNames.has(setting.apiName));
+    const ownedApiNames = new Set(qpqWebServerUtils.getOwnedWebsocketConfigs(qpqConfig).map((setting) => setting.apiName));
+    const unownedWebsocketSettings = qpqWebServerUtils.getAllWebsocketConfigs(qpqConfig).filter((setting) => !ownedApiNames.has(setting.apiName));
 
     if (unownedWebsocketSettings.length === 0) {
       return;

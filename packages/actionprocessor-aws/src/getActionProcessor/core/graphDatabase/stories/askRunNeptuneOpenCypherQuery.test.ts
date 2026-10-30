@@ -1,4 +1,5 @@
-import { Action, GraphDatabaseInstanceType, NetworkActionType, runStory } from '@qpqjs/core';
+import { Action, GraphDatabaseInstanceType, NetworkActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

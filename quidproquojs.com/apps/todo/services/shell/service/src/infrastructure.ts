@@ -1,10 +1,6 @@
 import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 import { defineDynamicRoutes } from '@qpqjs/features';
-import {
-  defineStorageDrive,
-  defineWebEntry,
-  QPQConfigAdvancedWebEntrySettings,
-} from 'quidproquo';
+import { defineStorageDrive, defineWebEntry, QPQConfigAdvancedWebEntrySettings } from 'quidproquo';
 
 import { TodoServiceEnum } from '@todo/constants';
 import { defineTodoService } from '@todo/service-utils';
@@ -45,23 +41,14 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
     autoUpload: false,
   },
 
-  ignoreCache: [
-    '*/index.js',
-    '*/index.html',
-    '*/remoteEntry.js',
-    '*/mf-manifest.json',
-  ],
+  ignoreCache: ['*/index.js', '*/index.html', '*/remoteEntry.js', '*/mf-manifest.json'],
 };
 
 export default [
   defineDevServerOptions({ views: { port: 3080 } }),
 
   // never change the app name, it will result in a new stack!
-  defineTodoService(
-    TodoServiceEnum.Shell,
-    __dirname,
-    '../../../../../../dist/apps/todo/services/shell/service'
-  ),
+  defineTodoService(TodoServiceEnum.Shell, __dirname, '../../../../../../dist/apps/todo/services/shell/service'),
 
   defineStorageDrive(websiteWebEntryStorageDriveName),
   defineWebEntry('website', webEntryOptions),

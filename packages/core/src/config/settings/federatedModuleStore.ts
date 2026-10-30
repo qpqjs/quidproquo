@@ -7,8 +7,8 @@ import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 // foreign drive with `owner` set for a shared bucket). The deploy layer resolves
 // that drive's bucket and points the lambdas at `<bucket>/<serviceName>`, so many
 // services can share one bucket with each service's artifacts under its own prefix.
-// Read access comes from the storage drive's own grants — nothing extra is created.
-export interface FederatedModuleStoreOptions {
+// Read access comes from the storage drive's own grants, nothing extra is created.
+export type FederatedModuleStoreOptions = {
   // How often (ms) a warm lambda re-checks the store for a newly published version.
   // Lower = faster pickup at the cost of one small S3 GET per container per interval.
   // Defaults to 60000. Set low (e.g. 5000) while testing to see changes quickly.
@@ -20,13 +20,13 @@ export interface FederatedModuleStoreOptions {
   // code - an unpublished store fails fast instead of silently serving stale bundled
   // code. Thin shells REQUIRE publishing the federated remote before they work.
   bundleFallback?: boolean;
-}
+};
 
-export interface FederatedModuleStoreQPQConfigSetting extends QPQConfigSetting {
+export type FederatedModuleStoreQPQConfigSetting = {
   storageDrive: string;
   recheckMs?: number;
   bundleFallback: boolean;
-}
+} & QPQConfigSetting;
 
 export const defineFederatedModuleStore = (storageDrive: string, options?: FederatedModuleStoreOptions): FederatedModuleStoreQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.federatedModuleStore,

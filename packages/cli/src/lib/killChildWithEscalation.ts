@@ -8,6 +8,9 @@
 // trade a data-loss bug for a hung-restart bug, and the next launch would find
 // its ports still held.
 import { ChildProcess } from 'child_process';
+import { createOutput } from './out';
+
+const out = createOutput('kill-child-with-escalation');
 
 // Above the dev server's 5s worst-case shutdown budget, below docker's 10s
 // default stop grace, so a container stop still exits cleanly rather than
@@ -29,7 +32,7 @@ export const killChildWithEscalation = (child: ChildProcess, graceMs = DEFAULT_K
 
   return new Promise<void>((resolve) => {
     const timer = setTimeout(() => {
-      console.warn(`Dev server did not exit within ${graceMs}ms — sending SIGKILL.`);
+      out.warn(`Dev server did not exit within ${graceMs}ms — sending SIGKILL.`);
       child.kill('SIGKILL');
     }, graceMs);
 

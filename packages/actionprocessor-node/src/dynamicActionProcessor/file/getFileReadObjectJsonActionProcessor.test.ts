@@ -3,7 +3,7 @@ import { askFileReadObjectJsonBase, ErrorTypeEnum, FileActionType, resolveAction
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileReadObjectJsonActionProcessor } from './getFileReadObjectJsonActionProcessor';
 
 vi.mock('fs/promises');

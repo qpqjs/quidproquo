@@ -5,6 +5,7 @@ import path from 'path';
 import yauzl, { Entry, ZipFile } from 'yauzl';
 
 import { isSafeProjectPath } from './isSafeProjectPath';
+import { isUserScriptArchiveError } from './isUserScriptArchiveError';
 import { USER_SCRIPT_SOURCE_LIMITS } from './USER_SCRIPT_SOURCE_LIMITS';
 import { UserScriptArchiveError, UserScriptArchiveErrorCode } from './UserScriptArchiveError';
 
@@ -86,7 +87,8 @@ const stripCommonFolder = (names: string[]): number => {
   const firstSegments = new Set(names.map((name) => name.split('/')[0]));
   const allNested = names.every((name) => name.includes('/'));
 
-  return firstSegments.size === 1 && allNested ? [...firstSegments][0].length + 1 : 0;
+  const [firstSegment] = firstSegments;
+  return firstSegments.size === 1 && allNested && firstSegment !== undefined ? firstSegment.length + 1 : 0;
 };
 
 const planEntries = async (zip: Buffer): Promise<PlannedEntry[]> => {
@@ -127,7 +129,7 @@ export const extractUserScriptZip = async (zip: Buffer, projectDir: string): Pro
   try {
     planned = await planEntries(zip);
   } catch (error) {
-    if (error instanceof UserScriptArchiveError) throw error;
+    if (isUserScriptArchiveError(error)) throw error;
     throw invalid(`cannot read the archive: ${error instanceof Error ? error.message : String(error)}`);
   }
 
@@ -153,7 +155,7 @@ export const extractUserScriptZip = async (zip: Buffer, projectDir: string): Pro
       written.push(relativePath);
     });
   } catch (error) {
-    if (error instanceof UserScriptArchiveError) throw error;
+    if (isUserScriptArchiveError(error)) throw error;
     throw invalid(`cannot unpack the archive: ${error instanceof Error ? error.message : String(error)}`);
   }
 

@@ -1,15 +1,10 @@
-import {
-  buildTestQpqConfig,
-  buildTestStorySession,
-  defineUserDirectory,
-  noopDynamicModuleLoader,
-  resolveActionResult,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
+import { signDevJwt } from '../../../logic/auth/devJwt';
 import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirectorySetAccessTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -17,12 +12,12 @@ const { userStore } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../../logic/auth/jsonUserStore', () => userStore);
+vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const resolvedDirectory = { serviceName: 'test-module', directoryName: 'directory' };
 
-const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(value)).toString('base64url');
-const buildJwt = (payload: object): string => `${base64UrlEncode({ alg: 'none' })}.${base64UrlEncode(payload)}.dev-signature`;
+const buildJwt = (payload: object): string => signDevJwt('test-secret', payload);
 
 const getProcessor = async () => {
   const processors = await getUserDirectorySetAccessTokenActionProcessor(devServerConfig)(
@@ -40,7 +35,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, buildTestStorySession({}));
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(resolveActionResult(result).userId).toBe('user-1');
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
@@ -51,7 +46,7 @@ describe('getUserDirectorySetAccessTokenActionProcessor', () => {
     const process = await getProcessor();
     const accessToken = buildJwt({ sub: 'user-1', email: 'joe@example.com', exp: Math.floor(Date.now() / 1000) + 3600 });
 
-    await invokeProcessor(process, { userDirectoryName: 'directory', accessToken }, buildTestStorySession({}));
+    await invokeProcessor(process!, { userDirectoryName: 'directory', accessToken }, { session: buildTestStorySession({}) });
 
     expect(userStore.upsertDevUser).not.toHaveBeenCalled();
   });

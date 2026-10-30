@@ -1,14 +1,9 @@
+import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildActionProcessorResolver, buildTestStorySession, createStubLogger, getTestTimeNow, noopDynamicModuleLoader } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
-import { actionResult } from '../logic/actionLogic';
-import { buildTestQpqConfig } from '../testing/configTesting';
-import {
-  buildActionProcessorResolver,
-  buildTestStorySession,
-  createStubLogger,
-  getTestTimeNow,
-  noopDynamicModuleLoader,
-} from '../testing/runtimeTesting';
+import { actionResult } from '../logic/actionResult';
 import { AskResponse, QpqRuntimeType } from '../types/StorySession';
 import { createRuntime } from './createRuntime';
 

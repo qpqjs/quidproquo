@@ -1,4 +1,5 @@
-import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, QueueActionType, runStory } from '@qpqjs/core';
+import { ConfigActionType, DeployEvent, DeployEventStatusType, DeployEventType, QueueActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -12,7 +13,7 @@ describe('seed deployEvent onDeploy', () => {
 
     runStory(onDeploy(event), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },
@@ -28,7 +29,7 @@ describe('seed deployEvent onDeploy', () => {
 
     runStory(onDeploy(event), {
       [ConfigActionType.GetGlobal]: ['seed/a::run'],
-      [QueueActionType.SendMessages]: (action: any) => {
+      [QueueActionType.SendMessage]: (action: any) => {
         messages.push(action.payload);
         return undefined;
       },

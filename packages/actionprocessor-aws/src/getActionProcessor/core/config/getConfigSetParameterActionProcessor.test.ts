@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askConfigSetParameter, buildTestQpqConfig, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { askConfigSetParameter, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setParameter } from '../../../logic/parametersManager/setParameter';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigSetParameterActionProcessor } from './getConfigSetParameterActionProcessor';
 
 vi.mock('../../../logic/parametersManager/setParameter', () => ({
@@ -27,20 +27,20 @@ describe('getConfigSetParameterActionProcessor', () => {
     vi.mocked(setParameter).mockResolvedValue(undefined as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterName: 'flag', parameterValue: 'on' });
+    const result = await invokeProcessor(processor!, { parameterName: 'flag', parameterValue: 'on' });
 
     expect(result).toEqual([undefined]);
     expect(setParameter).toHaveBeenCalledWith('flag-test-app-test-module-development', 'eu-west-1', 'on');
   });
 
   it.each([
-    ['ThrottlingException', askConfigSetParameter.errorType.Throttling],
+    ['ThrottlingException', askConfigSetParameter.errorType.Throttled],
     ['ParameterLimitExceeded', askConfigSetParameter.errorType.QuotaExceeded],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(setParameter).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterName: 'flag', parameterValue: 'on' });
+    const [, error] = await invokeProcessor(processor!, { parameterName: 'flag', parameterValue: 'on' });
 
     expect(error?.errorType).toBe(expectedType);
   });

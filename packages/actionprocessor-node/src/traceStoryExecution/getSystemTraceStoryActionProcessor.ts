@@ -4,7 +4,6 @@ import {
   actionResult,
   actionResultError,
   askTraceStory,
-  createActionProcessor,
   DynamicModuleLoader,
   ErrorTypeEnum,
   ProcessorFor,
@@ -18,13 +17,7 @@ import {
 } from '@qpqjs/core';
 
 import { traceStoryExecution } from './traceStoryExecution';
-
-// Resolves extra own-code markers (see resolveSourceMaps.filterOwnCodeLocations) for the
-// story being traced. Opt-in: lambda's federated remotes stay on the plain "not
-// node_modules" heuristic that already works for them; hosts whose bundle layout defeats
-// that heuristic (the dev server bundles every hosted service plus the whole framework
-// into one script) pass a resolver to narrow onlyOwnCode to the traced service.
-export type OwnCodeMarkersResolver = (qpqFunctionRuntimeInfo: QpqFunctionRuntime | undefined, qpqConfig: QPQConfig) => string[] | undefined;
+import { OwnCodeMarkersResolver } from './types';
 
 // Shared System::TraceStory processor for node runtimes (lambda and the dev server).
 // Loads the recorded story's real code through the runtime's dynamicModuleLoader (which
@@ -47,14 +40,14 @@ const getProcessTraceStory = (
 
     if (!storyResult.qpqFunctionRuntimeInfo) {
       return actionResultError(
-        ErrorTypeEnum.BadRequest,
+        askTraceStory.errorType.BadRequest,
         `Story [${storyResult.correlation}] has no qpqFunctionRuntimeInfo - cannot locate its code to trace`,
       );
     }
 
     const story = await dynamicModuleLoader(storyResult.qpqFunctionRuntimeInfo);
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load story for [${storyResult.correlation}]`);
+      return actionResultError(askTraceStory.errorType.NotFound, `Unable to dynamically load story for [${storyResult.correlation}]`);
     }
 
     try {

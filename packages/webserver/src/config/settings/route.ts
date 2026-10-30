@@ -4,15 +4,15 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { RouteSchema } from '../types/RouteSchema';
 import { ApiKeyReference } from './apiKey';
 
-interface GenericRouteAuthSettings<T> {
+type GenericRouteAuthSettings<T> = {
   userDirectoryName?: string;
 
   scopes?: string[];
 
   apiKeys?: T[];
-}
+};
 
-export interface ServiceAllowedOrigin {
+export type ServiceAllowedOrigin = {
   /**
    * The name of the api subdomain name for the given service
    */
@@ -30,29 +30,29 @@ export interface ServiceAllowedOrigin {
    * The protocol to use, defaults to https
    */
   protocol?: 'http' | 'https';
-}
+};
 
-export interface GenericRouteOptions<T> {
+export type GenericRouteOptions<T> = {
   allowedOrigins?: (string | ServiceAllowedOrigin)[];
 
   routeAuthSettings?: GenericRouteAuthSettings<T>;
 
   // Request and response shapes for validation and the generated OpenAPI document
   schema?: RouteSchema;
-}
+};
 
-// TODO: Probably clean up the types here
+// TODO: @joe-coady: clean up the types here
 // The idea is just so we can let the user define apiKeys as strings not objects
 // But let the internal logic always use objects
 export type RouteAuthSettings = GenericRouteAuthSettings<ApiKeyReference>;
 export type RouteOptions = GenericRouteOptions<ApiKeyReference>;
 
-export interface RouteQPQWebServerConfigSetting extends QPQConfigSetting {
+export type RouteQPQWebServerConfigSetting = {
   method: HTTPMethod;
   path: string;
   runtime: QpqFunctionRuntime;
   options: RouteOptions;
-}
+} & QPQConfigSetting;
 
 export const defineRoute = (
   method: HTTPMethod,
@@ -60,8 +60,8 @@ export const defineRoute = (
   runtime: QpqFunctionRuntime,
   options: GenericRouteOptions<ApiKeyReference | string> = {},
 ): RouteQPQWebServerConfigSetting => {
-  const routeAuthSettings = options.routeAuthSettings || {};
-  const apiKeys = routeAuthSettings.apiKeys || [];
+  const routeAuthSettings = options.routeAuthSettings ?? {};
+  const apiKeys = routeAuthSettings.apiKeys ?? [];
   const newOptions = {
     ...options,
     routeAuthSettings: {

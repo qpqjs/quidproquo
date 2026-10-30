@@ -1,11 +1,6 @@
 import { SMOKE_PROBE_STORE } from '@qpqjs/constants';
 import { SmokeProbeRecord } from '@qpqjs/test-models';
-import {
-  askKeyValueStoreUpsert,
-  AskResponse,
-  KvsStreamEventResponse,
-  KvsStreamRecord,
-} from 'quidproquo';
+import { askKeyValueStoreUpsert, AskResponse, KvsStreamEventResponse, KvsStreamRecord } from 'quidproquo';
 
 import { smokeStreamMarkerId } from '../../logic/smokeStreamMarkerId';
 
@@ -14,9 +9,7 @@ import { smokeStreamMarkerId } from '../../logic/smokeStreamMarkerId';
 // image's attribute names, so the test can check the stream hands back the
 // scope as its own field, the key stripped of it, and none of the store's
 // hidden index attributes.
-export function* onSmokeStreamRecord(
-  record: KvsStreamRecord<SmokeProbeRecord>
-): AskResponse<KvsStreamEventResponse> {
+export function* onSmokeStreamRecord(record: KvsStreamRecord<SmokeProbeRecord>): AskResponse<KvsStreamEventResponse> {
   const key = String(record.keys.probeId);
 
   const marker: SmokeProbeRecord = {

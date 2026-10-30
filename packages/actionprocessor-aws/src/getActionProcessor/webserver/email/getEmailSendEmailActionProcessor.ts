@@ -1,6 +1,14 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { askEmailSendEmail, EmailActionType } from '@qpqjs/webserver';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  createActionProcessor,
+  ProcessorFor,
+  QPQConfig,
+  transientErrorMap,
+} from '@qpqjs/core';
+import { askEmailSendEmail } from '@qpqjs/webserver';
 
 import { sendEmail } from '../../../logic/sesV2/sendEmail';
 
@@ -14,6 +22,7 @@ const getProcessSendEmail = (qpqConfig: QPQConfig): ProcessorFor<typeof askEmail
       return actionResult(messageId);
     } catch (error) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         MessageRejected: () => actionResultError(askEmailSendEmail.errorType.MessageRejected, 'Message rejected'),
         MailFromDomainNotVerifiedException: () => actionResultError(askEmailSendEmail.errorType.SenderNotVerified, 'Sender domain not verified'),
         AccountSuspendedException: () => actionResultError(askEmailSendEmail.errorType.AccountSuspended, 'Email sending account suspended'),

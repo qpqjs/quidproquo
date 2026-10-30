@@ -2,7 +2,7 @@ import { FileActionType, resolveActionResult } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 
 describe('getFileIsColdStorageActionProcessor', () => {

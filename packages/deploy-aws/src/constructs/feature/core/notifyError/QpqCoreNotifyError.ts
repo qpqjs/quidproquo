@@ -1,21 +1,20 @@
 import { NotifyErrorQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_cloudwatch, aws_cloudwatch_actions, aws_sns } from 'aws-cdk-lib';
+import { aws_cloudwatch, aws_cloudwatch_actions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreEventBusConstruct } from '..';
 
-export interface QpqCoreNotifyErrorConstructProps extends QpqConstructBlockProps {
+export type QpqCoreNotifyErrorConstructProps = {
   notifyErrorConfig: NotifyErrorQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqCoreNotifyErrorConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreNotifyErrorConstructProps) {
     super(scope, id, props);
 
-    // Create CloudWatch alarm for Lambda
     const errorsAlarm = new aws_cloudwatch.Alarm(this, `${props.notifyErrorConfig.uniqueKey}-error`, {
       alarmName: this.resourceName(`${props.notifyErrorConfig.name}-error`),
       metric: new aws_cloudwatch.Metric({

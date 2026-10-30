@@ -1,3 +1,43 @@
+import { getEventBusByName } from './config/settings/eventBus/logic';
+import { getAllKeyValueStoreConfigs, getKeyValueStoreByName } from './config/settings/keyValueStore/logic';
+export { getAllCryptoKeyConfigs, getCryptoKeyByName, getOwnedCryptoKeyConfigs, resolveCryptoKeyOrThrow } from './config/settings/cryptoKey/logic';
+export { getAllEventBusConfigs, getEventBusByName, getOwnedEventBusConfigs, resolveEventBusOrThrow } from './config/settings/eventBus/logic';
+export { getJavascriptRuntimeConfig } from './config/settings/javascriptRuntime/logic';
+export {
+  getAllSigningKeyConfigs,
+  getOwnedSigningKeyConfigs,
+  getSigningKeyByName,
+  resolveSigningKeyOrThrow,
+} from './config/settings/signingKey/logic';
+export {
+  getAllStorageDriveConfigs,
+  getOwnedStorageDriveConfigs,
+  getStorageDriveByName,
+  resolveStorageDriveOrThrow,
+} from './config/settings/storageDrive/logic';
+export {
+  getAllUserDirectoryConfigs,
+  getOwnedUserDirectoryConfigs,
+  getUserDirectoryByName,
+  resolveUserDirectoryOrThrow,
+} from './config/settings/userDirectory/logic';
+export { getUserScriptRunnerConfig, resolveUserScriptRunnerConfigOrThrow } from './config/settings/userScriptRunner/logic';
+import { getAllQueueConfigs, getQueueByName } from './config/settings/queue/logic';
+import { getAllStorageDriveConfigs } from './config/settings/storageDrive/logic';
+import { getAllUserDirectoryConfigs, getOwnedUserDirectoryConfigs } from './config/settings/userDirectory/logic';
+import {
+  getApplicationConfigSetting,
+  getApplicationModuleEnvironment,
+  getApplicationModuleFeature,
+  getApplicationModuleName,
+  getApplicationName,
+  getConfigSetting,
+  getConfigSettings,
+  getOwnedItems,
+  resolveOwnedResourceLocalName,
+  resolveOwnerDeploymentContext,
+} from './logic/config';
+import { CrossModuleOwner } from './types/CrossModuleOwner';
 import {
   ActionProcessorsQPQConfigSetting,
   AiQPQConfigSetting,
@@ -5,24 +45,20 @@ import {
   ApplicationQPQConfigSetting,
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
-  CryptoKeyQPQConfigSetting,
-  defineJavascriptRuntime,
+  BundleEntriesQPQConfigSetting,
   DeployEventsQPQConfigSetting,
   DynamicFunctionsQPQConfigSetting,
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
-  EventBusQPQConfigSetting,
   FederatedModuleStoreQPQConfigSetting,
   FrontendBundleOptions,
   FrontendBundleOptionsQPQConfigSetting,
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
-  JavascriptRuntimeQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
-  ParameterQPQConfigSetting,
   QPQConfig,
   QPQConfigItem,
   QPQConfigSetting,
@@ -30,18 +66,13 @@ import {
   QpqQueueProcessors,
   QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
-  SecretQPQConfigSetting,
   ServiceSettingsQPQConfigSetting,
-  SigningKeyQPQConfigSetting,
-  StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   UserScriptModuleQPQConfigSetting,
-  UserScriptRunnerQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
 import {
   ConfigUrl,
-  CrossModuleOwner,
   CrossServiceResourceName,
   CustomFullyQualifiedResource,
   FullyQualifiedResource,
@@ -52,187 +83,52 @@ import {
 } from './types';
 import { isQpqFunctionRuntimeAdvanced } from './utils';
 
-/**
- * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
- * If a QPQConfigItem has a configSettingType of QPQCoreConfigSettingType.environmentSettings,
- * and its environment matches the current environment, its settings will be added to the flattened array.
- * @function
- * @param {QPQConfig} qpqConfig - The input QPQConfig array to be flattened.
- * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects
- */
-export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
-  let environment = 'development';
-  let service: string | undefined;
-
-  /**
-   * A recursive helper function that flattens an array of QPQConfigItem objects.
-   * @function
-   * @param {QPQConfigItem[]} configItems - An array of QPQConfigItem objects to be flattened.
-   * @param {QPQConfigSetting[]} accumulator - An accumulator array for storing the flattened QPQConfigSetting objects.
-   * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
-   */
-  const flatten = (configItems: QPQConfigItem[], accumulator: QPQConfigSetting[] = []): QPQConfigSetting[] => {
-    return configItems.reduce<QPQConfigSetting[]>((acc, item) => {
-      if (Array.isArray(item)) {
-        return flatten(item, acc);
-      } else {
-        // If its a appName config item, update the environment variable
-        if (item.configSettingType === QPQCoreConfigSettingType.appName) {
-          environment = (item as ApplicationQPQConfigSetting).environment || 'development';
-        }
-
-        // If its a moduleName config item, update the service variable
-        else if (item.configSettingType === QPQCoreConfigSettingType.moduleName) {
-          service = (item as ModuleQPQConfigSetting).moduleName;
-        }
-
-        // Otherwise if its an environmentSettings config item, flatten out the child settings
-        // for the current environment, falling back to the '*' key if present.
-        else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
-          const envSetting = item as EnvironmentSettingsQPQConfigSetting;
-          const settings = envSetting.settingsByEnvironment[environment] ?? envSetting.settingsByEnvironment['*'] ?? [];
-
-          return flatten(settings, acc);
-        }
-
-        // Otherwise if its a serviceSettings config item, flatten out the child settings
-        // for the current service, falling back to the '*' key if present.
-        else if (item.configSettingType === QPQCoreConfigSettingType.serviceSettings) {
-          if (!service) {
-            throw new Error('defineServiceSettings requires a module to be set first via defineModule (usually through defineApplicationModule)');
-          }
-
-          const svcSetting = item as ServiceSettingsQPQConfigSetting;
-          const settings = svcSetting.settingsByService[service] ?? svcSetting.settingsByService['*'] ?? [];
-
-          return flatten(settings, acc);
-        }
-
-        // Otherwise its just a regular config item, add it to the list
-        return [...acc, item];
-      }
-    }, accumulator);
-  };
-
-  return flatten(qpqConfig);
-};
-
-/**
- * Filters and returns the config settings of a specific type from a QPQConfig array.
- * @function
- * @template T - The specific type of QPQConfigSetting to filter.
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @param {string} configSettingType - The specific config setting type to filter.
- * @returns {T[]} - An array of filtered config settings of the specified type.
- */
-export const getConfigSettings = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, configSettingType: string): T[] => {
-  const flatConfig = flattenQpqConfig(qpqConfig);
-  return flatConfig.filter((c) => c.configSettingType === configSettingType) as T[];
-};
-
-/**
- * Retrieves a single config setting of a specific type from a QPQConfig array.
- * @function
- * @template T - The specific type of QPQConfigSetting to retrieve.
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @param {string} serviceInfrastructureConfigType - The specific config setting type to retrieve.
- * @returns {T | undefined} - The found config setting of the specified type or undefined if not found.
- */
-export const getConfigSetting = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, serviceInfrastructureConfigType: string): T | undefined => {
-  const [setting] = getConfigSettings<T>(qpqConfig, serviceInfrastructureConfigType);
-  return setting;
-};
-
-/**
- * Retrieves the ApplicationModuleSetting from a QPQConfig array.
- * @function
- * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @returns {ApplicationQPQConfigSetting} - The ApplicationQPQConfigSetting from the QPQConfig array.
- * @throws {Error} - If the ApplicationQPQConfigSetting is not found in the QPQConfig array.
- */
-export const getApplicationConfigSetting = (qpqConfig: QPQConfig): ApplicationQPQConfigSetting => {
-  const applicationModuleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
-
-  if (!applicationModuleSetting) {
-    throw new Error('please use defineApplication in your QPQ config');
-  }
-
-  return applicationModuleSetting;
-};
-
-export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
-  const moduleSetting = getConfigSetting<ModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.moduleName);
-
-  if (!moduleSetting) {
-    throw new Error('please use defineModule in your QPQ config');
-  }
-
-  return moduleSetting.moduleName;
-};
-
-export const getApplicationConfigRoot = (qpqConfig: QPQConfig): string => {
-  const moduleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
-
-  if (!moduleSetting) {
-    throw new Error('please use defineApplication in your QPQ config');
-  }
-
-  return moduleSetting.configRoot;
-};
-
-export const getApplicationName = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).applicationName;
-};
-
-export const getApplicationModuleFeature = (qpqConfig: QPQConfig): string | undefined => {
-  return getApplicationConfigSetting(qpqConfig).feature;
-};
+// The config walk and the application accessors live in logic/config; they are part of this
+// namespace for callers.
+export {
+  getAllKeyValueStoreConfigs,
+  getKeyValueStoreByName,
+  getOwnedKeyValueStoreConfigs,
+  resolveKeyValueStoreOrThrow,
+} from './config/settings/keyValueStore/logic';
+export { getAllParameterConfigs, getOwnedParameterConfigs, getParameterByName, resolveParameterOrThrow } from './config/settings/parameter/logic';
+export { getAllQueueConfigs, getOwnedQueueConfigs, getQueueByName, resolveQueueOrThrow } from './config/settings/queue/logic';
+export { getAllSecretConfigs, getOwnedSecretConfigs, getSecretByName, resolveSecretOrThrow } from './config/settings/secret/logic';
+export {
+  flattenQpqConfig,
+  getApplicationConfigSetting,
+  getApplicationModuleEnvironment,
+  getApplicationModuleFeature,
+  getApplicationModuleName,
+  getApplicationName,
+  getConfigSetting,
+  getConfigSettings,
+  getOwnedItems,
+  resolveOwnedResourceLocalName,
+  resolveOwnerDeploymentContext,
+} from './logic/config';
 
 export const getConfigRoot = (qpqConfig: QPQConfig): string => {
   return getApplicationConfigSetting(qpqConfig).configRoot;
-};
-
-export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).environment || 'production';
-};
-
-export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
-  return getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive);
-};
-
-export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
-  return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
 };
 
 export const getFederatedModuleStore = (qpqConfig: QPQConfig): FederatedModuleStoreQPQConfigSetting | undefined => {
   return getConfigSetting<FederatedModuleStoreQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.federatedModuleStore);
 };
 
-export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
-  return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
-};
-
-export const getOwnedQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
-  return getOwnedItems(getQueues(configs), configs);
-};
-
 export const getNotifyErrorConfigs = (configs: QPQConfig): NotifyErrorQPQConfigSetting[] => {
   return getConfigSettings<NotifyErrorQPQConfigSetting>(configs, QPQCoreConfigSettingType.notifyError);
-};
-
-export const getQueueByName = (configs: QPQConfig, name: string): QueueQPQConfigSetting | undefined => {
-  return getQueues(configs).find((q) => q.name === name);
 };
 
 // A FIFO queue can only be fed by a FIFO event bus - standard SNS topics cannot deliver
 // to FIFO SQS queues at all. Called at deploy/startup time (the queue and bus are separate
 // settings, so defineQueue can't validate this on its own).
 export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfig): void => {
-  const invalidSubscriptions = getQueues(qpqConfig)
+  const invalidSubscriptions = getAllQueueConfigs(qpqConfig)
     .filter((queue) => queue.isFifo)
     .flatMap((queue) =>
       queue.eventBusSubscriptions
-        .filter((eventBusName) => !getEventBusConfigByName(eventBusName, qpqConfig)?.isFifo)
+        .filter((eventBusName) => !getEventBusByName(eventBusName, qpqConfig)?.isFifo)
         .map((eventBusName) => `queue [${queue.name}] -> event bus [${eventBusName}]`),
     );
 
@@ -244,67 +140,16 @@ export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfi
 };
 
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
-  const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive).map(
-    (sd) => sd.storageDrive,
-  );
-
-  return storageDriveNames;
-};
-
-export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
-  const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.eventBus);
-
-  return eventBuses;
+  return getAllStorageDriveConfigs(configs).map((sd) => sd.storageDrive);
 };
 
 export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
   return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
 };
 
-// Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
-export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
-  return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
-};
-
-export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
-  const ownedEventBusConfigs = getOwnedItems(getAllEventBusConfigs(qpqConfig), qpqConfig);
-
-  return ownedEventBusConfigs;
-};
-
-export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
-  const allConfigs = getAllEventBusConfigs(qpqConfig);
-
-  const eventBusConfig = allConfigs.find((eb) => eb.owner?.resourceNameOverride === eventBusName);
-
-  if (eventBusConfig) {
-    return eventBusConfig;
-  }
-
-  return allConfigs.find((eb) => eb.name === eventBusName);
-};
-
-export const getOwnedItems = <T extends QPQConfigSetting>(settings: T[], qpqConfig: QPQConfig): T[] => {
-  const appModuleName = getApplicationModuleName(qpqConfig);
-  const appName = getApplicationName(qpqConfig);
-  const appFeature = getApplicationModuleFeature(qpqConfig);
-  const appEnvironment = getApplicationModuleEnvironment(qpqConfig);
-
-  return settings.filter(
-    (s) =>
-      !s.owner ||
-      ((!s.owner.module || s.owner.module === appModuleName) &&
-        (!s.owner.application || s.owner.application === appName) &&
-        (s.owner.feature === undefined || (!s.owner.feature && !appFeature) || s.owner.feature === appFeature) &&
-        (!s.owner.environment || s.owner.environment === appEnvironment)),
-  );
-};
-
-export const getAllKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
-  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(qpqConfig, QPQCoreConfigSettingType.keyValueStore);
-
-  return keyValueStores;
-};
+/** The module a setting belongs to: its declared owner, or the executing module when it declares none. */
+export const resolveOwnerModuleName = (owner: CrossModuleOwner | undefined, qpqConfig: QPQConfig): string =>
+  resolveOwnerDeploymentContext(qpqConfig, owner).module;
 
 export const getAllGraphDatabaseConfigs = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   const graphDatabases = getConfigSettings<GraphDatabaseQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.graphDatabase);
@@ -318,20 +163,15 @@ export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConf
   return deployEvents;
 };
 
-export const getVirualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQPQConfigSetting[] => {
-  return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
-};
+export const getDeployEventByName = (name: string, qpqConfig: QPQConfig): Nullable<DeployEventsQPQConfigSetting> =>
+  getDeployEventConfigs(qpqConfig).find((c) => c.name === name) ?? null;
 
-export const getOwnedKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
-  return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
+export const getVirtualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQPQConfigSetting[] => {
+  return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
 };
 
 export const getOwnedGraphDatabases = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
   return getOwnedItems(getAllGraphDatabaseConfigs(qpqConfig), qpqConfig);
-};
-
-export const getOwnedStorageDrives = (qpqConfig: QPQConfig): StorageDriveQPQConfigSetting[] => {
-  return getOwnedItems(getStorageDrives(qpqConfig), qpqConfig);
 };
 
 export const resolveCrossServiceResourceName = (resourceName: ResourceName): CrossServiceResourceName => {
@@ -344,15 +184,6 @@ export const resolveCrossServiceResourceName = (resourceName: ResourceName): Cro
   return resourceName;
 };
 
-export const getKeyValueStoreByName = <T extends object = any>(
-  qpqConfig: QPQConfig,
-  kvsName: string,
-): KeyValueStoreQPQConfigSetting<T> | undefined => {
-  const keyValueStore = getAllKeyValueStores<T>(qpqConfig).find((kvs) => kvs.keyValueStoreName === kvsName);
-
-  return keyValueStore;
-};
-
 export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntime[] => {
   const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.runtime);
 
@@ -360,9 +191,7 @@ export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntim
 };
 
 export const getUserDirectoryEmailTemplates = (qpqConfig: QPQConfig): Record<string, EmailTemplates> => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userDirectory);
-
-  const record = userDirectories.reduce(
+  const record = getAllUserDirectoryConfigs(qpqConfig).reduce(
     (acc, ud) => ({
       ...acc,
       [ud.name]: ud.emailTemplates,
@@ -382,14 +211,12 @@ export const getOwnedScheduleEvents = (qpqConfig: QPQConfig): ScheduleQPQConfigS
 };
 
 export const getQueueSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
-  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
-
-  return queueConfigs.reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors)], [] as QpqFunctionRuntime[]);
+  return getAllQueueConfigs(configs).reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors)], [] as QpqFunctionRuntime[]);
 };
 
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   // We just want the ones this service owns.
-  const userConfigs = getOwnedUserDirectories(qpqConfig);
+  const userConfigs = getOwnedUserDirectoryConfigs(qpqConfig);
 
   return userConfigs
     .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates), ...Object.values(ud.customAuthRuntime || {})], [] as QpqFunctionRuntime[])
@@ -404,25 +231,20 @@ export const getOwnedInlineFunctions = (qpqConfig: QPQConfig): InlineFunctionQPQ
   return getOwnedItems(getAllInlineFunctions(qpqConfig), qpqConfig);
 };
 
+export const getAllBundleEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
+  return getConfigSettings<BundleEntriesQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.bundleEntries).flatMap((setting) => setting.runtimes);
+};
+
 export const getAllDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
   return getConfigSettings<DynamicFunctionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.dynamicFunctions);
 };
 
-export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
-  return getOwnedItems(getAllDynamicFunctions(qpqConfig), qpqConfig);
-};
-
-// The modules this service lets user scripts import (defineUserScriptModule).
 export const getAllUserScriptModules = (qpqConfig: QPQConfig): UserScriptModuleQPQConfigSetting[] => {
   return getConfigSettings<UserScriptModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptModule);
 };
 
 // The sandbox this service runs user scripts in (defineUserScriptRunner), or null when
 // the service has not declared one.
-export const getUserScriptRunner = (qpqConfig: QPQConfig): Nullable<UserScriptRunnerQPQConfigSetting> => {
-  return getConfigSetting<UserScriptRunnerQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userScriptRunner) ?? null;
-};
-
 // Runtime-attached action processor override sources must join the bundler sweep,
 // or the deployed bundle omits them and the dynamic load fails at runtime.
 export const expandSrcEntriesWithActionProcessors = (runtimes: QpqFunctionRuntime[]): QpqFunctionRuntime[] => {
@@ -437,16 +259,17 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
     ...getDeployEventConfigs(qpqConfig).map((r) => r.runtime),
-    ...getStorageDrives(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
+    ...getAllStorageDriveConfigs(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
     // A store's change-stream handler. Missing here, the bundler never sees it: the lambda
     // zip omits it and the dev server's dynamic loader has nothing to resolve, so the handler
-    // simply never runs — and since nothing throws, the only symptom is a projection that
+    // simply never runs, and since nothing throws, the only symptom is a projection that
     // silently stops updating.
-    ...(getAllKeyValueStores(qpqConfig)
+    ...(getAllKeyValueStoreConfigs(qpqConfig)
       .map((kvs) => kvs.onStream?.runtime)
       .filter((runtime) => !!runtime) as QpqFunctionRuntime[]),
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
     ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
+    ...getAllBundleEntries(qpqConfig),
     // Loaded only when a script is built or run, so nothing else would make the bundler see it.
     ...getAllUserScriptModules(qpqConfig).flatMap((m) => (m.typesRuntime ? [m.runtime, m.typesRuntime] : [m.runtime])),
   ];
@@ -469,78 +292,8 @@ export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunc
     return qpqFunctionRuntime.relativePath.split('/').pop() || '';
   }
 
-  const [srcPath] = qpqFunctionRuntime.split('::');
+  const [srcPath = ''] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
-};
-
-export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
-
-  const secret = secrets.find((s) => s.key === secretName);
-
-  if (!secret) {
-    throw new Error(`Can not find secret [${secretName}]`);
-  }
-
-  return secret;
-};
-
-export const getAllSecretConfigs = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
-
-  return secrets;
-};
-
-export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getAllSecretConfigs(qpqConfig);
-
-  return getOwnedItems(secrets, qpqConfig);
-};
-
-export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting => {
-  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
-
-  const cryptoKey = cryptoKeys.find((k) => k.keyName === cryptoKeyName);
-
-  if (!cryptoKey) {
-    throw new Error(`Can not find crypto key [${cryptoKeyName}]`);
-  }
-
-  return cryptoKey;
-};
-
-export const getAllCryptoKeyConfigs = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
-  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
-
-  return cryptoKeys;
-};
-
-export const getOwnedCryptoKeys = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
-  const cryptoKeys = getAllCryptoKeyConfigs(qpqConfig);
-
-  return getOwnedItems(cryptoKeys, qpqConfig);
-};
-
-export const getSigningKeyByName = (signingKeyName: string, qpqConfig: QPQConfig): SigningKeyQPQConfigSetting => {
-  const signingKeys = getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
-
-  const signingKey = signingKeys.find((k) => k.keyName === signingKeyName);
-
-  if (!signingKey) {
-    throw new Error(`Can not find signing key [${signingKeyName}]`);
-  }
-
-  return signingKey;
-};
-
-export const getAllSigningKeyConfigs = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
-  return getConfigSettings<SigningKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.signingKey);
-};
-
-export const getOwnedSigningKeys = (qpqConfig: QPQConfig): SigningKeyQPQConfigSetting[] => {
-  const signingKeys = getAllSigningKeyConfigs(qpqConfig);
-
-  return getOwnedItems(signingKeys, qpqConfig);
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {
@@ -562,52 +315,6 @@ export const resolveGlobalValue = <T>(qpqConfig: QPQConfig, functionGlobals: Rec
   }
 
   return getGlobalConfigValue<T>(qpqConfig, name);
-};
-
-export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(configs, QPQCoreConfigSettingType.userDirectory);
-
-  return userDirectories;
-};
-
-export const getOwnedUserDirectories = (qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting[] => {
-  const userDirectories = getUserDirectories(qpqConifg);
-
-  return getOwnedItems(userDirectories, qpqConifg);
-};
-
-export const getUserDirectoryByName = (userDirectoryName: string, qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting => {
-  const userDirectory = getUserDirectories(qpqConifg).find((ud) => ud.name === userDirectoryName);
-
-  if (!userDirectory) {
-    throw new Error(`UserDirectory not found: ${userDirectoryName}`);
-  }
-
-  return userDirectory;
-};
-
-export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
-
-  return parameters;
-};
-
-export const getParameterConfig = (name: string, qpqConfig: QPQConfig): ParameterQPQConfigSetting => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
-
-  const param = parameters.find((p) => p.key === name);
-
-  if (!param) {
-    throw new Error(`Parameter ${name} not found`);
-  }
-
-  return param;
-};
-
-export const getOwnedParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
-  const parameters = getAllParameterConfigs(qpqConfig);
-
-  return getOwnedItems(parameters, qpqConfig);
 };
 
 /**
@@ -644,14 +351,8 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
-export const getQueueConfigSettingByName = (name: string, qpqConfig: QPQConfig): QueueQPQConfigSetting | undefined => {
-  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
-
-  return queueConfigs.find((c) => c.name === name);
-};
-
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-  return getQueueConfigSettingByName(name, qpqConfig)?.qpqQueueProcessors || {};
+  return getQueueByName(name, qpqConfig)?.qpqQueueProcessors || {};
 };
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
@@ -672,24 +373,21 @@ export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(r
 };
 
 export const getFullyQualifiedResourceName = (qpqConfig: QPQConfig, resourceName: string, config?: QPQConfigSetting): FullyQualifiedResource => {
-  const confApplication = getApplicationName(qpqConfig);
-  const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
-  const confFeature = getApplicationModuleFeature(qpqConfig);
-  const confModule = getApplicationModuleName(qpqConfig);
+  const { application, module, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, config?.owner);
 
   return {
-    resourceName: config?.owner?.resourceNameOverride || resourceName,
+    resourceName: resolveOwnedResourceLocalName(resourceName, config?.owner),
 
-    application: config?.owner?.application || confApplication,
-    environment: config?.owner?.environment || confEnvironment,
-    module: config?.owner?.module || confModule,
-    feature: config?.owner?.feature || confFeature || '',
+    application,
+    environment,
+    module,
+    feature: feature || '',
   };
 };
 
 // Fully Qualified Resource Names
 export const getKeyValueStoreFullyQualifiedResourceName = (kvsName: string, qpqConfig: QPQConfig): FullyQualifiedResource => {
-  const storeConfig = getKeyValueStoreByName(qpqConfig, kvsName);
+  const storeConfig = getKeyValueStoreByName(kvsName, qpqConfig) ?? undefined;
 
   return getFullyQualifiedResourceName(qpqConfig, kvsName, storeConfig);
 };

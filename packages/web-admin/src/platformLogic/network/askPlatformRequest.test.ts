@@ -1,14 +1,15 @@
 import {
+  ActionOf,
+  askStateDispatchBase,
   AuthenticateUserChallenge,
   AuthenticateUserResponse,
   ContextActionType,
   DateActionType,
   GuidActionType,
   NetworkActionType,
-  runStory,
   StateActionType,
-  StateDispatchAction,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -67,8 +68,8 @@ describe('askPlatformRequest', () => {
     runStory(askPlatformRequest('GET', '/thing'), {
       ...baseMocks(),
       [NetworkActionType.Request]: { status: 500, data: {} },
-      [StateActionType.Dispatch]: (action: StateDispatchAction<{ type: string }>) => {
-        dispatched.push(action.payload.action.type);
+      [StateActionType.Dispatch]: (action: ActionOf<typeof askStateDispatchBase>) => {
+        dispatched.push((action.payload.action as { type: string }).type);
       },
     });
 

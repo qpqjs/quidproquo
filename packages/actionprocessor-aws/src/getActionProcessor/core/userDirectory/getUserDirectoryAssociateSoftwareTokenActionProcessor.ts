@@ -1,12 +1,5 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import {
-  actionResult,
-  askUserDirectoryAssociateSoftwareToken,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { actionResult, askUserDirectoryAssociateSoftwareToken, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { associateSoftwareToken } from '../../../logic/cognito/associateSoftwareToken';
 

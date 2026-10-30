@@ -1,14 +1,12 @@
 import {
   actionResult,
   askUserScriptListExports,
-  buildTestQpqConfig,
-  buildTestStorySession,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
 
 import path from 'path';
 import { describe, expect, it } from 'vitest';

@@ -1,22 +1,19 @@
 import {
   askKeyValueStoreUpsertBase,
-  buildTestQpqConfig,
-  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
   kvsKey,
   KvsStoreNotFoundError,
-  noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
@@ -27,7 +24,7 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
   getKvsRepository: vi.fn(() => repo),
 }));
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 
 // The processors resolve the store's config up front (scope gate), so the
 // store under test must be declared.
@@ -45,7 +42,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockResolvedValue({ id: 'a' });
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: { id: 'a' } });
 
     expect(repo.upsert).toHaveBeenCalledWith('store', { id: 'a' }, { ifNotExists: undefined }, undefined);
     expect(resolveActionResult(result)).toEqual({ id: 'a' });
@@ -55,7 +52,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: {} });
 
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.StoreNotFound);
   });
@@ -66,7 +63,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(conflictError);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.Conflict);
@@ -76,7 +73,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     repo.upsert.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
+    const result = await invokeProcessor(process!, { keyValueStoreName: 'store', item: {} });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

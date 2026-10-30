@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateLocalContext, show, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateLocalContext, show, Spec } from './spec';
 
 // Local-context matrix: global and local provide/read, with service boundaries, nested under
 // catch / parallel, run through the REAL runtime, asserted against the contract oracle.

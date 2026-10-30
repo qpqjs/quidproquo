@@ -3,7 +3,7 @@ import { Nullable } from '@qpqjs/core';
 import { MaintenanceLevel } from '../../types/MaintenanceLevel';
 import { MaintenanceType } from '../../types/MaintenanceType';
 
-// The full status snapshot one update carries — shared by ADD_UPDATE and
+// The full status snapshot one update carries, shared by ADD_UPDATE and
 // EDIT_UPDATE.
 export type MaintenanceUpdateData = {
   updateId: string;

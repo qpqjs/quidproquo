@@ -1,8 +1,8 @@
 import { expectGenerator } from '@qpqjs/testing';
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { runStory, StoryError, throwsError } from '../../testing';
 import { askCryptoSign } from './askCryptoSign';
 import { CryptoActionType } from './CryptoActionType';
 
@@ -33,7 +33,7 @@ describe('askCryptoSign', () => {
     expect(askCryptoSign.errorType).toEqual({
       KeyNotConfigured: `${CryptoActionType.Sign}-KeyNotConfigured`,
       KeyUnavailable: `${CryptoActionType.Sign}-KeyUnavailable`,
-      Throttling: `${CryptoActionType.Sign}-Throttling`,
+      Throttled: `${CryptoActionType.Sign}-Throttled`,
     });
   });
 });

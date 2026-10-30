@@ -1,10 +1,4 @@
-import {
-  askKeyValueStoreGet,
-  EitherActionResult,
-  ErrorTypeEnum,
-  getSuccessfulEitherActionResult,
-  getUnsuccessfulEitherActionResult,
-} from '@qpqjs/core';
+import { ActionProcessorResult, actionResult, actionResultError, askKeyValueStoreGet, ErrorTypeEnum, storyResultToActionResult } from '@qpqjs/core';
 
 import { StateMachineQPQConfigSetting } from '../../config/settings/stateMachine';
 import { StateMachineEntity } from '../../models/StateMachineEntity';
@@ -15,22 +9,19 @@ export const loadStateMachineEntity = async (
   resolveStory: StateMachineStoryResolver,
   smConfig: StateMachineQPQConfigSetting,
   id: string,
-): Promise<EitherActionResult<StateMachineEntity>> => {
+): Promise<ActionProcessorResult<StateMachineEntity>> => {
   const getResult = await resolveStory(function* askGetEntity() {
     return yield* askKeyValueStoreGet<StateMachineEntity>(smConfig.keyValueStoreName, id);
   }, []);
 
   if (getResult.error) {
-    return getUnsuccessfulEitherActionResult(getResult.error);
+    return storyResultToActionResult(getResult, 'StateMachine load entity');
   }
 
   const entity = getResult.result;
   if (!entity) {
-    return getUnsuccessfulEitherActionResult({
-      errorType: ErrorTypeEnum.NotFound,
-      errorText: `Entity not found: ${id}`,
-    });
+    return actionResultError(ErrorTypeEnum.NotFound, `Entity not found: ${id}`);
   }
 
-  return getSuccessfulEitherActionResult(entity);
+  return actionResult(entity);
 };

@@ -1,4 +1,4 @@
-export interface SearchParams {
+export type SearchParams = {
   runtimeType: string;
   startIsoDateTime: string;
   endIsoDateTime: string;
@@ -10,4 +10,4 @@ export interface SearchParams {
   deep: string;
 
   onlyErrors: boolean;
-}
+};

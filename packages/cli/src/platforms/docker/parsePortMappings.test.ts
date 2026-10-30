@@ -15,7 +15,7 @@ describe('parsePortMappings', () => {
   // but two short digit runs is refused before a command line is built.
   it.each(['80:8080; rm -rf /', '$(id):80', '80:8080 --privileged', '-p:80', '080:8080a', '123456:80'])(
     'rejects the shell-shaped mapping %j',
-    (value) => {
+    (value: any) => {
       expect(() => parsePortMappings(value)).toThrow('must be host:container');
     },
   );

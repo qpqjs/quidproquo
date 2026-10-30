@@ -1,18 +1,11 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import {
-  askKeyValueStoreScanBase,
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  KeyValueStoreActionType,
-  KvsLogicalOperatorType,
-  KvsQueryOperationType,
-} from '@qpqjs/core';
+import { askKeyValueStoreScanBase, defineKeyValueStore, KeyValueStoreActionType, KvsLogicalOperatorType, KvsQueryOperationType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { scan } from '../../../logic/dynamo/scan';
 import { lastEvaluatedKeyToString } from '../../../logic/dynamo/utils/lastEvaluatedKeyToString';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 
 vi.mock('../../../logic/dynamo/scan', () => ({
@@ -42,7 +35,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { keyValueStoreName: 'users', filterCondition: { f: 1 }, nextPageKey: 'pk1' });
+    const result = await invokeProcessor(processor!, { keyValueStoreName: 'users', filterCondition: { f: 1 }, nextPageKey: 'pk1' });
 
     expect(result).toEqual([{ items: [] }]);
     expect(scan).toHaveBeenCalledWith(
@@ -57,7 +50,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, { keyValueStoreName: 'users' });
+    await invokeProcessor(processor!, { keyValueStoreName: 'users' });
 
     expect(scan).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', composedRowExclusion, undefined);
   });
@@ -66,7 +59,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     const processor = await resolveProcessor();
     const otherScopeKey = lastEvaluatedKeyToString({ id: { S: 'bobco@@QPQSCOPE@@o-1' } });
 
-    const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'orders', nextPageKey: otherScopeKey, options: { scope: 'acme' } });
+    const [, error] = await invokeProcessor(processor!, { keyValueStoreName: 'orders', nextPageKey: otherScopeKey, options: { scope: 'acme' } });
 
     expect(error?.errorType).toBe(askKeyValueStoreScanBase.errorType.InvalidScope);
     expect(scan).not.toHaveBeenCalled();

@@ -1,6 +1,7 @@
+import { captureRequester, runStory, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory, throwsError } from '../../testing';
 import { askEventAutoRespond } from './askEventAutoRespond';
 import { EventActionType } from './EventActionType';
 

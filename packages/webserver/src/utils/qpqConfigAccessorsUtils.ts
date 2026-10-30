@@ -2,14 +2,10 @@ import { isDefined, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from '@qpqjs/c
 
 import {
   ApiKeyQPQWebServerConfigSetting,
-  CacheQPQWebServerConfigSetting,
   CertificateQPQWebServerConfigSetting,
   DefaultRouteOptionsQPQWebServerConfigSetting,
-  DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
-  EmailReceiverQPQWebServerConfigSetting,
   EmailReceivingDomainQPQWebServerConfigSetting,
-  EmailSenderQPQWebServerConfigSetting,
   FileUploadSettings,
   FileUploadSettingsQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
@@ -17,18 +13,13 @@ import {
   SeoQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
-  WebSocketQPQWebServerConfigSetting,
 } from '../config';
-import { ApiQPQWebServerConfigSetting, WebEntryQPQWebServerConfigSetting } from '../config';
+import { WebEntryQPQWebServerConfigSetting } from '../config';
+import { getDnsConfig } from '../config/settings/dns/logic/getDnsConfig';
+import { getOwnedWebsocketConfigs } from '../config/settings/websocket/logic';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Route);
-
-  return routes;
-};
-
-export const getAllRoutesForApi = (apiName: string, qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
-  const routes = getAllRoutes(qpqConfig);
 
   return routes;
 };
@@ -60,8 +51,8 @@ export const getOwnedServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQ
   return qpqCoreUtils.getOwnedItems(serviceFunctions, qpqConfig);
 };
 
-export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
-  return getOwnedWebsocketSettings(qpqConfig)
+const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
+  return getOwnedWebsocketConfigs(qpqConfig)
     .flatMap((s) => [s.eventProcessors.onConnect, s.eventProcessors.onDisconnect, s.eventProcessors.onMessage])
     .filter(isDefined);
 };
@@ -71,7 +62,7 @@ export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRunt
 export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   // The domain resolver pointer is a QpqPureFunction, structurally an advanced runtime, so
   // the same loader bundles and serves it.
-  const domainResolver = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns)?.resolver;
+  const domainResolver = getDnsConfig(configs)?.resolver;
 
   return qpqCoreUtils.expandSrcEntriesWithActionProcessors([
     ...getAllRoutes(configs).map((r) => r.runtime),
@@ -92,18 +83,6 @@ export const getWebEntry = (configs: QPQConfig): string => {
   return webEntry?.buildPath;
 };
 
-export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting => {
-  const websocketSettings = getWebsocketSettings(qpqConfig);
-
-  const websocketSetting = websocketSettings.find((s) => s.apiName === apiName);
-
-  if (!websocketSetting) {
-    throw new Error(`No websocket setting found for api [${apiName}]`);
-  }
-
-  return websocketSetting;
-};
-
 export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQWebServerConfigSetting[] => {
   const subdomainRedirects = qpqCoreUtils.getConfigSettings<SubdomainRedirectQPQWebServerConfigSetting>(
     configs,
@@ -111,10 +90,6 @@ export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQW
   );
 
   return subdomainRedirects;
-};
-
-export const getApiConfigs = (configs: QPQConfig): ApiQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Api);
 };
 
 export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConfigSetting[] => {
@@ -125,13 +100,7 @@ export const getDomainProxyConfigs = (configs: QPQConfig): DomainProxyQPQWebServ
   return qpqCoreUtils.getConfigSettings<DomainProxyQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.DomainProxy);
 };
 
-export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting[] => {
-  const cacheSettings = qpqCoreUtils.getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache);
-
-  return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
-};
-
-export const getAllOwnedCertifcateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
+export const getAllOwnedCertificateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
   const certificateSettings = qpqCoreUtils.getConfigSettings<CertificateQPQWebServerConfigSetting>(
     qpqConfig,
     QPQWebServerConfigSettingType.Certificate,
@@ -140,26 +109,13 @@ export const getAllOwnedCertifcateConfigs = (qpqConfig: QPQConfig): CertificateQ
   return qpqCoreUtils.getOwnedItems(certificateSettings, qpqConfig);
 };
 
-export const getCacheConfigByName = (cacheConfigName: string, qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting => {
-  const cacheSetting = qpqCoreUtils
-    .getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache)
-    .find((c) => c.name === cacheConfigName);
-
-  if (!cacheSetting) {
-    throw new Error(`No cache config found for name [${cacheConfigName}]`);
-  }
-
-  return cacheSetting;
-};
-
 export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveName: string): boolean => {
   return getWebEntryConfigs(qpqConfig).some((webEntry) => webEntry.storageDrive.sourceStorageDrive === storageDriveName);
 };
 
-// API Gateway caps request payloads at 10MB, so the default per-file ceiling matches it;
-// the other defaults exist to bound parser memory rather than to be hit in practice.
+// No default per-file ceiling: the platform applies its own request limit when the service
+// declares none. The other defaults exist to bound parser memory rather than to be hit in practice.
 export const defaultFileUploadSettings: FileUploadSettings = {
-  maxFileSizeBytes: 10 * 1024 * 1024,
   maxFileCount: 10,
   maxFieldCount: 100,
   maxFieldSizeBytes: 1024 * 1024,
@@ -184,32 +140,5 @@ export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptio
   return defaultRouteSettings;
 };
 
-export const getEmailSenderSettings = (qpqConfig: QPQConfig): EmailSenderQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
-};
-
 export const getEmailReceivingDomainConfig = (qpqConfig: QPQConfig): EmailReceivingDomainQPQWebServerConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<EmailReceivingDomainQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailReceivingDomain);
-
-export const getEmailReceiverConfigs = (qpqConfig: QPQConfig): EmailReceiverQPQWebServerConfigSetting[] =>
-  qpqCoreUtils.getConfigSettings<EmailReceiverQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailReceiver) || [];
-
-export const getEmailReceiverByName = (qpqConfig: QPQConfig, name: string): EmailReceiverQPQWebServerConfigSetting | undefined =>
-  getEmailReceiverConfigs(qpqConfig).find((receiver) => receiver.name === name);
-
-/** The receivers that write into a drive, which the mail provider must be allowed to write into. */
-export const getEmailReceiversForStorageDrive = (qpqConfig: QPQConfig, storageDriveName: string): EmailReceiverQPQWebServerConfigSetting[] =>
-  getEmailReceiverConfigs(qpqConfig).filter((receiver) => receiver.storageDriveName === storageDriveName);
-
-export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
-  const websocketSettings =
-    qpqCoreUtils.getConfigSettings<WebSocketQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.WebSocket) || [];
-
-  return websocketSettings;
-};
-
-export const getOwnedWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
-  const websocketSettings = getWebsocketSettings(qpqConfig);
-
-  return qpqCoreUtils.getOwnedItems(websocketSettings, qpqConfig);
-};

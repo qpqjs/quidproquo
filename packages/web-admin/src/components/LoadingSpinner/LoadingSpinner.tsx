@@ -1,11 +1,11 @@
 import React, { ReactNode, useMemo } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
-interface LoadingSpinnerProps {
+type LoadingSpinnerProps = {
   isLoading: boolean;
   size?: number;
   children?: ReactNode;
-}
+};
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isLoading, size = 200, children }) => {
   const sx = useMemo(

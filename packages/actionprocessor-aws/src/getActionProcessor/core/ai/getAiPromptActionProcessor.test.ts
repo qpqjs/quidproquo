@@ -1,8 +1,8 @@
-import { AiActionType, AiCacheTtl, AiModel, ErrorTypeEnum } from '@qpqjs/core';
+import { AiActionType, AiCacheTtl, AiModel, askAiPrompt, ErrorTypeEnum } from '@qpqjs/core';
+import { invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getAiPromptActionProcessor } from './getAiPromptActionProcessor';
 import {
   buildAiPromptInput,
@@ -11,7 +11,7 @@ import {
   prepareAiPromptCall,
   toBedrockReasoningOptions,
   toCacheableSystem,
-} from './logic';
+} from './utils';
 
 // Echoes the payload so the order history -> turn context is observable in the SDK call.
 const { echoPromptInput } = vi.hoisted(() => ({
@@ -25,9 +25,9 @@ const { echoPromptInput } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('./logic', async () => ({
+vi.mock('./utils', async () => ({
   // The real check: a test that mocked it could not tell a guarded reply from an unguarded one.
-  generateAiOutputObject: ((await vi.importActual('./logic/generateAiOutputObject')) as typeof import('./logic/generateAiOutputObject'))
+  generateAiOutputObject: ((await vi.importActual('./utils/generateAiOutputObject')) as typeof import('./utils/generateAiOutputObject'))
     .generateAiOutputObject,
   prepareAiPromptCall: vi.fn(),
   createDriveFileResolver: vi.fn(() => vi.fn()),
@@ -68,7 +68,7 @@ const loanSchema = {
 
 const invoke = async (payload: Record<string, unknown>) => {
   const processor = (await getAiPromptActionProcessor({} as never, null as any))[AiActionType.Prompt];
-  return invokeProcessor(processor, payload);
+  return invokeProcessor(processor!, payload);
 };
 
 const totalUsage = { inputTokens: 24281, inputTokenDetails: { noCacheTokens: 12, cacheReadTokens: 24112, cacheWriteTokens: 157 } };
@@ -84,12 +84,12 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('returns an action error when preparation fails', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ error: { type: ErrorTypeEnum.NotFound, message: 'no ai' } });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ error: { kind: 'NotFound', message: 'no ai' } });
 
     const [result, error] = await invoke({ prompt: 'hi' });
 
     expect(result).toBeUndefined();
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(askAiPrompt.errorType.NotFound);
   });
 
   it('generates text from a prompt payload and returns the total usage', async () => {
@@ -224,7 +224,7 @@ describe('getProcessAiPrompt', () => {
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
 
     expect(result).toBeUndefined();
-    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorType).toBe(askAiPrompt.errorType.Invalid);
     expect(error?.errorText).toBe('The reply does not match the output schema: (root) must NOT have additional properties (total_interest_amount)');
   });
 
@@ -235,7 +235,7 @@ describe('getProcessAiPrompt', () => {
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
 
     expect(result).toBeUndefined();
-    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorType).toBe(askAiPrompt.errorType.Invalid);
     expect(error?.errorText).toBe('The reply does not match the output schema: /applicants must be array');
   });
 
@@ -273,7 +273,7 @@ describe('getProcessAiPrompt', () => {
 
     expect(result).toBeUndefined();
     expect(generateText).toHaveBeenCalledTimes(2);
-    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorType).toBe(askAiPrompt.errorType.Invalid);
     expect(error?.errorText).toBe('The reply does not match the output schema: (root) must NOT have additional properties (extra)');
   });
 
@@ -284,7 +284,7 @@ describe('getProcessAiPrompt', () => {
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
 
     expect(result).toBeUndefined();
-    expect(error?.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error?.errorType).toBe(askAiPrompt.errorType.Invalid);
     expect(error?.errorText).toBe('The reply does not match the output schema: the reply is not JSON');
   });
 

@@ -1,5 +1,5 @@
 import { AnyGraphResult } from './AnyGraphResult';
 
-export interface GraphQueryResult {
+export type GraphQueryResult = {
   [key: string]: AnyGraphResult;
-}
+};

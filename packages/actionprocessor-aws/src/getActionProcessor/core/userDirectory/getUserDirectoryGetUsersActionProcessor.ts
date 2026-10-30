@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -7,10 +7,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { listPagedUsers } from '../../../logic/cognito/listPagedUsers';
 
@@ -18,7 +17,7 @@ const getProcessGetUsers = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDi
   return async ({ userDirectoryName, nextPageKey }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
     try {
       const userAttributes = await listPagedUsers(userPoolId, region, nextPageKey);
@@ -26,6 +25,7 @@ const getProcessGetUsers = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDi
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidParameterException: () => actionResultError(askUserDirectoryGetUsers.errorType.InvalidPageKey, 'The supplied page key is invalid'),
         TooManyRequestsException: () =>
           actionResultError(askUserDirectoryGetUsers.errorType.LimitExceeded, 'Too many requests, please try again later'),

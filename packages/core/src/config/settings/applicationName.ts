@@ -1,11 +1,11 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface ApplicationQPQConfigSetting extends QPQConfigSetting {
+export type ApplicationQPQConfigSetting = {
   applicationName: string;
   configRoot: string;
   environment?: string;
   feature?: string;
-}
+} & QPQConfigSetting;
 
 export const defineApplication = (
   applicationName: string,

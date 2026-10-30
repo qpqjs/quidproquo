@@ -1,8 +1,9 @@
+import { runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
 import { AskResponse } from '../../types';
 import { askMapParallel } from './askMapParallel';

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, buildTestStorySession, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -7,7 +8,7 @@ import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionP
 const invoke = async (matchResult: any) => {
   const processors = await getEventAutoRespondActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.AutoRespond];
-  return process(
+  return process!(
     { matchResult } as any,
     buildTestStorySession(),
     {},

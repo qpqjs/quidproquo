@@ -8,10 +8,11 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
 import { getCachedPublicKey } from '../../../logic/kms/getCachedPublicKey';
-import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './kmsSigningErrorMap';
+import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './utils';
 import { resolveSigningKeyAlias } from './utils';
 
 // Verifies locally against the cached public key rather than calling kms:Verify,
@@ -30,6 +31,7 @@ const getProcessCryptoVerify = (qpqConfig: QPQConfig): ProcessorFor<typeof askCr
       return actionResult(rs256Verify(publicKeyPem, message, signature));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         QpqSigningMalformedSignature: (e) => actionResultError(askCryptoVerify.errorType.MalformedSignature, e.message),
         ...kmsSigningErrorMap(askCryptoVerify.errorType, keyName),
       });

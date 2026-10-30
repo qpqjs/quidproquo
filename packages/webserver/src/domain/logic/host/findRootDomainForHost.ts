@@ -1,16 +1,16 @@
 import { Nullable, QPQConfig } from '@qpqjs/core';
 
-import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
+import { getRootDomains } from '../../../config/settings/dns/logic/getRootDomains';
 
 /**
  * Which declared root a request host belongs to, longest match wins, null when none does.
  * Used to key request-time behaviour off the Host header without trusting it as a domain.
  */
 export const findRootDomainForHost = (qpqConfig: QPQConfig, host: string): Nullable<string> => {
-  const hostname = host.split(':')[0].toLowerCase();
+  const hostname = (host.split(':')[0] ?? '').toLowerCase();
 
   const matches = getRootDomains(qpqConfig).filter((root) => {
-    const rootName = root.split(':')[0].toLowerCase();
+    const rootName = (root.split(':')[0] ?? '').toLowerCase();
     return hostname === rootName || hostname.endsWith(`.${rootName}`);
   });
 

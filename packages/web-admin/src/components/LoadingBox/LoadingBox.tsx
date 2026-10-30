@@ -1,3 +1,5 @@
+import { Nullable } from '@qpqjs/core';
+
 import React from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
@@ -5,15 +7,15 @@ import { useIsLoading } from '../../view';
 import { LoadingProvider } from '../../view';
 import { usePlatformDataFromPath } from './hooks';
 
-interface LoadingBoxProps<T> {
+type LoadingBoxProps<T> = {
   path: string;
   renderItem: (item: T) => React.ReactNode;
   renderLoading?: () => React.ReactNode;
-}
+};
 
 const LoadingBoxInternal = <T,>({ path, renderItem, renderLoading }: LoadingBoxProps<T>) => {
   const isLoading = useIsLoading();
-  const data: T | null = usePlatformDataFromPath<T>(path);
+  const data: Nullable<T> = usePlatformDataFromPath<T>(path);
 
   let reactNode: JSX.Element = <div>Error: Data could not be loaded</div>;
 

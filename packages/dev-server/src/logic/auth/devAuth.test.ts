@@ -1,10 +1,13 @@
-import { buildTestQpqConfig, defineUserDirectory } from '@qpqjs/core';
+import { defineUserDirectory } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { createDevJwt, createDevUserId, DEV_USER_EMAIL, DevUserDirectory, resolveDevUserDirectory } from './devAuth';
+import { verifyDevJwt } from './devJwt';
 
-const decodeJwtPayload = (jwt: string): Record<string, any> => JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString());
+const SECRET = 'test-secret';
+const decodeJwtPayload = (jwt: string): Record<string, any> => JSON.parse(Buffer.from(jwt!.split('.')[1]!, 'base64url').toString());
 
 const DIRECTORY: DevUserDirectory = { serviceName: 'my-service', directoryName: 'users' };
 const SIBLING_DIRECTORY: DevUserDirectory = { serviceName: 'my-service', directoryName: 'admins' };
@@ -61,7 +64,7 @@ describe('createDevUserId', () => {
 
 describe('createDevJwt', () => {
   it('puts the derived userId in sub and keeps the email in username/email', () => {
-    const payload = decodeJwtPayload(createDevJwt(DIRECTORY, 'joe@example.com'));
+    const payload = decodeJwtPayload(createDevJwt(SECRET, DIRECTORY, 'joe@example.com'));
 
     expect(payload.sub).toBe(createDevUserId(DIRECTORY, 'joe@example.com'));
     expect(payload.username).toBe('joe@example.com');
@@ -69,23 +72,28 @@ describe('createDevJwt', () => {
   });
 
   it('mints the same sub for the same login across tokens', () => {
-    expect(decodeJwtPayload(createDevJwt(DIRECTORY, 'joe@example.com')).sub).toBe(decodeJwtPayload(createDevJwt(DIRECTORY, 'Joe@Example.com')).sub);
+    expect(decodeJwtPayload(createDevJwt(SECRET, DIRECTORY, 'joe@example.com')).sub).toBe(
+      decodeJwtPayload(createDevJwt(SECRET, DIRECTORY, 'Joe@Example.com')).sub,
+    );
   });
 
-  // Security regression: a dev token must never verify against a real pool. The header says alg none and the
-  // signature segment is a fixed placeholder, so any RS256 verifier rejects it before looking at the claims.
-  it('mints an unsigned token that no RS256 verifier could accept', () => {
-    const jwt = createDevJwt(DIRECTORY, 'joe@example.com');
+  // Security regression: a dev token must never verify against a real pool, and nothing but this
+  // directory's secret must verify it here. HS256 over a per-checkout secret: an RS256 verifier
+  // rejects the algorithm outright, and a token signed with another secret is refused locally.
+  it('signs with the directory secret, never alg none, and refuses another secret', () => {
+    const jwt = createDevJwt(SECRET, DIRECTORY, 'joe@example.com');
     const [header, , signature] = jwt.split('.');
 
-    expect(JSON.parse(Buffer.from(header, 'base64url').toString())).toEqual({ alg: 'none', typ: 'JWT' });
-    expect(signature).toBe('dev-signature');
+    expect(JSON.parse(Buffer.from(header!, 'base64url')!.toString())).toEqual({ alg: 'HS256', typ: 'JWT' });
+    expect(signature).not.toBe('dev-signature');
+    expect(verifyDevJwt(SECRET, jwt)).toMatchObject({ email: 'joe@example.com' });
+    expect(verifyDevJwt('another-secret', jwt)).toBeNull();
     expect(decodeJwtPayload(jwt).iss).toBeUndefined();
   });
 
   it('mints different subs for the same login in different directories', () => {
-    expect(decodeJwtPayload(createDevJwt(DIRECTORY, 'joe@example.com')).sub).not.toBe(
-      decodeJwtPayload(createDevJwt(SIBLING_DIRECTORY, 'joe@example.com')).sub,
+    expect(decodeJwtPayload(createDevJwt(SECRET, DIRECTORY, 'joe@example.com')).sub).not.toBe(
+      decodeJwtPayload(createDevJwt(SECRET, SIBLING_DIRECTORY, 'joe@example.com')).sub,
     );
   });
 });

@@ -22,8 +22,8 @@ const SOURCE_MAPPING_URL_REGEX = /(?:\/\/[#@][ \t]*sourceMappingURL=([^\s'"]+)[ 
 // The parts of the standard source-map JSON shape this loader touches; nulls
 // mirror the spec (a source with no retrievable content is null).
 type RawSourceMap = {
-  sources?: (string | null)[];
-  sourcesContent?: (string | null)[];
+  sources?: Nullable<string>[];
+  sourcesContent?: Nullable<string>[];
   sourceRoot?: string;
   [key: string]: unknown;
 };
@@ -34,7 +34,7 @@ const readDataUrlMap = (url: string): Nullable<string> => {
     return null;
   }
 
-  const [, isBase64, data] = match;
+  const [, isBase64, data = ''] = match;
   return isBase64 ? Buffer.from(data, 'base64').toString('utf8') : decodeURIComponent(data);
 };
 
@@ -77,6 +77,10 @@ export default function sourceMapLoader(this: LoaderContext, content: string): v
   }
 
   const url = lastMatch[1] || lastMatch[2];
+  if (!url) {
+    callback(null, content);
+    return;
+  }
   const resourceDirectory = path.dirname(this.resourcePath);
 
   let rawMap: Nullable<string> = null;

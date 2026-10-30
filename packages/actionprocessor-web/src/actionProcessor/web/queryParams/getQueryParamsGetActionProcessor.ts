@@ -1,5 +1,5 @@
 import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { askQueryParamsGet, QueryParamsActionType } from '@qpqjs/web';
+import { askQueryParamsGet } from '@qpqjs/web';
 
 const getProcessQueryParamsGet = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueryParamsGet> => {
   return async ({ key }) => {

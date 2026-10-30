@@ -1,9 +1,0 @@
-{
-  "extends": "@qpqjs/tsconfig/tsconfig.umd.json",
-  "compilerOptions": {
-    "outDir": "./lib/umd",
-    "jsx": "react-jsx"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
-}

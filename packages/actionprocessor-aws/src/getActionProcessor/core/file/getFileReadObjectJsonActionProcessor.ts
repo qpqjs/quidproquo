@@ -6,12 +6,12 @@ import {
   askFileReadObjectJsonBase,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { readTextFile } from '../../../logic/s3/s3Utils';
+import { readTextFile } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadObjectJsonBase> => {
@@ -27,6 +27,7 @@ const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof
       return actionResult(obj);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         InvalidObjectState: () => actionResultError(askFileReadObjectJsonBase.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(askFileReadObjectJsonBase.errorType.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(askFileReadObjectJsonBase.errorType.FileNotFound, `File not found: ${filepath}`),

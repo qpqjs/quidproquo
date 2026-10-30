@@ -2,13 +2,13 @@ import { APIGatewayEvent, Context } from 'aws-lambda';
 
 /**
  * Standalone 301 handler for subdomain redirects. The CDK redirect construct resolves the
- * target at synth and JSON-encodes it onto the function env: `redirectBaseUrl` (absolute,
- * no trailing path) and `appendPath` (true for domain redirects, which keep the request
- * path; false for an explicit absolute url, which redirects as-is). No qpq runtime involved.
+ * target at synth and puts it on the function env: `redirectBaseUrl` (absolute, no trailing
+ * path) and `appendPath` ('true' for domain redirects, which keep the request path; 'false'
+ * for an explicit absolute url, which redirects as-is). No qpq runtime involved.
  */
 const apiGatewayEventHandler_redirect = async (event: APIGatewayEvent, context: Context) => {
-  const redirectBaseUrl: string = JSON.parse(process.env.redirectBaseUrl as string);
-  const appendPath: boolean = JSON.parse((process.env.appendPath as string | undefined) || 'false');
+  const redirectBaseUrl = process.env.redirectBaseUrl as string;
+  const appendPath = process.env.appendPath === 'true';
 
   let redirectUrl = appendPath ? `${redirectBaseUrl}${event.path}` : redirectBaseUrl;
 

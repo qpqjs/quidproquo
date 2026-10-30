@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -10,9 +10,9 @@ import {
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo';
 import { decomposeScopedKvsValue, stripScopedKvsIndexAttributes } from '../../../logic/dynamo/scope';
 
@@ -40,7 +40,7 @@ const toKvsScopedItem = (storeConfig: KeyValueStoreQPQConfigSetting, item: Recor
 // items indistinguishable from a scoped read, plus the scope beside them.
 const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreScanAllScopesBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
@@ -52,7 +52,8 @@ const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): ProcessorFo
       return actionResult({ items, nextPageKey: page.nextPageKey });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ...transientErrorMap(),
+        InternalServerError: () => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.StoreNotFound, error.message),
       });

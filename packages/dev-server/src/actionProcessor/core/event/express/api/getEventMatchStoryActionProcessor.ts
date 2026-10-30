@@ -1,17 +1,8 @@
 import { awsLambdaUtils } from '@qpqjs/actionprocessor-aws';
-import {
-  actionResult,
-  actionResultError,
-  askEventMatchStoryBase,
-  createActionProcessor,
-  ErrorTypeEnum,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askEventMatchStoryBase, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
@@ -35,7 +26,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       runtime: matchedRoute.route.runtime,
       runtimeOptions: matchedRoute.match.params || {},
 
-      // TODO: Make this aware of the API that we are eventing
+      // TODO: @joe-coady: Make this aware of the API that we are eventing
       config: qpqWebServerUtils.mergeAllRouteOptions('api', matchedRoute.route, qpqConfig),
     });
   };

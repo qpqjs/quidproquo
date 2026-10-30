@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { AiStreamUsage } from './types/AiStreamUsage';
 import { AiActionType } from './AiActionType';
 import { AiCacheTtl } from './AiCacheTtl';
@@ -47,6 +47,11 @@ export type AiPromptActionResult = {
 
 export const askAiPrompt = createActionRequester<AiPromptActionResult>()({
   actionType: AiActionType.Prompt,
+  errorTypes: [
+    'NotFound', // no ai config is defined under the given aiName
+    'NotImplemented', // the model is not offered on this platform
+    'Invalid', // the reply does not match outputSchema, even after the repair attempts
+  ],
   getPayload: (model: AiModel, prompt: string, options?: AskAiPromptOptions) => ({
     model,
     prompt,

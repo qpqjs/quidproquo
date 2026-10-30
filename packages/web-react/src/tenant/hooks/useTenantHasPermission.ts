@@ -9,7 +9,7 @@ import { tenantMembershipRuntime } from '../tenantMembershipRuntime';
 
 /** Whether the caller holds `permission` (optionally on a resource) in the loaded tenant. False until loaded. Hides controls only; the server still checks. */
 export const useTenantHasPermission = (permission: QpqPermission, resourceId: string = '', resourceKind: Nullable<string> = null): boolean => {
-  // TODO: revist this, im unsure about this.
+  // TODO: @joe-coady: revisit this, unsure about it.
   const computed = useMemo(
     () => createQpqRuntimeComputed(tenantMembershipRuntime, createTenantHasPermissionSelector(permission, resourceId, resourceKind)),
     [permission, resourceId, resourceKind],

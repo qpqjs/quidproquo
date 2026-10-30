@@ -1,2 +1,2 @@
-export * from './askRandomNumber';
+export * from './askMathRandomNumber';
 export * from './MathActionType';

@@ -1,3 +1,4 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 // Build a backend service as a module-federation remote and publish it into the
 // shared federated-code storage drive, under the service's own prefix. After this
 // runs, the already-deployed lambdas load their stories from the bucket (quidproquo's
@@ -17,16 +18,18 @@
 //   deployRemoteManifest - upload manifest.json, atomically flipping lambdas over
 // Version files always land before the manifest that references them, so a reading
 // lambda never sees a manifest whose files aren't all present yet.
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqCoreUtils } from '@qpqjs/core';
+import { getServiceRemotePublishedDistPath, qpqCoreUtils } from '@qpqjs/core';
 import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from '@qpqjs/deploy-rspack';
 
 import fs from 'fs';
 import path from 'path';
 
 import { getRoot, getServiceDirectory } from '../../lib/discovery';
+import { createOutput } from '../../lib/out';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
+
+const out = createOutput('aws:remote');
 
 // Everything the upload/deploy phases need to publish a built remote. Resolved
 // from the on-disk build output + service config, so each phase can run in its
@@ -39,8 +42,7 @@ export type RemotePublishTarget = {
   servicePrefix: string;
 };
 
-const getPublishPath = (appName: string, serviceName: string): string =>
-  path.join(getRoot(), 'dist', 'apps', appName, 'services', serviceName, 'service-remote-published');
+const getPublishPath = (appName: string, serviceName: string): string => getServiceRemotePublishedDistPath(getRoot(), appName, serviceName);
 
 // Resolve the shared store bucket from the service's defineFederatedModuleStore
 // setting (same derivation the lambda env var uses) and the per-service prefix
@@ -60,11 +62,7 @@ const resolveRemoteStore = (appName: string, serviceName: string): { bucketName:
       `defineFederatedModuleStore references storage drive [${federatedStore.storageDrive}] which service [${serviceName}] does not declare`,
     );
   }
-  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
-    qpqConfig,
-    storageDrive.owner,
-  );
+  const bucketName = awsNamingUtils.resolveOwnedResourceName(storageDrive.storageDrive, qpqConfig, storageDrive.owner);
   const servicePrefix = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return { bucketName, servicePrefix };
@@ -79,7 +77,7 @@ export const buildRemote = async (appName: string, serviceName: string): Promise
   const serviceDir = path.join(getServiceDirectory(appName, serviceName), 'service');
   const qpqConfig = loadServiceQpqConfig(appName, serviceName);
 
-  console.log(`Building federated remote: [${serviceName}]`);
+  out.log(`Building federated remote: [${serviceName}]`);
   const config = getServiceRemoteRspackConfig(qpqConfig, serviceDir);
   await runRspack(config);
 
@@ -113,7 +111,7 @@ export const resolvePublishTarget = (appName: string, serviceName: string): Remo
 export const uploadRemoteVersion = async (target: RemotePublishTarget): Promise<void> => {
   const { serviceName, publishPath, manifestHash, bucketName, servicePrefix } = target;
 
-  console.log(`Uploading [${serviceName}] version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/${manifestHash}]`);
+  out.log(`Uploading [${serviceName}] version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/${manifestHash}]`);
   await runCommand('aws', ['s3', 'sync', path.join(publishPath, manifestHash), `s3://${bucketName}/${servicePrefix}/${manifestHash}`]);
 };
 
@@ -122,6 +120,6 @@ export const uploadRemoteVersion = async (target: RemotePublishTarget): Promise<
 export const deployRemoteManifest = async (target: RemotePublishTarget): Promise<void> => {
   const { serviceName, publishPath, manifestHash, bucketName, servicePrefix } = target;
 
-  console.log(`Deploying [${serviceName}] manifest for version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/manifest.json]`);
+  out.log(`Deploying [${serviceName}] manifest for version [${manifestHash}] to [s3://${bucketName}/${servicePrefix}/manifest.json]`);
   await runCommand('aws', ['s3', 'cp', path.join(publishPath, 'manifest.json'), `s3://${bucketName}/${servicePrefix}/manifest.json`]);
 };

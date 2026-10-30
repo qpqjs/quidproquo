@@ -1,4 +1,5 @@
-// `qpq migrate` — run every pending migration against the LOCAL dev store, once, then exit.
+import { getDevServerDistPath } from '@qpqjs/core';
+// `qpq migrate`, run every pending migration against the LOCAL dev store, once, then exit.
 //
 // Deployed, migrations are triggered by a stack update. Nothing locally ever deploys, so
 // without this a migration is first executed in a real environment, which is a poor place to
@@ -9,16 +10,17 @@
 // this twice is a no-op the second time.
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
-import { spawn } from 'child_process';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
+import { spawnCommand } from '../lib/runCommand';
 
-const MIGRATE_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'migrate.js');
+const out = createOutput('migrate');
 
 export const migrateCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
@@ -26,7 +28,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
   process.env.QPQ_DEV_APP = appName;
   await resolveDeployment(argv, appName);
 
-  console.log(`Running local migrations for app [${appName}]`);
+  out.log(`Running local migrations for app [${appName}]`);
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName, 'migrate');
@@ -34,7 +36,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
 
   // Same bundle shape as the dev server, different output name so a running `go:dev:api`
   // watcher does not fight over the file.
-  const bundlePath = path.join(root, MIGRATE_BUNDLE_PATH);
+  const bundlePath = path.join(getDevServerDistPath(root), 'migrate.js');
   const migrateConfig = {
     ...rspackConfig,
     output: { ...rspackConfig.output, filename: 'migrate.js' },
@@ -47,7 +49,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
       }
 
       if (stats?.hasErrors()) {
-        console.error(stats.toString({ colors: true, all: false, errors: true }));
+        out.error(stats.toString({ colors: true, all: false, errors: true }));
         return reject(new Error('Failed to bundle migrations'));
       }
 
@@ -58,7 +60,7 @@ export const migrateCommand = async (argv: string[]): Promise<void> => {
   // The bundle exits non-zero on failure; mirror that so a shell chain or CI notices instead
   // of carrying on as though the data were migrated.
   const exitCode = await new Promise<number>((resolve) => {
-    const child = spawn('node', [bundlePath], { stdio: 'inherit', env: { ...process.env, QPQ_DEV_APP: appName } });
+    const child = spawnCommand('node', [bundlePath], { env: { QPQ_DEV_APP: appName } });
     child.on('exit', (code) => resolve(code ?? 1));
   });
 

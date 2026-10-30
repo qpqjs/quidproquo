@@ -1,17 +1,17 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
 import { CacheQPQWebServerConfigSetting, qpqHeaderIsBot } from '@qpqjs/webserver';
 
-import { aws_cloudfront, aws_s3 } from 'aws-cdk-lib';
+import { aws_cloudfront } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqWebServerCacheConstructProps extends QpqConstructBlockProps {
+export type QpqWebServerCacheConstructProps = {
   cacheConfig: CacheQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class QpqWebServerCacheConstruct extends QpqConstructBlock {
   cachePolicy: aws_cloudfront.ICachePolicy;

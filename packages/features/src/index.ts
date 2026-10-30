@@ -12,5 +12,6 @@ export * from './routes';
 export * from './systemUsers';
 export * from './tenant';
 export * from './tenantEmail';
+export * from './ui';
 export * from './validation';
 export * from './webSocketQueue';

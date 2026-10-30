@@ -1,16 +1,17 @@
-import { KeyValueStoreActionType, kvsEqual, runStory } from '@qpqjs/core';
+import { KeyValueStoreActionType, kvsEqual } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askGetMigrationBySrcPath, askUpsert } from './migrationInfoData';
+import { askMigrationGetBySrcPath, askMigrationInfoUpsert } from './migrationInfoData';
 
 const migrationInfo = { srcPath: 'mig/run', deployType: 'Api' } as any;
 
-describe('askGetMigrationBySrcPath', () => {
+describe('askMigrationGetBySrcPath', () => {
   it('queries the migrations store by srcPath and returns the first item', () => {
     let captured: any;
 
-    const result = runStory(askGetMigrationBySrcPath('mig/run', 'page-2'), {
+    const result = runStory(askMigrationGetBySrcPath('mig/run', 'page-2'), {
       [KeyValueStoreActionType.Query]: (action: any) => {
         captured = action;
         return { items: [migrationInfo] };
@@ -26,7 +27,7 @@ describe('askGetMigrationBySrcPath', () => {
   });
 
   it('returns undefined when nothing matches', () => {
-    const result = runStory(askGetMigrationBySrcPath('mig/run'), {
+    const result = runStory(askMigrationGetBySrcPath('mig/run'), {
       [KeyValueStoreActionType.Query]: { items: [] },
     });
 
@@ -34,11 +35,11 @@ describe('askGetMigrationBySrcPath', () => {
   });
 });
 
-describe('askUpsert', () => {
+describe('askMigrationInfoUpsert', () => {
   it('upserts the migration info into the migrations store', () => {
     let captured: any;
 
-    runStory(askUpsert(migrationInfo), {
+    runStory(askMigrationInfoUpsert(migrationInfo), {
       [KeyValueStoreActionType.Upsert]: (action: any) => {
         captured = action;
         return undefined;

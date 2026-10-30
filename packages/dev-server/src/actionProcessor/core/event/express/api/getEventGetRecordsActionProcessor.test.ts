@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
 
 describe('getEventGetRecordsActionProcessor (express)', () => {
@@ -13,7 +13,7 @@ describe('getEventGetRecordsActionProcessor (express)', () => {
 
   const invoke = async (expressEvent: any) => {
     const process = await getProcess();
-    return invokeProcessor(process, { eventParams: [expressEvent] } as any);
+    return invokeProcessor(process!, { eventParams: [expressEvent] } as any);
   };
 
   it('maps the express event into a base64-encoded internal record', async () => {

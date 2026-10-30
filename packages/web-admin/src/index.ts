@@ -4,3 +4,4 @@ export * from './App';
 export * from './components';
 export * from './FederatedAddon';
 export * from './FederatedAddonProvider';
+export * from './hooks/useLoadFederatedAddons';

@@ -10,7 +10,7 @@ You do not usually install this yourself. It arrives as a dependency of `@qpqjs/
 
 `config`, `context`, `date`, `error`, `guid`, `log`, `math`, `metric`, `network`, `platform`, `system`, and custom actions, plus the dns processors from the web server layer.
 
-These are the actions with no meaningful platform difference. `askDateNow` reads the same clock everywhere, `askNewGuid` generates the same kind of id, and `askNetworkRequest` uses `fetch`. Anything that does differ (storage, queues, user directories) is left to the platform packages.
+These are the actions with no meaningful platform difference. `askDateNow` reads the same clock everywhere, `askGuidNew` generates the same kind of id, and `askNetworkRequest` uses `fetch`. Anything that does differ (storage, queues, user directories) is left to the platform packages.
 
 ## Why it is separate
 

@@ -7,13 +7,12 @@ import {
   KvsUpdate,
   KvsUpdateActionType,
   QpqIsoDateTime,
-  runStory,
-  throwsError,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocSummaryView } from '../models';
 import { askEventDocSummaryViewWrite } from './askEventDocSummaryViewWrite';
 
@@ -35,7 +34,7 @@ const VIEW: EventDocSummaryView = {
 type UpdatePayload = { keyValueStoreName: string; key: unknown; sortKey?: unknown; updates: KvsUpdate; options?: { condition?: unknown } };
 
 const write = (onUpdate: (payload: UpdatePayload) => unknown) =>
-  runStory(askEventDocProvideStore({ storeName: 'templates', type: 'template' }, askEventDocSummaryViewWrite('doc-1', VIEW)), {
+  runStory(askEventDocStoreProvide(buildEventDocStore({ storeName: 'templates', type: 'template' }), askEventDocSummaryViewWrite('doc-1', VIEW)), {
     [KeyValueStoreActionType.Update]: (action: { payload: UpdatePayload }) => onUpdate(action.payload),
   });
 
@@ -62,6 +61,6 @@ describe('askEventDocSummaryViewWrite', () => {
   });
 
   it('rethrows any other failure', () => {
-    expect(() => write(() => throwsError(askKeyValueStoreUpdateBase.errorType.ServiceUnavailable, 'throttled'))).toThrow(/throttled/);
+    expect(() => write(() => throwsError(askKeyValueStoreUpdateBase.errorType.Throttled, 'throttled'))).toThrow(/throttled/);
   });
 });

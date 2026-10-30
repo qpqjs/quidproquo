@@ -4,7 +4,7 @@
 // getWorkspaceSourceAliases) so rspack bundles them from source and watch mode
 // picks up lib edits. QpqPlugin bundles every service's handlers and injects
 // the `quidproquo-dynamic-loader` virtual module the entry imports.
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { getDevServerDistPath, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import path from 'path';
 import { Configuration, ExternalItemFunctionData, IgnorePlugin } from '@rspack/core';
@@ -104,7 +104,7 @@ export const getDevServerRspackConfig = ({
     devtool: 'source-map',
 
     output: {
-      path: path.join(root, 'dist', 'qpq', 'dev-server'),
+      path: getDevServerDistPath(root),
       // One entry still lands at main.js; with the child entry each lands at <name>.js.
       filename: '[name].js',
       globalObject: 'this',

@@ -17,13 +17,13 @@ describe('defineAuthSystem', () => {
     expect(config[1]).toMatchObject({ configSettingType: QPQCoreConfigSettingType.serviceSettings });
 
     const serviceSettings = config[1] as unknown as { settingsByService: Record<string, QPQConfigSetting[]> };
-    expect(routePaths(serviceSettings.settingsByService.auth)).toContain('/login');
+    expect(routePaths(serviceSettings!.settingsByService.auth!)).toContain('/login');
   });
 
   it('prefixes every route with the supplied base path', () => {
     const config = defineAuthSystem('auth', 'users', { basePath: '/auth' });
     const serviceSettings = config[1] as unknown as { settingsByService: Record<string, QPQConfigSetting[]> };
-    const paths = routePaths(serviceSettings.settingsByService.auth);
+    const paths = routePaths(serviceSettings!.settingsByService.auth!);
 
     expect(paths).toContain('/auth/login');
     expect(paths).toContain('/auth/changePassword');

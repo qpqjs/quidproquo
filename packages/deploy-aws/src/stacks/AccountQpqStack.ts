@@ -12,7 +12,7 @@ import {
 } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
-export interface AccountQpqStackProps extends QpqServiceStackProps {}
+export type AccountQpqStackProps = {} & QpqServiceStackProps;
 
 // Owns account-level resources (audit trail, budgets, security services) so they never
 // share an app's lifecycle - tearing down an app's bootstrap must not take the account's
@@ -32,7 +32,7 @@ export class AccountQpqStack extends QpqServiceStack {
         }),
     );
 
-    const budgets = qpqConfigAwsUtils.getAccountBudgetConfigs(props.qpqConfig).map(
+    qpqConfigAwsUtils.getAccountBudgetConfigs(props.qpqConfig).forEach(
       (setting) =>
         new QpqAccountBudgetConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

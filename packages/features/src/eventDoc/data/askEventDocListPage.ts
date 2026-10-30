@@ -1,6 +1,6 @@
 import { askKeyValueStoreQuery, AskResponse, kvsEqual, kvsNotExists, QpqPagedData } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EVENT_DOC_LIST_PAGE_SIZE } from '../list/constants/eventDocListPageSize';
 import { EventDocSummary } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
@@ -17,7 +17,7 @@ export type EventDocListPageOptions = {
  * The index is named because it shares the table's partition key: unnamed, the query would read the table in id order.
  */
 export function* askEventDocListPage<T extends EventDocSummary = EventDocSummary>(options?: EventDocListPageOptions): AskResponse<QpqPagedData<T>> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   return yield* askKeyValueStoreQuery<T>(storeName, kvsEqual('type', type), {

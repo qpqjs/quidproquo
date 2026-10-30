@@ -4,9 +4,9 @@ import { LogRawJson } from '../../../LogRawJson';
 import { AsyncStoryState } from '../../hooks';
 import { MovedToColdStorage } from '../../MovedToColdStorage';
 
-interface RawTabProps {
+type RawTabProps = {
   log: AsyncStoryState;
-}
+};
 
 export const RawTab: React.FC<RawTabProps> = ({ log }) => {
   if (log.isLoading) {

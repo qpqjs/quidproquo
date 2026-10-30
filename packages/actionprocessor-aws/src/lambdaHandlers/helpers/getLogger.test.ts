@@ -1,16 +1,15 @@
-import { buildTestQpqConfig, LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, StoryResult } from '@qpqjs/core';
+import { buildStoryResult, buildTestQpqConfig } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getLogger } from './getLogger';
 
-// The logger reads only these two config-aws selectors; `settings` is swapped per test.
-let settings: Record<string, unknown> = {};
+// Real aws account config; only the log switches are swapped per test.
+let logSettings: { logServiceName?: string; disableLogs?: boolean; instantLogs?: boolean } = {};
 
-vi.mock('@qpqjs/config-aws', () => ({
-  getAwsServiceAccountInfoConfig: () => settings,
-  getAwsServiceAccountInfoByDeploymentInfo: () => ({ awsRegion: 'ap-southeast-2' }),
-}));
+const testConfig = () => buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2', [], logSettings)]);
 
 const send = vi.fn();
 
@@ -25,18 +24,10 @@ vi.mock('@aws-sdk/client-s3', () => ({
 
 const fetchMock = vi.fn();
 
-const storyResult = (overrides: Partial<StoryResult<unknown[]>> = {}): StoryResult<unknown[]> =>
-  ({
-    correlation: 'corr-1',
-    history: [],
-    input: [],
-    tags: [],
-    moduleName: 'test-module',
-    ...overrides,
-  }) as unknown as StoryResult<unknown[]>;
+const storyResult = (overrides: Partial<StoryResult<unknown[]>> = {}): StoryResult<unknown[]> => buildStoryResult(overrides);
 
 const logAndWait = async (result: StoryResult<unknown[]>) => {
-  const logger = getLogger(buildTestQpqConfig());
+  const logger = getLogger(testConfig());
   logger.log(result);
   await logger.waitToFinishWriting();
   return logger;
@@ -49,7 +40,7 @@ describe('getLogger', () => {
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
-    settings = { logServiceName: 'logs', disableLogs: false, instantLogs: false };
+    logSettings = { logServiceName: 'logs', disableLogs: false, instantLogs: false };
     send.mockReset().mockResolvedValue({});
     fetchMock.mockReset().mockResolvedValue({ ok: true, status: 202 });
     vi.stubGlobal('fetch', fetchMock);
@@ -66,10 +57,10 @@ describe('getLogger', () => {
   // log service is configured, or from inside the logs bucket's own file-event lambda (which would otherwise log its own
   // activity back into the bucket forever).
   it.each([
-    ['no log service is configured', () => (settings = { disableLogs: false, instantLogs: false })],
-    ['logs are disabled', () => (settings = { logServiceName: 'logs', disableLogs: true, instantLogs: false })],
+    ['no log service is configured', () => (logSettings = { disableLogs: false, instantLogs: false })],
+    ['logs are disabled', () => (logSettings = { logServiceName: 'logs', disableLogs: true, instantLogs: false })],
     ['running as the logs drive file-event lambda', () => (process.env.storageDriveName = QPQ_LOGS_STORAGE_DRIVE_NAME)],
-  ])('ships nothing when %s', async (_name, arrange) => {
+  ])('ships nothing when %s', async (_name: any, arrange: any) => {
     arrange();
     process.env.AWS_LAMBDA_RUNTIME_API = '127.0.0.1:9001';
 
@@ -112,7 +103,7 @@ describe('getLogger', () => {
   });
 
   it('bypasses the extension when instantLogs is set', async () => {
-    settings = { ...settings, instantLogs: true };
+    logSettings = { ...logSettings, instantLogs: true };
     process.env.AWS_LAMBDA_RUNTIME_API = '127.0.0.1:9001';
 
     await logAndWait(storyResult());
@@ -139,7 +130,7 @@ describe('getLogger', () => {
       { act: { type: '@quidproquo-core/KeyValueStore/Get', payload: { key: 'secret-row' } }, res: { value: 'x' }, startedAt: '', finishedAt: '' },
       { act: { type: LogActionType.DisableEventHistory, payload: {} }, res: undefined, startedAt: '', finishedAt: '' },
     ];
-    const logger = getLogger(buildTestQpqConfig());
+    const logger = getLogger(testConfig());
 
     await logger.enableLogs(false, 'test', 'corr-1');
     logger.log(storyResult({ history }));

@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, aws_iam, aws_lambda, aws_lambda_event_sources, aws_sqs, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
@@ -43,9 +43,9 @@ describe('QpqServiceRole', () => {
     template.resourceCountIs('AWS::IAM::ManagedPolicy', 1);
 
     const [policy] = Object.values(template.findResources('AWS::IAM::ManagedPolicy'));
-    expect(policy.Properties.Roles).toEqual(['service-role-test-app-test-module-development']);
-    expect(policy.Properties.PolicyDocument.Statement).toHaveLength(1);
-    expect(policy.Properties.PolicyDocument.Statement[0].Resource).toHaveLength(5);
+    expect(policy!.Properties.Roles).toEqual(['service-role-test-app-test-module-development']);
+    expect(policy!.Properties.PolicyDocument.Statement).toHaveLength(1);
+    expect(policy!.Properties.PolicyDocument.Statement[0].Resource).toHaveLength(5);
   });
 
   it('starts a new managed policy before a chunk would exceed the document limit', () => {

@@ -1,3 +1,6 @@
+import { createOutput } from './out';
+
+const out = createOutput('prompts');
 // Present a single-choice list prompt and return the selected value.
 // @inquirer/prompts is imported lazily so commands only pay for it when
 // actually prompting.
@@ -20,11 +23,24 @@ export const promptSelectDetailed = async <T>(
 // A yes/no list prompt, returning true for "Yes".
 export const promptYesNo = async (message: string): Promise<boolean> => (await promptSelect(message, ['No', 'Yes'])) === 'Yes';
 
-// A free-text prompt — used where a y/n is too easy to fat-finger (destructive
+// A free-text prompt, used where a y/n is too easy to fat-finger (destructive
 // confirmations that require typing the target name back).
 export const promptText = async (message: string): Promise<string> => {
   const { input } = await import('@inquirer/prompts');
   return input({ message });
+};
+
+// The friction for destructive commands: the target has to be typed back exactly. Resolves
+// true when it was; prints why it stops otherwise, so callers only have to bail out.
+export const promptTypedConfirmation = async (target: string): Promise<boolean> => {
+  const confirmation = await promptText(`Type '${target}' to confirm`);
+
+  if (confirmation !== target) {
+    out.log('Confirmation did not match. Exiting!');
+    return false;
+  }
+
+  return true;
 };
 
 // A multi-select checkbox prompt over labelled values; `checked` preselects a choice.

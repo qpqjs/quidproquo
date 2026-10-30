@@ -29,8 +29,8 @@ const convertDynamoAttributeToValue = (value: AttributeValue): unknown => {
 export function convertDynamoMapToObject(dynamoMap?: Record<string, AttributeValue>): Record<string, unknown> {
   const obj: Record<string, unknown> = {};
 
-  for (const property in dynamoMap) {
-    obj[property] = convertDynamoAttributeToValue(dynamoMap[property]);
+  for (const [property, attribute] of Object.entries(dynamoMap ?? {})) {
+    obj[property] = convertDynamoAttributeToValue(attribute);
   }
 
   return obj;

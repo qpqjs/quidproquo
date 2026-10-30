@@ -1,7 +1,7 @@
+import { runCommandCaptureSync, runCommandSync } from './runCommand';
 import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 import { USER_SCRIPT_BUILDER_LAYER_MODULES } from '@qpqjs/user-script';
 
-import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -22,7 +22,7 @@ export type BuilderLayerInstallOptions = {
 };
 
 /** The npm cpu name for a lambda architecture. */
-export const getBuilderLayerCpu = (architecture: JavascriptRuntimeArchitecture): 'arm64' | 'x64' => npmCpuByArchitecture[architecture];
+const getBuilderLayerCpu = (architecture: JavascriptRuntimeArchitecture): 'arm64' | 'x64' => npmCpuByArchitecture[architecture];
 
 /**
  * The npm argv that installs rspack for linux and the lambda's cpu into the layer's
@@ -43,7 +43,7 @@ export const getBuilderLayerInstallArgs = ({ outDir, architecture, rspackVersion
   `@rspack/core@${rspackVersion}`,
 ];
 
-const parseMajor = (version: string): number => parseInt(version.split('.')[0], 10);
+const parseMajor = (version: string): number => parseInt(version.split('.')[0] ?? '', 10);
 
 export type BuilderLayerRunners = {
   getNpmVersion: () => string;
@@ -51,9 +51,9 @@ export type BuilderLayerRunners = {
 };
 
 const defaultRunners: BuilderLayerRunners = {
-  getNpmVersion: () => execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(),
+  getNpmVersion: () => runCommandCaptureSync('npm', ['--version']).trim(),
   runNpm: (args) => {
-    execFileSync('npm', args, { stdio: 'inherit' });
+    runCommandSync('npm', args);
   },
 };
 
@@ -82,7 +82,9 @@ export const buildUserScriptBuilderLayer = (options: BuilderLayerInstallOptions,
 
   const installed = USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => fs.existsSync(path.join(nodeDir, 'node_modules', name)));
   if (installed.length !== USER_SCRIPT_BUILDER_LAYER_MODULES.length) {
-    throw new Error(`script:builder-layer: the layer is missing ${USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => !installed.includes(name)).join(', ')}`);
+    throw new Error(
+      `script:builder-layer: the layer is missing ${USER_SCRIPT_BUILDER_LAYER_MODULES.filter((name) => !installed.includes(name)).join(', ')}`,
+    );
   }
 
   return nodeDir;

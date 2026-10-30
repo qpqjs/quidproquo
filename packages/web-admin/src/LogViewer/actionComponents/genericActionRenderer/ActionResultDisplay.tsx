@@ -1,4 +1,3 @@
-import TruncatedText from '../../TruncatedText';
 import { ActionComponent } from '../types';
 import { genericFunctionRendererStyles } from './AnyVariableView';
 import { AnyVariableView } from './AnyVariableView';

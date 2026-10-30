@@ -32,9 +32,9 @@ import {
   EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import { eventDocAiQueueName } from '../constants/eventDocAiQueueName';
+import { buildEventDocAiMethodName } from '../logic';
 import type { EventDocAiChatSummary } from '../models';
 import {
-  buildEventDocAiMethodName,
   EVENT_DOC_AI_METHOD_CHAT_CREATE,
   EVENT_DOC_AI_METHOD_CHAT_HISTORY,
   EVENT_DOC_AI_METHOD_CHAT_LIST,
@@ -43,7 +43,7 @@ import {
 import { EventDocAiOptions } from '../types/EventDocAiOptions';
 import { defineEventDocAiRegistration } from './defineEventDocAiRegistration';
 
-// AI chats attached to an eventDoc collection — the AI sibling of defineEventDoc.
+// AI chats attached to an eventDoc collection, the AI sibling of defineEventDoc.
 // Provisions a chat-history drive + chat-list KVS, registers the AI (tools are
 // defineInlineFunction names supplied by the caller), subscribes a
 // collection-scoped queue of websocket service-request handlers that ship

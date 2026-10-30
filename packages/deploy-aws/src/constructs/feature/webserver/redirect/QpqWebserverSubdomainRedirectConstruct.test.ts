@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo, defineWafProtection } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, QPQConfig } from '@qpqjs/core';
+import { QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineDns, defineSubdomainRedirect, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
@@ -7,13 +8,22 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { QpqWebserverSubdomainRedirectConstruct } from './QpqWebserverSubdomainRedirectConstruct';
+
+// The log extension layer is produced by the aws package build; a synth in a unit test only needs a directory to package.
+const extensionLayer = vi.hoisted(() => ({ path: '' }));
+vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
+  ...((await importOriginal()) as typeof import('@qpqjs/actionprocessor-aws')),
+  getLogExtensionLayerPath: () => extensionLayer.path,
+}));
 
 // Code.fromAsset needs the bundle folder to exist, so the config roots at a scratch build dir.
 const configRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-redirect-synth-'));
 fs.mkdirSync(path.join(configRoot, 'build', 'apiGatewayEventHandler_redirect'), { recursive: true });
+extensionLayer.path = path.join(configRoot, 'extension-layer');
+fs.mkdirSync(extensionLayer.path);
 
 const synth = (extra: QPQConfig = []) => {
   const qpqConfig = buildTestQpqConfig(
@@ -29,7 +39,7 @@ const synth = (extra: QPQConfig = []) => {
 
   new QpqWebserverSubdomainRedirectConstruct(stack, 'redirect', {
     qpqConfig,
-    subdomainRedirectConfig: qpqWebServerUtils.getSubdomainRedirects(qpqConfig)[0],
+    subdomainRedirectConfig: qpqWebServerUtils.getSubdomainRedirects(qpqConfig)[0]!,
   });
 
   return Template.fromStack(stack);
@@ -59,5 +69,11 @@ describe('QpqWebserverSubdomainRedirectConstruct', () => {
     for (const method of (stages[0] as any).Properties.MethodSettings ?? []) {
       expect(method.DataTraceEnabled).not.toBe(true);
     }
+  });
+
+  it('passes the redirect target to the lambda as plain env values', () => {
+    synth().hasResourceProperties('AWS::Lambda::Function', {
+      Environment: { Variables: Match.objectLike({ redirectBaseUrl: 'https://development.example.com', appendPath: 'true' }) },
+    });
   });
 });

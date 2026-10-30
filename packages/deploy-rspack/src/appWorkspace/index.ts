@@ -1,7 +1,6 @@
+export * from './discovery';
 export * from './getAllViews';
-export * from './getAppServiceNames';
 export * from './getAppServiceQpqConfigs';
-export * from './getDefaultAppName';
 export * from './getDevServerRspackConfig';
 export * from './getServiceRemoteRspackConfig';
 export * from './getServiceRspackConfig';
@@ -16,5 +15,6 @@ export * from './scanFederatedExposes';
 export * from './serviceTsRules';
 export * from './USER_SCRIPT_CHILD_BUNDLE_NAME';
 export * from './ViewsContext';
+export * from './viewsEntry';
 export * from './ViewsInfo';
 export * from './writeFederatedTsconfigForApp';

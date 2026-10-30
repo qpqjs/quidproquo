@@ -9,8 +9,5 @@ import { SMOKE_PROBE_SECRET } from '../constants/SMOKE_PROBE_SECRET';
 export function* askRunSecretTest(): AskResponse<void> {
   const value = yield* askConfigGetSecret(SMOKE_PROBE_SECRET);
 
-  yield* askSmokeAssert(
-    typeof value === 'string' && value.length > 0,
-    'GetSecretValue returned an empty value'
-  );
+  yield* askSmokeAssert(typeof value === 'string' && value.length > 0, 'GetSecretValue returned an empty value');
 }

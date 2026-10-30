@@ -8,9 +8,7 @@ import { DevServerPlugin } from './types/DevServerPlugin';
  *
  * Sequential, not `Promise.all`: a plugin is up once its start resolves, so
  * starting in order means a plugin that publishes onto the event bus cannot
- * run before a plugin that listens on it has registered. That used to be
- * covered by a 100ms sleep in the two callers that fired these off without
- * awaiting them; both sleeps are gone.
+ * run before a plugin that listens on it has registered.
  *
  * The returned tasks are what the caller hands to runDevServerShutdown, so
  * only what was actually started is ever torn down.

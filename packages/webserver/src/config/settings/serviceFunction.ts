@@ -2,7 +2,7 @@ import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreU
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedServiceFunctionSettings = {
   functionName?: string;
   virtualNetworkName?: string;
 
@@ -12,22 +12,22 @@ export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvan
   maxConcurrentExecutions?: number;
 
   owner?: CrossModuleOwner<'functionName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetting {
+export type ServiceFunctionQPQWebServerConfigSetting = {
   runtime: QpqFunctionRuntime;
 
   functionName: string;
   virtualNetworkName?: string;
 
   maxConcurrentExecutions?: number;
-}
+} & QPQConfigSetting;
 
 export const defineServiceFunction = (
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedServiceFunctionSettings,
 ): ServiceFunctionQPQWebServerConfigSetting => {
-  const functionName = options?.functionName || qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
+  const functionName = options?.functionName ?? qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
 
   return {
     configSettingType: QPQWebServerConfigSettingType.ServiceFunction,

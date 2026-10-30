@@ -1,4 +1,4 @@
-import { EitherActionResult, MatchStoryResult, StoryResult, StorySession } from '@qpqjs/core';
+import { EitherActionResult, MatchStoryResult, StorySession } from '@qpqjs/core';
 import { ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
 import { Context } from 'aws-lambda';

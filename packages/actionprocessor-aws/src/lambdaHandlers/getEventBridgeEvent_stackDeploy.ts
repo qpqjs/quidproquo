@@ -4,13 +4,14 @@ import { EventBridgeEvent } from 'aws-lambda';
 
 import { getEventBridgeStackDeployEventActionProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
+import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 export const getEventBridgeEvent_stackDeploy = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<EventBridgeEvent<string, void>>(
     QpqRuntimeType.DEPLOY_EVENT,
     getBlankStorySession,
-    getEventBridgeStackDeployEventActionProcessor,
+    getEventBridgeStackDeployEventActionProcessor(requireLambdaEnvironment('deployEventConfigName')),
     dynamicModuleLoader,
     qpqConfig,
   );

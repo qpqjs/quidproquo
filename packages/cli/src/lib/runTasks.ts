@@ -1,7 +1,10 @@
+import { createOutput } from './out';
+
+const out = createOutput('run-tasks');
 export type Task = { label: string; run: () => Promise<void> };
 export type TaskFailure = { label: string; error: Error };
 
-// Run tasks with at most `limit` in flight; never rejects — failures come back
+// Run tasks with at most `limit` in flight; never rejects, failures come back
 // labelled so a whole wave can finish before we report what broke.
 export const runTasks = async (tasks: Task[], limit: number): Promise<TaskFailure[]> => {
   const failures: TaskFailure[] = [];
@@ -13,6 +16,7 @@ export const runTasks = async (tasks: Task[], limit: number): Promise<TaskFailur
       while (nextIndex < tasks.length) {
         const task = tasks[nextIndex];
         nextIndex += 1;
+        if (!task) continue;
         try {
           await task.run();
         } catch (error) {
@@ -90,7 +94,7 @@ export const runDependencyTasks = async (tasks: DependencyTask[], limit: number)
         if (task.deps.some((dep) => failed.has(dep))) {
           started.add(task.id);
           failed.add(task.id); // cascade so transitive dependents skip too
-          console.log(`Skipping ${task.label} (a dependency failed)`);
+          out.log(`Skipping ${task.label} (a dependency failed)`);
           changed = true;
         } else if (task.deps.every((dep) => succeeded.has(dep))) {
           started.add(task.id);
@@ -119,7 +123,7 @@ export const runDependencyTasks = async (tasks: DependencyTask[], limit: number)
 
 export const assertNoFailures = (phaseName: string, failures: TaskFailure[]): void => {
   if (failures.length === 0) return;
-  console.error(`\n${phaseName} failed for:`);
-  failures.forEach((failure) => console.error(`  ${failure.label}: ${failure.error.message}`));
+  out.error(`\n${phaseName} failed for:`);
+  failures.forEach((failure) => out.error(`  ${failure.label}: ${failure.error.message}`));
   throw new Error(`${phaseName}: ${failures.length} task(s) failed`);
 };

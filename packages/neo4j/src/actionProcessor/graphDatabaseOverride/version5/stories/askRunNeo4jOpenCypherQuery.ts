@@ -1,10 +1,10 @@
 import {
   askConfigGetParameter,
   askConfigGetSecret,
+  askGraphDatabaseExecuteOpenCypherQuery,
   askNetworkRequest,
   AskResponse,
   askThrowError,
-  ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
 } from '@qpqjs/core';
@@ -31,7 +31,7 @@ export function* askRunNeo4jOpenCypherQuery({
   const instanceName = yield* askConfigGetParameter(`neo4j-${graphDatabaseName}-instance`);
   const password = yield* askConfigGetSecret(`neo4j-${graphDatabaseName}-password`);
 
-  const response = yield* askNetworkRequest<Neo4jCypherRequest, Neo4jCypherResponse>(
+  const response = yield* askNetworkRequest<Neo4jCypherResponse, Neo4jCypherRequest>(
     'POST',
     `HTTPS://${instanceName}.databases.neo4j.io:443/db/neo4j/query/v2`,
     {
@@ -48,7 +48,7 @@ export function* askRunNeo4jOpenCypherQuery({
   );
 
   if (response.status < 200 || response.status >= 300) {
-    return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to query database');
+    return yield* askThrowError(askGraphDatabaseExecuteOpenCypherQuery.errorType.QueryFailed, 'Unable to query database');
   }
 
   return yield* askConvertNeo4jCypherResponseToCypherResponse(response.data);

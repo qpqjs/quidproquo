@@ -1,9 +1,9 @@
 import {
+  askDynamicFunctionExecute,
   askKeyValueStoreUpsertBase,
   ConfigActionType,
   DateActionType,
   DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
   FileActionType,
   GuidActionType,
   KeyValueStoreActionType,
@@ -12,10 +12,9 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -50,7 +49,7 @@ const globals: Record<string, string> = {
 };
 
 // Generic evaluator for the operators this flow issues. Sort keys are the numeric event
-// ids, so ordering operators compare numerically — exactly the contract the real store
+// ids, so ordering operators compare numerically, exactly the contract the real store
 // honours.
 const isCondition = (op: KvsQueryOperation): op is KvsQueryCondition => 'key' in op;
 
@@ -87,7 +86,7 @@ const buildMocks = () => {
     // No functions object registered for this collection: the append's pre-write gate
     // and any state read fall back exactly as an unregistered collection does.
     [DynamicFunctionsActionType.Execute]: throwsError(
-      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      askDynamicFunctionExecute.errorType.DynamicFunctionsNotFound,
       'Dynamic functions not found (test collection registers none)',
     ),
 
@@ -212,7 +211,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     const docId = seedDocWithEvents(mocks);
 
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
-    const snapshotAt = eventIdOf(fullLog[2]);
+    const snapshotAt = eventIdOf(fullLog![2]!);
     const snapshotState = { id: docId, folded: 'up-to-third-event' };
 
     tables[store.snapshotsStoreName] = [
@@ -258,7 +257,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     tables[store.snapshotsStoreName] = [
       {
         pk: eventDocSnapshotPk(docId, 'document', ''),
-        sk: eventIdOf(fullLog[2]),
+        sk: eventIdOf(fullLog![2]!),
         type: store.type,
         data: { type: 'storageDrive', views: ['document'] },
       },
@@ -279,18 +278,18 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
     expect(page.items).toEqual([]);
   });
 
-  it('under a snapshot cache key, only rows filed under that key are a usable base — legacy rows are invisible', () => {
+  it('under a snapshot cache key, only rows filed under that key are a usable base, legacy rows are invisible', () => {
     const { mocks, tables } = buildMocks();
     const docId = seedDocWithEvents(mocks);
 
     // The collection's registered definition files snapshots under 'k2'; nothing else is registered.
-    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: { functionName: string } }) =>
+    mocks[DynamicFunctionsActionType.Execute] = ((action: { payload: { functionName: string } }) =>
       action.payload.functionName === 'getSnapshotCacheKey'
         ? 'k2'
-        : throwsError(DynamicFunctionsExecuteErrorTypeEnum.FunctionNotFound, 'only getSnapshotCacheKey is registered');
+        : throwsError(askDynamicFunctionExecute.errorType.FunctionNotFound, 'only getSnapshotCacheKey is registered')) as any;
 
     const fullLog = listEventsPage(mocks, docId).items as EventDocEvent[];
-    const snapshotAt = eventIdOf(fullLog[2]);
+    const snapshotAt = eventIdOf(fullLog![2]!);
 
     // A legacy row (written before the key changed) is stale fold output: not found under the new pk.
     tables[store.snapshotsStoreName] = [
@@ -308,7 +307,7 @@ describe('eventDoc bootstrap round trip (listEvents ?includeBase=true)', () => {
 
     // A row filed under the current key is the base, and says which key it was filed under.
     const keyedState = { id: docId, folded: 'under-k2' };
-    tables[store.snapshotsStoreName].push({
+    tables![store.snapshotsStoreName]!.push({
       pk: eventDocSnapshotPk(docId, 'document', 'k2'),
       sk: snapshotAt,
       type: store.type,

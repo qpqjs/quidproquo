@@ -1,12 +1,13 @@
-import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, StateActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 import { QueryParamsActionType } from '@qpqjs/web';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
-import { adminUserContext } from '../../contexts/adminUserContext';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
+import { adminUserContext } from '../../context';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { makeInitStateEvent } from '../../testHelpers/makeSessionEvent';
 import { askStartSession } from './askStartSession';
 
@@ -47,19 +48,19 @@ describe('askStartSession', () => {
 
     runStory(askStartSession(), baseMocks(applied, dispatched, networkCalls));
 
-    expect(networkCalls[0].url).toBe('/v1/admin/session');
-    expect(networkCalls[0].body).toEqual({ name: 'joe — 2026-07-07T00:00:00.000Z', code: 'guid-1' });
-    expect(networkCalls[1].url).toBe('/v1/admin/session/doc-1/events');
+    expect(networkCalls![0]!.url).toBe('/v1/admin/session');
+    expect(networkCalls![0]!.body).toEqual({ name: 'joe — 2026-07-07T00:00:00.000Z', code: 'guid-1' });
+    expect(networkCalls![1]!.url).toBe('/v1/admin/session/doc-1/events');
 
     expect(dispatched).toContainEqual(expect.objectContaining({ payload: { docId: 'doc-1', events: [initEvent] } }));
 
     expect(applied[0]).toEqual({
-      type: AdminSessionEventType.sessionStarted,
+      type: AdminSessionEffect.SessionStarted,
       data: { username: 'joe', seededParams: { tab: 2, correlation: 'corr-7', service: 'billing' } },
     });
 
     expect(applied[1]).toEqual({
-      type: AdminSessionEventType.correlationOpened,
+      type: AdminSessionEffect.CorrelationOpened,
       data: { correlationId: 'corr-7', source: 'deepLink' },
     });
   });
@@ -73,6 +74,6 @@ describe('askStartSession', () => {
     });
 
     expect(applied).toHaveLength(1);
-    expect(applied[0].type).toBe(AdminSessionEventType.sessionStarted);
+    expect(applied![0]!.type).toBe(AdminSessionEffect.SessionStarted);
   });
 });

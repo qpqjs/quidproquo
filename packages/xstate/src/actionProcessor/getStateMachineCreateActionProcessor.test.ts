@@ -2,16 +2,12 @@ import {
   ActionProcessor,
   actionResult,
   actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStubLogger,
   DynamicModuleLoader,
   ErrorTypeEnum,
   KeyValueStoreActionType,
-  noopDynamicModuleLoader,
   QPQConfig,
 } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -56,7 +52,7 @@ describe('getStateMachineCreateActionProcessor', () => {
   it('returns a NotFound error when the state machine is not configured', async () => {
     const processor = await getProcessor(buildTestQpqConfig());
 
-    const [, error] = await invoke(processor, { stateMachineName: 'missing', id: 'id-1', item: {} }, kvsStore(new Map()));
+    const [, error] = await invoke(processor!, { stateMachineName: 'missing', id: 'id-1', item: {} }, kvsStore(new Map()));
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -66,7 +62,7 @@ describe('getStateMachineCreateActionProcessor', () => {
     const processor = await getProcessor(config);
     const store = new Map<string, any>();
 
-    const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: { total: 10 } }, kvsStore(store));
+    const [entity] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', item: { total: 10 } }, kvsStore(store));
 
     expect(entity).toEqual({ id: 'order-1', total: 10, __machineState: expect.objectContaining({ value: 'inactive' }) });
     expect(store.get('order-1')).toEqual(entity);
@@ -77,7 +73,7 @@ describe('getStateMachineCreateActionProcessor', () => {
     const processor = await getProcessor(config);
 
     const [, error] = await invoke(
-      processor,
+      processor!,
       { stateMachineName: 'order', id: 'order-1', item: {} },
       {
         [KeyValueStoreActionType.Upsert]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
@@ -102,7 +98,7 @@ describe('getStateMachineCreateActionProcessor', () => {
         ran++;
       };
 
-    await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
+    await invoke(processor!, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
 
     expect(ran).toBe(1);
   });
@@ -121,7 +117,7 @@ describe('getStateMachineCreateActionProcessor', () => {
         throw new Error('side effect failed');
       };
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
+    const [, error] = await invoke(processor!, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
 
     expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
     expect(error?.errorText).toBe('An unexpected error occurred [Error].');

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { combineQpqReducers, QpqReducer } from './combineQpqReducers';
 
-interface State {
+type State = {
   log: string[];
-}
+};
 
 const reducerA: QpqReducer<State, string> = (state, effect) => {
   if (effect === 'a') {

@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { StreamHandle } from '../../types/StreamRegistry';
 import { StreamActionType } from './StreamActionType';
 

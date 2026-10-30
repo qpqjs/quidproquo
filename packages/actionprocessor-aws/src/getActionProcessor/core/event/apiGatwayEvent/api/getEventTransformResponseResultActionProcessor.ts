@@ -1,5 +1,6 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   DynamicModuleLoader,
@@ -14,8 +15,8 @@ import {
 import { HttpEventHeaders, qpqWebServerUtils, RouteOptions, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { findApiRoute } from '../../../../../awsLambdaUtils';
-import { getApiRecordPath } from './getApiRecordPath';
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
+import { getApiRecordPath } from './utils';
 
 const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.BadRequest]: 400,
@@ -23,7 +24,7 @@ const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.PaymentRequired]: 402,
   [ErrorTypeEnum.Forbidden]: 403,
   [ErrorTypeEnum.NotFound]: 404,
-  [ErrorTypeEnum.TimeOut]: 408,
+  [ErrorTypeEnum.Timeout]: 408,
   [ErrorTypeEnum.Conflict]: 409,
   [ErrorTypeEnum.UnsupportedMediaType]: 415,
   [ErrorTypeEnum.OutOfResources]: 500,
@@ -78,11 +79,12 @@ const getProcessTransformResponseResult = async (
 
     const [apiGatewayEvent] = eventParams;
     const [record] = qpqEventRecordResponses;
+    if (!record) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
-    // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
     let successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
 
-    // Return an error if the body is the wrong type.
     if (successRecord.body && typeof successRecord.body !== 'string') {
       successRecord = getResponseFromErrorResult({
         errorText: 'Response body must be a string',
@@ -90,7 +92,6 @@ const getProcessTransformResponseResult = async (
       });
     }
 
-    // Add the cors headers
     const currentHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
       ...qpqWebServerUtils.getCorsHeaders(qpqConfig, getMatchedRouteOptions(apiGatewayEvent), apiGatewayEvent.headers, domainResolver),

@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 // same resource constructs.
 import { QpqCoreEventBusConstruct } from '../feature/core/eventBus/QpqCoreEventBusConstruct';
 
-export interface DefaultResourceAlarmProps {
+export type DefaultResourceAlarmProps = {
   /** Construct id (also seeds the per-event-bus action ids). */
   id: string;
   alarmName: string;
@@ -17,7 +17,7 @@ export interface DefaultResourceAlarmProps {
   comparisonOperator?: aws_cloudwatch.ComparisonOperator;
   evaluationPeriods?: number;
   datapointsToAlarm?: number;
-}
+};
 
 /** Event buses that error/alarm notifications route to (from `defineNotifyError`). */
 export const getNotifyErrorEventBusNames = (qpqConfig: QPQConfig): string[] => {

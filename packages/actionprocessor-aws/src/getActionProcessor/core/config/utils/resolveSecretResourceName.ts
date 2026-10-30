@@ -1,13 +1,8 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
-
 export const resolveSecretResourceName = (secretName: string, qpqConfig: QPQConfig) => {
-  const secretConfig = qpqCoreUtils.getSecretByName(secretName, qpqConfig);
+  const secretConfig = qpqCoreUtils.resolveSecretOrThrow(secretName, qpqConfig);
 
-  return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    secretConfig.owner?.resourceNameOverride || secretName,
-    qpqConfig,
-    secretConfig.owner?.module,
-  );
+  return awsNamingUtils.resolveOwnedResourceName(secretName, qpqConfig, secretConfig.owner);
 };

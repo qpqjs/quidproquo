@@ -1,5 +1,6 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from '@qpqjs/actionprocessor-node';
-import { ActionProcessor, askCryptoDecrypt, askCryptoEncrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { ActionProcessor, askCryptoDecrypt, askCryptoEncrypt, CryptoActionType, defineCryptoKey } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { existsSync } from 'fs';
 import { mkdtemp, rm } from 'fs/promises';
@@ -7,7 +8,6 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getCryptoActionProcessor } from './getCryptoActionProcessor';
 
 describe('getCryptoActionProcessor (dev server)', () => {
@@ -21,8 +21,8 @@ describe('getCryptoActionProcessor (dev server)', () => {
     const qpqConfig = buildTestQpqConfig([defineCryptoKey('my-key')]);
     const processors = await getCryptoActionProcessor({ runtimePath } as any)(qpqConfig, (() => null) as any);
 
-    encrypt = processors[CryptoActionType.Encrypt];
-    decrypt = processors[CryptoActionType.Decrypt];
+    encrypt! = processors[CryptoActionType.Encrypt]!;
+    decrypt! = processors[CryptoActionType.Decrypt]!;
   });
 
   afterEach(async () => {
@@ -74,7 +74,7 @@ describe('getCryptoActionProcessor (dev server)', () => {
     const qpqConfig = buildTestQpqConfig([defineCryptoKey('my-key')]);
     const rebuilt = await getCryptoActionProcessor({ runtimePath } as any)(qpqConfig, (() => null) as any);
 
-    const [plaintext] = await invokeProcessor(rebuilt[CryptoActionType.Decrypt], { keyName: 'my-key', ciphertext });
+    const [plaintext] = await invokeProcessor(rebuilt![CryptoActionType.Decrypt]!, { keyName: 'my-key', ciphertext });
     expect(plaintext).toBe('shhh');
   });
 });

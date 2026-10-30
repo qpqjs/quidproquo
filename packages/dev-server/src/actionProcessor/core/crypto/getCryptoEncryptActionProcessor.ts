@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoEncrypt> => {
   return async ({ keyName, plaintext, context }) => {
-    const cryptoKeyConfig = qpqCoreUtils.getAllCryptoKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
+    const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(keyName, qpqConfig);
     if (!cryptoKeyConfig) {
       return actionResultError(
         askCryptoEncrypt.errorType.KeyNotConfigured,
@@ -29,7 +29,8 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: Resolved
 
       return actionResult(ciphertext);
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

@@ -10,7 +10,7 @@ import { defineWebsocket } from '@qpqjs/webserver';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 
-export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedWebsocketQueueSettings = {
   owner?: CrossModuleOwnerWithNoResourceOverride;
   userDirectoryName?: string;
 
@@ -23,7 +23,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 
   // Registered inline-function name (see `defineInlineFunction`) invoked with
   // `{ connectionId }` (WebSocketQueueOnConnectedInput) as soon as a connection
-  // opens — BEFORE any authenticate, so only push PUBLIC state from it (e.g.
+  // opens, BEFORE any authenticate, so only push PUBLIC state from it (e.g.
   // the admin feature pushes the active maintenance set, which pre-login
   // clients must also see). Runs in the websocket-owning service; failures are
   // swallowed so a sync problem never breaks the connect.
@@ -42,7 +42,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // hold a token the owning service validates itself (a signing session, say).
   // Mutually exclusive with userDirectoryName.
   connectionAuthenticator?: string;
-}
+} & QPQConfigAdvancedSettings;
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
   return `qpq-wsq-eb-name-${apiName}`;
@@ -88,11 +88,11 @@ export const defineWebSocketQueue = (
   return [
     // User defined vars (stored in config)
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName), advancedSettings?.connectionAuthenticator || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForTopicAuthoriser(apiName), advancedSettings?.topicAuthoriser ?? ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionAuthenticator(apiName), advancedSettings?.connectionAuthenticator ?? ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {

@@ -1,2 +1,2 @@
-// Intentionally empty — noop placeholder package for the qpqjs app.
+// Intentionally empty: noop placeholder package for the qpqjs app.
 export {};

@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askKeyValueStoreScanAllScopesBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   KvsScopedItem,
   ProcessorFor,
   QPQConfig,

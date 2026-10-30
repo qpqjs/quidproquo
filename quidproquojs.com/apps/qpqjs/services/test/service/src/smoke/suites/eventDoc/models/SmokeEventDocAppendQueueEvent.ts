@@ -10,6 +10,4 @@ export type SmokeEventDocAppendPayload = {
   values: number[];
 };
 
-export type SmokeEventDocAppendQueueEvent = QueueEvent<
-  QueueMessage<SmokeEventDocAppendPayload>
->;
+export type SmokeEventDocAppendQueueEvent = QueueEvent<QueueMessage<SmokeEventDocAppendPayload>>;

@@ -1,17 +1,16 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   askKeyValueStoreUpsertManyBase,
   createActionProcessor,
-  KeyValueStoreActionType,
   ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { batchPutItems, transactPutItems } from '../../../logic/dynamo';
 import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 
@@ -23,7 +22,7 @@ import { getScopedKvsTranslatorOrThrow } from '../../../logic/dynamo/scope';
 // records as N single upserts.
 const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpsertManyBase> => {
   return async ({ keyValueStoreName, items, options }) => {
-    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
+    const dynamoTableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
@@ -31,7 +30,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
 
       // Same-key duplicates are rejected UP FRONT, before anything is written.
       // Dynamo itself only rejects them when both land in the same 25-item
-      // chunk — across chunks the later write silently wins — so left to the
+      // chunk. Across chunks the later write silently wins, so left to the
       // service the outcome would depend on item position.
       const seenKeys = new Set<string>();
       for (const item of items) {
@@ -57,15 +56,15 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<t
         await batchPutItems(dynamoTableName, scopedItems, region);
       }
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ...transientErrorMap(),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Throttled, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
-        // Retries exhausted on UnprocessedItems — sustained throttle, a transient
+        // Retries exhausted on UnprocessedItems, sustained throttle, a transient
         // fault: callers must see ServiceUnavailable, not a permanent failure.
-        BatchWriteUnprocessedItemsError: () =>
-          actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),
+        BatchWriteUnprocessedItemsError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Throttled, 'KVS batch write throttled'),
         ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.Conflict, 'KVS item already exists'),
         TransactionConflictException: () =>
           actionResultError(askKeyValueStoreUpsertManyBase.errorType.WriteContention, 'KVS item is being written by a transaction'),

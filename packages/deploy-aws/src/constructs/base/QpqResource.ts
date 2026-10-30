@@ -1,6 +1,6 @@
 import { aws_iam } from 'aws-cdk-lib';
 
-export interface QpqResource {
+export type QpqResource = {
   /**
    * Grants read permissions on this resource.
    *
@@ -21,4 +21,4 @@ export interface QpqResource {
    * @param grantee the role to be granted read/write access to the resource.
    */
   grantAll(grantee: aws_iam.IGrantable): void;
-}
+};

@@ -6,7 +6,7 @@ import { AiStreamPartType } from './AiStreamPartType';
  * Respond with an approval message (or a `ToolOutputDenied`) keyed by `approvalId`
  * before the model will proceed.
  */
-export interface AiStreamToolApprovalRequest {
+export type AiStreamToolApprovalRequest = {
   type: AiStreamPartType.ToolApprovalRequest;
   /** Identifier the approve/deny response must reference. */
   approvalId: string;
@@ -16,4 +16,4 @@ export interface AiStreamToolApprovalRequest {
   toolName: string;
   /** Arguments the tool would be called with if approved. */
   input: unknown;
-}
+};

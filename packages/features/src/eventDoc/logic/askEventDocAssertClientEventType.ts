@@ -1,7 +1,7 @@
 import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller, ErrorTypeEnum } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { eventDocServerEventTypeRefusal } from '../validation/eventDocServerEventTypeRefusal';
 import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
@@ -12,7 +12,7 @@ import { isEventDocFunctionsMissing } from './isEventDocFunctionsMissing';
  * store context.
  */
 export function* askEventDocAssertClientEventType(type: string): AskResponse<void> {
-  const { storeName, type: docType } = yield* askEventDocResolveStore();
+  const { storeName, type: docType } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, docType));
 
   const serverEventTypes = yield* askCatch(functionsCaller.getServerEventTypes());

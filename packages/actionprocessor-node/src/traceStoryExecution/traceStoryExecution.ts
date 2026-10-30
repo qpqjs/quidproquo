@@ -1,4 +1,4 @@
-// traceStoryExecution — replay a StoryResult log against real story code and record a
+// traceStoryExecution: replay a StoryResult log against real story code and record a
 // line-by-line execution trace: every statement executed, with local variable values.
 //
 // Wraps qpqExecuteLog (deterministic replay: every impure action is answered from the
@@ -8,7 +8,7 @@
 // an interactive debug session would. See trace-replay-plan.md.
 //
 // The CALLER must run on the process MAIN THREAD (lambda handlers and the dev server
-// do) — inspector.Session.connectToMainThread only targets the main thread.
+// do), inspector.Session.connectToMainThread only targets the main thread.
 
 import { ActionProcessorList, getQpqIsoDateTimeFromDate, qpqExecuteLog, QpqExecutionTrace, StoryResult } from '@qpqjs/core';
 
@@ -17,23 +17,23 @@ import { Worker } from 'worker_threads';
 import { TraceControllerWorkerData, traceControllerWorkerMain } from './controllerWorker';
 import { filterOwnCodeLocations, resolveSourceMappedSteps } from './resolveSourceMaps';
 
-export interface TraceStoryExecutionOptions {
+export type TraceStoryExecutionOptions = {
   // Regex sources matched against script urls to trace IN ADDITION to the story
   // function's own script (auto-detected via [[FunctionLocation]]). Use for bundles
   // split across chunks, e.g. ['/tmp/qpq-federated-code/'].
   scriptPatterns?: string[];
 
-  // Only break on statements whose source-mapped origin is the service's own code —
+  // Only break on statements whose source-mapped origin is the service's own code ,
   // node_modules positions get no breakpoints, so the step/time budgets are spent
   // entirely on user statements. Scripts without a source map stay fully traced.
   onlyOwnCode?: boolean;
 
-  // Extra own-code markers beyond the built-in "not node_modules" check — see
+  // Extra own-code markers beyond the built-in "not node_modules" check, see
   // resolveSourceMaps.filterOwnCodeLocations. Only takes effect when onlyOwnCode is set.
   ownCodeMarkers?: string[];
 
   // Step budget and wall-clock budget: past either, the replay finishes untraced and
-  // the trace is marked truncated. The wall clock is what bounds total runtime — locals
+  // the trace is marked truncated. The wall clock is what bounds total runtime, locals
   // capture makes per-step cost variable, so step count alone doesn't bound time.
   maxSteps?: number;
   maxTraceMs?: number;
@@ -45,19 +45,19 @@ export interface TraceStoryExecutionOptions {
   maxValueDepth?: number;
   maxSerializedLength?: number;
 
-  // Passed through to qpqExecuteLog — lets specific action types execute for real
+  // Passed through to qpqExecuteLog, lets specific action types execute for real
   // instead of being answered from the log.
   overrides?: ActionProcessorList;
-}
+};
 
-export interface TraceStoryExecutionResult {
+export type TraceStoryExecutionResult = {
   trace: QpqExecutionTrace;
 
   // The replay's own StoryResult (result/error of re-running the story)
   replay: StoryResult<any>;
-}
+};
 
-// Ready covers domain enable + breakpoint installation across every traced chunk —
+// Ready covers domain enable + breakpoint installation across every traced chunk ,
 // generous because the service function running this has minutes of budget, and an
 // abort here wastes a replay that would have succeeded (instrumentMs in the trace stats
 // shows the real cost).
@@ -128,7 +128,7 @@ export const traceStoryExecution = async (
   };
 
   // Lambdas ship as single-file webpack bundles, so the controller can't be a worker
-  // FILE on disk — it's serialized and run as an eval worker (see controllerWorker.ts).
+  // FILE on disk, it's serialized and run as an eval worker (see controllerWorker.ts).
   const controller = new Worker(`(${traceControllerWorkerMain.toString()})()`, {
     eval: true,
     workerData,
@@ -136,7 +136,7 @@ export const traceStoryExecution = async (
 
   // onlyOwnCode: the worker can't load trace-mapping (eval worker, builtin requires
   // only), so it round-trips candidate breakpoint locations here for source-map
-  // filtering. Attached before the ready-wait — instrumentation happens during init.
+  // filtering. Attached before the ready-wait, instrumentation happens during init.
   controller.on('message', (message: any) => {
     if (message?.type === 'filterLocations') {
       controller.postMessage({

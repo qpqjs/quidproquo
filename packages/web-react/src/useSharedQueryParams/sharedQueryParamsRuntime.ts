@@ -1,10 +1,11 @@
 import { createQpqRuntimeDefinition } from '../runtime/createQpqRuntimeDefinition';
-import { sharedQueryParamsLogic } from './logic/runtime';
-import { sharedQueryParamsInitalState, sharedQueryParamsReducer } from './logic';
+import { createInitialSharedQueryParamsState } from './logic/createInitialSharedQueryParamsState';
+import { frontendSharedQueryParamsApi } from './frontendSharedQueryParamsApi';
+import { sharedQueryParamsReducer } from './sharedQueryParamsReducer';
 
 export const sharedQueryParamsRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/web-react/sharedQueryParams',
-  api: sharedQueryParamsLogic,
-  initialState: sharedQueryParamsInitalState,
+  api: frontendSharedQueryParamsApi,
+  initialState: createInitialSharedQueryParamsState(),
   reducer: sharedQueryParamsReducer,
 });

@@ -1,4 +1,5 @@
-import { Action, ErrorTypeEnum, InlineFunctionActionType, runStory, throwsError } from '@qpqjs/core';
+import { Action, ErrorTypeEnum, InlineFunctionActionType } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -88,7 +89,7 @@ describe('askMcpHandleRequest', () => {
   });
 
   // Security regression: a tool or method name is a lookup key, so prototype names resolve to nothing and run nothing.
-  it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty'])('answers the tool name %s with InvalidParams and runs nothing', (name) => {
+  it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty'])('answers the tool name %s with InvalidParams and runs nothing', (name: any) => {
     const executed: ExecuteAction[] = [];
 
     const response = runStory(askMcpHandleRequest(callTool(name, {}), event), buildMocks(executed));
@@ -97,7 +98,7 @@ describe('askMcpHandleRequest', () => {
     expect(executed.filter((action) => action.payload!.functionName !== 'docsListFn')).toEqual([]);
   });
 
-  it.each(['__proto__', 'constructor', 'tools/call/../ping'])('answers the method %s with MethodNotFound', (method) => {
+  it.each(['__proto__', 'constructor', 'tools/call/../ping'])('answers the method %s with MethodNotFound', (method: any) => {
     const response = runStory(askMcpHandleRequest({ jsonrpc: '2.0', id: 3, method }, event), buildMocks());
 
     expect(response).toMatchObject({ id: 3, error: { code: McpJsonRpcErrorCode.MethodNotFound } });

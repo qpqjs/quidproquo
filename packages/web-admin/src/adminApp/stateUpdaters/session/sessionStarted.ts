@@ -1,12 +1,12 @@
 import { EventDocEventPayload } from '@qpqjs/features';
 
-import { AdminSessionState } from '../../AdminSessionState';
-import { SessionStartedData } from '../../effects/session/SessionStartedEvent';
+import { AdminSessionStartedData } from '../../effects/session/AdminSessionStartedEffect';
+import { AdminSessionState } from '../../types/AdminSessionState';
 
 // Seeds the session from the URL the user arrived on: tab, filters, and a
 // deep-linked correlation all become part of the folded state, so the audit
 // record explains what the user was looking at from the first event.
-export const sessionStarted = (state: AdminSessionState, { data }: EventDocEventPayload<SessionStartedData>): AdminSessionState => {
+export const sessionStarted = (state: AdminSessionState, { data }: EventDocEventPayload<AdminSessionStartedData>): AdminSessionState => {
   const { tab, correlation, ...searchSeed } = data.seededParams;
 
   return {

@@ -5,9 +5,9 @@ import { ObjectInspector } from 'react-inspector';
 
 import { useConsoleLogViewer } from './hooks';
 
-interface ConsoleLogViewerProps {
+type ConsoleLogViewerProps = {
   logs: StoryResult<any>['logs'];
-}
+};
 
 export const ConsoleLogViewer = ({ logs }: ConsoleLogViewerProps) => {
   const { formattedLogs } = useConsoleLogViewer(logs);

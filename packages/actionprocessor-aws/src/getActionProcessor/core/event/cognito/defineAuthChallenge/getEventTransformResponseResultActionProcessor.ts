@@ -1,9 +1,10 @@
 import {
   actionResult,
+  actionResultError,
   askEventTransformResponseResultBase,
   createActionProcessor,
   EitherActionResult,
-  EventActionType,
+  ErrorTypeEnum,
   ProcessorFor,
   QPQConfig,
   QPQError,
@@ -29,9 +30,12 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
 
     const [customMessageTriggerEvent] = eventParams;
     const [qpqEventRecordResponse] = qpqEventRecordResponses;
+    if (!qpqEventRecordResponse) {
+      return actionResultError(ErrorTypeEnum.GenericError, 'Expected one event record response');
+    }
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
-    let successRecord = qpqEventRecordResponse.success ? qpqEventRecordResponse.result : getResponseFromErrorResult(qpqEventRecordResponse.error);
+    const successRecord = qpqEventRecordResponse.success ? qpqEventRecordResponse.result : getResponseFromErrorResult(qpqEventRecordResponse.error);
 
     const eventOutput: EventOutput = {
       ...customMessageTriggerEvent,

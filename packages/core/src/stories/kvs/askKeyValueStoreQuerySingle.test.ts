@@ -1,9 +1,10 @@
+import { runStory } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askKeyValueStoreQueryBase } from '../../actions/keyValueStore/askKeyValueStoreQuery';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { KvsQueryOperationType } from '../../actions/keyValueStore/types';
-import { runStory } from '../../testing/storyTesting';
 import { ActionOf } from '../../types';
 import { QpqPagedData } from '../../types';
 import { askKeyValueStoreQuerySingle } from './askKeyValueStoreQuerySingle';

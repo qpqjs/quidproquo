@@ -74,7 +74,7 @@ A mock can be a literal value or a function, and a function mock is re-invoked p
 ## Conventions worth knowing
 
 - Anything named `ask*` is a generator and must be called with `yield*`. The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/packages/eslint-config) enforces this and auto-fixes a missing `yield*`.
-- Stories must be deterministic. No `Date.now()`, `Math.random()`, or `crypto.randomUUID()`. Yield `askDateNow()` or `askNewGuid()` so logs replay and tests stay stable.
+- Stories must be deterministic. No `Date.now()`, `Math.random()`, or `crypto.randomUUID()`. Yield `askDateNow()` or `askGuidNew()` so logs replay and tests stay stable.
 - Throw with `return yield* askThrowError(...)`, which tells TypeScript that control stops there.
 
 ## Status

@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/web",
   "version": "0.3.0",
-  "description": "",
+  "description": "Browser-side helpers for talking to a quidproquo backend.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -26,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/web"
   },
   "keywords": [],
   "author": "",
@@ -36,9 +45,15 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@qpqjs/core": "0.3.0",
+    "@qpqjs/testing": "0.3.0",
     "@qpqjs/tsconfig": "0.3.0",
-    "@qpqjs/webserver": "0.3.0",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@qpqjs/core": "0.3.0",
+    "@qpqjs/webserver": "0.3.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

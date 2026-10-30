@@ -1,4 +1,3 @@
-export * from './CloudflareDnsDeployEvent';
 export * from './constants';
 export * from './EmailReceivedEvent';
 export * from './EmailSendEvent';

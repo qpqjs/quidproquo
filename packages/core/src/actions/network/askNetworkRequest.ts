@@ -1,6 +1,7 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
-import { createActionRequester } from '../../types/utils/createActionRequester';
-import { HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, NetworkActionType, ResponseType } from './NetworkActionType';
+import { NetworkActionType } from './NetworkActionType';
+import { HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from './types';
 
 // Named because the processor layer (executeNetworkRequest) and the web-react hooks
 // build and consume this payload directly, without going through the requester.
@@ -36,11 +37,13 @@ export const askNetworkRequestBase = createActionRequester<HTTPNetworkResponse<u
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askNetworkRequest<T, R>(
+function* askNetworkRequestTyped<TResult, TPayload = unknown>(
   method: HTTPMethod,
   url: string,
-
-  httpRequestOptions?: HTTPRequestOptions<T>,
-): AskResponse<HTTPNetworkResponse<R>> {
-  return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<R>;
+  httpRequestOptions?: HTTPRequestOptions<TPayload>,
+): AskResponse<HTTPNetworkResponse<TResult>> {
+  return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<TResult>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askNetworkRequest = Object.assign(askNetworkRequestTyped, { errorType: askNetworkRequestBase.errorType });

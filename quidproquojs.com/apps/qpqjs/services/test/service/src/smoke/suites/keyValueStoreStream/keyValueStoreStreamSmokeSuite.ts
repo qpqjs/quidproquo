@@ -5,7 +5,5 @@ import { askRunKeyValueStoreStreamTest } from './logic/askRunKeyValueStoreStream
 /** A scoped store's change stream, as its handler sees it. */
 export const keyValueStoreStreamSmokeSuite: SmokeSuite = {
   defineConfig: defineKeyValueStoreStreamSmoke,
-  tests: [
-    { name: 'keyValueStoreStream', askRun: askRunKeyValueStoreStreamTest },
-  ],
+  tests: [{ name: 'keyValueStoreStream', askRun: askRunKeyValueStoreStreamTest }],
 };

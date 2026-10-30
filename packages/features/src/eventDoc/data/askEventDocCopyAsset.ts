@@ -1,7 +1,7 @@
-import { askFileCopy, askNewGuid, AskResponse } from '@qpqjs/core';
+import { askFileCopy, askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocAssetRef } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { eventDocAssetPath } from './eventDocAssetPath';
@@ -20,9 +20,9 @@ export function* askEventDocCopyAsset(
   targetDocId: string,
   targetFilename?: string,
 ): AskResponse<EventDocAssetRef> {
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
-  const guid = yield* askNewGuid();
+  const guid = yield* askGuidNew();
 
   yield* askFileCopy(
     eventDocStorageDriveName(sourceStoreName),

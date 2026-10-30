@@ -20,7 +20,7 @@ export const useFieldBinding = <TState, V, E = any>(
 
   useEffect(() => {
     // React bails out when the value is unchanged, so no equality guard is
-    // needed — and local edits (which also change `value`) don't re-run this.
+    // needed, and local edits (which also change `value`) don't re-run this.
     setValue(computedValue);
   }, [computedValue]);
 

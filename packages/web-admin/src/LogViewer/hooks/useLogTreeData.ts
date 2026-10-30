@@ -58,7 +58,6 @@ export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = 
   // still only re-running when a correlation id appears or disappears.
   const fetchTreeData = useEffectCallback(async () => {
     setIsLoading(true);
-    console.log('correlationId: ', correlationId);
     const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, false, accessToken);
 
     if (logHierarchy) {

@@ -35,7 +35,7 @@ const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: Resolved
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   // Get apis
-  const apiConfigs = qpqWebServerUtils.getApiConfigs(qpqConfig);
+  const apiConfigs = qpqWebServerUtils.getAllApiConfigs(qpqConfig);
 
   const apiDomains = apiConfigs.map((apiConfig) => ({
     apiName: apiConfig.apiName,
@@ -126,10 +126,10 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
   app.post('/admin/service/log/execute', async (req, res) => {
     allowAnyOrigin(res);
 
-    // TODO: Get list of services from config dynamically
+    // TODO: @joe-coady: Get list of services from config dynamically
     const serviceLog: StoryResult<any> = req.body;
 
-    let runtimeModule = serviceLog.qpqFunctionRuntimeInfo
+    const runtimeModule = serviceLog.qpqFunctionRuntimeInfo
       ? await devServerConfig.dynamicModuleLoader(serviceLog.moduleName, serviceLog.qpqFunctionRuntimeInfo)
       : askProcessEvent;
 
@@ -205,7 +205,7 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
         }
       }
     } else if (rootRoute && req.method === 'GET' && req.accepts('html')) {
-      // SPA fallback — client-side routes resolve to the root entry's index.
+      // SPA fallback: client-side routes resolve to the root entry's index.
       res.sendFile(path.resolve(rootRoute.dir, rootRoute.route.webEntry.indexRoot));
     } else {
       console.log(`NotFound::[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);

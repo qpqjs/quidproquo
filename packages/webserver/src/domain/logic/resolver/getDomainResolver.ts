@@ -1,6 +1,6 @@
 import { QPQConfig } from '@qpqjs/core';
 
-import { getPrimaryRootDomain } from '../../../configUtils/dns/getPrimaryRootDomain';
+import { getPrimaryRootDomain } from '../../../config/settings/dns/logic/getPrimaryRootDomain';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
 import { defaultDomainResolver } from '../../resolvers/defaultDomainResolver';
 import { localhostDomainResolver } from '../../resolvers/localhostDomainResolver';

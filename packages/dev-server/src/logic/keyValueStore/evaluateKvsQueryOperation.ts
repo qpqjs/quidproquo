@@ -18,7 +18,8 @@ const getConditionValue = (item: any, key: string, storeConfig: KeyValueStoreQPQ
     return item[storeConfig.partitionKey.key];
   }
   if (key === 'sk') {
-    return storeConfig.sortKeys.length > 0 ? item[storeConfig.sortKeys[0].key] : undefined;
+    const sortKey = storeConfig.sortKeys[0];
+    return sortKey ? item[sortKey.key] : undefined;
   }
   return getNestedValue(item, key.split('.'));
 };

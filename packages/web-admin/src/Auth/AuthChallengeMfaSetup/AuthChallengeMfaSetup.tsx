@@ -8,17 +8,19 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
-import { AuthState } from '../logic';
-import { authChallengeMfaSetupInitalState, authChallengeMfaSetupLogic, authChallengeMfaSetupReducer } from './logic';
+import { AuthState } from '../types/AuthState';
+import { createInitialAuthChallengeMfaSetupState } from './logic/createInitialAuthChallengeMfaSetupState';
+import { authChallengeMfaSetupReducer } from './authChallengeMfaSetupReducer';
+import { frontendAuthChallengeMfaSetupApi } from './frontendAuthChallengeMfaSetupApi';
 
-interface AuthChallengeMfaSetupProps {
+type AuthChallengeMfaSetupProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeMfaSetup',
-  api: authChallengeMfaSetupLogic,
-  initialState: authChallengeMfaSetupInitalState,
+  api: frontendAuthChallengeMfaSetupApi,
+  initialState: createInitialAuthChallengeMfaSetupState(),
   reducer: authChallengeMfaSetupReducer,
 });
 

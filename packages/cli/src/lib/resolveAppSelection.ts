@@ -12,6 +12,10 @@
 import { getArgValue } from './args';
 import { getAvailableApps } from './discovery';
 import { promptSelect } from './prompts';
+import { CliError } from './CliError';
+import { createOutput } from './out';
+
+const out = createOutput('resolve-app-selection');
 
 export type ResolveAppOptions = {
   argv: string[];
@@ -22,21 +26,27 @@ export type ResolveAppOptions = {
 };
 
 const exitWithAppList = (requested: string | undefined, availableApps: string[]): never => {
-  if (requested) console.error(`Unknown app '${requested}'.`);
-  console.error(`Valid apps: ${availableApps.join(', ')}`);
-  console.error(`Pass one with --app <name> (e.g. qpq <command> --app ${availableApps[0]}).`);
-  process.exit(1);
+  throw new CliError(
+    [
+      ...(requested ? [`Unknown app '${requested}'.`] : []),
+      `Valid apps: ${availableApps.join(', ')}`,
+      `Pass one with --app <name> (e.g. qpq <command> --app ${availableApps[0]}).`,
+    ].join('\n'),
+  );
 };
+
+// The app a caller named, from the sources above the auto-select and the prompt (--app, the npm
+// config flag, the command's env var); undefined when none did.
+export const getRequestedAppName = (argv: string[], envVar?: string): string | undefined =>
+  getArgValue(argv, '--app') || process.env.npm_config_app || (envVar ? process.env[envVar] : undefined);
 
 export const resolveAppSelection = async (options: ResolveAppOptions): Promise<string> => {
   const availableApps = getAvailableApps();
   if (availableApps.length === 0) {
-    console.error('No apps found under apps/.');
-    process.exit(1);
+    throw new CliError('No apps found under apps/.');
   }
 
-  const requested =
-    getArgValue(options.argv, '--app') || process.env.npm_config_app || (options.envVar ? process.env[options.envVar] : undefined);
+  const requested = getRequestedAppName(options.argv, options.envVar);
 
   if (requested) {
     if (options.allowAll && requested === 'all') return 'all';
@@ -44,9 +54,10 @@ export const resolveAppSelection = async (options: ResolveAppOptions): Promise<s
     return requested;
   }
 
-  if (availableApps.length === 1) {
-    console.log(`Using app: ${availableApps[0]}`);
-    return availableApps[0];
+  const [onlyApp] = availableApps;
+  if (availableApps.length === 1 && onlyApp !== undefined) {
+    out.log(`Using app: ${onlyApp}`);
+    return onlyApp;
   }
 
   if (process.stdin.isTTY) {

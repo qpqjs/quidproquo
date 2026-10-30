@@ -1,20 +1,20 @@
-import { buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
 import { getObjectStorageClass } from '../../../logic/s3/getObjectStorageClass';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('../../../logic/s3/getObjectStorageClass', () => ({ getObjectStorageClass: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
-  const processor = (await getFileIsColdStorageActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.IsColdStorage];
-  return invokeProcessor(processor, payload);
+  const processor = (
+    await getFileIsColdStorageActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.IsColdStorage];
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileIsColdStorage', () => {

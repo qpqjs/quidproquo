@@ -1,4 +1,4 @@
-import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
 import { EventInput, InternalEventRecord } from './types';
 

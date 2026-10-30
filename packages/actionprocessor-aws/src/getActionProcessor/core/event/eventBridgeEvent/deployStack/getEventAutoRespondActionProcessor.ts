@@ -4,19 +4,17 @@ import {
   createActionProcessor,
   DeployEventStatusType,
   DeployEventType,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { InternalEventOutput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord } from './types';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
-  return async ({ qpqEventRecord: rawQpqEventRecord, matchResult: rawMatchResult }) => {
+  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
-    const matchResult = rawMatchResult as MatchResult;
 
     // exit if we don't know what deploy type this is, probably another stack
     const earlyExit =

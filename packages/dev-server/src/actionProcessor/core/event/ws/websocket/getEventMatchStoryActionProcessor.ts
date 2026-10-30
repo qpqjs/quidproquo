@@ -1,16 +1,7 @@
-import {
-  actionResult,
-  actionResultError,
-  askEventMatchStoryBase,
-  createActionProcessor,
-  ErrorTypeEnum,
-  EventActionType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, askEventMatchStoryBase, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils, WebSocketEventType } from '@qpqjs/webserver';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord: rawQpqEventRecord, eventParams }) => {
@@ -18,7 +9,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
 
-    const webSocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(qpqEventRecord.apiName, qpqConfig);
+    const webSocketConfig = qpqWebServerUtils.resolveWebsocketOrThrow(qpqEventRecord.apiName, qpqConfig);
 
     switch (qpqEventRecord.eventType) {
       case WebSocketEventType.Connect:

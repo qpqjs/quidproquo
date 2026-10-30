@@ -1,10 +1,10 @@
-import { askDelay, AskResponse, askStateRead } from '@qpqjs/core';
+import { askPlatformDelay, AskResponse, askStateRead } from '@qpqjs/core';
 
 import { askApplySessionEvent } from '../../actions/askApplySessionEvent';
-import { AdminAppState } from '../../AdminAppState';
 import { sessionDrainTiming } from '../../constants/sessionDrainTiming';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
-import { SessionEndedData } from '../../effects/session/SessionEndedEvent';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
+import { AdminSessionEndedData } from '../../effects/session/AdminSessionEndedEffect';
+import { AdminAppState } from '../../types/AdminAppState';
 import { SessionEndReason } from '../../types/SessionEndReason';
 import { selectSessionState } from '../selectors/selectSessionState';
 
@@ -17,7 +17,7 @@ export function* askEndSession(): AskResponse<void> {
     return;
   }
 
-  yield* askApplySessionEvent<SessionEndedData>(AdminSessionEventType.sessionEnded, { reason: SessionEndReason.logout });
+  yield* askApplySessionEvent<AdminSessionEndedData>(AdminSessionEffect.SessionEnded, { reason: SessionEndReason.logout });
 
   for (let poll = 0; poll < sessionDrainTiming.maxPolls; poll++) {
     const { sessionLog } = yield* askStateRead<AdminAppState>('');
@@ -26,6 +26,6 @@ export function* askEndSession(): AskResponse<void> {
       return;
     }
 
-    yield* askDelay(sessionDrainTiming.pollMs);
+    yield* askPlatformDelay(sessionDrainTiming.pollMs);
   }
 }

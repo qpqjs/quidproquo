@@ -12,15 +12,15 @@ export enum EventBusQuickSubscriptionType {
  * an alert channel. `email` sends an email; `url` POSTs to an incident-tool
  * webhook (PagerDuty / Slack / OpsGenie), http/https auto-detected.
  *
- * This is an AWS-specific convenience — direct email/webhook delivery is an SNS
- * feature, not a portable event-bus concept — hence it lives in config-aws and
+ * This is an AWS-specific convenience, direct email/webhook delivery is an SNS
+ * feature, not a portable event-bus concept, hence it lives in config-aws and
  * not on core's platform-agnostic `defineEventBus`. For rich, in-band handling
  * use the normal bus -> queue -> function pattern instead.
  */
 export type EventBusQuickSubscription =
   { type: EventBusQuickSubscriptionType.email; email: string } | { type: EventBusQuickSubscriptionType.url; url: string };
 
-export interface QPQConfigAdvancedEventBusQuickSubscriptionSettings extends QPQConfigAdvancedSettings {
+export type QPQConfigAdvancedEventBusQuickSubscriptionSettings = {
   /**
    * The module that owns the target bus, when it lives in another service (mirror
    * the `owner` you pass to `defineEventBus`). The subscription then binds only to
@@ -28,15 +28,15 @@ export interface QPQConfigAdvancedEventBusQuickSubscriptionSettings extends QPQC
    * won't accidentally pick it up. Omit for a bus owned by this service.
    */
   owner?: CrossModuleOwner<'eventBusName'>;
-}
+} & QPQConfigAdvancedSettings;
 
-export interface EventBusQuickSubscriptionQPQConfigSetting extends QPQConfigSetting {
+export type EventBusQuickSubscriptionQPQConfigSetting = {
   eventBusName: string;
 
   subscriptions: EventBusQuickSubscription[];
 
   owner?: CrossModuleOwner;
-}
+} & QPQConfigSetting;
 
 /**
  * Attach direct SNS subscribers (email / incident-tool webhook) to an event bus

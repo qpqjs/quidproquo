@@ -1,4 +1,5 @@
-import { ContextActionType, ErrorTypeEnum, FileActionType, runStory, StoryError } from '@qpqjs/core';
+import { ContextActionType, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +23,7 @@ const expectErrorType = (run: () => unknown, errorType: ErrorTypeEnum) => {
 describe('askEventDocAiAttachmentsValidate', () => {
   it.each(['../other-doc/assets/x', '/etc/passwd', 'a/b', 'a.b', '', 'x\u0000y', 'id?x=1'])(
     'refuses the asset id %j before touching the drive',
-    (assetId) => {
+    (assetId: any) => {
       const exists = vi.fn(() => true);
 
       expectErrorType(

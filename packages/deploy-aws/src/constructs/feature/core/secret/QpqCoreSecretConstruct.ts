@@ -1,44 +1,27 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils, SecretQPQConfigSetting } from '@qpqjs/core';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { QPQConfig, SecretQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 import { QpqResource } from '../../../base/QpqResource';
 
-export interface QpqCoreSecretConstructProps extends QpqConstructBlockProps {
+export type QpqCoreSecretConstructProps = {
   secretConfig: SecretQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
-export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock implements QpqResource {
-  abstract secret: aws_secretsmanager.ISecret;
-
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.secret.grantRead(grantee);
-  }
-
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.secret.grantWrite(grantee);
-  }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
-}
-
-export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
-  secret: aws_secretsmanager.ISecret;
+export class QpqCoreSecretConstruct extends QpqReadWriteResourceConstructBase<aws_secretsmanager.ISecret> {
+  resource: aws_secretsmanager.ISecret;
 
   static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, secretConfig: SecretQPQConfigSetting): QpqResource {
-    const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
+    const secretName = awsNamingUtils.resolveOwnedResourceName(secretConfig.key, qpqConfig, secretConfig.owner);
 
-    class Import extends QpqCoreSecretConstructBase {
-      secret = aws_secretsmanager.Secret.fromSecretNameV2(scope, `${id}-${secretConfig.uniqueKey}`, secretName);
+    class Import extends QpqReadWriteResourceConstructBase<aws_secretsmanager.ISecret> {
+      resource = aws_secretsmanager.Secret.fromSecretNameV2(scope, `${id}-${secretConfig.uniqueKey}`, secretName);
     }
 
     return new Import(scope, id, { qpqConfig });
@@ -47,50 +30,33 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {
     super(scope, id, props);
 
-    this.secret = new aws_secretsmanager.Secret(this, 'secret', {
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
+    this.resource = new aws_secretsmanager.Secret(this, 'secret', {
       secretName: this.resourceName(props.secretConfig.key),
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Secret values are data too: retained unless the data-store removal policy says destroy.
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
       description: props.secretConfig.key,
     });
 
-    qpqDeployAwsUtils.applyEnvironmentTags(this.secret, props.qpqConfig);
+    qpqDeployAwsUtils.applyEnvironmentTags(this.resource, props.qpqConfig);
   }
 
   public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, secretConfigs: SecretQPQConfigSetting[], qpqConfig: QPQConfig) {
-    const secretActions = ['secretsmanager:GetSecretValue'];
+    const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
 
-    // Owned secrets are granted as a single tag-conditioned statement instead of one
-    // ARN per secret: applyEnvironmentTags stamps every owned secret, so the policy
-    // stays a fixed size no matter how many secrets the service declares.
-    const { awsRegion: ownRegion, awsAccountId: ownAccountId } = resolveAwsServiceAccountInfo(qpqConfig);
+    qpqDeployAwsUtils.grantOwnedAndForeignResources(scope, role, qpqConfig, {
+      idPrefix: 'webserverSecretAccess',
+      actions: ['secretsmanager:GetSecretValue'],
+      // applyEnvironmentTags stamps every owned secret.
+      ownedResourceArns: [`arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:*`],
+      ownedByTag: true,
+      foreignArns: qpqDeployAwsUtils.getForeignConfigs(secretConfigs, qpqConfig).map((secretConfig) => {
+        const owner = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
+        const secretName = awsNamingUtils.resolveOwnedResourceName(secretConfig.key, qpqConfig, secretConfig.owner);
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: secretActions,
-        resources: [`arn:aws:secretsmanager:${ownRegion}:${ownAccountId}:secret:*`],
-        conditions: {
-          StringEquals: qpqDeployAwsUtils.getOwnedResourceTagConditions(qpqConfig),
-        },
+        return `arn:aws:secretsmanager:${owner.awsRegion}:${owner.awsAccountId}:secret:${secretName}-*`;
       }),
-    );
-
-    // Cross-service secrets stay as exact ARNs on purpose: this short list is
-    // the part of the policy a human should be reviewing.
-    const ownedConfigs = qpqCoreUtils.getOwnedItems(secretConfigs, qpqConfig);
-    const foreignConfigs = secretConfigs.filter((cfg) => !ownedConfigs.includes(cfg));
-
-    const foreignArns = foreignConfigs.map((secretConfig) => {
-      const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
-
-      const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
-
-      return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
     });
-
-    if (foreignArns.length > 0) {
-      // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-      qpqDeployAwsUtils.attachManagedResourcePolicies(scope, role, 'webserverSecretAccess', secretActions, foreignArns);
-    }
   }
 }

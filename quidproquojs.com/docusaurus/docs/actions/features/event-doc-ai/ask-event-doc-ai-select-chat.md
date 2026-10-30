@@ -9,7 +9,7 @@ Client-side story that makes a chat active and loads its history. It immediately
 
 One of the four client stories exposed as `sharedEventDocAiApi`.
 
-- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatHistoryRequest](./ask-event-doc-ai-chat-requests.md), and the `askUIEventDocAiSetActiveChat` / `askUIEventDocAiSetMessages` / `askUIEventDocAiClearStream` / `askUIEventDocAiSetLoadingHistory` / `askUIEventDocAiSetError` UI actions.
+- Built from [askCatch](../../core/system/ask-catch.md), [askEventDocAiChatHistoryRequest](./ask-event-doc-ai-chat-requests.md), and the `askEventDocAiSetActiveChat` / `askEventDocAiSetMessages` / `askEventDocAiClearStream` / `askEventDocAiSetLoadingHistory` / `askEventDocAiSetError` UI actions.
 
 ```typescript
 import { askEventDocAiSelectChat } from '@qpqjs/features';
@@ -33,7 +33,7 @@ function* askEventDocAiSelectChat(chatId: string): AskResponse<void>;
 
 ## Returns
 
-`void`. On success the chat's messages are dispatched via `askUIEventDocAiSetMessages`; on failure the error text is dispatched via `askUIEventDocAiSetError`. The loading flag is cleared either way.
+`void`. On success the chat's messages are dispatched via `askEventDocAiSetMessages`; on failure the error text is dispatched via `askEventDocAiSetError`. The loading flag is cleared either way.
 
 ## Related
 

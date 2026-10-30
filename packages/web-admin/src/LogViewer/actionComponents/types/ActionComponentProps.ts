@@ -1,4 +1,4 @@
-import { Action, ActionHistory, ActionProcessorResult } from '@qpqjs/core';
+import { Action, ActionProcessorResult } from '@qpqjs/core';
 
 import { FC } from 'react';
 

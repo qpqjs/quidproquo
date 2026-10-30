@@ -1,0 +1,44 @@
+import { askDateNow, askPlatformDelay, AskResponse, askSecondsElapsedFrom, askStateRead, AuthenticateUserResponse } from '@qpqjs/core';
+
+import { askPlatformRequest, askSaveAuthToken } from '../../platformLogic';
+import { askAuthSetAuthInfo } from '../actionCreators/askAuthSetAuthInfo';
+import { AuthRefreshTokenPayload } from '../types/AuthRefreshTokenPayload';
+import { AuthState } from '../types/AuthState';
+
+export function* askRunRefreshTokensLoop(): AskResponse<void> {
+  while (true) {
+    const { authenticateUserResponse } = yield* askStateRead<AuthState>('');
+
+    if (
+      authenticateUserResponse?.authenticationInfo &&
+      authenticateUserResponse?.authenticationInfo.refreshToken &&
+      authenticateUserResponse?.authenticationInfo.expiresAt
+    ) {
+      const now = yield* askDateNow();
+      const timeToExpire = (yield* askSecondsElapsedFrom(now, authenticateUserResponse?.authenticationInfo.expiresAt)) * 1000;
+
+      // Refresh the token 10 minutes before it expires to ensure there's a buffer
+      const bufferTime = 10 * 60 * 1000;
+      const refreshTime = timeToExpire - bufferTime;
+
+      if (refreshTime > 0) {
+        yield* askPlatformDelay(refreshTime);
+      }
+
+      const response = yield* askPlatformRequest<AuthenticateUserResponse, AuthRefreshTokenPayload>('POST', '/refreshToken', {
+        body: {
+          refreshToken: authenticateUserResponse.authenticationInfo?.refreshToken,
+        },
+      });
+
+      if (response.status < 200 || response.status >= 300) {
+        continue;
+      }
+
+      yield* askSaveAuthToken(response.data);
+      yield* askAuthSetAuthInfo(response.data);
+    }
+
+    yield* askPlatformDelay(10000);
+  }
+}

@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -8,10 +8,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
@@ -21,9 +20,9 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
   return async ({ username, userDirectoryName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
@@ -33,6 +32,7 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         // An unknown account must look like a known one (the pool client prevents existence errors; this
         // covers the exception if it still arrives), so the caller cannot enumerate emails.
         UserNotFoundException: () =>

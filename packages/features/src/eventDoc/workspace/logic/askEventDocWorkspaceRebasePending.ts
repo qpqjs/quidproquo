@@ -1,7 +1,7 @@
 import { AskResponse, ErrorTypeEnum } from '@qpqjs/core';
 
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
-import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
+import { askEventDocWorkspaceSetError } from '../actionCreators/askEventDocWorkspaceSetError';
+import { askEventDocWorkspaceSetPendingEvents } from '../actionCreators/askEventDocWorkspaceSetPendingEvents';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
@@ -32,9 +32,9 @@ export function* askEventDocWorkspaceRebasePending(slots: EventDocWorkspaceSlotF
     return;
   }
 
-  yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, kept);
-  yield* askUIEventDocWorkspaceSetError(slotKey, {
+  yield* askEventDocWorkspaceSetPendingEvents(slotKey, kept);
+  yield* askEventDocWorkspaceSetError(slotKey, {
     operation: EventDocWorkspaceSlotOperation.rebase,
-    error: { errorType: ErrorTypeEnum.Invalid, errorText: describeDrop(dropped.length, dropped[0].reason) },
+    error: { errorType: ErrorTypeEnum.Invalid, errorText: describeDrop(dropped.length, dropped[0]?.reason ?? 'unknown') },
   });
 }

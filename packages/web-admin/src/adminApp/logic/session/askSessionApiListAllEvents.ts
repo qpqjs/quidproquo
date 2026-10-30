@@ -1,24 +1,16 @@
-import { AskResponse, QpqPagedData } from '@qpqjs/core';
+import { askPagedDataDrain, AskResponse, QpqPagedData } from '@qpqjs/core';
 import { EventDocEvent } from '@qpqjs/features';
 
 import { adminSessionApiBasePath } from '../../constants/adminSessionApiBasePath';
 import { askSessionApiRequestOrThrow } from './askSessionApiRequestOrThrow';
 
-// GET /v1/admin/session/{id}/events — the full ordered log (paged).
+// GET /v1/admin/session/{id}/events, the full ordered log (paged).
 export function* askSessionApiListAllEvents(docId: string): AskResponse<EventDocEvent[]> {
-  const events: EventDocEvent[] = [];
-  let nextPageKey: string | undefined = undefined;
-
-  do {
+  const { items } = yield* askPagedDataDrain(function* askEventsPage(nextPageKey) {
     const query = nextPageKey ? `?nextPageKey=${encodeURIComponent(nextPageKey)}` : '';
-    const page: QpqPagedData<EventDocEvent> = yield* askSessionApiRequestOrThrow<undefined, QpqPagedData<EventDocEvent>>(
-      'GET',
-      `${adminSessionApiBasePath}/${docId}/events${query}`,
-    );
 
-    events.push(...page.items);
-    nextPageKey = page.nextPageKey;
-  } while (nextPageKey);
+    return yield* askSessionApiRequestOrThrow<QpqPagedData<EventDocEvent>, undefined>('GET', `${adminSessionApiBasePath}/${docId}/events${query}`);
+  });
 
-  return events;
+  return items;
 }

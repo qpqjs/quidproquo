@@ -9,7 +9,7 @@ const getProcessLogCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogCr
       console.log(`${logLevel}: ${msg}`);
     }
 
-    return actionResult(void 0);
+    return actionResult(undefined);
   };
 };
 

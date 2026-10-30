@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askConfigGetParameter, buildTestQpqConfig, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { askConfigGetParameter, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getParameter } from '../../../logic/parametersManager/getParameter';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigGetParameterActionProcessor } from './getConfigGetParameterActionProcessor';
 
 vi.mock('../../../logic/parametersManager/getParameter', () => ({
@@ -27,7 +27,7 @@ describe('getConfigGetParameterActionProcessor', () => {
     vi.mocked(getParameter).mockResolvedValue('value');
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterName: 'flag' });
+    const result = await invokeProcessor(processor!, { parameterName: 'flag' });
 
     expect(result).toEqual(['value']);
     expect(getParameter).toHaveBeenCalledWith('flag-test-app-test-module-development', 'eu-west-1');
@@ -37,16 +37,16 @@ describe('getConfigGetParameterActionProcessor', () => {
     vi.mocked(getParameter).mockRejectedValue(Object.assign(new Error('rate'), { name: 'ThrottlingException' }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterName: 'flag' });
+    const [, error] = await invokeProcessor(processor!, { parameterName: 'flag' });
 
-    expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttling);
+    expect(error?.errorType).toBe(askConfigGetParameter.errorType.Throttled);
   });
 
   // Security regression: a story can only read parameters its config declares; an undeclared name never reaches SSM.
   it('refuses an undeclared parameter before touching SSM', async () => {
     const processor = await resolveProcessor();
 
-    await expect(invokeProcessor(processor, { parameterName: '/aws/reference/secretsmanager/other-app-secret' })).rejects.toThrow('not found');
+    await expect(invokeProcessor(processor!, { parameterName: '/aws/reference/secretsmanager/other-app-secret' })).rejects.toThrow('not found');
     expect(getParameter).not.toHaveBeenCalled();
   });
 });

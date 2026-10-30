@@ -1,8 +1,17 @@
-import { actionResult, actionResultError, askAiPromptStream, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  askAiPromptStream,
+  createActionProcessor,
+  ErrorTypeEnum,
+  generateUuid,
+  ProcessorFor,
+  QPQConfig,
+} from '@qpqjs/core';
 
 import { streamText } from 'ai';
 
-import { randomGuid } from '../../../awsLambdaUtils';
+import { BedrockCacheSettings } from './types';
 import {
   buildAiPromptInput,
   buildAiStopConditions,
@@ -15,14 +24,13 @@ import {
   toBedrockReasoningOptions,
   toCacheableSystem,
   toErrorMessage,
-} from './logic';
-import { BedrockCacheSettings } from './types';
+} from './utils';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPromptStream> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
     if ('error' in prepared) {
-      return actionResultError(prepared.error.type, prepared.error.message);
+      return actionResultError(askAiPromptStream.errorType[prepared.error.kind], prepared.error.message);
     }
 
     try {
@@ -51,7 +59,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         },
       });
 
-      const streamId = `ai-prompt-${Date.now()}-${randomGuid()}`;
+      const streamId = `ai-prompt-${Date.now()}-${generateUuid()}`;
 
       async function* aiStreamIterator(): AsyncIterableIterator<string> {
         for await (const part of stream) {

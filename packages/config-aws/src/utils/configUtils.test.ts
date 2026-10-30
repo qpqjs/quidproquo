@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, defineStorageDrive } from '@qpqjs/core';
+import { defineKeyValueStore } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -12,7 +13,7 @@ import {
   defineAwsAlarm,
 } from '../config/settings/awsAlarm';
 import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
-import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
+import { defineAwsDynamoOverrideForKvs } from '../config/settings/awsDynamoOverrideForKvs';
 import { defineAwsServiceDashboard } from '../config/settings/awsServiceDashboard';
 import { defineAwsVirtualNetworkSettings } from '../config/settings/awsVirtualNetworkSettings';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
@@ -38,7 +39,7 @@ import {
   getCloudWatchLogRetentionDays,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
-  getDynamoTableNameOverrride,
+  getDynamoTableNameOverride,
   getLayerProvidedModules,
   getLocalServiceAccountInfo,
   getOwnedAwsAlarmConfigs,
@@ -382,23 +383,23 @@ describe('getDomainCertificateArnSsmParameterName', () => {
   });
 });
 
-describe('getDynamoTableNameOverrride', () => {
+describe('getDynamoTableNameOverride', () => {
   it('returns the override table name when the kvs resource matches', () => {
     const config = buildTestQpqConfig([
       defineKeyValueStore('users', 'id'),
-      defineAwsDyanmoOverrideForKvs(
+      defineAwsDynamoOverrideForKvs(
         'override',
         { keyValueStoreName: 'users', module: 'test-module', application: 'test-app', environment: 'development', feature: '' },
         'users-table',
       ),
     ]);
 
-    expect(getDynamoTableNameOverrride('users', config)).toBe('users-table');
+    expect(getDynamoTableNameOverride('users', config)).toBe('users-table');
   });
 
   it('returns an empty string when no override matches', () => {
     const config = buildTestQpqConfig([defineKeyValueStore('users', 'id')]);
 
-    expect(getDynamoTableNameOverrride('users', config)).toBe('');
+    expect(getDynamoTableNameOverride('users', config)).toBe('');
   });
 });

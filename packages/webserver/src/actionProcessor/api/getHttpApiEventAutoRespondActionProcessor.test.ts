@@ -1,15 +1,5 @@
-import {
-  actionResult,
-  actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStreamRegistry,
-  createStubLogger,
-  ErrorTypeEnum,
-  EventActionType,
-  noopDynamicModuleLoader,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, createStreamRegistry, ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -39,7 +29,7 @@ const invoke = async (
   const map = await getHttpApiEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader);
   const processor = map[EventActionType.AutoRespond];
 
-  return processor(
+  return processor!(
     { qpqEventRecord, matchResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
     buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),

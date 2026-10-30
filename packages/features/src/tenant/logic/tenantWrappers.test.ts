@@ -1,4 +1,5 @@
-import { ContextActionType, FileActionType, KeyValueStoreActionType, runStory } from '@qpqjs/core';
+import { ContextActionType, FileActionType, KeyValueStoreActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

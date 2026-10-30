@@ -10,7 +10,7 @@ export function* askEventDocWorkspaceApiAppendEvent(
   identity: EventDocWorkspaceDocumentIdentity,
   input: EventDocEventInput,
 ): AskResponse<EventDocEvent> {
-  const response = yield* askApiRequest<EventDocEventInput, EventDocEvent>(identity.serviceName, 'POST', eventDocWorkspaceEventsEndpoint(identity), {
+  const response = yield* askApiRequest<EventDocEvent, EventDocEventInput>(identity.serviceName, 'POST', eventDocWorkspaceEventsEndpoint(identity), {
     body: input,
   });
 

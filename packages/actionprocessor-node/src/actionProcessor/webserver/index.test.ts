@@ -1,8 +1,8 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getWebserverActionProcessor } from './index';
+import { getWebserverActionProcessor } from './getWebserverActionProcessor';
 
 describe('getWebserverActionProcessor', () => {
   it('exposes the shared js webserver processors', async () => {

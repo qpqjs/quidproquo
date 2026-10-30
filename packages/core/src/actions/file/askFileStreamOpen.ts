@@ -1,6 +1,6 @@
+import { createActionRequester } from '../../logic/actions/createActionRequester';
 import { AskResponse } from '../../types/StorySession';
 import { StreamEncoding, StreamHandle } from '../../types/StreamRegistry';
-import { createActionRequester } from '../../types/utils/createActionRequester';
 import { FileActionType } from './FileActionType';
 
 export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
@@ -9,6 +9,7 @@ export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
     'InvalidStorageClass', // object is in cold storage and cannot be streamed directly
     'FileNotFound', // no object exists at the given filepath
     'InvalidScope', // scope is not a valid single path segment
+    'NoContent', // the storage answered without a body to stream
   ],
   getPayload: (drive: string, filepath: string, encoding: StreamEncoding = 'text', chunkSize?: number, scope?: string) => ({
     drive,
@@ -21,12 +22,15 @@ export const askFileStreamOpenBase = createActionRequester<StreamHandle>()({
 
 // The handle is tagged with the encoding the caller asked for, so reads come back as
 // text or binary chunks without a cast at every call site.
-export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
+function* askFileStreamOpenTyped<E extends StreamEncoding = 'text'>(
   drive: string,
   filepath: string,
-  encoding: E = 'text' as E,
+  encoding?: E,
   chunkSize?: number,
   scope?: string,
 ): AskResponse<StreamHandle<E>> {
   return (yield* askFileStreamOpenBase(drive, filepath, encoding, chunkSize, scope)) as StreamHandle<E>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askFileStreamOpen = Object.assign(askFileStreamOpenTyped, { errorType: askFileStreamOpenBase.errorType });

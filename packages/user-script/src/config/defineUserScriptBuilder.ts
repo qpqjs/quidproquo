@@ -8,6 +8,6 @@ import { ActionProcessorsQPQConfigSetting, defineActionProcessors } from '@qpqjs
 export const defineUserScriptBuilder = (): ActionProcessorsQPQConfigSetting =>
   defineActionProcessors({
     basePath: __dirname,
-    relativePath: '../actionProcessor/getUserScriptBuildActionProcessors',
-    functionName: 'getUserScriptBuildActionProcessors',
+    relativePath: '../actionProcessor/getUserScriptBuilderActionProcessor',
+    functionName: 'getUserScriptBuilderActionProcessor',
   });

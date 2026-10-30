@@ -8,9 +8,9 @@ import { domainScopedId, lookupHostedZone, resolveHostedZoneForHost } from '../.
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { resolveEmailReceivingHosts } from './resolveEmailReceivingHosts';
 
-export interface QpqBootstrapEmailReceivingDomainConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapEmailReceivingDomainConstructProps = {
   emailReceivingDomainConfig: EmailReceivingDomainQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // Per root: the receiving host as a verified SES identity (DKIM CNAMEs in its zone) and the
 // MX record that routes its mail to SES in the deploy region. The identity is the host

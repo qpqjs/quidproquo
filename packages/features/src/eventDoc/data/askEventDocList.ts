@@ -1,6 +1,6 @@
 import { askKeyValueStoreQueryAll, AskResponse, kvsEqual } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocSummary } from '../models';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
@@ -10,7 +10,7 @@ export type EventDocListOptions = {
 
 /** Every summary row in the collection, newest first, read and sorted in memory. Prefer askEventDocListPage for large collections. */
 export function* askEventDocList<T extends EventDocSummary = EventDocSummary>(options?: EventDocListOptions): AskResponse<T[]> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const items = yield* askKeyValueStoreQueryAll<T>(storeName, kvsEqual('type', type), { scope });

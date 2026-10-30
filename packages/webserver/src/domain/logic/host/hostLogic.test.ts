@@ -1,19 +1,12 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { defineApi } from '../../../config/settings/api';
 import { defineDns } from '../../../config/settings/dns';
-import { defineStorageDriveCorsSettings } from '../../../config/settings/storageDriveCorsSettings';
-import { getDnsConfig } from '../../../configUtils/dns/getDnsConfig';
-import { getRootDomains } from '../../../configUtils/dns/getRootDomains';
+import { getDnsConfig } from '../../../config/settings/dns/logic/getDnsConfig';
+import { getRootDomains } from '../../../config/settings/dns/logic/getRootDomains';
 import { defaultDomainResolver } from '../../../domain/resolvers/defaultDomainResolver';
 import { DomainResolver } from '../../../domain/types/DomainResolver';
-import { getStorageDriveCorsAllowedOrigins } from '../origin/getStorageDriveCorsAllowedOrigins';
-import { resolveContentSecurityPolicyEntry } from '../origin/resolveContentSecurityPolicyEntry';
-import { resolveOrigins } from '../origin/resolveOrigins';
-import { resolveServiceScopedCorsAllowedOrigins } from '../origin/resolveServiceScopedCorsAllowedOrigins';
-import { getDomainResolver } from '../resolver/getDomainResolver';
 import { loadDomainResolver } from '../resolver/loadDomainResolver';
 import { findRootDomainForHost } from './findRootDomainForHost';
 import { resolveHostForRequestHost } from './resolveHostForRequestHost';
@@ -66,7 +59,7 @@ describe('resolveHosts', () => {
   // contains or starts with the root (a takeover-shaped host) is refused, as is an empty host.
   it.each(['example.com.evil.com', 'evilexample.com', 'example.com-evil.com', 'example.comm', ''])(
     'rejects the lookalike host %j from a resolver',
-    (host) => {
+    (host: any) => {
       const rogue: DomainResolver = { resolveHost: () => host };
       expect(() => resolveHosts(twoRoots(), {}, rogue)).toThrow('must be the root or end with .example.com');
     },

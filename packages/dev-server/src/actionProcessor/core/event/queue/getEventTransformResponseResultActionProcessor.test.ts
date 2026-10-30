@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../testing/testProcessorRuntime';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
 describe('getEventTransformResponseResultActionProcessor (queue)', () => {
@@ -10,7 +10,7 @@ describe('getEventTransformResponseResultActionProcessor (queue)', () => {
     const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[EventActionType.TransformResponseResult];
 
-    const result = await invokeProcessor(process, { eventParams: [], qpqEventRecordResponses: [] } as any);
+    const result = await invokeProcessor(process!, { eventParams: [], qpqEventRecordResponses: [] } as any);
 
     expect(resolveActionResult(result)).toBeUndefined();
   });

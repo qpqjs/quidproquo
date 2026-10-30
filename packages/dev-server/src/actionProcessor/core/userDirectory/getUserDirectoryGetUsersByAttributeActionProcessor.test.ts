@@ -1,8 +1,9 @@
-import { buildTestQpqConfig, defineUserDirectory, noopDynamicModuleLoader, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
+import { defineUserDirectory, resolveActionResult, UserDirectoryActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getUserDirectoryGetUsersByAttributeActionProcessor } from './getUserDirectoryGetUsersByAttributeActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -11,7 +12,7 @@ const { userStore } = vi.hoisted(() => ({
 
 vi.mock('../../../logic/auth/jsonUserStore', () => userStore);
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const resolvedDirectory = { serviceName: 'test-module', directoryName: 'directory' };
 
 const getProcessor = async () => {
@@ -30,7 +31,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     userStore.findDevUsersByAttribute.mockResolvedValue(users);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', attribueName: 'email', attribueValue: 'joe@example.com' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', attribueName: 'email', attribueValue: 'joe@example.com' });
 
     expect(userStore.findDevUsersByAttribute).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'email', 'joe@example.com');
     expect(resolveActionResult(result)).toEqual({ items: users });
@@ -40,7 +41,7 @@ describe('getUserDirectoryGetUsersByAttributeActionProcessor', () => {
     userStore.findDevUsersByAttribute.mockResolvedValue([{ userId: 'a' }, { userId: 'b' }, { userId: 'c' }]);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, {
+    const result = await invokeProcessor(process!, {
       userDirectoryName: 'directory',
       attribueName: 'emailVerified',
       attribueValue: 'true',

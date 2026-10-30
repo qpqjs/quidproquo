@@ -17,6 +17,14 @@ export type EmailSendEmailActionPayload = {
 
 export const askEmailSendEmail = createActionRequester<string>()({
   actionType: EmailActionType.SendEmail,
-  errorTypes: ['MessageRejected', 'SenderNotVerified', 'AccountSuspended', 'SendingPaused', 'Throttled', 'LimitExceeded', 'BadRequest'],
+  errorTypes: [
+    'MessageRejected', // the mail service refused the message content
+    'SenderNotVerified', // the from address is not verified for sending
+    'AccountSuspended', // the sending account is suspended
+    'SendingPaused', // sending is paused for the account
+    'Throttled', // the mail service is rate limiting sends
+    'LimitExceeded', // a sending quota is exhausted
+    'BadRequest', // the request itself is malformed
+  ],
   getPayload: (payload: EmailSendEmailActionPayload) => payload,
 });

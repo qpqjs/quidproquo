@@ -9,7 +9,7 @@ export enum NetworkRequestErrorCode {
 }
 
 /**
- * Thrown by preformNetworkRequest when no HTTP response came back at all, so callers can
+ * Thrown by performNetworkRequest when no HTTP response came back at all, so callers can
  * tell a client-side failure from a server status by code instead of by error text.
  */
 export class NetworkRequestError extends Error {

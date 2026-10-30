@@ -1,2 +1,2 @@
-export * from './connectionData';
+export * from './connection';
 export * from './subscriptionData';

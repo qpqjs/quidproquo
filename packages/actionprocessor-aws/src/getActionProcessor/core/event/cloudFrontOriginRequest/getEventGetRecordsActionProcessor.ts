@@ -1,13 +1,4 @@
-import {
-  actionResult,
-  askEventGetRecordsBase,
-  createActionProcessor,
-  DynamicModuleLoader,
-  EventActionType,
-  HTTPMethod,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, DynamicModuleLoader, HTTPMethod, ProcessorFor, QPQConfig } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { EventInput, InternalEventRecord } from './types';
@@ -26,7 +17,7 @@ const getProcessGetRecords = async (qpqConfig: QPQConfig, loader: DynamicModuleL
       const headers: Record<string, string> = Object.keys(cfRecordRequest.headers).reduce(
         (acc, header) => ({
           ...acc,
-          [header]: cfRecordRequest.headers[header][0].value,
+          [header]: cfRecordRequest.headers[header]?.[0]?.value ?? '',
         }),
         {},
       );
@@ -41,7 +32,7 @@ const getProcessGetRecords = async (qpqConfig: QPQConfig, loader: DynamicModuleL
         path: cfRecordRequest.uri,
         sourceIp: cfRecordRequest.clientIp,
         headers: headers,
-        // TODO: query string support
+        // TODO: @joe-coady: query string support
         query: {},
       };
 

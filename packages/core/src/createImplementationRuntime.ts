@@ -1,4 +1,5 @@
-import { actionResult, actionResultError } from './logic/actionLogic';
+import { actionResult, actionResultError } from './logic/actionResult';
+import { Nullable } from './types/Nullable';
 import { QPQConfig } from './config';
 import { createNestedRuntime, createRuntime } from './runtime';
 import {
@@ -45,7 +46,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
   qpqConfig: QPQConfig,
   story: AnyStory,
   tag: string,
-  actionProcessorListResolver: ActionProcessorListResolver | null,
+  actionProcessorListResolver: Nullable<ActionProcessorListResolver>,
   getDateNow: () => string,
   getNewGuid: () => string,
 ): T => {

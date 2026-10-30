@@ -1,1 +1,1 @@
-export * from './askCreateBinaryData';
+export * from './askCreateTextQpqBinaryData';

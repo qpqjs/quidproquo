@@ -1,15 +1,15 @@
-import { buildTestQpqConfig, ErrorTypeEnum, EventActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
-import { QPQWebServerConfigSettingType } from '@qpqjs/webserver';
+import { ErrorTypeEnum, EventActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
+import { defineRoute } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../../../testing/testProcessorRuntime';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
 const invoke = async (qpqEventRecordResponses: any) => {
   const processors = await getEventTransformResponseResultActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
   const process = processors[EventActionType.TransformResponseResult];
-  return invokeProcessor(process, { eventParams: [{ headers: {} }], qpqEventRecordResponses } as any);
+  return invokeProcessor(process!, { eventParams: [{ headers: {} }], qpqEventRecordResponses } as any);
 };
 
 describe('getEventTransformResponseResultActionProcessor (express)', () => {
@@ -26,19 +26,12 @@ describe('getEventTransformResponseResultActionProcessor (express)', () => {
 
   it("answers with the matched route's own allowed origin, as its preflight does", async () => {
     const config = buildTestQpqConfig([
-      {
-        configSettingType: QPQWebServerConfigSettingType.Route,
-        uniqueKey: 'POST/signer/session',
-        path: '/signer/session',
-        method: 'POST',
-        runtime: { src: 'handler', runtimeType: 'Function' },
-        options: { allowedOrigins: ['http://localhost:3082'] },
-      } as any,
+      defineRoute('POST', '/signer/session', '/entry/handler::handler', { allowedOrigins: ['http://localhost:3082'] }),
     ]);
     const processors = await getEventTransformResponseResultActionProcessor(config, noopDynamicModuleLoader);
     const fromSigningSite = async (path: string) =>
       resolveActionResult(
-        await invokeProcessor(processors[EventActionType.TransformResponseResult], {
+        await invokeProcessor(processors![EventActionType.TransformResponseResult]!, {
           eventParams: [{ path, method: 'POST', headers: { origin: 'http://localhost:3082' } }],
           qpqEventRecordResponses: [{ success: true, result: { status: 200, body: 'ok', isBase64Encoded: false } }],
         } as any),

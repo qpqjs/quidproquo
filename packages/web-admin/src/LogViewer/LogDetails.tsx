@@ -1,4 +1,4 @@
-import { StoryResult } from '@qpqjs/core';
+import { getMillisecondsBetween, StoryResult } from '@qpqjs/core';
 
 import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
@@ -9,11 +9,11 @@ import { processLog } from './logic';
 import { LogSummaryDetails } from './LogSummaryDetails';
 import { LogSummaryReturn } from './LogSummaryReturn';
 
-interface LogDetailsProps {
+type LogDetailsProps = {
   log: StoryResult<any>;
   hideFastActions: boolean;
   orderByDuration: boolean;
-}
+};
 
 const leftTableCell = {
   width: '200px',
@@ -40,15 +40,15 @@ export const LogDetails = ({
 
   if (hideFastActions) {
     history = history.filter((item) => {
-      const duration = new Date(item.finishedAt).getTime() - new Date(item.startedAt).getTime();
+      const duration = getMillisecondsBetween(item.startedAt, item.finishedAt);
       return duration >= 500;
     });
   }
 
   if (orderByDuration) {
     history.sort((a, b) => {
-      const durationA = new Date(a.finishedAt).getTime() - new Date(a.startedAt).getTime();
-      const durationB = new Date(b.finishedAt).getTime() - new Date(b.startedAt).getTime();
+      const durationA = getMillisecondsBetween(a.startedAt, a.finishedAt);
+      const durationB = getMillisecondsBetween(b.startedAt, b.finishedAt);
       return durationB - durationA;
     });
   }

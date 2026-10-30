@@ -1,7 +1,7 @@
 import { AskResponse, createDynamicFunctionCaller, Nullable } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotBaseLatest } from '../data/askEventDocSnapshotBaseLatest';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
@@ -24,7 +24,7 @@ export function* askEventDocDocumentStateAsOf(
   upToEventId: number,
   options?: EventDocDocumentStateAsOfOptions,
 ): AskResponse<Nullable<EventDocDocumentStateAtEvent>> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const snapshotCacheKey = yield* askEventDocSnapshotCacheKeyResolve();

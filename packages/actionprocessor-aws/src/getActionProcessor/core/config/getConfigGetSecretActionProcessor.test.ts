@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askConfigGetSecret, buildTestQpqConfig, ConfigActionType, defineSecret } from '@qpqjs/core';
+import { askConfigGetSecret, ConfigActionType, defineSecret } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getSecret } from '../../../logic/secretsManager/getSecret';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigGetSecretActionProcessor } from './getConfigGetSecretActionProcessor';
 
 vi.mock('../../../logic/secretsManager/getSecret', () => ({
@@ -27,7 +27,7 @@ describe('getConfigGetSecretActionProcessor', () => {
     vi.mocked(getSecret).mockResolvedValue('shhh');
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { secretName: 'apiKey' });
+    const result = await invokeProcessor(processor!, { secretName: 'apiKey' });
 
     expect(result).toEqual(['shhh']);
     expect(getSecret).toHaveBeenCalledWith('apiKey-test-app-test-module-development', 'eu-west-1');
@@ -35,12 +35,12 @@ describe('getConfigGetSecretActionProcessor', () => {
 
   it.each([
     ['ResourceNotFoundException', askConfigGetSecret.errorType.ResourceNotFound],
-    ['ThrottlingException', askConfigGetSecret.errorType.Throttling],
+    ['ThrottlingException', askConfigGetSecret.errorType.Throttled],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getSecret).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { secretName: 'apiKey' });
+    const [, error] = await invokeProcessor(processor!, { secretName: 'apiKey' });
 
     expect(error?.errorType).toBe(expectedType);
   });
@@ -50,7 +50,7 @@ describe('getConfigGetSecretActionProcessor', () => {
   it('refuses an undeclared secret before touching Secrets Manager', async () => {
     const processor = await resolveProcessor();
 
-    await expect(invokeProcessor(processor, { secretName: 'other-app/prod/db' })).rejects.toThrow('Can not find secret');
+    await expect(invokeProcessor(processor!, { secretName: 'other-app/prod/db' })).rejects.toThrow('Can not find secret');
     expect(getSecret).not.toHaveBeenCalled();
   });
 });

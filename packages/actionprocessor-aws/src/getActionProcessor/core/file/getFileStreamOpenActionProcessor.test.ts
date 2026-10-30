@@ -1,15 +1,13 @@
-import { buildTestQpqConfig, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileStreamOpenBase, ErrorTypeEnum, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { Readable } from 'stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createAwsClient } from '../../../logic/createAwsClient';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: class {},
@@ -22,8 +20,10 @@ vi.mock('../../../logic/createAwsClient', () => ({ createAwsClient: vi.fn() }));
 const send = vi.fn();
 
 const invoke = async (payload: Record<string, unknown>, streamRegistry: unknown) => {
-  const processor = (await getFileStreamOpenActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.StreamOpen];
-  return invokeProcessor(processor, payload, { streamRegistry });
+  const processor = (
+    await getFileStreamOpenActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.StreamOpen];
+  return invokeProcessor(processor!, payload, { streamRegistry });
 };
 
 const drain = async (iterator: AsyncIterableIterator<string>) => {
@@ -53,7 +53,7 @@ describe('getProcessFileStreamOpen', () => {
 
   // Security regression: a chunk size of zero or less must never spin the iterator forever (a hung lambda until its
   // timeout); the stream still terminates and yields every byte.
-  it.each([0, -5, Number.NaN])('terminates and yields the whole content for the chunk size %s', async (chunkSize) => {
+  it.each([0, -5, Number.NaN])('terminates and yields the whole content for the chunk size %s', async (chunkSize: any) => {
     send.mockResolvedValue({ Body: Readable.from(['hello']) });
     const registry = { register: vi.fn() };
 
@@ -78,7 +78,7 @@ describe('getProcessFileStreamOpen', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt', encoding: 'text' }, { register: vi.fn() });
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error?.errorType).toBe(askFileStreamOpenBase.errorType.NoContent);
     expect(error?.errorText).toContain('Empty response body');
   });
 

@@ -1,3 +1,4 @@
+import { Nullable } from '@qpqjs/core';
 /**
  * Base64url-decodes a JWT's payload WITHOUT verifying its signature. Never use for authorization.
  *
@@ -5,7 +6,7 @@
  * this to peek at whatever bearer token a request sent, and many are legitimately not JWTs (opaque
  * session tokens, API keys), so a miss is normal, not an error worth logging.
  */
-export function unsafeDecodeJWTPayload<T>(token: string | null | undefined): T | null {
+export function unsafeDecodeJWTPayload<T>(token: Nullable<string> | undefined): Nullable<T> {
   const parts = typeof token === 'string' ? token.split('.') : [];
   if (parts.length !== 3 || !parts[1]) {
     return null;

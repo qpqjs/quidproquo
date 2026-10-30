@@ -1,4 +1,4 @@
-import { AskResponse, AskResponseReturnType, EitherActionResult, ErrorTypeEnum } from '../../types';
+import { AskResponse, AskResponseReturnType } from '../../types';
 
 export function* askExecuteIf<T extends AskResponse<any>>(
   storyIterator: T | boolean,

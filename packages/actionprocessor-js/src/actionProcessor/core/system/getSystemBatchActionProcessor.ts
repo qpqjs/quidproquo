@@ -35,13 +35,13 @@ const getProcessSystemBatch = (qpqConfig: QPQConfig): ProcessorFor<typeof askBat
     );
 
     // A failure in any action NOT flagged returnErrors fails the whole batch.
-    const erroredBatchItem = batchRes.find((br, i) => isErroredActionResult(br) && !payload.actions[i].returnErrors);
+    const erroredBatchItem = batchRes.find((br, i) => isErroredActionResult(br) && !payload.actions[i]?.returnErrors);
     if (erroredBatchItem) {
       const error = resolveActionResultError(erroredBatchItem);
       return actionResultError(error.errorType, error.errorText, error.errorStack);
     }
 
-    return actionResult(batchRes.map((br, i) => unwrapBatchItem(br, payload.actions[i].returnErrors)));
+    return actionResult(batchRes.map((br, i) => unwrapBatchItem(br, payload.actions[i]?.returnErrors)));
   };
 };
 

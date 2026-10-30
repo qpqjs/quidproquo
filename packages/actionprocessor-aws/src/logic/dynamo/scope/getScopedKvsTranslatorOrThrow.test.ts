@@ -1,12 +1,5 @@
-import {
-  buildTestQpqConfig,
-  defineKeyValueStore,
-  InvalidScopeError,
-  InvalidScopeErrorCode,
-  kvsKey,
-  KvsQueryOperationType,
-  KvsStoreNotFoundError,
-} from '@qpqjs/core';
+import { defineKeyValueStore, InvalidScopeError, InvalidScopeErrorCode, kvsKey, KvsQueryOperationType, KvsStoreNotFoundError } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,10 +1,23 @@
 {
   "name": "@qpqjs/dev-server",
   "version": "0.3.0",
-  "description": "",
+  "description": "A local server that runs a whole quidproquo app on one machine.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./config": {
+      "types": "./lib/commonjs/config/index.d.ts",
+      "module": "./lib/esm/config/index.js",
+      "default": "./lib/commonjs/config/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*",
@@ -14,10 +27,11 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=24"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.commonjs.json -w",
@@ -29,7 +43,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/dev-server"
   },
   "keywords": [],
   "author": "",
@@ -53,10 +68,11 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@types/express": "^4.17.21",
     "@types/multer": "^1.4.12",
     "@types/ws": "^8.18.1",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   }
 }

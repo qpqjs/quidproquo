@@ -5,7 +5,9 @@ import { getLogHierarchy } from './getLogHierarchy';
 const apiRequestGet = vi.fn();
 const externalRequestGet = vi.fn();
 
-vi.mock('../../logic', () => ({
+// Only the network wrappers are replaced, not the whole logic barrel.
+vi.mock('../../logic/platform/apiRequest', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
   externalRequestGet: (...args: unknown[]) => externalRequestGet(...args),
 }));

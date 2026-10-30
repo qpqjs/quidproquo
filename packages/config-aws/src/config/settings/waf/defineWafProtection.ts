@@ -2,7 +2,7 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
 
-export interface WafProtectionQPQConfigSetting extends QPQConfigSetting {}
+export type WafProtectionQPQConfigSetting = {} & QPQConfigSetting;
 
 /**
  * Opt this service's api gateway stage and cloudfront distributions into the web acls

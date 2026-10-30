@@ -2,9 +2,9 @@ import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType, resol
 
 import { describe, expect, it } from 'vitest';
 
-import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelpers';
+import { fileConfig, runFileAction } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
-import { verifySecureUrlToken } from './secureUrlUtils';
+import { verifySecureUrlToken } from './utils';
 
 const invoke = (filepath: string, expirationMs: number = 60_000) =>
   runFileAction(getFileGenerateTemporarySecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporarySecureUrl, {
@@ -20,7 +20,7 @@ describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
     expect(url.startsWith('http://localhost:4000/secure-download?token=')).toBe(true);
 
     const token = url.split('token=')[1];
-    const decoded = verifySecureUrlToken(token, fileConfig.secureUrlSecret);
+    const decoded = verifySecureUrlToken(token!, fileConfig.secureUrlSecret);
     expect(decoded?.operation).toBe('download');
   });
 

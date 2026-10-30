@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { createQpqRuntimeDefinition, useQpqRuntime } from '@qpqjs/web-react';
 
 import LockIcon from '@mui/icons-material/Lock';
@@ -8,17 +7,19 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { AsyncButton } from '../../components';
-import { AuthState } from '../logic';
-import { authChallengeMfaInitalState, authChallengeMfaLogic, authChallengeMfaReducer } from './logic';
+import { AuthState } from '../types/AuthState';
+import { createInitialAuthChallengeMfaState } from './logic/createInitialAuthChallengeMfaState';
+import { authChallengeMfaReducer } from './authChallengeMfaReducer';
+import { frontendAuthChallengeMfaApi } from './frontendAuthChallengeMfaApi';
 
-interface AuthChallengeSoftwareTokenMfaProps {
+type AuthChallengeSoftwareTokenMfaProps = {
   authState: AuthState;
-}
+};
 
 const challengeRuntime = createQpqRuntimeDefinition({
   uniqueName: 'qpq/admin/authChallengeSoftwareTokenMfa',
-  api: authChallengeMfaLogic,
-  initialState: authChallengeMfaInitalState,
+  api: frontendAuthChallengeMfaApi,
+  initialState: createInitialAuthChallengeMfaState(),
   reducer: authChallengeMfaReducer,
 });
 
@@ -29,6 +30,8 @@ export function AuthChallengeSoftwareTokenMfa({ authState }: AuthChallengeSoftwa
   if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {
     return <div>Error, missing challenge / session</div>;
   }
+
+  const { challenge, session } = authState.authenticateUserResponse;
 
   return (
     <Box
@@ -68,16 +71,7 @@ export function AuthChallengeSoftwareTokenMfa({ authState }: AuthChallengeSoftwa
             />
           </Grid>
           <Grid item xs={12}>
-            <AsyncButton
-              disabled={!isCodeValid}
-              onClick={() =>
-                api.authChallengeSendMfaCode(
-                  authState.authenticateUserResponse?.challenge!,
-                  authState.authenticateUserResponse?.session!,
-                  authState.username,
-                )
-              }
-            >
+            <AsyncButton disabled={!isCodeValid} onClick={() => api.authChallengeSendMfaCode(challenge, session, authState.username)}>
               Verify
             </AsyncButton>
           </Grid>

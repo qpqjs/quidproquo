@@ -1,4 +1,5 @@
-import { Action, ConfigActionType, InlineFunctionActionType, KeyValueStoreActionType, runStory, StoryError } from '@qpqjs/core';
+import { Action, ConfigActionType, InlineFunctionActionType, KeyValueStoreActionType } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -48,7 +49,7 @@ describe('askMcpEventDocAiRunTool', () => {
 
     expect(executed.map((action) => action.payload!.functionName)).toEqual(['authoriseFn', 'describeFlowFn']);
     expect(toolRun?.payload!.payload).toEqual({ flowId: 'f1' });
-    expect(toolRun?.context).toMatchObject({ 'event-doc-ai-context': { serviceName: 'mimir', type: 'plan', docId: 'doc-1' } });
+    expect(toolRun?.context).toMatchObject({ 'qpq-event-doc-ai': { serviceName: 'mimir', type: 'plan', docId: 'doc-1' } });
     expect(result).toEqual({ flowId: 'f1', name: 'Intake' });
   });
 
@@ -58,7 +59,7 @@ describe('askMcpEventDocAiRunTool', () => {
     runStory(askMcpEventDocAiRunTool({ name: 'describeFlow', args: { flowId: 'f1' }, event }), buildMocks([], executed));
 
     expect(executed.map((action) => action.payload!.functionName)).toEqual(['describeFlowFn']);
-    expect(executed[0].context).toMatchObject({ 'event-doc-ai-context': { docId: '' } });
+    expect(executed![0]!.context).toMatchObject({ 'qpq-event-doc-ai': { docId: '' } });
   });
 
   it('fails with NotFound for a docId that is not here, without running the tool', () => {
@@ -98,6 +99,6 @@ describe('askMcpEventDocAiRunTool', () => {
     });
 
     expect(executed.map((action) => action.payload!.functionName)).toEqual(['describeFlowFn']);
-    expect(executed[0].context).toMatchObject({ 'event-doc-ai-context': { type: 'register', docId: 'reg-1' } });
+    expect(executed![0]!.context).toMatchObject({ 'qpq-event-doc-ai': { type: 'register', docId: 'reg-1' } });
   });
 });

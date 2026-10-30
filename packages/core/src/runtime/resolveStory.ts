@@ -1,10 +1,11 @@
 import { QPQConfig } from '../config';
-import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { createStreamRegistry } from '../logic/stream';
 import { getApplicationModuleName } from '../qpqCoreUtils';
 import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { Action, ActionProcessorList } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
+import { Nullable } from '../types/Nullable';
 import { QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
 import { getGlobalsFromQpqFunctionRuntime } from '../utils';
 import { mergeRuntimeActionProcessors } from './mergeRuntimeActionProcessors';
@@ -41,7 +42,7 @@ export async function resolveStory<TArgs extends Array<any>>(
 
   const runtimeGlobals = getGlobalsFromQpqFunctionRuntime(qpqFunctionRuntimeInfo);
 
-  let storyProgress: IteratorResult<Action<any>, any> | null = null;
+  let storyProgress: Nullable<IteratorResult<Action<any>, any>> = null;
   let storySession: StorySession = {
     correlation: runtimeCorrelation,
     depth: callerSession.depth + 1,

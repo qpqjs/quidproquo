@@ -4,7 +4,7 @@ import {
   askFileExists,
   askFileReadTextContents,
   askFileWriteBinaryContents,
-  askNewGuid,
+  askGuidNew,
   AskResponse,
   askUserScriptBuildFromZip,
 } from 'quidproquo';
@@ -19,7 +19,7 @@ import { askRunSmokeUserScriptCalls } from './askRunSmokeUserScriptCalls';
 // The build goes to an extensionless, asset-style path with its source map turned on, so
 // this also proves the output is exactly one file with the map embedded in it.
 export function* askRunUserScriptZipTest(): AskResponse<void> {
-  const scriptId = yield* askNewGuid();
+  const scriptId = yield* askGuidNew();
   const directory = `smoke/userScript/${scriptId}`;
   const zipPath = `${directory}/script.zip`;
   const builtPath = `${directory}/assets/built`;
@@ -31,36 +31,19 @@ export function* askRunUserScriptZipTest(): AskResponse<void> {
     mimetype: 'application/zip',
   });
 
-  const built = yield* askUserScriptBuildFromZip(
-    SMOKE_PROBE_DRIVE,
-    zipPath,
-    builtPath,
-    undefined,
-    { sourceMap: true }
-  );
+  const built = yield* askUserScriptBuildFromZip(SMOKE_PROBE_DRIVE, zipPath, builtPath, undefined, { sourceMap: true });
   yield* askSmokeAssert(
     built.exports.includes('add') && built.exports.includes('greet'),
-    `zip build did not report the script's exports: [${built.exports.join(', ')}]`
+    `zip build did not report the script's exports: [${built.exports.join(', ')}]`,
   );
 
-  const builtSource = yield* askFileReadTextContents(
-    SMOKE_PROBE_DRIVE,
-    builtPath
-  );
+  const builtSource = yield* askFileReadTextContents(SMOKE_PROBE_DRIVE, builtPath);
   yield* askSmokeAssert(
-    builtSource.includes(
-      '//# sourceMappingURL=data:application/json;charset=utf-8;base64,'
-    ),
-    'zip build with sourceMap on did not embed the source map'
+    builtSource.includes('//# sourceMappingURL=data:application/json;charset=utf-8;base64,'),
+    'zip build with sourceMap on did not embed the source map',
   );
-  const separateMapExists = yield* askFileExists(
-    SMOKE_PROBE_DRIVE,
-    `${builtPath}.map`
-  );
-  yield* askSmokeAssert(
-    !separateMapExists,
-    'zip build wrote a separate .map file'
-  );
+  const separateMapExists = yield* askFileExists(SMOKE_PROBE_DRIVE, `${builtPath}.map`);
+  yield* askSmokeAssert(!separateMapExists, 'zip build wrote a separate .map file');
 
   yield* askRunSmokeUserScriptCalls(builtPath, outputPath, 'zip');
 

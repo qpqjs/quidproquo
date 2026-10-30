@@ -1,7 +1,8 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
 import { StorageDriveTier } from '../../config';
-import { captureRequester } from '../../testing';
 import { askFileWriteTextContents } from './askFileWriteTextContents';
 import { FileActionType } from './FileActionType';
 

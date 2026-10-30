@@ -1,15 +1,5 @@
-import {
-  actionResult,
-  actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStreamRegistry,
-  createStubLogger,
-  ErrorTypeEnum,
-  EventActionType,
-  noopDynamicModuleLoader,
-} from '@qpqjs/core';
+import { actionResult, actionResultError, createStreamRegistry, ErrorTypeEnum, EventActionType } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -32,7 +22,7 @@ const invoke = async (
   const map = await getHttpApiEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader);
   const processor = map[EventActionType.GetStorySession];
 
-  return processor(
+  return processor!(
     { qpqEventRecord, matchStoryResult: { config, ...matchResultExtras } },
     buildTestStorySession(),
     buildActionProcessorList({ [RouteAuthValidationActionType.ResolveContext]: async () => actionResult({}), ...processors }),
@@ -44,10 +34,10 @@ const invoke = async (
 };
 
 describe('getHttpApiEventGetStorySessionActionProcessor', () => {
-  it('returns an undefined session when there is no access token', async () => {
+  it('returns a null session when there is no access token', async () => {
     const [session] = await invoke({ headers: {} }, {}, notApplicableDecode);
 
-    expect(session).toBeUndefined();
+    expect(session).toBeNull();
   });
 
   it('attaches the validated token to the session for an authenticated route', async () => {

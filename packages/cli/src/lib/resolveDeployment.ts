@@ -5,8 +5,12 @@ import { getPlatformDriver } from '../platforms';
 import { getArgValue } from './args';
 import { getRoot } from './discovery';
 import { promptSelect } from './prompts';
+import { CliError } from './CliError';
+import { createOutput } from './out';
 
-export const DEPLOYMENT_FLAG = '--deployment';
+const out = createOutput('resolve-deployment');
+
+const DEPLOYMENT_FLAG = '--deployment';
 
 export type ResolvedDeployment = {
   deploymentName: string;
@@ -21,23 +25,24 @@ const selectDeploymentName = async (argv: string[], appName: string, configuredN
 
   if (requested) {
     if (!configuredNames.includes(requested)) {
-      console.error(`Unknown deployment '${requested}' in ${getQpqAppDeployConfigPath(getRoot(), appName)}. Configured: ${configuredNames.join(', ')}`);
-      process.exit(1);
+      throw new CliError(
+        `Unknown deployment '${requested}' in ${getQpqAppDeployConfigPath(getRoot(), appName)}. Configured: ${configuredNames.join(', ')}`,
+      );
     }
     return requested;
   }
 
-  if (configuredNames.length === 1) {
-    console.log(`Using deployment: ${configuredNames[0]}`);
-    return configuredNames[0];
+  const [onlyName] = configuredNames;
+  if (configuredNames.length === 1 && onlyName !== undefined) {
+    out.log(`Using deployment: ${onlyName}`);
+    return onlyName;
   }
 
   if (process.stdin.isTTY) {
     return promptSelect('Select deployment', configuredNames);
   }
 
-  console.error(`No deployment selected. Pass ${DEPLOYMENT_FLAG} <name>. Configured: ${configuredNames.join(', ')}`);
-  return process.exit(1);
+  throw new CliError(`No deployment selected. Pass ${DEPLOYMENT_FLAG} <name>. Configured: ${configuredNames.join(', ')}`);
 };
 
 /**
@@ -51,6 +56,9 @@ export const resolveDeployment = async (argv: string[], appName: string): Promis
   const { deployments } = getQpqAppDeployConfig(getRoot(), appName);
   const deploymentName = await selectDeploymentName(argv, appName, Object.keys(deployments));
   const deployment = deployments[deploymentName];
+  if (!deployment) {
+    throw new Error(`Deployment [${deploymentName}] is not in ${appName}'s deploy.config.json`);
+  }
 
   primeDeploymentEnv(appName, deploymentName, deployment);
   getPlatformDriver(deployment.platform).prepareDeployment(deploymentName, deployment);

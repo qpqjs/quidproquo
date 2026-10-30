@@ -9,15 +9,8 @@ export type SmokeUserScriptFunctions = {
   add: (a: number, b: number) => number;
   greet: (name: string) => string;
   stampedGreeting: (name: string) => AskResponse<string>;
-  postJson: (
-    url: string,
-    body: EchoRequest
-  ) => AskResponse<HTTPNetworkResponse<EchoResponse>>;
-  writeFile: (
-    drive: string,
-    filepath: string,
-    text: string
-  ) => AskResponse<void>;
+  postJson: (url: string, body: EchoRequest) => AskResponse<HTTPNetworkResponse<EchoResponse>>;
+  writeFile: (drive: string, filepath: string, text: string) => AskResponse<void>;
   probeAwsAccess: (bucket: string, key: string) => Promise<SmokeAwsProbeResult>;
   startSurvivor: (port: number) => number;
   checkSurvivor: (port: number) => Promise<SmokeSurvivorProbeResult>;

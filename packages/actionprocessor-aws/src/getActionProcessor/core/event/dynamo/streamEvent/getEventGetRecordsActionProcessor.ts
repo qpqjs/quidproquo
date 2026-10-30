@@ -1,19 +1,12 @@
-import {
-  actionResult,
-  askEventGetRecordsBase,
-  createActionProcessor,
-  EventActionType,
-  KvsStreamEventType,
-  ProcessorFor,
-  QPQConfig,
-} from '@qpqjs/core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, KvsStreamEventType, ProcessorFor } from '@qpqjs/core';
 
 import { DynamoDBRecord } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { convertDynamoMapToObject } from '../../../../../logic/dynamo/convertDynamoMapToObject';
 import { decomposeScopedKvsValue, stripScopedKvsIndexAttributes } from '../../../../../logic/dynamo/scope';
-import { EventInput, GLOBAL_KVS_STREAM_COALESCE, GLOBAL_KVS_STREAM_PARTITION_KEY, GLOBAL_KVS_STREAM_STORE_NAME, InternalEventRecord } from './types';
+import { KvsStreamLambdaSettings } from '../../../../../runtimeConfig/KvsStreamLambdaSettings';
+import { EventInput, InternalEventRecord } from './types';
 
 // aws-lambda types the stream images with its own AttributeValue shape; the marshaller is
 // the SDK's. Structurally identical, so this is a lens rather than a conversion.
@@ -22,7 +15,7 @@ const toObject = (image?: Record<string, unknown>) =>
 
 // Switch on the closed union aws-lambda declares, not on `string`. Exhausting it means a
 // stream event type we do not handle is a COMPILE error here, rather than a `default` branch
-// quietly folding it into Modify — which for a REMOVE would report a delete as an edit.
+// quietly folding it into Modify, which for a REMOVE would report a delete as an edit.
 const toEventType = (eventName: DynamoDBRecord['eventName']): KvsStreamEventType => {
   switch (eventName) {
     case 'INSERT':
@@ -44,30 +37,31 @@ const stripScope = (
   image: Record<string, unknown> | undefined,
   rawPartitionKey: string,
   scope: string | undefined,
+  partitionKey: string,
 ): Record<string, unknown> | undefined => {
-  if (!image || !GLOBAL_KVS_STREAM_PARTITION_KEY) {
+  if (!image || !partitionKey) {
     return image;
   }
 
-  const rawImage = { ...image, [GLOBAL_KVS_STREAM_PARTITION_KEY]: rawPartitionKey };
+  const rawImage = { ...image, [partitionKey]: rawPartitionKey };
   return scope === undefined ? rawImage : stripScopedKvsIndexAttributes(rawImage);
 };
 
-const toInternalRecord = (record: DynamoDBRecord): InternalEventRecord => {
+const toInternalRecord = (record: DynamoDBRecord, { keyValueStoreName, partitionKey }: KvsStreamLambdaSettings): InternalEventRecord => {
   const keys = toObject(record.dynamodb?.Keys) ?? {};
 
   // The stored partition key carries the scope; split it once here so every consumer gets a
   // raw key plus an explicit scope, and none of them has to know the composition format.
-  const composedPartitionKey = GLOBAL_KVS_STREAM_PARTITION_KEY ? String(keys[GLOBAL_KVS_STREAM_PARTITION_KEY] ?? '') : '';
+  const composedPartitionKey = partitionKey ? String(keys[partitionKey] ?? '') : '';
   const { scope, rawValue } = decomposeScopedKvsValue(composedPartitionKey);
 
   return {
-    keyValueStoreName: GLOBAL_KVS_STREAM_STORE_NAME,
+    keyValueStoreName,
     eventType: toEventType(record.eventName),
     scope,
-    keys: GLOBAL_KVS_STREAM_PARTITION_KEY ? { ...keys, [GLOBAL_KVS_STREAM_PARTITION_KEY]: rawValue } : keys,
-    newImage: stripScope(toObject(record.dynamodb?.NewImage), rawValue, scope),
-    oldImage: stripScope(toObject(record.dynamodb?.OldImage), rawValue, scope),
+    keys: partitionKey ? { ...keys, [partitionKey]: rawValue } : keys,
+    newImage: stripScope(toObject(record.dynamodb?.NewImage), rawValue, scope, partitionKey),
+    oldImage: stripScope(toObject(record.dynamodb?.OldImage), rawValue, scope, partitionKey),
   };
 };
 
@@ -81,30 +75,32 @@ const toInternalRecord = (record: DynamoDBRecord): InternalEventRecord => {
 // Grouped by SCOPE AND key, not key alone: keys are raw by this point, so two tenants can
 // legitimately hold the same id, and collapsing on the raw key would drop one tenant's change
 // on the floor because another tenant touched the same id in the same batch.
-const coalesceByPartitionKey = (records: InternalEventRecord[]): InternalEventRecord[] => {
-  if (!GLOBAL_KVS_STREAM_PARTITION_KEY) {
+const coalesceByPartitionKey = (records: InternalEventRecord[], partitionKey: string): InternalEventRecord[] => {
+  if (!partitionKey) {
     return records;
   }
 
   const latest = new Map<string, InternalEventRecord>();
 
   for (const record of records) {
-    latest.set(`${record.scope ?? ''}\u0000${String(record.keys[GLOBAL_KVS_STREAM_PARTITION_KEY])}`, record);
+    latest.set(`${record.scope ?? ''}\u0000${String(record.keys[partitionKey])}`, record);
   }
 
   return [...latest.values()];
 };
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+const getProcessGetRecords = (settings: KvsStreamLambdaSettings): ProcessorFor<typeof askEventGetRecordsBase> => {
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const [streamEvent] = eventParams as EventInput;
 
-    const records = streamEvent.Records.map(toInternalRecord);
+    const records = streamEvent.Records.map((record) => toInternalRecord(record, settings));
 
-    return actionResult(GLOBAL_KVS_STREAM_COALESCE ? coalesceByPartitionKey(records) : records);
+    return actionResult(settings.coalesceByPartitionKey ? coalesceByPartitionKey(records, settings.partitionKey) : records);
   };
 };
 
-export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);
+/** The stream the lambda serves comes from the handler, which reads its settings from the lambda environment once. */
+export const getEventGetRecordsActionProcessor = (settings: KvsStreamLambdaSettings) =>
+  createActionProcessor(askEventGetRecordsBase, () => getProcessGetRecords(settings));

@@ -1,6 +1,7 @@
+import { captureRequester, runStory, StoryError, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
 import { askLogCreate } from './askLogCreate';
 import { LogActionType } from './LogActionType';

@@ -7,10 +7,9 @@ import {
   InlineFunctionActionType,
   QueueEvent,
   QueueMessage,
-  runStory,
-  throwsError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { runStory, throwsError } from '@qpqjs/testing';
 import { WebsocketActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -52,7 +51,7 @@ const run = (authorise: string, authoriseOutcome: 'allow' | 'forbid' = 'allow'):
 
   runStory(wrapper(buildEvent({ docId: 'doc-1', name: 'hello' })), {
     [ContextActionType.Read]: connectionInfo,
-    [ConfigActionType.GetGlobal]: (action: Action<{ globalName: string }>) => globals[action.payload.globalName],
+    [ConfigActionType.GetGlobal]: (action: Action<{ globalName: string }>) => globals[action!.payload!.globalName],
     [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-1', username: 'joe' },
     [InlineFunctionActionType.Execute]: (action: Action<{ functionName: string; payload: unknown }>) => {
       harness.authoriseCalls.push(action.payload);

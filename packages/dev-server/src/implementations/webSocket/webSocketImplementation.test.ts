@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineWebsocket, QpqWebSocketEventProcessors } from '@qpqjs/webserver';
 
 import { request } from 'http';
@@ -40,19 +40,14 @@ const openRawSocket = (key: string): Promise<Socket> =>
   });
 
 const waitForConnections = async (count: number): Promise<Record<string, unknown>> => {
-  const deadline = Date.now() + 2000;
-  for (;;) {
-    const connections = findRegisteredWebSocketServer('test-module', 'api')?.connections ?? {};
-    if (Object.keys(connections).length >= count || Date.now() > deadline) {
-      return connections;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 10));
-  }
+  const registered = () => findRegisteredWebSocketServer('test-module', 'api')?.connections ?? {};
+  await vi.waitFor(() => expect(Object.keys(registered()).length).toBeGreaterThanOrEqual(count), { timeout: 2000, interval: 10 });
+  return registered();
 };
 
 describe('sendMessageToWebSocketConnection', () => {
-  it('resolves without throwing when no matching connection is registered', async () => {
-    await expect(sendMessageToWebSocketConnection('svc-a', 'api', 'unknown-conn', { hi: true })).resolves.toBeUndefined();
+  it('reports false when no matching connection is registered', async () => {
+    await expect(sendMessageToWebSocketConnection('svc-a', 'api', 'unknown-conn', { hi: true })).resolves.toBe(false);
   });
 });
 

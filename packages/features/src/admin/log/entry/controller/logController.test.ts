@@ -1,13 +1,5 @@
-import {
-  Action,
-  ConfigActionType,
-  ErrorTypeEnum,
-  FileActionType,
-  KeyValueStoreActionType,
-  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
-  runStory,
-  StoryError,
-} from '@qpqjs/core';
+import { Action, ConfigActionType, ErrorTypeEnum, FileActionType, KeyValueStoreActionType, QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME } from '@qpqjs/core';
+import { runStory, StoryError } from '@qpqjs/testing';
 import { HTTPEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -24,8 +16,8 @@ describe('getLog', () => {
       [KeyValueStoreActionType.Query]: { items: [log] },
     });
 
-    expect(response.status).toBe(200);
-    expect(JSON.parse(response.body!)).toEqual(log);
+    expect((response as any).status).toBe(200);
+    expect(JSON.parse((response as any).body!)).toEqual(log);
   });
 
   it('throws a NotFound error when the log is missing', () => {
@@ -52,7 +44,7 @@ describe('getServiceNames', () => {
         action.payload.globalName === 'qpq-serviceNames' ? services : 'log',
     });
 
-    expect(JSON.parse(response.body!)).toEqual({ services, logServiceName: 'log' });
+    expect(JSON.parse((response as any).body!)).toEqual({ services, logServiceName: 'log' });
   });
 });
 
@@ -64,7 +56,7 @@ describe('getChildren', () => {
       [KeyValueStoreActionType.Query]: children,
     });
 
-    expect(JSON.parse(response.body!)).toEqual(children);
+    expect(JSON.parse((response as any).body!)).toEqual(children);
   });
 });
 
@@ -81,7 +73,7 @@ describe('downloadUrl', () => {
     });
 
     expect(signed?.payload).toMatchObject({ drive: QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, filepath: 'c1.redacted.json' });
-    expect(JSON.parse(response.body!)).toEqual({ url: 'https://signed.example/c1.redacted.json', isColdStorage: false });
+    expect(JSON.parse((response as any).body!)).toEqual({ url: 'https://signed.example/c1.redacted.json', isColdStorage: false });
   });
 
   it('reports cold storage without a url when no redacted copy is cached', () => {
@@ -90,7 +82,7 @@ describe('downloadUrl', () => {
       [FileActionType.IsColdStorage]: true,
     });
 
-    expect(JSON.parse(response.body!)).toEqual({ url: '', isColdStorage: true });
+    expect(JSON.parse((response as any).body!)).toEqual({ url: '', isColdStorage: true });
   });
 });
 
@@ -112,6 +104,6 @@ describe('traceLog', () => {
     });
 
     expect(executed?.payload.payload.storyResult).toBe(redactedLog);
-    expect(JSON.parse(response.body!)).toEqual({ pending: true });
+    expect(JSON.parse((response as any).body!)).toEqual({ pending: true });
   });
 });

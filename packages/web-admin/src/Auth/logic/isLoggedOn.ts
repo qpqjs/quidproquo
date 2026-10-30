@@ -1,4 +1,4 @@
-import { AuthState } from './authTypes';
+import { AuthState } from '../types/AuthState';
 
 export function isLoggedOn(state: AuthState): boolean {
   const accessToken = state.authenticateUserResponse?.authenticationInfo?.accessToken;

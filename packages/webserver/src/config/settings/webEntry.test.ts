@@ -18,7 +18,6 @@ describe('defineWebEntry', () => {
       ignoreCache: [],
       compressFiles: true,
       securityHeaders: undefined,
-      cloudflareApiKeySecretName: undefined,
       cacheSettingsName: undefined,
     });
   });

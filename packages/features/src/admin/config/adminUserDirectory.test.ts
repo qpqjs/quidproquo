@@ -2,7 +2,8 @@ import { QPQCoreConfigSettingType } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
-import { adminUserDirectoryResourceName, defineAdminUserDirectory } from './adminUserDirectory';
+import { ADMIN_USER_DIRECTORY_NAME } from '../constants';
+import { defineAdminUserDirectory } from './adminUserDirectory';
 
 describe('defineAdminUserDirectory', () => {
   it('defines a single admin user directory', () => {
@@ -11,7 +12,7 @@ describe('defineAdminUserDirectory', () => {
     expect(config).toHaveLength(1);
     expect(config[0]).toMatchObject({
       configSettingType: QPQCoreConfigSettingType.userDirectory,
-      name: adminUserDirectoryResourceName,
+      name: ADMIN_USER_DIRECTORY_NAME,
     });
   });
 });

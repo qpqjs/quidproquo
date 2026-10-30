@@ -1,10 +1,18 @@
 {
   "name": "@qpqjs/web-react",
   "version": "0.3.0",
-  "description": "",
+  "description": "React bindings for quidproquo: runtimes, stores and hooks.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "types": "./lib/commonjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/commonjs/index.d.ts",
+      "module": "./lib/esm/index.js",
+      "default": "./lib/commonjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "lib/**/*"
@@ -13,7 +21,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.esm.json -w",
@@ -25,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qpqjs/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git",
+    "directory": "packages/web-react"
   },
   "keywords": [],
   "author": "",
@@ -35,21 +45,24 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
+    "@qpqjs/testing": "0.3.0",
+    "@qpqjs/tsconfig": "0.3.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
-    "@qpqjs/core": "0.3.0",
-    "@qpqjs/tsconfig": "0.3.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "react": ">=18.3.1"
   },
   "dependencies": {
-    "@qpqjs/actionprocessor-node": "0.3.0",
     "@qpqjs/actionprocessor-web": "0.3.0",
+    "@qpqjs/core": "0.3.0",
     "@qpqjs/features": "0.3.0",
     "@qpqjs/web": "0.3.0",
     "@qpqjs/webserver": "0.3.0",
     "symbol-observable": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

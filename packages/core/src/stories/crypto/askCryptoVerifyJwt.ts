@@ -42,6 +42,9 @@ export function* askCryptoVerifyJwt<T extends object>(keyName: string, token: st
   }
 
   const [headerSegment, payloadSegment, signature] = segments;
+  if (headerSegment === undefined || payloadSegment === undefined || signature === undefined) {
+    return { valid: false, reason: 'malformed' };
+  }
 
   const header = parseJson(headerSegment);
   if (!isRecord(header)) {

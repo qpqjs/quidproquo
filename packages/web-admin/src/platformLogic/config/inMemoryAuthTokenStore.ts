@@ -1,8 +1,8 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse } from '@qpqjs/core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, Nullable } from '@qpqjs/core';
 
-// Tokens deliberately live in memory only — never localStorage — so a page
+// Tokens deliberately live in memory only, never localStorage, so a page
 // refresh forces a fresh login and with it a fresh admin session doc.
-let currentAuthToken: AuthenticateUserResponse | null = null;
+let currentAuthToken: Nullable<AuthenticateUserResponse> = null;
 
 export const getInMemoryAuthToken = (): AuthenticateUserResponse =>
   currentAuthToken ?? {

@@ -1,8 +1,6 @@
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-
-import { randomGuid } from '../../awsLambdaUtils';
+import { generateUuid, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 export const getRuntimeCorrelation = (qpqConfig: QPQConfig): string => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  return `${moduleName}::${randomGuid()}`;
+  return `${moduleName}::${generateUuid()}`;
 };

@@ -1,8 +1,4 @@
-import {
-  defineKeyValueStore,
-  defineRecurringSchedule,
-  QPQConfig,
-} from 'quidproquo';
+import { defineKeyValueStore, defineRecurringSchedule, QPQConfig } from 'quidproquo';
 
 import { SCHEDULE_TICK_STORE } from '../constants/scheduleTickStore';
 import { ScheduleTickRecord } from '../models/ScheduleTickRecord';
@@ -24,20 +20,15 @@ import { ScheduleTickRecord } from '../models/ScheduleTickRecord';
  * test can reasonably wait out.
  */
 export const defineScheduleSmoke = (): QPQConfig => [
-  defineKeyValueStore<ScheduleTickRecord>(
-    SCHEDULE_TICK_STORE,
-    'scheduleName',
-    [],
-    {
-      onStream: {
-        runtime: {
-          basePath: __dirname,
-          relativePath: '../entry/kvsStream/onScheduleTickStream',
-          functionName: 'onScheduleTickStream',
-        },
+  defineKeyValueStore<ScheduleTickRecord>(SCHEDULE_TICK_STORE, 'scheduleName', [], {
+    onStream: {
+      runtime: {
+        basePath: __dirname,
+        relativePath: '../entry/kvsStream/onScheduleTickStream',
+        functionName: 'onScheduleTickStream',
       },
-    }
-  ),
+    },
+  }),
 
   defineRecurringSchedule(
     { everyMinutes: 1 },
@@ -45,6 +36,6 @@ export const defineScheduleSmoke = (): QPQConfig => [
       basePath: __dirname,
       relativePath: '../entry/schedule/onTick',
       functionName: 'onTick',
-    }
+    },
   ),
 ];

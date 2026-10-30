@@ -1,10 +1,11 @@
-import { ActionOf, runStory } from '@qpqjs/core';
+import { ActionOf } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
 import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
-import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
+import { AdminSessionEffect } from '../../effects/session/AdminSessionEffect';
 import { askSendChatMessage } from './askSendChatMessage';
 
 describe('askSendChatMessage', () => {
@@ -17,7 +18,7 @@ describe('askSendChatMessage', () => {
       },
     });
 
-    expect(applied).toEqual([{ type: AdminSessionEventType.chatMessageSent, data: { correlationId: 'corr-1', message: 'what happened here?' } }]);
+    expect(applied).toEqual([{ type: AdminSessionEffect.ChatMessageSent, data: { correlationId: 'corr-1', message: 'what happened here?' } }]);
   });
 
   it('records nothing for a blank message', () => {

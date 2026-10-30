@@ -3,11 +3,11 @@ import { DomainTarget } from '@qpqjs/webserver';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface DomainCertificateQPQConfigSetting extends QPQConfigSetting {
+export type DomainCertificateQPQConfigSetting = {
   region: string;
   targets: DomainTarget[];
   includeApex: boolean;
-}
+} & QPQConfigSetting;
 
 /**
  * One ACM certificate per region covering every declared root: each target resolves to a

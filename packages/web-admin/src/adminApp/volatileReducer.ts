@@ -10,7 +10,7 @@ import { logSearchPartLoaded } from './stateUpdaters/volatile/logSearchPartLoade
 import { logSearchStarted } from './stateUpdaters/volatile/logSearchStarted';
 import { realtimeErrorLogReceived } from './stateUpdaters/volatile/realtimeErrorLogReceived';
 import { serviceNamesLoaded } from './stateUpdaters/volatile/serviceNamesLoaded';
-import { VolatileState } from './VolatileState';
+import { VolatileState } from './types/VolatileState';
 
 export const volatileReducer = buildEffectReducer<VolatileState, VolatileEffects>({
   [VolatileEffect.logSearchStarted]: logSearchStarted,

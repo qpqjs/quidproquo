@@ -14,7 +14,7 @@ import {
   UserScriptRunnerRequestKind,
 } from '@qpqjs/core';
 
-import { requestUserScriptRunner } from './logic/requestUserScriptRunner';
+import { requestUserScriptRunner } from './utils/requestUserScriptRunner';
 
 const getProcessListExports = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScriptListExports> => {
   return async (

@@ -1,6 +1,5 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { qpqCoreUtils } from '@qpqjs/core';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { Nullable, qpqCoreUtils } from '@qpqjs/core';
 import { DomainTarget, qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import {
@@ -27,16 +26,16 @@ import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup'
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
-export interface WebQpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
+export type WebQpqWebserverWebEntryConstructProps = {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: WebQpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
     // create / reference an s3 bucket
-    let originBucket: aws_s3.IBucket | null = null;
+    let originBucket: Nullable<aws_s3.IBucket> = null;
 
     if (!props.webEntryConfig.storageDrive.sourceStorageDrive) {
       originBucket = new aws_s3.Bucket(this, 'bucket', {
@@ -80,7 +79,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
+          qpqWebServerUtils.resolveCacheOrThrow(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
@@ -116,7 +115,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       },
     });
 
-    // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distributionOrigin = aws_cloudfront_origins.S3BucketOrigin.withOriginAccessControl(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
@@ -153,7 +151,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     // Deploy-time artifact publishing: the build dir is packaged as a CDK
     // asset at synth time, unpacked into the origin bucket during deploy, then
     // the distribution is invalidated so the new content serves immediately.
-    // Note: prunes objects missing from the source — only safe on buckets this
+    // Note: prunes objects missing from the source, only safe on buckets this
     // web entry owns outright, not shared multi-service drives.
     if (props.webEntryConfig.storageDrive.autoUpload) {
       const webEntryBuildPath = qpqAwsCdkPathUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
@@ -185,9 +183,14 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     );
 
     rootDomains.forEach((rootDomain, index) => {
+      const domainName = domainNames[index];
+      if (domainName === undefined) {
+        throw new Error(`Root domain [${rootDomain}] resolved to no host`);
+      }
+
       new aws_route53.ARecord(this, domainScopedId(props.qpqConfig, 'web-alias', rootDomain), {
-        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainNames[index])),
-        recordName: domainNames[index],
+        zone: lookupHostedZone(this, resolveHostedZoneForHost(props.qpqConfig, domainName)),
+        recordName: domainName,
         target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
       });
     });
@@ -230,20 +233,20 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         role: this.getServiceRole(),
       });
 
-      for (let seo of seos) {
+      for (const seo of seos) {
         // Deprecated edge lambdas are not added as a behavior, but they are still built
         if (seo.deprecated) {
           continue;
         }
 
-        // TODO: Find a better solution for this.
+        // TODO: @joe-coady: Find a better solution for this.
         // Removed this because aws limits for the number of AWS CloudFront Cache Policies in your account
         const seoCachePolicy = seo.cacheSettingsName
           ? QpqWebServerCacheConstruct.fromOtherStack(
               this,
               `seo-cache-${seo.uniqueKey}`,
               props.qpqConfig,
-              qpqWebServerUtils.getCacheConfigByName(seo.cacheSettingsName, props.qpqConfig),
+              qpqWebServerUtils.resolveCacheOrThrow(seo.cacheSettingsName, props.qpqConfig),
             ).cachePolicy
           : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 

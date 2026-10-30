@@ -1,16 +1,16 @@
+import { assertLambdaMemoryInMiB, assertLambdaTimeoutInSeconds } from '@qpqjs/config-aws';
 import { USER_SCRIPT_RUNNER_FUNCTION_NAME, UserScriptRunnerQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_ec2, aws_iam, aws_lambda } from 'aws-cdk-lib';
+import { aws_iam } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
-export interface QpqCoreUserScriptRunnerConstructProps extends QpqConstructBlockProps {
+export type QpqCoreUserScriptRunnerConstructProps = {
   userScriptRunnerConfig: UserScriptRunnerQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 /**
  * The sandbox that runs a service's user scripts (defineUserScriptRunner): one function on
@@ -25,36 +25,23 @@ export class QpqCoreUserScriptRunnerConstruct extends QpqConstructBlock {
 
     const { virtualNetworkName } = props.userScriptRunnerConfig;
 
-    const vpc = virtualNetworkName
-      ? aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', { vpcName: this.qpqBootstrapResourceName(virtualNetworkName) })
-      : undefined;
-
-    const securityGroups =
-      vpc && virtualNetworkName
-        ? [
-            aws_ec2.SecurityGroup.fromLookupByName(
-              this,
-              'workload-sg-lookup',
-              getVirtualNetworkWorkloadSecurityGroupName(virtualNetworkName, props.qpqConfig),
-              vpc,
-            ),
-          ]
-        : undefined;
-
     const role = new aws_iam.Role(this, 'role', {
       roleName: this.resourceName(`${USER_SCRIPT_RUNNER_FUNCTION_NAME}-role`),
       assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
-        ...(vpc ? [aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')] : []),
+        ...(virtualNetworkName ? [aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')] : []),
       ],
     });
     qpqDeployAwsUtils.applyEnvironmentTags(role, props.qpqConfig);
 
+    // The sandbox's limits are config; lambda's own ceilings are checked here, where it deploys.
+    assertLambdaTimeoutInSeconds(props.userScriptRunnerConfig.timeoutInSeconds, 'defineUserScriptRunner');
+    assertLambdaMemoryInMiB(props.userScriptRunnerConfig.memoryInMiB, 'defineUserScriptRunner');
+
     this.function = new Function(this, 'runner-function', {
       functionName: this.resourceName(USER_SCRIPT_RUNNER_FUNCTION_NAME),
-      functionType: 'userScriptRunnerEvent_userScript',
-      executorName: 'userScriptRunnerEvent_userScript',
+      handler: 'userScriptRunnerEvent_userScript',
 
       timeoutInSeconds: props.userScriptRunnerConfig.timeoutInSeconds,
       memoryInBytes: props.userScriptRunnerConfig.memoryInMiB,
@@ -63,8 +50,7 @@ export class QpqCoreUserScriptRunnerConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
 
       role,
-      vpc,
-      securityGroups,
+      virtualNetworkName,
     });
 
     this.getServiceRole().addToPrincipalPolicy(

@@ -1,4 +1,4 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { FileActionType } from './FileActionType';
 
 export const askFileDelete = createActionRequester<string[]>()({
@@ -7,6 +7,7 @@ export const askFileDelete = createActionRequester<string[]>()({
     'AccessDenied', // caller lacks permission to delete
     'DriveNotFound', // storage drive does not exist
     'InvalidScope', // scope is not a valid single path segment
+    'DeleteFailed', // one or more files could not be deleted; the message lists them
   ],
   getPayload: (drive: string, filepaths: string[], scope?: string) => ({ drive, filepaths, scope }),
 });

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -19,25 +19,18 @@ import { defineWebsocket } from '../config/settings/websocket';
 import {
   defaultFileUploadSettings,
   getAllApiKeyConfigs,
-  getAllOwnedCacheConfigs,
-  getAllOwnedCertifcateConfigs,
+  getAllOwnedCertificateConfigs,
   getAllRoutes,
-  getAllRoutesForApi,
   getAllSeo,
   getAllServiceFunctions,
   getAllSrcEntries,
-  getApiConfigs,
-  getCacheConfigByName,
   getDefaultRouteSettings,
   getDomainProxyConfigs,
   getFileUploadSettings,
   getOwnedServiceFunctions,
-  getOwnedWebsocketSettings,
   getSubdomainRedirects,
   getWebEntry,
   getWebEntryConfigs,
-  getWebsocketEntryByApiName,
-  getWebsocketSettings,
   isStorageDriveWebEntryOrigin,
 } from './qpqConfigAccessorsUtils';
 
@@ -55,11 +48,9 @@ describe('config setting selectors', () => {
     ]);
 
     expect(getAllRoutes(config)).toHaveLength(1);
-    expect(getAllRoutesForApi('orders', config)).toHaveLength(1);
     expect(getAllApiKeyConfigs(config)).toHaveLength(1);
     expect(getAllSeo(config)).toHaveLength(1);
     expect(getAllServiceFunctions(config)).toHaveLength(1);
-    expect(getApiConfigs(config)).toHaveLength(1);
   });
 
   it('collects every buildable src entry', () => {
@@ -82,34 +73,6 @@ describe('getWebEntry', () => {
 
   it('throws when no web entry build path is configured', () => {
     expect(() => getWebEntry(buildTestQpqConfig())).toThrow('please use defineWebEntry');
-  });
-});
-
-describe('websocket selectors', () => {
-  const config = buildTestQpqConfig([defineWebsocket('api', {}, { apiName: 'realtime' })]);
-
-  it('returns all websocket settings', () => {
-    expect(getWebsocketSettings(config)).toHaveLength(1);
-  });
-
-  it('finds a websocket by api name', () => {
-    expect(getWebsocketEntryByApiName('realtime', config).apiName).toBe('realtime');
-  });
-
-  it('throws when no websocket matches the api name', () => {
-    expect(() => getWebsocketEntryByApiName('missing', config)).toThrow('No websocket setting found');
-  });
-});
-
-describe('getCacheConfigByName', () => {
-  const config = buildTestQpqConfig([defineCache('cdn', cacheSettings)]);
-
-  it('finds a cache config by name', () => {
-    expect(getCacheConfigByName('cdn', config).name).toBe('cdn');
-  });
-
-  it('throws when no cache config matches', () => {
-    expect(() => getCacheConfigByName('missing', config)).toThrow('No cache config found');
   });
 });
 
@@ -174,7 +137,7 @@ describe('getDefaultRouteSettings', () => {
 describe('certificate ownership selectors', () => {
   it('does not throw building a certificate config', () => {
     const config = buildTestQpqConfig([defineCertificate(true, 'example.com')]);
-    expect(getAllOwnedCertifcateConfigs(config)).toHaveLength(1);
+    expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });
 
@@ -204,8 +167,6 @@ describe('list and ownership selectors', () => {
 
   it('returns owned resources for the deploying module', () => {
     expect(getOwnedServiceFunctions(config)).toHaveLength(1);
-    expect(getOwnedWebsocketSettings(config)).toHaveLength(1);
-    expect(getAllOwnedCacheConfigs(config)).toHaveLength(1);
-    expect(getAllOwnedCertifcateConfigs(config)).toHaveLength(1);
+    expect(getAllOwnedCertificateConfigs(config)).toHaveLength(1);
   });
 });

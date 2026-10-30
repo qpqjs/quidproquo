@@ -1,25 +1,20 @@
 import { loadUserScriptHostModules } from '@qpqjs/actionprocessor-node';
 import {
-  ActionProcessorList,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   askFileListDirectory,
   askFileReadTextContents,
   askUserScriptBuild,
   createActionProcessor,
   createNestedRuntime,
-  DynamicModuleLoader,
+  generateUuid,
+  getDateNow,
   ProcessorFor,
   QPQConfig,
-  QpqLogger,
   QpqRuntimeType,
-  StorySession,
-  StorySessionUpdater,
-  StreamRegistry,
-  UserScriptBuildActionPayload,
+  storyResultToActionResult,
 } from '@qpqjs/core';
-
-import { randomUUID } from 'crypto';
 
 import { UserScriptBuildError } from '../build/UserScriptBuildError';
 import { askUserScriptCheckPublishedOutput } from './logic/askUserScriptCheckPublishedOutput';
@@ -32,8 +27,6 @@ import { materialiseUserScriptSource } from './logic/materialiseUserScriptSource
 
 const { errorType } = askUserScriptBuild;
 
-const getDateNow = () => new Date().toISOString();
-
 // Drive failures while collecting the source, re-labelled into this action's catalog; any
 // other failure passes through with its own type.
 const COLLECT_ERROR_TYPES: Record<string, string> = {
@@ -44,22 +37,14 @@ const COLLECT_ERROR_TYPES: Record<string, string> = {
 };
 
 const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScriptBuild> => {
-  return async (
-    payload: UserScriptBuildActionPayload,
-    session: StorySession,
-    actionProcessors: ActionProcessorList,
-    logger: QpqLogger,
-    updateSession: StorySessionUpdater,
-    dynamicModuleLoader: DynamicModuleLoader,
-    streamRegistry: StreamRegistry,
-  ) => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const resolveStory = createNestedRuntime(
       qpqConfig,
       session,
       actionProcessors,
       getDateNow,
       logger,
-      randomUUID,
+      generateUuid,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
       undefined,
@@ -85,22 +70,22 @@ const getProcessBuild = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserScrip
         payload.sourceMap,
         hostModules,
       );
-    } catch (error) {
-      if (error instanceof UserScriptBuildError) {
-        return actionResultError(getUserScriptBuildErrorType(error.code, errorType), error.message);
-      }
-      throw error;
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserScriptBuildError: (error) =>
+          actionResultError(getUserScriptBuildErrorType((error as UserScriptBuildError).code, errorType), error.message),
+      });
     }
 
     const published = await resolveStory(() => askUserScriptPublishOutput(payload.drive, payload.outputFilepath, built.script, payload.scope), []);
     if (published.error) {
-      return actionResultError(published.error.errorType, published.error.errorText);
+      return storyResultToActionResult(published, 'UserScript Build publish');
     }
 
     // The output contract is judged where the script's top-level code cannot reach the host.
     const checked = await resolveStory(() => askUserScriptCheckPublishedOutput(payload.drive, payload.outputFilepath, payload.scope, errorType), []);
     if (checked.error) {
-      return actionResultError(checked.error.errorType, checked.error.errorText);
+      return storyResultToActionResult(checked, 'UserScript Build check output');
     }
 
     return actionResult({ exports: checked.result });

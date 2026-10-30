@@ -79,9 +79,7 @@ const waitForReady = async (server) => {
 
   while (Date.now() < deadline) {
     if (server.exitCode !== null) {
-      throw new Error(
-        `dev server exited with ${server.exitCode} before it was ready`
-      );
+      throw new Error(`dev server exited with ${server.exitCode} before it was ready`);
     }
 
     try {
@@ -120,9 +118,7 @@ const stopServer = (server) =>
     }
 
     const timer = setTimeout(() => {
-      log(
-        `dev server did not stop within ${STOP_TIMEOUT_MS}ms, sending SIGKILL`
-      );
+      log(`dev server did not stop within ${STOP_TIMEOUT_MS}ms, sending SIGKILL`);
       server.kill('SIGKILL');
     }, STOP_TIMEOUT_MS);
 
@@ -142,14 +138,10 @@ const main = async () => {
   // hear the stop, its dev server child would never drain, and the exit would
   // come back as a signal kill. One less layer means the signal lands where
   // the handler is.
-  const server = spawn(
-    process.execPath,
-    [QPQ_BIN, 'go:dev:api', '--app', APP_NAME, '--deployment', DEPLOYMENT],
-    {
-      cwd: APP_ROOT,
-      stdio: 'inherit',
-    }
-  );
+  const server = spawn(process.execPath, [QPQ_BIN, 'go:dev:api', '--app', APP_NAME, '--deployment', DEPLOYMENT], {
+    cwd: APP_ROOT,
+    stdio: 'inherit',
+  });
 
   // The server is stopped either way, but a smoke failure is reported ahead of
   // a dirty shutdown: it is the more useful of the two, and letting the
@@ -173,9 +165,7 @@ const main = async () => {
   }
 
   if (signal) {
-    throw new Error(
-      `dev server was killed by ${signal} instead of shutting down, so its teardown never ran`
-    );
+    throw new Error(`dev server was killed by ${signal} instead of shutting down, so its teardown never ran`);
   }
 
   if (code !== 0) {
@@ -183,6 +173,4 @@ const main = async () => {
   }
 };
 
-main().catch((error) =>
-  fail(error instanceof Error ? error.message : String(error))
-);
+main().catch((error) => fail(error instanceof Error ? error.message : String(error)));

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { defineKeyValueStore, KeyValueStoreActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import * as os from 'os';
@@ -6,7 +7,6 @@ import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { closeAllKvsRepositories } from '../../../logic/keyValueStore/getKvsRepository';
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
@@ -44,16 +44,16 @@ describe('cross-service KVS visibility', () => {
     const upsert = upsertProcessors[KeyValueStoreActionType.Upsert];
     const get = getProcessors[KeyValueStoreActionType.Get];
 
-    await invokeProcessor(upsert, { keyValueStoreName: 'userLinks', item: { id: 'link-1', member: true } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'userLinks', item: { id: 'link-1', member: true } });
 
-    const firstRead = await invokeProcessor(get, { keyValueStoreName: 'userLinks', key: 'link-1' });
+    const firstRead = await invokeProcessor(get!, { keyValueStoreName: 'userLinks', key: 'link-1' });
     expect(resolveActionResult(firstRead)).toEqual({ id: 'link-1', member: true });
 
     // The actual bug: the reader has already touched the store; a later
     // write through the owner must still come back, not a stale snapshot.
-    await invokeProcessor(upsert, { keyValueStoreName: 'userLinks', item: { id: 'link-2', member: true } });
+    await invokeProcessor(upsert!, { keyValueStoreName: 'userLinks', item: { id: 'link-2', member: true } });
 
-    const secondRead = await invokeProcessor(get, { keyValueStoreName: 'userLinks', key: 'link-2' });
+    const secondRead = await invokeProcessor(get!, { keyValueStoreName: 'userLinks', key: 'link-2' });
     expect(resolveActionResult(secondRead)).toEqual({ id: 'link-2', member: true });
   });
 });

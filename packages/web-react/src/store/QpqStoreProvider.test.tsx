@@ -25,6 +25,15 @@ describe('QpqStoreProvider', () => {
   });
 
   it('useQpqStore throws without a provider', () => {
-    expect(() => renderHook(() => useQpqStore())).toThrow('useQpqStore must be used inside a QpqStoreProvider');
+    // React's development build rethrows a render error through a window error event so devtools
+    // can pause on it, and jsdom prints every unhandled one to stderr. Handling the event keeps the
+    // run quiet; the throw still reaches toThrow.
+    const markHandled = (event: ErrorEvent) => event.preventDefault();
+    window.addEventListener('error', markHandled);
+    try {
+      expect(() => renderHook(() => useQpqStore())).toThrow('useQpqStore must be used inside a QpqStoreProvider');
+    } finally {
+      window.removeEventListener('error', markHandled);
+    }
   });
 });

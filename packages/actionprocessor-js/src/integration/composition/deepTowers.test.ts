@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { assignIds, buildStory, evaluate, generateTowers, Spec } from './compositionSpec';
 import { runComposition } from './runtime';
-import { assignIds, buildStory, evaluate, generateTowers, Spec } from './spec';
 
 // Mega-tower stress test: every control-flow primitive (catch, override, global/local provide,
 // boundary, parallel) stacked many levels deep down a single chain, in every rotation order,

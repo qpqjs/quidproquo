@@ -26,10 +26,7 @@ import { getRootHosts, runEdgeChecks } from './smoke/runEdgeChecks.mjs';
 import { runSmokeRun } from './smoke/runSmokeRun.mjs';
 
 const SERVICE_NAME = 'test';
-const DEPLOY_CONFIG_PATH = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '../apps/qpqjs/deploy.config.json'
-);
+const DEPLOY_CONFIG_PATH = join(dirname(fileURLToPath(import.meta.url)), '../apps/qpqjs/deploy.config.json');
 
 const log = (message) => console.log(`deployed-smoke: ${message}`);
 
@@ -56,9 +53,7 @@ const getRoots = (environment) => {
   const { deployments } = JSON.parse(readFileSync(DEPLOY_CONFIG_PATH, 'utf8'));
   const allRoots = splitList(deployments[environment]?.settings?.ROOT_DOMAINS);
   if (!allRoots.length) {
-    fail(
-      `deployment '${environment}' in ${DEPLOY_CONFIG_PATH} has no ROOT_DOMAINS setting`
-    );
+    fail(`deployment '${environment}' in ${DEPLOY_CONFIG_PATH} has no ROOT_DOMAINS setting`);
   }
 
   const subset = splitList(process.env.SMOKE_ROOTS);
@@ -75,9 +70,7 @@ const getRoots = (environment) => {
 
 const printTable = (root, results) => {
   for (const result of results) {
-    log(
-      `  [${root}] ${result.ok ? 'pass' : 'FAIL'}  ${result.name.padEnd(36)} ${result.detail}`
-    );
+    log(`  [${root}] ${result.ok ? 'pass' : 'FAIL'}  ${result.name.padEnd(36)} ${result.detail}`);
   }
 };
 
@@ -97,9 +90,7 @@ const smokeRoot = async (hosts, allHosts) => {
     await runSmokeRun(apiUrl, rootLog);
   } catch (error) {
     apiOk = false;
-    rootLog(
-      `api smoke failed: ${error instanceof Error ? error.message : String(error)}`
-    );
+    rootLog(`api smoke failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   return edgeOk && apiOk;

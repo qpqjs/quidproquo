@@ -1,3 +1,4 @@
+import { unique } from '@qpqjs/core';
 import { EmailDeliveryStatus } from '@qpqjs/webserver';
 
 import { ActionSearchActionRow } from '../../domain/ActionSearchActionRow';
@@ -72,7 +73,7 @@ const getEmailLookupKeys = (entity: ActionSearchEntityRow): string[] => {
     .map((address) => address.trim())
     .filter((address) => !!address);
 
-  return [...new Set(addresses)].map((address) => `recipient#${address}`);
+  return unique(addresses).map((address) => `recipient#${address}`);
 };
 
 export const emailEntityDefinition: ActionSearchEntityDefinition = {

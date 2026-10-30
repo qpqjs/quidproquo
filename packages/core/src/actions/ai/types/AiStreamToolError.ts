@@ -6,7 +6,7 @@ import { AiStreamPartType } from './AiStreamPartType';
  * `toolCallId` matches the originating {@link AiStreamToolCall}. The error is stringified
  * into `message` so the part stays JSON-serializable.
  */
-export interface AiStreamToolError {
+export type AiStreamToolError = {
   type: AiStreamPartType.ToolError;
   /** Id of the tool call that errored. */
   toolCallId: string;
@@ -16,4 +16,4 @@ export interface AiStreamToolError {
   input: unknown;
   /** Stringified error message. */
   message: string;
-}
+};

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, defineKeyValueStore, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
+import { defineKeyValueStore, KvsUpdateActionType, QPQConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -6,7 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { runKvsRepositoryContractTests } from './kvsRepositoryContractTests';
+import { runKvsRepositoryContractTests } from './testing/kvsRepositoryContractTests';
 import { SqliteKvsRepository } from './SqliteKvsRepository';
 import { warnIfLegacyJsonKvsStores } from './warnIfLegacyJsonKvsStores';
 
@@ -71,6 +72,21 @@ describe('SqliteKvsRepository storage', () => {
         .map((row: any) => row.name),
     );
     expect(tables).toEqual(['qpq_kvs_other-service_widgets']);
+  });
+
+  it("names the table by the owner's resourceNameOverride, as the dynamo table is named", async () => {
+    const repo = makeRepo([
+      defineKeyValueStore('widgets', { key: 'id', type: 'string' }, [], { owner: { module: 'other-service', resourceNameOverride: 'gadgets' } }),
+    ]);
+    await repo.upsert('widgets', { id: 'w1' });
+
+    const tables = inspectDatabase((db) =>
+      db
+        .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'qpq_kvs_%'`)
+        .all()
+        .map((row: any) => row.name),
+    );
+    expect(tables).toEqual(['qpq_kvs_other-service_gadgets']);
   });
 
   it("stores unscoped rows under the '' scope sentinel and scoped rows under their scope name", async () => {

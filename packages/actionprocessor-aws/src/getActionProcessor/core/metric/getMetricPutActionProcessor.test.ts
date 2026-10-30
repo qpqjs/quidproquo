@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, MetricActionType, MetricUnit } from '@qpqjs/core';
+import { MetricActionType, MetricUnit } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getMetricPutActionProcessor } from './getMetricPutActionProcessor';
 
 const resolveProcessor = async () => {
@@ -21,7 +21,7 @@ describe('getMetricPutActionProcessor', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, { metricName: 'templateGenerated', value: 3, unit: MetricUnit.milliseconds, dimensions: { kind: 'docx' } });
+    await invokeProcessor(processor!, { metricName: 'templateGenerated', value: 3, unit: MetricUnit.milliseconds, dimensions: { kind: 'docx' } });
 
     const emf = getLoggedEmf(logSpy);
     expect(emf._aws.CloudWatchMetrics).toEqual([
@@ -41,7 +41,7 @@ describe('getMetricPutActionProcessor', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, { metricName: 'signIn', value: 1 });
+    await invokeProcessor(processor!, { metricName: 'signIn', value: 1 });
 
     const emf = getLoggedEmf(logSpy);
     expect(emf._aws.CloudWatchMetrics[0].Metrics).toEqual([{ Name: 'signIn', Unit: 'Count' }]);
@@ -52,7 +52,7 @@ describe('getMetricPutActionProcessor', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const processors = await getMetricPutActionProcessor(buildTestQpqConfig([], { feature: 'jane' }), {} as any);
 
-    await invokeProcessor(processors[MetricActionType.Put], { metricName: 'signIn', value: 1 });
+    await invokeProcessor(processors![MetricActionType.Put]!, { metricName: 'signIn', value: 1 });
 
     const emf = getLoggedEmf(logSpy);
     expect(emf._aws.CloudWatchMetrics[0].Namespace).toBe('qpq/test-app/development/jane');
@@ -65,7 +65,7 @@ describe('getMetricPutActionProcessor', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const processor = await resolveProcessor();
 
-    await invokeProcessor(processor, {
+    await invokeProcessor(processor!, {
       metricName: 'requests',
       value: 1,
       dimensions: { kind: 'a"}\n{"_aws":{"CloudWatchMetrics":[{"Namespace":"other-app"}]}}', Namespace: 'other-app' },

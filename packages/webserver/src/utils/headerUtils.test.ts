@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, ErrorTypeEnum, runStory, StoryError } from '@qpqjs/core';
+import { ErrorTypeEnum } from '@qpqjs/core';
+import { buildTestQpqConfig, runStory, StoryError } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

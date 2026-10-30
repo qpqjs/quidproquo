@@ -2,10 +2,16 @@
 // a future dockerized variant: pick an app, confirm the target, pick services
 // (or domain/bootstrap), pick stacks. buildDeployPlanFromArgs is the
 // non-interactive shortcut (`qpq go all all`) that skips every prompt.
+import { Nullable } from '@qpqjs/core';
+
 import { getPositionalArgs } from './args';
-import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { getServiceNames } from './discovery';
-import { promptSelect, promptText, promptYesNo } from './prompts';
+import { getDeployTargetLabel } from './getDeployTargetLabel';
+import { promptSelect, promptTypedConfirmation, promptYesNo } from './prompts';
+import { CliError } from './CliError';
+import { createOutput } from './out';
+
+const out = createOutput('deploy-prompts');
 
 export type StackType = 'all' | 'inf' | 'api' | 'web' | 'views';
 
@@ -31,7 +37,7 @@ export type DeployPlan =
 // Returns null when no positional services token is given, so callers fall back
 // to the interactive promptDeployPlan. Passing args is an explicit opt-in to a
 // prompt-free deploy, so the "Deploying to: [env]" confirmation is skipped too.
-export const buildDeployPlanFromArgs = (appName: string, argv: string[]): DeployPlan | null => {
+export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Nullable<DeployPlan> => {
   const [servicesArg, stacksArg] = getPositionalArgs(argv, ['--app', '--deployment']);
 
   if (!servicesArg) {
@@ -49,18 +55,22 @@ export const buildDeployPlanFromArgs = (appName: string, argv: string[]): Deploy
   }
 
   const allServices = getServiceNames(appName);
-  const services = servicesArg === 'all' ? allServices : servicesArg.split(',').map((s) => s.trim()).filter(Boolean);
+  const services =
+    servicesArg === 'all'
+      ? allServices
+      : servicesArg
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
 
   const unknownServices = services.filter((service) => !allServices.includes(service));
   if (unknownServices.length > 0) {
-    console.error(`Unknown service(s): ${unknownServices.join(', ')}. Valid services: ${allServices.join(', ')}`);
-    process.exit(1);
+    throw new CliError(`Unknown service(s): ${unknownServices.join(', ')}. Valid services: ${allServices.join(', ')}`);
   }
 
   const stacks = (stacksArg ?? 'all') as StackType;
   if (!STACK_TYPES.includes(stacks)) {
-    console.error(`Unknown stacks '${stacksArg}'. Valid stacks: ${STACK_TYPES.join(', ')}`);
-    process.exit(1);
+    throw new CliError(`Unknown stacks '${stacksArg}'. Valid stacks: ${STACK_TYPES.join(', ')}`);
   }
 
   return { kind: 'services', appName, services: [...new Set(services)], stacks };
@@ -70,7 +80,7 @@ export const promptDeployPlan = async (appName: string): Promise<DeployPlan> => 
   const deployInfo = getDeployTargetLabel();
 
   if (!(await promptYesNo(`Deploying to: [${deployInfo}]`))) {
-    console.log('Exiting!');
+    out.log('Exiting!');
     return { kind: 'cancelled' };
   }
 
@@ -117,7 +127,7 @@ export type TeardownPlan =
   | { kind: 'services'; appName: string; services: string[] };
 
 // The question flow for `qpq teardown`: pick services, then type the deploy
-// target back to confirm — destroying inf stacks takes user data (key value
+// target back to confirm, destroying inf stacks takes user data (key value
 // stores, user directories) with it, so a y/n prompt isn't enough friction.
 export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan> => {
   const deployInfo = getDeployTargetLabel();
@@ -140,11 +150,8 @@ export const promptTeardownPlan = async (appName: string): Promise<TeardownPlan>
 
   services = [...new Set(services)];
 
-  console.log(`\nThis will DESTROY the web, api and inf stacks (including all stored data) for: ${services.join(', ')}`);
-  const confirmation = await promptText(`Type '${deployInfo}' to confirm`);
-
-  if (confirmation !== deployInfo) {
-    console.log('Confirmation did not match. Exiting!');
+  out.log(`\nThis will DESTROY the web, api and inf stacks (including all stored data) for: ${services.join(', ')}`);
+  if (!(await promptTypedConfirmation(deployInfo))) {
     return { kind: 'cancelled' };
   }
 

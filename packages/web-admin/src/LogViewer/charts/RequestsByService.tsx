@@ -4,10 +4,10 @@ import { Typography } from '@mui/material';
 import { useRequestsByService } from '../hooks/useRequestsByService';
 import { SearchParams } from '../types';
 
-interface RequestsByServiceProps {
+type RequestsByServiceProps = {
   logs: any[];
   searchParams: SearchParams;
-}
+};
 
 export const RequestsByService = ({ logs, searchParams }: RequestsByServiceProps) => {
   const data = useRequestsByService(logs, searchParams);

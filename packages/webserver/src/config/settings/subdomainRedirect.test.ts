@@ -14,19 +14,15 @@ describe('defineSubdomainRedirect', () => {
       addEnvironment: true,
       addFeatureEnvironment: true,
       onRootDomain: true,
-      cloudflareApiKeySecretName: undefined,
     });
   });
 
-  it('honours the supplied flags and cloudflare secret', () => {
-    const setting = defineSubdomainRedirect('www', './build', 'https://example.com', false, false, false, {
-      cloudflareApiKeySecretName: 'cf-secret',
-    });
+  it('honours the supplied flags', () => {
+    const setting = defineSubdomainRedirect('www', './build', 'https://example.com', false, false, false);
 
     expect(setting.addEnvironment).toBe(false);
     expect(setting.addFeatureEnvironment).toBe(false);
     expect(setting.onRootDomain).toBe(false);
-    expect(setting.cloudflareApiKeySecretName).toBe('cf-secret');
   });
 
   // Security regression: the redirect target is config, stored verbatim, so what a request can add is only the path and
@@ -40,7 +36,6 @@ describe('defineSubdomainRedirect', () => {
         'addEnvironment',
         'addFeatureEnvironment',
         'apiBuildPath',
-        'cloudflareApiKeySecretName',
         'configSettingType',
         'onRootDomain',
         'redirectUrl',

@@ -4,8 +4,10 @@ import { findRootLog } from './findRootLog';
 
 const apiRequestGet = vi.fn();
 
-vi.mock('../../logic', () => ({
-  cache: (fn: unknown) => fn,
+// Only the network wrapper is replaced; the memoising `cache` around findRootLog is real, so each
+// test walks a correlation of its own.
+vi.mock('../../logic/platform/apiRequest', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<object>()),
   apiRequestGet: (...args: unknown[]) => apiRequestGet(...args),
 }));
 

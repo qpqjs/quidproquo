@@ -4,7 +4,6 @@ import {
   actionResultErrorFromCaughtError,
   askFileWriteBinaryContents,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
@@ -36,7 +35,7 @@ const getProcessFileWriteBinaryContents =
           );
         }
 
-        return actionResult(void 0);
+        return actionResult(undefined);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
           InvalidScopeError: (error) => actionResultError(askFileWriteBinaryContents.errorType.InvalidScope, error.message),

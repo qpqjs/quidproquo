@@ -32,11 +32,12 @@ export const sendMessageToWebSocketConnection = async (
   websocketApiName: string,
   connectionId: string,
   payload: any,
-): Promise<void> => {
+): Promise<boolean> => {
   const wsConnection = findRegisteredWebSocketServer(service, websocketApiName)?.connections?.[connectionId];
   if (!wsConnection) {
-    return;
+    return false;
   }
 
   wsConnection.send(JSON.stringify(payload));
+  return true;
 };

@@ -4,9 +4,7 @@ import { SmokeSurvivorProbeResult } from '../models/SmokeSurvivorProbeResult';
 
 // Runs INSIDE the sandbox: tries the survivor port on loopback. A refused connection is the
 // good outcome; anything that accepts is a process an earlier script call left behind.
-export const probeSurvivor = (
-  port: number
-): Promise<SmokeSurvivorProbeResult> =>
+export const probeSurvivor = (port: number): Promise<SmokeSurvivorProbeResult> =>
   new Promise((resolve) => {
     const socket = connect({ port, host: '127.0.0.1' });
     const finish = (reachable: boolean, detail: string): void => {

@@ -3,7 +3,7 @@ import { defineGlobal, defineServiceSettings, defineUserDirectory, EmailTemplate
 import { AUTH_USER_DIRECTORY_GLOBAL_KEY } from '../../../services/auth/config';
 import { defineAuthServiceRoute } from '../../../services/auth/config/defineAuthServiceRoute';
 
-export interface AuthSystemOptions {
+export type AuthSystemOptions = {
   phoneRequired?: boolean;
 
   selfSignUpEnabled?: boolean;
@@ -21,7 +21,7 @@ export interface AuthSystemOptions {
   // Shorter shrinks the post-revocation window in which a stateless access token still
   // works. Keep comfortably above 10 (the web client refreshes ~10 min before expiry).
   accessTokenValidityMinutes?: number;
-}
+};
 
 // Bundles a complete username/password login flow: a user directory plus the
 // endpoints needed to log in, refresh tokens, respond to challenges, recover a

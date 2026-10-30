@@ -1,9 +1,7 @@
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { QPQConfig } from '@qpqjs/core';
 
-import { MCP_TOOLSET_CONFIG_SETTING_TYPE } from '../constants/mcpToolsetConfigSettingType';
+import { getAllMcpToolsetConfigs } from '../config/logic/getAllMcpToolsetConfigs';
 import { McpToolset } from '../models/McpToolset';
-import { McpToolsetQPQConfigSetting } from '../types/McpToolsetQPQConfigSetting';
 
 /** Every defineMcpToolset in the service. */
-export const buildMcpToolsets = (qpqConfig: QPQConfig): McpToolset[] =>
-  qpqCoreUtils.getConfigSettings<McpToolsetQPQConfigSetting>(qpqConfig, MCP_TOOLSET_CONFIG_SETTING_TYPE).map(({ toolset }) => toolset);
+export const buildMcpToolsets = (qpqConfig: QPQConfig): McpToolset[] => getAllMcpToolsetConfigs(qpqConfig).map(({ toolset }) => toolset);

@@ -11,13 +11,7 @@ import {
 } from '@qpqjs/config-aws';
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { QpqAppDeployContext } from '@qpqjs/deploy-aws';
-import {
-  defineApi,
-  defineDns,
-  defineEmailReceivingDomain,
-  getDeploySettingList,
-  QPQConfig,
-} from 'quidproquo';
+import { defineApi, defineDns, defineEmailReceivingDomain, getDeploySettingList, QPQConfig } from 'quidproquo';
 
 export default ({ region }: QpqAppDeployContext): QPQConfig => [
   defineDns(getDeploySettingList('ROOT_DOMAINS')),
@@ -33,12 +27,7 @@ export default ({ region }: QpqAppDeployContext): QPQConfig => [
 
   defineBootstrapWaf({
     rateLimits: [{ name: 'all-traffic', limit: 2000 }],
-    managedRuleGroups: [
-      WafManagedRuleGroup.common,
-      WafManagedRuleGroup.ipReputation,
-      WafManagedRuleGroup.knownBadInputs,
-      WafManagedRuleGroup.sqli,
-    ],
+    managedRuleGroups: [WafManagedRuleGroup.common, WafManagedRuleGroup.ipReputation, WafManagedRuleGroup.knownBadInputs, WafManagedRuleGroup.sqli],
     managedRuleOverrides: {
       [WafManagedRuleGroup.common]: [
         { name: 'SizeRestrictions_BODY', action: WafRuleOverrideAction.count }, // Disable the 8kb limit
@@ -49,20 +38,10 @@ export default ({ region }: QpqAppDeployContext): QPQConfig => [
   defineApi('api'),
 
   // CloudFront (us-east-1): the site root plus every web entry, on every root domain.
-  defineDomainCertificate(
-    'us-east-1',
-    [
-      { subdomain: 'www' },
-      { subdomain: 'views' },
-      { subdomain: 'docs' },
-      { subdomain: 'storybook' },
-    ],
-    { includeApex: true }
-  ),
+  defineDomainCertificate('us-east-1', [{ subdomain: 'www' }, { subdomain: 'views' }, { subdomain: 'docs' }, { subdomain: 'storybook' }], {
+    includeApex: true,
+  }),
 
   // Regional API Gateway: the api and the admin websocket.
-  defineDomainCertificate(region, [
-    { subdomain: 'api' },
-    { subdomain: 'qpqadmin', service: QpqjsServiceEnum.Admin },
-  ]),
+  defineDomainCertificate(region, [{ subdomain: 'api' }, { subdomain: 'qpqadmin', service: QpqjsServiceEnum.Admin }]),
 ];

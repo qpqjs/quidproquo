@@ -1,5 +1,6 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, defineEventBus, defineQueue, QPQConfig, QueueQPQConfigSetting } from '@qpqjs/core';
+import { defineEventBus, defineQueue, QPQConfig, QueueQPQConfigSetting } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
@@ -23,7 +24,7 @@ const isSslDeny = (statement: any) =>
 // (which embeds a story session) can never travel unencrypted.
 describe('QpqCoreQueueConstruct transport', () => {
   it('denies plain http on the main queue and the dead letter queue', () => {
-    const template = synth(defineQueue('jobs', 'src/jobs', {}));
+    const template = synth(defineQueue('jobs', {}, {}));
     const policies = Object.values(template.findResources('AWS::SQS::QueuePolicy'));
     const queuesWithSslDeny = policies
       .filter((policy: any) => policy.Properties.PolicyDocument.Statement.some(isSslDeny))
@@ -55,13 +56,13 @@ const sourceArns = (template: Template): string[] =>
 // another app's topic inject messages with a forged identity.
 describe('QpqCoreQueueConstruct sns delivery policy', () => {
   it('grants send only to the exact topics the queue subscribes to', () => {
-    const template = synth(defineQueue('jobs', 'src/jobs', { eventBusSubscriptions: ['events'] }), [defineEventBus('events')]);
+    const template = synth(defineQueue('jobs', {}, { eventBusSubscriptions: ['events'] }), [defineEventBus('events')]);
 
     expect(sourceArns(template)).toEqual(['arn:aws:sns:ap-southeast-2:123456789012:events-test-app-test-module-development']);
   });
 
   it("resolves a bus owned by another module to that owner's topic", () => {
-    const template = synth(defineQueue('jobs', 'src/jobs', { eventBusSubscriptions: ['events'] }), [
+    const template = synth(defineQueue('jobs', {}, { eventBusSubscriptions: ['events'] }), [
       defineEventBus('events', { owner: { module: 'other' } }),
     ]);
 
@@ -69,12 +70,12 @@ describe('QpqCoreQueueConstruct sns delivery policy', () => {
   });
 
   it('never carries a wildcard source arn', () => {
-    const template = synth(defineQueue('jobs', 'src/jobs', { eventBusSubscriptions: ['events'] }), [defineEventBus('events')]);
+    const template = synth(defineQueue('jobs', {}, { eventBusSubscriptions: ['events'] }), [defineEventBus('events')]);
 
     expect(sourceArns(template).some((arn) => arn.includes('*'))).toBe(false);
   });
 
   it('grants sns nothing when the queue subscribes to no bus', () => {
-    expect(snsSendStatements(synth(defineQueue('jobs', 'src/jobs', {})))).toEqual([]);
+    expect(snsSendStatements(synth(defineQueue('jobs', {}, {})))).toEqual([]);
   });
 });

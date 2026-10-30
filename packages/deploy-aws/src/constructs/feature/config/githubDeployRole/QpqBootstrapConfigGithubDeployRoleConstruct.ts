@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsGithubDeployRoleQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsGithubDeployRoleQPQConfigSetting, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, CfnOutput, DefaultStackSynthesizer, Duration } from 'aws-cdk-lib';
@@ -7,9 +6,9 @@ import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigGithubDeployRoleConstructProps extends QpqConstructBlockProps {
+export type QpqBootstrapConfigGithubDeployRoleConstructProps = {
   githubDeployRoleConfig: AwsGithubDeployRoleQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 /** The subject claims GitHub may present: the immutable-id form when ids are known, the name form when there are none or it was asked for. */
 export const buildGithubSubjectClaims = (config: AwsGithubDeployRoleQPQConfigSetting, githubEnvironment: string): string[] => {
@@ -44,7 +43,7 @@ const buildCdkAssumeStatement = (accountId: string, regions: string[]): aws_iam.
 // Outside CloudFormation a deploy only syncs built views and federated remotes into this
 // app's buckets, which are all named `<name>-<app>-<service>-<env>[-<feature>]`.
 const buildAppBucketStatements = (application: string, environment: string, feature: string | undefined): aws_iam.PolicyStatement[] => {
-  const suffix = feature ? `${application}-*-${environment}-${feature}` : `${application}-*-${environment}`;
+  const suffix = awsNamingUtils.withFeatureSuffix(`${application}-*-${environment}`, feature);
   const bucketArn = `arn:aws:s3:::*-${suffix}`;
 
   return [

@@ -1,4 +1,5 @@
-import { buildTestQpqConfig, buildTestStorySession, createStubLogger, LogActionType, resolveActionResult } from '@qpqjs/core';
+import { LogActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 

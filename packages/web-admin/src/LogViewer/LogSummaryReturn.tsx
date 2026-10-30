@@ -7,9 +7,9 @@ import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 
 import { AnyVariableView, genericFunctionRendererStyles } from './actionComponents';
 
-interface LogSummaryReturnProps {
+type LogSummaryReturnProps = {
   log: StoryResult<any>;
-}
+};
 
 export const LogSummaryReturn = ({ log }: LogSummaryReturnProps) => {
   const [expanded, setExpanded] = useState(false);

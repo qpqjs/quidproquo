@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import { defineCache, qpqHeaderIsBot } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';

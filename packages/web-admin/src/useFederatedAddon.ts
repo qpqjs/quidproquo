@@ -2,8 +2,8 @@ import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from '@qpq
 
 import { useEffect, useState } from 'react';
 
+import { useLoadFederatedAddons } from './hooks/useLoadFederatedAddons';
 import { FederatedAddon } from './FederatedAddon';
-import { useLoadFederatedAddons } from './FederatedAddonProvider';
 
 export function useFederatedAddon(): {
   addons: FederatedAddon[];
@@ -26,9 +26,8 @@ export function useFederatedAddon(): {
 
   useEffect(() => {
     doAsyncWork()
-      .catch((e) => {
-        console.log(e);
-        console.log('Unable to federate modules in');
+      .catch(() => {
+        // A remote that fails to load leaves the addon list empty; the shell renders without it.
       })
       .finally(() => {
         setLoading(false);

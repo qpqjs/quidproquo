@@ -1,15 +1,14 @@
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   askEventGetRecordsBase,
   createActionProcessor,
   DeployEventStatusType,
   DeployEventType,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
 import { EventInput, InternalEventRecord } from './types';
 
 const deployTypeMap: Record<string, DeployEventStatusType> = {
@@ -22,7 +21,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   return async ({ eventParams }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
-    const [eventBridgeEvent, context] = eventParams as EventInput;
+    const [eventBridgeEvent] = eventParams as EventInput;
 
     const status = eventBridgeEvent.detail['status-details'].status || '';
     const stackId = eventBridgeEvent.detail['stack-id'];
@@ -37,9 +36,9 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       deployEventStatusType: deployTypeMap[status] || DeployEventStatusType.Unknown,
     };
 
-    if (stackName === getApiStackName(qpqConfig)) {
+    if (stackName === awsNamingUtils.getApiStackName(qpqConfig)) {
       internalEventRecord.deployEventType = DeployEventType.Api;
-    } else if (stackName === getWebStackName(qpqConfig)) {
+    } else if (stackName === awsNamingUtils.getWebStackName(qpqConfig)) {
       internalEventRecord.deployEventType = DeployEventType.Web;
     }
 

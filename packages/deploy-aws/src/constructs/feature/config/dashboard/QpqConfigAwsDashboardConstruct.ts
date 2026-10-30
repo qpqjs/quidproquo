@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { AwsServiceDashboardQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, AwsServiceDashboardQPQConfigSetting, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { qpqWebServerUtils } from '@qpqjs/webserver';
 
@@ -12,9 +11,9 @@ import { getNotifyErrorEventBusNames } from '../../../base/createDefaultResource
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreEventBusConstruct } from '../../core/eventBus/QpqCoreEventBusConstruct';
 
-export interface QpqConfigAwsDashboardConstructProps extends QpqConstructBlockProps {
+export type QpqConfigAwsDashboardConstructProps = {
   dashboardConfig: AwsServiceDashboardQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 const FIVE_MINUTES = Duration.minutes(5);
 
@@ -24,11 +23,19 @@ const FIVE_MINUTES = Duration.minutes(5);
 // dashboard focused. All names are config-derived - no construct handles needed.
 const getServiceLambdaFunctionNames = (qpqConfig: QPQConfig): string[] => {
   const baseNames = [
-    ...qpqWebServerUtils.getApiConfigs(qpqConfig).map((api) => `${api.apiName}-route`),
-    ...qpqWebServerUtils.getOwnedServiceFunctions(qpqConfig).map((serviceFunction) => `${serviceFunction.functionName}-sfunc`),
-    ...qpqCoreUtils.getQueues(qpqConfig).map((queue) => `${queue.uniqueKey}-queue`),
-    ...qpqCoreUtils.getOwnedScheduleEvents(qpqConfig).map((schedule) => `${schedule.uniqueKey}-SE`),
-    ...qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((websocket) => `${websocket.apiName}-ws`),
+    ...qpqWebServerUtils.getAllApiConfigs(qpqConfig).map((api) => awsNamingUtils.getLambdaBaseName(api.apiName, awsNamingUtils.QpqLambdaKind.Route)),
+    ...qpqWebServerUtils
+      .getOwnedServiceFunctions(qpqConfig)
+      .map((serviceFunction) => awsNamingUtils.getServiceFunctionLambdaBaseName(serviceFunction.functionName)),
+    ...qpqCoreUtils
+      .getAllQueueConfigs(qpqConfig)
+      .map((queue) => awsNamingUtils.getLambdaBaseName(queue.uniqueKey, awsNamingUtils.QpqLambdaKind.Queue)),
+    ...qpqCoreUtils
+      .getOwnedScheduleEvents(qpqConfig)
+      .map((schedule) => awsNamingUtils.getLambdaBaseName(schedule.uniqueKey, awsNamingUtils.QpqLambdaKind.Schedule)),
+    ...qpqWebServerUtils
+      .getOwnedWebsocketConfigs(qpqConfig)
+      .map((websocket) => awsNamingUtils.getLambdaBaseName(websocket.apiName, awsNamingUtils.QpqLambdaKind.Websocket)),
   ];
 
   return baseNames.map((name) => awsNamingUtils.getConfigRuntimeResourceNameFromConfig(name, qpqConfig));
@@ -60,7 +67,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
     });
 
     // Api row
-    qpqWebServerUtils.getApiConfigs(props.qpqConfig).forEach((apiConfig) => {
+    qpqWebServerUtils.getAllApiConfigs(props.qpqConfig).forEach((apiConfig) => {
       const apiName = this.resourceName(`${apiConfig.apiName}-rest-api`);
 
       const apiMetric = (metricName: string, statistic: string, label?: string): aws_cloudwatch.Metric =>
@@ -191,7 +198,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
     }
 
     // Data row
-    const tableWidgets = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map((kvsConfig) => {
+    const tableWidgets = qpqCoreUtils.getOwnedKeyValueStoreConfigs(props.qpqConfig).map((kvsConfig) => {
       const tableName = this.qpqResourceName(kvsConfig.keyValueStoreName, 'kvs');
 
       const tableMetric = (metricName: string, label: string): aws_cloudwatch.Metric =>
@@ -212,7 +219,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
       });
     });
 
-    const queueWidgets = qpqCoreUtils.getQueues(props.qpqConfig).map((queueConfig) => {
+    const queueWidgets = qpqCoreUtils.getAllQueueConfigs(props.qpqConfig).map((queueConfig) => {
       const queueMetric = (queueName: string, metricName: string, label: string): aws_cloudwatch.Metric =>
         new aws_cloudwatch.Metric({
           namespace: 'AWS/SQS',
@@ -242,7 +249,7 @@ export class QpqConfigAwsDashboardConstruct extends QpqConstructBlock {
           namespace: 'AWS/WAFV2',
           metricName,
           dimensionsMap: {
-            WebACL: `qpq-waf-regional-${qpqCoreUtils.getApplicationName(props.qpqConfig)}-${qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig)}`,
+            WebACL: awsNamingUtils.getWafWebAclName('regional', props.qpqConfig),
             Region: qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig),
             Rule: 'ALL',
           },

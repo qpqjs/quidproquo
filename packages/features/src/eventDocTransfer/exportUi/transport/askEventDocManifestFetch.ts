@@ -6,7 +6,7 @@ import { EventDocDocRef, EventDocManifestItem } from '../../models';
 
 /** POST /transfer/manifest: everything that would travel with the picked docs. Builds nothing. */
 export function* askEventDocManifestFetch(serviceName: string, docs: EventDocDocRef[]): AskResponse<EventDocManifestItem[]> {
-  const response = yield* askApiRequest<{ docs: EventDocDocRef[] }, EventDocManifestItem[]>(
+  const response = yield* askApiRequest<EventDocManifestItem[], { docs: EventDocDocRef[] }>(
     serviceName,
     'POST',
     eventDocTransferEndpoint('manifest'),

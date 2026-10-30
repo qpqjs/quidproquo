@@ -4,7 +4,6 @@ import {
   askEventMatchStoryBase,
   createActionProcessor,
   ErrorTypeEnum,
-  EventActionType,
   ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
@@ -12,27 +11,14 @@ import {
 } from '@qpqjs/core';
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { InternalEventRecord, MatchResult, ResolveQueueName } from './types';
 
-export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetting => {
-  // Only the queue name travels via the environment - the full setting lives in
-  // the bundled qpqConfig (serializing it into env blows the lambda 4KB limit).
-  const queueName = process.env.queueName as string;
-  const queueQPQConfigSetting = qpqCoreUtils.getQueueConfigSettingByName(queueName, qpqConfig);
+const getProcessMatchStory = (qpqConfig: QPQConfig, resolveQueueName: ResolveQueueName): ProcessorFor<typeof askEventMatchStoryBase> => {
+  return async ({ qpqEventRecord: rawQpqEventRecord, eventParams }) => {
+    const queueQPQConfigSetting = qpqCoreUtils.resolveQueueOrThrow(resolveQueueName(eventParams), qpqConfig);
+    const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
+    const queueTypes = Object.keys(queueQueueProcessors).sort();
 
-  if (!queueQPQConfigSetting) {
-    throw new Error(`No queue config setting found for queue [${queueName}]`);
-  }
-
-  return queueQPQConfigSetting;
-};
-
-const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
-  const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig);
-  const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
-  const queueTypes = Object.keys(queueQueueProcessors).sort();
-
-  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
     // Registered for one event source only, so the base requester's
     // source-agnostic payload is narrowed to this source's types here.
     const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
@@ -65,4 +51,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
   };
 };
 
-export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);
+/** Shared by the lambda and the dev server (B6); each passes how it resolves the queue name. */
+export const getEventMatchStoryActionProcessor = (resolveQueueName: ResolveQueueName) =>
+  createActionProcessor(askEventMatchStoryBase, (qpqConfig) => getProcessMatchStory(qpqConfig, resolveQueueName));

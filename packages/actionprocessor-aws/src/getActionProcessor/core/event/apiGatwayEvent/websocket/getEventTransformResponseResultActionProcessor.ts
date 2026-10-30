@@ -4,29 +4,17 @@ import {
   askLogCreate,
   AskResponse,
   createActionProcessor,
-  EventActionType,
   EventTransformResponseResultActionPayload,
+  generateUuid,
   getProcessCustomImplementation,
   LogLevelEnum,
   ProcessorFor,
   QPQConfig,
 } from '@qpqjs/core';
 
-import { randomGuid } from '../../../../../awsLambdaUtils';
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
-
-export function* askTransformResponseStory({
-  eventParams,
-  qpqEventRecordResponses: [record],
-}: EventTransformResponseResultActionPayload<EventInput, InternalEventRecord>): AskResponse<EventOutput> {
-  if (!record.success) {
-    yield* askLogCreate(LogLevelEnum.Fatal, record.error.errorText, record.error.errorStack);
-  }
-
-  return {
-    statusCode: 500,
-  };
-}
+/** Logs a failed websocket handler run at fatal level; the gateway is always answered with a 500. */
+import { askTransformResponseStory } from './stories';
+import { EventInput, EventOutput, InternalEventRecord } from './types';
 
 const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // Create a custom runtime for errored responses so we can log them out
@@ -36,7 +24,7 @@ const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<t
     'Transform Errored Websocket Response',
     null,
     () => new Date().toISOString(),
-    randomGuid,
+    generateUuid,
   );
 
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

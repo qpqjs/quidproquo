@@ -13,43 +13,22 @@ import { askServiceFunctionExecute } from '@qpqjs/webserver';
 import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
+import { ADMIN_LOG_SERVICE_NAME_GLOBAL, ADMIN_SERVICE_NAMES_GLOBAL } from '../../../constants';
 import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
+import {
+  askLogMetadataGetByCorrelation,
+  askLogMetadataGetByFromCorrelation,
+  askLogMetadataGetHierarchiesByCorrelation,
+} from '../../data/logMetadata';
+import { askEnsureRedactedLog, askRedactedLogGetByCorrelation } from '../../data/redactedLogData';
 import { logsLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
-import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
-import { askEnsureRedactedLog, askGetRedactedByCorrelation } from '../data/redactedLogData';
-
-export interface GetLogsParams {
-  nextPageKey?: string;
-
-  startIsoDateTime: string;
-  endIsoDateTime: string;
-  runtimeType: QpqRuntimeType;
-
-  infoFilter: string;
-  errorFilter: string;
-  serviceFilter: string;
-  userFilter: string;
-  deep: string;
-  onlyErrors: boolean;
-}
+import { LogDeepSearchQuery } from '../domain';
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
-  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =
-    yield* askFromJsonEventRequest<GetLogsParams>(event);
+  const query = yield* askFromJsonEventRequest<LogDeepSearchQuery>(event);
 
-  const logs = yield* logsLogic.askGetLogs(
-    runtimeType,
-    startIsoDateTime,
-    endIsoDateTime,
-    errorFilter,
-    serviceFilter,
-    infoFilter,
-    userFilter,
-    deep,
-    onlyErrors,
-    nextPageKey,
-  );
+  const logs = yield* logsLogic.askLogGetAll(query);
 
   return toJsonEventResponse(logs);
 }
@@ -60,9 +39,9 @@ export function* getLog(
     correlationId: string;
   },
 ) {
-  const log = yield* askGetByCorrelation(params.correlationId);
+  const log = yield* askLogMetadataGetByCorrelation(params.correlationId);
   if (!log) {
-    yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
+    return yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
   }
 
   return toJsonEventResponse(log);
@@ -80,8 +59,8 @@ export function* toggleLogCheck(
 }
 
 export function* getServiceNames(event: HTTPEvent) {
-  const services = yield* askConfigGetGlobal<string[]>('qpq-serviceNames');
-  const logServiceName = yield* askConfigGetGlobal<string>('qpq-log-service-name');
+  const services = yield* askConfigGetGlobal<string[]>(ADMIN_SERVICE_NAMES_GLOBAL);
+  const logServiceName = yield* askConfigGetGlobal<string>(ADMIN_LOG_SERVICE_NAME_GLOBAL);
 
   return toJsonEventResponse({ services, logServiceName });
 }
@@ -92,7 +71,7 @@ export function* getHierarchies(
     correlationId: string;
   },
 ) {
-  const reportUrl = yield* askGetHierarchiesByCorrelation(params.correlationId, event.query.refresh === 'true');
+  const reportUrl = yield* askLogMetadataGetHierarchiesByCorrelation(params.correlationId, event.query.refresh === 'true');
 
   return toJsonEventResponse({ url: reportUrl });
 }
@@ -103,7 +82,7 @@ export function* getChildren(
     fromCorrelation: string;
   },
 ) {
-  const log = yield* askGetByFromCorrelation(params.fromCorrelation);
+  const log = yield* askLogMetadataGetByFromCorrelation(params.fromCorrelation);
 
   return toJsonEventResponse(log);
 }
@@ -128,13 +107,13 @@ export function* downloadUrl(
 // Replays the log against its service's real code under the execution tracer and
 // returns a signed url to the resulting QpqExecutionTrace json. The trace itself is
 // produced by the OWNING service (routed on the log's moduleName) so the story code
-// loads through that service's own module loader — see trace-replay-plan.md.
+// loads through that service's own module loader, see trace-replay-plan.md.
 // The replay input is the redacted log, so the stored trace (which records local
 // variables) never carries anything the admin could not already read.
 //
 // ASYNC: tracing re-executes the story and can far outlive an HTTP request, so this
 // never waits for it. Responses are { url } when a stored trace exists, otherwise
-// { pending: true } with the trace kicked off fire-and-forget — the owning service
+// { pending: true } with the trace kicked off fire-and-forget, the owning service
 // replies via qpqStoreTraceResult, which stores the trace and pushes a TraceDone
 // websocket message to admin clients. `check=true` only reports state (never triggers),
 // so clients can poll without stacking trace runs; `refresh=true` forces a re-run.
@@ -162,7 +141,7 @@ export function* traceLog(
     return toJsonEventResponse({ pending: true });
   }
 
-  const storyResult = yield* askGetRedactedByCorrelation(params.correlationId);
+  const storyResult = yield* askRedactedLogGetByCorrelation(params.correlationId);
   const applicationInfo = yield* askConfigGetApplicationInfo();
 
   const traceLogPayload: QpqTraceLogExecutionPayload = {

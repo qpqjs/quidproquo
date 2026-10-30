@@ -1,10 +1,10 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { ConfigActionType } from './ConfigActionType';
 
 export const askConfigGetParameter = createActionRequester<string>()({
   actionType: ConfigActionType.GetParameter,
   errorTypes: [
-    'Throttling', // request rate exceeded
+    'Throttled', // request rate exceeded
   ],
   getPayload: (parameterName: string) => ({ parameterName }),
 });

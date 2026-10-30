@@ -1,4 +1,4 @@
-import { AskResponse } from '@qpqjs/core';
+import { askPagedDataDrain, AskResponse } from '@qpqjs/core';
 
 import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
@@ -9,14 +9,9 @@ export function* askEventDocWorkspaceApiFetchEvents(
   identity: EventDocWorkspaceDocumentIdentity,
   afterEventId?: number,
 ): AskResponse<EventDocEvent[]> {
-  const all: EventDocEvent[] = [];
-  let nextPageKey: string | undefined;
+  const { items } = yield* askPagedDataDrain(function* askEventsPage(nextPageKey) {
+    return yield* askEventDocWorkspaceApiFetchEventsPage(identity, { nextPageKey, afterEventId });
+  });
 
-  do {
-    const page = yield* askEventDocWorkspaceApiFetchEventsPage(identity, { nextPageKey, afterEventId });
-    all.push(...page.items);
-    nextPageKey = page.nextPageKey;
-  } while (nextPageKey);
-
-  return all;
+  return items;
 }

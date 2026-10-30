@@ -19,7 +19,7 @@ export function* askEventDocRenderFetch(
     params.effectiveAt = options.effectiveAt;
   }
 
-  const response = yield* askApiRequest<void, EventDocRenderResult>(
+  const response = yield* askApiRequest<EventDocRenderResult, void>(
     serviceName,
     'GET',
     eventDocRenderEndpoint(basePath, id),

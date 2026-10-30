@@ -1,11 +1,10 @@
-import { defineAccountEmailReceiving, defineAccountGithubOidcProvider, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { awsNamingUtils, defineAccountEmailReceiving, defineAccountGithubOidcProvider, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { describe, it } from 'vitest';
 
-import { QPQ_EMAIL_RECEIPT_RULE_SET_NAME } from '../constructs/feature/webserver/emailReceiving/emailReceiptRuleSetName';
 import { AccountQpqStack } from './AccountQpqStack';
 
 const synth = (withProvider: boolean) => {
@@ -45,10 +44,14 @@ describe('AccountQpqStack email receiving', () => {
   it('creates the fixed-name rule set and activates it through an SDK call', () => {
     const template = synthReceiving(true);
 
-    template.hasResourceProperties('AWS::SES::ReceiptRuleSet', { RuleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME });
+    template.hasResourceProperties('AWS::SES::ReceiptRuleSet', { RuleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME });
     template.hasResourceProperties('Custom::AWS', {
       Create: Match.serializedJson(
-        Match.objectLike({ service: 'SES', action: 'setActiveReceiptRuleSet', parameters: { RuleSetName: QPQ_EMAIL_RECEIPT_RULE_SET_NAME } }),
+        Match.objectLike({
+          service: 'SES',
+          action: 'setActiveReceiptRuleSet',
+          parameters: { RuleSetName: awsNamingUtils.QPQ_EMAIL_RECEIPT_RULE_SET_NAME },
+        }),
       ),
       Delete: Match.serializedJson(Match.objectLike({ action: 'setActiveReceiptRuleSet', parameters: {} })),
     });

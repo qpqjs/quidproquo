@@ -5,10 +5,10 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
+import { getOrSeedDevJwtSecret } from '../../../logic/auth/devJwtSecret';
 import { upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
@@ -18,13 +18,15 @@ const getProcessAuthenticateUser = (
 ): ProcessorFor<typeof askUserDirectoryAuthenticateUserBase> => {
   return async ({ userDirectoryName, authenticateUserRequest }) => {
     try {
-      // Any username / password is accepted in dev ~ mint an unsigned JWT for whatever was typed in
+      // Any username / password is accepted in dev: mint a locally signed JWT for whatever was typed in
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       await upsertDevUser(devServerConfig.runtimePath, userDirectory, authenticateUserRequest.email);
+      const secret = await getOrSeedDevJwtSecret(devServerConfig.runtimePath, userDirectory);
 
-      return actionResult(createDevAuthResponse(userDirectory, authenticateUserRequest.email));
+      return actionResult(createDevAuthResponse(secret, userDirectory, authenticateUserRequest.email));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

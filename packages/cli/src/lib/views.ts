@@ -1,4 +1,5 @@
-// Views build — programmatic (getViewsRspackConfig), platform-neutral. Where
+import { getViewsDistPath } from '@qpqjs/core';
+// Views build, programmatic (getViewsRspackConfig), platform-neutral. Where
 // the built views get hosted is a platform driver concern (see
 // platforms/<platform>/viewsSync).
 import { getViewsRspackConfig, runRspack } from '@qpqjs/deploy-rspack';
@@ -16,5 +17,4 @@ export const bundleViews = async (appName: string, serviceName: string): Promise
   await runRspack(getViewsRspackConfig(viewsDir));
 };
 
-export const getViewsDistDir = (appName: string, serviceName: string): string =>
-  path.join(getRoot(), 'dist', 'apps', appName, 'services', serviceName, 'views');
+export const getViewsDistDir = (appName: string, serviceName: string): string => getViewsDistPath(getRoot(), appName, serviceName);

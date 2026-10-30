@@ -6,7 +6,7 @@ import { eventDocListCollectionEndpoint } from './eventDocListCollectionEndpoint
 
 /** POST {basePath}: creates a doc and returns its summary. */
 export function* askEventDocCreateFetch(serviceName: string, basePath: string, name: string, code: string): AskResponse<EventDocSummary> {
-  const response = yield* askApiRequest<{ name: string; code: string }, EventDocSummary>(
+  const response = yield* askApiRequest<EventDocSummary, { name: string; code: string }>(
     serviceName,
     'POST',
     eventDocListCollectionEndpoint(basePath),

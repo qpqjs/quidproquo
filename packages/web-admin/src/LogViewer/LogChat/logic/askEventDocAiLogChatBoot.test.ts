@@ -1,5 +1,6 @@
-import { ContextActionType, runStory, StateActionType } from '@qpqjs/core';
+import { ContextActionType, StateActionType } from '@qpqjs/core';
 import { eventDocAiContext, ServiceActionType } from '@qpqjs/features';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

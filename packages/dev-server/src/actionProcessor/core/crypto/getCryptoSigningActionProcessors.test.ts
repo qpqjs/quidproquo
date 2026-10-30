@@ -5,10 +5,10 @@ import {
   askCryptoSignJwt,
   askCryptoVerify,
   askCryptoVerifyJwt,
-  buildTestQpqConfig,
   CryptoActionType,
   defineSigningKey,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { createPublicKey, verify } from 'crypto';
 import { existsSync } from 'fs';
@@ -17,7 +17,6 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getCryptoActionProcessor } from './getCryptoActionProcessor';
 
 describe('signing key action processors (dev server)', () => {
@@ -32,9 +31,9 @@ describe('signing key action processors (dev server)', () => {
     const qpqConfig = buildTestQpqConfig([defineSigningKey('my-key')]);
     const processors = await getCryptoActionProcessor({ runtimePath } as any)(qpqConfig, (() => null) as any);
 
-    sign = processors[CryptoActionType.Sign];
-    verifyProcessor = processors[CryptoActionType.Verify];
-    getPublicKey = processors[CryptoActionType.GetPublicKey];
+    sign! = processors[CryptoActionType.Sign]!;
+    verifyProcessor! = processors[CryptoActionType.Verify]!;
+    getPublicKey! = processors[CryptoActionType.GetPublicKey]!;
   });
 
   afterEach(async () => {
@@ -60,11 +59,11 @@ describe('signing key action processors (dev server)', () => {
     const foreignConfig = buildTestQpqConfig([defineSigningKey('their-key', { owner: { module: 'other-module' } })]);
     const processors = await getCryptoActionProcessor({ runtimePath } as any)(foreignConfig, (() => null) as any);
 
-    const [signature, error] = await invokeProcessor(processors[CryptoActionType.Sign], { keyName: 'their-key', message: 'header.payload' });
+    const [signature, error] = await invokeProcessor(processors![CryptoActionType.Sign]!, { keyName: 'their-key', message: 'header.payload' });
     expect(signature).toBeUndefined();
     expect(error).toMatchObject({ errorType: askCryptoSign.errorType.KeyUnavailable, errorText: 'Access denied to signing key: [their-key]' });
 
-    const [publicKeyPem] = await invokeProcessor(processors[CryptoActionType.GetPublicKey], { keyName: 'their-key' });
+    const [publicKeyPem] = await invokeProcessor(processors![CryptoActionType.GetPublicKey]!, { keyName: 'their-key' });
     expect(publicKeyPem).toMatch(/^-----BEGIN PUBLIC KEY-----/);
   });
 
@@ -72,7 +71,7 @@ describe('signing key action processors (dev server)', () => {
     const [first] = await invokeProcessor(sign, { keyName: 'my-key', message: 'header.payload' });
 
     const rebuilt = await getCryptoActionProcessor({ runtimePath } as any)(buildTestQpqConfig([defineSigningKey('my-key')]), (() => null) as any);
-    const [second] = await invokeProcessor(rebuilt[CryptoActionType.Sign], { keyName: 'my-key', message: 'header.payload' });
+    const [second] = await invokeProcessor(rebuilt![CryptoActionType.Sign]!, { keyName: 'my-key', message: 'header.payload' });
 
     expect(second).toBe(first);
   });

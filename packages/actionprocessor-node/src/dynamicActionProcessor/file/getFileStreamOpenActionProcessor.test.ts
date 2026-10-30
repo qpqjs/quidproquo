@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import { Readable } from 'stream';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { errorWithCode, fileConfig, resolveFileProcessors } from '../../testing/fileProcessorTestHelpers';
+import { errorWithCode, fileConfig, resolveFileProcessors } from './__fixtures__/fileProcessorTestHelpers';
 import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 
 vi.mock('fs');

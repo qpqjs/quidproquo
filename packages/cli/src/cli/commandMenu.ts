@@ -11,10 +11,10 @@ type MenuChoice = { kind: 'run'; command: CliCommand } | { kind: 'drill'; prefix
 
 type MenuRow = { label: string; summary?: string; value: MenuChoice };
 
-const lastSegment = (name: string): string => name.split(':').slice(-1)[0];
+const lastSegment = (name: string): string => name.split(':').slice(-1)[0] ?? name;
 
 // The first path segment of `name` below `prefix` ('' means the tree root).
-const childSegment = (name: string, prefix: string): string => name.slice(prefix ? prefix.length + 1 : 0).split(':')[0];
+const childSegment = (name: string, prefix: string): string => name.slice(prefix ? prefix.length + 1 : 0).split(':')[0] ?? '';
 
 const runRow = (command: CliCommand): MenuRow => ({
   label: `qpq ${command.name}`,
@@ -34,8 +34,9 @@ const buildRows = (commands: CliCommand[], prefix: string): MenuRow[] => {
     const segmentPrefix = prefix ? `${prefix}:${segment}` : segment;
     const subtree = deeper.filter((command) => command.name === segmentPrefix || command.name.startsWith(`${segmentPrefix}:`));
 
-    if (subtree.length === 1 && subtree[0].name === segmentPrefix) {
-      leafRows.push(runRow(subtree[0]));
+    const [only] = subtree;
+    if (subtree.length === 1 && only && only.name === segmentPrefix) {
+      leafRows.push(runRow(only));
     } else {
       // A group's summary is its own runnable command's summary when it has
       // one, otherwise a listing of what's inside.

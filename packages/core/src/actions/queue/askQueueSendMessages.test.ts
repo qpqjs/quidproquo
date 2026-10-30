@@ -1,6 +1,7 @@
+import { captureRequester } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
 import { askQueueSendMessages } from './askQueueSendMessages';
 import { QueueActionType } from './QueueActionType';
 
@@ -12,7 +13,7 @@ describe('askQueueSendMessages', () => {
     const { action } = captureRequester(askQueueSendMessages('my-queue', m1, m2));
 
     expect(action).toEqual({
-      type: QueueActionType.SendMessages,
+      type: QueueActionType.SendMessage,
       payload: {
         queueName: 'my-queue',
         queueMessages: [m1, m2],
@@ -32,7 +33,7 @@ describe('askQueueSendMessages', () => {
     const { action } = captureRequester(askQueueSendMessages('my-queue'));
 
     expect(action).toEqual({
-      type: QueueActionType.SendMessages,
+      type: QueueActionType.SendMessage,
       payload: {
         queueName: 'my-queue',
         queueMessages: [],

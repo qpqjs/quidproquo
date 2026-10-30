@@ -1,16 +1,5 @@
-import {
-  ActionProcessorResult,
-  actionResult,
-  actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStreamRegistry,
-  createStubLogger,
-  ErrorTypeEnum,
-  noopDynamicModuleLoader,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { ActionProcessorResult, actionResult, actionResultError, createStreamRegistry, ErrorTypeEnum, UserDirectoryActionType } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -23,7 +12,7 @@ const invoke = async (payload: unknown, decodeProcessor: () => ActionProcessorRe
   const processors = await getRouteAuthValidationDecodeActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const processor = processors[RouteAuthValidationActionType.Decode];
 
-  return processor(
+  return processor!(
     payload,
     buildTestStorySession(),
     buildActionProcessorList({ [UserDirectoryActionType.DecodeAccessToken]: async () => decodeProcessor() }),

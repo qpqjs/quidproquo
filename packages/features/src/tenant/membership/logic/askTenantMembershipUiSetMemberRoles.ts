@@ -1,9 +1,10 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { TenantClientTarget } from '../../models/TenantClientTarget';
 import { TenantId } from '../../models/TenantId';
 import { TenantMemberRolesSetRequest } from '../../models/TenantMemberRolesSetRequest';
-import { askUITenantMembershipSetError } from '../actionCreators/askUITenantMembershipSetError';
+import { askTenantMembershipSetError } from '../actionCreators/askTenantMembershipSetError';
 import { askTenantMemberRolesPut } from '../transport/askTenantMemberRolesPut';
 import { askTenantMembershipUiLoadMembers } from './askTenantMembershipUiLoadMembers';
 
@@ -14,12 +15,9 @@ export function* askTenantMembershipUiSetMemberRoles(
   userId: string,
   assignment: TenantMemberRolesSetRequest,
 ): AskResponse<boolean> {
-  yield* askUITenantMembershipSetError(null);
-
-  const result = yield* askCatch(askTenantMemberRolesPut(target, tenantId, userId, assignment));
+  const result = yield* askUiCatch(askTenantMemberRolesPut(target, tenantId, userId, assignment), { askSetError: askTenantMembershipSetError });
 
   if (!result.success) {
-    yield* askUITenantMembershipSetError(result.error.errorText);
     return false;
   }
 

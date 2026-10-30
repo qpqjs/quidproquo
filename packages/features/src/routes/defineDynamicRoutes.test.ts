@@ -14,9 +14,12 @@ describe('defineDynamicRoutes', () => {
       list: dynamicRoute(['GET', '/widgets'], function* () {
         return ok();
       }),
-      get: dynamicRoute(['GET', '/widgets/{id}', 2], function* (_event, params: { id: string }) {
-        return ok();
-      }),
+      get: dynamicRoute(
+        ['GET', '/widgets/{id}', 2],
+        function* (_event, params: { id: string }) {
+          return ok();
+        }!,
+      ),
     };
 
     const routes = qpqCoreUtils.flattenQpqConfig(defineDynamicRoutes(controllers, '/widgets/controller')) as RouteQPQWebServerConfigSetting[];

@@ -11,7 +11,7 @@ type DateCellProps =
     };
 
 export const DateCell: React.FC<DateCellProps> = (props: DateCellProps) => {
-  let date = 'isoDateTime' in props ? new Date(props.isoDateTime) : new Date(props.unixTimestampMs);
+  const date = 'isoDateTime' in props ? new Date(props.isoDateTime) : new Date(props.unixTimestampMs);
 
   const formattedTime = date.toLocaleTimeString('en-AU', {
     hour: '2-digit',

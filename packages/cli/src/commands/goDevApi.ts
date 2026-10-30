@@ -1,4 +1,4 @@
-// `qpq go:dev:api` — boots the QPQ local dev server. Resolves the app,
+// `qpq go:dev:api`, boots the QPQ local dev server. Resolves the app,
 // generates the dev-server entry, builds the rspack config, then runs rspack
 // in watch mode, restarting the server process on every successful rebuild.
 //
@@ -8,12 +8,12 @@
 //
 // The one thing NOT hot-reloaded is the qpq configs themselves: each service's
 // infrastructure.ts is evaluated once at launch and baked into the
-// `quidproquo-dynamic-loader` virtual module — config changes need a full
+// `quidproquo-dynamic-loader` virtual module, config changes need a full
 // `go:dev:api` restart.
+import { getDevServerDistPath, Nullable } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from '@qpqjs/deploy-rspack';
 
-import { ChildProcess, spawn } from 'child_process';
-import fs from 'fs';
+import { ChildProcess } from 'child_process';
 import path from 'path';
 import { rspack } from '@rspack/core';
 
@@ -24,20 +24,24 @@ import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
+import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
+import { spawnCommand } from '../lib/runCommand';
+
+const out = createOutput('go:dev:api');
 
 // 8080/8888 are set in the generated entry; 3001 is the @qpqjs/dev-server
 // file-storage (secure URL) default port.
 const getDevServerPortList = (appName: string): number[] => Object.values(readDevServerPorts(appName));
-const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
+const getDevServerBundlePath = (root: string): string => path.join(getDevServerDistPath(root), 'main.js');
 
 export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
   process.env.QPQ_DEV_APP = appName;
   await resolveDeployment(argv, appName);
-  console.log(`Dev server for app [${appName}]`);
+  out.log(`Dev server for app [${appName}]`);
 
   // The sweep matches on a RELATIVE bundle path, so every checkout's dev
   // server looks like ours and a sibling worktree gets taken down with it.
@@ -45,35 +49,35 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   // the same either way, so what you get instead is EADDRINUSE. Report who
   // holds them, or that failure says nothing about the cause.
   if (hasArgFlag(argv, KEEP_OTHER_DEV_SERVERS_FLAG)) {
-    console.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
+    out.log(`${KEEP_OTHER_DEV_SERVERS_FLAG}: leaving other dev servers alone.`);
     reportPortHolders(getDevServerPortList(appName));
   } else {
     // Catches a lingering watcher from a previous run even if its spawned
-    // child already exited (see killOtherQpqDevProcesses) — then the usual
+    // child already exited (see killOtherQpqDevProcesses), then the usual
     // port-based sweep for anything else still bound to our ports.
     killOtherQpqDevProcesses(root);
-    killStaleListeners(getDevServerPortList(appName), (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
+    killStaleListeners(getDevServerPortList(appName), (command) => command.includes(getDevServerBundlePath(root)));
   }
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);
   const userScriptChildEntry = writeUserScriptChildEntry(root);
   const rspackConfig = getDevServerRspackConfig({ root, entry, userScriptChildEntry, qpqConfigs });
-  const bundlePath = path.join(root, DEV_SERVER_BUNDLE_PATH);
-  const env = { ...process.env, QPQ_DEV_APP: appName };
+  const bundlePath = getDevServerBundlePath(root);
+  const env = { QPQ_DEV_APP: appName };
 
   // The long-lived server process (HTTP 8080 / WS 8888), restarted per rebuild.
-  let child: ChildProcess | null = null;
+  let child: Nullable<ChildProcess> = null;
   let restartQueued = false;
 
   const startServer = (): void => {
-    child = spawn('node', [bundlePath], { stdio: 'inherit', env });
+    child = spawnCommand('node', [bundlePath], { env });
     child.on('exit', (code) => {
       child = null;
       if (!restartQueued) {
-        // Crashed (or exited) on its own — leave it down; the next successful
+        // Crashed (or exited) on its own, leave it down; the next successful
         // rebuild (i.e. the next file save) brings it back up.
-        console.log(`Dev server exited with code ${code}. Save a file to restart it.`);
+        out.log(`Dev server exited with code ${code}. Save a file to restart it.`);
       }
     });
   };
@@ -96,17 +100,17 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     void killChildWithEscalation(child);
   };
 
-  console.log('Bundling dev server (watch mode)...');
+  out.log('Bundling dev server (watch mode)...');
   let lastHash: string | null | undefined;
   const compiler = rspack(rspackConfig);
   compiler.watch({ aggregateTimeout: 200 }, (err, stats) => {
     if (err) {
-      console.error(err);
+      out.error(err);
       return;
     }
     if (stats?.hasErrors()) {
-      console.error(stats.toString({ colors: true, chunks: false, modules: false }));
-      console.log('Build failed — dev server not restarted. Fix the error and save again.');
+      out.error(stats.toString({ colors: true, chunks: false, modules: false }));
+      out.log('Build failed — dev server not restarted. Fix the error and save again.');
       return;
     }
     // Skip no-op rebuilds (e.g. the virtual-module-triggered second compile at
@@ -115,7 +119,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
       return;
     }
     lastHash = stats?.hash;
-    console.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
+    out.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
     restartServer();
   });
 

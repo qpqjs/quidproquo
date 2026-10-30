@@ -4,6 +4,4 @@ export type SmokeProbeEventPayload = {
   markerId: string;
 };
 
-export type SmokeProbeEventQueueEvent = QueueEvent<
-  QueueMessage<SmokeProbeEventPayload>
->;
+export type SmokeProbeEventQueueEvent = QueueEvent<QueueMessage<SmokeProbeEventPayload>>;

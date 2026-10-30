@@ -8,11 +8,11 @@ export type DataGridColumDefinitions<T extends object> = {
   renderCell?: (i: T, params?: any) => React.ReactNode;
 } & ({ field: keyof T } | { valueGetter: (i: T, params?: any) => any });
 
-export interface DataGridProps<T extends object> {
+export type DataGridProps<T extends object> = {
   items: T[];
   columns: DataGridColumDefinitions<T>[];
   onRowClick?: (row: T) => void;
-}
+};
 
 export const DataGrid = <T extends object>({ items, columns, onRowClick }: DataGridProps<T>) => {
   const handleRowClick = ({ row }: { row: T }) => {

@@ -1,4 +1,4 @@
-import { AskResponse } from '@qpqjs/core';
+import { askPagedDataDrain, AskResponse } from '@qpqjs/core';
 
 import { EventDocEvent } from '../models';
 import { askEventDocEventList } from './askEventDocEventList';
@@ -11,19 +11,14 @@ export function* askEventDocEventListAll(
   modelId: string,
   options?: { consistentRead?: boolean; afterEventId?: number; upToEventId?: number },
 ): AskResponse<EventDocEvent[]> {
-  const events: EventDocEvent[] = [];
-  let nextPageKey: string | undefined;
-
-  do {
-    const page = yield* askEventDocEventList(modelId, {
+  const { items } = yield* askPagedDataDrain(function* askEventPage(nextPageKey) {
+    return yield* askEventDocEventList(modelId, {
       nextPageKey,
       consistentRead: options?.consistentRead,
       afterEventId: options?.afterEventId,
       upToEventId: options?.upToEventId,
     });
-    events.push(...page.items);
-    nextPageKey = page.nextPageKey;
-  } while (nextPageKey);
+  });
 
-  return events;
+  return items;
 }

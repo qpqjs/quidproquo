@@ -5,9 +5,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 
 import { AsyncButton } from '../components';
-import { authLogic } from './logic';
 
-interface LoginProps {
+type LoginProps = {
   username: string;
   password: string;
 
@@ -15,7 +14,7 @@ interface LoginProps {
   setPassword: (password: string) => void;
 
   onLogin: () => Promise<void>;
-}
+};
 
 export function Login({ username, password, setUsername, setPassword, onLogin }: LoginProps) {
   return (

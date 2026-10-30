@@ -3,13 +3,7 @@ import { DataGridColumDefinitions, LoadingSpinner } from '@qpqjs/web-admin';
 import { AdminGridProps } from './types/AdminGridProps';
 import useStyles from './styles';
 
-export const AdminGrid = <T extends object>({
-  title = '',
-  loading = false,
-  items,
-  columns,
-  onRowClick,
-}: AdminGridProps<T>) => {
+export const AdminGrid = <T extends object>({ title = '', loading = false, items, columns, onRowClick }: AdminGridProps<T>) => {
   const styles = useStyles();
 
   const handleRowClick = (item: T) => {
@@ -43,10 +37,7 @@ export const AdminGrid = <T extends object>({
                   key={index}
                   className={styles.headerCell}
                   style={{
-                    width:
-                      col.widthScale && totalScale
-                        ? `${col.widthScale / totalScale}%`
-                        : 'auto',
+                    width: col.widthScale && totalScale ? `${col.widthScale / totalScale}%` : 'auto',
                   }}
                 >
                   {col.headerName}
@@ -56,18 +47,10 @@ export const AdminGrid = <T extends object>({
           </thead>
           <tbody>
             {items.map((item, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={
-                  rowIndex % 2 === 0 ? styles.row : styles.alternateRow
-                }
-                onClick={() => handleRowClick(item)}
-              >
+              <tr key={rowIndex} className={rowIndex % 2 === 0 ? styles.row : styles.alternateRow} onClick={() => handleRowClick(item)}>
                 {columns.map((col, colIndex) => (
                   <td key={colIndex} className={styles.cell}>
-                    {col.renderCell
-                      ? col.renderCell(item)
-                      : getCellValue(item, col)}
+                    {col.renderCell ? col.renderCell(item) : getCellValue(item, col)}
                   </td>
                 ))}
               </tr>

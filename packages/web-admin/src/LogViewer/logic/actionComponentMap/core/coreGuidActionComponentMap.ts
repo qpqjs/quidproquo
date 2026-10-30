@@ -1,9 +1,9 @@
 import { GuidActionType } from '@qpqjs/core';
 
 const coreGuidActionComponentMap: Record<string, string[]> = {
-  [GuidActionType.New]: ['askNewGuid'],
-  [GuidActionType.NewSortable]: ['askNewSortableGuid'],
-  [GuidActionType.NewSortableMany]: ['askNewSortableGuids', 'count'],
+  [GuidActionType.New]: ['askGuidNew'],
+  [GuidActionType.NewSortable]: ['askGuidNewSortable'],
+  [GuidActionType.NewSortableMany]: ['askGuidNewSortableMany', 'count'],
 };
 
 export default coreGuidActionComponentMap;

@@ -1,20 +1,20 @@
-import { askFileReadTextContents, buildTestQpqConfig, FileActionType } from '@qpqjs/core';
+import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { askFileReadTextContents, FileActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { readTextFile } from '../../../logic/s3/s3Utils';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
+import { readTextFile } from '../../../logic/s3';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
 
-vi.mock('@qpqjs/config-aws', () => ({
-  qpqConfigAwsUtils: { getApplicationModuleDeployRegion: () => 'us-test-1' },
-}));
 vi.mock('./utils', () => ({ resolveStorageDriveBucketName: vi.fn(() => 'bucket-x') }));
-vi.mock('../../../logic/s3/s3Utils', () => ({ readTextFile: vi.fn() }));
+vi.mock('../../../logic/s3', () => ({ readTextFile: vi.fn() }));
 
 const invoke = async (payload: { drive: string; filepath: string }) => {
-  const processor = (await getFileReadTextContentsActionProcessor(buildTestQpqConfig(), null as any))[FileActionType.ReadTextContents];
-  return invokeProcessor(processor, payload);
+  const processor = (
+    await getFileReadTextContentsActionProcessor(buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]), null as any)
+  )[FileActionType.ReadTextContents];
+  return invokeProcessor(processor!, payload);
 };
 
 describe('getProcessFileReadTextContents', () => {

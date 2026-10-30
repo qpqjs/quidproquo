@@ -1,6 +1,7 @@
+import { awsNamingUtils, clampToLambdaTimeout } from '@qpqjs/config-aws';
 import { qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
-import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
+import { aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -9,23 +10,19 @@ import { Function } from '../../../basic/Function';
 import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
 import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
 
-export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
+export type QpqApiCoreQueueConstructProps = {
   queueConfig: QueueQPQConfigSetting;
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-}
+} & QpqConstructBlockProps;
 
 export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiCoreQueueConstructProps) {
     super(scope, id, props);
 
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
-      functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
-      functionType: 'sqsEvent_queueEvent',
-      executorName: 'sqsEvent_queueEvent',
+      functionName: this.resourceName(awsNamingUtils.getLambdaBaseName(props.queueConfig.uniqueKey, awsNamingUtils.QpqLambdaKind.Queue)),
+      handler: 'sqsEvent_queueEvent',
 
       qpqConfig: props.qpqConfig,
-
-      apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         // Just the name - the runtime resolves the full setting from the bundled
@@ -36,13 +33,10 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
 
       reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,
 
-      // Timeout in 15 mins ~ Max
-      // Note: AWS requires that the visibility timeout of the SQS queue be greater than or
-      //       equal to the timeout of the Lambda function. This is because if a message is
-      //       processed by a Lambda function for a time longer than the SQS visibility timeout,
-      //       the message will become visible in the SQS queue again and could be consumed
-      //       by another Lambda function, resulting in the message being processed multiple times.
-      timeoutInSeconds: Math.min(props.queueConfig.ttRetryInSeconds, 15 * 60),
+      // The consumer may run for the whole retry delay, up to lambda's ceiling. SQS requires the
+      // queue's visibility timeout (the retry delay itself) to be at least this, or a message still
+      // being processed would reappear and be consumed twice; a longer delay is fine.
+      timeoutInSeconds: clampToLambdaTimeout(props.queueConfig.ttRetryInSeconds),
 
       role: this.getServiceRole(),
     });

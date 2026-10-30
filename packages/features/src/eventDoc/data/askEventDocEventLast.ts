@@ -1,7 +1,7 @@
 import { askKeyValueStoreQuery, AskResponse, kvsEqual } from '@qpqjs/core';
 import { Nullable } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocEvent } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
@@ -12,7 +12,7 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
  * pass `consistentRead`: a stale head silently truncates everything clamped to it.
  */
 export function* askEventDocEventLast(modelId: string, options?: { consistentRead?: boolean }): AskResponse<Nullable<EventDocEvent>> {
-  const { eventsStoreName } = yield* askEventDocResolveStore();
+  const { eventsStoreName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, kvsEqual('pk', modelId), {

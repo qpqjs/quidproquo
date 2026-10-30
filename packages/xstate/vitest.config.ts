@@ -1,15 +1,4 @@
-import path from 'node:path';
-import { defineConfig } from 'vitest/config';
+import { defineQpqVitestConfig } from '@qpqjs/testing/vitest-config';
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@qpqjs/core': path.resolve(__dirname, '../core/src'),
-    },
-  },
-  test: {
-    globals: true,
-    environment: 'node',
-    pool: 'threads',
-  },
-});
+// No vi.mock in this package, so test files can share one module cache per worker (T6).
+export default defineQpqVitestConfig(import.meta.url, { test: { isolate: false } });

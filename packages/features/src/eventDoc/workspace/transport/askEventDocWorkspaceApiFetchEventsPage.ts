@@ -25,7 +25,7 @@ export function* askEventDocWorkspaceApiFetchEventsPage(
     params.newestFirst = 'true';
   }
 
-  const response = yield* askApiRequest<void, QpqPagedData<EventDocEvent>>(
+  const response = yield* askApiRequest<QpqPagedData<EventDocEvent>, void>(
     identity.serviceName,
     'GET',
     eventDocWorkspaceEventsEndpoint(identity),

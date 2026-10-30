@@ -1,15 +1,17 @@
-import { awsNamingUtils, getLogExtensionLayerPath } from '@qpqjs/actionprocessor-aws';
+import { getLogExtensionLayerPath } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { ApiLayer, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_lambda } from 'aws-cdk-lib';
+import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
 
 import { getLambdaRuntime } from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
-export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
+const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
 
   return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
@@ -21,9 +23,23 @@ export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] =
   }));
 };
 
-export interface LambdaLayersProps extends QpqConstructBlockProps {}
+export type LambdaLayersProps = {} & QpqConstructBlockProps;
+
+const STACK_CHILD_ID = 'lambda-layers';
 
 export class LambdaLayers extends QpqConstructBlock {
+  /** The stack's one set of layers, built on first use: every Function in the stack shares it. */
+  static of(scope: Construct, qpqConfig: QPQConfig): LambdaLayers {
+    const stack = Stack.of(scope);
+    const existing = stack.node.tryFindChild(STACK_CHILD_ID);
+
+    if (existing instanceof LambdaLayers) {
+      return existing;
+    }
+
+    return new LambdaLayers(stack, STACK_CHILD_ID, { qpqConfig });
+  }
+
   public readonly layers: aws_lambda.ILayerVersion[];
 
   constructor(scope: Construct, id: string, props: LambdaLayersProps) {
@@ -43,7 +59,8 @@ export class LambdaLayers extends QpqConstructBlock {
     });
 
     // Always-on: the qpq-log-extension ships story logs to S3 off the function's
-    // response path. Attached to every function via apiLayerVersions.
+    // response path. Function attaches these layers to every lambda it builds; bundles
+    // externalise layer modules on that assumption.
     const logExtensionLayer = new aws_lambda.LayerVersion(this, 'qpq-log-extension-layer', {
       layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig('qpq-log-extension', props.qpqConfig),
       code: new aws_lambda.AssetCode(getLogExtensionLayerPath()),

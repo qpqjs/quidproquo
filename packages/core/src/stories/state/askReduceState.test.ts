@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { askMathRandomNumber } from '../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../actions/math/MathActionType';
 import { askStateDispatch } from '../../actions/state/askStateDispatch';
 import { askStateRead } from '../../actions/state/askStateRead';
@@ -22,9 +22,9 @@ type IncrementEffect = Effect<CounterEffect.Increment>;
 type AddEffect = Effect<CounterEffect.Add, number>;
 type CounterEffects = IncrementEffect | AddEffect;
 
-interface CounterState {
+type CounterState = {
   count: number;
-}
+};
 
 const counterReducer = buildMutableEffectReducer<CounterState, CounterEffects>({
   [CounterEffect.Increment]: (state) => {
@@ -42,9 +42,9 @@ enum MarkEffect {
 type MarkMarkEffect = Effect<MarkEffect.Mark, string>;
 type MarkEffects = MarkMarkEffect;
 
-interface MarkState {
+type MarkState = {
   marks: string[];
-}
+};
 
 const markReducer = buildMutableEffectReducer<MarkState, MarkEffects>({
   [MarkEffect.Mark]: (state, label) => {
@@ -89,7 +89,7 @@ describe('askReduceState', () => {
 
   it('passes non-state actions through to the runtime', () => {
     function* logic(): AskResponse<void> {
-      const n = yield* askRandomNumber();
+      const n = yield* askMathRandomNumber();
       yield* askStateDispatchEffect<AddEffect>(CounterEffect.Add, n);
     }
 
@@ -166,6 +166,6 @@ describe('askReduceState', () => {
 
     expect(result.done).toBe(true);
     expect(result.value).toEqual({ marks: ['x'] }); // outer reducer handled the bubbled Mark
-    expect(caught).toEqual({ success: true, result: undefined }); // single wrap — no nesting
+    expect(caught).toEqual({ success: true, result: undefined }); // single wrap, no nesting
   });
 });

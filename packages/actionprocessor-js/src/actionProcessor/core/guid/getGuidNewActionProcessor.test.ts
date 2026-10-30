@@ -1,26 +1,21 @@
-import { buildTestQpqConfig, GuidActionType, resolveActionResult } from '@qpqjs/core';
+import { GuidActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getGuidNewActionProcessor } from './getGuidNewActionProcessor';
 
-vi.mock('@qpqjs/core', async (importActual: () => Promise<typeof import('@qpqjs/core')>) => {
-  const actual = await importActual();
-  return {
-    ...actual,
-    generateUuid: () => '00000000-0000-4000-8000-000000000000',
-  };
-});
+const V4_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 describe('getGuidNewActionProcessor', () => {
-  it('returns a v4 uuid', async () => {
-    const processor = (await getGuidNewActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.New] as (
-      p: any,
-      ...rest: any[]
-    ) => Promise<any>;
+  it('returns a fresh v4 uuid on every call', async () => {
+    const processor = (await getGuidNewActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.New]!;
 
-    const result = await processor(undefined, undefined as any);
+    const first = resolveActionResult(await invokeProcessor<string>(processor, undefined));
+    const second = resolveActionResult(await invokeProcessor<string>(processor, undefined));
 
-    expect(resolveActionResult(result)).toBe('00000000-0000-4000-8000-000000000000');
+    expect(first).toMatch(V4_UUID);
+    expect(second).toMatch(V4_UUID);
+    expect(first).not.toBe(second);
   });
 });

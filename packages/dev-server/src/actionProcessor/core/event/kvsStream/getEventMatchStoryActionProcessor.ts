@@ -1,6 +1,6 @@
-import { actionResult, askEventMatchStoryBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import { actionResult, askEventMatchStoryBase, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { EventInput, MatchResult } from './types';
 
 // The store's configured handler travels with the message: the backend already resolved it
 // from the store config when it decided to emit at all.

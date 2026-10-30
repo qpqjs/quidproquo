@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -10,9 +10,8 @@ import {
   StorySession,
   toCrossServiceSession,
 } from '@qpqjs/core';
-import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent, ServiceFunctionActionType } from '@qpqjs/webserver';
+import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent } from '@qpqjs/webserver';
 
-import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
 
 // `any` here is a variance boundary: this processor forwards whatever payload/result
@@ -29,7 +28,13 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askService
     const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
     const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-    const awsFunctionName = getConfigRuntimeResourceName(`${functionName}-sfunc`, appName, service, environment, feature);
+    const awsFunctionName = awsNamingUtils.getConfigRuntimeResourceName(
+      awsNamingUtils.getServiceFunctionLambdaBaseName(functionName),
+      appName,
+      service,
+      environment,
+      feature,
+    );
 
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
@@ -40,7 +45,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askService
     const result = await executeLambdaByName<EitherActionResult<any>>(awsFunctionName, region, serviceFunctionEvent, isAsync);
 
     if (!result) {
-      return actionResult(void 0);
+      return actionResult(undefined);
     }
 
     if (!result.success) {

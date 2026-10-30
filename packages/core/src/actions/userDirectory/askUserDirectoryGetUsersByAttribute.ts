@@ -1,5 +1,7 @@
-import { createActionRequester, QpqPagedData } from '../../types';
-import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { createActionRequester } from '../../logic/actions';
+import { QpqPagedData } from '../../types';
+import { UserAttributes } from './types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryGetUsersByAttribute = createActionRequester<QpqPagedData<UserAttributes>>()({
   actionType: UserDirectoryActionType.GetUsersByAttribute,

@@ -6,12 +6,12 @@ import {
   askFileDelete,
   composeStorageDriveFilePathOrThrow,
   createActionProcessor,
-  FileActionType,
   ProcessorFor,
   QPQConfig,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { deleteFiles } from '../../../logic/s3/s3Utils';
+import { deleteFiles } from '../../../logic/s3';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileDelete> => {
@@ -27,6 +27,7 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askFile
       return actionResult(errored);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         AccessDenied: () => actionResultError(askFileDelete.errorType.AccessDenied, 'Access denied deleting files'),
         NoSuchBucket: () => actionResultError(askFileDelete.errorType.DriveNotFound, `Storage drive not found: ${drive}`),
         StorageDriveNotFoundError: (error) => actionResultError(askFileDelete.errorType.DriveNotFound, error.message),

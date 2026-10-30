@@ -1,5 +1,5 @@
-import { askGetLogLogs } from './askGetLogLogs';
+import { askLogLogGetAll } from './askLogLogGetAll';
 
 export const logLogLogic = {
-  askGetLogLogs,
+  askLogLogGetAll,
 };

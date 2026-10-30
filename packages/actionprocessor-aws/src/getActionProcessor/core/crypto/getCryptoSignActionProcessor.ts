@@ -11,7 +11,7 @@ import {
 } from '@qpqjs/core';
 
 import { signWithKey } from '../../../logic/kms/signWithKey';
-import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './kmsSigningErrorMap';
+import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './utils';
 import { resolveSigningKeyAlias } from './utils';
 
 const getProcessCryptoSign = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryptoSign> => {

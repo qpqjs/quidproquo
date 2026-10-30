@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getArgValue, hasArgFlag, getPositionalArgs } from './args';
+import { getArgValue, getPositionalArgs,hasArgFlag } from './args';
 
 describe('hasArgFlag', () => {
   it('is false when the flag is absent', () => {

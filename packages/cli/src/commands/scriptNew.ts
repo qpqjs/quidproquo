@@ -1,22 +1,25 @@
-// `qpq script:new <dir>` — write the user-script template project into a new
+// `qpq script:new <dir>`, write the user-script template project into a new
 // directory. See templates/user-script/README.md for what a script is.
 import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
+import { createOutput } from '../lib/out';
 import { createUserScriptProject } from '../lib/userScriptTemplate';
+
+const out = createOutput('script:new');
 
 export const scriptNewCommand = async (argv: string[]): Promise<void> => {
   const [targetDir] = getPositionalArgs(argv, []);
   if (!targetDir) {
-    console.error('Usage: qpq script:new <dir>');
+    out.error('Usage: qpq script:new <dir>');
     process.exit(1);
   }
 
   const written = createUserScriptProject(targetDir);
 
-  console.log(`script:new: wrote ${written.length} files to ${path.resolve(targetDir)}`);
+  out.log(`script:new: wrote ${written.length} files to ${path.resolve(targetDir)}`);
   for (const file of written) {
-    console.log(`  ${file}`);
+    out.log(`  ${file}`);
   }
-  console.log(`Next: cd ${targetDir} && npm run build`);
+  out.log(`Next: cd ${targetDir} && npm run build`);
 };

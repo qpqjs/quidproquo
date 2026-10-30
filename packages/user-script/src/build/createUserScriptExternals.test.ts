@@ -12,7 +12,7 @@ const resolveAsync = (request: string, issuer?: string, hostModuleNames: string[
   });
 
 describe('createUserScriptExternals', () => {
-  it.each([...FEDERATED_SHARED_PACKAGE_NAMES])('leaves the shared package %s external as commonjs', async (name) => {
+  it.each([...FEDERATED_SHARED_PACKAGE_NAMES])('leaves the shared package %s external as commonjs', async (name: any) => {
     expect(await resolveAsync(name)).toEqual({ error: undefined, result: `commonjs ${name}` });
   });
 
@@ -21,7 +21,7 @@ describe('createUserScriptExternals', () => {
     expect(await resolveAsync('my-sdk/v1')).toEqual({ error: undefined, result: undefined });
   });
 
-  it.each(['fs', 'node:fs', 'path', 'crypto'])('refuses the Node builtin %s, naming the importer', async (name) => {
+  it.each(['fs', 'node:fs', 'path', 'crypto'])('refuses the Node builtin %s, naming the importer', async (name: any) => {
     const { error, result } = await resolveAsync(name, '/project/src/main.ts');
 
     expect(result).toBeUndefined();

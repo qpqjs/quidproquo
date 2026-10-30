@@ -80,7 +80,7 @@ export class SqliteKvsRepository implements KvsRepository {
 
   private accessStore(keyValueStoreName: string): KvsStoreAccess {
     const storeConfig = resolveKvsStoreConfigOrThrow(this.qpqConfig, keyValueStoreName);
-    const tableName = getKvsTableName(this.qpqConfig, storeConfig, keyValueStoreName);
+    const tableName = getKvsTableName(keyValueStoreName, this.qpqConfig);
 
     if (!this.ensuredTables.has(tableName)) {
       ensureKvsTable(this.db, tableName, storeConfig);
@@ -121,7 +121,7 @@ export class SqliteKvsRepository implements KvsRepository {
     const parts = splitKvsCompositeKey(key, storeConfig);
     return {
       pk: coerceKvsKeyValue(parts.pk, storeConfig.partitionKey.type),
-      sk: parts.sk === null ? null : coerceKvsKeyValue(parts.sk, storeConfig.sortKeys[0].type),
+      sk: parts.sk === null ? null : coerceKvsKeyValue(parts.sk, storeConfig.sortKeys[0]?.type ?? 'string'),
     };
   }
 
@@ -157,7 +157,7 @@ export class SqliteKvsRepository implements KvsRepository {
     return row?.data ?? null;
   }
 
-  async get(keyValueStoreName: string, key: string, scope?: string): Promise<any | null> {
+  async get(keyValueStoreName: string, key: string, scope?: string): Promise<Nullable<any>> {
     const access = this.accessStore(keyValueStoreName);
     const scopeValue = scope ?? '';
     const { pk, sk } = this.toKeyBindValues(key, access.storeConfig);
@@ -392,7 +392,7 @@ export class SqliteKvsRepository implements KvsRepository {
     }
 
     const pk = coerceKvsKeyValue(key, access.storeConfig.partitionKey.type);
-    const sk = access.hasSortKey && sortKey !== undefined ? coerceKvsKeyValue(sortKey, access.storeConfig.sortKeys[0].type) : null;
+    const sk = access.hasSortKey && sortKey !== undefined ? coerceKvsKeyValue(sortKey, access.storeConfig.sortKeys[0]?.type ?? 'string') : null;
 
     // Read-modify-write in one transaction so concurrent updates to a row
     // serialize instead of clobbering each other. No awaits inside: see
@@ -406,7 +406,7 @@ export class SqliteKvsRepository implements KvsRepository {
         ? JSON.parse(existingData)
         : {
             [access.storeConfig.partitionKey.key]: pk,
-            ...(access.hasSortKey && sortKey !== undefined ? { [access.storeConfig.sortKeys[0].key]: sk } : {}),
+            ...(access.hasSortKey && sortKey !== undefined ? { [access.storeConfig.sortKeys[0]?.key ?? 'sk']: sk } : {}),
           };
 
       if (condition && !evaluateKvsQueryOperation(currentItem, condition, access.storeConfig)) {

@@ -1,6 +1,5 @@
 import { QPQConfigAdvancedSettings, QPQConfigSetting } from '@qpqjs/core';
 
-import { ApiLayer, ServiceAccountInfo } from '../../types';
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
 export enum AwsAlarmOperator {
@@ -81,7 +80,7 @@ export enum AwsAlarmSqsMetricName {
   ApproximateNumberOfMessagesDelayedNotVisible = 'ApproximateNumberOfMessagesDelayedNotVisible',
 }
 
-interface BaseAwsAlarmQPQConfigSetting {
+type BaseAwsAlarmQPQConfigSetting = {
   statistic: AwsAlarmStatistic;
   period: AwsAlarmPeriod;
   operator: AwsAlarmOperator;
@@ -92,43 +91,41 @@ interface BaseAwsAlarmQPQConfigSetting {
   onAlarm: {
     publishToEventBus?: string[];
   };
-}
+};
 
 // Specific namespace configuration interfaces
-interface AwsAlarmLambdaConfigSetting extends BaseAwsAlarmQPQConfigSetting {
+type AwsAlarmLambdaConfigSetting = {
   namespace: AwsAlarmNamespace.Lambda;
   metricName: AwsAlarmLambdaMetricName;
-}
+} & BaseAwsAlarmQPQConfigSetting;
 
-interface AwsAlarmApiGatewayConfigSetting extends BaseAwsAlarmQPQConfigSetting {
+type AwsAlarmApiGatewayConfigSetting = {
   namespace: AwsAlarmNamespace.ApiGateway;
   metricName: AwsAlarmApiGatewayMetricName;
-}
+} & BaseAwsAlarmQPQConfigSetting;
 
-interface AwsAlarmDynamoDbConfigSetting extends BaseAwsAlarmQPQConfigSetting {
+type AwsAlarmDynamoDbConfigSetting = {
   namespace: AwsAlarmNamespace.DynamoDb;
   metricName: AwsAlarmDynamoDbMetricName;
-}
+} & BaseAwsAlarmQPQConfigSetting;
 
-interface AwsAlarmSqsConfigSetting extends BaseAwsAlarmQPQConfigSetting {
+type AwsAlarmSqsConfigSetting = {
   namespace: AwsAlarmNamespace.Sqs;
   metricName: AwsAlarmSqsMetricName;
-}
-
-// Advanced settings interface
-export interface QPQConfigAdvancedAwsAlarmSettings extends QPQConfigAdvancedSettings {}
+} & BaseAwsAlarmQPQConfigSetting;
 
 // Union type for namespace specific settings
 type AwsAlarmNamespaceSpecificSettings =
   AwsAlarmLambdaConfigSetting | AwsAlarmApiGatewayConfigSetting | AwsAlarmDynamoDbConfigSetting | AwsAlarmSqsConfigSetting;
 
-export interface QPQConfigAdvancedAwsAlarmSettings extends QPQConfigAdvancedSettings {}
+export type QPQConfigAdvancedAwsAlarmSettings = {} & QPQConfigAdvancedSettings;
 
-export interface AwsAlarmQPQConfigSetting extends QPQConfigSetting {
+export type AwsAlarmQPQConfigSetting = {
   name: string;
 
   alarmSettings: AwsAlarmNamespaceSpecificSettings;
-}
+  deprecated: boolean;
+} & QPQConfigSetting;
 
 export const defineAwsAlarm = (
   name: string,
@@ -140,4 +137,5 @@ export const defineAwsAlarm = (
 
   name,
   alarmSettings,
+  deprecated: options?.deprecated ?? false,
 });

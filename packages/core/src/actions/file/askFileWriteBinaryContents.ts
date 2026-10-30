@@ -1,6 +1,7 @@
-import { createActionRequester } from '../../types';
+import { createActionRequester } from '../../logic/actions';
 import { QPQBinaryData } from '../../types/QPQBinaryData';
-import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { FileActionType } from './FileActionType';
+import { StorageDriveAdvancedWriteOptions } from './types';
 
 export const askFileWriteBinaryContents = createActionRequester<void>()({
   actionType: FileActionType.WriteBinaryContents,

@@ -1,4 +1,4 @@
-import { buildTestQpqConfig } from '@qpqjs/core';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -30,18 +30,18 @@ describe('buildOpenApiDocument', () => {
     expect(document.info).toEqual({ title: 'test-app test-module', version: '1.0.0', description: undefined });
     expect(Object.keys(document.paths)).toEqual(['/v1/widgets', '/v1/widgets/{id}']);
 
-    const list = document.paths['/v1/widgets'].get;
+    const list = document!.paths['/v1/widgets']!.get;
     expect(list?.operationId).toBe('get_v1_widgets');
     expect(list?.responses).toEqual({ '200': { description: 'Success' } });
     expect(list?.parameters).toBeUndefined();
     expect(list?.requestBody).toBeUndefined();
 
-    const create = document.paths['/v1/widgets'].post;
+    const create = document!.paths['/v1/widgets']!.post;
     expect(create).toMatchObject({ summary: 'Create', tags: ['widgets'], operationId: 'post_v1_widgets' });
     expect(create?.requestBody).toEqual({ required: true, content: { 'application/json': { schema: bodySchema } } });
     expect(create?.responses['422']).toBeDefined();
 
-    const get = document.paths['/v1/widgets/{id}'].get;
+    const get = document!.paths['/v1/widgets/{id}']!.get;
     expect(get?.operationId).toBe('get_v1_widgets_id');
     expect(get?.parameters).toEqual([{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }]);
     expect(get?.responses['200']).toEqual({ description: 'Success', content: { 'application/json': { schema: { type: 'object' } } } });
@@ -50,7 +50,7 @@ describe('buildOpenApiDocument', () => {
   it('unpacks a query object schema into one parameter per property', () => {
     const config = buildTestQpqConfig([defineRoute('GET', '/v1/widgets', '/src/widgets::list', { schema: { queryJsonSchema: querySchema } })]);
 
-    const parameters = buildOpenApiDocument(config).paths['/v1/widgets'].get?.parameters;
+    const parameters = buildOpenApiDocument!(config).paths['/v1/widgets']!.get?.parameters;
 
     expect(parameters).toEqual([
       { name: 'limit', in: 'query', required: true, schema: querySchema.properties.limit, description: 'Page size' },
@@ -67,9 +67,9 @@ describe('buildOpenApiDocument', () => {
 
     const document = buildOpenApiDocument(config);
 
-    expect(document.paths['/v1/me'].get?.security).toEqual([{ [OPEN_API_BEARER_AUTH]: ['read'] }]);
-    expect(document.paths['/v1/me'].get?.responses['401']).toBeDefined();
-    expect(document.paths['/v1/hook'].post?.security).toEqual([{ [OPEN_API_BEARER_AUTH]: ['read'] }, { [OPEN_API_API_KEY_AUTH]: [] }]);
+    expect(document!.paths['/v1/me']!.get?.security).toEqual([{ [OPEN_API_BEARER_AUTH]: ['read'] }]);
+    expect(document!.paths['/v1/me']!.get?.responses['401']).toBeDefined();
+    expect(document!.paths['/v1/hook']!.post?.security).toEqual([{ [OPEN_API_BEARER_AUTH]: ['read'] }, { [OPEN_API_API_KEY_AUTH]: [] }]);
     expect(Object.keys(document.components.securitySchemes).sort()).toEqual([OPEN_API_API_KEY_AUTH, OPEN_API_BEARER_AUTH]);
   });
 
@@ -78,7 +78,7 @@ describe('buildOpenApiDocument', () => {
 
     const document = buildOpenApiDocument(config);
 
-    expect(document.paths['/health'].get?.security).toBeUndefined();
+    expect(document!.paths['/health']!.get?.security).toBeUndefined();
     expect(document.components.securitySchemes).toEqual({});
   });
 

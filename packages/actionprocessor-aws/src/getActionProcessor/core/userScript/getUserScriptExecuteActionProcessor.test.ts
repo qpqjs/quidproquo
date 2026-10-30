@@ -4,19 +4,16 @@ import {
   actionResultError,
   askFileGenerateTemporarySecureUrl,
   askUserScriptExecute,
-  buildTestQpqConfig,
-  buildTestStorySession,
   createStreamRegistry,
-  createStubLogger,
   defineUserScriptRunner,
   FileActionType,
   UserScriptActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, buildTestStorySession, createStubLogger, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getUserScriptExecuteActionProcessor } from './getUserScriptExecuteActionProcessor';
 
 vi.mock('../../../logic/lambda/executeLambdaByName', () => ({
@@ -37,7 +34,7 @@ const payload = { drive: 'scripts', filepath: 'tenant-a/main.js', functionName: 
 const invoke = async (config = withRunner, actionProcessors: Record<string, unknown> = urlProcessors, args: unknown[] = payload.args) => {
   const processors = await getUserScriptExecuteActionProcessor(config, async () => null);
   return invokeProcessor(
-    processors[UserScriptActionType.Execute],
+    processors![UserScriptActionType.Execute]!,
     { ...payload, args },
     {
       session: buildTestStorySession(),
@@ -111,19 +108,19 @@ describe('getUserScriptExecuteActionProcessor (lambda)', () => {
   });
 
   it.each([
-    ['Lambda Error: Unhandled. Details: {"errorMessage":"2026-01-01T00:01:00.000Z abc Task timed out after 60.00 seconds"}', 'TimedOut'],
+    ['Lambda Error: Unhandled. Details: {"errorMessage":"2026-01-01T00:01:00.000Z abc Task timed out after 60.00 seconds"}', 'Timeout'],
     [
       'Lambda Error: Unhandled. Details: {"errorMessage":"Response payload size exceeded maximum allowed payload size (6291556 bytes)."}',
       'PayloadTooLarge',
     ],
     ['RequestEntityTooLargeException: Request must be smaller than 6291456 bytes', 'PayloadTooLarge'],
     ['ResourceNotFoundException: Function not found', 'RunnerUnavailable'],
-  ])('classifies an invoke failure [%s] as %s', async (message, expected) => {
+  ])('classifies an invoke failure [%s] as %s', async (message: any, expected: any) => {
     vi.mocked(executeLambdaByName).mockRejectedValue(new Error(message));
 
     const [, error] = await invoke();
 
-    expect(error?.errorType).toBe(askUserScriptExecute.errorType[expected as 'TimedOut']);
+    expect(error?.errorType).toBe(askUserScriptExecute.errorType[expected as 'Timeout']);
   });
 
   it('treats an answer without a result as the runner being unavailable', async () => {

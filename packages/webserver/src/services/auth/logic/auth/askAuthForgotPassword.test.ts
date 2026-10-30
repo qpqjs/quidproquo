@@ -1,0 +1,28 @@
+import { Action, AuthenticationDeliveryDetails, ConfigActionType, UserDirectoryActionType } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
+
+import { describe, expect, it } from 'vitest';
+
+import { askAuthForgotPassword } from './askAuthForgotPassword';
+
+describe('askAuthForgotPassword', () => {
+  it('starts a reset against the resolved directory and returns delivery details', () => {
+    const deliveryDetails: AuthenticationDeliveryDetails = {
+      attributeName: 'email',
+      deliveryMedium: 'EMAIL',
+      destination: 'a***@b.com',
+    };
+    let captured: Action<any> | undefined;
+
+    const result = runStory(askAuthForgotPassword('a@b.com'), {
+      [ConfigActionType.GetGlobal]: 'my-directory',
+      [UserDirectoryActionType.ForgotPassword]: (action: Action<any>) => {
+        captured = action;
+        return deliveryDetails;
+      },
+    });
+
+    expect(captured?.payload).toEqual({ userDirectoryName: 'my-directory', username: 'a@b.com' });
+    expect(result).toBe(deliveryDetails);
+  });
+});

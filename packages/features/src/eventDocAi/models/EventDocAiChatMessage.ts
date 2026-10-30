@@ -2,7 +2,7 @@ import type { AiModel, AiStreamUsage } from '@qpqjs/core';
 
 import type { EventDocAiMessageSegment } from './EventDocAiMessageSegment';
 
-// A finalized chat message. Stream parts never persist — they're folded into
+// A finalized chat message. Stream parts never persist, they're folded into
 // segments once the reply completes.
 export type EventDocAiChatMessage = {
   role: 'user' | 'assistant';

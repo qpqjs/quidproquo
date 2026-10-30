@@ -1,5 +1,13 @@
-import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
-import { askWebsocketSendMessageBase, qpqWebServerUtils, WebsocketActionType } from '@qpqjs/webserver';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  createActionProcessor,
+  ProcessorFor,
+  QPQConfig,
+  qpqCoreUtils,
+} from '@qpqjs/core';
+import { askWebsocketSendMessageBase, qpqWebServerUtils } from '@qpqjs/webserver';
 
 // The connection REGISTRY, not the implementation: webSocketImplementation imports
 // the event-processing pipeline (which includes these processors), so importing it
@@ -9,15 +17,20 @@ import { sendMessageToWebSocketConnection } from '../../../implementations/webSo
 
 const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWebsocketSendMessageBase> => {
   return async ({ connectionId, payload, websocketApiName }) => {
-    const websocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
-    const service = websocketConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+    const websocketConfig = qpqWebServerUtils.resolveWebsocketOrThrow(websocketApiName, qpqConfig);
+    const service = qpqCoreUtils.resolveOwnerModuleName(websocketConfig.owner, qpqConfig);
 
     try {
-      await sendMessageToWebSocketConnection(service, websocketApiName, connectionId, payload);
+      // A connection that is no longer registered answers Disconnected, as AWS does with GoneException.
+      const sent = await sendMessageToWebSocketConnection(service, websocketApiName, connectionId, payload);
+      if (!sent) {
+        return actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists');
+      }
 
-      return actionResult(void 0);
+      return actionResult(undefined);
     } catch (error) {
-      return actionResultErrorFromCaughtError(error, {});
+      // A send that throws (socket closing) has no catalogued local failure; it becomes GenericError.
+      return actionResultErrorFromCaughtError(error);
     }
   };
 };

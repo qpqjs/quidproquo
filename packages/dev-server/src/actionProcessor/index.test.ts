@@ -1,9 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { buildTestQpqConfig, DynamicFunctionsActionType, FileActionType, noopDynamicModuleLoader, UserScriptActionType } from '@qpqjs/core';
+import { DynamicFunctionsActionType, FileActionType, UserScriptActionType } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { getDevServerActionProcessors } from './index';
+import { getDevServerActionProcessors } from './getDevServerActionProcessors';
 
 const { repo } = vi.hoisted(() => ({
   repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },

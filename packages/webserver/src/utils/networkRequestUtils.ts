@@ -61,7 +61,7 @@ const isFormData = (body: unknown): body is FormData => typeof FormData !== 'und
 const isUrlSearchParams = (body: unknown): body is URLSearchParams => typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams;
 const isReadableStream = (body: unknown): body is ReadableStream => typeof ReadableStream !== 'undefined' && body instanceof ReadableStream;
 
-// A non-null object (arrays included) — the payloads we JSON-serialise.
+// A non-null object (arrays included), the payloads we JSON-serialise.
 const isObjectPayload = (body: unknown): boolean => body !== null && typeof body === 'object';
 const hasJsonContentType = (headers: Record<string, string>): boolean =>
   (getHeaderValue(headers, 'content-type') || '').toLowerCase().includes('application/json');
@@ -69,7 +69,7 @@ const hasJsonContentType = (headers: Record<string, string>): boolean =>
 // Resolve payload.body into a fetch BodyInit, mirroring axios' transformRequest: raw
 // byte/stream/form bodies pass through untouched; only object payloads (or an explicit
 // JSON content-type) get JSON.stringify'd. JSON.stringify(Blob | ArrayBuffer) yields
-// "{}", which previously corrupted binary uploads (e.g. presigned S3 PUTs). May set a
+// "{}", which would corrupt binary uploads (e.g. presigned S3 PUTs). May set a
 // default Content-Type on `headers`.
 const resolveRequestBody = (payload: NetworkRequestActionPayload<any>, headers: Record<string, string>): BodyInit | undefined => {
   const { body, method } = payload;
@@ -96,7 +96,7 @@ const resolveRequestBody = (payload: NetworkRequestActionPayload<any>, headers: 
     return JSON.stringify(body);
   }
 
-  // Anything else (e.g. a bare number) — hand to fetch as-is, like axios' final return.
+  // Anything else (e.g. a bare number), hand to fetch as-is, like axios' final return.
   return body as BodyInit;
 };
 

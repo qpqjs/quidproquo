@@ -25,7 +25,7 @@ expectGenerator(askGreet('world'))
 
 Chain `thenYield` for each subsequent action, and finish with `thenReturn` or, for a void story, `thenComplete`. `whenGiven` also answers to `andReceive` and `withResponse` if one of those reads better at the call site.
 
-This is the right tool when the order of actions is the thing you care about. When you only care about the outcome, `runStory` from `@qpqjs/core` is simpler: it takes a map of mocks keyed by action type and hands you the return value.
+This is the right tool when the order of actions is the thing you care about. When you only care about the outcome, `runStory` from this package is simpler: it takes a map of mocks keyed by action type and hands you the return value.
 
 ## vitest matchers
 

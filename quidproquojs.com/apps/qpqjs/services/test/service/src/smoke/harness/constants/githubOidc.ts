@@ -5,8 +5,7 @@
 export const GITHUB_OIDC_ISSUER = 'https://token.actions.githubusercontent.com';
 
 // Where GitHub publishes the signing keys for its Actions OIDC tokens.
-export const GITHUB_OIDC_JWKS_URL =
-  'https://token.actions.githubusercontent.com/.well-known/jwks';
+export const GITHUB_OIDC_JWKS_URL = 'https://token.actions.githubusercontent.com/.well-known/jwks';
 
 // Dedicated audience the deployed-smoke workflow job requests its token with.
 // Tokens minted for any other purpose (e.g. the AWS deploy role) carry a

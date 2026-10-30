@@ -1,7 +1,7 @@
 import { askCatch, AskResponse, askThrowError, createDynamicFunctionCaller, ErrorTypeEnum } from '@qpqjs/core';
 
 import { eventDocFunctionsName } from '../constants/eventDocFunctionsName';
-import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
 import { EventDocEvent } from '../models';
 
@@ -13,7 +13,7 @@ import { EventDocEvent } from '../models';
  * Only runs for a registered collection: the caller resolved the head state through this collection's own fold.
  */
 export function* askEventDocValidateAppend<S = unknown>(event: EventDocEvent, state: S): AskResponse<S> {
-  const { storeName, type } = yield* askEventDocResolveStore();
+  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
 
   const verdict = yield* functionsCaller.validateEvent(event, state);

@@ -1,21 +1,21 @@
-// Docker platform deploy (`qpq go` with platform 'docker') — proof-of-concept
+// Docker platform deploy (`qpq go` with platform 'docker'), proof-of-concept
 // self-hosting: bakes the QPQ dev server (a full local platform emulation)
 // plus every service of the app and its pre-built views into one docker image.
 //
 //   1. Build workspace packages, then the dev-server bundle (all services).
 //   2. Build every views microfrontend with a same-origin module-federation
 //      remote base (/<views subdomain>/<svc>), mirroring the AWS layout.
-//   3. Assemble an image context under dist/qpq/docker-image/<app>/ — server
+//   3. Assemble an image context under dist/qpq/docker-image/<app>/, server
 //      bundle, web root (every web entry, placed by its port or its domain),
 //      a workspaces-stripped package.json for runtime deps, and the
 //      locally-built quidproquo packages as a vendor overlay.
 //   4. docker build (buildx with a push when the deployment names a registry or
 //      a target platform), write a docker-compose.yml, print how to run it.
 //
-// Not production-grade (single process, sqlite KVS, in-memory queues) —
+// Not production-grade (single process, sqlite KVS, in-memory queues):
 // it's the whole product on one box with one command.
 import { getQpqAppDeployment } from '@qpqjs/config-aws';
-import { isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
+import { getDevServerDistPath, getDockerImageContextPath, isQpqPackageName, QpqDeployEnvVar } from '@qpqjs/core';
 import { getAppServiceQpqConfigs, getDevServerRspackConfig, listInstalledQpqPackageNames, runRspack } from '@qpqjs/deploy-rspack';
 import { getWebEntryDir, getWebEntryPlacements, WebEntryHost, WebEntryRoute } from '@qpqjs/dev-server';
 import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
@@ -29,6 +29,7 @@ import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
+import { createOutput } from '../../lib/out';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 import { runCommand } from '../../lib/runCommand';
 import { assertNoFailures } from '../../lib/runTasks';
@@ -41,7 +42,9 @@ import { getImageName } from './getImageName';
 import { resolvePortMappings } from './resolvePortMappings';
 import { writeComposeFile } from './writeComposeFile';
 
-const getImageContextDir = (root: string, appName: string): string => path.join(root, 'dist', 'qpq', 'docker-image', appName);
+const out = createOutput('docker');
+
+const getImageContextDir = (root: string, appName: string): string => getDockerImageContextPath(root, appName);
 
 // Every web entry's files go where the runtime looks for them. The federated views entry
 // is assembled from every service's views build (one folder per service, as on AWS);
@@ -96,12 +99,12 @@ const writeDockerfile = (contextDir: string, containerPorts: number[]): void => 
 
 // The consumer root package.json, stripped to what the image's npm install
 // needs: runtime dependencies (+ overrides). Workspaces/scripts/devDeps are
-// host-only concerns — the workspace packages themselves are bundled into the
+// host-only concerns, the workspace packages themselves are bundled into the
 // server bundle from source.
 //
 // quidproquo deps declared as file: refs (a consumer living beside the qpq
 // monorepo) point outside the image context, where npm install would leave
-// dangling symlinks — rewrite them to the vendored copies inside the context.
+// dangling symlinks, rewrite them to the vendored copies inside the context.
 const writeImagePackageJson = (root: string, contextDir: string): void => {
   const rootPackageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 
@@ -126,7 +129,7 @@ const writeImagePackageJson = (root: string, contextDir: string): void => {
 // Copy the locally-built quidproquo packages (which may be npm-linked
 // checkouts newer than the registry) into vendor/ so the image runs the same
 // qpq code the bundle was built against. Follows the node_modules symlinks;
-// lib/config only — no node_modules, no src.
+// lib/config only, no node_modules, no src.
 const vendorQuidproquoPackages = (root: string, contextDir: string): number => {
   const nodeModules = path.join(root, 'node_modules');
   const vendorDir = path.join(contextDir, 'vendor');
@@ -156,7 +159,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   }
 
   if (plan.kind === 'account' || plan.kind === 'bootstrap') {
-    console.log(`Nothing to do — the docker platform has no ${plan.kind} stacks.`);
+    out.log(`Nothing to do — the docker platform has no ${plan.kind} stacks.`);
     return;
   }
 
@@ -170,8 +173,8 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const volumeName = `${containerName}-data`;
 
   // The dev server hosts every service of the app, so per-service/stack
-  // selections don't apply — the image is always the whole app.
-  console.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
+  // selections don't apply, the image is always the whole app.
+  out.log(`\n\nBuilding docker image [${imageName}] — the whole app deploys as one image\n\n`);
 
   logTimeStart('totalTime');
 
@@ -179,11 +182,11 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
 
   // Workspace packages resolve through their built dist/ (package.json main),
   // so bundles would ship stale code unless every lib is tsc'd first.
-  console.log('Building workspace packages');
+  out.log('Building workspace packages');
   assertNoFailures('Workspace build', await runHookForAppPackages('build', appName, getDefaultHookJobs()));
 
   // ---- Server bundle: the dev server + every service, one main.js ----
-  console.log('Bundling server (dev server + all services)');
+  out.log('Bundling server (dev server + all services)');
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
 
   // Resolved before anything slow runs, so a bad port or domain fails the build up front.
@@ -207,14 +210,14 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   process.env.QPQ_VIEWS_REMOTE_BASE = `/${FEDERATED_VIEWS_SUBDOMAIN}`;
   const viewServices = getServiceNamesWithViews(appName);
   for (const serviceName of viewServices) {
-    console.log(`Bundling views: [${serviceName}]`);
+    out.log(`Bundling views: [${serviceName}]`);
     await bundleViews(appName, serviceName);
   }
   delete process.env.QPQ_VIEWS_REMOTE_BASE;
   clearWebAddressingEnv();
 
   // ---- Assemble the image context ----
-  console.log('Assembling image context');
+  out.log('Assembling image context');
   const contextDir = getImageContextDir(root, appName);
   fs.rmSync(contextDir, { recursive: true, force: true });
   fs.mkdirSync(contextDir, { recursive: true });
@@ -223,9 +226,9 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   writeImagePackageJson(root, contextDir);
 
   const vendored = vendorQuidproquoPackages(root, contextDir);
-  console.log(`Vendored ${vendored} quidproquo packages`);
+  out.log(`Vendored ${vendored} quidproquo packages`);
 
-  fs.cpSync(path.join(root, 'dist', 'qpq', 'dev-server'), path.join(contextDir, 'server'), { recursive: true });
+  fs.cpSync(getDevServerDistPath(root), path.join(contextDir, 'server'), { recursive: true });
 
   for (const entry of [...webEntryRoutes, ...webEntryHosts]) {
     copyWebEntryContent(appName, contextDir, entry, viewServices);
@@ -244,7 +247,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   });
 
   // ---- Build the image ----
-  console.log(
+  out.log(
     `Building docker image${dockerSettings.arch ? ` for ${dockerSettings.arch}` : ''}${dockerSettings.registry ? `, pushing to ${dockerSettings.registry}` : ''}`,
   );
   await buildImage(imageName, contextDir, dockerSettings);
@@ -264,7 +267,7 @@ export const dockerGo = async (appName: string, plan: DeployPlan): Promise<void>
   const onHost = dockerSettings.registry
     ? `On the host (Unraid: Compose Manager, or any docker host), copy the compose file there and run:`
     : `Run it here:`;
-  console.log(`
+  out.log(`
 Done. The image is ${where}.
 
 ${onHost}

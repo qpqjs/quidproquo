@@ -8,6 +8,7 @@ export * from './crypto';
 export * from './dateTime';
 export * from './json';
 export * from './kvs';
+export * from './paging';
 export * from './state';
 export * from './stream';
 export * from './system';

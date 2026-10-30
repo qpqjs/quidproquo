@@ -1,11 +1,11 @@
 import { askMapParallel, AskResponse, Nullable } from '@qpqjs/core';
 
 import { EventDocEvent, EventDocSnapshotBase } from '../../models';
-import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
-import { askUIEventDocWorkspaceSetDocumentIdentity } from '../actionCreators/askUIEventDocWorkspaceSetDocumentIdentity';
-import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
-import { askUIEventDocWorkspaceSetLoading } from '../actionCreators/askUIEventDocWorkspaceSetLoading';
-import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
+import { askEventDocWorkspaceClearError } from '../actionCreators/askEventDocWorkspaceClearError';
+import { askEventDocWorkspaceSetDocumentIdentity } from '../actionCreators/askEventDocWorkspaceSetDocumentIdentity';
+import { askEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askEventDocWorkspaceSetHistoryEvents';
+import { askEventDocWorkspaceSetLoading } from '../actionCreators/askEventDocWorkspaceSetLoading';
+import { askEventDocWorkspaceSetPendingEvents } from '../actionCreators/askEventDocWorkspaceSetPendingEvents';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotSnapshot, EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
@@ -23,10 +23,10 @@ const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTranspor
     pending: EventDocEvent[],
     base: Nullable<EventDocSnapshotBase>,
   ): AskResponse<void> {
-    yield* askUIEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
-    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, history, base);
-    yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, pending);
-    yield* askUIEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
+    yield* askEventDocWorkspaceSetHistoryEvents(slotKey, history, base);
+    yield* askEventDocWorkspaceSetPendingEvents(slotKey, pending);
+    yield* askEventDocWorkspaceClearError(slotKey);
 
     yield* askEventDocWorkspaceRefresh(transport, slots, [slotKey]);
   };
@@ -68,12 +68,12 @@ const getAskInitDocumentSlot = (
 
     const preservedPending: EventDocEvent[] = snapshotMatches ? snapshotSlot.pending : [];
 
-    yield* askUIEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
-    yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
-    yield* askUIEventDocWorkspaceClearError(slotKey);
-    yield* askUIEventDocWorkspaceSetLoading(slotKey, true);
+    yield* askEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
+    yield* askEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
+    yield* askEventDocWorkspaceClearError(slotKey);
+    yield* askEventDocWorkspaceSetLoading(slotKey, true);
     yield* askEventDocWorkspaceResync(transport, slots, slotKey);
-    yield* askUIEventDocWorkspaceSetLoading(slotKey, false);
+    yield* askEventDocWorkspaceSetLoading(slotKey, false);
   };
 
 /**

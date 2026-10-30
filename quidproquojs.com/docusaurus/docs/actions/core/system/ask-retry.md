@@ -7,7 +7,7 @@ description: Retry a story on failure with a wait between attempts and optional 
 
 Runs a story and retries it if it fails, waiting between attempts. It returns the same `EitherActionResult` shape as [askCatch](./ask-catch.md): the first successful outcome, or the last failure once retries are exhausted. Optionally restrict retries to specific error types and add linear backoff or jitter.
 
-- **Built from:** [askCatch](./ask-catch.md) (to run each attempt and capture its outcome as a value), plus `askDelay` for the waits and `askNewGuid` for jitter entropy.
+- **Built from:** [askCatch](./ask-catch.md) (to run each attempt and capture its outcome as a value), plus `askPlatformDelay` for the waits and `askGuidNew` for jitter entropy.
 
 ```typescript
 import { askRetry, ErrorTypeEnum } from '@qpqjs/core';
@@ -64,7 +64,7 @@ function* askRetry<R>(
 ## Notes
 
 - Retries stop early when the error's `errorType` is not in `errorTypeRetryList` — the current failure is returned as-is.
-- Jitter uses `askNewGuid` rather than `Math.random`, because stories must stay replay-safe (deterministic) and cannot call `Math.random` directly.
+- Jitter uses `askGuidNew` rather than `Math.random`, because stories must stay replay-safe (deterministic) and cannot call `Math.random` directly.
 
 ## Related
 

@@ -1,4 +1,4 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
   actionResultError,
@@ -7,10 +7,9 @@ import {
   createActionProcessor,
   ProcessorFor,
   QPQConfig,
-  UserDirectoryActionType,
+  transientErrorMap,
 } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 
@@ -18,9 +17,9 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
   return async ({ userDirectoryName, refreshToken }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolClientId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
     if (!session.decodedAccessToken || !session.decodedAccessToken.username) {
       return actionResultError(askUserDirectoryRefreshToken.errorType.Unauthorized, 'Invalid accessToken');
@@ -39,6 +38,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUs
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        ...transientErrorMap(),
         NotAuthorizedException: () =>
           actionResultError(askUserDirectoryRefreshToken.errorType.Unauthorized, 'Refresh token is invalid or has expired'),
         TooManyRequestsException: () =>

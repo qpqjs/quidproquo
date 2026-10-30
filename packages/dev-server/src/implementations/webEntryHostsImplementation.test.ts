@@ -40,7 +40,7 @@ describe('startHost', () => {
   // never read a sibling of the web root.
   it.each(['/../secret.txt', '/%2e%2e/secret.txt', '/..%2fsecret.txt', '/site/../../secret.txt'])(
     'never serves %s from outside the web root',
-    async (route) => {
+    async (route: any) => {
       const response = await fetch(`${baseUrl}${route}`, { headers: { accept: 'application/json' } });
 
       expect(await response.text()).not.toContain('outside the web root');

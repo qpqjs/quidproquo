@@ -1,4 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
+import { awsNamingUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_kms } from 'aws-cdk-lib';
@@ -20,14 +20,14 @@ export const resolveCryptoKeyForResource = (
   cryptoKeyName: string,
   ownedCryptoKeys: OwnedCryptoKeys,
 ): aws_kms.IKey => {
-  const cryptoKeyConfig = qpqCoreUtils.getCryptoKeyByName(cryptoKeyName, qpqConfig);
+  const cryptoKeyConfig = qpqCoreUtils.resolveCryptoKeyOrThrow(cryptoKeyName, qpqConfig);
 
   const owned = ownedCryptoKeys[cryptoKeyName];
   if (owned) {
     return owned;
   }
 
-  const aliasName = `alias/${awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`;
+  const aliasName = `alias/${awsNamingUtils.resolveOwnedResourceName(cryptoKeyConfig.keyName, qpqConfig, cryptoKeyConfig.owner)}`;
 
   return aws_kms.Alias.fromAliasName(scope, id, aliasName);
 };

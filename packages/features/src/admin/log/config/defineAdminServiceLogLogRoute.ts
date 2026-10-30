@@ -1,4 +1,4 @@
-import { HTTPMethod, QpqFunctionRuntime } from '@qpqjs/core';
+import { HTTPMethod } from '@qpqjs/core';
 import { ApiKeyReference } from '@qpqjs/webserver';
 import { defineRoute, GenericRouteOptions } from '@qpqjs/webserver';
 

@@ -6,20 +6,20 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
   QpqIsoDateTime,
-  runStory,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
-import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
+import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent, EventDocSummary, EventDocVersion } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { askEventDocPublishedVersionAsOf } from './askEventDocPublishedVersionAsOf';
 
-// A published render resolves BOTH which version renders and — via the returned version's
-// publishedAt — the clock its linked assets resolve at. Getting the version wrong silently renders
+// A published render resolves BOTH which version renders and, via the returned version's
+// publishedAt, the clock its linked assets resolve at. Getting the version wrong silently renders
 // the wrong document, so the selection rules are pinned here: keyed on effectiveFrom (not
 // publishedAt), truncated at the version's head, and never guessing when nothing is effective.
 
@@ -41,7 +41,7 @@ const buildEvent = (index: number): EventDocEvent => ({
   },
 });
 
-// A log of 6 events (ids 0..5) — enough that a version head genuinely truncates it.
+// A log of 6 events (ids 0..5), enough that a version head genuinely truncates it.
 const EVENTS: EventDocEvent[] = [0, 1, 2, 3, 4, 5].map(buildEvent);
 
 const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): EventDocSummary => ({
@@ -59,7 +59,7 @@ const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): 
 });
 
 // v1 published 03-01 (head @1), v2 published 05-01 (head @3), v3 published 06-01 but not effective
-// until 09-01 — a publish scheduled for the future.
+// until 09-01, a publish scheduled for the future.
 const VERSION_1: EventDocVersion = {
   version: 1,
   eventId: eventId(1),
@@ -78,7 +78,7 @@ const VERSION_3_SCHEDULED: EventDocVersion = {
   publishedAt: '2026-06-01T00:00:00.000Z' as QpqIsoDateTime,
   effectiveFrom: '2026-09-01T00:00:00.000Z' as QpqIsoDateTime,
 };
-// The open draft — no publish stamps at all.
+// The open draft, no publish stamps at all.
 const VERSION_DRAFT: EventDocVersion = { version: 4, eventId: eventId(5) };
 
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
@@ -92,7 +92,7 @@ const STORE_NAME = 'templates';
 const EVENTS_STORE_NAME = eventDocEventsStoreName(STORE_NAME);
 const SNAPSHOTS_STORE_NAME = eventDocSnapshotsStoreName(STORE_NAME);
 
-// The sort-key bound the state resolver issues (upToEventId → at-or-before) — honoured
+// The sort-key bound the state resolver issues (upToEventId → at-or-before), honoured
 // for real so the truncation at the version's head is exercised, not hand-waved.
 const skAtOrBefore = (keyCondition: KvsQueryOperation): number | undefined => {
   if ('conditions' in keyCondition) {
@@ -113,7 +113,10 @@ const resolveAsOf = (summary: EventDocSummary | null, clock: string) => {
   eventQueries = [];
 
   return runStory(
-    askEventDocProvideStore({ storeName: STORE_NAME, type: 'template' }, askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime)),
+    askEventDocStoreProvide(
+      buildEventDocStore({ storeName: STORE_NAME, type: 'template' }),
+      askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime),
+    ),
     {
       [KeyValueStoreActionType.Query]: (action: {
         payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { consistentRead?: boolean } };
@@ -160,7 +163,7 @@ describe('askEventDocPublishedVersionAsOf', () => {
 
     expect(slice?.version).toEqual(VERSION_2);
     // v2's head is index 3, so events 4 and 5 (written after it published) never reach
-    // the fold — the state is folded from the truncated prefix.
+    // the fold, the state is folded from the truncated prefix.
     expect(slice?.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
   });
 
@@ -172,7 +175,7 @@ describe('askEventDocPublishedVersionAsOf', () => {
   });
 
   it('ignores a publish scheduled to take effect in the future', () => {
-    // v3 is already published (06-01) but not effective until 09-01 — a render on 07-15 must still
+    // v3 is already published (06-01) but not effective until 09-01, a render on 07-15 must still
     // resolve v2, which is why selection keys on effectiveFrom rather than publishedAt.
     const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_3_SCHEDULED]), '2026-07-15T00:00:00.000Z');
 

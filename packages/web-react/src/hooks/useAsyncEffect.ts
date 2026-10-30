@@ -24,7 +24,7 @@ export const useAsyncEffect = (effect: (isMounted: () => boolean) => Promise<voi
       });
     };
     // The dependency list is supplied by the caller, so it can't be statically
-    // verified here — this hook is a passthrough wrapper around useEffect.
+    // verified here; this hook is a passthrough wrapper around useEffect.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 };

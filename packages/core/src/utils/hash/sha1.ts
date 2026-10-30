@@ -37,7 +37,7 @@ export function sha1(message: Uint8Array): Uint8Array {
     }
 
     for (let t = 16; t < 80; t++) {
-      const x = w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16];
+      const x = (w[t - 3] ?? 0) ^ (w[t - 8] ?? 0) ^ (w[t - 14] ?? 0) ^ (w[t - 16] ?? 0);
       w[t] = (x << 1) | (x >>> 31);
     }
 
@@ -65,7 +65,7 @@ export function sha1(message: Uint8Array): Uint8Array {
         k = 0xca62c1d6;
       }
 
-      const temp = (((a << 5) | (a >>> 27)) + f + e + k + w[t]) >>> 0;
+      const temp = (((a << 5) | (a >>> 27)) + f + e + k + (w[t] ?? 0)) >>> 0;
       e = d;
       d = c;
       c = (b << 30) | (b >>> 2);

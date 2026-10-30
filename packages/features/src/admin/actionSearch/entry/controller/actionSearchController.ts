@@ -1,7 +1,10 @@
-import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData } from '@qpqjs/core';
+import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData, unique } from '@qpqjs/core';
 import { HTTPEvent, HTTPEventResponse } from '@qpqjs/webserver';
 import { askFromJsonEventRequest, toJsonEventResponse } from '@qpqjs/webserver';
 
+import * as actionRowData from '../../data/actionRowData';
+import * as entityLookupData from '../../data/entityLookupData';
+import * as entityRowData from '../../data/entityRowData';
 import { ActionSearchEntityDefinition } from '../../domain/ActionSearchEntityDefinition';
 import { ActionSearchEntityRow } from '../../domain/ActionSearchEntityRow';
 import { ActionSearchFieldDefinition } from '../../domain/ActionSearchFieldDefinition';
@@ -15,9 +18,6 @@ import { matchesActionSearchFilters } from '../../logic/matchesActionSearchFilte
 import { getActionSearchDefinitionByActionType } from '../../logic/registry/getActionSearchDefinitionByActionType';
 import { getActionSearchDefinitionByEntityType } from '../../logic/registry/getActionSearchDefinitionByEntityType';
 import { toLookupKey } from '../../logic/toLookupKey';
-import * as actionRowData from '../data/actionRowData';
-import * as entityLookupData from '../data/entityLookupData';
-import * as entityRowData from '../data/entityRowData';
 
 type LookupFilterMatch = {
   filter: ActionSearchFilter;
@@ -52,10 +52,10 @@ function* askListEntitiesViaLookup(
   // a definition's lookupKeys emits must match the hasLookup field's name
   const lookupKey = toLookupKey(entityDefinition.entityType, `${lookupFilterMatch.field.name}#${lookupFilterMatch.filter.value}`);
 
-  const lookupRows = yield* entityLookupData.askListLinkKeys(lookupKey, startIsoDateTime, endIsoDateTime, nextPageKey);
+  const lookupRows = yield* entityLookupData.askEntityLookupListLinkKeys(lookupKey, startIsoDateTime, endIsoDateTime, nextPageKey);
 
-  const linkKeys = [...new Set(lookupRows.items.map((lookupRow) => lookupRow.linkKey))];
-  const entities = yield* entityRowData.askGetByLinkKeys(linkKeys);
+  const linkKeys = unique(lookupRows.items.map((lookupRow) => lookupRow.linkKey));
+  const entities = yield* entityRowData.askEntityRowGetByLinkKeys(linkKeys);
 
   // Any remaining filters apply in memory; the page is already lookup-sized
   const remainingFilters = allFilters.filter((filter) => filter !== lookupFilterMatch.filter);
@@ -77,7 +77,13 @@ export function* listActionRows(event: HTTPEvent, params: {}): AskResponse<HTTPE
 
   const filter = buildKvsFilterConditions(filters ?? [], definition.action.fields);
 
-  const actionRows = yield* actionRowData.askListByActionType(actionType, startIsoDateTime, endIsoDateTime, filter ?? undefined, nextPageKey);
+  const actionRows = yield* actionRowData.askActionRowListByActionType(
+    actionType,
+    startIsoDateTime,
+    endIsoDateTime,
+    filter ?? undefined,
+    nextPageKey,
+  );
 
   return toJsonEventResponse(actionRows);
 }
@@ -101,7 +107,7 @@ export function* listEntityRows(event: HTTPEvent, params: {}): AskResponse<HTTPE
 
   const filter = buildKvsFilterConditions(allFilters, entityDefinition.fields);
 
-  const entities = yield* entityRowData.askListByEntityType(entityType, startIsoDateTime, endIsoDateTime, filter ?? undefined, nextPageKey);
+  const entities = yield* entityRowData.askEntityRowListByEntityType(entityType, startIsoDateTime, endIsoDateTime, filter ?? undefined, nextPageKey);
 
   return toJsonEventResponse(entities);
 }
@@ -109,7 +115,7 @@ export function* listEntityRows(event: HTTPEvent, params: {}): AskResponse<HTTPE
 export function* getEntityTimeline(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
   const { linkKey } = yield* askFromJsonEventRequest<GetEntityTimelineRequest>(event);
 
-  const actionRows = yield* actionRowData.askListAllByLinkKey(linkKey);
+  const actionRows = yield* actionRowData.askActionRowListAllByLinkKey(linkKey);
 
   const sortedActionRows = [...actionRows].sort((a, b) => a.startedAt.localeCompare(b.startedAt));
 

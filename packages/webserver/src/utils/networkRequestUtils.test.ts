@@ -6,13 +6,13 @@ import { executeNetworkRequest } from './networkRequestUtils';
 
 const fetchMock = vi.fn();
 
-interface FakeResponseInit {
+type FakeResponseInit = {
   status?: number;
   statusText?: string;
   // Array-of-pairs form allows repeated header names (multiple Set-Cookie lines).
   headers?: Record<string, string> | [string, string][];
   body?: unknown;
-}
+};
 
 // A minimal stand-in for the parts of `Response` the implementation consumes,
 // giving precise control over headers without the real Response auto-populating them.
@@ -102,7 +102,7 @@ describe('executeNetworkRequest', () => {
   it('passes a Blob body through untouched instead of JSON-stringifying it to "{}"', async () => {
     fetchMock.mockResolvedValue(fakeResponse({ body: '' }));
 
-    // A File would exercise the same path — File extends Blob.
+    // A File would exercise the same path, File extends Blob.
     const blob = new Blob(['\x89PNG fake binary'], { type: 'image/png' });
     await executeNetworkRequest(buildPayload({ method: 'PUT', headers: { 'Content-Type': 'image/png' }, body: blob, responseType: 'text' }));
 

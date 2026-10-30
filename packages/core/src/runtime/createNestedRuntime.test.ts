@@ -1,8 +1,4 @@
-import { describe, expect, it } from 'vitest';
-
-import { actionResult } from '../logic/actionLogic';
-import { createStreamRegistry } from '../logic/stream';
-import { buildTestQpqConfig } from '../testing/configTesting';
+import { buildTestQpqConfig } from '@qpqjs/testing';
 import {
   buildActionProcessorList,
   buildTestStorySession,
@@ -10,7 +6,12 @@ import {
   getTestTimeNow,
   noopDynamicModuleLoader,
   testRandomGuid,
-} from '../testing/runtimeTesting';
+} from '@qpqjs/testing';
+
+import { describe, expect, it } from 'vitest';
+
+import { actionResult } from '../logic/actionResult';
+import { createStreamRegistry } from '../logic/stream';
 import { Action, ActionProcessor, DecodedAccessToken, StreamRegistry } from '../types';
 import { AskResponse, QpqRuntimeType, StorySession } from '../types/StorySession';
 import { createNestedRuntime } from './createNestedRuntime';

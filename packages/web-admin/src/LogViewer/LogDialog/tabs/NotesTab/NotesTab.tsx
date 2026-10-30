@@ -4,9 +4,9 @@ import { LogSummary } from '../../../LogSummary';
 import { AsyncStoryState } from '../../hooks';
 import { MovedToColdStorage } from '../../MovedToColdStorage';
 
-interface NotesTabProps {
+type NotesTabProps = {
   log: AsyncStoryState;
-}
+};
 
 export const NotesTab: React.FC<NotesTabProps> = ({ log }) => {
   if (log.isLoading) {

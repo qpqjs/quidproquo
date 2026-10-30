@@ -1,5 +1,5 @@
 import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
-import { askQueryParamsGetAll, QueryParamsActionType } from '@qpqjs/web';
+import { askQueryParamsGetAll } from '@qpqjs/web';
 
 const getProcessQueryParamsGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueryParamsGetAll> => {
   return async () => {
@@ -13,7 +13,7 @@ const getProcessQueryParamsGetAll = (qpqConfig: QPQConfig): ProcessorFor<typeof 
       if (key === '__proto__') {
         return;
       }
-      const existing = Object.prototype.hasOwnProperty.call(paramsObject, key) ? paramsObject[key] : [];
+      const existing = Object.prototype.hasOwnProperty.call(paramsObject, key) ? (paramsObject[key] ?? []) : [];
       paramsObject[key] = [...existing, value];
     });
 

@@ -1,6 +1,7 @@
 export * from './actionProcessor';
 export * from './actions';
 export * from './config';
+export * from './configUtils';
 export * from './domain';
 export * from './qpqWebServerUtils';
 export * from './services';

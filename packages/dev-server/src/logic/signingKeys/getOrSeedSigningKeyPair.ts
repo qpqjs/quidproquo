@@ -3,6 +3,7 @@ import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import * as path from 'path';
 
+import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
 import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
 // Offline stand-in for an asymmetric KMS key: an RSA-2048 pair per configured
@@ -22,8 +23,9 @@ const inFlightSeeds = new Map<string, Promise<Rs256KeyPair>>();
 const readOrSeed = async (runtimePath: string, serviceName: string, key: string): Promise<Rs256KeyPair> => {
   const keys = await readJsonFileStore<Rs256KeyPair>(runtimePath, SIGNING_KEYS_STORE_DIRECTORY, serviceName);
 
-  if (key in keys) {
-    return keys[key];
+  const existing = keys[key];
+  if (existing !== undefined) {
+    return existing;
   }
 
   const keyPair = generateRs256KeyPair();
@@ -33,12 +35,9 @@ const readOrSeed = async (runtimePath: string, serviceName: string, key: string)
 };
 
 export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyName: string, qpqConfig: QPQConfig): Promise<Rs256KeyPair> => {
-  const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(signingKeyName, qpqConfig);
+  const signingKeyConfig = qpqCoreUtils.resolveSigningKeyOrThrow(signingKeyName, qpqConfig);
 
-  // Mirrors the AWS runtime's resolveSigningKeyAlias: a cross-module owner
-  // redirects storage to the owning service's file
-  const serviceName = signingKeyConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const key = signingKeyConfig.owner?.resourceNameOverride || signingKeyName;
+  const { serviceName, key } = resolveOwnedStoreLocation(signingKeyName, signingKeyConfig.owner, qpqConfig);
 
   const seedKey = path.join(runtimePath, serviceName, key);
   const inFlight = inFlightSeeds.get(seedKey);

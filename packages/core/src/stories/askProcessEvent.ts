@@ -8,7 +8,7 @@ import {
   askEventTransformResponseResult,
 } from '../actions';
 import { askExecuteStory } from '../actions/system';
-import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionLogic';
+import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionResult';
 import { AskResponse, EitherActionResult, ErrorTypeEnum, LogLevelEnum } from '../types';
 import { askCatch } from './system/askCatch';
 import { askMapParallel } from './array';
@@ -36,14 +36,20 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     return getSuccessfulEitherActionResult(earlyExitQpqEventRecordResponse);
   }
 
+  const { runtime } = matchResultResult.result;
+  if (!runtime) {
+    return getUnsuccessfulEitherActionResult({ errorType: ErrorTypeEnum.NotFound, errorText: 'The matched story has no runtime to execute' });
+  }
+
   const messageSession = yield* askEventGetStorySession<EventParams, QpqEventRecord, MSR>(eventArguments, qpqEventRecord, matchResultResult.result);
 
   // Execute the story
   const executeStoryResponse = yield* askCatch(
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
-      matchResultResult.result.runtime!,
+      runtime,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
-      messageSession,
+      // An event source with no session of its own answers null; the story then starts a fresh one.
+      messageSession ?? undefined,
     ),
   );
 

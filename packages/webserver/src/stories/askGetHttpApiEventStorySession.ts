@@ -6,11 +6,11 @@ import { HTTPEvent } from '../types/HTTPEvent';
 import { getAccessTokenFromHeaders } from '../utils/headerUtils';
 import { unsafeDecodeJWTPayload } from '../utils/jwtUtils';
 
-export interface GetHttpApiEventStorySessionPayload {
+export type GetHttpApiEventStorySessionPayload = {
   event: HTTPEvent;
   routeAuthSettings?: RouteAuthSettings;
   session: StorySession;
-}
+};
 
 // For the logs only: an unverified token on a route without token auth, marked wasValid: false.
 const getUnverifiedAccessToken = (event: HTTPEvent): Nullable<DecodedAccessToken> => {

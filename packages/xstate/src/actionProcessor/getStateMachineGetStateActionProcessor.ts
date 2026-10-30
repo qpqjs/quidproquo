@@ -1,8 +1,17 @@
-import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from '@qpqjs/core';
+import {
+  actionResult,
+  actionResultError,
+  createActionProcessor,
+  ErrorTypeEnum,
+  isErroredActionResult,
+  ProcessorFor,
+  QPQConfig,
+  resolveActionResult,
+} from '@qpqjs/core';
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
-import { askStateMachineGetState, StateMachineActionType } from '../actions';
+import { askStateMachineGetState } from '../actions';
 import { getStateMachineByName } from '../config';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
@@ -25,10 +34,10 @@ const getProcessStateMachineGetState = (qpqConfig: QPQConfig): ProcessorFor<type
     );
 
     const entityResult = await loadStateMachineEntity(resolveStory, smConfig, payload.id);
-    if (!entityResult.success) {
-      return actionResultError(entityResult.error.errorType, entityResult.error.errorText);
+    if (isErroredActionResult(entityResult)) {
+      return entityResult;
     }
-    const entity = entityResult.result;
+    const entity = resolveActionResult(entityResult);
 
     // The snapshot round-trips through the key value store untyped.
     const persistedSnapshot = entity[smConfig.stateField] as Snapshot<unknown> | undefined;

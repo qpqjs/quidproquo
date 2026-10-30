@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_sqs } from 'aws-cdk-lib';
@@ -10,33 +9,25 @@ import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
+export type QpqCoreQueueConstructProps = {
   queueConfig: QueueQPQConfigSetting;
-}
+} & QpqConstructBlockProps;
 
 // The same owner-fallback derivation the runtime send processor and the service role use.
 const resolveSubscribedTopicArns = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string[] =>
   queueConfig.eventBusSubscriptions.map((eventBusName) => {
-    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       throw new Error(`Queue [${queueConfig.name}] subscribes to an undefined event bus [${eventBusName}]`);
     }
 
-    return awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
-      qpqConfig,
-      eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-      eventBusConfig.isFifo,
-    );
+    return awsNamingUtils.getEventBusSnsTopicArnFromConfig(eventBusConfig.name, qpqConfig, eventBusConfig);
   });
 
 export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
   abstract queue: aws_sqs.IQueue;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.queue.grant(
       grantee,
       'sqs:GetQueueAttributes',
@@ -47,13 +38,8 @@ export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
     );
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
     return this.queue.grant(grantee, 'sqs:SendMessage');
-  }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
   }
 }
 

@@ -1,10 +1,11 @@
+import { expectError, runStory, throwsError } from '@qpqjs/testing';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { askConfigGetParameter } from '../actions/config/askConfigGetParameter';
 import { ConfigActionType } from '../actions/config/ConfigActionType';
 import { GuidActionType } from '../actions/guid/GuidActionType';
 import { PlatformActionType } from '../actions/platform/PlatformActionType';
-import { expectError, runStory, throwsError } from '../testing/storyTesting';
 import { AskResponse } from '../types';
 import { askRetry } from './askRetry';
 

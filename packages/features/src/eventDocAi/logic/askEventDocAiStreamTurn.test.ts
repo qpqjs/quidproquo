@@ -7,11 +7,11 @@ import {
   FileActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
-  runStory,
   StateActionType,
   StreamActionType,
   SystemActionType,
 } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 

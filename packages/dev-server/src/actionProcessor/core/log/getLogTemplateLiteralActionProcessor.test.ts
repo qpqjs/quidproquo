@@ -1,8 +1,8 @@
-import { buildTestQpqConfig, LogActionType, noopDynamicModuleLoader, resolveActionResult } from '@qpqjs/core';
+import { LogActionType, resolveActionResult } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getLogTemplateLiteralActionProcessor } from './getLogTemplateLiteralActionProcessor';
 
 describe('getLogTemplateLiteralActionProcessor', () => {
@@ -20,7 +20,7 @@ describe('getLogTemplateLiteralActionProcessor', () => {
     const processors = await getLogTemplateLiteralActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
     const process = processors[LogActionType.TemplateLiteral];
 
-    const result = await invokeProcessor(process, { messageParts: [['a ', ' b'], ['X']] });
+    const result = await invokeProcessor(process!, { messageParts: [['a ', ' b'], ['X']] });
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const message = logSpy.mock.calls[0][0] as string;

@@ -1,10 +1,10 @@
-import { Action, AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from '@qpqjs/core';
+import { AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from '@qpqjs/core';
 
 import { ApiActionType } from './ApiActionType';
 
 // basePath is resolved by the processor, so it is omitted from the caller options
 export type ApiRequestOptions<T> = Omit<HTTPRequestOptions<T>, 'basePath'>;
-export interface ApiRequestActionPayload<T> {
+export type ApiRequestActionPayload<T> = {
   service: string;
   endpoint: string;
   method: HTTPMethod;
@@ -12,12 +12,7 @@ export interface ApiRequestActionPayload<T> {
   params?: Record<string, string>;
   headers?: Record<string, string>;
   responseType: ResponseType;
-}
-
-export interface ApiRequestAction<T> extends Action<ApiRequestActionPayload<T>> {
-  type: ApiActionType.Request;
-  payload: ApiRequestActionPayload<T>;
-}
+};
 
 export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
   actionType: ApiActionType.Request,
@@ -39,11 +34,14 @@ export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unkno
 
 // The request and response body types are only known to the caller, so the base takes
 // and returns unknown and this story casts to what the caller declared.
-export function* askApiRequest<T, R>(
+function* askApiRequestTyped<TResult, TPayload = unknown>(
   service: string,
   method: HTTPMethod,
   endpoint: string,
-  options?: ApiRequestOptions<T>,
-): AskResponse<HTTPNetworkResponse<R>> {
-  return (yield* askApiRequestBase(service, method, endpoint, options as ApiRequestOptions<unknown>)) as HTTPNetworkResponse<R>;
+  options?: ApiRequestOptions<TPayload>,
+): AskResponse<HTTPNetworkResponse<TResult>> {
+  return (yield* askApiRequestBase(service, method, endpoint, options as ApiRequestOptions<unknown>)) as HTTPNetworkResponse<TResult>;
 }
+
+/** Carries the base requester's `errorType` catalog so callers can match on it. */
+export const askApiRequest = Object.assign(askApiRequestTyped, { errorType: askApiRequestBase.errorType });

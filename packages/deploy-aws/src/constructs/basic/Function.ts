@@ -1,5 +1,4 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
+import { awsNamingUtils, getAwsServiceAccountInfoConfig } from '@qpqjs/config-aws';
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
@@ -8,17 +7,17 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { join } from 'upath';
 
-import { BootstrapResource } from '../../constants';
-import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
+import { getLambdaArchitecture, getLambdaRuntime, lookupVirtualNetwork, qpqAwsCdkPathUtils, resolveLogRetention } from '../../utils';
 import * as qpqDeployAwsUtils from '../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { LambdaLayers } from './LambdaLayers';
 
-export interface FunctionProps extends QpqConstructBlockProps {
+export type FunctionProps = {
   functionName?: string;
 
   srcFilename?: string;
-  functionType: string; // TODO: Rename this to subFolder / folder or something
-  executorName: string; // TODO: Rename this to handlerName or something maybe?
+  // The bundle folder under the api build path and the export the lambda invokes are the same name.
+  handler: string;
 
   timeoutInSeconds?: number;
   memoryInBytes?: number;
@@ -27,17 +26,15 @@ export interface FunctionProps extends QpqConstructBlockProps {
     [key: string]: string;
   };
 
-  apiLayerVersions?: aws_lambda.ILayerVersion[];
-
   reservedConcurrentExecutions?: number;
 
   role?: aws_iam.IRole;
 
   reacreateOnFunctionNameChange?: boolean;
 
-  vpc?: aws_ec2.IVpc;
-  securityGroups?: aws_ec2.ISecurityGroup[];
-}
+  // Put the lambda in this bootstrap virtual network (defineVirtualNetwork), carrying its workload security group.
+  virtualNetworkName?: string;
+} & QpqConstructBlockProps;
 
 // Resolves the federated code store location for this service, if it opted in via
 // defineFederatedModuleStore. Points the lambda at the referenced storage drive's
@@ -57,11 +54,7 @@ const getFederatedCodeStoreEnv = (qpqConfig: QPQConfig): Record<string, string> 
     );
   }
 
-  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
-    qpqConfig,
-    storageDrive.owner,
-  );
+  const bucketName = awsNamingUtils.resolveOwnedResourceName(storageDrive.storageDrive, qpqConfig, storageDrive.owner);
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return {
@@ -76,6 +69,7 @@ export class Function extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: FunctionProps) {
     super(scope, id, props);
 
+    // eslint-disable-next-line no-console -- deliberate synth-time guardrail: a function name over 64 characters fails at deploy, this shows the length early.
     console.log(`Function: [${props.functionName || ''}]::${props.functionName?.length}`);
 
     const handlerFile = props.srcFilename || 'index';
@@ -84,6 +78,11 @@ export class Function extends QpqConstructBlock {
 
     const functionId = props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
 
+    // The stack's layers and, when asked for, the virtual network: applied here so no construct
+    // threads them through.
+    const layers = LambdaLayers.of(this, props.qpqConfig).layers;
+    const network = props.virtualNetworkName ? lookupVirtualNetwork(this, props.virtualNetworkName, props.qpqConfig) : undefined;
+
     this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
@@ -91,10 +90,10 @@ export class Function extends QpqConstructBlock {
       runtime: getLambdaRuntime(props.qpqConfig),
       architecture: getLambdaArchitecture(props.qpqConfig),
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
-      layers: props.apiLayerVersions,
+      layers,
 
-      code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.functionType)),
-      handler: `${handlerFile}.${props.executorName}`,
+      code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.handler)),
+      handler: `${handlerFile}.${props.handler}`,
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -123,13 +122,9 @@ export class Function extends QpqConstructBlock {
 
       role: props.role,
 
-      vpc: props.vpc,
-      vpcSubnets: props.vpc
-        ? {
-            subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
-          }
-        : undefined,
-      securityGroups: props.securityGroups,
+      vpc: network?.vpc,
+      vpcSubnets: network ? { subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS } : undefined,
+      securityGroups: network ? [network.workloadSecurityGroup] : undefined,
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.lambdaFunction, props.qpqConfig);
@@ -138,7 +133,7 @@ export class Function extends QpqConstructBlock {
       const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
       const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 
-      const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
+      const topicName = awsNamingUtils.getWarmLambdasTopicName(this.qpqConfig);
       const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
       const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);
 

@@ -1,15 +1,6 @@
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import {
-  actionResult,
-  actionResultError,
-  askUserDirectoryDecodeAccessToken,
-  createActionProcessor,
-  ProcessorFor,
-  QPQConfig,
-  UserDirectoryActionType,
-} from '@qpqjs/core';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { actionResult, actionResultError, askUserDirectoryDecodeAccessToken, createActionProcessor, ProcessorFor, QPQConfig } from '@qpqjs/core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 
@@ -17,7 +8,7 @@ const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof 
   return async ({ userDirectoryName, accessToken, ignoreExpiration }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+    const userPoolId = await getExportedValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
     const authInfo = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 

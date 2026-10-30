@@ -1,16 +1,5 @@
-import {
-  ActionProcessor,
-  actionResult,
-  actionResultError,
-  buildActionProcessorList,
-  buildTestQpqConfig,
-  buildTestStorySession,
-  createStubLogger,
-  ErrorTypeEnum,
-  KeyValueStoreActionType,
-  noopDynamicModuleLoader,
-  QPQConfig,
-} from '@qpqjs/core';
+import { ActionProcessor, actionResult, actionResultError, ErrorTypeEnum, KeyValueStoreActionType, QPQConfig } from '@qpqjs/core';
+import { buildActionProcessorList, buildTestQpqConfig, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 import { createActor, createMachine } from 'xstate';
@@ -74,7 +63,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
   it('returns a NotFound error when the state machine is not configured', async () => {
     const processor = await getProcessor(buildTestQpqConfig());
 
-    const [, error] = await invokeWith(processor, { stateMachineName: 'missing', id: 'order-1' }, { id: 'order-1' });
+    const [, error] = await invokeWith(processor!, { stateMachineName: 'missing', id: 'order-1' }, { id: 'order-1' });
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -84,7 +73,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
     const processors = await getStateMachineGetStateActionProcessor(config, noopDynamicModuleLoader);
     const processor = processors[StateMachineActionType.GetState];
 
-    const [, error] = await processor(
+    const [, error] = await processor!(
       { stateMachineName: 'order', id: 'order-1' },
       session,
       buildActionProcessorList({
@@ -102,7 +91,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
   it('returns a NotFound error when the entity does not exist', async () => {
     const processor = await getProcessor(orderConfig(toggleConfig));
 
-    const [, error] = await invokeWith(processor, { stateMachineName: 'order', id: 'order-1' }, null);
+    const [, error] = await invokeWith(processor!, { stateMachineName: 'order', id: 'order-1' }, null);
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -110,7 +99,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
   it('returns a NotFound error when the entity has no persisted machine state', async () => {
     const processor = await getProcessor(orderConfig(toggleConfig));
 
-    const [, error] = await invokeWith(processor, { stateMachineName: 'order', id: 'order-1' }, { id: 'order-1' });
+    const [, error] = await invokeWith(processor!, { stateMachineName: 'order', id: 'order-1' }, { id: 'order-1' });
 
     expect(error?.errorText).toContain('No state machine state');
   });
@@ -119,7 +108,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
     const processor = await getProcessor(orderConfig(toggleConfig));
     const entity = { id: 'order-1', __machineState: makeSnapshot(toggleConfig) };
 
-    const [result] = await invokeWith(processor, { stateMachineName: 'order', id: 'order-1' }, entity);
+    const [result] = await invokeWith(processor!, { stateMachineName: 'order', id: 'order-1' }, entity);
 
     expect(result).toEqual({ value: 'inactive', done: false });
   });
@@ -128,7 +117,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
     const processor = await getProcessor(orderConfig(toggleConfig));
     const entity = { id: 'order-1', __machineState: makeSnapshot(toggleConfig, [{ type: 'TOGGLE' }]) };
 
-    const [result] = await invokeWith(processor, { stateMachineName: 'order', id: 'order-1' }, entity);
+    const [result] = await invokeWith(processor!, { stateMachineName: 'order', id: 'order-1' }, entity);
 
     expect(result).toEqual({ value: 'active', done: true });
   });
@@ -137,7 +126,7 @@ describe('getStateMachineGetStateActionProcessor', () => {
     const processor = await getProcessor(orderConfig(parallelConfig));
     const entity = { id: 'order-1', __machineState: makeSnapshot(parallelConfig) };
 
-    const [result] = await invokeWith(processor, { stateMachineName: 'order', id: 'order-1' }, entity);
+    const [result] = await invokeWith(processor!, { stateMachineName: 'order', id: 'order-1' }, entity);
 
     expect(result).toEqual({ value: JSON.stringify({ a: 'a1', b: 'b1' }), done: false });
   });

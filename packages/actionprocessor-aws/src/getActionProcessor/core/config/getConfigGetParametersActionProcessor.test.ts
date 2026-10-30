@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { askConfigGetParameters, buildTestQpqConfig, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { askConfigGetParameters, ConfigActionType, defineParameter } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getParameters } from '../../../logic/parametersManager/getParameters';
-import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getConfigGetParametersActionProcessor } from './getConfigGetParametersActionProcessor';
 
 vi.mock('../../../logic/parametersManager/getParameters', () => ({
@@ -27,7 +27,7 @@ describe('getConfigGetParametersActionProcessor', () => {
     vi.mocked(getParameters).mockResolvedValue(['x', 'y']);
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { parameterNames: ['a', 'b'] });
+    const result = await invokeProcessor(processor!, { parameterNames: ['a', 'b'] });
 
     expect(result).toEqual([['x', 'y']]);
     expect(getParameters).toHaveBeenCalledWith(['a-test-app-test-module-development', 'b-test-app-test-module-development'], 'eu-west-1');
@@ -37,8 +37,8 @@ describe('getConfigGetParametersActionProcessor', () => {
     vi.mocked(getParameters).mockRejectedValue(Object.assign(new Error('rate'), { name: 'ThrottlingException' }));
     const processor = await resolveProcessor();
 
-    const [, error] = await invokeProcessor(processor, { parameterNames: ['a'] });
+    const [, error] = await invokeProcessor(processor!, { parameterNames: ['a'] });
 
-    expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttling);
+    expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttled);
   });
 });

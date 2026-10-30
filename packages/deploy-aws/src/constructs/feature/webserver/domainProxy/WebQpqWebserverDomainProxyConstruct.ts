@@ -1,8 +1,6 @@
-import { awsNamingUtils } from '@qpqjs/actionprocessor-aws';
-import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsDomainProxyViewerProtocolPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { DomainProxyQPQWebServerConfigSetting, DomainTarget, qpqWebServerUtils } from '@qpqjs/webserver';
-import { DomainProxyViewerProtocolPolicy } from '@qpqjs/webserver';
 
 import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -13,24 +11,22 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 
-export interface WebQpqWebserverDomainProxyConstructProps extends QpqConstructBlockProps {
+export type WebQpqWebserverDomainProxyConstructProps = {
   domainProxyConfig: DomainProxyQPQWebServerConfigSetting;
-}
+} & QpqConstructBlockProps;
 
-function convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
-  policy: DomainProxyViewerProtocolPolicy,
-): aws_cloudfront.ViewerProtocolPolicy {
+const toAwsViewerProtocolPolicy = (policy: AwsDomainProxyViewerProtocolPolicy): aws_cloudfront.ViewerProtocolPolicy => {
   switch (policy) {
-    case DomainProxyViewerProtocolPolicy.HTTPS_ONLY:
+    case AwsDomainProxyViewerProtocolPolicy.httpsOnly:
       return aws_cloudfront.ViewerProtocolPolicy.HTTPS_ONLY;
-    case DomainProxyViewerProtocolPolicy.REDIRECT_TO_HTTPS:
+    case AwsDomainProxyViewerProtocolPolicy.redirectToHttps:
       return aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS;
-    case DomainProxyViewerProtocolPolicy.ALLOW_ALL:
+    case AwsDomainProxyViewerProtocolPolicy.allowAll:
       return aws_cloudfront.ViewerProtocolPolicy.ALLOW_ALL;
     default:
-      throw new Error('Unknown DomainProxyViewerProtocolPolicy value');
+      throw new Error(`Unknown AwsDomainProxyViewerProtocolPolicy value [${policy}]`);
   }
-}
+};
 
 export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: WebQpqWebserverDomainProxyConstructProps) {
@@ -49,16 +45,15 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
+          qpqWebServerUtils.resolveCacheOrThrow(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
-    // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
-    let distributionOrigin = new aws_cloudfront_origins.HttpOrigin(props.domainProxyConfig.httpProxyDomain);
+    const distributionOrigin = new aws_cloudfront_origins.HttpOrigin(props.domainProxyConfig.httpProxyDomain);
 
-    const viewerProtocolPolicy = convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
-      props.domainProxyConfig.domainProxyViewerProtocolPolicy,
+    const viewerProtocolPolicy = toAwsViewerProtocolPolicy(
+      qpqConfigAwsUtils.getAwsDomainProxyViewerProtocolPolicy(props.domainProxyConfig.name, props.qpqConfig),
     );
 
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {

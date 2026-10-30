@@ -2,9 +2,9 @@ import { StoryResult } from '@qpqjs/core';
 
 import { Box, Typography } from '@mui/material';
 
-interface LogRawJsonProps {
+type LogRawJsonProps = {
   log: StoryResult<any>;
-}
+};
 
 export const LogRawJson = ({ log }: LogRawJsonProps) => {
   return (

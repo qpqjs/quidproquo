@@ -1,19 +1,16 @@
 import {
   askUserDirectoryGetUserAttributesByUserId,
-  buildTestQpqConfig,
-  createActionProcessor,
   defineUserDirectory,
   isErroredActionResult,
-  noopDynamicModuleLoader,
-  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { getUserDirectoryGetUserAttributesByUserIdActionProcessor } from './getUserDirectoryGetUserAttributesByUserIdActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -22,7 +19,7 @@ const { userStore } = vi.hoisted(() => ({
 
 vi.mock('../../../logic/auth/jsonUserStore', () => userStore);
 
-const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+const devServerConfig = buildTestDevServerConfig();
 const resolvedDirectory = { serviceName: 'test-module', directoryName: 'directory' };
 
 const getProcessor = async () => {
@@ -41,7 +38,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     userStore.getDevUserByUserId.mockResolvedValue(user);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', userId: 'user-1' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', userId: 'user-1' });
 
     expect(userStore.getDevUserByUserId).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'user-1');
     expect(resolveActionResult(result)).toEqual(user);
@@ -51,7 +48,7 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     userStore.getDevUserByUserId.mockResolvedValue(null);
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { userDirectoryName: 'directory', userId: 'unknown' });
+    const result = await invokeProcessor(process!, { userDirectoryName: 'directory', userId: 'unknown' });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound);

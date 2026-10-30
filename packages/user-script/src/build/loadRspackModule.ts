@@ -27,6 +27,7 @@ const requireOrImport = async (): Promise<RspackModule> => {
   try {
     return nodeRequire(entry) as RspackModule;
   } catch (error) {
+    // Deliberate: an ESM-only rspack cannot be required, so the same entry is imported instead; any other failure propagates.
     if (!isRequireEsmError(error)) throw error;
     return importByUrl(pathToFileURL(entry).href);
   }

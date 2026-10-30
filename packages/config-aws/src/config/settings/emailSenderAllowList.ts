@@ -2,9 +2,9 @@ import { QPQConfigSetting } from '@qpqjs/core';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface EmailSenderAllowListQPQConfigSetting extends QPQConfigSetting {
+export type EmailSenderAllowListQPQConfigSetting = {
   allowedEmailAddresses: string[];
-}
+} & QPQConfigSetting;
 
 /**
  * Recipient addresses this service is allowed to email while the SES account is

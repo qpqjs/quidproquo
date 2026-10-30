@@ -1,6 +1,5 @@
 import { DevServerPlugin } from './types/DevServerPlugin';
 import { apiPlugin } from './apiPlugin';
-import { eventBusPlugin } from './eventBusPlugin';
 import { fileStoragePlugin } from './fileStoragePlugin';
 import { fileWatcherPlugin } from './fileWatcherPlugin';
 import { inFlightPlugin } from './inFlightPlugin';
@@ -27,7 +26,6 @@ export const DEV_SERVER_PLUGINS: DevServerPlugin[] = [
   kvsPlugin,
   inFlightPlugin,
 
-  eventBusPlugin,
   queuePlugin,
   kvsStreamPlugin,
   serviceFunctionPlugin,

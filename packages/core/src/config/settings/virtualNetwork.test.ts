@@ -9,6 +9,7 @@ describe('defineVirtualNetwork', () => {
       configSettingType: QPQCoreConfigSettingType.virtualNetwork,
       uniqueKey: 'Vpc',
       name: 'Vpc',
+      deprecated: false,
     });
   });
 });

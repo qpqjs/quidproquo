@@ -1,6 +1,6 @@
 import { askConfigGetApplicationInfo, askDateNow, askFileReadBinaryContents, AskResponse, QpqIsoDateTime } from '@qpqjs/core';
 
-import { askEventDocResolveStore } from '../../eventDoc/context';
+import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocEventListAll, askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc/data';
 import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants';
 import { EventDocBundle, EventDocBundleAsset, EventDocBundleDoc, EventDocDocRef, EventDocTransferRegistry } from '../models';
@@ -8,7 +8,7 @@ import { askEventDocTransferProvideCollection } from './askEventDocTransferProvi
 
 // Assets travel by value: the target environment cannot reach this drive.
 function* askEventDocBundleReadDoc(ref: EventDocDocRef): AskResponse<EventDocBundleDoc> {
-  const { storageDriveName } = yield* askEventDocResolveStore();
+  const { storageDriveName } = yield* askEventDocStoreReadOrThrow();
   const scope = yield* askEventDocResolveScope();
 
   const events = yield* askEventDocEventListAll(ref.id);

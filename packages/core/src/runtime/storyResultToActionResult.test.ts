@@ -1,22 +1,11 @@
+import { buildStoryResult } from '@qpqjs/testing';
+
 import { describe, expect, it } from 'vitest';
 
-import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionResult';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, StoryResult } from '../types/StorySession';
 import { storyResultToActionResult } from './storyResultToActionResult';
-
-const buildStoryResult = (overrides: Partial<StoryResult<any>>): StoryResult<any> => ({
-  input: [],
-  session: { depth: 0, context: {} },
-  history: [],
-  startedAt: '',
-  finishedAt: '',
-  correlation: 'corr',
-  tags: [],
-  moduleName: 'test-module',
-  runtimeType: QpqRuntimeType.EXECUTE_STORY,
-  ...overrides,
-});
 
 describe('storyResultToActionResult', () => {
   it('returns the story result on success', () => {

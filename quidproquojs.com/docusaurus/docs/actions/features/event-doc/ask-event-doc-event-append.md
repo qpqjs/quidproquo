@@ -27,7 +27,7 @@ export function* appendTitleChange(docId: string) {
       type: 'SET_NAME',
       payload: {
         data: { name: 'Q3 Report' },
-        metadata: { version: 3, clientMessageId: yield* askNewGuid() },
+        metadata: { version: 3, clientMessageId: yield* askGuidNew() },
       },
     },
     actor,

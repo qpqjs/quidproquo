@@ -2,11 +2,7 @@ import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { defineDevServerOptions } from '@qpqjs/dev-server/config';
 import { defineDynamicRoutes } from '@qpqjs/features';
 import { defineQpqjsService } from '@qpqjs/service-utils';
-import {
-  defineStorageDrive,
-  defineWebEntry,
-  QPQConfigAdvancedWebEntrySettings,
-} from 'quidproquo';
+import { defineStorageDrive, defineWebEntry, QPQConfigAdvancedWebEntrySettings } from 'quidproquo';
 
 import * as dynamicRoutes from './entry/controller';
 
@@ -44,17 +40,12 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
     autoUpload: false,
   },
 
-  ignoreCache: [
-    '*/index.js',
-    '*/index.html',
-    '*/remoteEntry.js',
-    '*/mf-manifest.json',
-  ],
+  ignoreCache: ['*/index.js', '*/index.html', '*/remoteEntry.js', '*/mf-manifest.json'],
 };
 
 // The Docusaurus docs site. No storage drive: the web entry owns its bucket,
 // and autoUpload (the default) packages docusaurus/build as a CDK asset at
-// synth time, uploads it at deploy time, and invalidates the distribution —
+// synth time, uploads it at deploy time, and invalidates the distribution,
 // so `docusaurus` must be built before the web stack deploys.
 const docsWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   buildPath: '../../../../../../docusaurus/build',
@@ -73,11 +64,7 @@ export default [
   }),
 
   // never change the app name, it will result in a new stack!
-  defineQpqjsService(
-    QpqjsServiceEnum.Shell,
-    __dirname,
-    '../../../../../../dist/apps/qpqjs/services/shell/service'
-  ),
+  defineQpqjsService(QpqjsServiceEnum.Shell, __dirname, '../../../../../../dist/apps/qpqjs/services/shell/service'),
 
   defineStorageDrive(websiteWebEntryStorageDriveName),
   defineWebEntry('website', webEntryOptions),

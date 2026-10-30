@@ -10,10 +10,10 @@ import { useAdminApp } from '../../adminApp';
 import { eventDocAiLogChatRuntime } from './eventDocAiLogChatRuntime';
 import { EventDocAiSegments } from './EventDocAiSegments';
 
-interface LogChatProps {
+type LogChatProps = {
   logServiceName: string;
   logCorrelation: string;
-}
+};
 
 const LogChatConversation: React.FC<{ logCorrelation: string }> = ({ logCorrelation }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -134,7 +134,7 @@ const LogChatConversation: React.FC<{ logCorrelation: string }> = ({ logCorrelat
 };
 
 // The generic EventDocAi chat, scoped to this one log (docId = correlation id).
-// See eventdoc-chat-plan.md — replaces the old one-off Claude chat.
+// See eventdoc-chat-plan.md, replaces the old one-off Claude chat.
 export const LogChat: React.FC<LogChatProps> = ({ logServiceName, logCorrelation }) => {
   if (!logServiceName) {
     return (

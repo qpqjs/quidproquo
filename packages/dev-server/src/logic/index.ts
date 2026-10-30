@@ -1,5 +1,7 @@
+export * from './concurrencyGate';
 export * from './config';
 export * from './cryptoKeys';
+export * from './email';
 export * from './eventBus';
 export * from './fifoDeduplication';
 export * from './inFlight';
@@ -10,4 +12,5 @@ export * from './readiness';
 export * from './schedule';
 export * from './shutdown';
 export * from './signingKeys';
+export * from './sleep';
 export * from './withProcessorDelay';

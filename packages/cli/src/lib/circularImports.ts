@@ -5,7 +5,7 @@
 // flows like `npm run validate-ts` with no bundling.
 //
 // Scope: each workspace's src, relative imports. Cross-package cycles are
-// already impossible — TypeScript project references refuse to build them — so
+// already impossible, TypeScript project references refuse to build them, so
 // every runtime-relevant cycle lives inside one package's src. Type-only
 // imports are skipped (skipTypeImports): tsc erases them, so they never create
 // a runtime cycle.
@@ -18,7 +18,7 @@ const madge = require('madge') as (paths: string[], config: object) => Promise<{
 
 export type ImportCycle = string[];
 
-// Expand npm workspace globs (plain path segments and `*` segments only — the
+// Expand npm workspace globs (plain path segments and `*` segments only, the
 // only forms npm workspaces use in practice) into existing directories.
 const expandWorkspaceGlob = (root: string, pattern: string): string[] => {
   let candidates = [root];
@@ -41,7 +41,7 @@ const expandWorkspaceGlob = (root: string, pattern: string): string[] => {
   return candidates.filter((dir) => fs.existsSync(dir) && fs.statSync(dir).isDirectory());
 };
 
-export const getWorkspaceDirectories = (root: string): string[] => {
+const getWorkspaceDirectories = (root: string): string[] => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
   const patterns: string[] = packageJson.workspaces ?? [];
   return patterns.flatMap((pattern) => expandWorkspaceGlob(root, pattern));
@@ -54,7 +54,7 @@ export const findWorkspaceImportCycles = async (root: string): Promise<ImportCyc
 
   // Excludes: node_modules and built output (dist/lib), declaration files
   // (type-only, can't cycle at runtime), and anything madge resolves to outside
-  // the repo root (linked framework packages — their cycles surface through the
+  // the repo root (linked framework packages, their cycles surface through the
   // rspack CircularCheckRspackPlugin instead, this command owns the consumer
   // repo). Out-of-root paths start with '..' because baseDir is the repo root.
   const result = await madge(sourceDirs, {

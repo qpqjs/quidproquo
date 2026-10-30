@@ -10,7 +10,7 @@ Declares the sandbox that runs this service's user scripts. [askUserScriptExecut
 The sandbox is two walls:
 
 - **No permissions.** The runner is its own function with its own role, which can write logs and nothing else. It never uses the service role, so it cannot reach a drive, a store, a secret or a queue even if a script tries.
-- **Pure actions only.** The runner's action processors are date, guid, log, math and error. A script can yield `askDateNow` or `askNewGuid`, and its story runs as usual. Anything else it yields has no processor and fails at that point.
+- **Pure actions only.** The runner's action processors are date, guid, log, math and error. A script can yield `askDateNow` or `askGuidNew`, and its story runs as usual. Anything else it yields has no processor and fails at that point.
 
 ```typescript
 import { defineUserScriptRunner } from '@qpqjs/core';

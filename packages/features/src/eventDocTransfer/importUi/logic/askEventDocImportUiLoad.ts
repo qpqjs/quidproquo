@@ -1,9 +1,10 @@
-import { askCatch, AskResponse } from '@qpqjs/core';
+import { AskResponse } from '@qpqjs/core';
 
+import { askUiCatch } from '../../../ui/logic/askUiCatch';
 import { EventDocTransferPlanResult } from '../../models';
-import { askUIEventDocImportSetError } from '../actionCreators/askUIEventDocImportSetError';
-import { askUIEventDocImportSetLoading } from '../actionCreators/askUIEventDocImportSetLoading';
-import { askUIEventDocImportSetPlan } from '../actionCreators/askUIEventDocImportSetPlan';
+import { askEventDocImportSetError } from '../actionCreators/askEventDocImportSetError';
+import { askEventDocImportSetLoading } from '../actionCreators/askEventDocImportSetLoading';
+import { askEventDocImportSetPlan } from '../actionCreators/askEventDocImportSetPlan';
 import { askEventDocBundleUpload } from '../transport/askEventDocBundleUpload';
 import { askEventDocPlanFetch } from '../transport/askEventDocPlanFetch';
 import { askEventDocUploadTargetFetch } from '../transport/askEventDocUploadTargetFetch';
@@ -25,15 +26,15 @@ function* askEventDocImportUiUploadAndPlan(serviceName: string, file: File): Ask
 
 /** Uploads the chosen bundle file and stores its plan. Writes nothing. */
 export function* askEventDocImportUiLoad(serviceName: string, file: File): AskResponse<void> {
-  yield* askUIEventDocImportSetLoading(true);
-  yield* askUIEventDocImportSetError(null);
-
-  const loaded = yield* askCatch(askEventDocImportUiUploadAndPlan(serviceName, file), askUIEventDocImportSetLoading(false));
+  const loaded = yield* askUiCatch(askEventDocImportUiUploadAndPlan(serviceName, file), {
+    askSetError: askEventDocImportSetError,
+    askSetBusy: askEventDocImportSetLoading,
+    errorText: 'Could not read that bundle. Is it a file exported from this app?',
+  });
 
   if (!loaded.success) {
-    yield* askUIEventDocImportSetError('Could not read that bundle. Is it a file exported from this app?');
     return;
   }
 
-  yield* askUIEventDocImportSetPlan(loaded.result.transferId, loaded.result.source, loaded.result.rows);
+  yield* askEventDocImportSetPlan(loaded.result.transferId, loaded.result.source, loaded.result.rows);
 }

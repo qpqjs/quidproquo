@@ -1,15 +1,14 @@
 // @vitest-environment jsdom
 import {
-  buildTestQpqConfig,
   ConfigActionType,
   CryptoActionType,
   EventBusActionType,
   FileActionType,
   KeyValueStoreActionType,
-  noopDynamicModuleLoader,
   QueueActionType,
   UserDirectoryActionType,
 } from '@qpqjs/core';
+import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 import { QueryParamsActionType, WindowActionType } from '@qpqjs/web';
 import { ApiActionType, ServiceFunctionActionType, WebsocketActionType } from '@qpqjs/webserver';
 
