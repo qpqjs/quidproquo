@@ -4,6 +4,7 @@ export * from './jwtUtils';
 export * from './mergeRouteUtils';
 export * from './NetworkRequestError';
 export * from './networkRequestErrorMap';
+export * from './NetworkRequestErrorTypes';
 export * from './networkRequestUtils';
 export * from './openApi';
 export * from './pathUtils';
