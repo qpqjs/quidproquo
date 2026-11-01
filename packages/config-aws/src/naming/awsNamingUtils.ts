@@ -347,13 +347,13 @@ export const getApiStackName = (qpqConfig: QPQConfig) => {
 
 // App-level stacks (bootstrap, domain) are per deployment, not per service, so their names
 // carry no module segment.
-export const getAppStackName = (application: string, environment: string, feature: string | undefined, suffix: string) =>
+export const getAppStackName = (application: string, environment: string, suffix: string, feature?: string) =>
   `${getDeploymentName(application, environment, feature)}-${suffix}`;
 
 const getAppStackNameFromConfig = (qpqConfig: QPQConfig, suffix: string) => {
   const { application, environment, feature } = resolveDeploymentFromConfig(qpqConfig);
 
-  return getAppStackName(application, environment, feature, suffix);
+  return getAppStackName(application, environment, suffix, feature);
 };
 
 export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackNameFromConfig(qpqConfig, 'bs');

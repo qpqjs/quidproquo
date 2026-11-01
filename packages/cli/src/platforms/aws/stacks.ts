@@ -71,6 +71,6 @@ export const deployBootstrapStack = async (appName: string): Promise<void> => {
   const appPrefix = getAppPrefix(appName);
   const environment = process.env[QpqDeployEnvVar.environment];
   const feature = process.env[QpqDeployEnvVar.featureName];
-  const stackName = awsNamingUtils.getAppStackName(appPrefix, environment ?? '', feature, 'bs');
+  const stackName = awsNamingUtils.getAppStackName(appPrefix, environment ?? '', 'bs', feature);
   await deployStack(stackName, getDeployEnv(appName));
 };
