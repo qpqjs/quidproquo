@@ -7,14 +7,7 @@ import {
   WebSocketQueueQpqAdminServerEventMessageModifySetting,
   WebSocketQueueQpqAdminServerMessageEventType,
 } from '../../log/logic/webSocket';
-
-export type AdminConfigSyncTarget = {
-  // The websocket connection that asked, as the connection-info context holds it.
-  connectionId?: string;
-  correlationId?: string;
-  // The service whose settings these are, shown beside each one.
-  service: string;
-};
+import { AdminConfigSyncTarget } from './AdminConfigSyncTarget';
 
 // Reads one parameter and shows it on the admin client as an editable setting.
 export function* askAdminConfigSyncSendParameter(param: string, target: AdminConfigSyncTarget): AskResponse<void> {
