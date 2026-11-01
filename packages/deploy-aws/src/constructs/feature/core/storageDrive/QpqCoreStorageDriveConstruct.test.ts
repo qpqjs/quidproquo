@@ -44,9 +44,12 @@ describe('QpqCoreStorageDriveConstruct lockedDown', () => {
     const template = synth(defineStorageDrive('logs', { lockedDown: true }));
     const policies = template.findResources('AWS::S3::BucketPolicy');
     const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+    // The plain-http deny covers s3:* on purpose, but only when the request is not over tls. Every other deny must
+    // stay limited to object reads.
+    const isPlainHttpDeny = (statement: any) => statement.Condition?.Bool?.['aws:SecureTransport'] === 'false';
     const denied = statements
-      .filter((statement: any) => statement.Effect === 'Deny' && statement.Sid === 'DenyObjectReadExceptServiceRole')
-      .flatMap((statement: any) => statement.Action);
+      .filter((statement: any) => statement.Effect === 'Deny' && !isPlainHttpDeny(statement))
+      .flatMap((statement: any) => [statement.Action].flat());
 
     expect(denied).toEqual(['s3:GetObject', 's3:GetObjectVersion']);
   });
