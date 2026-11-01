@@ -14,7 +14,7 @@ import {
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/types';
-import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, sleep, trackInFlight } from '../logic';
+import { ConcurrencyGate, createConcurrencyGate, eventBus, processEvent, trackInFlight } from '../logic';
 import { DevServerPluginStop } from '../plugins/types/DevServerPluginStop';
 import { ResolvedDevServerConfig } from '../types';
 
@@ -132,6 +132,22 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
   // Per-queue concurrency: AWS caps a queue's consumer at maxConcurrentExecutions (migrations
   // rely on 1 to run serially), so the same cap is applied here.
   const queueGates: Map<string, ConcurrencyGate> = new Map();
+
+  // A retry waits outside the queue's concurrency gate (SQS hides the message and the consumer
+  // moves on to the next one) and ends early at shutdown, so a waiting message is reported dropped
+  // instead of outliving the drain and vanishing without a word.
+  let stopping = false;
+  const pendingRetryWaits: Set<() => void> = new Set();
+  const waitForRetry = (ms: number): Promise<void> =>
+    new Promise<void>((resolve) => {
+      const wake = (): void => {
+        clearTimeout(timer);
+        pendingRetryWaits.delete(wake);
+        resolve();
+      };
+      const timer = setTimeout(wake, ms);
+      pendingRetryWaits.add(wake);
+    });
   const getQueueGate = (payload: AnyQueueMessageWithSession): ConcurrencyGate | undefined => {
     const limit = resolveQueueConcurrencyLimit(devServerConfig.qpqConfigs, payload);
     if (limit === undefined) {
@@ -167,30 +183,39 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     };
 
     // Redelivery as AWS does it: up to maxTries, waiting ttRetryInSeconds between tries. There is
-    // no local dead-letter queue, so the last failure is logged and the message dropped.
-    const processAllUngated = async () => {
+    // no local dead-letter queue, so the last failure is logged and the message dropped. Only a
+    // delivery holds the queue's concurrency slot; the wait between tries does not.
+    const gate = getQueueGate(payload);
+    const deliverOnce = gate ? () => gate.run(processOnce) : processOnce;
+
+    const processAll = async () => {
       const queueConfig = resolveQueueConfig(devServerConfig.qpqConfigs, payload);
       const maxTries = Math.max(1, queueConfig?.maxTries ?? 1);
       const retryDelayMs = Math.min((queueConfig?.ttRetryInSeconds ?? 0) * 1000, LOCAL_MAX_RETRY_DELAY_MS);
       const label = `Queue [${payload.queueName}] message [${payload.messageId}]`;
 
       for (let attempt = 1; attempt <= maxTries; attempt += 1) {
-        const failure = await processOnce();
+        const failure = await deliverOnce();
         if (failure === null) {
           return;
         }
 
-        if (attempt < maxTries) {
+        if (attempt < maxTries && !stopping) {
           console.warn(`${label} failed on try ${attempt} of ${maxTries}, retrying in ${retryDelayMs / 1000}s:`, failure);
-          await sleep(retryDelayMs);
+          await waitForRetry(retryDelayMs);
+          if (!stopping) {
+            continue;
+          }
+        }
+
+        if (stopping) {
+          console.error(`${label} failed on try ${attempt} of ${maxTries} and the dev server is stopping; dropped:`, failure);
         } else {
           console.error(`${label} failed after ${maxTries} ${maxTries === 1 ? 'try' : 'tries'}; no local dead-letter queue, dropped:`, failure);
         }
+        return;
       }
     };
-
-    const gate = getQueueGate(payload);
-    const processAll = gate ? () => gate.run(processAllUngated) : processAllUngated;
 
     if (payload.groupId === undefined) {
       await trackInFlight(processAll());
@@ -215,7 +240,13 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     }
   });
 
-  // Nothing to take down: the messages themselves are in-flight work, drained
-  // by the in-flight plugin, and the bus outlives every listener on it.
-  return null;
+  // The messages themselves are in-flight work, drained by the in-flight plugin, and the bus
+  // outlives every listener on it. What stop does is wake every retry wait, so a message that was
+  // between tries settles (as dropped) inside the drain instead of after it.
+  return async () => {
+    stopping = true;
+    for (const wake of [...pendingRetryWaits]) {
+      wake();
+    }
+  };
 };

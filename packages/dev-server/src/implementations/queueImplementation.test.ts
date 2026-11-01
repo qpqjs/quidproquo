@@ -213,6 +213,66 @@ describe('queueImplementation retries', () => {
     expect(String(consoleError.mock.calls[0]?.[0])).toContain('no local dead-letter queue');
   });
 
+  // On AWS a failed message is hidden for the visibility timeout while the consumer takes the next one; locally the
+  // wait must not hold the queue's only slot, or every other message stalls behind a failing one.
+  it('releases the concurrency slot while a failed message waits to retry', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const delivered: string[] = [];
+      vi.mocked(processEvent).mockImplementation(async (payload: any) => {
+        delivered.push(payload.messageId);
+        if (payload.messageId === 'slow' && delivered.filter((id) => id === 'slow').length === 1) {
+          throw new Error('boom');
+        }
+        return {} as any;
+      });
+
+      const handler = startImplementation(QueueActionType.SendMessage, [
+        defineQueue('serialQueue', {}, { maxConcurrentExecutions: 1, maxTries: 2, ttRetryInSeconds: 1 }),
+      ]);
+      const slow = handler(buildPayload({ messageId: 'slow', queueName: 'serialQueue' }), 'corr');
+      const quick = handler(buildPayload({ messageId: 'quick', queueName: 'serialQueue' }), 'corr');
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect(delivered).toEqual(['slow', 'quick']);
+      await quick;
+
+      await vi.advanceTimersByTimeAsync(1000);
+      await slow;
+      expect(delivered).toEqual(['slow', 'quick', 'slow']);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // Plugin stops run before the drain, so a message between tries must settle when told to stop, and say so.
+  it('ends a pending retry wait at shutdown and reports the message dropped', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.mocked(processEvent).mockRejectedValue(new Error('boom'));
+
+      const stop = await queueImplementation(buildDevServerConfig([defineQueue('retryQueue', {}, { maxTries: 3, ttRetryInSeconds: 1 })]));
+      const registrations = vi.mocked(eventBus.on).mock.calls.filter(([type]: any[]) => type === QueueActionType.SendMessage);
+      const handler = registrations[registrations.length - 1]![1] as (payload: any, correlation: string) => Promise<void>;
+
+      const delivery = handler(buildPayload({ messageId: 'r4', queueName: 'retryQueue' }), 'corr');
+      await vi.advanceTimersByTimeAsync(1);
+      expect(processEvent).toHaveBeenCalledTimes(1);
+
+      await stop!();
+      await delivery;
+
+      expect(processEvent).toHaveBeenCalledTimes(1);
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(String(consoleError.mock.calls[0]?.[0])).toContain('dev server is stopping');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('delivers once when the queue is unknown to the config', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(processEvent).mockRejectedValue(new Error('boom'));
