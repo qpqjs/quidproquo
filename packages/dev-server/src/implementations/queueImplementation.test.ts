@@ -160,21 +160,42 @@ describe('queueImplementation retries', () => {
 
   const retrySettings = [defineQueue('retryQueue', {}, { maxTries: 3, ttRetryInSeconds: 0 })];
 
-  it('redelivers a thrown failure up to maxTries and stops once it succeeds', async () => {
+  // Success comes on the second of three allowed tries, so a loop that never retries (one call) and a loop that
+  // keeps delivering past a success (three calls) both fail this test.
+  it('redelivers a thrown failure and stops as soon as a later delivery succeeds', async () => {
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     let tries = 0;
     vi.mocked(processEvent).mockImplementation(async () => {
       tries += 1;
-      if (tries < 3) throw new Error('boom');
+      if (tries < 2) throw new Error('boom');
       return {} as any;
     });
 
     const handler = startImplementation(QueueActionType.SendMessage, retrySettings);
     await handler(buildPayload({ messageId: 'r1', queueName: 'retryQueue' }), 'corr');
 
-    expect(tries).toBe(3);
-    expect(consoleWarn).toHaveBeenCalledTimes(2);
+    expect(tries).toBe(2);
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  // A story that fails does not throw: the queue's transform processor passes the record's error through and
+  // askProcessEvent rethrows it, so processEvent resolves to a story result carrying `error`. That result must be
+  // retried exactly like a throw.
+  it('redelivers a failed story result and stops once a later delivery succeeds', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(processEvent)
+      .mockResolvedValueOnce({ error: { errorType: 'GenericError', errorText: 'story failed' } } as any)
+      .mockResolvedValueOnce({} as any);
+
+    const handler = startImplementation(QueueActionType.SendMessage, retrySettings);
+    await handler(buildPayload({ messageId: 'r3', queueName: 'retryQueue' }), 'corr');
+
+    expect(processEvent).toHaveBeenCalledTimes(2);
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(String(consoleWarn.mock.calls[0]?.[1])).toContain('story failed');
     expect(consoleError).not.toHaveBeenCalled();
   });
 
