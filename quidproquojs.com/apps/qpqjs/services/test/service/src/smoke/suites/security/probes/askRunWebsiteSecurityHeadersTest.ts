@@ -1,13 +1,7 @@
-import { askNetworkRequest, askOpenApiGetDocument, AskResponse } from 'quidproquo';
+import { AskResponse } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
-
-// The website lives on the api host minus its `api.` label (the app's web entry is
-// on the root domain, the api on `api.` under it). Good enough for this app's probe.
-const toWebsiteUrl = (apiBaseUrl: string): string => {
-  const api = new URL(apiBaseUrl);
-  return `https://${api.hostname.replace(/^api\./, '')}`;
-};
+import { askSmokeFetchWebsiteIndex } from '../../../harness/logic/website/askSmokeFetchWebsiteIndex';
 
 const header = (headers: Record<string, string>, name: string): string | undefined =>
   Object.entries(headers).find(([key]) => key.toLowerCase() === name)?.[1];
@@ -22,13 +16,7 @@ const hasPositiveMaxAge = (value: string): boolean => {
 // browser hardening headers whether or not the app configured any, so the site
 // cannot be framed, sniffed or downgraded to http.
 export function* askRunWebsiteSecurityHeadersTest(): AskResponse<void> {
-  const document = yield* askOpenApiGetDocument();
-  const baseUrl = document.servers[0]?.url;
-  yield* askSmokeAssert(!!baseUrl, 'document lists no servers to call');
-  const websiteUrl = toWebsiteUrl(baseUrl);
-
-  const index = yield* askNetworkRequest<string, undefined>('GET', `${websiteUrl}/`, { responseType: 'text' });
-  yield* askSmokeAssert(index.status === 200, `website index returned [${index.status}] from ${websiteUrl}`);
+  const { index } = yield* askSmokeFetchWebsiteIndex();
 
   const expected: [string, (value: string) => boolean][] = [
     ['strict-transport-security', hasPositiveMaxAge],
