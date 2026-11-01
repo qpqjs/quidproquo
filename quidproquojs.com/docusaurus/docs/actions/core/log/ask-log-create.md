@@ -56,9 +56,9 @@ Numeric enum ordered from most to least severe (the value is the number shown be
 
 ## Notes
 
-- For interpolated messages where you also want the individual values captured structurally, use [askLogTemplateLiteral](./ask-log-template-literal.md).
+- For interpolated messages where you also want the individual values captured structurally, use [askLog](./ask-log.md).
 
 ## Related
 
-- [askLogTemplateLiteral](./ask-log-template-literal.md) — log an interpolated message as a tagged template.
+- [askLog](./ask-log.md) — log an interpolated message as a tagged template.
 - [askLogDisableEventHistory](./ask-log-disable-event-history.md) — control whether the story's full action history is persisted.

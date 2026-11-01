@@ -1,9 +1,9 @@
 ---
-title: askLogTemplateLiteral
+title: askLog
 description: Log an interpolated message written as a tagged template literal.
 ---
 
-# askLogTemplateLiteral
+# askLog
 
 Logs a message written as a [tagged template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates), keeping the literal string parts and the interpolated values separate so both the reconstructed message and the individual values are captured.
 
@@ -13,17 +13,17 @@ Logs a message written as a [tagged template literal](https://developer.mozilla.
 Because it is a tag function, you call it by placing the template literal directly after it — no parentheses:
 
 ```typescript
-import { askLogTemplateLiteral } from '@qpqjs/core';
+import { askLog } from '@qpqjs/core';
 
 export function* askGreetUser(userId: string, age: number) {
-  yield* askLogTemplateLiteral`User ${userId} is ${age} years old`;
+  yield* askLog`User ${userId} is ${age} years old`;
 }
 ```
 
 ## Signature
 
 ```typescript
-function* askLogTemplateLiteral(
+function* askLog(
   strings: TemplateStringsArray,
   ...variables: DecomposedStringPrimitive[]
 ): AskResponse<void>;
@@ -46,7 +46,7 @@ Internally these are stored as a `DecomposedString` — a `[strings, variables]`
 
 ## Notes
 
-- `askLog` is exported from @qpqjs/core as an alias for `askLogTemplateLiteral`; the two are identical.
+- The entry is written at info level; for warnings and errors use [askLogCreate](./ask-log-create.md) with a level.
 - Unlike [askLogCreate](./ask-log-create.md), this requester takes no log level.
 
 ## Related
