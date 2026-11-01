@@ -1,6 +1,8 @@
 import { KeyOf } from '../../../types';
 import { QPQCoreConfigSettingType } from '../../QPQConfig';
-import { CompositeCompositeKvsIndex, CompositeKvsIndex, CompositeKvsKey } from './types/CompositeKvsIndex';
+import { CompositeCompositeKvsIndex } from './types/CompositeCompositeKvsIndex';
+import { CompositeKvsIndex } from './types/CompositeKvsIndex';
+import { CompositeKvsKey } from './types/CompositeKvsKey';
 import { KeyValueStoreQPQConfigSetting } from './types/KeyValueStoreQPQConfigSetting';
 import { KvsIndex } from './types/KvsIndex';
 import { KvsKey } from './types/KvsKey';
