@@ -118,134 +118,156 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   }
 };
 
+// What the queue handlers share for the life of the dev server: the FIFO group tails, the per-queue
+// concurrency gates, and the retry waits that stop wakes early.
+type QueueRuntimeState = {
+  devServerConfig: ResolvedDevServerConfig;
+  // FIFO simulation: messages with a groupId are chained onto a per-group promise tail so they process
+  // strictly one at a time, in send order, like SQS FIFO message groups. There is no local
+  // redelivery/DLQ, so a failed message just logs and the group moves on.
+  fifoGroupTails: Map<string, Promise<void>>;
+  // Per-queue concurrency: AWS caps a queue's consumer at maxConcurrentExecutions (migrations rely on
+  // 1 to run serially), so the same cap is applied here.
+  queueGates: Map<string, ConcurrencyGate>;
+  // A retry waits outside the queue's concurrency gate (SQS hides the message and the consumer moves
+  // on to the next one) and ends early at shutdown, so a waiting message is reported dropped instead
+  // of outliving the drain and vanishing without a word.
+  pendingRetryWaits: Set<() => void>;
+  isStopping: () => boolean;
+};
+
+const waitForRetry = (state: QueueRuntimeState, ms: number): Promise<void> =>
+  new Promise<void>((resolve) => {
+    const wake = (): void => {
+      clearTimeout(timer);
+      state.pendingRetryWaits.delete(wake);
+      resolve();
+    };
+    const timer = setTimeout(wake, ms);
+    state.pendingRetryWaits.add(wake);
+  });
+
+const getQueueGate = (state: QueueRuntimeState, payload: AnyQueueMessageWithSession): ConcurrencyGate | undefined => {
+  const limit = resolveQueueConcurrencyLimit(state.devServerConfig.qpqConfigs, payload);
+  if (limit === undefined) {
+    return undefined;
+  }
+
+  const gateKey = `${payload.targetModule}:${payload.queueName}`;
+  const existing = state.queueGates.get(gateKey);
+  if (existing) {
+    return existing;
+  }
+
+  const gate = createConcurrencyGate(limit);
+  state.queueGates.set(gateKey, gate);
+  return gate;
+};
+
+// One delivery: the first failure (a thrown error or a failed story) is what a retry answers.
+const deliverQueueMessageOnce = async (devServerConfig: ResolvedDevServerConfig, payload: AnyQueueMessageWithSession): Promise<Nullable<unknown>> => {
+  try {
+    for (const qpqConfig of devServerConfig.qpqConfigs) {
+      const result = await processQueueMessages(qpqConfig, payload, devServerConfig);
+      if (result?.error) {
+        return result.error.errorText;
+      }
+    }
+  } catch (error) {
+    return error;
+  }
+
+  return null;
+};
+
+// Redelivery as AWS does it: up to maxTries, waiting ttRetryInSeconds between tries. There is no local
+// dead-letter queue, so the last failure is logged and the message dropped. Only a delivery holds the
+// queue's concurrency slot; the wait between tries does not.
+const processQueueMessageWithRetries = async (state: QueueRuntimeState, payload: AnyQueueMessageWithSession): Promise<void> => {
+  const gate = getQueueGate(state, payload);
+  const deliverOnce = (): Promise<Nullable<unknown>> =>
+    gate ? gate.run(() => deliverQueueMessageOnce(state.devServerConfig, payload)) : deliverQueueMessageOnce(state.devServerConfig, payload);
+
+  const queueConfig = resolveQueueConfig(state.devServerConfig.qpqConfigs, payload);
+  const maxTries = Math.max(1, queueConfig?.maxTries ?? 1);
+  const retryDelayMs = Math.min((queueConfig?.ttRetryInSeconds ?? 0) * 1000, LOCAL_MAX_RETRY_DELAY_MS);
+  const label = `Queue [${payload.queueName}] message [${payload.messageId}]`;
+
+  for (let attempt = 1; attempt <= maxTries; attempt += 1) {
+    const failure = await deliverOnce();
+    if (failure === null) {
+      return;
+    }
+
+    if (attempt < maxTries && !state.isStopping()) {
+      console.warn(`${label} failed on try ${attempt} of ${maxTries}, retrying in ${retryDelayMs / 1000}s:`, failure);
+      await waitForRetry(state, retryDelayMs);
+      if (!state.isStopping()) {
+        continue;
+      }
+    }
+
+    if (state.isStopping()) {
+      console.error(`${label} failed on try ${attempt} of ${maxTries} and the dev server is stopping; dropped:`, failure);
+    } else {
+      console.error(`${label} failed after ${maxTries} ${maxTries === 1 ? 'try' : 'tries'}; no local dead-letter queue, dropped:`, failure);
+    }
+    return;
+  }
+};
+
+// A sent queue message: processed straight away, or queued behind its FIFO group's tail.
+const onQueueSendMessage = async (state: QueueRuntimeState, payload: AnyQueueMessageWithSession): Promise<void> => {
+  const processAll = (): Promise<void> => processQueueMessageWithRetries(state, payload);
+
+  if (payload.groupId === undefined) {
+    await trackInFlight(processAll());
+    return;
+  }
+
+  const groupKey = `${payload.queueName}:${payload.groupId}`;
+  const groupTail = trackInFlight((state.fifoGroupTails.get(groupKey) ?? Promise.resolve()).then(processAll));
+  state.fifoGroupTails.set(groupKey, groupTail);
+
+  await groupTail;
+
+  // Drop drained groups so the map doesn't grow forever
+  if (state.fifoGroupTails.get(groupKey) === groupTail) {
+    state.fifoGroupTails.delete(groupKey);
+  }
+};
+
+// An event bus message: fanned out to every subscribed queue of every service.
+const onEventBusSendMessage = async (devServerConfig: ResolvedDevServerConfig, payload: AnyEventBusMessageWithSession): Promise<void> => {
+  for (const qpqConfig of devServerConfig.qpqConfigs) {
+    await processQueueEventBusSubscriptions(qpqConfig, payload);
+  }
+};
+
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig): Promise<Nullable<DevServerPluginStop>> => {
   // Fail fast when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
   for (const qpqConfig of devServerConfig.qpqConfigs) {
     qpqCoreUtils.assertFifoQueueEventBusSubscriptionsAreValid(qpqConfig);
   }
 
-  // FIFO simulation: messages with a groupId are chained onto a per-group promise tail so
-  // they process strictly one at a time, in send order - like SQS FIFO message groups.
-  // There is no local redelivery/DLQ, so a failed message just logs and the group moves on.
-  const fifoGroupTails: Map<string, Promise<void>> = new Map();
-
-  // Per-queue concurrency: AWS caps a queue's consumer at maxConcurrentExecutions (migrations
-  // rely on 1 to run serially), so the same cap is applied here.
-  const queueGates: Map<string, ConcurrencyGate> = new Map();
-
-  // A retry waits outside the queue's concurrency gate (SQS hides the message and the consumer
-  // moves on to the next one) and ends early at shutdown, so a waiting message is reported dropped
-  // instead of outliving the drain and vanishing without a word.
   let stopping = false;
-  const pendingRetryWaits: Set<() => void> = new Set();
-  const waitForRetry = (ms: number): Promise<void> =>
-    new Promise<void>((resolve) => {
-      const wake = (): void => {
-        clearTimeout(timer);
-        pendingRetryWaits.delete(wake);
-        resolve();
-      };
-      const timer = setTimeout(wake, ms);
-      pendingRetryWaits.add(wake);
-    });
-  const getQueueGate = (payload: AnyQueueMessageWithSession): ConcurrencyGate | undefined => {
-    const limit = resolveQueueConcurrencyLimit(devServerConfig.qpqConfigs, payload);
-    if (limit === undefined) {
-      return undefined;
-    }
-
-    const gateKey = `${payload.targetModule}:${payload.queueName}`;
-    const existing = queueGates.get(gateKey);
-    if (existing) {
-      return existing;
-    }
-
-    const gate = createConcurrencyGate(limit);
-    queueGates.set(gateKey, gate);
-    return gate;
+  const state: QueueRuntimeState = {
+    devServerConfig,
+    fifoGroupTails: new Map(),
+    queueGates: new Map(),
+    pendingRetryWaits: new Set(),
+    isStopping: () => stopping,
   };
 
-  eventBus.on(QueueActionType.SendMessage, async (payload: AnyQueueMessageWithSession, correlation: string) => {
-    // One delivery: the first failure (a thrown error or a failed story) is what a retry answers.
-    const processOnce = async (): Promise<Nullable<unknown>> => {
-      try {
-        for (const qpqConfig of devServerConfig.qpqConfigs) {
-          const result = await processQueueMessages(qpqConfig, payload, devServerConfig);
-          if (result?.error) {
-            return result.error.errorText;
-          }
-        }
-      } catch (error) {
-        return error;
-      }
-
-      return null;
-    };
-
-    // Redelivery as AWS does it: up to maxTries, waiting ttRetryInSeconds between tries. There is
-    // no local dead-letter queue, so the last failure is logged and the message dropped. Only a
-    // delivery holds the queue's concurrency slot; the wait between tries does not.
-    const gate = getQueueGate(payload);
-    const deliverOnce = gate ? () => gate.run(processOnce) : processOnce;
-
-    const processAll = async () => {
-      const queueConfig = resolveQueueConfig(devServerConfig.qpqConfigs, payload);
-      const maxTries = Math.max(1, queueConfig?.maxTries ?? 1);
-      const retryDelayMs = Math.min((queueConfig?.ttRetryInSeconds ?? 0) * 1000, LOCAL_MAX_RETRY_DELAY_MS);
-      const label = `Queue [${payload.queueName}] message [${payload.messageId}]`;
-
-      for (let attempt = 1; attempt <= maxTries; attempt += 1) {
-        const failure = await deliverOnce();
-        if (failure === null) {
-          return;
-        }
-
-        if (attempt < maxTries && !stopping) {
-          console.warn(`${label} failed on try ${attempt} of ${maxTries}, retrying in ${retryDelayMs / 1000}s:`, failure);
-          await waitForRetry(retryDelayMs);
-          if (!stopping) {
-            continue;
-          }
-        }
-
-        if (stopping) {
-          console.error(`${label} failed on try ${attempt} of ${maxTries} and the dev server is stopping; dropped:`, failure);
-        } else {
-          console.error(`${label} failed after ${maxTries} ${maxTries === 1 ? 'try' : 'tries'}; no local dead-letter queue, dropped:`, failure);
-        }
-        return;
-      }
-    };
-
-    if (payload.groupId === undefined) {
-      await trackInFlight(processAll());
-      return;
-    }
-
-    const groupKey = `${payload.queueName}:${payload.groupId}`;
-    const groupTail = trackInFlight((fifoGroupTails.get(groupKey) ?? Promise.resolve()).then(processAll));
-    fifoGroupTails.set(groupKey, groupTail);
-
-    await groupTail;
-
-    // Drop drained groups so the map doesn't grow forever
-    if (fifoGroupTails.get(groupKey) === groupTail) {
-      fifoGroupTails.delete(groupKey);
-    }
-  });
-
-  eventBus.on(EventBusActionType.SendMessage, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
-    for (const qpqConfig of devServerConfig.qpqConfigs) {
-      await processQueueEventBusSubscriptions(qpqConfig, payload);
-    }
-  });
+  eventBus.on(QueueActionType.SendMessage, (payload: AnyQueueMessageWithSession) => onQueueSendMessage(state, payload));
+  eventBus.on(EventBusActionType.SendMessage, (payload: AnyEventBusMessageWithSession) => onEventBusSendMessage(devServerConfig, payload));
 
   // The messages themselves are in-flight work, drained by the in-flight plugin, and the bus
   // outlives every listener on it. What stop does is wake every retry wait, so a message that was
   // between tries settles (as dropped) inside the drain instead of after it.
   return async () => {
     stopping = true;
-    for (const wake of [...pendingRetryWaits]) {
+    for (const wake of [...state.pendingRetryWaits]) {
       wake();
     }
   };
