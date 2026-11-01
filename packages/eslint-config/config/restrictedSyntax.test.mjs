@@ -46,6 +46,12 @@ describe('restrictedSyntaxConfigs', () => {
     expect(tsxMessages.some((message) => message.startsWith('E:'))).toBe(true);
   });
 
+  it('allows re-exports in test fixtures, which model user code rather than framework source', async () => {
+    const messages = await messagesFor(`${reExport}\nexport { x } from './sdk';`, 'virtual/src/__fixtures__/userScript/sdk.ts');
+
+    expect(messages.some((message) => message.startsWith('G6'))).toBe(false);
+  });
+
   it('keeps re-exports reported in test files, which D6 skips', async () => {
     const messages = await messagesFor(`${reExport}\n${physicalName}`, 'virtual/src/thing.test.ts');
 

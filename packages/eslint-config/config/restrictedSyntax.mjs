@@ -35,8 +35,9 @@ const narrowWithGuard = {
   message: 'D1: narrow a setting with its is<Name>Setting guard, not by comparing configSettingType.',
 };
 
-// Re-exports are what barrels are for (G6); the utils namespace composers are the one sanctioned exception.
-const barrelFiles = ['**/index.ts', '**/index.tsx', '**/qpq*UtilsLib.ts', '**/qpq*Utils.ts', '**/awsNamingUtils.ts'];
+// Re-exports are what barrels are for (G6); the utils namespace composers are the one sanctioned exception, and a
+// test fixture is user code under test (a user script's sdk entry re-exports on purpose), not framework source.
+const barrelFiles = ['**/index.ts', '**/index.tsx', '**/qpq*UtilsLib.ts', '**/qpq*Utils.ts', '**/awsNamingUtils.ts', '**/__fixtures__/**'];
 const reExportSelectors = [
   { selector: 'ExportNamedDeclaration[source]', message: 'G6: `export ... from` belongs in index.ts only.' },
   { selector: 'ExportAllDeclaration', message: 'G6: `export * from` belongs in index.ts only.' },
