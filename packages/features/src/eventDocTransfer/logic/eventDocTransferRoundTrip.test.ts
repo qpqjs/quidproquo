@@ -221,6 +221,10 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       if (action.payload.functionName === 'foldDocumentState') {
         const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], { count: number } | undefined];
         foldCalls.push(folded);
+        // An event marked unfoldable stands in for a schema version this definition cannot read.
+        if (folded.some((candidate) => (candidate.payload.data as { unfoldable?: boolean })?.unfoldable)) {
+          return throwsError(ErrorTypeEnum.GenericError, 'unknown event schema');
+        }
         return { count: (seed?.count ?? 0) + folded.length };
       }
 
@@ -883,6 +887,45 @@ describe('eventDoc transfer import validation', () => {
     expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/BAD_EVENT is not allowed/);
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+  });
+
+  it('refuses a new doc whose bundle log does not open with INIT_STATE and writes nothing for it', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const staged = target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(transferId)}`] as EventDocBundle;
+    const templateDoc = staged.docs.find((doc) => doc.id === 'template-1')!;
+    templateDoc.events[0] = { ...templateDoc.events[0]!, type: 'SET_NAME' };
+
+    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/must open with INIT_STATE/);
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+  });
+
+  it('refuses a new doc whose opening event the fold cannot read, as Invalid', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const staged = target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(transferId)}`] as EventDocBundle;
+    const templateDoc = staged.docs.find((doc) => doc.id === 'template-1')!;
+    templateDoc.events[0] = {
+      ...templateDoc.events[0]!,
+      payload: { ...templateDoc.events[0]!.payload, data: { ...(templateDoc.events[0]!.payload.data as object), unfoldable: true } },
+    };
+
+    let thrown: unknown;
+    try {
+      runStory(importBundle(httpEvent({ transferId })), target.mocks);
+    } catch (error) {
+      thrown = error;
+    }
+    expect((thrown as { errorType: string }).errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(String((thrown as Error).message)).toMatch(/opening event the document fold cannot read/);
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
   });
 
   it('still imports a valid log through the validator', () => {

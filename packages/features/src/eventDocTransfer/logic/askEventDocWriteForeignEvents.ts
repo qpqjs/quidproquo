@@ -68,6 +68,13 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
 // bundle's copy of the prefix is not trusted to fold to the state the real document holds.
 function* askEventDocReadForeignPrefix(docId: string, events: EventDocEvent[], fromIndex: number): AskResponse<EventDocEvent[]> {
   if (fromIndex === 0) {
+    if (events[0]?.type !== EventDocEffect.InitState) {
+      return yield* askThrowError(
+        ErrorTypeEnum.Invalid,
+        `A bundle doc must open with ${EventDocEffect.InitState}, got [${events[0]?.type ?? 'nothing'}].`,
+      );
+    }
+
     return events.slice(0, 1);
   }
 
@@ -97,6 +104,15 @@ function* askEventDocValidateForeignTail(docId: string, events: EventDocEvent[],
   if (!seed.success) {
     if (isEventDocFunctionsMissing(seed.error.errorType)) {
       return;
+    }
+
+    // The bundle's own opening event is uploader input, so a fold that cannot read it is refused as Invalid, the
+    // way the append gate refuses an unreadable event. A stored prefix that fails is the target's problem, not the bundle's.
+    if (fromIndex === 0) {
+      return yield* askThrowError(
+        ErrorTypeEnum.Invalid,
+        `Refusing to import an opening event the document fold cannot read (it would be stored permanently and make the document unreadable): ${seed.error.errorText}`,
+      );
     }
 
     return yield* askThrowError(seed.error.errorType, seed.error.errorText);
