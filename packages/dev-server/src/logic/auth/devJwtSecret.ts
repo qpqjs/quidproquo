@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { updateJsonFileStore } from '../jsonFileStore';
 import { DevUserDirectory } from './devAuth';
 
 // Offline stand-in for a user pool's signing key: one random HMAC secret per user directory,
@@ -12,18 +12,12 @@ import { DevUserDirectory } from './devAuth';
 const JWT_SECRETS_STORE_DIRECTORY = 'jwtSecrets';
 
 export const getOrSeedDevJwtSecret = async (runtimePath: string, userDirectory: DevUserDirectory): Promise<string> => {
-  const secrets = await readJsonFileStore<string>(runtimePath, JWT_SECRETS_STORE_DIRECTORY, userDirectory.serviceName);
+  // Seeded inside the store's serialised update: two first uses of a directory (or of two directories
+  // sharing the service's file) at once must agree on one secret each, or a token signed with the
+  // losing secret stops verifying as soon as the other write lands.
+  const secrets = await updateJsonFileStore<string>(runtimePath, JWT_SECRETS_STORE_DIRECTORY, userDirectory.serviceName, (values) =>
+    values[userDirectory.directoryName] !== undefined ? values : { ...values, [userDirectory.directoryName]: randomBytes(32).toString('base64') },
+  );
 
-  const existing = secrets[userDirectory.directoryName];
-  if (existing !== undefined) {
-    return existing;
-  }
-
-  const secret = randomBytes(32).toString('base64');
-  await writeJsonFileStore(runtimePath, JWT_SECRETS_STORE_DIRECTORY, userDirectory.serviceName, {
-    ...secrets,
-    [userDirectory.directoryName]: secret,
-  });
-
-  return secret;
+  return secrets[userDirectory.directoryName]!;
 };
