@@ -1,7 +1,9 @@
 import { askFileReadObjectJson, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
-import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION, EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferImportPath } from '../constants';
+import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants/eventDocTransferBundleFormatVersion';
+import { eventDocTransferImportPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import { EventDocBundle } from '../models';
 
 /** Reads an uploaded bundle off the transfer drive, refusing an unsupported format version. */

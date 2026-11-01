@@ -3,7 +3,7 @@ import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocAuthorise } from '../../eventDoc/logic/askEventDocAuthorise';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
-import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
+import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants/eventDocTransferGlobalNames';
 
 /**
  * Runs the transfer's collection authoriser for `action` on the collection in context, the way that collection's

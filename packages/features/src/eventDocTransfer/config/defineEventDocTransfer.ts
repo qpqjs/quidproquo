@@ -3,7 +3,7 @@ import { RouteAuthSettings, RouteOptions } from '@qpqjs/webserver';
 
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
-import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import { buildEventDocTransferGlobals } from '../globals';
 import { EventDocTransferCollectionSource, toEventDocTransferCollection } from './toEventDocTransferCollection';
 

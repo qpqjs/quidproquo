@@ -1,7 +1,9 @@
 import { askFileGenerateTemporarySecureUrl, askFileWriteObjectJson, askGuidNew, AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
-import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferBundleFilename, eventDocTransferExportPath } from '../constants';
+import { eventDocTransferBundleFilename } from '../constants/eventDocTransferBundleFilename';
+import { eventDocTransferExportPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import { EventDocDocRef, EventDocTransferExportResult, EventDocTransferRegistry } from '../models';
 import { askEventDocBundleBuild } from './askEventDocBundleBuild';
 import { askEventDocManifest } from './askEventDocManifest';

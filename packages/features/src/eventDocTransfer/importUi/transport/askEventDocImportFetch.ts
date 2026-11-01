@@ -1,7 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { askApiRequest } from '@qpqjs/webserver';
 
-import { eventDocTransferEndpoint } from '../../constants';
+import { eventDocTransferEndpoint } from '../../constants/eventDocTransferEndpoint';
 import { EventDocTransferPlanRow } from '../../models';
 
 /** POST /transfer/import: applies the uploaded bundle and returns a row per doc. */

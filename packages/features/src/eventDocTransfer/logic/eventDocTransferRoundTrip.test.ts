@@ -27,15 +27,14 @@ import { eventDocEventsStoreName, eventDocFunctionsName, eventDocStorageDriveNam
 import { eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode, EventDocSummary } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
+import { eventDocTransferDiscardedPath, eventDocTransferImportPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import {
   EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL,
   EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
-  EVENT_DOC_TRANSFER_DRIVE_NAME,
   EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_TRANSFER_SERVICE_GLOBAL,
-  eventDocTransferDiscardedPath,
-  eventDocTransferImportPath,
-} from '../constants';
+} from '../constants/eventDocTransferGlobalNames';
 import { EventDocBundle, EventDocDocRef, EventDocTransferStatus } from '../models';
 import { exportBundle } from '../routes/controllers/exportBundle';
 import { importBundle } from '../routes/controllers/importBundle';
