@@ -1,11 +1,10 @@
 import { QPQConfig } from '@qpqjs/core';
-import { FileUploadSettings, qpqWebServerUtils } from '@qpqjs/webserver';
+import { qpqWebServerUtils } from '@qpqjs/webserver';
 
+import { AwsFileUploadSettings } from './AwsFileUploadSettings';
 import { API_GATEWAY_MAX_PAYLOAD_BYTES } from './awsLimits';
 
-/** The upload limits with the per-file ceiling resolved: the service's own, else what API Gateway can carry. */
-export type AwsFileUploadSettings = FileUploadSettings & { maxFileSizeBytes: number };
-
+/** The service's upload limits with `maxFileSizeBytes` filled from the API Gateway payload cap when it declares none. */
 export const getAwsFileUploadSettings = (qpqConfig: QPQConfig): AwsFileUploadSettings => {
   const settings = qpqWebServerUtils.getFileUploadSettings(qpqConfig);
 
