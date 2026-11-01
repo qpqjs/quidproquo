@@ -1,11 +1,11 @@
-import { askBatch, askThrowError, SystemActionType, SystemBatchActionPayload } from '../../../actions';
+import { askBatch, askThrowError, SystemBatchActionPayload } from '../../../actions';
 import { getSuccessfulEitherActionResult } from '../../../logic/actionResult';
 import { Action, AskResponse, EitherActionResult } from '../../../types';
 import { ActionOverrideMap } from '../../../types/ActionOverrideMap';
 import { askMapParallel } from '../../array/askMapParallel';
 import { askCatch } from '../askCatch';
 import { AskOverrideSlot } from './AskOverrideSlot';
-import { getOwnOverrideHandler } from './getOwnOverrideHandler';
+import { askOverrideSlotRun } from './askOverrideSlotRun';
 import { getSuccessfulEitherActionResultIfRequired } from './getSuccessfulEitherActionResultIfRequired';
 
 const isFailedSlotResult = (slotResult: EitherActionResult<any> | undefined): slotResult is EitherActionResult<any> & { success: false } =>
@@ -20,21 +20,8 @@ const isFailedSlotResult = (slotResult: EitherActionResult<any> | undefined): sl
 export function* askOverrideBatch(action: Action<any>, overrides: ActionOverrideMap, askOverrideSlot: AskOverrideSlot): AskResponse<unknown> {
   const batchActionPayload: SystemBatchActionPayload = action.payload;
 
-  const batchActionsToRun = yield* askMapParallel(batchActionPayload.actions, function* askRunSlot(batchAction) {
-    const isOverridden = !!(getOwnOverrideHandler(overrides, batchAction.type) || getOwnOverrideHandler(overrides, '*'));
-    const isBatch = batchAction.type === SystemActionType.Batch;
-    const needsRecursion = isOverridden || isBatch;
-
-    return {
-      action: batchAction,
-      // Already processed here, so it must not be sent to the runtime again below.
-      alreadyProcessed: needsRecursion,
-      // The slot run is wrapped in askCatch so a failing sub-action becomes a captured failure for
-      // THIS slot instead of escaping bare and bypassing the enclosing batch's returnErrors
-      // protection. Every slot holds an EitherActionResult; the successful ones are unwrapped when
-      // the batch is reassembled.
-      result: needsRecursion ? yield* askCatch(askOverrideSlot(batchAction)) : undefined,
-    };
+  const batchActionsToRun = yield* askMapParallel(batchActionPayload.actions, function* (batchAction) {
+    return yield* askOverrideSlotRun(batchAction, overrides, askOverrideSlot);
   });
 
   const remainingBatchActionsToRun = batchActionsToRun.filter((ba) => !ba.alreadyProcessed);
