@@ -1,8 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { HTTPEvent, qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { z } from 'zod';
-
+import { askValidateSchemaOrThrowError } from '../validation/askValidateSchemaOrThrowError';
 import { DynamicRouteInput } from './DynamicRouteInput';
 import { DynamicRouteSchema } from './DynamicRouteSchema';
 
@@ -22,24 +21,14 @@ function* askParseJsonBody(event: HTTPEvent): AskResponse<unknown> {
   }
 }
 
-function* askValidate<T>(label: string, schema: z.ZodType<T>, value: unknown): AskResponse<T> {
-  const result = schema.safeParse(value);
-
-  if (!result.success) {
-    return yield* askThrowError(ErrorTypeEnum.Invalid, `Invalid ${label}: ${z.prettifyError(result.error)}`);
-  }
-
-  return result.data;
-}
-
 // Turn the raw event into the typed input a handler receives. Only the parts the
 // route declared a schema for are touched; the rest come through as `undefined`.
 export function* askDynamicRouteParseInput<TBody, TQuery>(
   event: HTTPEvent,
   schema?: DynamicRouteSchema<TBody, TQuery>,
 ): AskResponse<DynamicRouteInput<TBody, TQuery>> {
-  const body = schema?.body ? yield* askValidate('request body', schema.body, yield* askParseJsonBody(event)) : undefined;
-  const query = schema?.query ? yield* askValidate('query string', schema.query, event.query) : undefined;
+  const body = schema?.body ? yield* askValidateSchemaOrThrowError(schema.body, yield* askParseJsonBody(event), 'request body') : undefined;
+  const query = schema?.query ? yield* askValidateSchemaOrThrowError(schema.query, event.query, 'query string') : undefined;
 
   return { body, query } as DynamicRouteInput<TBody, TQuery>;
 }
