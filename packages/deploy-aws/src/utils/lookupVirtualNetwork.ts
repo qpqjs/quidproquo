@@ -5,13 +5,7 @@ import { aws_ec2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { getVirtualNetworkWorkloadSecurityGroupName } from './qpqAwsCdkNamingUtils';
-
-export type VirtualNetworkLookup = {
-  vpc: aws_ec2.IVpc;
-  // The bootstrap-created workload group, not a CDK auto-created one: in-VPC data stores
-  // allow ingress from this group only.
-  workloadSecurityGroup: aws_ec2.ISecurityGroup;
-};
+import { VirtualNetworkLookup } from './VirtualNetworkLookup';
 
 /** The bootstrap stack's VPC for a defineVirtualNetwork name, with its workload security group; one lookup shape for every consumer. */
 export const lookupVirtualNetwork = (scope: Construct, virtualNetworkName: string, qpqConfig: QPQConfig): VirtualNetworkLookup => {
