@@ -1,10 +1,10 @@
-import { AskResponse } from 'quidproquo';
+import { AskResponse, Nullable } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 import { askSmokeFetchWebsiteIndex } from '../../../harness/logic/website/askSmokeFetchWebsiteIndex';
 
-const header = (headers: Record<string, string>, name: string): string | undefined =>
-  Object.entries(headers).find(([key]) => key.toLowerCase() === name)?.[1];
+const header = (headers: Record<string, string>, name: string): Nullable<string> =>
+  Object.entries(headers).find(([key]) => key.toLowerCase() === name)?.[1] ?? null;
 
 // `max-age=0` switches HSTS off, so a header that carries it must fail the probe.
 const hasPositiveMaxAge = (value: string): boolean => {
