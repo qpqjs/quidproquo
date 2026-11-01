@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
 import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
@@ -94,7 +95,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
       // When retained, deletionProtection also blocks deletes/replacements outright (RETAIN alone only orphans the table).
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
       // PITR on by default (35-day continuous backups / point-in-time restore); opt out per-table via config.

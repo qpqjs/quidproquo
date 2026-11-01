@@ -9,4 +9,5 @@ export * from './OwnedAndForeignGrant';
 export * from './path';
 export * from './qpqAwsCdkNamingUtils';
 export * from './qpqDeployAwsUtils';
+export * from './toRemovalPolicy';
 export * from './VirtualNetworkLookup';

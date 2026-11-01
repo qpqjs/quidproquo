@@ -16,6 +16,7 @@ import { qpqAwsCdkPathUtils } from '../../../../utils';
 import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
 import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
@@ -137,7 +138,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
 
       // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
 
       // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back

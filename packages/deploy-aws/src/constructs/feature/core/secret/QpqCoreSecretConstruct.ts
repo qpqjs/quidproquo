@@ -1,11 +1,11 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { QPQConfig, SecretQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 import { QpqResource } from '../../../base/QpqResource';
@@ -35,7 +35,7 @@ export class QpqCoreSecretConstruct extends QpqReadWriteResourceConstructBase<aw
     this.resource = new aws_secretsmanager.Secret(this, 'secret', {
       secretName: this.resourceName(props.secretConfig.key),
       // Secret values are data too: retained unless the data-store removal policy says destroy.
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       description: props.secretConfig.key,
     });
 

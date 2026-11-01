@@ -20,6 +20,7 @@ import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
 import { lookupHostedZone, resolveDeployPrimaryHost, resolveHostedZoneForHost } from '../../../../utils/domain';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { Function } from '../../../basic/Function';
@@ -78,7 +79,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       // Retain user pools by default (user accounts are unrecoverable); dev configs opt into
       // full teardown via defineAwsDataStoreRemovalPolicy(destroy). When retained, deletionProtection
       // also blocks deletes/replacements outright (RETAIN alone only orphans the pool).
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,
       userPoolName: userPoolName,
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
