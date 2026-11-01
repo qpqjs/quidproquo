@@ -27,7 +27,8 @@ export default {
         if (names.length === 2 && !isAllowedPair(names[0], names[1])) return;
         const name = primaryName(names);
         const expected = isScreaming(name) ? screamingToCamel(name) : name;
-        const base = path.basename(context.filename).replace(/\.[jt]sx?$/, '');
+        // Every module extension the config lints, so the plugin's own .mjs files are held to the rule too.
+        const base = path.basename(context.filename).replace(/\.[cm]?[jt]sx?$/, '');
         if (base !== expected) {
           context.report({ node: program, messageId: 'mismatch', data: { file: path.basename(context.filename), name, expected } });
         }
