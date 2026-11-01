@@ -24,8 +24,8 @@ import { getServiceRemoteRspackConfig, publishFederatedRemote, runRspack } from 
 import fs from 'fs';
 import path from 'path';
 
-import { getRoot, getServiceDirectory } from '../../lib/discovery';
 import { createOutput } from '../../lib/createOutput';
+import { getRoot, getServiceDirectory } from '../../lib/discovery';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 

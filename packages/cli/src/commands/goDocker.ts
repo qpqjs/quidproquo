@@ -2,9 +2,9 @@
 // platform driver's parallel containerized deploy (drivers without a docker
 // strategy don't offer one). `--build-only` and `--from-build` split that run
 // into a build half and a deploy half that can run on different machines.
+import { createOutput } from '../lib/createOutput';
 import { buildDeployPlanFromArgs, promptDeployPlan } from '../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, resolveGoDockerMode } from '../lib/goDockerMode';
-import { createOutput } from '../lib/createOutput';
 import { requireDriverCapability } from '../lib/requireDriverCapability';
 import { resolveCommandContext } from '../lib/resolveCommandContext';
 

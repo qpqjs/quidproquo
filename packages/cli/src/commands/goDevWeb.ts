@@ -16,11 +16,11 @@ import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { hasArgFlag } from '../lib/args';
+import { createOutput } from '../lib/createOutput';
 import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
-import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { setWebAddressingEnv } from '../lib/webAddressingEnv';
