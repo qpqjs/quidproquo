@@ -1,3 +1,4 @@
+export * from './associateRegionalWebAcl';
 export * from './domain';
 export * from './getForeignConfigs';
 export * from './grantOwnedAndForeignResources';
