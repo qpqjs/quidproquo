@@ -17,6 +17,15 @@ describe('cognito/defineAuthChallenge getEventGetRecordsActionProcessor', () => 
 
     const [records] = await processor({ eventParams: [event, {}] });
 
-    expect(records).toEqual([{ userName: 'joe', session: [], userAttributes: { email: 'a@b.com' } }]);
+    expect(records).toEqual([{ userName: 'joe', session: [], userAttributes: { email: 'a@b.com' }, userNotFound: undefined }]);
+  });
+
+  it('passes the userNotFound flag through so a story can treat an unknown account like a real one', async () => {
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+    const event = { userName: 'nobody', request: { session: [], userAttributes: {}, userNotFound: true } };
+
+    const [records] = await processor({ eventParams: [event, {}] });
+
+    expect((records as any[])[0].userNotFound).toBe(true);
   });
 });

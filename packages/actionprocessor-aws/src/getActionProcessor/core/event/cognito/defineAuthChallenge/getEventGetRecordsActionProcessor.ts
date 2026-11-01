@@ -14,6 +14,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEven
       userName: event.userName,
       session: getChallengeSessionFromCognitoTriggerEventSession(event.request.session),
       userAttributes: getQpqAttributesFromCognitoStringMap(event.request.userAttributes),
+      userNotFound: event.request.userNotFound,
     };
 
     return actionResult([internalEventRecord]);
