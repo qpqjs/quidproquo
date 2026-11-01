@@ -8,7 +8,7 @@ import { GuidActionType } from '../../../actions/guid/GuidActionType';
 import { askMathRandomNumber } from '../../../actions/math/askMathRandomNumber';
 import { MathActionType } from '../../../actions/math/MathActionType';
 import { SystemActionType } from '../../../actions/system/SystemActionType';
-import { Action, AskResponse, EitherActionResult } from '../../../types';
+import { Action, AskResponse, EitherActionResult, Nullable } from '../../../types';
 import { ActionOverrideHandler } from '../../../types/ActionOverrideHandler';
 import { ActionOverrideMap } from '../../../types/ActionOverrideMap';
 import { askCatch } from '../askCatch';
@@ -825,7 +825,7 @@ describe('askOverrideActions', () => {
         return (yield { type: MathActionType.RandomNumber, payload: { seed: 42 } }) as any;
       }
 
-      let receivedAction: Action<any> | null = null;
+      let receivedAction: Nullable<Action<any>> = null;
       const overrides: ActionOverrideMap = {
         [MathActionType.RandomNumber]: function* (action) {
           receivedAction = action;
