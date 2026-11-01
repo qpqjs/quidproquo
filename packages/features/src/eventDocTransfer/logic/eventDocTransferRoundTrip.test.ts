@@ -35,7 +35,7 @@ import {
   eventDocTransferDiscardedPath,
   eventDocTransferImportPath,
 } from '../constants';
-import { EventDocBundle, EventDocTransferStatus } from '../models';
+import { EventDocBundle, EventDocDocRef, EventDocTransferStatus } from '../models';
 import { exportBundle } from '../routes/controllers/exportBundle';
 import { importBundle } from '../routes/controllers/importBundle';
 import { manifest } from '../routes/controllers/manifest';
@@ -919,7 +919,7 @@ describe('eventDoc transfer round trip', () => {
 });
 
 // Stages the source's exported bundle into the target as an upload and returns the transfer id.
-const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: EventDocDocRefLike[]): string => {
+const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: EventDocDocRef[]): string => {
   const exportResult = runStory(exportBundle(httpEvent({ docs })), source.mocks);
   expect(exportResult.status).toBe(200);
   const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
@@ -930,8 +930,6 @@ const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: Eve
 
   return uploadTarget.transferId;
 };
-
-type EventDocDocRefLike = { service: string; type: string; id: string };
 
 // Security regression: an uploaded bundle is whatever the uploader says it is, so its tail goes through the same
 // validator and fold the append gate runs; a rejected event never reaches a document log.
