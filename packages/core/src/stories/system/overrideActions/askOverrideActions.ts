@@ -1,6 +1,6 @@
 import { SystemActionType } from '../../../actions';
 import { AskResponse, AskResponseReturnType } from '../../../types';
-import { ActionOverrideMap } from '../../../types/ActionOverride';
+import { ActionOverrideMap } from '../../../types/ActionOverrideMap';
 import { askOverrideBatch } from './askOverrideBatch';
 import { askProcessAction } from './askProcessAction';
 import { getOwnOverrideHandler } from './getOwnOverrideHandler';

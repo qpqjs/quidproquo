@@ -1,5 +1,6 @@
 export * from './Action';
-export * from './ActionOverride';
+export * from './ActionOverrideHandler';
+export * from './ActionOverrideMap';
 export * from './ActionRequesterFunction';
 export * from './authChallenge';
 export * from './BoundLogicStory';

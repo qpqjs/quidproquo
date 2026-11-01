@@ -1,4 +1,5 @@
-import { ActionOverrideHandler, ActionOverrideMap } from '../../../types/ActionOverride';
+import { ActionOverrideHandler } from '../../../types/ActionOverrideHandler';
+import { ActionOverrideMap } from '../../../types/ActionOverrideMap';
 
 // Looks up a handler as an OWN property of the override map. A plain-object map inherits from
 // Object.prototype, so an action type like "toString" or "constructor" would otherwise resolve

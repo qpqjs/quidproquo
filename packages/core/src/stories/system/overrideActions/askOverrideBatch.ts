@@ -1,15 +1,12 @@
 import { askBatch, askThrowError, SystemActionType, SystemBatchActionPayload } from '../../../actions';
 import { getSuccessfulEitherActionResult } from '../../../logic/actionResult';
 import { Action, AskResponse, EitherActionResult } from '../../../types';
-import { ActionOverrideMap } from '../../../types/ActionOverride';
+import { ActionOverrideMap } from '../../../types/ActionOverrideMap';
 import { askMapParallel } from '../../array/askMapParallel';
 import { askCatch } from '../askCatch';
+import { AskOverrideSlot } from './AskOverrideSlot';
 import { getOwnOverrideHandler } from './getOwnOverrideHandler';
 import { getSuccessfulEitherActionResultIfRequired } from './getSuccessfulEitherActionResultIfRequired';
-
-// How an overridden (or nested batch) slot is run. askOverrideActions passes itself in here, so the
-// batch splitting never has to import the loop it is part of.
-export type AskOverrideSlot = (batchAction: Action<any>) => AskResponse<unknown>;
 
 const isFailedSlotResult = (slotResult: EitherActionResult<any> | undefined): slotResult is EitherActionResult<any> & { success: false } =>
   slotResult !== undefined && !slotResult.success;
