@@ -6,6 +6,7 @@ export * from './askEventDocAppendRetrying';
 export * from './askEventDocAppendServerEvent';
 export * from './askEventDocAppendServerEvents';
 export * from './askEventDocAssertClientEventType';
+export * from './askEventDocAuthorise';
 export * from './askEventDocCreate';
 export * from './askEventDocDocumentStateAdvance';
 export * from './askEventDocDocumentStateAsOf';

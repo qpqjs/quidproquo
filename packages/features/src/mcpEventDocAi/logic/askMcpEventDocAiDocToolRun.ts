@@ -4,14 +4,14 @@ import { HTTPEvent } from '@qpqjs/webserver';
 import { eventDocRouteAction } from '../../eventDoc/constants/eventDocRouteAction';
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';
 import { askEventDocGetById } from '../../eventDoc/data/askEventDocGetById';
+import { askEventDocAuthorise } from '../../eventDoc/logic/askEventDocAuthorise';
 import { askEventDocAiProvide } from '../../eventDocAi/context';
 import { McpEventDocAi } from '../models/McpEventDocAi';
-import { askMcpEventDocAiAuthorise } from './askMcpEventDocAiAuthorise';
 
 // Gated like the collection's get route, so a docId is only usable by someone who could open it, and a
 // wrong id fails here with a clear message rather than deep inside the tool.
 function* askAssertDocReadable(eventDocAi: McpEventDocAi, event: HTTPEvent, docId: string): AskResponse<void> {
-  yield* askMcpEventDocAiAuthorise(eventDocAi.store, event, eventDocRouteAction.get);
+  yield* askEventDocAuthorise(eventDocAi.store, eventDocRouteAction.get, event);
 
   const summary = yield* askEventDocGetById(docId);
   if (!summary || summary.deletedAt) {

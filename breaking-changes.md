@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features`: `askMcpEventDocAiAuthorise(store, event, action)` is removed. Call `askEventDocAuthorise(store, action, event)` from `@qpqjs/features` instead; it is the one story that runs a collection's `authorise` hook for routes, MCP calls and websocket chats.
+
 ## 0.4.0
 
 - `askRandomNumber` is `askMathRandomNumber` (A3, noun first); every framework call site, the docs and the scaffold follow.

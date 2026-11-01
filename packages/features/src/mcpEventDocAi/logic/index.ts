@@ -1,4 +1,3 @@
-export * from './askMcpEventDocAiAuthorise';
 export * from './askMcpEventDocAiDocToolRun';
 export * from './askMcpEventDocAiListDocs';
 export * from './askMcpEventDocAiListTools';

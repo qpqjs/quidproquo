@@ -4,12 +4,12 @@ import { HTTPEvent } from '@qpqjs/webserver';
 import { eventDocRouteAction } from '../../eventDoc/constants/eventDocRouteAction';
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';
 import { askEventDocListPage } from '../../eventDoc/data/askEventDocListPage';
+import { askEventDocAuthorise } from '../../eventDoc/logic/askEventDocAuthorise';
 import { McpDocListItem } from '../models/McpDocListItem';
 import { McpEventDocAi } from '../models/McpEventDocAi';
-import { askMcpEventDocAiAuthorise } from './askMcpEventDocAiAuthorise';
 
 function* askListPage(eventDocAi: McpEventDocAi, event: HTTPEvent, nextPageKey?: string): AskResponse<QpqPagedData<McpDocListItem>> {
-  yield* askMcpEventDocAiAuthorise(eventDocAi.store, event, eventDocRouteAction.list);
+  yield* askEventDocAuthorise(eventDocAi.store, eventDocRouteAction.list, event);
 
   const page = yield* askEventDocListPage({ nextPageKey });
 

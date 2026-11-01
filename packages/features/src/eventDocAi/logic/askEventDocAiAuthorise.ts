@@ -1,21 +1,21 @@
-import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_AUTHORISER_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
-import { EventDocAuthoriseInput } from '../../eventDoc/types/EventDocAuthoriseInput';
+import { askConfigGetGlobalAddedAfterV1 } from '../../eventDoc/globals/askConfigGetGlobalAddedAfterV1';
+import { askEventDocAuthorise } from '../../eventDoc/logic/askEventDocAuthorise';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
 
 /**
- * Runs the collection's `authorise` hook for a websocket chat, exactly as its routes and MCP tools do, with no HTTP
- * event to pass. Must run inside the connection's storage scope. A collection without an authoriser is ungated.
+ * Runs the collection's `authorise` hook for a websocket chat, which has no store context and no HTTP event, so the
+ * authoriser and store name are read from the route's globals first. Must run inside the connection's storage scope.
  */
 export function* askEventDocAiAuthorise(action: EventDocPermissionAction): AskResponse<void> {
-  // A collection with no authoriser global is ungated.
-  const authorise = yield* askCatch(askConfigGetGlobal<string>(EVENT_DOC_AUTHORISER_GLOBAL));
-  if (!authorise.success || !authorise.result) {
+  const authorise = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_AUTHORISER_GLOBAL);
+  if (!authorise) {
     return;
   }
 
   const storeName = yield* askConfigGetGlobal<string>(EVENT_DOC_STORE_NAME_GLOBAL);
 
-  yield* askInlineFunctionExecute<void, EventDocAuthoriseInput>(authorise.result, { storeName, action });
+  yield* askEventDocAuthorise({ authorise, storeName }, action);
 }
