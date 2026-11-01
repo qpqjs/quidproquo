@@ -134,6 +134,25 @@ describe('QpqCoreStorageDriveConstruct lifecycle rules', () => {
     });
   });
 
+  it.each([
+    [StorageDriveTier.OCCASIONAL_ACCESS, 'STANDARD_IA'],
+    [StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS, 'ONEZONE_IA'],
+    [StorageDriveTier.COLD_STORAGE, 'GLACIER'],
+    [StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS, 'GLACIER_IR'],
+    [StorageDriveTier.DEEP_COLD_STORAGE, 'DEEP_ARCHIVE'],
+    [StorageDriveTier.SMART_TIERING, 'INTELLIGENT_TIERING'],
+  ])('maps the %s tier to the %s storage class', (tier: StorageDriveTier, storageClass: string) => {
+    const template = synth(
+      defineStorageDrive('tiered', { lifecycleRules: [{ transitions: [{ storageDriveTier: tier, transitionAfterDays: 10 }] }] }),
+    );
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: [Match.objectLike({ Status: 'Enabled', Transitions: [{ StorageClass: storageClass, TransitionInDays: 10 }] })],
+      },
+    });
+  });
+
   it('refuses a transition to the REGULAR tier at synth', () => {
     expect(() =>
       synth(
