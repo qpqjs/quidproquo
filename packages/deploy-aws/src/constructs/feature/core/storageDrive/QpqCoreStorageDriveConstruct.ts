@@ -18,7 +18,6 @@ import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
-import { QpqResource } from '../../../base/QpqResource';
 
 export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
