@@ -5,7 +5,17 @@ import { LocalEmailInbox } from './LocalEmailInbox';
 
 const CRLF = '\r\n';
 
-const hostOf = (address: string): string => address.slice(address.lastIndexOf('@') + 1).toLowerCase();
+// A recipient may be written `Support <help@inbox.app.example>`, as the provider accepts: the bare
+// address is what is matched against receivers and what the provider stamps into Delivered-To. CR/LF
+// is removed as the raw message builder does for every header, so a recipient can never add a header.
+const toBareAddress = (recipient: string): string => {
+  const sanitised = recipient.replace(/[\r\n]+/g, '').trim();
+  const bracketed = /<([^<>]*)>\s*$/.exec(sanitised);
+
+  return (bracketed ? bracketed[1]! : sanitised).trim().toLowerCase();
+};
+
+const hostOf = (address: string): string => address.slice(address.lastIndexOf('@') + 1);
 
 /**
  * The local stand-in for the mail provider's receipt rule: one copy of the raw message per
@@ -26,9 +36,7 @@ export const deliverLocalEmail = async (
   const written: string[] = [];
 
   for (const inbox of inboxes) {
-    const delivered = [
-      ...new Set(recipients.map((recipient) => recipient.toLowerCase()).filter((recipient) => inbox.hosts.includes(hostOf(recipient)))),
-    ];
+    const delivered = [...new Set(recipients.map(toBareAddress).filter((address) => inbox.hosts.includes(hostOf(address))))];
     if (delivered.length === 0) {
       continue;
     }

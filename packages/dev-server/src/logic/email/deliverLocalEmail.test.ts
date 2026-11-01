@@ -44,6 +44,32 @@ describe('deliverLocalEmail', () => {
     expect(await fs.readFile(written[2]!, 'utf8')).toBe(`Delivered-To: ap@invoices.app.example\r\n${RAW}`);
   });
 
+  // The provider accepts a display-name recipient and stamps the bare address; a header-style recipient must
+  // match its host and never put the display name (or anything else) into Delivered-To.
+  it('matches and stamps the bare address of a display-name recipient', async () => {
+    const written = await deliverLocalEmail(storagePath, inboxes, ['Accounts Payable <AP@Invoices.App.Example>'], 'msg-3', RAW);
+
+    expect(written.map((file) => path.relative(storagePath, file))).toEqual([path.join('billing', 'email-invoices', 'msg-3.eml')]);
+    expect(await fs.readFile(written[0]!, 'utf8')).toBe(`Delivered-To: ap@invoices.app.example\r\n${RAW}`);
+  });
+
+  // Security regression: a recipient string is caller input written into a header, so a line break in it must
+  // not become an extra header for onEmail to parse.
+  it('never lets a line break in a recipient add a header', async () => {
+    const written = await deliverLocalEmail(
+      storagePath,
+      inboxes,
+      ['ap@invoices.app.example\r\nX-Injected: yes', 'ap@invoices.app.example'],
+      'msg-4',
+      RAW,
+    );
+
+    expect(written).toHaveLength(1);
+    const content = await fs.readFile(written[0]!, 'utf8');
+    expect(content).not.toContain('X-Injected');
+    expect(content.startsWith('Delivered-To: ap@invoices.app.example\r\n')).toBe(true);
+  });
+
   it('delivers nothing for a recipient at a host no receiver listens on', async () => {
     expect(await deliverLocalEmail(storagePath, inboxes, ['someone@gmail.example'], 'msg-2', RAW)).toEqual([]);
   });
