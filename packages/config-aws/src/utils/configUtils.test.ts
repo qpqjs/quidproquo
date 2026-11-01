@@ -347,12 +347,16 @@ describe('getAwsServiceAccountInfoByDeploymentInfo', () => {
     expect(resolveAwsServiceAccountInfo(config, { module: 'auth' }).awsAccountId).toBe('111');
   });
 
-  it('prefers the entry pinned to this environment over an environment wildcard', () => {
+  // An environment wildcard and an entry pinned to this environment both score a full match, so the weight alone cannot
+  // separate them. The entry with more fields wins the tie, which is why the wildcard is listed first here: without the
+  // tie-break the stable sort would keep it in front.
+  it('breaks a weight tie between an environment wildcard and an entry pinned to this environment by specificity', () => {
     const anyEnvironment: ServiceAccountInfo = { moduleName: 'auth', awsAccountId: 'any', awsRegion: 'r1' };
     const thisEnvironment: ServiceAccountInfo = { moduleName: 'auth', environment: 'development', awsAccountId: 'dev', awsRegion: 'r1' };
     const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'us-east-1', [anyEnvironment, thisEnvironment])]);
 
     expect(resolveAwsServiceAccountInfo(config, { module: 'auth' }).awsAccountId).toBe('dev');
+    expect(resolveAwsServiceAccountInfo(config, { module: 'auth', environment: 'staging' }).awsAccountId).toBe('any');
   });
 });
 
