@@ -1,7 +1,7 @@
 import { type AiStreamPart, AiStreamPartType, AskResponse, askStreamMap } from '@qpqjs/core';
 
 import { askEventDocAiAppendStreamChunk } from '../module';
-import type { EventDocAiStreamHandle } from './askEventDocAiPromptStreamOpen';
+import type { EventDocAiStreamHandle } from './EventDocAiStreamHandle';
 import { redactAiStreamPartUsage } from './redactAiStreamPartUsage';
 
 // Drains the model stream, forwarding each part to the UI as it arrives, and returns every
