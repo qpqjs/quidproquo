@@ -1,16 +1,20 @@
 import { QPQJS_USER_DIRECTORY } from '@qpqjs/constants';
-import { askTenantGenerateNewId, askTenantLinkMember, askTenantMembershipDelete, askTenantResolveRequest } from '@qpqjs/features';
+import {
+  askTenantGenerateNewId,
+  askTenantLinkMember,
+  askTenantMembershipDelete,
+  askTenantResolveRequest,
+  DEFAULT_TENANT_HEADER_NAME,
+} from '@qpqjs/features';
 import { askCatch, AskResponse, askThrowError, askUserDirectoryReadAccessToken, ErrorTypeEnum, HTTPEvent } from 'quidproquo';
 
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
-
-const TENANT_HEADER = 'x-qpq-tenant-id';
 
 const toTenantedEvent = (tenantId?: string): HTTPEvent => ({
   path: '/security/tenant-probe',
   method: 'GET',
   query: {},
-  headers: tenantId ? { [TENANT_HEADER]: tenantId } : {},
+  headers: tenantId ? { [DEFAULT_TENANT_HEADER_NAME]: tenantId } : {},
   correlation: '',
   sourceIp: '127.0.0.1',
   isBase64Encoded: false,
