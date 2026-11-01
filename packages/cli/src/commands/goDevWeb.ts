@@ -20,7 +20,7 @@ import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { setWebAddressingEnv } from '../lib/webAddressingEnv';

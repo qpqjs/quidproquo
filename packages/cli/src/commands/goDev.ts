@@ -7,7 +7,7 @@
 import { getAllViews } from '@qpqjs/deploy-rspack';
 
 import { getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { startTypeWatcher } from '../lib/typeWatcher';

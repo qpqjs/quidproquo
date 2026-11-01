@@ -16,7 +16,7 @@ import { DeployPlan } from '../../lib/deployPrompts';
 import { getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { assertNoFailures } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';

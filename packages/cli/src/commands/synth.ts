@@ -11,7 +11,7 @@ import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
 import { getRequestedAppName, resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';

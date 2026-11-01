@@ -1,4 +1,4 @@
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 const out = createOutput('run-tasks');
 export type Task = { label: string; run: () => Promise<void> };

@@ -29,7 +29,7 @@ import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 import { runCommand } from '../../lib/runCommand';
 import { assertNoFailures } from '../../lib/runTasks';

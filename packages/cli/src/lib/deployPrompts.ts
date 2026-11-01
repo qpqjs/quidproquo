@@ -6,9 +6,9 @@ import { Nullable } from '@qpqjs/core';
 
 import { getPositionalArgs } from './args';
 import { CliError } from './CliError';
+import { createOutput } from './createOutput';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
-import { createOutput } from './out';
 import { promptSelect, promptTypedConfirmation, promptYesNo } from './prompts';
 
 const out = createOutput('deploy-prompts');

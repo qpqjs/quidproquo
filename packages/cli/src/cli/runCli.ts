@@ -1,7 +1,7 @@
 import { Nullable } from '@qpqjs/core';
 
 import { CliError } from '../lib/CliError';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { promptCommandFromMenu } from './commandMenu';
 import { buildUsage, CliCommand, cliCommands } from './commandRegistry';
 

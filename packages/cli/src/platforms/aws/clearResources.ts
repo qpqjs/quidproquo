@@ -23,7 +23,7 @@ import {
 import { DeleteObjectsCommand, ListObjectVersionsCommand, NoSuchBucket, ObjectIdentifier, S3Client } from '@aws-sdk/client-s3';
 
 import { ClearableResource, ClearResourcesPlan } from '../../lib/clearResourcesPlan';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { isAwsCredentialsValid } from './awsCredentials';
 

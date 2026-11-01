@@ -13,7 +13,7 @@ import { ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 import { spawnCommand } from './runCommand';
 
 const out = createOutput('type-watcher');

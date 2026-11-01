@@ -24,7 +24,7 @@ import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { spawnCommand } from '../lib/runCommand';

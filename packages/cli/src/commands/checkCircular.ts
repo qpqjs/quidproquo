@@ -5,7 +5,7 @@
 // failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';
 import { getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 
 const out = createOutput('check:circular');
 

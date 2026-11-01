@@ -7,9 +7,9 @@
 // the service that owns it.
 import { qpqCoreUtils } from '@qpqjs/core';
 
+import { createOutput } from './createOutput';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
-import { createOutput } from './out';
 import { promptCheckbox, promptSelect, promptTypedConfirmation } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
 

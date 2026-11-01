@@ -10,7 +10,7 @@ import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 import path from 'path';
 
 import { getRoot, getServiceNames } from '../../lib/discovery';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { getAppPrefix, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';

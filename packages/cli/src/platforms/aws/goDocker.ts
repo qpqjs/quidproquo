@@ -56,7 +56,7 @@ import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../li
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { GoDockerMode } from '../../lib/goDockerMode';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { nextPrefixColor, runCommand, runCommandBestEffort, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';

@@ -1,17 +1,4 @@
-type Print = (...parts: unknown[]) => void;
-
-export type Output = {
-  log: Print;
-  info: Print;
-  warn: Print;
-  error: Print;
-  // A named stopwatch, printed on end.
-  time: (label: string) => void;
-  timeEnd: (label: string) => void;
-  // Rewrites a line printed `linesUp` rows above the cursor in place (a status chip appended to a row that is
-  // already on screen), prefixed like every other line. Terminal only: the caller falls back to a plain line otherwise.
-  rewriteLineAbove: (linesUp: number, text: string) => void;
-};
+import { Output } from './Output';
 
 // Every line the cli prints carries `[qpq:<area>]`, so output from the concurrent and nested
 // commands reads as one program. This is the only place the cli touches the console.
@@ -29,7 +16,7 @@ export const createOutput = (area: string): Output => {
   // A leading string is prefixed line by line; anything else (an error, an object) is printed
   // after the prefix as its own argument so the console keeps formatting it. The console method is
   // looked up per call, not captured, so a test can spy on it after this module loads.
-  const withPrefix = (method: 'log' | 'info' | 'warn' | 'error'): Print => {
+  const withPrefix = (method: 'log' | 'info' | 'warn' | 'error'): Output[typeof method] => {
     return (...parts) => {
       const [first, ...rest] = parts;
 

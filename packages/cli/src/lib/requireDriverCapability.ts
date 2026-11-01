@@ -1,6 +1,6 @@
 import { QpqPlatformDriver } from '../platforms';
 import { CliError } from './CliError';
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 import { CommandContext } from './resolveCommandContext';
 
 const out = createOutput('require-driver-capability');

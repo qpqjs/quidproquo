@@ -9,7 +9,7 @@ import { qpqWebServerUtils } from '@qpqjs/webserver';
 import fs from 'fs';
 import path from 'path';
 
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { getViewsDistDir } from '../../lib/views';

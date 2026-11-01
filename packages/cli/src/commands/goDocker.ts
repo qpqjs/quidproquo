@@ -4,7 +4,7 @@
 // into a build half and a deploy half that can run on different machines.
 import { buildDeployPlanFromArgs, promptDeployPlan } from '../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, resolveGoDockerMode } from '../lib/goDockerMode';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { requireDriverCapability } from '../lib/requireDriverCapability';
 import { resolveCommandContext } from '../lib/resolveCommandContext';
 

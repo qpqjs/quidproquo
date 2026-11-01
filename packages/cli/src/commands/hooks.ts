@@ -6,7 +6,7 @@
 import { getArgValue } from '../lib/args';
 import { getDefaultHookJobs } from '../lib/getDefaultHookJobs';
 import { runHookForAllPackages } from '../lib/hooks';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { assertNoFailures } from '../lib/runTasks';
 
 const out = createOutput('hooks');

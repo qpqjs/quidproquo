@@ -9,7 +9,7 @@ import { Nullable } from '@qpqjs/core';
 import fs from 'fs';
 import path from 'path';
 
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 import { runCommandCaptureSync, sleepSync } from './runCommand';
 
 const out = createOutput('kill-stale-listeners');

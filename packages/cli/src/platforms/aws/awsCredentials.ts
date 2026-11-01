@@ -1,6 +1,6 @@
 import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 
 const out = createOutput('aws:aws-credentials');
 

@@ -15,7 +15,7 @@ import { rspack } from '@rspack/core';
 
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { spawnCommand } from '../lib/runCommand';

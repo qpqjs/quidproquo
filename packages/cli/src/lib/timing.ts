@@ -1,4 +1,4 @@
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 const out = createOutput('timing');
 export const logTimeStart = (name: string): void => out.time(name);

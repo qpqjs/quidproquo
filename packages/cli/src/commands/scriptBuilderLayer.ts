@@ -8,7 +8,7 @@ import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 import { getUserScriptBuilderLayerDir } from '@qpqjs/user-script';
 
 import { getArgValue } from '../lib/args';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { buildUserScriptBuilderLayer } from '../lib/userScriptBuilderLayer';
 
 const out = createOutput('script:builder-layer');

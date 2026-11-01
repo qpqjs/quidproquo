@@ -9,7 +9,7 @@
 // its ports still held.
 import { ChildProcess } from 'child_process';
 
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 const out = createOutput('kill-child-with-escalation');
 

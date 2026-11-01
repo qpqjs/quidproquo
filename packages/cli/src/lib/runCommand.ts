@@ -1,7 +1,7 @@
 import { ChildProcess, spawn, spawnSync, StdioOptions } from 'child_process';
 import type { Readable } from 'stream';
 
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 const out = createOutput('run-command');
 

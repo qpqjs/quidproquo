@@ -25,7 +25,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { getRoot, getServiceDirectory } from '../../lib/discovery';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 

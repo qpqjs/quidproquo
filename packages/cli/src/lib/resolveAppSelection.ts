@@ -11,8 +11,8 @@
 // `--app all` (returned as the literal 'all').
 import { getArgValue } from './args';
 import { CliError } from './CliError';
+import { createOutput } from './createOutput';
 import { getAvailableApps } from './discovery';
-import { createOutput } from './out';
 import { promptSelect } from './prompts';
 
 const out = createOutput('resolve-app-selection');

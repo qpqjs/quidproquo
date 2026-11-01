@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 describe('createOutput', () => {
   afterEach(() => {

@@ -4,7 +4,7 @@
 import { writeFederatedTsconfigForApp } from '@qpqjs/deploy-rspack';
 
 import { getAvailableApps, getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 const out = createOutput('prep');

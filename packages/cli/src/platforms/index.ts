@@ -1,5 +1,5 @@
 import { CliError } from '../lib/CliError';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { awsPlatformDriver } from './aws';
 import { dockerPlatformDriver } from './docker';
 import { QpqDeployPlatform, QpqPlatformDriver } from './types';
