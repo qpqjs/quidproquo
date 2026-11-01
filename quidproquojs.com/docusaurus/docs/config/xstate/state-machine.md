@@ -9,7 +9,7 @@ Defines a **state machine**: a named [XState](https://stately.ai/docs) machine d
 
 Each instance is a row in a key-value store. Its current XState snapshot is serialized into a field on that row, so a machine created by one story can be advanced and read by later stories, requests, or events — the machine survives between invocations rather than living in memory.
 
-- **On AWS:** `defineStateMachine` expands into **two** config settings — a key-value store named `qpq-sm-<machineName>` (keyed by `id`) and the state-machine setting itself. The key-value store deploys a DynamoDB table (see [defineKeyValueStore](../core/key-value-store.md)) partitioned by `id`; that table is where every instance and its persisted snapshot live. The machine definition itself is not deployed as any dedicated infrastructure — it is evaluated in-process by the action processors whenever an instance is created, read, or advanced.
+- **On AWS:** `defineStateMachine` expands into a key-value store named `qpq-sm-<machineName>` (keyed by `id`), the state-machine setting itself, the registration of the xstate action processors, and, when `actions` or `guards` name stories, a bundle-entries setting so those stories ship in the deployed bundle. The key-value store deploys a DynamoDB table (see [defineKeyValueStore](../core/key-value-store.md)) partitioned by `id`; that table is where every instance and its persisted snapshot live. The machine definition itself is not deployed as any dedicated infrastructure: it is evaluated in-process by the action processors whenever an instance is created, read, or advanced.
 
 ```typescript
 import { defineStateMachine } from '@qpqjs/xstate';
@@ -40,10 +40,10 @@ export default [
 function defineStateMachine(
   stateMachineName: string,
   options: QPQConfigAdvancedStateMachineSettings,
-): QPQConfigSetting[];
+): QPQConfig;
 ```
 
-`defineStateMachine` returns an **array** of config settings (the derived key-value store plus the state-machine setting). Spread it into your config export, or let the array flatten naturally.
+`defineStateMachine` returns a `QPQConfig`: the derived key-value store, the state-machine setting, the action processor registration, and a bundle-entries setting when `actions` or `guards` name stories. Put the result in your config export as one element, as the examples on this page do; nested configs flatten when the config is read, so there is nothing to spread.
 
 ## Parameters
 
