@@ -1,13 +1,5 @@
 import { AskResponse, QpqPagedData } from '../../types';
-
-export type PagedDataDrainOptions<T> = {
-  // Where to start, for a caller that already holds the first page.
-  startPageKey?: string;
-
-  // Asked after every page lands with everything collected so far. Answering false stops the
-  // walk early; the result then carries the key of the next unread page.
-  askShouldContinue?: (collected: T[]) => AskResponse<boolean>;
-};
+import { PagedDataDrainOptions } from './PagedDataDrainOptions';
 
 // The one page loop. Walks `askPage` from the start key until it answers no next page (or the
 // caller says stop) and returns everything collected. `nextPageKey` on the result is undefined
