@@ -53,7 +53,7 @@ This story throws a core qpq error via [askThrowError](../../core/error/ask-thro
 
 | Error | Meaning |
 | --- | --- |
-| `ErrorTypeEnum.Invalid` | The model failed schema validation. The error text is Zod's own `z.prettifyError` output: one line per failing field naming its path and what was expected. It never echoes the submitted value, so it is safe to return to a caller. No error stack is attached. |
+| `ErrorTypeEnum.Invalid` | The model failed schema validation. The error text is Zod's own `z.prettifyError` output: for each issue a `✖` line with the message (what was expected, and the type received), then `  → at <path>` on the next line. It never echoes the submitted value, so it is safe to return to a caller. No error stack is attached. |
 
 Because it is a normal thrown qpq error, wrap the call in [askCatch](../../core/system/ask-catch.md) if you want to handle validation failure inline instead of letting it propagate:
 
