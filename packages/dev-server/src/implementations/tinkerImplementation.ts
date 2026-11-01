@@ -101,7 +101,7 @@ export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, 
       tinkerPrint(`  .exit         - Exit tinker\n`);
       tinkerPrint(`Usage (automatically runs in QPQ context):`);
       tinkerPrint(`  yield* askDateNow()                        - Direct generator code`);
-      tinkerPrint(`  yield* askExecuteServiceFunction(...)      - Call service functions`);
+      tinkerPrint(`  yield* askServiceFunctionExecute(...)      - Call service functions`);
       tinkerPrint(`  tinker.switchService('serviceName')        - Change service context`);
       tinkerPrint(`  tinker.getServices()                       - List services\n`);
       tinkerPrint(`Tip: Code is automatically wrapped in a generator function and executed via run()\n`);
