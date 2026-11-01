@@ -1,6 +1,6 @@
 /**
- * What an import would do (or did) to one doc. Only New and FastForward write unasked; Diverged and CodeConflict block;
- * Overwritten only appears after a forced apply.
+ * What an import would do (or did) to one doc. Only New and FastForward write unasked; Diverged, CodeConflict and
+ * Rejected block; Overwritten only appears after a forced apply.
  */
 export enum EventDocTransferStatus {
   // No doc with this id in the target; the whole log is written.
@@ -13,6 +13,8 @@ export enum EventDocTransferStatus {
   Diverged = 'diverged',
   // A different doc of the same type in the same scope owns this code. Blocking; force cannot fix it.
   CodeConflict = 'codeConflict',
+  // The bundle's events for this doc fail the collection's validator or fold. Blocking; force cannot fix it. Apply result only.
+  Rejected = 'rejected',
   // The target's divergent tail was backed up and discarded, then the bundle written. Apply result only.
   Overwritten = 'overwritten',
   // The bundle carries no events for this doc (only possible in a hand-edited bundle).

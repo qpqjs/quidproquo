@@ -7,6 +7,7 @@ export const EVENT_DOC_TRANSFER_STATUS_LABELS: Record<EventDocTransferStatus, st
   [EventDocTransferStatus.Same]: 'Already up to date',
   [EventDocTransferStatus.Diverged]: 'Blocked: changed here',
   [EventDocTransferStatus.CodeConflict]: 'Blocked: code in use',
+  [EventDocTransferStatus.Rejected]: 'Blocked: invalid events',
   [EventDocTransferStatus.Overwritten]: 'Overwritten',
   [EventDocTransferStatus.Ignored]: 'Skipped',
 };

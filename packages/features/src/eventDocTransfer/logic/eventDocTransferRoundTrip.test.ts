@@ -842,9 +842,13 @@ describe('eventDoc transfer round trip', () => {
     const upload2 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
     target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload2.transferId)}`] = source.files[secondKey];
 
-    expect(() => runStory(importBundle(httpEvent({ transferId: upload2.transferId, force: true })), target.mocks)).toThrow(
-      /BAD_EVENT is not allowed/,
-    );
+    const forced = JSON.parse(runStory(importBundle(httpEvent({ transferId: upload2.transferId, force: true })), target.mocks).body!);
+    const forcedRow = forced.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(forcedRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(forcedRow.detail).toMatch(/BAD_EVENT is not allowed/);
+    expect(forcedRow.discardedEvents).toBe(0);
+    expect(forcedRow.eventsWritten).toBe(0);
 
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(before);
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(summaryBefore);
@@ -940,9 +944,17 @@ describe('eventDoc transfer import validation', () => {
 
     const transferId = stageBundle(source, target, [templateRef]);
 
-    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/BAD_EVENT is not allowed/);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/BAD_EVENT is not allowed/);
+    expect(templateRow.eventsWritten).toBe(0);
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+    // The rest of the bundle still lands: one rejected doc does not veto the others.
+    expect(rows.find((row: { id: string }) => row.id === 'content-1').status).toBe(EventDocTransferStatus.New);
+    expect(eventsFor(target, CONTENT_TYPE, 'content-1').length).toBeGreaterThan(0);
   });
 
   it('refuses a new doc whose bundle log does not open with INIT_STATE and writes nothing for it', () => {
@@ -955,7 +967,11 @@ describe('eventDoc transfer import validation', () => {
     const templateDoc = staged.docs.find((doc) => doc.id === 'template-1')!;
     templateDoc.events[0] = { ...templateDoc.events[0]!, type: 'SET_NAME' };
 
-    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/must open with INIT_STATE/);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/must open with INIT_STATE/);
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
   });
@@ -973,14 +989,11 @@ describe('eventDoc transfer import validation', () => {
       payload: { ...templateDoc.events[0]!.payload, data: { ...(templateDoc.events[0]!.payload.data as object), unfoldable: true } },
     };
 
-    let thrown: unknown;
-    try {
-      runStory(importBundle(httpEvent({ transferId })), target.mocks);
-    } catch (error) {
-      thrown = error;
-    }
-    expect((thrown as { errorType: string }).errorType).toBe(ErrorTypeEnum.Invalid);
-    expect(String((thrown as Error).message)).toMatch(/opening event the document fold cannot read/);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/opening event the document fold cannot read/);
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
   });
 
