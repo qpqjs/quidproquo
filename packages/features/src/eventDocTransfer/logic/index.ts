@@ -10,6 +10,8 @@ export * from './askEventDocTransferReadBundle';
 export * from './askEventDocTransferTruncateLog';
 export * from './askEventDocTransferUploadTarget';
 export * from './askEventDocTransferWriteAssets';
+export * from './askEventDocValidateForeignTail';
 export * from './askEventDocWriteForeignEvents';
 export * from './findEventDocLogDivergence';
 export * from './findEventDocTransferCollection';
+export * from './toEventDocLocalActor';

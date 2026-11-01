@@ -8,8 +8,10 @@ import { EventDocBundleApplyOptions, EventDocBundleDoc, EventDocTransferPlanRow,
 import { askEventDocBundlePlanDoc } from './askEventDocBundlePlanDoc';
 import { askEventDocTransferTruncateLog } from './askEventDocTransferTruncateLog';
 import { askEventDocTransferWriteAssets } from './askEventDocTransferWriteAssets';
+import { askEventDocValidateForeignTail } from './askEventDocValidateForeignTail';
 import { askEventDocWriteForeignEvents } from './askEventDocWriteForeignEvents';
 import { findEventDocLogDivergence } from './findEventDocLogDivergence';
+import { toEventDocLocalActor } from './toEventDocLocalActor';
 
 const isWritable = (status: EventDocTransferStatus): boolean =>
   status === EventDocTransferStatus.New || status === EventDocTransferStatus.FastForward;
@@ -52,6 +54,11 @@ export function* askEventDocBundleApplyDoc(doc: EventDocBundleDoc, options: Even
 
   const existingEvents = yield* askEventDocEventListAll(doc.id);
   const fromIndex = overwriteFromIndex(existingEvents, doc.events);
+
+  // The tail is checked before the cut, against the prefix already in hand: a bundle that fails the gate must leave
+  // the target's log whole, not cut short with its summary pointing at deleted events.
+  const localised = doc.events.map((event) => toEventDocLocalActor(event, options.importerUserId));
+  yield* askEventDocValidateForeignTail(doc.id, localised, fromIndex, existingEvents.slice(0, fromIndex));
 
   const discarded = yield* askEventDocTransferTruncateLog(options.transferId, doc.id, existingEvents, fromIndex);
   const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, fromIndex, {

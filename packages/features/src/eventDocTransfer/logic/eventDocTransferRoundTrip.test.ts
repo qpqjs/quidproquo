@@ -795,6 +795,62 @@ describe('eventDoc transfer round trip', () => {
     expect(discarded.events.map((discardedEvent) => discardedEvent.payload.metadata.eventId)).toEqual([eventId(2), eventId(3)]);
   });
 
+  // Security regression: a forced overwrite cuts the target's tail, so the bundle's tail must pass the gate before the
+  // cut. Otherwise a rejected bundle would leave the log short, its summary pointing at deleted events, and nothing written.
+  it('refuses a forced overwrite whose tail the validator rejects without touching the target log', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const upload1 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload1.transferId)}`] = source.files[exportedKey];
+    runStory(importBundle(httpEvent({ transferId: upload1.transferId })), target.mocks);
+
+    // The target edits event 3 directly (its own identity), so the logs diverge there.
+    const targetEvents = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!;
+    targetEvents.splice(
+      targetEvents.findIndex((row) => row.pk === 'template-1' && row.sk === eventId(3)),
+      1,
+    );
+    targetEvents.push({
+      pk: 'template-1',
+      sk: eventId(3),
+      data: {
+        type: 'ADD_STYLE_LINK',
+        payload: {
+          data: link(STYLE_TYPE, 'style-shared'),
+          metadata: {
+            version: 1,
+            clientMessageId: 'target-edit-3',
+            createdBy: { userId: 'uat-user', userDisplayName: 'UAT User' },
+            createdAt: '2026-07-25T10:00:03.000Z',
+            eventId: eventId(3),
+          },
+        },
+      },
+    });
+    const before = JSON.parse(JSON.stringify(eventsFor(target, TEMPLATE_TYPE, 'template-1')));
+    const summaryBefore = JSON.parse(JSON.stringify(summaryFor(target, TEMPLATE_TYPE, 'template-1')));
+
+    // The source's next export carries an event the target's validator rejects.
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({ pk: 'template-1', sk: eventId(4), data: event(4, REJECTED_EVENT_TYPE, {}) });
+    delete source.files[exportedKey];
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const secondKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const upload2 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload2.transferId)}`] = source.files[secondKey];
+
+    expect(() => runStory(importBundle(httpEvent({ transferId: upload2.transferId, force: true })), target.mocks)).toThrow(
+      /BAD_EVENT is not allowed/,
+    );
+
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(before);
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(summaryBefore);
+    expect(target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferDiscardedPath(upload2.transferId, 'template-1')}`]).toBeUndefined();
+  });
+
   it('blocks a rename that would collide with a sibling, not just a new doc', () => {
     // The case a new-docs-only code check misses: this doc ALREADY exists in the target and
     // fast-forwards cleanly, but the incoming tail renames it onto a code a sibling holds. Letting it
