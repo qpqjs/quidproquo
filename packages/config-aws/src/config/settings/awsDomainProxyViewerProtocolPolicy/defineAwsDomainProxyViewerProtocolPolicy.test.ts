@@ -2,9 +2,10 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getAwsDomainProxyViewerProtocolPolicy } from '../../utils/configUtils';
-import { QPQAwsConfigSettingType } from '../QPQConfig';
-import { AwsDomainProxyViewerProtocolPolicy, defineAwsDomainProxyViewerProtocolPolicy } from './awsDomainProxyViewerProtocolPolicy';
+import { getAwsDomainProxyViewerProtocolPolicy } from '../../../utils/configUtils';
+import { QPQAwsConfigSettingType } from '../../QPQConfig';
+import { defineAwsDomainProxyViewerProtocolPolicy } from './defineAwsDomainProxyViewerProtocolPolicy';
+import { AwsDomainProxyViewerProtocolPolicy } from './types';
 
 describe('defineAwsDomainProxyViewerProtocolPolicy', () => {
   it('keys the policy to the domain proxy', () => {

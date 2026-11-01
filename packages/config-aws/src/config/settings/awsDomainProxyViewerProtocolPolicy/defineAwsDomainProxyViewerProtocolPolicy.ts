@@ -1,18 +1,5 @@
-import { QPQConfigSetting } from '@qpqjs/core';
-
-import { QPQAwsConfigSettingType } from '../QPQConfig';
-
-/** CloudFront's viewer protocol policies, for a domain proxy's distribution. */
-export enum AwsDomainProxyViewerProtocolPolicy {
-  httpsOnly = 'https-only',
-  redirectToHttps = 'redirect-to-https',
-  allowAll = 'allow-all',
-}
-
-export type AwsDomainProxyViewerProtocolPolicyQPQConfigSetting = {
-  domainProxyName: string;
-  viewerProtocolPolicy: AwsDomainProxyViewerProtocolPolicy;
-} & QPQConfigSetting;
+import { QPQAwsConfigSettingType } from '../../QPQConfig';
+import { AwsDomainProxyViewerProtocolPolicy, AwsDomainProxyViewerProtocolPolicyQPQConfigSetting } from './types';
 
 /**
  * How the domain proxy named `domainProxyName` (defineDomainProxy) treats plain http viewers on
