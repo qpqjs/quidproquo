@@ -35,6 +35,30 @@ const narrowWithGuard = {
   message: 'D1: narrow a setting with its is<Name>Setting guard, not by comparing configSettingType.',
 };
 
+// Re-exports are what barrels are for (G6); the utils namespace composers are the one sanctioned exception.
+const barrelFiles = ['**/index.ts', '**/index.tsx', '**/qpq*UtilsLib.ts', '**/qpq*Utils.ts', '**/awsNamingUtils.ts'];
+const reExportSelectors = [
+  { selector: 'ExportNamedDeclaration[source]', message: 'G6: `export ... from` belongs in index.ts only.' },
+  { selector: 'ExportAllDeclaration', message: 'G6: `export * from` belongs in index.ts only.' },
+];
+
+// Flat config replaces a rule's options block for block (the last matching block wins, nothing merges), so a block
+// that adds selectors for a file kind must carry every selector that kind already had. Each extra group is therefore
+// emitted twice: once for the files G6 skips (barrels and the utils composers) and once, with the G6 selectors
+// included, for everything else.
+const withReExportSelectors = ({ files, ignores, selectors }) => [
+  {
+    files,
+    ignores,
+    rules: { 'no-restricted-syntax': ['error', ...base, ...selectors] },
+  },
+  {
+    files,
+    ignores: [...ignores, ...barrelFiles],
+    rules: { 'no-restricted-syntax': ['error', ...base, ...reExportSelectors, ...selectors] },
+  },
+];
+
 export const restrictedSyntaxConfigs = [
   {
     rules: {
@@ -42,50 +66,35 @@ export const restrictedSyntaxConfigs = [
     },
   },
   {
-    // Re-exports are what barrels are for (G6); the utils namespace composers are the
-    // one sanctioned exception.
     files: ['**/*.{ts,tsx}'],
-    ignores: ['**/index.ts', '**/index.tsx', '**/qpq*UtilsLib.ts', '**/qpq*Utils.ts', '**/awsNamingUtils.ts'],
+    ignores: barrelFiles,
     rules: {
-      'no-restricted-syntax': [
-        'error',
-        ...base,
-        { selector: 'ExportNamedDeclaration[source]', message: 'G6: `export ... from` belongs in index.ts only.' },
-        { selector: 'ExportAllDeclaration', message: 'G6: `export * from` belongs in index.ts only.' },
-      ],
+      'no-restricted-syntax': ['error', ...base, ...reExportSelectors],
     },
   },
-  {
-    // A hook is defined in hooks/ (E rules), never beside a component.
+  // A hook is defined in hooks/ (E rules), never beside a component.
+  ...withReExportSelectors({
     files: ['**/*.tsx'],
     ignores: ['**/hooks/**'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        ...base,
-        {
-          selector: 'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name=/^use[A-Z]/]',
-          message: 'E: hooks live in a hooks/ folder, one per file.',
-        },
-      ],
-    },
-  },
-  {
-    // Physical names are built by the naming module (D6), nowhere else.
+    selectors: [
+      {
+        selector: 'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name=/^use[A-Z]/]',
+        message: 'E: hooks live in a hooks/ folder, one per file.',
+      },
+    ],
+  }),
+  // Physical names are built by the naming module (D6), nowhere else.
+  ...withReExportSelectors({
     files: ['**/*.ts'],
     ignores: ['**/*NamingUtils*.ts', '**/naming/**', '**/*.test.ts'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        ...base,
-        narrowWithGuard,
-        {
-          selector: "TemplateLiteral:has(Identifier[name='applicationName']):has(Identifier[name='environment'])",
-          message: 'D6: application, environment, feature and module names are composed by the naming module only.',
-        },
-      ],
-    },
-  },
+    selectors: [
+      narrowWithGuard,
+      {
+        selector: "TemplateLiteral:has(Identifier[name='applicationName']):has(Identifier[name='environment'])",
+        message: 'D6: application, environment, feature and module names are composed by the naming module only.',
+      },
+    ],
+  }),
   {
     // The one place `T | null` is spelled out.
     files: ['**/Nullable.ts'],
