@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 
 import { getAppDirectory, getAppsDirectory, getAvailableApps, getRoot } from './discovery';
+import { createOutput } from './out';
 import { nextPrefixColor, runCommand, runCommandPrefixed } from './runCommand';
 import { runDependencyTasks, TaskFailure } from './runTasks';
-import { createOutput } from './out';
 
 const out = createOutput('hooks');
 

@@ -3,10 +3,10 @@ import { QpqAppDeployment, QpqDeployEnvVar } from '@qpqjs/core';
 
 import { getPlatformDriver } from '../platforms';
 import { getArgValue } from './args';
-import { getRoot } from './discovery';
-import { promptSelect } from './prompts';
 import { CliError } from './CliError';
+import { getRoot } from './discovery';
 import { createOutput } from './out';
+import { promptSelect } from './prompts';
 
 const out = createOutput('resolve-deployment');
 

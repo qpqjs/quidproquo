@@ -9,9 +9,9 @@ import { qpqCoreUtils } from '@qpqjs/core';
 
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
+import { createOutput } from './out';
 import { promptCheckbox, promptSelect, promptTypedConfirmation } from './prompts';
 import { loadServiceQpqConfig } from './qpqConfigs';
-import { createOutput } from './out';
 
 const out = createOutput('clear-resources-plan');
 

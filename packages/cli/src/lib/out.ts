@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 type Print = (...parts: unknown[]) => void;
 
 export type Output = {

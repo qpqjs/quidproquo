@@ -1,4 +1,3 @@
-import { spawnCommand } from './runCommand';
 // Keeps workspace packages' declaration output (dist/*.d.ts) fresh while
 // `qpq go:dev` runs. The rspack dev builds bundle workspace source directly,
 // so this watcher only feeds the editor and validate-ts, which resolve
@@ -13,7 +12,9 @@ import { getWorkspacePackageDirs } from '@qpqjs/deploy-rspack';
 import { ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+
 import { createOutput } from './out';
+import { spawnCommand } from './runCommand';
 
 const out = createOutput('type-watcher');
 
