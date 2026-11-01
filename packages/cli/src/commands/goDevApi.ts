@@ -18,13 +18,13 @@ import path from 'path';
 import { rspack } from '@rspack/core';
 
 import { hasArgFlag } from '../lib/args';
+import { createOutput } from '../lib/createOutput';
 import { writeDevServerEntry, writeUserScriptChildEntry } from '../lib/devServerEntry';
 import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { killChildWithEscalation } from '../lib/killChildWithEscalation';
 import { killOtherQpqDevProcesses, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
-import { createOutput } from '../lib/createOutput';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { spawnCommand } from '../lib/runCommand';
@@ -101,7 +101,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   };
 
   out.log('Bundling dev server (watch mode)...');
-  let lastHash: string | null | undefined;
+  let lastHash: Nullable<string> = null;
   const compiler = rspack(rspackConfig);
   compiler.watch({ aggregateTimeout: 200 }, (err, stats) => {
     if (err) {
@@ -115,10 +115,10 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
     }
     // Skip no-op rebuilds (e.g. the virtual-module-triggered second compile at
     // startup): only restart when the output actually changed.
-    if (stats?.hash === lastHash && child) {
+    if ((stats?.hash ?? null) === lastHash && child) {
       return;
     }
-    lastHash = stats?.hash;
+    lastHash = stats?.hash ?? null;
     out.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
     restartServer();
   });
