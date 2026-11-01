@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/tsconfig`: `tsconfig.commonjs.json` and `tsconfig.esm.json` now set `include` (`src`), `exclude` (tests, `__fixtures__`, `testing` folders) and `outDir` (`lib/commonjs`, `lib/esm`) relative to the extending package. A config that extended one of them without its own `include` compiled everything under its folder and now compiles `src` only; a config with its own `exclude` keeps it, since `exclude` replaces the inherited list.
 - `@qpqjs/features`: `askMcpEventDocAiAuthorise(store, event, action)` is removed. Call `askEventDocAuthorise(store, action, event)` from `@qpqjs/features` instead; it is the one story that runs a collection's `authorise` hook for routes, MCP calls and websocket chats.
 
 ## 0.4.0

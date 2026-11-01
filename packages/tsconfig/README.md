@@ -18,7 +18,7 @@ npm install --save-dev @qpqjs/tsconfig
 }
 ```
 
-Packages that ship both module formats extend this from two files, one per output, and set `module` and `outDir` accordingly.
+Packages that ship both module formats extend `tsconfig.commonjs.json` and `tsconfig.esm.json` instead, one per output. Those two set `module` and, relative to the extending package, `outDir` (`lib/commonjs` or `lib/esm`), `include` (`src`) and the `exclude` list that keeps tests, `__fixtures__` and `testing` folders out of the build, so a package file is usually just the `extends` line. A package that needs more excluded restates the whole list, because `exclude` replaces rather than merges.
 
 An app scaffolded with `create-qpq-app` is already set up this way, so there is nothing to configure.
 

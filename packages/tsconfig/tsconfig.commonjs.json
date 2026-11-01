@@ -1,8 +1,18 @@
 // tsconfig.commonjs.json
+// The CommonJS half of a package build. `${configDir}` is the extending package's folder, so every package
+// compiles `src` into `lib/commonjs` and leaves tests, fixtures and test helpers out without restating the list.
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "./lib/commonjs"
-  }
+    "outDir": "${configDir}/lib/commonjs"
+  },
+  "include": ["${configDir}/src"],
+  "exclude": [
+    "${configDir}/node_modules",
+    "${configDir}/**/*.test.ts",
+    "${configDir}/**/*.test.tsx",
+    "${configDir}/**/__fixtures__/**",
+    "${configDir}/**/testing/**"
+  ]
 }
