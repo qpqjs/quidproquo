@@ -49,6 +49,8 @@ const MAX_SHIP_ATTEMPTS = 3;
 const RETRY_BASE_MS = 100;
 
 const log = (...args: unknown[]) => console.log(`[${EXTENSION_NAME}]`, ...args);
+// Deliberately not core's `sleep`: the extension is bundled with every dependency inlined, so a value import from
+// @qpqjs/core would pull the whole package into the layer for one line.
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 

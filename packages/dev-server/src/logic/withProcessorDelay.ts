@@ -1,7 +1,6 @@
-import { ActionProcessorList } from '@qpqjs/core';
+import { ActionProcessorList, sleep } from '@qpqjs/core';
 
 import { DevServerDelayConfig } from '../types';
-import { sleep } from './sleep';
 
 export const resolveDelayMs = (delay: DevServerDelayConfig | undefined, actionType: string): number => {
   if (delay === undefined) return 0;

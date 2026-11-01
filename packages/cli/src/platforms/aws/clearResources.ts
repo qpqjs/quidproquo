@@ -10,7 +10,7 @@ import { resolveStorageDriveBucketName } from '@qpqjs/actionprocessor-aws';
 // same naming utils the deployed runtime uses, so what gets emptied is
 // exactly what the app reads and writes.
 import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
-import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { QPQConfig, qpqCoreUtils, sleep } from '@qpqjs/core';
 
 import {
   BatchWriteItemCommand,
@@ -108,7 +108,7 @@ const truncateTable = async (tableName: string, region: string): Promise<number>
 
         if (requests.length > 0) {
           // Throttled - back off briefly before retrying the leftovers.
-          await new Promise((resolve) => setTimeout(resolve, 250));
+          await sleep(250);
         }
       }
     }
