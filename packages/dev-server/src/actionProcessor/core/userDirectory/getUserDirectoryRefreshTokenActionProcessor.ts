@@ -25,9 +25,15 @@ const getProcessRefreshToken = (
       // token has to be one this directory signed, as a pool would insist.
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       const secret = await getOrSeedDevJwtSecret(devServerConfig.runtimePath, userDirectory);
-      const decoded = verifyDevJwt<{ username?: string; email?: string; sub?: string }>(secret, refreshToken);
+      const decoded = verifyDevJwt<{ username?: string; email?: string; sub?: string; exp?: number }>(secret, refreshToken);
       if (!decoded) {
         return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid refresh token');
+      }
+
+      // verifyDevJwt checks the signature only. A refresh token past its expiry is refused the way a pool
+      // refuses one (NotAuthorized), rather than minting fresh tokens for as long as the secret lives.
+      if (typeof decoded.exp === 'number' && decoded.exp < Math.floor(Date.now() / 1000)) {
+        return actionResultError(ErrorTypeEnum.Unauthorized, 'Refresh token is invalid or has expired');
       }
 
       // A token carrying only a sub (userId) resolves back to its email through the user store

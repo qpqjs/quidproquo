@@ -55,6 +55,21 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
   });
 
+  // Security regression: a refresh token past its expiry mints nothing, as Cognito answers NotAuthorized; only the
+  // signature was checked before, so an expired token kept working for as long as the directory's secret lived.
+  it('refuses an expired refresh token', async () => {
+    const process = await getProcessor();
+
+    const [, error] = await invokeProcessor(process!, {
+      userDirectoryName: 'directory',
+      refreshToken: createDevJwt('test-secret', resolvedDirectory, 'joe@example.com', -60),
+    });
+
+    expect(error?.errorType).toBe(ErrorTypeEnum.Unauthorized);
+    expect(error?.errorText).toMatch(/expired/);
+    expect(userStore.upsertDevUser).not.toHaveBeenCalled();
+  });
+
   // Security regression: a refresh token the directory did not sign mints nothing.
   it('refuses a refresh token signed with another secret', async () => {
     const process = await getProcessor();
