@@ -51,7 +51,7 @@ function* askKeyValueStoreDelete(
 
 | Error | Meaning |
 | --- | --- |
-| `KeyValueStoreDeleteErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
+| `KeyValueStoreDeleteErrorTypeEnum.Throttled` | DynamoDB internal error or throttling. |
 | `KeyValueStoreDeleteErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreDeleteErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, or the partition-key value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped calls reject it too). |
 | `KeyValueStoreDeleteErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |

@@ -57,7 +57,7 @@ function* askKeyValueStoreUpsert<KvsItem>(
 
 | Error | Meaning |
 | --- | --- |
-| `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
+| `KeyValueStoreUpsertErrorTypeEnum.Throttled` | DynamoDB internal error or throttling. |
 | `KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreUpsertErrorTypeEnum.Conflict` | A conditional (`ifNotExists`) write lost to an existing item — final, the slot is taken. Namespaced — not the generic `ErrorTypeEnum.Conflict` — so retry logic can target the write race specifically without also catching domain-level conflicts. |
 | `KeyValueStoreUpsertErrorTypeEnum.WriteContention` | A conditional (`ifNotExists`) write lost to another write (a transaction) holding the item right now — transient, the item may still be absent once it settles. |

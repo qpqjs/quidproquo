@@ -117,7 +117,7 @@ When `nextPageKey` is set, pass it back as `options.nextPageKey` to fetch the ne
 
 | Error | Meaning |
 | --- | --- |
-| `KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
+| `KeyValueStoreQueryErrorTypeEnum.Throttled` | DynamoDB internal error or throttling. |
 | `KeyValueStoreQueryErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreQueryErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, a scoped query's key condition does not constrain the partition key or an [index](../../../config/core/key-value-store.md#indexes-gsis) partition key (or constrains one with an operator that cannot be scoped: an index partition key only takes `=`), a condition names an attribute containing `@@QPQ`, an index partition-key condition value doesn't match that index's declared type, or a partition-key condition value contains the reserved `@@QPQ` marker (reserved on string-pk stores, so unscoped queries reject it too). |
 | `KeyValueStoreQueryErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |

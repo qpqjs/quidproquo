@@ -58,7 +58,7 @@ function* askCryptoEncrypt(
 | --- | --- |
 | `CryptoEncryptErrorTypeEnum.KeyNotConfigured` | No `defineCryptoKey` with that name exists in the service config. |
 | `CryptoEncryptErrorTypeEnum.KeyUnavailable` | The key exists in config but is disabled, deleted, or access was denied. Infrastructure problem; surface to ops. |
-| `CryptoEncryptErrorTypeEnum.Throttling` | The provider rate limit was exceeded; back off and retry. |
+| `CryptoEncryptErrorTypeEnum.Throttled` | The provider rate limit was exceeded; back off and retry. |
 
 ## Related
 

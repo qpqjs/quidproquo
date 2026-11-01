@@ -53,7 +53,7 @@ Each failure mode is distinguishable because they need different handling:
 | `CryptoDecryptErrorTypeEnum.MalformedCiphertext` | The blob is corrupt, truncated, or not a qpq crypto blob. Data problem; the stored value needs re-creating. |
 | `CryptoDecryptErrorTypeEnum.KeyNotConfigured` | No `defineCryptoKey` with that name exists in the service config. |
 | `CryptoDecryptErrorTypeEnum.KeyUnavailable` | The key is disabled, deleted, or access was denied. Infrastructure problem; surface to ops. |
-| `CryptoDecryptErrorTypeEnum.Throttling` | The provider rate limit was exceeded; back off and retry. |
+| `CryptoDecryptErrorTypeEnum.Throttled` | The provider rate limit was exceeded; back off and retry. |
 
 ## Related
 

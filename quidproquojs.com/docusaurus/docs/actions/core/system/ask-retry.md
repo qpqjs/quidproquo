@@ -17,7 +17,7 @@ export function* askChargeCard(paymentId: string) {
     () => askCallPaymentProvider(paymentId),
     3,      // up to 3 retries after the first attempt
     1000,   // wait 1000ms between attempts
-    [ErrorTypeEnum.TimeOut, ErrorTypeEnum.OutOfResources], // only retry these
+    [ErrorTypeEnum.Timeout, ErrorTypeEnum.OutOfResources], // only retry these
   );
 
   if (outcome.success) {

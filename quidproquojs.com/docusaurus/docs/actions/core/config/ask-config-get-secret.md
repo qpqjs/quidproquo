@@ -52,7 +52,7 @@ function* askConfigGetSecret(
 | Error | Meaning |
 | --- | --- |
 | `askConfigGetSecret.errorTypeEnum.ResourceNotFound` | No secret with that name exists. |
-| `askConfigGetSecret.errorTypeEnum.Throttling` | The request rate exceeded the provider's limit; back off and retry. |
+| `askConfigGetSecret.errorTypeEnum.Throttled` | The request rate exceeded the provider's limit; back off and retry. |
 
 ## Related
 

@@ -42,7 +42,7 @@ function* askConfigSetParameter(
 
 | Error | Meaning |
 | --- | --- |
-| `ConfigSetParameterErrorTypeEnum.Throttling` | The request rate exceeded the provider's limit; back off and retry. |
+| `ConfigSetParameterErrorTypeEnum.Throttled` | The request rate exceeded the provider's limit; back off and retry. |
 | `ConfigSetParameterErrorTypeEnum.QuotaExceeded` | The parameter store's storage limit was hit. |
 
 ## Related

@@ -41,7 +41,7 @@ function* askConfigGetParameters(
 
 | Error | Meaning |
 | --- | --- |
-| `ConfigGetParametersErrorTypeEnum.Throttling` | The request rate exceeded the provider's limit; back off and retry. |
+| `ConfigGetParametersErrorTypeEnum.Throttled` | The request rate exceeded the provider's limit; back off and retry. |
 
 ## Related
 

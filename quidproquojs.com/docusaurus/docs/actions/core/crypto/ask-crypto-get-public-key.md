@@ -43,7 +43,7 @@ function* askCryptoGetPublicKey(
 | --- | --- |
 | `askCryptoGetPublicKey.errorType.KeyNotConfigured` | No `defineSigningKey` with that name exists in the service config. |
 | `askCryptoGetPublicKey.errorType.KeyUnavailable` | The key exists in config but is disabled, deleted, or access was denied. |
-| `askCryptoGetPublicKey.errorType.Throttling` | The provider rate limit was exceeded; back off and retry. |
+| `askCryptoGetPublicKey.errorType.Throttled` | The provider rate limit was exceeded; back off and retry. |
 
 ## Related
 

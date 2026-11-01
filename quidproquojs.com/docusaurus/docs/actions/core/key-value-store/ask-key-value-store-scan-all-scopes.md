@@ -80,7 +80,7 @@ interface QpqPagedData<T> {
 
 | Error | Meaning |
 | --- | --- |
-| `KeyValueStoreScanAllScopesErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
+| `KeyValueStoreScanAllScopesErrorTypeEnum.Throttled` | DynamoDB internal error or throttling. |
 | `KeyValueStoreScanAllScopesErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreScanAllScopesErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 

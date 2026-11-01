@@ -59,7 +59,7 @@ Pass the script's functions type as `TFunctions` so `functionName` and `args` ar
 | `FunctionNotFound` | The named export is not an own enumerable function of the module. |
 | `FunctionThrew` | The function threw before returning a story, or its promise rejected. |
 | `RunnerUnavailable` | The sandboxed runner could not be invoked, or answered with something other than a result. |
-| `TimedOut` | The runner did not finish within the timeout set by [defineUserScriptRunner](../../../config/core/user-script-runner.md). |
+| `Timeout` | The runner did not finish within the timeout set by [defineUserScriptRunner](../../../config/core/user-script-runner.md). |
 | `PayloadTooLarge` | The args or the result exceed what can cross to the runner in one invoke. |
 
 If the member is a generator and its own story throws, that error propagates with its original error type.
