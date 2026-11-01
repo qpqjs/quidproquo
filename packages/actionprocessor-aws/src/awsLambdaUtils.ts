@@ -1,3 +1,4 @@
+import { getS3StorageClassNameForStorageDriveTier } from '@qpqjs/config-aws';
 import { HTTPMethod, Nullable, StorageDriveTier } from '@qpqjs/core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
@@ -62,24 +63,6 @@ export const findApiRoute = (routes: RouteQPQWebServerConfigSetting[], method: H
   );
 };
 
-/** Maps a qpq storage drive tier to its S3 storage class. An unset tier lets S3 pick (INTELLIGENT_TIERING). */
-export const getS3BucketStorageClassFromStorageDriveTier = (driveTier?: StorageDriveTier): keyof typeof StorageClass => {
-  switch (driveTier) {
-    case StorageDriveTier.REGULAR:
-      return 'STANDARD';
-    case StorageDriveTier.OCCASIONAL_ACCESS:
-      return 'STANDARD_IA';
-    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
-      return 'ONEZONE_IA';
-    case StorageDriveTier.COLD_STORAGE:
-      return 'GLACIER';
-    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
-      return 'GLACIER_IR';
-    case StorageDriveTier.DEEP_COLD_STORAGE:
-      return 'DEEP_ARCHIVE';
-    case StorageDriveTier.SMART_TIERING:
-      return 'INTELLIGENT_TIERING';
-    default:
-      return 'INTELLIGENT_TIERING';
-  }
-};
+/** The S3 storage class for a write's tier; the one mapping lives in @qpqjs/config-aws, shared with deploy's lifecycle transitions. */
+export const getS3BucketStorageClassFromStorageDriveTier = (driveTier?: StorageDriveTier): keyof typeof StorageClass =>
+  getS3StorageClassNameForStorageDriveTier(driveTier);

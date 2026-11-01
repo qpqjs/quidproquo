@@ -1,4 +1,4 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, getS3StorageClassNameForStorageDriveTier, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   QPQConfig,
   qpqCoreUtils,
@@ -69,24 +69,13 @@ export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock
 
 // Each tier's S3 class is the one its enum doc names. REGULAR is the class objects
 // start in, so it is never a transition target.
+// A transition targets a tier objects do not start in, so REGULAR (STANDARD) is refused here rather than by CloudFormation.
 const convertStorageDriveTierToAwsS3StorageClass = (storageDriveTier: StorageDriveTier): aws_s3.StorageClass => {
-  switch (storageDriveTier) {
-    case StorageDriveTier.OCCASIONAL_ACCESS:
-      return aws_s3.StorageClass.INFREQUENT_ACCESS;
-    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
-      return aws_s3.StorageClass.ONE_ZONE_INFREQUENT_ACCESS;
-    case StorageDriveTier.COLD_STORAGE:
-      return aws_s3.StorageClass.GLACIER;
-    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
-      return aws_s3.StorageClass.GLACIER_INSTANT_RETRIEVAL;
-    case StorageDriveTier.DEEP_COLD_STORAGE:
-      return aws_s3.StorageClass.DEEP_ARCHIVE;
-    case StorageDriveTier.SMART_TIERING:
-      return aws_s3.StorageClass.INTELLIGENT_TIERING;
-    case StorageDriveTier.REGULAR:
-    default:
-      throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
+  if (storageDriveTier === StorageDriveTier.REGULAR) {
+    throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
   }
+
+  return new aws_s3.StorageClass(getS3StorageClassNameForStorageDriveTier(storageDriveTier));
 };
 
 const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
