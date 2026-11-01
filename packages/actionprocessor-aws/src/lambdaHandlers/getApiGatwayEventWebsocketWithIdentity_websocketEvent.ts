@@ -4,8 +4,8 @@ import { APIGatewayEventWebsocketRequestContextV2, APIGatewayProxyWebsocketEvent
 
 import { getApiGatewayWebsocketEventEventProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
-import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
+import { requireLambdaEnvironment } from './helpers/requireLambdaEnvironment';
 
 // TODO: @joe-coady: this shape is also declared in getActionProcessor/core/event/apiGatwayEvent/websocket/types.ts;
 // it belongs in one shared model file.

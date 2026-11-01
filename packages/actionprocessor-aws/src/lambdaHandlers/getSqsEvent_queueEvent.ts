@@ -13,8 +13,8 @@ import { SQSEvent } from 'aws-lambda';
 
 import { getSqsQueueEventProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
-import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
+import { requireLambdaEnvironment } from './helpers/requireLambdaEnvironment';
 
 const getProcessEventStory = (qpqConfig: QPQConfig, queueName: string): typeof askProcessEvent => {
   // FIFO queues must process records one group at a time, blocking a group once a record fails
