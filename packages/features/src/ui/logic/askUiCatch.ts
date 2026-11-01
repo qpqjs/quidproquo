@@ -17,11 +17,13 @@ export type UiCatchOptions = {
 // the error, flag busy, run the work under askCatch, record the failure. The result is
 // handed back so the caller decides what success means (store it, reload, return it).
 export function* askUiCatch<T>(work: AskResponse<T>, options: UiCatchOptions): AskResponse<EitherActionResult<T>> {
+  // The error is cleared first: a module's SetError commonly resets its busy flags as well, so clearing it after
+  // raising busy would drop the flag the moment it was raised.
+  yield* options.askSetError(null);
+
   if (options.askSetBusy) {
     yield* options.askSetBusy(true);
   }
-
-  yield* options.askSetError(null);
 
   const result = yield* askCatch(work, options.askSetBusy ? options.askSetBusy(false) : undefined);
 
