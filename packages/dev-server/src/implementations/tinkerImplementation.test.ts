@@ -45,7 +45,11 @@ describe('createTinkerInterface', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
-  afterEach(() => vi.restoreAllMocks());
+  // restoreAllMocks only restores spies; the repl.start mock keeps its call history across tests unless it is cleared.
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+  });
 
   it('defaults the current service to the first service when no initial service is given', () => {
     const tinker = createTinkerInterface(buildDevServerConfig());
