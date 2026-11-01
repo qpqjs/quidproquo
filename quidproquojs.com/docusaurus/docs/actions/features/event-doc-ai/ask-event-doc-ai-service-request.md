@@ -16,18 +16,20 @@ import { askEventDocAiServiceRequest } from '@qpqjs/features';
 
 // How a request builder uses it (payload/response typed by the caller):
 export function* askMyEventDocAiMethod(payload: MyPayload) {
-  return yield* askEventDocAiServiceRequest<MyPayload, MyResponse>('MyMethod', payload);
+  return yield* askEventDocAiServiceRequest<MyResponse, MyPayload>('MyMethod', payload);
 }
 ```
 
 ## Signature
 
 ```typescript
-function* askEventDocAiServiceRequest<TPayload, TResponse>(
+function* askEventDocAiServiceRequest<TResult, TPayload = unknown>(
   method: string,
   payload: TPayload,
-): AskResponse<TResponse>;
+): AskResponse<TResult>;
 ```
+
+`TResult` is the response type and comes first; `TPayload` is the request payload type and defaults to `unknown`.
 
 ## Parameters
 
@@ -38,7 +40,7 @@ function* askEventDocAiServiceRequest<TPayload, TResponse>(
 
 ## Returns
 
-`TResponse` — the handler's response, passed straight back.
+`TResult`: the handler's response, passed straight back.
 
 ## Notes
 
