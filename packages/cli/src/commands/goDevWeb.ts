@@ -113,7 +113,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
     }
     const line = `  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}  \x1b[33m(started)\x1b[0m`;
     const up = linesBelowList + (views.length - index);
-    process.stdout.write(`\x1b[${up}F\x1b[2K${line}\x1b[${up}E`);
+    out.rewriteLineAbove(up, line);
   };
 
   const pollUntilStarted = (index: number): void => {
