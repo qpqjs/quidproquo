@@ -21,11 +21,11 @@ const base = [
   },
   {
     selector: inGenerator("CallExpression[callee.object.name='Math'][callee.property.name='random']"),
-    message: 'C2: stories are deterministic; use askNewGuid() or a seeded source.',
+    message: 'C2: stories are deterministic; use askGuidNew() or a seeded source.',
   },
   {
     selector: `${inGenerator("CallExpression[callee.name='randomUUID']")}, ${inGenerator("CallExpression[callee.property.name='randomUUID']")}`,
-    message: 'C2: stories are deterministic; use askNewGuid().',
+    message: 'C2: stories are deterministic; use askGuidNew().',
   },
 ];
 
