@@ -137,6 +137,8 @@ type TestEnvironment = {
   authoriseCalls: AuthoriseCall[];
   // Authoriser calls and row deletes in the order they happened, for tests that care about sequence.
   callLog: string[];
+  // Every run of the registered fold, with the events it was given, for tests that care what state the tail was checked against.
+  foldCalls: EventDocEvent[][];
   // Actions the authoriser refuses with Forbidden.
   forbidActions: Set<string>;
 };
@@ -151,6 +153,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
   const files: Record<string, unknown> = {};
   const authoriseCalls: AuthoriseCall[] = [];
   const callLog: string[] = [];
+  const foldCalls: EventDocEvent[][] = [];
   const forbidActions = new Set<string>();
 
   let guidCounter = 0;
@@ -217,6 +220,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       // events folded so far, and the validator refuses REJECTED_EVENT_TYPE.
       if (action.payload.functionName === 'foldDocumentState') {
         const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], { count: number } | undefined];
+        foldCalls.push(folded);
         return { count: (seed?.count ?? 0) + folded.length };
       }
 
@@ -341,7 +345,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       `https://${environmentName}.example.com/upload/${action.payload.drive}/${action.payload.filepath}`,
   };
 
-  return { tables, files, mocks, seedDoc, authoriseCalls, callLog, forbidActions };
+  return { tables, files, mocks, seedDoc, authoriseCalls, callLog, foldCalls, forbidActions };
 };
 
 const httpEvent = (body: unknown): HTTPEvent => ({
@@ -654,6 +658,47 @@ describe('eventDoc transfer round trip', () => {
 
     const divergedApply = JSON.parse(runStory(importBundle(httpEvent({ transferId: secondUpload.transferId })), target.mocks).body!);
     expect(divergedApply.find((row: { id: string }) => row.id === 'template-1').eventsWritten).toBe(0);
+  });
+
+  // Security regression: the fast-forward match is by event identity, so a bundle can carry the shared prefix with its
+  // data changed. The tail must be validated against the state the target's own stored prefix folds to, never the
+  // bundle's copy, or a crafted tail could land an event the real document's fold cannot read.
+  it('validates a fast-forward tail against the stored prefix, not the bundle copy of it', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const firstKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const firstUpload = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(firstUpload.transferId)}`] = source.files[firstKey];
+    runStory(importBundle(httpEvent({ transferId: firstUpload.transferId })), target.mocks);
+
+    // The source appends one event, then the bundle is tampered: event 2 keeps its identity but its data changes.
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({
+      pk: 'template-1',
+      sk: eventId(4),
+      data: event(4, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content')),
+    });
+    delete source.files[firstKey];
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const secondKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const tampered = JSON.parse(JSON.stringify(source.files[secondKey])) as EventDocBundle;
+    const tamperedDoc = tampered.docs.find((doc) => doc.id === 'template-1')!;
+    tamperedDoc.events[2] = { ...tamperedDoc.events[2]!, payload: { ...tamperedDoc.events[2]!.payload, data: { tampered: true } } };
+
+    const secondUpload = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(secondUpload.transferId)}`] = tampered;
+    target.foldCalls.length = 0;
+
+    const applied = JSON.parse(runStory(importBundle(httpEvent({ transferId: secondUpload.transferId })), target.mocks).body!);
+    expect(applied.find((row: { id: string }) => row.id === 'template-1').status).toBe(EventDocTransferStatus.FastForward);
+
+    // The seed fold ran over the four stored events, carrying the target's data for event 2, not the tampered copy.
+    const seedFold = target.foldCalls.find((folded) => folded.length === 4)!;
+    expect(seedFold).toBeDefined();
+    expect(seedFold[2]!.payload.data).not.toEqual({ tampered: true });
+    expect(seedFold[2]!.payload.data).toEqual(eventsFor(target, TEMPLATE_TYPE, 'template-1')[2]!.payload.data);
   });
 
   it('blocks a code collision on a different doc id', () => {
