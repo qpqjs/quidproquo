@@ -13,7 +13,8 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqAwsCdkPathUtils } from '../../../../utils';
-import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
+import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
+import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';

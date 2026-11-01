@@ -5,7 +5,8 @@ import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
+import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
+import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

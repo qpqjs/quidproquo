@@ -3,7 +3,7 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { getForeignConfigs } from './ownedAndForeignGrants';
+import { getForeignConfigs } from './getForeignConfigs';
 
 describe('getForeignConfigs', () => {
   it('keeps only the settings another service owns', () => {
