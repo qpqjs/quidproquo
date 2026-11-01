@@ -54,8 +54,15 @@ describe('QpqWebserverSubdomainRedirectConstruct', () => {
     template.resourceCountIs('AWS::WAFv2::WebACLAssociation', 1);
     template.hasResourceProperties('AWS::WAFv2::WebACLAssociation', {
       ResourceArn: Match.objectLike({ 'Fn::Join': Match.anyValue() }),
-      WebACLArn: Match.anyValue(),
+      WebACLArn: { Ref: Match.anyValue() },
     });
+
+    // The acl arn is read from ssm at deploy, so the association refs a template parameter whose default is the
+    // parameter name. API Gateway only accepts a regional acl, so that name must be the regional one.
+    const association = Object.values(template.findResources('AWS::WAFv2::WebACLAssociation'))[0] as any;
+    const ssmParameter = template.toJSON().Parameters[association.Properties.WebACLArn.Ref];
+    expect(ssmParameter.Type).toBe('AWS::SSM::Parameter::Value<String>');
+    expect(ssmParameter.Default).toBe('/qpq/waf/web-acl-arn/regional/test-app-development');
   });
 
   it('adds no association when waf protection is off', () => {
