@@ -135,6 +135,8 @@ type TestEnvironment = {
   seedDoc: (type: string, events: EventDocEvent[], assets?: { guid: string; data: QPQBinaryData }[]) => void;
   // Every call the transfer made to the collection authoriser (only when the environment declares one).
   authoriseCalls: AuthoriseCall[];
+  // Authoriser calls and row deletes in the order they happened, for tests that care about sequence.
+  callLog: string[];
   // Actions the authoriser refuses with Forbidden.
   forbidActions: Set<string>;
 };
@@ -148,6 +150,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
   const tables: Record<string, Record<string, unknown>[]> = {};
   const files: Record<string, unknown> = {};
   const authoriseCalls: AuthoriseCall[] = [];
+  const callLog: string[] = [];
   const forbidActions = new Set<string>();
 
   let guidCounter = 0;
@@ -233,6 +236,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
     // actions the test marks as forbidden.
     [InlineFunctionActionType.Execute]: (action: { payload: AuthoriseCall }) => {
       authoriseCalls.push(action.payload);
+      callLog.push(`authorise:${action.payload.payload.action}`);
 
       return forbidActions.has(action.payload.payload.action)
         ? throwsError(ErrorTypeEnum.Forbidden, `Missing permission: eventDoc:${action.payload.payload.storeName}:${action.payload.payload.action}`)
@@ -265,6 +269,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
 
     [KeyValueStoreActionType.Delete]: (action: { payload: { keyValueStoreName: string; key: unknown; sortKey?: unknown } }) => {
       const { keyValueStoreName, key, sortKey } = action.payload;
+      callLog.push(`kvs:delete:${keyValueStoreName}`);
       const table = tableFor(keyValueStoreName);
 
       const index = table.findIndex((row) => (sortKey === undefined ? row.id === key : row.pk === key && row.sk === sortKey));
@@ -336,7 +341,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       `https://${environmentName}.example.com/upload/${action.payload.drive}/${action.payload.filepath}`,
   };
 
-  return { tables, files, mocks, seedDoc, authoriseCalls, forbidActions };
+  return { tables, files, mocks, seedDoc, authoriseCalls, callLog, forbidActions };
 };
 
 const httpEvent = (body: unknown): HTTPEvent => ({
@@ -899,5 +904,11 @@ describe('eventDoc transfer authorise', () => {
 
     expect(rows.find((row: { id: string }) => row.id === 'template-1').status).toBe(EventDocTransferStatus.Overwritten);
     expect(target.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: TEMPLATES_STORE, action: 'delete' });
+
+    // The authorisation must come before the first event row is cut, not merely appear somewhere in the run.
+    const deleteAuthorisedAt = target.callLog.indexOf('authorise:delete');
+    const firstRowDeleteAt = target.callLog.indexOf(`kvs:delete:${eventDocEventsStoreName(TEMPLATES_STORE)}`);
+    expect(deleteAuthorisedAt).toBeGreaterThanOrEqual(0);
+    expect(firstRowDeleteAt).toBeGreaterThan(deleteAuthorisedAt);
   });
 });
