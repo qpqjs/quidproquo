@@ -63,7 +63,7 @@ function* askServiceRequest<TResult, TPayload = unknown>(
 
 ## Returns
 
-`TResponse` — the typed response returned by the target service's handler for that method.
+`TResult`: the typed response returned by the target service's handler for that method.
 
 ## Deferring the reply
 
