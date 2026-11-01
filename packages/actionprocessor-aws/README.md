@@ -32,7 +32,7 @@ There is also a dynamic module loader, which lets a Lambda pull the service's bu
 
 ## Naming and config
 
-`awsNamingUtils` derives every resource name from the account, region, and qpq config, so names are consistent between what the CDK package creates and what the processors look up at runtime. Nothing needs to be passed by hand between the two.
+Resource names are never passed by hand between deploy and runtime. The processors derive them through `awsNamingUtils` from `@qpqjs/config-aws`, the same helpers the CDK package uses when it creates the resources, so a lookup at runtime always lands on the name the deploy chose. This package does not export the naming helpers itself; import them from `@qpqjs/config-aws`.
 
 ## Status
 
