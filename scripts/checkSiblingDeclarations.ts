@@ -7,12 +7,20 @@ const root = path.resolve(__dirname, '..');
 const packagesDir = path.join(root, 'packages');
 const siblingImport = /from ['"](@qpqjs\/[a-z-]+|quidproquo|create-qpq-app)(?:\/[^'"]*)?['"]/g;
 
-const listSourceFiles = (dir: string): string[] =>
-  fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) return entry.name === 'node_modules' ? [] : listSourceFiles(full);
-    return /\.(ts|tsx|mts|js|mjs)$/.test(entry.name) ? [full] : [];
-  });
+const sourceFile = /\.(ts|tsx|mts|js|mjs)$/;
+
+// The source files one directory entry contributes: a file if it is source, a directory's files
+// recursively, and nothing for node_modules.
+const listEntrySourceFiles = (dir: string, entry: fs.Dirent): string[] => {
+  const full = path.join(dir, entry.name);
+  if (entry.isDirectory()) {
+    return entry.name === 'node_modules' ? [] : listSourceFiles(full);
+  }
+
+  return sourceFile.test(entry.name) ? [full] : [];
+};
+
+const listSourceFiles = (dir: string): string[] => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => listEntrySourceFiles(dir, entry));
 
 const isTestFile = (file: string): boolean => /\.test\.[jt]sx?$/.test(file) || /[\\/](testing|__fixtures__|integration)[\\/]/.test(file);
 
