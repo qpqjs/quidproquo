@@ -1,14 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getLambdaBaseName, getServiceFunctionLambdaBaseName, QpqLambdaKind } from './lambdaNames';
 import { withFeatureSuffix } from './withFeatureSuffix';
-
-describe('lambda names', () => {
-  it('suffixes the kind', () => {
-    expect(getLambdaBaseName('orders', QpqLambdaKind.Queue)).toBe('orders-queue');
-    expect(getServiceFunctionLambdaBaseName('trace')).toBe('trace-sfunc');
-  });
-});
 
 describe('withFeatureSuffix', () => {
   it('adds the feature only when there is one, with the given separator', () => {

@@ -359,6 +359,8 @@ export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackNameFr
 
 export const getDomainStackName = (qpqConfig: QPQConfig) => getAppStackNameFromConfig(qpqConfig, 'domain');
 
-export * from './lambdaNames';
+export { getLambdaBaseName } from './getLambdaBaseName';
+export { getServiceFunctionLambdaBaseName } from './getServiceFunctionLambdaBaseName';
+export { QpqLambdaKind } from './QpqLambdaKind';
 export { resolveDeploymentFromConfig } from './resolveDeploymentFromConfig';
 export { withFeatureSuffix } from './withFeatureSuffix';
