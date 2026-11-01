@@ -9,9 +9,9 @@ import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import path from 'path';
 
-import { getRoot, getServiceNames } from '../../lib/discovery';
 import { createOutput } from '../../lib/createOutput';
-import { getAppPrefix, loadServiceQpqConfig } from '../../lib/qpqConfigs';
+import { getRoot } from '../../lib/discovery';
+import { getAppPrefix, loadFirstServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { getCdkAppCommand } from './cdkApp';
@@ -51,11 +51,7 @@ export const destroyServiceStack = (serviceName: string, stackName: string, appN
   destroyStack(stackName, getDeployEnv(appName, serviceName));
 
 export const deployDomainStack = async (appName: string): Promise<void> => {
-  const [firstService] = getServiceNames(appName);
-  if (firstService === undefined) {
-    throw new Error(`No services found for app ${appName}`);
-  }
-  const qpqConfig = loadServiceQpqConfig(appName, firstService);
+  const qpqConfig = loadFirstServiceQpqConfig(appName);
   const stackName = qpqDeployAwsUtils.getDomainStackName(qpqConfig);
   out.log('Deploy Domain: ', stackName);
   await deployStack(stackName, getDeployEnv(appName));
