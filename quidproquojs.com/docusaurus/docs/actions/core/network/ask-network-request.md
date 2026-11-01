@@ -18,7 +18,7 @@ interface Todo {
 }
 
 export function* askGetTodo(id: string) {
-  const response = yield* askNetworkRequest<undefined, Todo>('GET', `https://example.com/todos/${id}`);
+  const response = yield* askNetworkRequest<Todo>('GET', `https://example.com/todos/${id}`);
 
   return response.data;
 }
@@ -27,14 +27,14 @@ export function* askGetTodo(id: string) {
 ## Signature
 
 ```typescript
-function* askNetworkRequest<T, R>(
+function* askNetworkRequest<TResult, TPayload = unknown>(
   method: HTTPMethod,
   url: string,
-  httpRequestOptions?: HTTPRequestOptions<T>,
-): AskResponse<HTTPNetworkResponse<R>>;
+  httpRequestOptions?: HTTPRequestOptions<TPayload>,
+): AskResponse<HTTPNetworkResponse<TResult>>;
 ```
 
-`T` is the request body type; `R` is the expected response `data` type.
+`TResult` is the expected response `data` type and comes first; `TPayload` is the request body type and defaults to `unknown`, so a request without a body names only the result type.
 
 ## Parameters
 

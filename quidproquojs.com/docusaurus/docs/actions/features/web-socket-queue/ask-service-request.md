@@ -17,7 +17,7 @@ interface GetQuoteRequest { symbol: string; }
 interface GetQuoteResponse { symbol: string; price: number; }
 
 export function* askGetQuote(symbol: string) {
-  const quote = yield* askServiceRequest<GetQuoteRequest, GetQuoteResponse>(
+  const quote = yield* askServiceRequest<GetQuoteResponse, GetQuoteRequest>(
     'market',   // service name
     'getQuote', // method
     { symbol },
@@ -44,12 +44,14 @@ export function* askQuotePrice(symbol: string) {
 ## Signature
 
 ```typescript
-function* askServiceRequest<TPayload, TResponse>(
+function* askServiceRequest<TResult, TPayload = unknown>(
   serviceName: string,
   method: string,
   payload: TPayload,
-): AskResponse<TResponse>;
+): AskResponse<TResult>;
 ```
+
+`TResult` is the response type and comes first; `TPayload` is the request payload type and defaults to `unknown`.
 
 ## Parameters
 
