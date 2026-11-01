@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { expectGenerator } from './vitest';
+import { expectGenerator } from './index';
 
 describe('@qpqjs/testing/vitest entry point', () => {
   it('registers custom matchers and re-exports the barrel', () => {
