@@ -133,6 +133,11 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
       ? await devServerConfig.dynamicModuleLoader(serviceLog.moduleName, serviceLog.qpqFunctionRuntimeInfo)
       : askProcessEvent;
 
+    // The admin dialog's Execute button exists to replay a logged story under an attached debugger (it discards the
+    // response), so this is where the replay pauses: step into qpqExecuteLog from here. The statement is a no-op
+    // without an inspector, and the dev server never ships in a lambda, which is why it lives here and not in core.
+    // eslint-disable-next-line no-debugger
+    debugger;
     const result = await qpqExecuteLog(serviceLog, runtimeModule);
     res.json(result);
   });
