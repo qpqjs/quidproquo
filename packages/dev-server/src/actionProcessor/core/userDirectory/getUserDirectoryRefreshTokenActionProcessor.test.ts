@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { createDevJwt } from '../../../logic/auth/devAuth';
-import { signDevJwt } from '../../../logic/auth/devJwt';
+import { signDevJwt } from '../../../logic/auth/signDevJwt';
 import { getUserDirectoryRefreshTokenActionProcessor } from './getUserDirectoryRefreshTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({

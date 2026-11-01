@@ -10,9 +10,9 @@ import {
 } from '@qpqjs/core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
-import { verifyDevJwt } from '../../../logic/auth/devJwt';
 import { getOrSeedDevJwtSecret } from '../../../logic/auth/devJwtSecret';
 import { getDevUserByUserId, upsertDevUser } from '../../../logic/auth/jsonUserStore';
+import { verifyDevJwt } from '../../../logic/auth/verifyDevJwt';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessRefreshToken = (

@@ -11,7 +11,7 @@ import {
 } from '@qpqjs/core';
 
 import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
-import { signDevJwt } from './devJwt';
+import { signDevJwt } from './signDevJwt';
 
 /**
  * Dev server auth helpers.

@@ -4,7 +4,7 @@ import { buildTestQpqConfig } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { createDevJwt, createDevUserId, DEV_USER_EMAIL, DevUserDirectory, resolveDevUserDirectory } from './devAuth';
-import { verifyDevJwt } from './devJwt';
+import { verifyDevJwt } from './verifyDevJwt';
 
 const SECRET = 'test-secret';
 const decodeJwtPayload = (jwt: string): Record<string, any> => JSON.parse(Buffer.from(jwt!.split('.')[1]!, 'base64url').toString());

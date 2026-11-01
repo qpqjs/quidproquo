@@ -4,7 +4,7 @@ import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamic
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
-import { signDevJwt } from '../../../logic/auth/devJwt';
+import { signDevJwt } from '../../../logic/auth/signDevJwt';
 import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirectorySetAccessTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({

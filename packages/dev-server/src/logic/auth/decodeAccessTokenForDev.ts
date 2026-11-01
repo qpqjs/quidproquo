@@ -1,6 +1,6 @@
 import { DecodedAccessToken, Nullable } from '@qpqjs/core';
 
-import { verifyDevJwt } from './devJwt';
+import { verifyDevJwt } from './verifyDevJwt';
 
 type DevJwtClaims = {
   sub?: string;

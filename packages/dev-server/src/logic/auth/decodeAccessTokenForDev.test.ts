@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { decodeAccessTokenForDev } from './decodeAccessTokenForDev';
-import { signDevJwt } from './devJwt';
+import { signDevJwt } from './signDevJwt';
 
 const SECRET = 'test-secret';
 const now = () => Math.floor(Date.now() / 1000);
