@@ -16,7 +16,8 @@ import { qpqAwsCdkPathUtils } from '../../../../utils';
 import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 import { QpqResource } from '../../../base/QpqResource';
 
 export type QpqCoreStorageDriveConstructProps = {
@@ -55,15 +56,13 @@ export type QpqCoreStorageDriveConstructProps = {
   emailReceiptRuleNames?: string[];
 } & QpqConstructBlockProps;
 
-export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
+// The bucket is the resource the shared base grants on; it keeps its own name because every
+// consumer of a storage drive reaches for `.bucket`.
+export abstract class QpqCoreStorageDriveConstructBase extends QpqReadWriteResourceConstructBase<aws_s3.IBucket> {
   abstract bucket: aws_s3.IBucket;
 
-  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.bucket.grantRead(grantee);
-  }
-
-  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.bucket.grantWrite(grantee);
+  get resource(): aws_s3.IBucket {
+    return this.bucket;
   }
 }
 
