@@ -1,6 +1,11 @@
 import path from 'node:path';
 
-import { collectExports, isAllowedPair, isExemptFile, isScreaming, primaryName, screamingToCamel } from './exportsOfFile.mjs';
+import { collectExports } from './exports/collectExports.mjs';
+import { isAllowedPair } from './exports/isAllowedPair.mjs';
+import { isExemptFile } from './exports/isExemptFile.mjs';
+import { isScreaming } from './exports/isScreaming.mjs';
+import { primaryName } from './exports/primaryName.mjs';
+import { screamingToCamel } from './exports/screamingToCamel.mjs';
 
 // A file is named after what it exports (G1); a SCREAMING constant lives in a camelCase
 // file (G8). Only files the one-export rule accepts are checked here.
