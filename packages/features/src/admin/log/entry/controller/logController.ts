@@ -38,7 +38,7 @@ export function* getLog(
   params: {
     correlationId: string;
   },
-) {
+): AskResponse<HTTPEventResponse> {
   const log = yield* askLogMetadataGetByCorrelation(params.correlationId);
   if (!log) {
     return yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
