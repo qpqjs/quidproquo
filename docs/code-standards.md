@@ -52,7 +52,7 @@ yield* askMapParallel(items, askSendOrNull);
 
 **G5. `type` over `interface`, `unknown` over `any`, `Nullable<T>` over `| null` or `| undefined`.** `interface` only for `extends` or declaration merging. `any` needs an adjacent comment saying why. **lint** (type definitions; `| null` as a warning)
 
-**G6. Barrels.** Every directory has an `index.ts` that only re-exports. Inside a module, import leaf files (`../actionCreators/askTenantSetLoading`), never the module's own barrel. When something moves, repoint every caller; never leave a forwarding `export { X } from '<old>'` behind. **lint** (export-from outside `index.ts`)
+**G6. Barrels.** Every directory has an `index.ts` that only re-exports. Inside a module, import leaf files (`../actionCreators/askTenantSetLoading`), never the module's own barrel. When something moves, repoint every caller; never leave a forwarding `export { X } from '<old>'` behind. A versioned module may also keep one `publicExports.ts` that re-exports the current `./vN` folder: consumers import from it, a version bump repoints it, and anything the new version dropped or reshaped fails to compile at the callers. **lint** (export-from outside `index.ts` and `publicExports.ts`)
 
 **G7. Comments.** Every export gets a one-to-three-line JSDoc: what it is for and any contract the signature does not express. Inline comments only for what the code cannot say (a workaround, an invariant). Never narrate history ("used to", "moved from"), never restate the code, never use an em dash. **lint** (em dashes, history words; JSDoc as a warning)
 
