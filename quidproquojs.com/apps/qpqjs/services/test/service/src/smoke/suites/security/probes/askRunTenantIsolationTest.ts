@@ -56,10 +56,7 @@ export function* askRunTenantIsolationTest(): AskResponse<void> {
 
   // A failed assertion ends the story through an error action, which never reaches a `finally` block,
   // so the membership row is removed through askCatch's finally story and the failure rethrown.
-  const checks = yield* askCatch(
-    askCheckTenantResolution(memberTenantId, foreignTenantId),
-    askTenantMembershipDelete(userId!, memberTenantId),
-  );
+  const checks = yield* askCatch(askCheckTenantResolution(memberTenantId, foreignTenantId), askTenantMembershipDelete(userId!, memberTenantId));
   if (!checks.success) {
     return yield* askThrowError(checks.error.errorType, checks.error.errorText, checks.error.errorStack);
   }
