@@ -5,7 +5,6 @@ import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
 import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
@@ -195,7 +194,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       // The same naming path as `getKvsDynamoTableNameFromConfig`, so no CDK cross-stack ref is created. The runtime
       // reaches a foreign store in this deployment's own region and account (the name carries the owner's module only),
       // so the grant targets that table, not wherever the owner's full service account info would resolve to.
-      foreignArns: getForeignConfigs(qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+      foreignArns: qpqCoreUtils.getForeignItems(qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
         const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
         const tableArn = `arn:aws:dynamodb:${region}:${accountId}:table/${tableName}`;
 

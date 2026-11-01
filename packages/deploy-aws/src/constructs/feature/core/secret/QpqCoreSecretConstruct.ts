@@ -1,5 +1,5 @@
 import { awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { QPQConfig, SecretQPQConfigSetting } from '@qpqjs/core';
+import { QPQConfig, qpqCoreUtils, SecretQPQConfigSetting } from '@qpqjs/core';
 
 import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -51,7 +51,7 @@ export class QpqCoreSecretConstruct extends QpqReadWriteResourceConstructBase<aw
       // applyEnvironmentTags stamps every owned secret.
       ownedResourceArns: [`arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:*`],
       ownedByTag: true,
-      foreignArns: qpqDeployAwsUtils.getForeignConfigs(secretConfigs, qpqConfig).map((secretConfig) => {
+      foreignArns: qpqCoreUtils.getForeignItems(secretConfigs, qpqConfig).map((secretConfig) => {
         const owner = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
         const secretName = awsNamingUtils.resolveOwnedResourceName(secretConfig.key, qpqConfig, secretConfig.owner);
 

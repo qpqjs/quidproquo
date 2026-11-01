@@ -1,5 +1,5 @@
 import { awsNamingUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { ParameterQPQConfigSetting, QPQConfig } from '@qpqjs/core';
+import { ParameterQPQConfigSetting, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -50,7 +50,7 @@ export class QpqCoreParameterConstruct extends QpqReadWriteResourceConstructBase
       // applyEnvironmentTags stamps every owned parameter.
       ownedResourceArns: [`arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/*`],
       ownedByTag: true,
-      foreignArns: qpqDeployAwsUtils.getForeignConfigs(parameterConfigs, qpqConfig).map((parameterConfig) => {
+      foreignArns: qpqCoreUtils.getForeignItems(parameterConfigs, qpqConfig).map((parameterConfig) => {
         const owner = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
         const paramName = awsNamingUtils.resolveOwnedResourceName(parameterConfig.key, qpqConfig, parameterConfig.owner);
 

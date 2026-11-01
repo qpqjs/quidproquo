@@ -1,6 +1,5 @@
 export * from './associateRegionalWebAcl';
 export * from './domain';
-export * from './getForeignConfigs';
 export * from './grantOwnedAndForeignResources';
 export * from './javascriptRuntimeUtils';
 export * from './logRetentionUtils';

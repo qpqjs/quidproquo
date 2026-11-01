@@ -13,7 +13,6 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqAwsCdkPathUtils } from '../../../../utils';
-import { getForeignConfigs } from '../../../../utils/getForeignConfigs';
 import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
 import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
@@ -284,7 +283,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       ownedResourceArns: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
       ownedByTag: false,
       // The same naming path as `resolveStorageDriveBucketName`, so no CDK cross-stack ref is created.
-      foreignArns: getForeignConfigs(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+      foreignArns: qpqCoreUtils.getForeignItems(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
         const bucketArn = `arn:aws:s3:::${awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner)}`;
 
         return [bucketArn, `${bucketArn}/*`];
