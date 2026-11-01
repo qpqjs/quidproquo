@@ -1,4 +1,4 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_iam, aws_kms, aws_ssm } from 'aws-cdk-lib';
@@ -190,11 +190,12 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       // is imported, not created here, so it only matches if whoever created it applied the same tags.
       ownedResourceArns: [`arn:aws:dynamodb:${region}:${accountId}:table/*`, `arn:aws:dynamodb:${region}:${accountId}:table/*/index/*`],
       ownedByTag: true,
-      // The same naming path as `getKvsDynamoTableNameFromConfig`, so no CDK cross-stack ref is created.
+      // The same naming path as `getKvsDynamoTableNameFromConfig`, so no CDK cross-stack ref is created. The runtime
+      // reaches a foreign store in this deployment's own region and account (the name carries the owner's module only),
+      // so the grant targets that table, not wherever the owner's full service account info would resolve to.
       foreignArns: getForeignConfigs(qpqCoreUtils.getAllKeyValueStoreConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
         const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
-        const owner = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
-        const tableArn = `arn:aws:dynamodb:${owner.awsRegion}:${owner.awsAccountId}:table/${tableName}`;
+        const tableArn = `arn:aws:dynamodb:${region}:${accountId}:table/${tableName}`;
 
         return [tableArn, `${tableArn}/index/*`];
       }),
