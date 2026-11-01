@@ -50,7 +50,6 @@ The web entry's name and `uniqueKey`. This is the name you pass to [askWebEntryI
 | `compressFiles` | `boolean` | `true` | Whether the CDN compresses responses (gzip/brotli). |
 | `securityHeaders` | `ResponseSecurityHeaders` | – | Security-related HTTP response headers (CSP, HSTS, frame options, etc.) attached via a CDN response-headers policy — see [ResponseSecurityHeaders](#responsesecurityheaders). |
 | `corsAllowedOrigins` | `string[]` | service's own domain | Browser origins allowed to cross-origin `fetch` this web entry's static assets. Omit to scope to this service's own domain (`https://<domain>` and `https://*.<domain>`); pass `['*']` to allow any origin (e.g. serving assets as a public CDN or cross-origin fonts). |
-| `cloudflareApiKeySecretName` | `string` | – | Name of a [secret](../core/secret.md) holding a Cloudflare API key, for setups whose DNS is managed through Cloudflare rather than Route 53. |
 | `deprecated` | `boolean` | `false` | Standard advanced-settings flag marking the entry as deprecated. |
 
 ### `WebDomainOptions`
