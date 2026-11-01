@@ -14,6 +14,7 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
+  Nullable,
   QPQBinaryData,
   UserDirectoryActionType,
 } from '@qpqjs/core';
@@ -219,7 +220,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       // The registered definition's fold and validator, as an app would register them: the state counts the
       // events folded so far, and the validator refuses REJECTED_EVENT_TYPE.
       if (action.payload.functionName === 'foldDocumentState') {
-        const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], { count: number } | undefined];
+        const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], Nullable<{ count: number }>];
         foldCalls.push(folded);
         // An event marked unfoldable stands in for a schema version this definition cannot read.
         if (folded.some((candidate) => (candidate.payload.data as { unfoldable?: boolean })?.unfoldable)) {
