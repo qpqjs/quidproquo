@@ -17,7 +17,7 @@ You usually pair it with [`@qpqjs/deploy-aws`](https://www.npmjs.com/package/@qp
 | Setting | For |
 | --- | --- |
 | `defineAwsServiceAccountInfo` | Which account and region a service deploys into |
-| `defineAwsDyanmoOverrideForKvs` | DynamoDB specifics for a key value store: indexes, capacity, streams |
+| `defineAwsDynamoOverrideForKvs` | DynamoDB specifics for a key value store: indexes, capacity, streams |
 | `defineAwsDataStoreRemovalPolicy` | Whether data stores survive a stack delete |
 | `defineAwsVirtualNetworkSettings` | VPC placement |
 | `defineAwsAlarm`, `defineAwsServiceDashboard` | CloudWatch alarms and dashboards |
