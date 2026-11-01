@@ -162,16 +162,18 @@ const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws
 };
 
 /**
- * The baseline headers always apply; a content security policy is only added when the app declares
- * `securityHeaders`, because the default `'self'` policy would break a shell that loads views from
- * another host.
+ * The baseline headers always apply; a content security policy is only added when the app declares one,
+ * because a `'self'` policy would break a shell that loads views from another host. Setting any other
+ * security header never implies a policy.
  */
 export const convertSecurityHeadersFromQpqSecurityHeaders = (
   qpqConfig: QPQConfig,
   securityHeaders?: ResponseSecurityHeaders,
 ): aws_cloudfront.ResponseSecurityHeadersBehavior => {
   return {
-    contentSecurityPolicy: securityHeaders ? convertContentSecurityPolicy(qpqConfig, securityHeaders.contentSecurityPolicy) : undefined,
+    contentSecurityPolicy: securityHeaders?.contentSecurityPolicy
+      ? convertContentSecurityPolicy(qpqConfig, securityHeaders.contentSecurityPolicy)
+      : undefined,
     contentTypeOptions: convertContentTypeOptions(securityHeaders?.contentTypeOptions),
     frameOptions: convertFrameOptions(securityHeaders?.frameOptions),
     referrerPolicy: convertReferrerPolicy(securityHeaders?.referrerPolicy),
