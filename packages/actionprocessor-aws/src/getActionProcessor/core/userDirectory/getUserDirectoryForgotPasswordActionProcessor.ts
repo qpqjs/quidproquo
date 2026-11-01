@@ -14,7 +14,7 @@ import {
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
-import { maskDeliveryDestination } from '../../../logic/cognito/utils/maskDeliveryDestination';
+import { maskDeliveryDestination } from '../../../logic/cognito/utils';
 
 const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryForgotPassword> => {
   return async ({ username, userDirectoryName }) => {

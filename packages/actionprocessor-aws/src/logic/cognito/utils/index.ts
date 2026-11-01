@@ -6,5 +6,6 @@ export * from './cognitoChallengeNameTypeToQpqAuthenticateUserChallenge';
 export * from './cognitoCodeDeliveryDetailsToQpqDeliveryDetails';
 export * from './CognitoUserAttribute';
 export * from './getValidCognitoUserAttributes';
+export * from './maskDeliveryDestination';
 export * from './pageKeyToPaginationToken';
 export * from './paginationTokenToPageKey';
