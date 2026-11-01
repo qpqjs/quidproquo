@@ -1,6 +1,6 @@
 import { generateUuid, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { getOrSeedJsonFileStoreValue, readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 import { resolveOwnedStoreLocation } from './resolveOwnedStoreLocation';
 
 // Offline stand-in for SSM Parameter Store / Secrets Manager. Values live in
@@ -54,32 +54,12 @@ export const writeConfigStoreValue = async (
   await writeJsonFileStore(runtimePath, storeDirectory, serviceName, { ...values, [key]: value });
 };
 
-const getOrSeedConfigStoreValue = async (
-  runtimePath: string,
-  storeDirectory: ConfigStoreDirectory,
-  serviceName: string,
-  key: string,
-  buildSeedValue: () => string,
-): Promise<string> => {
-  const values = await readConfigStoreFile(runtimePath, storeDirectory, serviceName);
-
-  const existing = values[key];
-  if (existing !== undefined) {
-    return existing;
-  }
-
-  const seededValue = buildSeedValue();
-  await writeConfigStoreValue(runtimePath, storeDirectory, serviceName, key, seededValue);
-
-  return seededValue;
-};
-
 // First read seeds the file with the parameter's config default so every
 // available parameter becomes visible and editable on disk.
 export const getOrSeedParameterValue = async (runtimePath: string, parameterName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveParameterStorageLocation(parameterName, qpqConfig);
 
-  return getOrSeedConfigStoreValue(
+  return getOrSeedJsonFileStoreValue(
     runtimePath,
     ConfigStoreDirectory.parameters,
     serviceName,
@@ -99,5 +79,5 @@ export const setParameterValue = async (runtimePath: string, parameterName: stri
 export const getOrSeedSecretValue = async (runtimePath: string, secretName: string, qpqConfig: QPQConfig): Promise<string> => {
   const { serviceName, key } = resolveSecretStorageLocation(secretName, qpqConfig);
 
-  return getOrSeedConfigStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => generateUuid());
+  return getOrSeedJsonFileStoreValue(runtimePath, ConfigStoreDirectory.secrets, serviceName, key, () => generateUuid());
 };

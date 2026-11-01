@@ -3,7 +3,7 @@ import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 import { randomBytes } from 'crypto';
 
 import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
-import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { getOrSeedJsonFileStoreValue } from '../jsonFileStore';
 
 // Offline stand-in for a KMS CMK: a 32-byte master key per configured crypto
 // key, seeded on first use. Same file layout as the parameter/secret stores:
@@ -20,15 +20,9 @@ export const getOrSeedCryptoMasterKey = async (runtimePath: string, cryptoKeyNam
 
   const { serviceName, key } = resolveOwnedStoreLocation(cryptoKeyName, cryptoKeyConfig.owner, qpqConfig);
 
-  const keys = await readJsonFileStore<string>(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName);
+  const masterKey = await getOrSeedJsonFileStoreValue(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName, key, () =>
+    randomBytes(32).toString('base64'),
+  );
 
-  const existing = keys[key];
-  if (existing !== undefined) {
-    return Buffer.from(existing, 'base64');
-  }
-
-  const masterKey = randomBytes(32);
-  await writeJsonFileStore(runtimePath, CRYPTO_KEYS_STORE_DIRECTORY, serviceName, { ...keys, [key]: masterKey.toString('base64') });
-
-  return masterKey;
+  return Buffer.from(masterKey, 'base64');
 };
