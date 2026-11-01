@@ -234,9 +234,10 @@ export function YieldLoop() {
   }, []);
 
   const { step, phase, completed } = view;
+  // `step` only ever advances within STEPS, but an indexed read is `T | undefined` under noUncheckedIndexedAccess.
   const active = STEPS[step];
   const returning = phase === Phase.back;
-  const hubMessage = phase === Phase.done ? 'story complete' : returning ? `⟵ ${active.result}` : `${active.action} ⟶`;
+  const hubMessage = phase === Phase.done || !active ? 'story complete' : returning ? `⟵ ${active.result}` : `${active.action} ⟶`;
 
   return (
     <section className="section" id="loop">
@@ -292,7 +293,7 @@ export function YieldLoop() {
                     >
                       {line}
                     </span>
-                    {isDone && stepIndex !== -1 && <span className="loop-line__result">⟵ {STEPS[stepIndex].result}</span>}
+                    {isDone && stepIndex !== -1 && <span className="loop-line__result">⟵ {STEPS[stepIndex]?.result}</span>}
                   </span>
                 );
               })}
