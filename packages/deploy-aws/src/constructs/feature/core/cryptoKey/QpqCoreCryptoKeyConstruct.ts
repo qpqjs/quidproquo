@@ -1,11 +1,11 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { CryptoKeyQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
 import { aws_iam, aws_kms } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsUtils from '../../../../utils';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
@@ -49,7 +49,7 @@ export class QpqCoreCryptoKeyConstruct extends QpqConstructBlock implements QpqR
 
       // Follows the data-store removal policy: a retained store is unreadable without the
       // key that encrypts or signs for it. DESTROY still goes through KMS's waiting period.
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
     });
 
     qpqDeployAwsUtils.applyEnvironmentTags(this.key, props.qpqConfig);

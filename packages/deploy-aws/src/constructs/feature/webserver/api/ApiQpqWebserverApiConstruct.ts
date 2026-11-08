@@ -2,11 +2,11 @@ import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import { qpqCoreUtils } from '@qpqjs/core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from '@qpqjs/webserver';
 
-import { aws_apigateway, aws_cloudwatch, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
+import { aws_apigateway, aws_cloudwatch, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { applyEnvironmentTags, resolveLogRetention } from '../../../../utils';
+import { applyEnvironmentTags, associateRegionalWebAcl, resolveLogRetention } from '../../../../utils';
 import { domainScopedId, resolveDeployHostForRoot } from '../../../../utils/domain';
 import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -114,17 +114,8 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       }
     }
 
-    // Attach the shared REGIONAL web acl (created by the bootstrap phase's defineBootstrapWaf,
-    // arn published to SSM) - one association per service api stage, resolved at deploy time
-    if (qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)) {
-      new aws_wafv2.CfnWebACLAssociation(this, 'waf-association', {
-        resourceArn: api.deploymentStage.stageArn,
-        webAclArn: aws_ssm.StringParameter.valueForStringParameter(
-          this,
-          qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('regional', props.qpqConfig),
-        ),
-      });
-    }
+    // One association per service api stage with the shared regional web acl.
+    associateRegionalWebAcl(this, api.deploymentStage.stageArn, props.qpqConfig);
 
     // Mounted under the service name on the api's custom domain of every root.
     for (const rootDomain of qpqWebServerUtils.getRootDomains(props.qpqConfig)) {

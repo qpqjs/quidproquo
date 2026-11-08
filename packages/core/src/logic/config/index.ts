@@ -7,6 +7,7 @@ export * from './getApplicationModuleName';
 export * from './getApplicationName';
 export * from './getConfigSetting';
 export * from './getConfigSettings';
+export * from './getForeignItems';
 export * from './getOwnedItems';
 export * from './resolveOwnedResourceLocalName';
 export * from './resolveOwnerDeploymentContext';

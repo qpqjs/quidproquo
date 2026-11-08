@@ -14,6 +14,7 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
+  Nullable,
   QPQBinaryData,
   UserDirectoryActionType,
 } from '@qpqjs/core';
@@ -26,16 +27,15 @@ import { eventDocEventsStoreName, eventDocFunctionsName, eventDocStorageDriveNam
 import { eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode, EventDocSummary } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
+import { eventDocTransferDiscardedPath, eventDocTransferImportPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import {
   EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL,
   EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
-  EVENT_DOC_TRANSFER_DRIVE_NAME,
   EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_TRANSFER_SERVICE_GLOBAL,
-  eventDocTransferDiscardedPath,
-  eventDocTransferImportPath,
-} from '../constants';
-import { EventDocBundle, EventDocTransferStatus } from '../models';
+} from '../constants/eventDocTransferGlobalNames';
+import { EventDocBundle, EventDocDocRef, EventDocTransferStatus } from '../models';
 import { exportBundle } from '../routes/controllers/exportBundle';
 import { importBundle } from '../routes/controllers/importBundle';
 import { manifest } from '../routes/controllers/manifest';
@@ -135,6 +135,10 @@ type TestEnvironment = {
   seedDoc: (type: string, events: EventDocEvent[], assets?: { guid: string; data: QPQBinaryData }[]) => void;
   // Every call the transfer made to the collection authoriser (only when the environment declares one).
   authoriseCalls: AuthoriseCall[];
+  // Authoriser calls and row deletes in the order they happened, for tests that care about sequence.
+  callLog: string[];
+  // Every run of the registered fold, with the events it was given, for tests that care what state the tail was checked against.
+  foldCalls: EventDocEvent[][];
   // Actions the authoriser refuses with Forbidden.
   forbidActions: Set<string>;
 };
@@ -148,6 +152,8 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
   const tables: Record<string, Record<string, unknown>[]> = {};
   const files: Record<string, unknown> = {};
   const authoriseCalls: AuthoriseCall[] = [];
+  const callLog: string[] = [];
+  const foldCalls: EventDocEvent[][] = [];
   const forbidActions = new Set<string>();
 
   let guidCounter = 0;
@@ -213,7 +219,12 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       // The registered definition's fold and validator, as an app would register them: the state counts the
       // events folded so far, and the validator refuses REJECTED_EVENT_TYPE.
       if (action.payload.functionName === 'foldDocumentState') {
-        const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], { count: number } | undefined];
+        const [folded, seed] = action.payload.args as unknown as [EventDocEvent[], Nullable<{ count: number }>];
+        foldCalls.push(folded);
+        // An event marked unfoldable stands in for a schema version this definition cannot read.
+        if (folded.some((candidate) => (candidate.payload.data as { unfoldable?: boolean })?.unfoldable)) {
+          return throwsError(ErrorTypeEnum.GenericError, 'unknown event schema');
+        }
         return { count: (seed?.count ?? 0) + folded.length };
       }
 
@@ -233,6 +244,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
     // actions the test marks as forbidden.
     [InlineFunctionActionType.Execute]: (action: { payload: AuthoriseCall }) => {
       authoriseCalls.push(action.payload);
+      callLog.push(`authorise:${action.payload.payload.action}`);
 
       return forbidActions.has(action.payload.payload.action)
         ? throwsError(ErrorTypeEnum.Forbidden, `Missing permission: eventDoc:${action.payload.payload.storeName}:${action.payload.payload.action}`)
@@ -265,6 +277,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
 
     [KeyValueStoreActionType.Delete]: (action: { payload: { keyValueStoreName: string; key: unknown; sortKey?: unknown } }) => {
       const { keyValueStoreName, key, sortKey } = action.payload;
+      callLog.push(`kvs:delete:${keyValueStoreName}`);
       const table = tableFor(keyValueStoreName);
 
       const index = table.findIndex((row) => (sortKey === undefined ? row.id === key : row.pk === key && row.sk === sortKey));
@@ -336,7 +349,7 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       `https://${environmentName}.example.com/upload/${action.payload.drive}/${action.payload.filepath}`,
   };
 
-  return { tables, files, mocks, seedDoc, authoriseCalls, forbidActions };
+  return { tables, files, mocks, seedDoc, authoriseCalls, callLog, foldCalls, forbidActions };
 };
 
 const httpEvent = (body: unknown): HTTPEvent => ({
@@ -651,6 +664,47 @@ describe('eventDoc transfer round trip', () => {
     expect(divergedApply.find((row: { id: string }) => row.id === 'template-1').eventsWritten).toBe(0);
   });
 
+  // Security regression: the fast-forward match is by event identity, so a bundle can carry the shared prefix with its
+  // data changed. The tail must be validated against the state the target's own stored prefix folds to, never the
+  // bundle's copy, or a crafted tail could land an event the real document's fold cannot read.
+  it('validates a fast-forward tail against the stored prefix, not the bundle copy of it', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const firstKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const firstUpload = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(firstUpload.transferId)}`] = source.files[firstKey];
+    runStory(importBundle(httpEvent({ transferId: firstUpload.transferId })), target.mocks);
+
+    // The source appends one event, then the bundle is tampered: event 2 keeps its identity but its data changes.
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({
+      pk: 'template-1',
+      sk: eventId(4),
+      data: event(4, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content')),
+    });
+    delete source.files[firstKey];
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const secondKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const tampered = JSON.parse(JSON.stringify(source.files[secondKey])) as EventDocBundle;
+    const tamperedDoc = tampered.docs.find((doc) => doc.id === 'template-1')!;
+    tamperedDoc.events[2] = { ...tamperedDoc.events[2]!, payload: { ...tamperedDoc.events[2]!.payload, data: { tampered: true } } };
+
+    const secondUpload = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(secondUpload.transferId)}`] = tampered;
+    target.foldCalls.length = 0;
+
+    const applied = JSON.parse(runStory(importBundle(httpEvent({ transferId: secondUpload.transferId })), target.mocks).body!);
+    expect(applied.find((row: { id: string }) => row.id === 'template-1').status).toBe(EventDocTransferStatus.FastForward);
+
+    // The seed fold ran over the four stored events, carrying the target's data for event 2, not the tampered copy.
+    const seedFold = target.foldCalls.find((folded) => folded.length === 4)!;
+    expect(seedFold).toBeDefined();
+    expect(seedFold[2]!.payload.data).not.toEqual({ tampered: true });
+    expect(seedFold[2]!.payload.data).toEqual(eventsFor(target, TEMPLATE_TYPE, 'template-1')[2]!.payload.data);
+  });
+
   it('blocks a code collision on a different doc id', () => {
     const source = buildEnvironment('dev');
     const target = buildEnvironment('uat');
@@ -741,6 +795,66 @@ describe('eventDoc transfer round trip', () => {
     expect(discarded.events.map((discardedEvent) => discardedEvent.payload.metadata.eventId)).toEqual([eventId(2), eventId(3)]);
   });
 
+  // Security regression: a forced overwrite cuts the target's tail, so the bundle's tail must pass the gate before the
+  // cut. Otherwise a rejected bundle would leave the log short, its summary pointing at deleted events, and nothing written.
+  it('refuses a forced overwrite whose tail the validator rejects without touching the target log', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const upload1 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload1.transferId)}`] = source.files[exportedKey];
+    runStory(importBundle(httpEvent({ transferId: upload1.transferId })), target.mocks);
+
+    // The target edits event 3 directly (its own identity), so the logs diverge there.
+    const targetEvents = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!;
+    targetEvents.splice(
+      targetEvents.findIndex((row) => row.pk === 'template-1' && row.sk === eventId(3)),
+      1,
+    );
+    targetEvents.push({
+      pk: 'template-1',
+      sk: eventId(3),
+      data: {
+        type: 'ADD_STYLE_LINK',
+        payload: {
+          data: link(STYLE_TYPE, 'style-shared'),
+          metadata: {
+            version: 1,
+            clientMessageId: 'target-edit-3',
+            createdBy: { userId: 'uat-user', userDisplayName: 'UAT User' },
+            createdAt: '2026-07-25T10:00:03.000Z',
+            eventId: eventId(3),
+          },
+        },
+      },
+    });
+    const before = JSON.parse(JSON.stringify(eventsFor(target, TEMPLATE_TYPE, 'template-1')));
+    const summaryBefore = JSON.parse(JSON.stringify(summaryFor(target, TEMPLATE_TYPE, 'template-1')));
+
+    // The source's next export carries an event the target's validator rejects.
+    source.tables[eventDocEventsStoreName(TEMPLATES_STORE)]!.push({ pk: 'template-1', sk: eventId(4), data: event(4, REJECTED_EVENT_TYPE, {}) });
+    delete source.files[exportedKey];
+    runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
+    const secondKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
+    const upload2 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
+    target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload2.transferId)}`] = source.files[secondKey];
+
+    const forced = JSON.parse(runStory(importBundle(httpEvent({ transferId: upload2.transferId, force: true })), target.mocks).body!);
+    const forcedRow = forced.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(forcedRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(forcedRow.detail).toMatch(/BAD_EVENT is not allowed/);
+    expect(forcedRow.discardedEvents).toBe(0);
+    expect(forcedRow.eventsWritten).toBe(0);
+
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(before);
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(summaryBefore);
+    expect(target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferDiscardedPath(upload2.transferId, 'template-1')}`]).toBeUndefined();
+  });
+
   it('blocks a rename that would collide with a sibling, not just a new doc', () => {
     // The case a new-docs-only code check misses: this doc ALREADY exists in the target and
     // fast-forwards cleanly, but the incoming tail renames it onto a code a sibling holds. Letting it
@@ -805,7 +919,7 @@ describe('eventDoc transfer round trip', () => {
 });
 
 // Stages the source's exported bundle into the target as an upload and returns the transfer id.
-const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: EventDocDocRefLike[]): string => {
+const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: EventDocDocRef[]): string => {
   const exportResult = runStory(exportBundle(httpEvent({ docs })), source.mocks);
   expect(exportResult.status).toBe(200);
   const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;
@@ -816,8 +930,6 @@ const stageBundle = (source: TestEnvironment, target: TestEnvironment, docs: Eve
 
   return uploadTarget.transferId;
 };
-
-type EventDocDocRefLike = { service: string; type: string; id: string };
 
 // Security regression: an uploaded bundle is whatever the uploader says it is, so its tail goes through the same
 // validator and fold the append gate runs; a rejected event never reaches a document log.
@@ -830,9 +942,57 @@ describe('eventDoc transfer import validation', () => {
 
     const transferId = stageBundle(source, target, [templateRef]);
 
-    expect(() => runStory(importBundle(httpEvent({ transferId })), target.mocks)).toThrow(/BAD_EVENT is not allowed/);
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/BAD_EVENT is not allowed/);
+    expect(templateRow.eventsWritten).toBe(0);
     expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+    // The rest of the bundle still lands: one rejected doc does not veto the others.
+    expect(rows.find((row: { id: string }) => row.id === 'content-1').status).toBe(EventDocTransferStatus.New);
+    expect(eventsFor(target, CONTENT_TYPE, 'content-1').length).toBeGreaterThan(0);
+  });
+
+  it('refuses a new doc whose bundle log does not open with INIT_STATE and writes nothing for it', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const staged = target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(transferId)}`] as EventDocBundle;
+    const templateDoc = staged.docs.find((doc) => doc.id === 'template-1')!;
+    templateDoc.events[0] = { ...templateDoc.events[0]!, type: 'SET_NAME' };
+
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/must open with INIT_STATE/);
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1')).toBeUndefined();
+  });
+
+  it('refuses a new doc whose opening event the fold cannot read, as Invalid', () => {
+    const source = buildEnvironment('dev');
+    const target = buildEnvironment('uat');
+    seedDiamond(source);
+
+    const transferId = stageBundle(source, target, [templateRef]);
+    const staged = target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(transferId)}`] as EventDocBundle;
+    const templateDoc = staged.docs.find((doc) => doc.id === 'template-1')!;
+    templateDoc.events[0] = {
+      ...templateDoc.events[0]!,
+      payload: { ...templateDoc.events[0]!.payload, data: { ...(templateDoc.events[0]!.payload.data as object), unfoldable: true } },
+    };
+
+    const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId })), target.mocks).body!);
+    const templateRow = rows.find((row: { id: string }) => row.id === 'template-1');
+
+    expect(templateRow.status).toBe(EventDocTransferStatus.Rejected);
+    expect(templateRow.detail).toMatch(/opening event the document fold cannot read/);
+    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual([]);
   });
 
   it('still imports a valid log through the validator', () => {
@@ -899,5 +1059,11 @@ describe('eventDoc transfer authorise', () => {
 
     expect(rows.find((row: { id: string }) => row.id === 'template-1').status).toBe(EventDocTransferStatus.Overwritten);
     expect(target.authoriseCalls.map((call) => call.payload)).toContainEqual({ storeName: TEMPLATES_STORE, action: 'delete' });
+
+    // The authorisation must come before the first event row is cut, not merely appear somewhere in the run.
+    const deleteAuthorisedAt = target.callLog.indexOf('authorise:delete');
+    const firstRowDeleteAt = target.callLog.indexOf(`kvs:delete:${eventDocEventsStoreName(TEMPLATES_STORE)}`);
+    expect(deleteAuthorisedAt).toBeGreaterThanOrEqual(0);
+    expect(firstRowDeleteAt).toBeGreaterThan(deleteAuthorisedAt);
   });
 });

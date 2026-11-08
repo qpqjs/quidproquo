@@ -21,9 +21,18 @@ describe('convertSecurityHeadersFromQpqSecurityHeaders', () => {
     expect(behaviour.referrerPolicy?.referrerPolicy).toBe('strict-origin-when-cross-origin');
   });
 
-  it('defaults the csp to self when security headers are configured without one', () => {
-    const behaviour = convertSecurityHeadersFromQpqSecurityHeaders(qpqConfig, {});
+  it('adds no csp when other security headers are configured without one', () => {
+    const behaviour = convertSecurityHeadersFromQpqSecurityHeaders(qpqConfig, { contentTypeOptions: { override: false } });
 
-    expect(behaviour.contentSecurityPolicy?.contentSecurityPolicy).toBe("default-src 'self'; object-src 'none'");
+    expect(behaviour.contentSecurityPolicy).toBeUndefined();
+    expect(behaviour.contentTypeOptions?.override).toBe(false);
+  });
+
+  it('adds the csp when one is configured', () => {
+    const behaviour = convertSecurityHeadersFromQpqSecurityHeaders(qpqConfig, {
+      contentSecurityPolicy: { override: true, contentSecurityPolicy: { 'default-src': ["'self'"] } },
+    });
+
+    expect(behaviour.contentSecurityPolicy?.contentSecurityPolicy).toContain("default-src 'self'");
   });
 });

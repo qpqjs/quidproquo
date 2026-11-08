@@ -2,16 +2,15 @@ import { askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable
 import { HTTPEvent } from '@qpqjs/webserver';
 
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
-import { EventDocAuthoriseInput } from '../types/EventDocAuthoriseInput';
+import { askEventDocAuthorise } from '../logic/askEventDocAuthorise';
 import { EventDocPermissionAction } from '../types/EventDocPermissionAction';
 
 // The collection's authoriser runs inside the resolved scope, so it can read the active tenant. A story that names
 // no action (a custom route deciding its own authority) skips it.
 function* askAuthoriseThenRun<T>(event: HTTPEvent, story: AskResponse<T>, action?: EventDocPermissionAction): AskResponse<T> {
-  const { authorise, storeName } = yield* askEventDocStoreRead();
-
-  if (authorise && action) {
-    yield* askInlineFunctionExecute<void, EventDocAuthoriseInput>(authorise, { event, storeName, action });
+  if (action) {
+    const store = yield* askEventDocStoreRead();
+    yield* askEventDocAuthorise(store, action, event);
   }
 
   return yield* story;

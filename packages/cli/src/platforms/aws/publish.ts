@@ -2,7 +2,7 @@
 // module-federation remote and publish it into that service's federated code
 // bucket (see ./remote for the three-phase mechanics).
 import { CliError } from '../../lib/CliError';
-import { createOutput } from '../../lib/out';
+import { createOutput } from '../../lib/createOutput';
 import { isAwsCredentialsValid } from './awsCredentials';
 import { buildRemote, deployRemoteManifest, resolvePublishTarget, uploadRemoteVersion } from './remote';
 

@@ -5,7 +5,6 @@ import {
   askAiPromptStream,
   askConfigGetGlobal,
   AskResponse,
-  AskResponseReturnType,
   type Nullable,
 } from '@qpqjs/core';
 
@@ -21,14 +20,7 @@ import type { EventDocAiChatMessage } from '../models';
 import { chatMessagesToAiMessages } from '../module';
 import { askEventDocAiSystemPromptResolve } from './askEventDocAiSystemPromptResolve';
 import { askEventDocAiTurnContextResolve } from './askEventDocAiTurnContextResolve';
-
-export type EventDocAiStreamHandle = AskResponseReturnType<ReturnType<typeof askAiPromptStream>>;
-
-export type EventDocAiPromptStream = {
-  streamHandle: EventDocAiStreamHandle;
-  // The model the turn ran on, recorded on the saved reply.
-  model: AiModel;
-};
+import type { EventDocAiPromptStream } from './EventDocAiPromptStream';
 
 // Gathers everything one model call needs (the configured model and limits, the system
 // prompt, the turn context, the history as model messages) and opens the stream.

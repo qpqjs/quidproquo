@@ -38,7 +38,7 @@ function* askConfigListParameters(): AskResponse<string[]>;
 
 | Error | Meaning |
 | --- | --- |
-| `ConfigListParametersErrorTypeEnum.Throttling` | The request rate exceeded the provider's limit; back off and retry. |
+| `ConfigListParametersErrorTypeEnum.Throttled` | The request rate exceeded the provider's limit; back off and retry. |
 
 ## Related
 

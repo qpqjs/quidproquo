@@ -3,8 +3,8 @@ import os from 'os';
 import path from 'path';
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { promptSelect } from './prompts';
 import { CliError } from './CliError';
+import { promptSelect } from './prompts';
 import { resolveDeployment } from './resolveDeployment';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-cli-deployment-'));

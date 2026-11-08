@@ -16,8 +16,8 @@ describe('getLog', () => {
       [KeyValueStoreActionType.Query]: { items: [log] },
     });
 
-    expect((response as any).status).toBe(200);
-    expect(JSON.parse((response as any).body!)).toEqual(log);
+    expect(response.status).toBe(200);
+    expect(JSON.parse(response.body!)).toEqual(log);
   });
 
   it('throws a NotFound error when the log is missing', () => {

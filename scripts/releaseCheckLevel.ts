@@ -21,7 +21,7 @@ const countBreakingChanges = (): number => {
 const main = () => {
   const level = process.argv[2];
 
-  if (!LEVELS.includes(level)) {
+  if (!level || !LEVELS.includes(level)) {
     console.error(`Expected a release level (${LEVELS.join(', ')}), got: ${level ?? 'nothing'}`);
     process.exit(1);
   }

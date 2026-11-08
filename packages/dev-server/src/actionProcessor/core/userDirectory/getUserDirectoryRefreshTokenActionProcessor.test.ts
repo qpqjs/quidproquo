@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
 import { createDevJwt } from '../../../logic/auth/devAuth';
-import { signDevJwt } from '../../../logic/auth/devJwt';
+import { signDevJwt } from '../../../logic/auth/signDevJwt';
 import { getUserDirectoryRefreshTokenActionProcessor } from './getUserDirectoryRefreshTokenActionProcessor';
 
 const { userStore } = vi.hoisted(() => ({
@@ -53,6 +53,21 @@ describe('getUserDirectoryRefreshTokenActionProcessor', () => {
 
     expect(userStore.getDevUserByUserId).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'user-1');
     expect(userStore.upsertDevUser).toHaveBeenCalledWith('/tmp/runtime', resolvedDirectory, 'joe@example.com');
+  });
+
+  // Security regression: a refresh token past its expiry mints nothing, as Cognito answers NotAuthorized; only the
+  // signature was checked before, so an expired token kept working for as long as the directory's secret lived.
+  it('refuses an expired refresh token', async () => {
+    const process = await getProcessor();
+
+    const [, error] = await invokeProcessor(process!, {
+      userDirectoryName: 'directory',
+      refreshToken: createDevJwt('test-secret', resolvedDirectory, 'joe@example.com', -60),
+    });
+
+    expect(error?.errorType).toBe(ErrorTypeEnum.Unauthorized);
+    expect(error?.errorText).toMatch(/expired/);
+    expect(userStore.upsertDevUser).not.toHaveBeenCalled();
   });
 
   // Security regression: a refresh token the directory did not sign mints nothing.

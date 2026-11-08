@@ -3,18 +3,20 @@
 // resolution cannot resolve. The import() type syntax keeps it a script.
 type GeneratorTestSequence = import('./types').GeneratorTestSequence;
 
-// Extend Vitest's expect with custom matchers for generators.
-// An interface (not a type) because it participates in declaration merging
-// with vitest's Assertion/AsymmetricMatchersContaining below.
+// The custom generator matchers added to Vitest's expect.
 type CustomMatchers<R = unknown> = {
   toYieldValue(expected: any): R;
   toCompleteWith(expected: any): R;
   toYieldSequence(sequence: GeneratorTestSequence): R;
 };
 
+// Interfaces, not types: vitest declares Assertion and AsymmetricMatchersContaining as interfaces, and only an
+// interface merges with them (G5 keeps `interface` for exactly this case).
 declare module 'vitest' {
-  type Assertion<T = any> = {} & CustomMatchers<T>;
-  type AsymmetricMatchersContaining = {} & CustomMatchers;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface Assertion<T = any> extends CustomMatchers<T> {}
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
 // Only register matchers if expect is available

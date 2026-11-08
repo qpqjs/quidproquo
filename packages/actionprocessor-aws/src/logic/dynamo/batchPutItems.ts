@@ -1,4 +1,4 @@
-import { KvsObjectDataType } from '@qpqjs/core';
+import { KvsObjectDataType, sleep } from '@qpqjs/core';
 
 import { BatchWriteItemCommand, DynamoDBClient, WriteRequest } from '@aws-sdk/client-dynamodb';
 
@@ -25,8 +25,6 @@ export class BatchWriteUnprocessedItemsError extends Error {
   }
 }
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 // Unconditional batched puts. No ConditionExpression exists on BatchWriteItem,
 // so unlike putItem there is no ifNotExists, callers must only batch items
 // whose keys are unique by construction (see askKeyValueStoreUpsertMany).
@@ -44,7 +42,7 @@ export async function batchPutItems(tableName: string, items: KvsObjectDataType[
       }
 
       if (attempt > 0) {
-        await delay(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1));
+        await sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1));
       }
 
       const response = await dynamoDBClient.send(

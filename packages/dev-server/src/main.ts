@@ -10,10 +10,6 @@ import { awaitDevServerIdle, installDevServerShutdownHandlers, markDevServerRead
 import { apiPlugin, DEV_SERVER_PLUGINS, DevServerPlugin, MIGRATION_DEV_SERVER_PLUGINS, startDevServerPlugins } from './plugins';
 import { DevServerConfig, DevServerConfigOverrides, ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from './types';
 
-export * from './implementations';
-export * from './logic/inFlight';
-export * from './plugins';
-
 export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?: DevServerConfigOverrides): QPQConfig[] => {
   return qpqConfigs.map((qpqConfig) => {
     return [

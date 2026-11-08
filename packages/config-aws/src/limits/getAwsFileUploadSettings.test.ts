@@ -3,7 +3,7 @@ import { defineFileUploadSettings } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { API_GATEWAY_MAX_PAYLOAD_BYTES } from './awsLimits';
+import { API_GATEWAY_MAX_PAYLOAD_BYTES } from '../constants';
 import { getAwsFileUploadSettings } from './getAwsFileUploadSettings';
 
 describe('getAwsFileUploadSettings', () => {

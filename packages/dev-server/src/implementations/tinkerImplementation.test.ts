@@ -38,14 +38,23 @@ const buildDevServerConfig = (): any => ({
   runtimePath: '/tmp/qpq-tinker-test-runtime',
 });
 
-const shippedRuntimePackages = ['core', 'webserver', 'actionprocessor-aws', 'actionprocessor-node', 'actionprocessor-js', 'deploy-aws'];
+// Developer tooling that runs the dev server on purpose. Every other package in the repo must not depend on it.
+const devToolingPackages = ['dev-server', 'cli', 'deploy-rspack'];
+const packagesRoot = path.resolve(__dirname, '../../..');
+const shippedPackages = fs
+  .readdirSync(packagesRoot)
+  .filter((packageName) => !devToolingPackages.includes(packageName) && fs.existsSync(path.join(packagesRoot, packageName, 'package.json')));
 
 describe('createTinkerInterface', () => {
   beforeEach(() => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
-  afterEach(() => vi.restoreAllMocks());
+  // restoreAllMocks only restores spies; the repl.start mock keeps its call history across tests unless it is cleared.
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+  });
 
   it('defaults the current service to the first service when no initial service is given', () => {
     const tinker = createTinkerInterface(buildDevServerConfig());
@@ -147,10 +156,13 @@ describe('createTinkerInterface', () => {
   });
 
   // Security regression: tinker ships only in the dev server; no runtime or deploy package depends on it, so a deployed
-  // lambda can never carry the REPL.
-  it('is not a dependency of any shipped runtime package', () => {
-    for (const packageName of shippedRuntimePackages) {
-      const packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../../${packageName}/package.json`), 'utf8'));
+  // lambda can never carry the REPL. Every package outside the developer tooling is checked so a new one cannot slip by.
+  it('is not a dependency of any shipped package', () => {
+    expect(shippedPackages).toContain('core');
+    expect(shippedPackages).toContain('features');
+
+    for (const packageName of shippedPackages) {
+      const packageJson = JSON.parse(fs.readFileSync(path.join(packagesRoot, packageName, 'package.json'), 'utf8'));
       const dependencies = Object.keys({ ...packageJson.dependencies, ...packageJson.peerDependencies });
 
       expect(dependencies, packageName).not.toContain('@qpqjs/dev-server');

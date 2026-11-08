@@ -44,9 +44,12 @@ describe('QpqCoreStorageDriveConstruct lockedDown', () => {
     const template = synth(defineStorageDrive('logs', { lockedDown: true }));
     const policies = template.findResources('AWS::S3::BucketPolicy');
     const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+    // The plain-http deny covers s3:* on purpose, but only when the request is not over tls. Every other deny must
+    // stay limited to object reads.
+    const isPlainHttpDeny = (statement: any) => statement.Condition?.Bool?.['aws:SecureTransport'] === 'false';
     const denied = statements
-      .filter((statement: any) => statement.Effect === 'Deny' && statement.Sid === 'DenyObjectReadExceptServiceRole')
-      .flatMap((statement: any) => statement.Action);
+      .filter((statement: any) => statement.Effect === 'Deny' && !isPlainHttpDeny(statement))
+      .flatMap((statement: any) => [statement.Action].flat());
 
     expect(denied).toEqual(['s3:GetObject', 's3:GetObjectVersion']);
   });
@@ -127,6 +130,25 @@ describe('QpqCoreStorageDriveConstruct lifecycle rules', () => {
           Match.objectLike({ Prefix: 'tmp/', Status: 'Disabled', ExpirationInDays: 7 }),
           Match.objectLike({ Status: 'Enabled', Transitions: [{ StorageClass: 'INTELLIGENT_TIERING', TransitionInDays: 1 }] }),
         ]),
+      },
+    });
+  });
+
+  it.each([
+    [StorageDriveTier.OCCASIONAL_ACCESS, 'STANDARD_IA'],
+    [StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS, 'ONEZONE_IA'],
+    [StorageDriveTier.COLD_STORAGE, 'GLACIER'],
+    [StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS, 'GLACIER_IR'],
+    [StorageDriveTier.DEEP_COLD_STORAGE, 'DEEP_ARCHIVE'],
+    [StorageDriveTier.SMART_TIERING, 'INTELLIGENT_TIERING'],
+  ])('maps the %s tier to the %s storage class', (tier: StorageDriveTier, storageClass: string) => {
+    const template = synth(
+      defineStorageDrive('tiered', { lifecycleRules: [{ transitions: [{ storageDriveTier: tier, transitionAfterDays: 10 }] }] }),
+    );
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: [Match.objectLike({ Status: 'Enabled', Transitions: [{ StorageClass: storageClass, TransitionInDays: 10 }] })],
       },
     });
   });

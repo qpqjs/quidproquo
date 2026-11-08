@@ -1,7 +1,7 @@
 import { askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askStorageScopeProvide, Nullable } from '@qpqjs/core';
 import { HTTPEvent } from '@qpqjs/webserver';
 
-import { EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL } from '../constants';
+import { EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL } from '../constants/eventDocTransferGlobalNames';
 
 /**
  * Runs the story under the storage scope returned by the transfer's scope resolver global.

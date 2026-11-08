@@ -1,12 +1,9 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineUserScriptRunner } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, createScratchBuildRoot } from '@qpqjs/testing';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Capture, Match, Template } from 'aws-cdk-lib/assertions';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
 import { describe, expect, it, vi } from 'vitest';
 
 import { QpqCoreUserScriptRunnerConstruct } from './QpqCoreUserScriptRunnerConstruct';
@@ -19,10 +16,8 @@ vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
 }));
 
 // Code.fromAsset needs the bundle folder to exist, so the config roots at a scratch build dir.
-const configRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-runner-synth-'));
-fs.mkdirSync(path.join(configRoot, 'build', 'userScriptRunnerEvent_userScript'), { recursive: true });
-extensionLayer.path = path.join(configRoot, 'extension-layer');
-fs.mkdirSync(extensionLayer.path);
+const { configRoot, extensionLayerPath } = createScratchBuildRoot(['userScriptRunnerEvent_userScript'], 'qpq-runner-synth-');
+extensionLayer.path = extensionLayerPath;
 
 const synth = () => {
   const qpqConfig = buildTestQpqConfig(

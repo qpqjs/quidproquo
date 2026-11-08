@@ -6,8 +6,8 @@
 // likewise via DEPLOY_NAME, so neither asks again; their output shares the terminal.
 import { getAllViews } from '@qpqjs/deploy-rspack';
 
+import { createOutput } from '../lib/createOutput';
 import { getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { startTypeWatcher } from '../lib/typeWatcher';

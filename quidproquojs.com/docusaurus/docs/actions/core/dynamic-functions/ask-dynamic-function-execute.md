@@ -55,7 +55,7 @@ The `TFunctions` generic is the type of the registered functions object — pass
 
 ## Errors
 
-`askDynamicFunctionExecute` fails with `DynamicFunctionsExecuteErrorTypeEnum`:
+`askDynamicFunctionExecute` carries its error catalog as `askDynamicFunctionExecute.errorType`, so a caller matches on `askDynamicFunctionExecute.errorType.<Name>` rather than on a string:
 
 | Error | Cause |
 | --- | --- |
@@ -73,6 +73,8 @@ const outcome = yield* askCatch(
 
 if (outcome.success) {
   const views = outcome.result;
+} else if (outcome.error.errorType === askDynamicFunctionExecute.errorType.FunctionNotFound) {
+  // the loaded object has no such member
 } else {
   // outcome.error.errorType / outcome.error.errorText
 }

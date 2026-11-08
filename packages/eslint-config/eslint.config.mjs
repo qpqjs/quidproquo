@@ -12,8 +12,9 @@ import { testingConfigs } from './config/testing.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
 export default [
-  // lib/ is always build output (esm, commonjs and the bundled lambda layers).
-  { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
+  // A package's own lib/ is build output (esm, commonjs and the bundled lambda layers). The pattern is anchored to the
+  // package root on purpose: `**/lib/**` would also skip source folders such as src/lib, which the cli and the scaffolder have.
+  { ignores: ['**/dist/**', 'lib/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,

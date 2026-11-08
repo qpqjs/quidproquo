@@ -1,4 +1,10 @@
-import { askEventDocAppendServerEvent, askEventDocAppendServerEvents, askEventDocStoreProvide, buildEventDocStore, EventDocServerEventInput } from '@qpqjs/features';
+import {
+  askEventDocAppendServerEvent,
+  askEventDocAppendServerEvents,
+  askEventDocStoreProvide,
+  buildEventDocStore,
+  EventDocServerEventInput,
+} from '@qpqjs/features';
 import { AskResponse, QueueEventResponse } from 'quidproquo';
 
 import {

@@ -14,8 +14,3 @@ export type LogSearchQuery = {
 
   nextPageKey?: string;
 };
-
-/** A log search that also greps the redacted log text for `deep` (empty = no deep filter). */
-export type LogDeepSearchQuery = LogSearchQuery & {
-  deep: string;
-};

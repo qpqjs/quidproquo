@@ -43,9 +43,11 @@ generator that never runs. Auto-fixable: the fix inserts `yield*` (adding parent
 to `yield*`, and replaces a wrong `await`.
 
 ```ts
-const now = askDateNow(); // error, fixed to: yield* askDateNow()
-const now = yield askDateNow(); // error, fixed to: yield* askDateNow()
-const now = yield * askDateNow(); // correct
+function* askExample() {
+  askDateNow(); // error, fixed to: yield* askDateNow()
+  yield askDateNow(); // error, fixed to: yield* askDateNow()
+  const now = yield* askDateNow(); // correct
+}
 ```
 
 Allowed without `yield*`:

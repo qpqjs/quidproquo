@@ -42,7 +42,10 @@ describe('getEmailSendEmailActionProcessor', () => {
     });
 
     const messageId = resolveActionResult(result);
-    expect(messageId).toMatch(/^dev-server-email-/);
+    // A UUID per send, as a real SES messageId is: a constant or subject-derived id would fold distinct sends together.
+    expect(messageId).toMatch(/^dev-server-email-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    const second = await invokeProcessor(process!, { from: 'noreply@app.example', to: ['help@inbox.app.example'], subject: 'hi', bodyText: 'body' });
+    expect(resolveActionResult(second)).not.toBe(messageId);
 
     const [runtimePath, serviceName, outboxId, raw] = email.writeLocalEmailOutbox.mock.calls[0]!;
     expect([runtimePath, serviceName, outboxId]).toEqual(['/tmp/runtime', 'test-module', messageId]);

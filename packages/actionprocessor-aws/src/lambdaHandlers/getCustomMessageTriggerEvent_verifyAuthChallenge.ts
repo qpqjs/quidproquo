@@ -4,8 +4,8 @@ import { VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 
 import { getCognitoVerifyAuthChallengeEventProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
-import { requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
+import { requireLambdaEnvironment } from './helpers/requireLambdaEnvironment';
 
 export const getCustomMessageTriggerEvent_verifyAuthChallenge = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<VerifyAuthChallengeResponseTriggerEvent>(

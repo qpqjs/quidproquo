@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getLambdaEnvironment, requireLambdaEnvironment } from './getLambdaEnvironment';
+import { getLambdaEnvironment } from './getLambdaEnvironment';
 
 const originalEnv = { ...process.env };
 
@@ -43,11 +43,5 @@ describe('getLambdaEnvironment', () => {
 
     expect(environment.storageDriveRuntime).toBe('/::');
     expect(environment.kvsStream).toEqual({ runtime: '/::', coalesceByPartitionKey: false, partitionKey: '' });
-  });
-
-  it('throws a deploy-fault message for a required value that is not set', () => {
-    delete process.env.deployEventConfigName;
-
-    expect(() => requireLambdaEnvironment('deployEventConfigName')).toThrow('Lambda environment variable [deployEventConfigName] is not set');
   });
 });

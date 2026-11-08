@@ -16,11 +16,11 @@ import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { hasArgFlag } from '../lib/args';
+import { createOutput } from '../lib/createOutput';
 import { readDevServerPorts } from '../lib/devServerPorts';
 import { getRoot } from '../lib/discovery';
 import { KEEP_OTHER_DEV_SERVERS_FLAG } from '../lib/keepOtherDevServersFlag';
 import { isQpqCliCommand, killStaleListeners, reportPortHolders } from '../lib/killStaleListeners';
-import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';
 import { setWebAddressingEnv } from '../lib/webAddressingEnv';
@@ -113,7 +113,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
     }
     const line = `  http://localhost:${v.port}  ${v.service.padEnd(serviceColumnWidth)}  \x1b[33m(started)\x1b[0m`;
     const up = linesBelowList + (views.length - index);
-    process.stdout.write(`\x1b[${up}F\x1b[2K${line}\x1b[${up}E`);
+    out.rewriteLineAbove(up, line);
   };
 
   const pollUntilStarted = (index: number): void => {

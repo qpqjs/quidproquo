@@ -1,7 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { askApiRequest } from '@qpqjs/webserver';
 
-import { eventDocTransferEndpoint } from '../../constants';
+import { eventDocTransferEndpoint } from '../../constants/eventDocTransferEndpoint';
 import { EventDocTransferPlanResult } from '../../models';
 
 /** POST /transfer/plan: what importing the uploaded bundle would do. Writes nothing. */

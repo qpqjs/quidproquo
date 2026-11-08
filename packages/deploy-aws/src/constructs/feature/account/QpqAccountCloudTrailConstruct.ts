@@ -5,6 +5,7 @@ import { aws_cloudtrail, aws_logs, aws_s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { resolveLogRetention } from '../../../utils';
+import { toRemovalPolicy } from '../../../utils/toRemovalPolicy';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
 export type QpqAccountCloudTrailConstructProps = {
@@ -38,7 +39,7 @@ export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
       encryption: aws_s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
       // Retain audit logs by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
       lifecycleRules: [{ expiration: cdk.Duration.days(retentionDays) }],
     });

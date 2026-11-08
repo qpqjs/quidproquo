@@ -1,11 +1,10 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineSecret, QPQConfigItem } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, createScratchBuildRoot, ScratchBuildRoot } from '@qpqjs/testing';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -20,10 +19,12 @@ vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
 
 // The construct packages a built handler directory as the lambda asset, so a throwaway build root
 // with one empty handler stands in for the real api build.
-let configRoot: string;
+let scratch: ScratchBuildRoot;
 
 const synth = (settings: QPQConfigItem[] = [], environment: Record<string, string> = {}) => {
-  const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), ...settings], { configRoot });
+  const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), ...settings], {
+    configRoot: scratch.configRoot,
+  });
   const stack = new Stack(new App(), 'api', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
   new Function(stack, 'fn', { qpqConfig, handler: 'handler', environment, reservedConcurrentExecutions: 3 });
@@ -32,15 +33,13 @@ const synth = (settings: QPQConfigItem[] = [], environment: Record<string, strin
 };
 
 beforeEach(() => {
-  configRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-fn-'));
-  fs.mkdirSync(path.join(configRoot, 'build', 'handler'), { recursive: true });
-  fs.writeFileSync(path.join(configRoot, 'build', 'handler', 'index.js'), 'exports.handler = async () => {};');
-  extensionLayer.path = path.join(configRoot, 'extension-layer');
-  fs.mkdirSync(extensionLayer.path);
+  scratch = createScratchBuildRoot(['handler'], 'qpq-fn-');
+  fs.writeFileSync(path.join(scratch.configRoot, 'build', 'handler', 'index.js'), 'exports.handler = async () => {};');
+  extensionLayer.path = scratch.extensionLayerPath;
 });
 
 afterEach(() => {
-  fs.rmSync(configRoot, { recursive: true, force: true });
+  scratch.remove();
 });
 
 // Security regression: a function's environment carries only names and pointers, never a secret

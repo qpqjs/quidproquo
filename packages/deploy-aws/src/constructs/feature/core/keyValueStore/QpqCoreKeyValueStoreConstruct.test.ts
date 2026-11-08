@@ -2,7 +2,7 @@ import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { defineKeyValueStore, KeyValueStoreQPQConfigSetting, kvsKey } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
-import { App, Stack } from 'aws-cdk-lib';
+import { App, aws_iam, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { describe, expect, it } from 'vitest';
 
@@ -113,5 +113,32 @@ describe('QpqCoreKeyValueStoreConstruct table defaults', () => {
 
     expect((tables[0] as any).Properties.PointInTimeRecoverySpecification).toEqual({ PointInTimeRecoveryEnabled: false });
     expect((tables[0] as any).Properties.DeletionProtectionEnabled).toBe(true);
+  });
+});
+
+// Security regression: the KVS processors call this deployment's own region and account with a table name derived from
+// the owner's module alone, so the grant for a foreign store must target that table. Resolving the owner's full service
+// account info would grant a table in another account the runtime never calls and deny the one it does.
+describe('QpqCoreKeyValueStoreConstruct.authorizeActionsForRole', () => {
+  it('grants a foreign store in this deployment, not where the owner maps to', () => {
+    const qpqConfig = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2', [
+        { moduleName: 'other', environment: 'production', awsAccountId: '999999999999', awsRegion: 'us-east-1' },
+      ]),
+      defineKeyValueStore('shared', 'id', [], { owner: { module: 'other', environment: 'production' } }),
+    ]);
+    const stack = new Stack(new App(), 'test', { env: { account: '123456789012', region: 'ap-southeast-2' } });
+    const role = new aws_iam.Role(stack, 'role', { assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com') });
+
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(stack, role, qpqConfig);
+
+    const policies = Object.values(Template.fromStack(stack).findResources('AWS::IAM::ManagedPolicy')) as any[];
+    const resources = policies.flatMap((policy) => policy.Properties.PolicyDocument.Statement.flatMap((statement: any) => statement.Resource));
+
+    expect(resources.length).toBeGreaterThan(0);
+    for (const resource of resources) {
+      expect(resource).toMatch(/^arn:aws:dynamodb:ap-southeast-2:123456789012:table\//);
+      expect(resource).not.toContain('999999999999');
+    }
   });
 });

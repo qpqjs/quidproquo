@@ -1,7 +1,7 @@
 import { CliError } from '../../lib/CliError';
+import { createOutput } from '../../lib/createOutput';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { BUILD_ONLY_FLAG, FROM_BUILD_FLAG, GoDockerMode } from '../../lib/goDockerMode';
-import { createOutput } from '../../lib/out';
 import { QpqPlatformDriver } from '../types';
 import { getDockerPlatformSettings } from './getDockerPlatformSettings';
 import { dockerGo } from './go';

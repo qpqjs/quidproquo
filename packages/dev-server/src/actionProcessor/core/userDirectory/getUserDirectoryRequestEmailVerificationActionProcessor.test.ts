@@ -4,7 +4,7 @@ import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@q
 import { describe, expect, it } from 'vitest';
 
 import { DEV_USER_EMAIL } from '../../../logic/auth/devAuth';
-import { signDevJwt } from '../../../logic/auth/devJwt';
+import { signDevJwt } from '../../../logic/auth/signDevJwt';
 import { getUserDirectoryRequestEmailVerificationActionProcessor } from './getUserDirectoryRequestEmailVerificationActionProcessor';
 
 const getProcessor = async () => {

@@ -3,7 +3,7 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
-import { AskResponse } from '../../types';
+import { AskResponse, ErrorTypeEnum } from '../../types';
 import { askMapParallelBatch } from './askMapParallelBatch';
 
 function* doubleInBatches(items: number[], numBatch: number, delayMs = 0): AskResponse<number[]> {
@@ -46,8 +46,10 @@ describe('askMapParallelBatch', () => {
   });
 
   it('throws Invalid when the batch size cannot make progress', () => {
-    expect(() => runStory(doubleInBatches([1, 2], 0))).toThrowError(/numBatch must be at least 1/);
-    expect(() => runStory(doubleInBatches([1, 2], -1))).toThrowError(/numBatch must be at least 1/);
-    expect(() => runStory(doubleInBatches([1, 2], Number.NaN))).toThrowError(/numBatch must be at least 1/);
+    for (const numBatch of [0, -1, Number.NaN]) {
+      expect(() => runStory(doubleInBatches([1, 2], numBatch))).toThrowError(
+        expect.objectContaining({ errorType: ErrorTypeEnum.Invalid, errorText: expect.stringMatching(/numBatch must be at least 1/) }),
+      );
+    }
   });
 });

@@ -10,8 +10,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
+import { createOutput } from '../lib/createOutput';
 import { getAvailableApps, getRoot, getServiceNamesWithSubdir } from '../lib/discovery';
-import { createOutput } from '../lib/out';
 import { loadServiceQpqConfig } from '../lib/qpqConfigs';
 import { getRequestedAppName, resolveAppSelection } from '../lib/resolveAppSelection';
 import { resolveDeployment } from '../lib/resolveDeployment';

@@ -4,8 +4,8 @@
 // QPQ_CIRCULAR_DEPS_WARN=1 is a temporary escape hatch that reports without
 // failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';
+import { createOutput } from '../lib/createOutput';
 import { getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
 
 const out = createOutput('check:circular');
 

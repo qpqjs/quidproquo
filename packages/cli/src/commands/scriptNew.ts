@@ -3,7 +3,7 @@
 import path from 'path';
 
 import { getPositionalArgs } from '../lib/args';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { createUserScriptProject } from '../lib/userScriptTemplate';
 
 const out = createOutput('script:new');

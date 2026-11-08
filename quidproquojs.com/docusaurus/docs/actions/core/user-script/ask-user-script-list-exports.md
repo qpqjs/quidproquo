@@ -45,7 +45,7 @@ function* askUserScriptListExports(drive: string, filepath: string, scope?: stri
 | `ModuleNotFound` | The script required a module outside the shared package list. |
 | `ScriptInvalid` | The script threw while its module body was being loaded. |
 | `RunnerUnavailable` | The service declares no runner, or the runner could not be invoked. |
-| `TimedOut` | The runner did not finish within the service's configured runner timeout. |
+| `Timeout` | The runner did not finish within the service's configured runner timeout. |
 
 ## Related
 

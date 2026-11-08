@@ -1,12 +1,8 @@
-import { askCatch, askInlineFunctionExecute, AskResponse, askThrowError, createDynamicFunctionCaller, Nullable } from '@qpqjs/core';
+import { askInlineFunctionExecute, AskResponse, Nullable } from '@qpqjs/core';
 
-import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocEventWrite, askEventDocUpsert } from '../../eventDoc/data';
-import { EventDocInvokableFunctions } from '../../eventDoc/definition/types/EventDocInvokableFunctions';
 import { askEventDocHookStates } from '../../eventDoc/logic/askEventDocHookStates';
-import { askEventDocValidateAppendRun } from '../../eventDoc/logic/askEventDocValidateAppendRun';
-import { isEventDocFunctionsMissing } from '../../eventDoc/logic/isEventDocFunctionsMissing';
 import {
   EventDocEffect,
   EventDocEvent,
@@ -17,6 +13,8 @@ import {
 } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
+import { askEventDocValidateForeignTail } from './askEventDocValidateForeignTail';
+import { toEventDocLocalActor } from './toEventDocLocalActor';
 
 /** Options for askEventDocWriteForeignEvents. */
 export type EventDocWriteForeignEventsOptions = {
@@ -24,18 +22,6 @@ export type EventDocWriteForeignEventsOptions = {
   // The tail was discarded, so the hooks must fire even when nothing new was written: the summary still changed.
   logRewritten?: boolean;
 };
-
-// The source user id would dangle in the target directory; the display name is a snapshot and stays true.
-const toLocalActor = (event: EventDocEvent, importerUserId: string): EventDocEvent => ({
-  ...event,
-  payload: {
-    ...event.payload,
-    metadata: {
-      ...event.payload.metadata,
-      createdBy: { ...event.payload.metadata.createdBy, userId: importerUserId },
-    },
-  },
-});
 
 const findLatestPublishEvent = (events: EventDocEvent[]): Nullable<EventDocEvent> =>
   [...events].reverse().find((event) => event.type === EventDocEffect.Publish) ?? null;
@@ -63,27 +49,6 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
   }
 }
 
-// The uploader is the bundle's only provenance, so the tail gets the append gate's validator and fold, each event
-// against the state its predecessors fold to. The opening INIT_STATE seeds the state like a create does, so the run
-// starts after it. A collection with no registered definition degrades to an unvalidated write, as an append does.
-function* askEventDocValidateForeignTail(events: EventDocEvent[], fromIndex: number): AskResponse<void> {
-  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
-  const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
-
-  const seedCount = Math.max(fromIndex, 1);
-  const seed = yield* askCatch(functionsCaller.foldDocumentState(events.slice(0, seedCount)));
-
-  if (!seed.success) {
-    if (isEventDocFunctionsMissing(seed.error.errorType)) {
-      return;
-    }
-
-    return yield* askThrowError(seed.error.errorType, seed.error.errorText);
-  }
-
-  yield* askEventDocValidateAppendRun(events.slice(seedCount), seed.result);
-}
-
 /**
  * Writes `events[fromIndex..]` into the collection's log verbatim except for `createdBy.userId`, which becomes the importer.
  * Bypasses askEventDocEventAppend's restamping on purpose (replayed history keeps its ids and times) but not its gate: the
@@ -98,11 +63,11 @@ export function* askEventDocWriteForeignEvents(
 ): AskResponse<number> {
   const { type } = yield* askEventDocStoreReadOrThrow();
 
-  const localised = events.map((event) => toLocalActor(event, importerUserId));
+  const localised = events.map((event) => toEventDocLocalActor(event, importerUserId));
   const missing = localised.slice(fromIndex);
 
   if (missing.length > 0) {
-    yield* askEventDocValidateForeignTail(localised, fromIndex);
+    yield* askEventDocValidateForeignTail(docId, localised, fromIndex);
   }
 
   for (const event of missing) {

@@ -7,7 +7,7 @@ description: Redirect a subdomain to another URL via a small API Gateway + Lambd
 
 Redirects a **subdomain** (rooted at the service's [DNS base](./dns.md)) to another URL. A common use is redirecting `www.example.com` to `example.com`, or an old subdomain to a new destination.
 
-- **On AWS:** deploys a small redirect **Lambda** (`functionType: 'apiGatewayEventHandler_redirect'`) fronted by an **API Gateway** `LambdaRestApi` (proxy integration), plus an API Gateway custom **domain name** for the subdomain, a Route53 **`A` alias record**, and a base-path mapping (`QpqWebserverSubdomainRedirectConstruct` in `@qpqjs/deploy-aws`). Requests hitting the subdomain are handled by the Lambda, which responds with an HTTP redirect to `redirectUrl`. The redirect config (including `subdomain` and `redirectUrl`) is passed to the Lambda as environment. An optional Cloudflare API-key secret name is carried for Cloudflare-managed DNS setups.
+- **On AWS:** deploys a small redirect **Lambda** (the `apiGatewayEventHandler_redirect` handler) fronted by an **API Gateway** `LambdaRestApi` (proxy integration), plus an API Gateway custom **domain name** for the subdomain, a Route53 **`A` alias record**, and a base-path mapping (`QpqWebserverSubdomainRedirectConstruct` in `@qpqjs/deploy-aws`). Requests hitting the subdomain are handled by the Lambda, which responds with an HTTP redirect to `redirectUrl`. The redirect config (including `subdomain` and `redirectUrl`) is passed to the Lambda as environment. An optional Cloudflare API-key secret name is carried for Cloudflare-managed DNS setups.
 
 ```typescript
 import { defineSubdomainRedirect } from '@qpqjs/webserver';
@@ -46,9 +46,7 @@ function defineSubdomainRedirect(
 
 ### `QPQConfigAdvancedSubdomainRedirectSettings`
 
-| Property | Type | Default | Description |
-| --- | --- | --- | --- |
-| `cloudflareApiKeySecretName` | `string` | – | Name of a [secret](../core/secret.md) holding a Cloudflare API key, for when the redirect's DNS is managed through Cloudflare rather than Route53. |
+The shared `QPQConfigAdvancedSettings` (for example `deprecated`); the redirect has no options of its own. DNS for a redirect is managed by the platform (Route53 on AWS), so there is nothing to configure here.
 
 ## Examples
 
@@ -59,16 +57,8 @@ export default [
   // Simple www -> apex redirect
   defineSubdomainRedirect('www', './build/redirect', 'https://example.com'),
 
-  // Redirect an old subdomain, without env/feature prefixing, using a Cloudflare-managed zone
-  defineSubdomainRedirect(
-    'legacy',
-    './build/redirect',
-    'https://new.example.com',
-    false,
-    false,
-    true,
-    { cloudflareApiKeySecretName: 'cloudflare-api-key' },
-  ),
+  // Redirect an old subdomain, without env/feature prefixing
+  defineSubdomainRedirect('legacy', './build/redirect', 'https://new.example.com', false, false, true),
 ];
 ```
 

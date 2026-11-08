@@ -4,9 +4,9 @@
 // Wire the root package.json's lifecycle to it, e.g.
 // "postinstall": "qpq hooks postinstall". Use --jobs=1 to force serial runs.
 import { getArgValue } from '../lib/args';
+import { createOutput } from '../lib/createOutput';
 import { getDefaultHookJobs } from '../lib/getDefaultHookJobs';
 import { runHookForAllPackages } from '../lib/hooks';
-import { createOutput } from '../lib/out';
 import { assertNoFailures } from '../lib/runTasks';
 
 const out = createOutput('hooks');

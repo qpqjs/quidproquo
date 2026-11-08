@@ -63,7 +63,7 @@ export type QueueMessage<T> = {
 | --- | --- |
 | `QueueSendMessagesErrorTypeEnum.AccessDenied` | The caller lacks permission to send to the queue. |
 | `QueueSendMessagesErrorTypeEnum.QueueNotFound` | The underlying queue does not exist. |
-| `QueueSendMessagesErrorTypeEnum.ServiceUnavailable` | Internal error or throttling from the messaging service. |
+| `QueueSendMessagesErrorTypeEnum.Throttled` | Internal error or throttling from the messaging service. |
 
 Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

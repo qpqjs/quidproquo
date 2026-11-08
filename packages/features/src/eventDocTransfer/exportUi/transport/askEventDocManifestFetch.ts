@@ -1,7 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { askApiRequest } from '@qpqjs/webserver';
 
-import { eventDocTransferEndpoint } from '../../constants';
+import { eventDocTransferEndpoint } from '../../constants/eventDocTransferEndpoint';
 import { EventDocDocRef, EventDocManifestItem } from '../../models';
 
 /** POST /transfer/manifest: everything that would travel with the picked docs. Builds nothing. */

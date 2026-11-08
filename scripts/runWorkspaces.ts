@@ -85,8 +85,8 @@ const getChangedDirs = (): Set<string> => {
     .map((line) => line.slice(3).trim()) // strip the 2-char status + space
     .filter(Boolean)
     // A rename shows as "old -> new"; the new path is what matters.
-    .map((file) => (file.includes(' -> ') ? file.split(' -> ')[1] : file))
-    .map((file) => file.split('/')[0]);
+    .map((file) => (file.includes(' -> ') ? (file.split(' -> ')[1] ?? file) : file))
+    .map((file) => file.split('/')[0] ?? file);
 
   return new Set(changed);
 };
@@ -362,7 +362,7 @@ const main = async (): Promise<void> => {
       console.error(`\n✖ ${failure.name} › ${failure.script} failed (exit ${failure.code}):\n`);
       console.error(failure.output.trimEnd());
     }
-    process.exit(failures[0].code || 1);
+    process.exit(failures[0]?.code || 1);
   }
 
   if (started.size < tasks.length) {

@@ -1,6 +1,7 @@
 import { getEventAutoRespondNoopActionProcessor as getEventAutoRespondActionProcessor } from '@qpqjs/actionprocessor-js';
 import { EventActionType, QpqFunctionRuntime, storageScopeContext } from '@qpqjs/core';
-import { buildTestQpqConfig, resolveEventProcessor } from '@qpqjs/testing';
+import { buildTestQpqConfig, invokeProcessor, resolveEventProcessor } from '@qpqjs/testing';
+import { StorageDriveEventType } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -42,5 +43,22 @@ describe('fileEvent getS3FileEventEventProcessor composition', () => {
         EventActionType.TransformResponseResult,
       ].sort(),
     );
+  });
+
+  // The drive name and handler come from the lambda environment through the composer; a composer that dropped either
+  // would still compose every action, so the composed processors are driven and their output checked.
+  it('hands the drive name to the records processor and the handler to the match processor', async () => {
+    const processors = await getS3FileEventEventProcessor('uploads', '/entry/drive::onEvent' as QpqFunctionRuntime)(
+      buildTestQpqConfig(),
+      null as any,
+    );
+
+    const [records] = await invokeProcessor(processors[EventActionType.GetRecords]!, {
+      eventParams: [{ Records: [buildS3Record('ObjectCreated:Put', 'folder/a.txt')] }, {}],
+    } as any);
+    const [match] = await invokeProcessor(processors[EventActionType.MatchStory]!, { qpqEventRecord: {}, eventParams: [] } as any);
+
+    expect(records).toEqual([{ driveName: 'uploads', filePaths: ['folder/a.txt'], eventType: StorageDriveEventType.Create }]);
+    expect(match).toEqual({ runtime: '/entry/drive::onEvent' });
   });
 });

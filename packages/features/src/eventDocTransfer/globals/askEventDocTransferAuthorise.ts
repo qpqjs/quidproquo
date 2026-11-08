@@ -1,22 +1,23 @@
-import { askCatch, askConfigGetGlobal, askInlineFunctionExecute, AskResponse } from '@qpqjs/core';
+import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
-import { EventDocAuthoriseInput } from '../../eventDoc/types/EventDocAuthoriseInput';
+import { askEventDocAuthorise } from '../../eventDoc/logic/askEventDocAuthorise';
 import { EventDocPermissionAction } from '../../eventDoc/types/EventDocPermissionAction';
-import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants';
+import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL } from '../constants/eventDocTransferGlobalNames';
 
 /**
  * Runs the transfer's collection authoriser for `action` on the collection in context, the way that collection's
  * own routes would. A transfer declared without an authoriser is gated by scope alone. Requires the store context.
  */
 export function* askEventDocTransferAuthorise(action: EventDocPermissionAction): AskResponse<void> {
-  // A transfer with no authoriser global is gated by scope alone.
-  const authorise = yield* askCatch(askConfigGetGlobal<string>(EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL));
-  if (!authorise.success || !authorise.result) {
+  // buildEventDocTransferGlobals always sets the global ('' when no authoriser was declared), so the read is not
+  // caught: a transfer route whose globals are missing fails closed rather than skipping the check.
+  const authorise = yield* askConfigGetGlobal<string>(EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL);
+  if (!authorise) {
     return;
   }
 
   const { storeName } = yield* askEventDocStoreReadOrThrow();
 
-  yield* askInlineFunctionExecute<void, EventDocAuthoriseInput>(authorise.result, { storeName, action });
+  yield* askEventDocAuthorise({ authorise, storeName }, action);
 }

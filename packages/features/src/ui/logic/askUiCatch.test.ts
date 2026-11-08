@@ -28,13 +28,13 @@ function* askFailingWork(): AskResponse<number> {
 }
 
 describe('askUiCatch', () => {
-  it('raises busy, clears the error, runs the work and lowers busy', () => {
+  it('clears the error, raises busy, runs the work and lowers busy', () => {
     const ui = buildUi();
 
     const result = runStory(askUiCatch(askWork(), ui));
 
     expect(result).toEqual({ success: true, result: 42 });
-    expect(ui.calls).toEqual(['busy:true', 'error:null', 'busy:false']);
+    expect(ui.calls).toEqual(['error:null', 'busy:true', 'busy:false']);
   });
 
   it("records the error's own text after lowering busy when the work fails", () => {
@@ -43,7 +43,7 @@ describe('askUiCatch', () => {
     const result = runStory(askUiCatch(askFailingWork(), ui));
 
     expect(result.success).toBe(false);
-    expect(ui.calls).toEqual(['busy:true', 'error:null', 'busy:false', 'error:nope']);
+    expect(ui.calls).toEqual(['error:null', 'busy:true', 'busy:false', 'error:nope']);
   });
 
   it('uses a fixed or derived error text when given one', () => {

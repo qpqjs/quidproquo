@@ -1,4 +1,4 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { awsNamingUtils, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { GraphDatabaseQPQConfigSetting, QPQConfig } from '@qpqjs/core';
 
 import { aws_dynamodb, aws_ec2, aws_iam } from 'aws-cdk-lib';
@@ -6,7 +6,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 
-import { applyEnvironmentTags, lookupVirtualNetwork, resolveLogRetention } from '../../../../utils';
+import { applyEnvironmentTags, lookupVirtualNetwork, resolveLogRetention, toRemovalPolicy } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export type QpqCoreApiGraphDatabaseConstructProps = {
@@ -62,10 +62,7 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
 
       // Retain data stores by default; a final snapshot preserves the graph data without keeping
       // an orphaned live cluster running. Dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
-      removalPolicy:
-        qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig) === AwsDataStoreRemovalPolicy.destroy
-          ? cdk.RemovalPolicy.DESTROY
-          : cdk.RemovalPolicy.SNAPSHOT,
+      removalPolicy: toRemovalPolicy(qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig), cdk.RemovalPolicy.SNAPSHOT),
 
       // clusterParameterGroup,
     });

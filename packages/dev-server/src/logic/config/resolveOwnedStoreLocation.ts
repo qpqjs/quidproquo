@@ -1,11 +1,6 @@
 import { CrossModuleOwner, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-export type OwnedStoreLocation = {
-  // The service whose local store holds the resource: its owner's, or this one.
-  serviceName: string;
-  // The key inside that store: the owner's override when it renamed the resource.
-  key: string;
-};
+import { OwnedStoreLocation } from './OwnedStoreLocation';
 
 // Where the dev server keeps a named resource's local stand-in. The AWS runtime resolves the
 // same owner the same way for its aliases, user pools and parameter keys; this is the local

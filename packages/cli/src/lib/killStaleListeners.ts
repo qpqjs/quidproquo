@@ -1,4 +1,3 @@
-import { runCommandCaptureSync, sleepSync } from './runCommand';
 // Pre-start sweep shared by the dev-server commands: a previous run whose
 // wrapper died without killing its listener (closed terminal, SIGKILL) leaves
 // an orphaned process holding a dev port, and the next launch dies with
@@ -9,7 +8,9 @@ import { Nullable } from '@qpqjs/core';
 
 import fs from 'fs';
 import path from 'path';
-import { createOutput } from './out';
+
+import { createOutput } from './createOutput';
+import { runCommandCaptureSync, sleepSync } from './runCommand';
 
 const out = createOutput('kill-stale-listeners');
 

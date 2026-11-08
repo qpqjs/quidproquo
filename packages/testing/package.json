@@ -12,9 +12,9 @@
       "default": "./lib/commonjs/index.js"
     },
     "./vitest": {
-      "types": "./lib/commonjs/vitest.d.ts",
-      "module": "./lib/esm/vitest.js",
-      "default": "./lib/commonjs/vitest.js"
+      "types": "./lib/commonjs/vitest/index.d.ts",
+      "module": "./lib/esm/vitest/index.js",
+      "default": "./lib/commonjs/vitest/index.js"
     },
     "./vitest-config": {
       "types": "./lib/commonjs/vitestConfig/index.d.ts",

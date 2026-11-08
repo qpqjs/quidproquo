@@ -8,7 +8,7 @@
 import { Nullable } from '@qpqjs/core';
 
 import { getArgValue } from '../lib/args';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 import { promptCheckbox } from '../lib/prompts';
 import { resolveCommandContext } from '../lib/resolveCommandContext';
 import { SetupCheckResult, SetupStep } from '../lib/setupStep';

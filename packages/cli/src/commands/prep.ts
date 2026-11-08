@@ -3,8 +3,8 @@
 // `// federated.export` marker.
 import { writeFederatedTsconfigForApp } from '@qpqjs/deploy-rspack';
 
+import { createOutput } from '../lib/createOutput';
 import { getAvailableApps, getRoot } from '../lib/discovery';
-import { createOutput } from '../lib/out';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 const out = createOutput('prep');

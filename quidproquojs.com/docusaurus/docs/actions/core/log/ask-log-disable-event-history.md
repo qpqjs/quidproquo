@@ -45,9 +45,9 @@ function* askLogDisableEventHistory(
 ## Notes
 
 - The setting is scoped to the current execution's correlation id, not global.
-- Log entries created with [askLogCreate](./ask-log-create.md) and [askLogTemplateLiteral](./ask-log-template-literal.md) are always retained even when event history is disabled.
+- Log entries created with [askLogCreate](./ask-log-create.md) and [askLog](./ask-log.md) are always retained even when event history is disabled.
 
 ## Related
 
 - [askLogCreate](./ask-log-create.md) — write a log line that is kept regardless of this setting.
-- [askLogTemplateLiteral](./ask-log-template-literal.md) — log an interpolated message.
+- [askLog](./ask-log.md) — log an interpolated message.

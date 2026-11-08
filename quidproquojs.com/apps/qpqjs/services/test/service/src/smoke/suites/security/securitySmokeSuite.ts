@@ -1,13 +1,15 @@
 import { SmokeSuite } from '../../harness/types/SmokeSuite';
 import { defineSecuritySmoke } from './config/defineSecuritySmoke';
-import { askRunAdminServicesRequireAuthTest } from './probes/askRunAdminServicesRequireAuthTest';
-import { askRunRuntimeErrorTextLeakTest } from './probes/askRunRuntimeErrorTextLeakTest';
-import { askRunSourceMapNotServedTest } from './probes/askRunSourceMapNotServedTest';
-import { askRunTenantIsolationTest } from './probes/askRunTenantIsolationTest';
-import { askRunUnverifiedBearerNoExpiryTest } from './probes/askRunUnverifiedBearerNoExpiryTest';
-import { askRunUnverifiedBearerTest } from './probes/askRunUnverifiedBearerTest';
-import { askRunWebsiteBucketNotPublicTest } from './probes/askRunWebsiteBucketNotPublicTest';
-import { askRunWebsiteSecurityHeadersTest } from './probes/askRunWebsiteSecurityHeadersTest';
+import {
+  askRunAdminServicesRequireAuthTest,
+  askRunRuntimeErrorTextLeakTest,
+  askRunSourceMapNotServedTest,
+  askRunTenantIsolationTest,
+  askRunUnverifiedBearerNoExpiryTest,
+  askRunUnverifiedBearerTest,
+  askRunWebsiteBucketNotPublicTest,
+  askRunWebsiteSecurityHeadersTest,
+} from './probes';
 
 /** Regression probes from the security audit, one per checklist item. Each calls the deployed surface the way an attacker would and asserts the platform refuses or stays quiet. */
 export const securitySmokeSuite: SmokeSuite = {

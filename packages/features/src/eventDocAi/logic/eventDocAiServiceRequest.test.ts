@@ -5,6 +5,7 @@ import {
   ContextActionType,
   ErrorTypeEnum,
   InlineFunctionActionType,
+  Nullable,
   QueueEvent,
   QueueMessage,
   UserDirectoryActionType,
@@ -31,10 +32,10 @@ const buildEvent = (payload: unknown): QueueEvent<QueueMessage<unknown>> => ({
   message: { type: 'serviceRequest', payload },
 });
 
-type Harness = { sent: Action<any> | undefined; authoriseCalls: unknown[]; ran: boolean };
+type Harness = { sent: Nullable<Action<any>>; authoriseCalls: unknown[]; ran: boolean };
 
 const run = (authorise: string, authoriseOutcome: 'allow' | 'forbid' = 'allow'): Harness => {
-  const harness: Harness = { sent: undefined, authoriseCalls: [], ran: false };
+  const harness: Harness = { sent: null, authoriseCalls: [], ran: false };
   const globals: Record<string, string> = {
     [EVENT_DOC_USER_DIRECTORY_GLOBAL]: 'users',
     [EVENT_DOC_AI_SERVICE_NAME_GLOBAL]: 'svc',

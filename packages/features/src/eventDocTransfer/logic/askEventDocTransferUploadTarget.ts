@@ -1,7 +1,8 @@
 import { askFileGenerateTemporaryUploadSecureUrl, askGuidNew, AskResponse } from '@qpqjs/core';
 
 import { askEventDocResolveScope } from '../../eventDoc/data';
-import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferImportPath } from '../constants';
+import { eventDocTransferImportPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import { EventDocTransferUploadTarget } from '../models';
 
 const BUNDLE_UPLOAD_TTL_MS = 10 * 60 * 1000;

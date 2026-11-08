@@ -1,4 +1,4 @@
-import { AwsDataStoreRemovalPolicy, awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
+import { AwsDataStoreRemovalPolicy, awsNamingUtils, getS3StorageClassNameForStorageDriveTier, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   QPQConfig,
   qpqCoreUtils,
@@ -13,10 +13,11 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqAwsCdkPathUtils } from '../../../../utils';
-import { getForeignConfigs, grantOwnedAndForeignResources } from '../../../../utils/ownedAndForeignGrants';
+import { grantOwnedAndForeignResources } from '../../../../utils/grantOwnedAndForeignResources';
 import * as qpqDeployAwsUtils from '../../../../utils/qpqDeployAwsUtils';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
+import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
+import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 
 export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
@@ -54,38 +55,25 @@ export type QpqCoreStorageDriveConstructProps = {
   emailReceiptRuleNames?: string[];
 } & QpqConstructBlockProps;
 
-export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
+// The bucket is the resource the shared base grants on; it keeps its own name because every
+// consumer of a storage drive reaches for `.bucket`.
+export abstract class QpqCoreStorageDriveConstructBase extends QpqReadWriteResourceConstructBase<aws_s3.IBucket> {
   abstract bucket: aws_s3.IBucket;
 
-  public override grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.bucket.grantRead(grantee);
-  }
-
-  public override grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    return this.bucket.grantWrite(grantee);
+  get resource(): aws_s3.IBucket {
+    return this.bucket;
   }
 }
 
 // Each tier's S3 class is the one its enum doc names. REGULAR is the class objects
 // start in, so it is never a transition target.
+// A transition targets a tier objects do not start in, so REGULAR (STANDARD) is refused here rather than by CloudFormation.
 const convertStorageDriveTierToAwsS3StorageClass = (storageDriveTier: StorageDriveTier): aws_s3.StorageClass => {
-  switch (storageDriveTier) {
-    case StorageDriveTier.OCCASIONAL_ACCESS:
-      return aws_s3.StorageClass.INFREQUENT_ACCESS;
-    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
-      return aws_s3.StorageClass.ONE_ZONE_INFREQUENT_ACCESS;
-    case StorageDriveTier.COLD_STORAGE:
-      return aws_s3.StorageClass.GLACIER;
-    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
-      return aws_s3.StorageClass.GLACIER_INSTANT_RETRIEVAL;
-    case StorageDriveTier.DEEP_COLD_STORAGE:
-      return aws_s3.StorageClass.DEEP_ARCHIVE;
-    case StorageDriveTier.SMART_TIERING:
-      return aws_s3.StorageClass.INTELLIGENT_TIERING;
-    case StorageDriveTier.REGULAR:
-    default:
-      throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
+  if (storageDriveTier === StorageDriveTier.REGULAR) {
+    throw new Error(`Storage drive lifecycle transition to tier [${storageDriveTier}] is not supported; objects already start in that tier`);
   }
+
+  return new aws_s3.StorageClass(getS3StorageClassNameForStorageDriveTier(storageDriveTier));
 };
 
 const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
@@ -147,7 +135,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
 
       // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
-      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
 
       // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
@@ -293,7 +281,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       ownedResourceArns: [`arn:aws:s3:::${ownedBucketPattern}`, `arn:aws:s3:::${ownedBucketPattern}/*`],
       ownedByTag: false,
       // The same naming path as `resolveStorageDriveBucketName`, so no CDK cross-stack ref is created.
-      foreignArns: getForeignConfigs(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
+      foreignArns: qpqCoreUtils.getForeignItems(qpqCoreUtils.getAllStorageDriveConfigs(qpqConfig), qpqConfig).flatMap((cfg) => {
         const bucketArn = `arn:aws:s3:::${awsNamingUtils.resolveOwnedResourceName(cfg.storageDrive, qpqConfig, cfg.owner)}`;
 
         return [bucketArn, `${bucketArn}/*`];

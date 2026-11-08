@@ -5,7 +5,6 @@ import {
   askExecuteStoryBase,
   createStreamRegistry,
   DecodedAccessToken,
-  getDateNow,
   StorySession,
   StreamRegistry,
   SystemActionType,
@@ -41,12 +40,6 @@ const resolveProcessor = async () => {
   const processors = await getSystemExecuteStoryActionProcessor(buildTestQpqConfig(), {} as any);
   return processors[SystemActionType.ExecuteStory];
 };
-
-describe('getDateNow', () => {
-  it('returns an ISO timestamp', () => {
-    expect(getDateNow()).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-  });
-});
 
 describe('getSystemExecuteStoryActionProcessor', () => {
   it('returns a NotFound error when the runtime module cannot be loaded', async () => {

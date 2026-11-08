@@ -8,7 +8,8 @@
 // trade a data-loss bug for a hung-restart bug, and the next launch would find
 // its ports still held.
 import { ChildProcess } from 'child_process';
-import { createOutput } from './out';
+
+import { createOutput } from './createOutput';
 
 const out = createOutput('kill-child-with-escalation');
 

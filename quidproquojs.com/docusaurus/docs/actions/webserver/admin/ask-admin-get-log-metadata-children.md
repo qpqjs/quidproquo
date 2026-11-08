@@ -32,7 +32,7 @@ export function* walkChildren(correlationId: string) {
 function* askAdminGetLogMetadataChildren(
   correlationId: string,
   nextPageKey?: string,
-): AskResponse<QpqLogList>;
+): AskResponse<QpqPagedData<StoryResultMetadata>>;
 ```
 
 ## Parameters
@@ -44,13 +44,13 @@ function* askAdminGetLogMetadataChildren(
 
 ## Returns
 
-`QpqLogList` — a page of child metadata summaries:
+`QpqPagedData<StoryResultMetadata>`, the core paging shape, holding one page of direct children (one level down the tree):
 
 ```typescript
-export interface QpqLogList {
-  items: StoryResultMetadata[];  // direct children (one level down the tree)
+type QpqPagedData<T> = {
+  items: T[];
   nextPageKey?: string;
-}
+};
 ```
 
 Each item is a `StoryResultMetadata` (see [askAdminGetLogMetadata](./ask-admin-get-log-metadata.md) for its shape). `nextPageKey` is present when more children remain. To build the full execution tree, recurse: call this action again with each child's `correlation`. The framework also models the fully-expanded tree as `StoryResultMetadataWithChildren` (`StoryResultMetadata` plus a `children` array).

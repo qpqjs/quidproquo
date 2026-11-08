@@ -23,13 +23,13 @@ import { FEDERATED_VIEWS_SUBDOMAIN } from '@qpqjs/webserver';
 import fs from 'fs';
 import path from 'path';
 
+import { createOutput } from '../../lib/createOutput';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { writeDevServerEntry, writeUserScriptChildEntry } from '../../lib/devServerEntry';
 import { readDevServerPorts } from '../../lib/devServerPorts';
 import { getRoot, getServiceNamesWithViews } from '../../lib/discovery';
 import { getDefaultHookJobs } from '../../lib/getDefaultHookJobs';
 import { runAppHook, runHookForAppPackages } from '../../lib/hooks';
-import { createOutput } from '../../lib/out';
 import { getOwnPackageRoot } from '../../lib/packageRoot';
 import { runCommand } from '../../lib/runCommand';
 import { assertNoFailures } from '../../lib/runTasks';

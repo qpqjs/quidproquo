@@ -2,7 +2,8 @@ import { askFileWriteObjectJson, AskResponse } from '@qpqjs/core';
 
 import { askEventDocEventDelete, askEventDocResolveScope } from '../../eventDoc/data';
 import { EventDocEvent } from '../../eventDoc/models';
-import { EVENT_DOC_TRANSFER_DRIVE_NAME, eventDocTransferDiscardedPath } from '../constants';
+import { eventDocTransferDiscardedPath } from '../constants/eventDocTransferBundlePath';
+import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 
 /**
  * Cuts the target's log back to `fromIndex` and returns what was cut. The discarded tail is written to the transfer drive

@@ -2,7 +2,8 @@ import { askConfigGetApplicationInfo, askConfigListParameters, askMapParallelBat
 
 import { askWebsocketConnectionInfoRead } from '../../../webSocketQueue/context';
 import { ADMIN_CONFIG_SYNC_BATCH_SIZE } from '../../constants';
-import { AdminConfigSyncTarget, askAdminConfigSyncSendParameter } from './askAdminConfigSyncSendParameter';
+import { AdminConfigSyncTarget } from './AdminConfigSyncTarget';
+import { askAdminConfigSyncSendParameter } from './askAdminConfigSyncSendParameter';
 
 // Sends every parameter of this service to the admin client that asked, in batches.
 export function* askAdminConfigSync(): AskResponse<void> {

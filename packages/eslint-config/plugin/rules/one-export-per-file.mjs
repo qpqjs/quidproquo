@@ -1,4 +1,6 @@
-import { collectExports, isAllowedPair, isExemptFile } from './exportsOfFile.mjs';
+import { collectExports } from './exports/collectExports.mjs';
+import { isAllowedPair } from './exports/isAllowedPair.mjs';
+import { isExemptFile } from './exports/isExemptFile.mjs';
 
 // One exported thing per file (G1). Barrels, declaration files and tests are exempt, and the
 // two sanctioned pairs (askXBase + askX, XEffect + XPayload) count as one concept.

@@ -63,7 +63,7 @@ The standard error categories. Their names deliberately echo HTTP-style semantic
 | `PaymentRequired` | Payment is required to access this resource or perform this action. |
 | `Forbidden` | The caller is authenticated but lacks sufficient privileges. |
 | `NotFound` | The requested resource does not exist. |
-| `TimeOut` | Timed out waiting for a downstream resource. |
+| `Timeout` | Timed out waiting for a downstream resource. |
 | `UnsupportedMediaType` | The request used an unsupported media type or format. |
 | `OutOfResources` | The system or a downstream resource is out of capacity. |
 | `GenericError` | A generic failure that fits no more specific category (think "500 Internal Server Error"). |

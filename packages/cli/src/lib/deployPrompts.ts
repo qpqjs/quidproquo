@@ -5,11 +5,11 @@
 import { Nullable } from '@qpqjs/core';
 
 import { getPositionalArgs } from './args';
+import { CliError } from './CliError';
+import { createOutput } from './createOutput';
 import { getServiceNames } from './discovery';
 import { getDeployTargetLabel } from './getDeployTargetLabel';
 import { promptSelect, promptTypedConfirmation, promptYesNo } from './prompts';
-import { CliError } from './CliError';
-import { createOutput } from './out';
 
 const out = createOutput('deploy-prompts');
 

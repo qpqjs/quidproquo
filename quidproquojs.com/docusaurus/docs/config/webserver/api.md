@@ -40,7 +40,6 @@ The API's name and its `uniqueKey` within the config. Unless overridden by `opti
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `subDomain` | `string` | `apiName` | Override the subdomain the API is served on. Use it when the API name and the public subdomain should differ. |
-| `cloudflareApiKeySecretName` | `string` | – | Name of the secret holding the Cloudflare API key, used when DNS/records for the API are managed through Cloudflare. |
 | `virtualNetworkName` | `string` | – | Name of a `defineVirtualNetwork` (VPC) to place the API's Lambda in. Required to reach in-VPC data stores; the Lambda joins that network's bootstrap-created workload security group. |
 | `maxConcurrentExecutions` | `number` | – | Reserved concurrency for the API's Lambda — a cap **and** a guarantee on concurrent requests across all routes (one compute unit serves every route). Carved out of the account's shared concurrency pool. |
 | `deprecated` | `boolean` | `false` | Marks the API as deprecated. Inherited from `QPQConfigAdvancedSettings`. |

@@ -7,8 +7,8 @@
 import { qpqDeployAwsUtils } from '@qpqjs/deploy-aws';
 
 import { synthCommand } from '../../commands/synth';
+import { createOutput } from '../../lib/createOutput';
 import { TeardownPlan } from '../../lib/deployPrompts';
-import { createOutput } from '../../lib/out';
 import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { isAwsCredentialsValid } from './awsCredentials';

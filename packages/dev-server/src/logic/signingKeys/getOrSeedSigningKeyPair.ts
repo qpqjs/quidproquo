@@ -1,10 +1,8 @@
 import { generateRs256KeyPair, Rs256KeyPair } from '@qpqjs/actionprocessor-node';
 import { QPQConfig, qpqCoreUtils } from '@qpqjs/core';
 
-import * as path from 'path';
-
 import { resolveOwnedStoreLocation } from '../config/resolveOwnedStoreLocation';
-import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
+import { getOrSeedJsonFileStoreValue } from '../jsonFileStore';
 
 // Offline stand-in for an asymmetric KMS key: an RSA-2048 pair per configured
 // signing key, generated on first use. Same file layout as the crypto key store:
@@ -15,38 +13,10 @@ import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
 const SIGNING_KEYS_STORE_DIRECTORY = 'signingKeys';
 
-// Concurrent first-use callers (parallel smoke tests on a fresh checkout) must
-// share one generation, otherwise each seeds its own pair and last write wins,
-// so callers hold different keys for the same name
-const inFlightSeeds = new Map<string, Promise<Rs256KeyPair>>();
-
-const readOrSeed = async (runtimePath: string, serviceName: string, key: string): Promise<Rs256KeyPair> => {
-  const keys = await readJsonFileStore<Rs256KeyPair>(runtimePath, SIGNING_KEYS_STORE_DIRECTORY, serviceName);
-
-  const existing = keys[key];
-  if (existing !== undefined) {
-    return existing;
-  }
-
-  const keyPair = generateRs256KeyPair();
-  await writeJsonFileStore(runtimePath, SIGNING_KEYS_STORE_DIRECTORY, serviceName, { ...keys, [key]: keyPair });
-
-  return keyPair;
-};
-
 export const getOrSeedSigningKeyPair = async (runtimePath: string, signingKeyName: string, qpqConfig: QPQConfig): Promise<Rs256KeyPair> => {
   const signingKeyConfig = qpqCoreUtils.resolveSigningKeyOrThrow(signingKeyName, qpqConfig);
 
   const { serviceName, key } = resolveOwnedStoreLocation(signingKeyName, signingKeyConfig.owner, qpqConfig);
 
-  const seedKey = path.join(runtimePath, serviceName, key);
-  const inFlight = inFlightSeeds.get(seedKey);
-  if (inFlight) {
-    return inFlight;
-  }
-
-  const seed = readOrSeed(runtimePath, serviceName, key).finally(() => inFlightSeeds.delete(seedKey));
-  inFlightSeeds.set(seedKey, seed);
-
-  return seed;
+  return getOrSeedJsonFileStoreValue(runtimePath, SIGNING_KEYS_STORE_DIRECTORY, serviceName, key, generateRs256KeyPair);
 };

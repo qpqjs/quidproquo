@@ -1,4 +1,4 @@
-import { createOutput } from './out';
+import { createOutput } from './createOutput';
 
 const out = createOutput('prompts');
 // Present a single-choice list prompt and return the selected value.

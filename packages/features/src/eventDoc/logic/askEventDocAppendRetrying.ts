@@ -5,20 +5,10 @@ import {
   EVENT_DOC_APPEND_RETRY_BASE_WAIT_MS,
   EVENT_DOC_APPEND_RETRY_MAX_JITTER_MS,
 } from '../constants/eventDocAppendRetry';
-import { EventDocAppendBase, EventDocEvent } from '../models';
+import { EventDocAppendBase, EventDocAppendLap, EventDocEvent } from '../models';
 import { askEventDocAppendBaseAdvance } from './askEventDocAppendBaseAdvance';
 import { askEventDocAppendBaseResolve } from './askEventDocAppendBaseResolve';
 import { askEventDocValidateAppendRun } from './askEventDocValidateAppendRun';
-
-export type EventDocAppendLap<T extends EventDocEvent[]> = {
-  // The events to claim from head + 1 on, built again from the advanced base on every lap.
-  buildEvents: (base: EventDocAppendBase) => T;
-  // The conditional write; its slot race errors are the ones that re-lap.
-  askWrite: (modelId: string, events: T) => AskResponse<void>;
-  slotRaceErrorTypes: string[];
-  // The Conflict text once every lap has been lost.
-  contentionText: string;
-};
 
 /**
  * The one append lap: resolve the head, build the events on it, validate them against the state at head when the

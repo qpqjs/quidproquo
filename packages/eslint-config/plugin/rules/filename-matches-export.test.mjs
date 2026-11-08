@@ -17,9 +17,11 @@ ruleTester.run('filename-matches-export', rule, {
     { code: 'export const a = 1; export const b = 2;', filename: 'anything.ts' },
     { code: 'export default 1;', filename: 'anything.ts' },
     { code: 'export const a = 1;', filename: 'index.ts' },
+    { code: 'export const collectExports = 1;', filename: 'collectExports.mjs' },
   ],
   invalid: [
     { code: 'export const askTenantRead = 1;', filename: 'tenantRead.ts', errors: [{ messageId: 'mismatch' }] },
     { code: 'export const MAX_ITEMS = 3000;', filename: 'MAX_ITEMS.ts', errors: [{ messageId: 'mismatch' }] },
+    { code: 'export const collectExports = 1;', filename: 'exportsOfFile.mjs', errors: [{ messageId: 'mismatch' }] },
   ],
 });

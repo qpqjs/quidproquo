@@ -1,9 +1,10 @@
-import { runCommandCaptureSync, runCommandSync } from './runCommand';
 import { JavascriptRuntimeArchitecture } from '@qpqjs/core';
 import { USER_SCRIPT_BUILDER_LAYER_MODULES } from '@qpqjs/user-script';
 
 import fs from 'fs';
 import path from 'path';
+
+import { runCommandCaptureSync, runCommandSync } from './runCommand';
 
 const MIN_NPM_MAJOR = 9;
 

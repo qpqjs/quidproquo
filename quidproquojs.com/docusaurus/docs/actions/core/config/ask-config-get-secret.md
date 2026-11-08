@@ -20,7 +20,7 @@ interface Charge {
 export function* askCreateCharge(amountCents: number) {
   const apiKey = yield* askConfigGetSecret('payment-provider-api-key');
 
-  const response = yield* askNetworkRequest<{ amount: number }, Charge>('POST', 'https://api.example.com/charges', {
+  const response = yield* askNetworkRequest<Charge, { amount: number }>('POST', 'https://api.example.com/charges', {
     headers: { Authorization: `Bearer ${apiKey}` },
     body: { amount: amountCents },
   });
@@ -52,7 +52,7 @@ function* askConfigGetSecret(
 | Error | Meaning |
 | --- | --- |
 | `askConfigGetSecret.errorTypeEnum.ResourceNotFound` | No secret with that name exists. |
-| `askConfigGetSecret.errorTypeEnum.Throttling` | The request rate exceeded the provider's limit; back off and retry. |
+| `askConfigGetSecret.errorTypeEnum.Throttled` | The request rate exceeded the provider's limit; back off and retry. |
 
 ## Related
 

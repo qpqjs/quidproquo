@@ -4,8 +4,9 @@ import { S3Event } from 'aws-lambda';
 
 import { getS3FileEventEventProcessor } from '../getActionProcessor';
 import { getBlankStorySession } from './helpers/getBlankStorySession';
-import { getLambdaEnvironment, requireLambdaEnvironment } from './helpers/getLambdaEnvironment';
+import { getLambdaEnvironment } from './helpers/getLambdaEnvironment';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
+import { requireLambdaEnvironment } from './helpers/requireLambdaEnvironment';
 
 export const getS3Event_fileEvent = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<S3Event>(

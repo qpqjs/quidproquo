@@ -2,7 +2,7 @@ import { askConfigGetApplicationInfo, askDateNow, askFileReadBinaryContents, Ask
 
 import { askEventDocStoreReadOrThrow } from '../../eventDoc/context';
 import { askEventDocEventListAll, askEventDocListAssets, askEventDocResolveScope, eventDocAssetPath } from '../../eventDoc/data';
-import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants';
+import { EVENT_DOC_TRANSFER_BUNDLE_FORMAT_VERSION } from '../constants/eventDocTransferBundleFormatVersion';
 import { EventDocBundle, EventDocBundleAsset, EventDocBundleDoc, EventDocDocRef, EventDocTransferRegistry } from '../models';
 import { askEventDocTransferProvideCollection } from './askEventDocTransferProvideCollection';
 

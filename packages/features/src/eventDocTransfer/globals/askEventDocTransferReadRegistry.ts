@@ -1,6 +1,6 @@
 import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
-import { EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
+import { EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants/eventDocTransferGlobalNames';
 import { EventDocTransferCollection, EventDocTransferRegistry } from '../models';
 
 // The definer emits '' for an unset hook; the store builder wants undefined.

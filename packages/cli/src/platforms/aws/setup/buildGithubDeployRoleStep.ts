@@ -2,7 +2,7 @@ import { awsNamingUtils, qpqConfigAwsUtils } from '@qpqjs/config-aws';
 
 import { GetRoleCommand, IAMClient } from '@aws-sdk/client-iam';
 
-import { createOutput } from '../../../lib/out';
+import { createOutput } from '../../../lib/createOutput';
 import { SetupCheckResult, SetupStep } from '../../../lib/setupStep';
 import { AwsSetupContext } from './awsSetupContext';
 

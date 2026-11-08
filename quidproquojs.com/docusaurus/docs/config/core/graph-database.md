@@ -24,7 +24,7 @@ export default [
 ```typescript
 function defineGraphDatabase(
   name: string,
-  virualNetworkName: string,
+  virtualNetworkName: string,
   options?: QPQConfigAdvancedGraphDatabaseSettings,
 ): GraphDatabaseQPQConfigSetting;
 ```
@@ -35,11 +35,9 @@ function defineGraphDatabase(
 
 The name of the graph database. This is the name you pass as the first argument to [askGraphDatabaseExecuteOpenCypherQuery](../../actions/core/graph-database/ask-graph-database-execute-open-cypher-query.md). It is also the database's `uniqueKey` within the config, and on AWS it is used to derive the physical Neptune cluster name (prefixed with application/module/environment, so the same config deploys to multiple environments without collisions).
 
-### `virualNetworkName` — `string` (required)
+### `virtualNetworkName` — `string` (required)
 
 The name of the **virtual network** (VPC) the database is deployed into. Only workloads attached to this same network can reach the cluster. This must match a virtual network declared for the service.
-
-> **Note:** the parameter is spelled `virualNetworkName` (missing the second "t") in the source. This has no effect on usage — you pass the network name as a plain string — but it is the literal property name on the config setting.
 
 ### `options` — `QPQConfigAdvancedGraphDatabaseSettings` (optional)
 

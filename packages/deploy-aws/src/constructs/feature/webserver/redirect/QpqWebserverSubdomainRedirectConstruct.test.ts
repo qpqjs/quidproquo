@@ -1,13 +1,10 @@
 import { defineAwsServiceAccountInfo, defineWafProtection } from '@qpqjs/config-aws';
 import { QPQConfig } from '@qpqjs/core';
-import { buildTestQpqConfig } from '@qpqjs/testing';
+import { buildTestQpqConfig, createScratchBuildRoot } from '@qpqjs/testing';
 import { defineDns, defineSubdomainRedirect, qpqWebServerUtils } from '@qpqjs/webserver';
 
 import { App, Stack } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
 import { describe, expect, it, vi } from 'vitest';
 
 import { QpqWebserverSubdomainRedirectConstruct } from './QpqWebserverSubdomainRedirectConstruct';
@@ -20,10 +17,8 @@ vi.mock('@qpqjs/actionprocessor-aws', async (importOriginal: any) => ({
 }));
 
 // Code.fromAsset needs the bundle folder to exist, so the config roots at a scratch build dir.
-const configRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'qpq-redirect-synth-'));
-fs.mkdirSync(path.join(configRoot, 'build', 'apiGatewayEventHandler_redirect'), { recursive: true });
-extensionLayer.path = path.join(configRoot, 'extension-layer');
-fs.mkdirSync(extensionLayer.path);
+const { configRoot, extensionLayerPath } = createScratchBuildRoot(['apiGatewayEventHandler_redirect'], 'qpq-redirect-synth-');
+extensionLayer.path = extensionLayerPath;
 
 const synth = (extra: QPQConfig = []) => {
   const qpqConfig = buildTestQpqConfig(
@@ -54,8 +49,15 @@ describe('QpqWebserverSubdomainRedirectConstruct', () => {
     template.resourceCountIs('AWS::WAFv2::WebACLAssociation', 1);
     template.hasResourceProperties('AWS::WAFv2::WebACLAssociation', {
       ResourceArn: Match.objectLike({ 'Fn::Join': Match.anyValue() }),
-      WebACLArn: Match.anyValue(),
+      WebACLArn: { Ref: Match.anyValue() },
     });
+
+    // The acl arn is read from ssm at deploy, so the association refs a template parameter whose default is the
+    // parameter name. API Gateway only accepts a regional acl, so that name must be the regional one.
+    const association = Object.values(template.findResources('AWS::WAFv2::WebACLAssociation'))[0] as any;
+    const ssmParameter = template.toJSON().Parameters[association.Properties.WebACLArn.Ref];
+    expect(ssmParameter.Type).toBe('AWS::SSM::Parameter::Value<String>');
+    expect(ssmParameter.Default).toBe('/qpq/waf/web-acl-arn/regional/test-app-development');
   });
 
   it('adds no association when waf protection is off', () => {

@@ -6,7 +6,11 @@ import { describe, expect, it } from 'vitest';
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
 import { defineTenantedEventDocTransfer } from '../../tenant/config/defineTenantedEventDocTransfer';
 import { TENANT_EVENT_DOC_AUTHORISER_FN } from '../../tenant/constants/tenantStoreNames';
-import { EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL, EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
+import {
+  EVENT_DOC_TRANSFER_AUTHORISER_GLOBAL,
+  EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
+  EVENT_DOC_TRANSFER_SERVICE_GLOBAL,
+} from '../constants/eventDocTransferGlobalNames';
 import { defineEventDocTransfer } from './defineEventDocTransfer';
 
 const collections = [{ storeName: 'templates', type: 'template' }];

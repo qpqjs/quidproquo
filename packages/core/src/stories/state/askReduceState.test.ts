@@ -7,7 +7,7 @@ import { askStateRead } from '../../actions/state/askStateRead';
 import { askStateDispatchEffect } from '../../logic/stateEffects/askStateDispatchEffect';
 import { buildMutableEffectReducer } from '../../logic/stateEffects/buildMutableEffectReducer';
 import { Effect } from '../../logic/stateEffects/Effect';
-import { AskResponse, EitherActionResult } from '../../types';
+import { AskResponse, EitherActionResult, Nullable } from '../../types';
 import { askCatch } from '../system/askCatch';
 import { askReduceState } from './askReduceState';
 
@@ -71,7 +71,7 @@ describe('askReduceState', () => {
   });
 
   it('askStateRead returns the current accumulated state mid-flight', () => {
-    let observed: CounterState | null = null;
+    let observed: Nullable<CounterState> = null;
 
     function* logic(): AskResponse<void> {
       yield* askStateDispatchEffect<AddEffect>(CounterEffect.Add, 3);
@@ -107,8 +107,8 @@ describe('askReduceState', () => {
   });
 
   it('bubbles effects the inner reducer does not handle up to the outer reducer', () => {
-    let innerState: CounterState | null = null;
-    let innerReadDuringRun: CounterState | null = null;
+    let innerState: Nullable<CounterState> = null;
+    let innerReadDuringRun: Nullable<CounterState> = null;
 
     function* innerLogic(): AskResponse<void> {
       yield* askStateDispatchEffect<AddEffect>(CounterEffect.Add, 2);
@@ -132,7 +132,7 @@ describe('askReduceState', () => {
   });
 
   it('does not double-wrap a read captured under askCatch', () => {
-    let read: EitherActionResult<CounterState> | null = null;
+    let read: Nullable<EitherActionResult<CounterState>> = null;
 
     function* logic(): AskResponse<void> {
       yield* askStateDispatchEffect<AddEffect>(CounterEffect.Add, 4);
@@ -149,7 +149,7 @@ describe('askReduceState', () => {
   });
 
   it('forwards a bubbled dispatch result verbatim under askCatch (nested)', () => {
-    let caught: EitherActionResult<void> | null = null;
+    let caught: Nullable<EitherActionResult<void>> = null;
 
     function* innerLogic(): AskResponse<void> {
       // Mark is unhandled by counterReducer -> bubbles to the outer markReducer. Wrapping the

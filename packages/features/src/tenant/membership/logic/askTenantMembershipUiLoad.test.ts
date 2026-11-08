@@ -36,9 +36,10 @@ describe('askTenantMembershipUiLoad', () => {
     runStory(askTenantMembershipUiLoad(target, tenantId), mocks);
 
     expect(requested).toEqual(['/v1/my-tenants/tenant-a/membership', '/v1/my-tenants/tenant-a/roles']);
+    // askUiCatch clears the last error before raising the busy flag, so a retry never shows both.
     expect(dispatched.map((effect) => effect.type)).toEqual([
-      TenantMembershipUiEffect.SetLoading,
       TenantMembershipUiEffect.SetError,
+      TenantMembershipUiEffect.SetLoading,
       TenantMembershipUiEffect.SetMembership,
       TenantMembershipUiEffect.SetRoles,
       TenantMembershipUiEffect.SetLoading,

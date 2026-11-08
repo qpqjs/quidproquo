@@ -74,7 +74,7 @@ export type EventBusMessage<T> = {
 | --- | --- |
 | `EventBusSendMessagesErrorTypeEnum.AccessDenied` | The caller lacks permission to publish to the topic. |
 | `EventBusSendMessagesErrorTypeEnum.TopicNotFound` | The underlying topic does not exist. |
-| `EventBusSendMessagesErrorTypeEnum.ServiceUnavailable` | Internal error or throttling from the messaging service. |
+| `EventBusSendMessagesErrorTypeEnum.Throttled` | Internal error or throttling from the messaging service. |
 
 Errors thrown by actions can be caught with `askCatch` from @qpqjs/core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

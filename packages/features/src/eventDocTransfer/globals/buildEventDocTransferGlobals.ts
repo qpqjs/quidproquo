@@ -3,7 +3,7 @@ import {
   EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL,
   EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_TRANSFER_SERVICE_GLOBAL,
-} from '../constants';
+} from '../constants/eventDocTransferGlobalNames';
 import { EventDocTransferCollection } from '../models';
 
 /** Input to buildEventDocTransferGlobals. */

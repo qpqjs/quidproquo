@@ -86,7 +86,6 @@ Each value is a `QpqFunctionRuntime` — a reference to a story entry point, wri
 | --- | --- | --- | --- |
 | `apiName` | `string` | `'api'` | Logical name for the API. Used to derive the deployed WebSocket API's resource/export names and passed to [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md) as `websocketApiName` when sending to connections on this API. |
 | `onRootDomain` | `boolean` | `false` | When `true`, the API's custom domain is built from the base domain rather than the module's service domain. |
-| `cloudflareApiKeySecretName` | `string` | – | Name of the secret holding a Cloudflare API key, for DNS setups fronted by Cloudflare. |
 | `maxConcurrentExecutions` | `number` | – | Reserved concurrency for the API's Lambda. Caps and guarantees concurrent event processing: never throttled below it, never scales above it. One compute unit serves all of the API's event processors (connect/disconnect/message), so this bounds the API as a whole. Carved out of the deploy account's shared concurrency pool. |
 | `deprecated` | `boolean` | `false` | When `true`, the API is not deployed. Use to retire an API without deleting its config. |
 | `owner` | `CrossModuleOwner<'websocketApiName'>` | – | Declares that this WebSocket API is owned by **another** module/service, so this service references it rather than deploying its own. |

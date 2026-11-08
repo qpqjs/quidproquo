@@ -12,7 +12,7 @@ import { buildTestQpqConfig, buildTestStorySession, invokeProcessor, noopDynamic
 import { describe, expect, it, vi } from 'vitest';
 
 import { buildTestDevServerConfig } from '../../../__fixtures__/buildTestDevServerConfig';
-import { signDevJwt } from '../../../logic/auth/devJwt';
+import { signDevJwt } from '../../../logic/auth/signDevJwt';
 import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirectoryReadAccessTokenActionProcessor';
 
 vi.mock('../../../logic/auth/devJwtSecret', () => ({ getOrSeedDevJwtSecret: vi.fn(async () => 'test-secret') }));

@@ -1,10 +1,12 @@
 export { buildStoryResult } from './buildStoryResult';
 export * from './configTesting';
+export { createScratchBuildRoot } from './createScratchBuildRoot';
 export { expectGenerator, GeneratorExpectChain } from './generatorExpect';
 export { invokeProcessor, ProcessorRuntimeOverrides } from './invokeProcessor';
 export * from './requesterTesting';
 export { resolveEventProcessor } from './resolveEventProcessor';
 export * from './runtimeTesting';
+export { ScratchBuildRoot } from './ScratchBuildRoot';
 export * from './storyTesting';
 export * from './types';
 

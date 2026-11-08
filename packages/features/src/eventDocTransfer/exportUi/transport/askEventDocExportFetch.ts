@@ -1,7 +1,7 @@
 import { AskResponse, askThrowError, ErrorTypeEnum } from '@qpqjs/core';
 import { askApiRequest } from '@qpqjs/webserver';
 
-import { eventDocTransferEndpoint } from '../../constants';
+import { eventDocTransferEndpoint } from '../../constants/eventDocTransferEndpoint';
 import { EventDocDocRef, EventDocTransferExportResult } from '../../models';
 
 /** POST /transfer/export: stages the bundle and returns a short-lived download url. */

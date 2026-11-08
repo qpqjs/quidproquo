@@ -3,6 +3,7 @@ import path from 'path';
 
 import { listFilesRecursive } from '../lib/listFilesRecursive';
 import { readJsonFile } from '../lib/readJsonFile';
+import { readSharedPrettierOptions } from '../lib/readSharedPrettierOptions';
 import { writeJsonFile } from '../lib/writeJsonFile';
 import { AppLanguage, CreateQpqAppStep } from '../types';
 
@@ -26,9 +27,9 @@ export const transpileToJavaScript: CreateQpqAppStep = {
     /* eslint-enable @typescript-eslint/no-require-imports */
 
     // The transpiler re-prints files in its own style; format the output with
-    // the app's own prettier settings so generated code matches the repo.
-    const prettierRcPath = path.join(targetDirectory, '.prettierrc');
-    const prettierOptions = fs.existsSync(prettierRcPath) ? readJsonFile(prettierRcPath) : {};
+    // the shared prettier settings the app's own prettier.config.mjs re-exports,
+    // so generated code passes the app's prettier/prettier rule.
+    const prettierOptions = readSharedPrettierOptions();
 
     const compilerOptions: import('typescript').CompilerOptions = {
       target: ts.ScriptTarget.ESNext,

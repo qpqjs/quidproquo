@@ -1,19 +1,9 @@
 import { askThrowError } from '../../actions/error/askThrowError';
 import { AnyGraphResult } from '../../config/settings/graphDatabase/types/AnyGraphResult';
-import { GraphNodeResult } from '../../config/settings/graphDatabase/types/GraphNodeResult';
-import { GraphRelationshipResult } from '../../config/settings/graphDatabase/types/GraphRelationshipResult';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { AskResponse } from '../../types/StorySession';
+import { GraphResultConverters } from './GraphResultConverters';
 import { isGraphScalarResult } from './isGraphScalarResult';
-
-/** What a vendor supplies to turn its own result cells into the platform-neutral graph results. */
-export type GraphResultConverters<TResult, TNode extends TResult, TRelationship extends TResult> = {
-  vendor: string;
-  isNode: (result: TResult) => result is TNode;
-  isRelationship: (result: TResult) => result is TRelationship;
-  askConvertNode: (node: TNode) => AskResponse<GraphNodeResult>;
-  askConvertRelationship: (relationship: TRelationship) => AskResponse<GraphRelationshipResult>;
-};
 
 /**
  * Builds the story that converts any one cell of a vendor's query result: scalars pass through,

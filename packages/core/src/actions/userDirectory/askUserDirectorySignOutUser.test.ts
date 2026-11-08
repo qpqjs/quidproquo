@@ -12,9 +12,12 @@ describe('askUserDirectorySignOutUser', () => {
     expect(action).toEqual({ type: UserDirectoryActionType.SignOutUser, payload: { accessToken: 'token' } });
   });
 
+  // The result type is void, so the runtime's answer is a sentinel here: a requester that dropped the
+  // resolved value would return undefined and pass a check against undefined.
   it('returns the value the runtime resolves', () => {
-    const { returned } = captureRequester(askUserDirectorySignOutUser('token'), undefined);
+    const sentinel = { resolvedBy: 'runtime' };
+    const { returned } = captureRequester(askUserDirectorySignOutUser('token'), sentinel);
 
-    expect(returned).toEqual(undefined);
+    expect(returned).toBe(sentinel);
   });
 });

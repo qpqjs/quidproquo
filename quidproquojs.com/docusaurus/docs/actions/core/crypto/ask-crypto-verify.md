@@ -48,7 +48,7 @@ function* askCryptoVerify(
 | `askCryptoVerify.errorType.KeyNotConfigured` | No `defineSigningKey` with that name exists in the service config. |
 | `askCryptoVerify.errorType.MalformedSignature` | `signature` is not base64url. Probable encoding bug at the caller, not an attack; do not treat as `false`. |
 | `askCryptoVerify.errorType.KeyUnavailable` | The key exists in config but is disabled, deleted, or access was denied. |
-| `askCryptoVerify.errorType.Throttling` | The provider rate limit was exceeded; back off and retry. |
+| `askCryptoVerify.errorType.Throttled` | The provider rate limit was exceeded; back off and retry. |
 
 ## Related
 

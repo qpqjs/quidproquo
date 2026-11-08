@@ -10,10 +10,10 @@
 // Commands that can meaningfully run for every app may pass allowAll to accept
 // `--app all` (returned as the literal 'all').
 import { getArgValue } from './args';
+import { CliError } from './CliError';
+import { createOutput } from './createOutput';
 import { getAvailableApps } from './discovery';
 import { promptSelect } from './prompts';
-import { CliError } from './CliError';
-import { createOutput } from './out';
 
 const out = createOutput('resolve-app-selection');
 

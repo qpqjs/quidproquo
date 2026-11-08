@@ -38,7 +38,7 @@ function* askAdminGetLogs(
   startIsoDateTime: string,
   endIsoDateTime: string,
   nextPageKey?: string,
-): AskResponse<QpqLogList>;
+): AskResponse<QpqPagedData<StoryResultMetadata>>;
 ```
 
 ## Parameters
@@ -52,13 +52,13 @@ function* askAdminGetLogs(
 
 ## Returns
 
-`QpqLogList` — a page of metadata summaries:
+`QpqPagedData<StoryResultMetadata>`, the core paging shape, holding one page of metadata summaries:
 
 ```typescript
-export interface QpqLogList {
-  items: StoryResultMetadata[];
+type QpqPagedData<T> = {
+  items: T[];
   nextPageKey?: string;
-}
+};
 ```
 
 `nextPageKey` is present when more results remain; pass it back in to continue paging. When it is absent, you have reached the end of the window.

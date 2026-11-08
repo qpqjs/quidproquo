@@ -6,7 +6,7 @@ import { buildUserScript, checkUserScriptOutput, UserScriptBuildError } from '@q
 import path from 'path';
 
 import { getArgValue, getPositionalArgs, hasArgFlag } from '../lib/args';
-import { createOutput } from '../lib/out';
+import { createOutput } from '../lib/createOutput';
 
 const out = createOutput('script:build');
 

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { askKeyValueStoreUpdateBase } from '../../actions/keyValueStore/askKeyValueStoreUpdate';
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
-import { ActionOf } from '../../types';
+import { ActionOf, ErrorTypeEnum } from '../../types';
 import { askKeyValueStoreUpdatePartialProperties } from './askKeyValueStoreUpdatePartialProperties';
 
 type Widget = {
@@ -66,7 +66,9 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
         [KeyValueStoreActionType.Update]: update,
       });
 
-    expect(act).toThrowError(/not a supported kvs data type/);
+    expect(act).toThrowError(
+      expect.objectContaining({ errorType: ErrorTypeEnum.Invalid, errorText: expect.stringMatching(/not a supported kvs data type/) }),
+    );
     expect(update).not.toHaveBeenCalled();
   });
 });
