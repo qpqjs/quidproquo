@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.5.0
+
+- features/core: `askEventDocAuthorise` is the one story that runs a collection's `authorise` hook for routes, mcp calls and websocket chats, and core gains `askValidateSchemaOrThrowError` as the single zod parse-or-throw
+- features: event doc transfer import is stricter. It needs `INIT_STATE` to open a new doc, validates a fast-forward tail against the stored prefix, checks the bundle tail before a forced overwrite, fails closed when the authoriser's global can't be read, and a rejected bundle doc becomes a blocked row while the rest still lands
+- features: a failed event doc ai send reloads the chat from the server, `askUiCatch` clears the error before raising busy, and the admin replay pauses an attached debugger again
+- dev-server: local email writes one copy per receiver drive and matches display-name recipients by bare address, queue retries release their concurrency slot and end at shutdown, failed story results are retried, refresh refuses an expired refresh token, and jwt secret seeding is serialised per store file
+- cli: output prefixes every line, keeps blank lines and rewrites rows with the prefix
+- actionprocessor-aws/deploy-aws: aws event processors take their handler's environment instead of reading `process.env` on load, the foreign kvs grant targets the table the runtime actually reaches, and the forgot password mask answers the email shape for alias usernames
+- deploy-aws: csp is only added when the app configures one, and the cognito define and create auth challenge events carry `userNotFound`
+- config-aws/deploy-aws: one storage tier to s3 class mapping, `toRemovalPolicy` and a shared regional web acl association replace copies across constructs
+- core: `getForeignItems` sits beside `getOwnedItems`, and one shared sleep replaces the copies in the dev server, dynamo batch writes and the cli
+- testing: `createScratchBuildRoot` replaces three copied synth test setups
+- eslint-config: stricter one export per file and barrel rules (G1, G6), and the `lib/` ignore is anchored to the package root so `src/lib` folders get linted
+- tsconfig: the shared esm and commonjs configs carry `include`, `exclude` and `outDir`
+- docs: fixed examples and error tables that named removed or renamed apis
+
+### Breaking changes
+
+- config-aws: `getAppStackName` takes the optional feature last
+- deploy-aws: `getForeignConfigs` is removed, use `qpqCoreUtils.getForeignItems`
+- tsconfig: shared configs now set `include`, `exclude` and `outDir`, so a package extending one without its own `include` compiles `src` only
+- features: `askMcpEventDocAiAuthorise` is removed, use `askEventDocAuthorise`
+
 ## 0.4.0
 
 - core/webserver/features: config accessors follow one shape per setting (`getAll…Configs`, `getOwned…Configs`, `get…ByName`, `resolve…OrThrow`) for queues, key value stores, storage drives, event buses, caches, websockets, apis, email receivers, user directories, keys, secrets, parameters and the dns, email sender and user script runner singletons

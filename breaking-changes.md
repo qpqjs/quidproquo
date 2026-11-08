@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.5.0
+
 - `@qpqjs/config-aws`: `awsNamingUtils.getAppStackName(application, environment, feature, suffix)` is now `getAppStackName(application, environment, suffix, feature?)`, with the optional feature last like the other name builders.
 - `@qpqjs/deploy-aws`: `qpqDeployAwsUtils.getForeignConfigs(configs, qpqConfig)` is removed. Use `qpqCoreUtils.getForeignItems(settings, qpqConfig)` from `@qpqjs/core`, the inverse of `getOwnedItems`, which now lives beside it.
 - `@qpqjs/tsconfig`: `tsconfig.commonjs.json` and `tsconfig.esm.json` now set `include` (`src`), `exclude` (tests, `__fixtures__`, `testing` folders) and `outDir` (`lib/commonjs`, `lib/esm`) relative to the extending package. A config that extended one of them without its own `include` compiled everything under its folder and now compiles `src` only; a config with its own `exclude` keeps it, since `exclude` replaces the inherited list.
