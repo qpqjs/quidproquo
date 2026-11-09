@@ -121,7 +121,7 @@ jobs:
       # versions were never published, say a branch with a local bump).
       - name: wait for npm
         if: ${{ inputs.from_npm }}
-        timeout-minutes: 15
+        timeout-minutes: 30
         env:
           POLL_MS: '30000'
         run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/watchNpmVersions.ts
