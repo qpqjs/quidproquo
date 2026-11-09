@@ -404,6 +404,10 @@ Each slice ships on its own and is reviewable alone.
     - **End to end (`runStory`):** events appended through the consumer and read back through EventDoc and the real month fold across two months, a redelivered message counted once; a declared view by name; another tenant reading none of it (a security regression); Invalid for an unknown view, a bad ad hoc view and an overlong period.
 17. Export from `packages/features/src/index.ts` (through the reports barrel). A docs page for `askReportAppend` and `askReportRead` beside the `defineReports` one in the docs site is still to write; `breaking-changes.md` untouched (additive).
 
+#### Smoke suite (built 9 Nov 2026, not yet run)
+
+18. `quidproquojs.com/apps/qpqjs`: `defineSmokeReport()` in the app's `service-utils` (report `smoke`, owned by the test service, `+10:00`, scoped, one declared view `smokeByKind`), declared by both the test service and testa. The test service's `suites/reports` has two tests: `reports` appends three events in a fresh scope, waits for the queue to fold them and checks totals, min and max, groups, the seven daily buckets, a filtered read and that another scope reads nothing; `reportsCrossService` has testa append through its reference to the test service's bus, waits for the owner's queue to fold the events, then has testa read them back through its references to the test service's stores and its own registration of the month fold. It runs in CI: the `local-smoke` job on a dev server, and the deployed smoke after a site deploy. Each run leaves its month documents behind in its own scope until retention (slice 4) can destroy them.
+
 #### Slice 4: retention
 
 17. Uplift `askEventDocDestroy` from Kiln into `packages/features/src/eventDoc/logic/` with the tombstone on the append path, per the Kiln design's "hard destroy" section. Its own plan when it is picked up; this slice depends on it.
