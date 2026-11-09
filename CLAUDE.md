@@ -125,8 +125,9 @@ When writing documentation, comments, or user-facing frontend copy (e.g. the lan
 
 All code conventions (comments, types, story and config rules, module and file layout, processors, tests, application layout) are in `docs/code-standards.md`. Read it before writing or reviewing code and cite rule ids (G1, C3, ...) in reviews. CLAUDE.md does not repeat them; if this file and that document ever disagree, the document wins.
 
-Three rules worth restating because they bite most often:
+Four rules worth restating because they bite most often:
 
+- Everything outside an action processor is pure (G12): stories, logic, folds, core utils and `define*` config hold no clock, randomness, `process.env`, I/O, `Intl` time zone lookups or module-level state (caches, singletons). Impure work is an action and its processor; the story passes the result in, and config takes its settings as arguments.
 - Every generator is `ask<Domain><Verb>` and deterministic (`askDateNow`, `askGuidNew`; never `Date.now()` or `Math.random()` in a story). Entry handlers are named after their trigger.
 - Throw with `return yield* askErrorThrow(...)`; clear loading flags through `askCatch`'s finally parameter.
 - `define*` returns config only and is never spread; names are derived, platform concerns live in the owning layer.

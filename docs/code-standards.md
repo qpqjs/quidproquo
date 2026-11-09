@@ -69,6 +69,17 @@ export const SIGN_DEV_PORT = 3074;
 
 **G11. No dead code.** No commented-out blocks, no placeholder exports (an unused package is exactly `export {};`), no exports only their own file uses, no tracked scratch files. A TODO names its owner by GitHub handle: `// TODO: @joe-coady: refactor this to be faster`.
 
+**G12. Pure by default; impure work is an action.** Every function outside an action processor is pure: its result depends only on its arguments, and it changes nothing a caller can see. That covers stories, logic, folds and reducers, core utils, models and `define*` config. Anything that reads or changes the world is an action, and the story passes its result in: the clock, randomness and ids, `process.env`, I/O and the network, logging, the runtime's own data (the `Intl` time zone tables), and module-level mutable state (caches, counters, singletons). Config takes its settings as arguments, never by looking them up. Local mutation inside one call that no caller can see is fine. Processors are the impure edge, and a cache lives there (the KMS key caches in `actionprocessor-aws`), along with deploy, the CLI and the dev server's runtime; React hooks follow E5. C2 is this rule for stories.
+
+```ts
+// impure: a cache every caller shares, and the runtime's time zone tables
+const formats = new Map<string, Intl.DateTimeFormat>();
+export const getZonedHour = (at: Date, timeZone: string) => ...;
+
+// pure: what varies arrives as an argument
+export const reportBucketKeys = (at: QpqIsoDateTime, utcOffsetMinutes: number): ReportBucketKeys => ...;
+```
+
 ---
 
 ## Actions and requesters
