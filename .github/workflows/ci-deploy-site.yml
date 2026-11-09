@@ -18,9 +18,23 @@ name: ci-deploy-site
 # deploy job, once the gates pass, only pushes that saved build to AWS and
 # smoke tests it.
 #
-# Called by deploy-site.yml, which maps branches to environments. A caller has
-# to grant `id-token: write`: a reusable workflow can narrow what it is given,
-# never widen it.
+# Called by deploy-site.yml, which maps branches to environments, and by
+# release.yml, which deploys production on the packages it just published. A
+# caller has to grant `id-token: write`: a reusable workflow can narrow what it
+# is given, never widen it.
+#
+# Two ways to source the qpq packages. By default the site's file: links point
+# at the monorepo, which is built first, so a push deploys this repo's own lib
+# folders. With `from_npm` the monorepo is never installed or built: the site
+# is pinned to the published versions instead (scripts/sitePinQpq.ts), the
+# ones the checked out package.json files name, after waiting for the registry
+# to serve them, and installed fresh from npm. Never installed, not just not
+# built, because node resolves modules up through parent folders: anything a
+# published package forgot to declare would be found in the repo root's
+# node_modules and the deploy would pass anyway. The two scripts that run on
+# that path need only node builtins, and run under a tsx fetched by npx at the
+# version the root package.json pins. That is the release deploy, and the only
+# deploy that proves what npm serves installs, builds and runs.
 on:
   workflow_call:
     inputs:
@@ -28,6 +42,16 @@ on:
         description: The environment to deploy (development, staging, production)
         type: string
         required: true
+      from_npm:
+        description: Pin the site to the published qpq packages (the versions the checkout names) instead of the monorepo
+        type: boolean
+        required: false
+        default: false
+      ref:
+        description: The git ref to check out; empty means the calling run's commit
+        type: string
+        required: false
+        default: ''
 
 jobs:
   # Deploy gate: the unit tests on the node version the deploy runs on. When
@@ -68,6 +92,8 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v5
         with:
@@ -79,11 +105,39 @@ jobs:
 
       # Build the monorepo first: quidproquojs.com pulls the @qpqjs/*
       # packages via file: refs, which resolve to each package's built lib/.
+      # Not on a from_npm run, where the root stays uninstalled (see the top).
       - run: npm ci
+        if: ${{ !inputs.from_npm }}
       - run: npm run build
+        if: ${{ !inputs.from_npm }}
 
       - run: npm ci
+        if: ${{ !inputs.from_npm }}
         working-directory: quidproquojs.com
+
+      # Registry propagation after a publish can lag by minutes. The script
+      # polls until npm's latest matches every package.json here, and the step
+      # timeout is what fails the run if it never does (a checkout whose
+      # versions were never published, say a branch with a local bump).
+      - name: wait for npm
+        if: ${{ inputs.from_npm }}
+        timeout-minutes: 15
+        env:
+          POLL_MS: '30000'
+        run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/watchNpmVersions.ts
+
+      # The registry answering `latest` for every package is not the same as
+      # every mirror serving the tarballs: an install right after the last
+      # package appears has been seen to 404. Thirty seconds is cheap insurance.
+      - name: let the registry settle
+        if: ${{ inputs.from_npm }}
+        run: sleep 30
+
+      # The site's file: links become the published versions and the site is
+      # installed fresh from the registry. Nothing is committed.
+      - name: pin the site to the published packages
+        if: ${{ inputs.from_npm }}
+        run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/sitePinQpq.ts
 
       - uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -102,7 +156,8 @@ jobs:
       # One tarball for the deploy job: the monorepo libs, so it can run qpq
       # without building, and the saved build (the layout is listed at the top
       # of @qpqjs/cli's goDocker.ts). A tarball rather than a zipped
-      # artifact because it keeps file permissions, which zipping resets.
+      # artifact because it keeps file permissions, which zipping resets. On a
+      # from_npm run there are no libs, and nullglob lets tar skip them.
       - name: pack the saved build
         run: |
           shopt -s nullglob
@@ -136,6 +191,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v5
         with:
@@ -146,6 +203,7 @@ jobs:
             quidproquojs.com/package-lock.json
 
       - run: npm ci
+        if: ${{ !inputs.from_npm }}
 
       - uses: actions/download-artifact@v8
         with:
@@ -156,7 +214,16 @@ jobs:
       - run: tar -I zstd -xf deploy-build.tar.zst && rm deploy-build.tar.zst
 
       - run: npm ci
+        if: ${{ !inputs.from_npm }}
         working-directory: quidproquojs.com
+
+      # The same pin the build job made, with the root still uninstalled, so
+      # the @qpqjs/cli that deploys the saved build is the version that
+      # synthesised it (the saved build's manifest checks) and nothing resolves
+      # from the monorepo. The registry wait already happened in the build job.
+      - name: pin the site to the published packages
+        if: ${{ inputs.from_npm }}
+        run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/sitePinQpq.ts
 
       - uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -173,8 +240,8 @@ jobs:
       # qpq-smoke audience, start a smoke run on the deployed test service,
       # poll it to completion. The smoke endpoint validates the token against
       # this repo's immutable id and this job's `environment:` claim, so only
-      # this workflow can call it. Non-production only: prod has no CI smoke
-      # path.
+      # this workflow can call it. Every environment, production included: the
+      # test service and everything the suite touches are deployed there too.
       #
       # Deliberately a step of THIS job, not a job of its own: the per
       # environment concurrency lock above is held until the job ends, so a
@@ -182,7 +249,6 @@ jobs:
       # deployed and been verified. As a separate job the smoke would run
       # against an environment the next deploy was already replacing.
       - name: deployed smoke
-        if: inputs.environment != 'production'
         run: node scripts/deployedSmoke.mjs
         working-directory: quidproquojs.com
         env:

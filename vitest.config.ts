@@ -21,9 +21,13 @@ export default defineConfig({
     // Hide console output from passing tests (the library logs on expected error paths),
     // but keep it for failing tests so debugging output is never lost.
     silent: 'passed-only',
-    projects: packageJson.workspaces.filter(
-      (workspace: string) => !packagesToSkip.includes(workspace)
-    ),
+    projects: [
+      ...packageJson.workspaces.filter(
+        (workspace: string) => !packagesToSkip.includes(workspace)
+      ),
+      // The release and site scripts, which live outside any package.
+      'scripts',
+    ],
     coverage: {
       reportsDirectory: './.coverage',
       reporter: ['text', 'html', 'json'],

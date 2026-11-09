@@ -7,12 +7,19 @@ name: release
 # (0.1.x to 0.2.0), major for 1.0. A patch is refused while breaking-changes.md
 # has bullets under ## vNext.
 #
-# Two jobs, so the npm publish rights never share a job with third-party code:
+# Three jobs, so the npm publish rights never share a job with third-party code:
 #   build   - bumps, writes the changelog with Claude, commits and tags locally,
 #             then builds, tests, scaffolds and packs. Cannot publish.
 #   publish - can mint an npm token (trusted publishing, no stored secret) and
 #             installs nothing. Publishes the tarballs, then pushes the bump
 #             commit and tag and makes the GitHub release.
+#   deploy  - the ordinary site deploy (ci-deploy-site.yml) to production, on
+#             the tag just pushed and pinned to the packages just published,
+#             smoke included. The one deploy that proves what npm serves
+#             installs, builds and runs. No npm rights. A failure here cannot
+#             undo the release: the run going red is the signal, and the fix is
+#             a patch release, or a manual deploy-site run from main with
+#             from_npm if the packages were not at fault.
 #
 # The publish job runs in the `npm` environment, which waits for a maintainer to
 # approve the run ("Review deployments" on the run page) and only accepts main.
@@ -173,3 +180,21 @@ jobs:
           else
             gh release create "$VERSION" --title "$VERSION" --notes-file "$RUNNER_TEMP/release/notes.md" --verify-tag
           fi
+
+  # Runs once the packages are on npm and the tag is pushed, so the tag
+  # checkout works and the registry wait has something to wait for. The tag
+  # and main are the same bump commit at that moment; the tag is used because
+  # main can move while the deploy runs. The reusable workflow's own
+  # `environment: production` supplies the role and region, and its per
+  # environment concurrency lock queues this behind any manual production
+  # deploy rather than racing it.
+  deploy:
+    needs: [build, publish]
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/ci-deploy-site.yml
+    with:
+      environment: production
+      from_npm: true
+      ref: refs/tags/${{ needs.build.outputs.version }}

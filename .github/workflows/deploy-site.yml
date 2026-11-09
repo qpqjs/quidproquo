@@ -26,6 +26,14 @@ on:
         type: choice
         default: production
         options: [development, staging, production]
+      # The release deploy's path, by hand: pin the site to the published qpq
+      # packages named by this checkout's package.json files (on main, the last
+      # release) instead of building the monorepo. How that path is tested
+      # against staging, and the fallback if a release's deploy fails.
+      from_npm:
+        description: Deploy on the published qpq packages instead of the monorepo
+        type: boolean
+        default: false
 
 # Default for every job, including the reusable workflows called below. Only
 # the deploy job widens this, so ci-deploy-site.yml can mint an OIDC token.
@@ -96,3 +104,4 @@ jobs:
     uses: ./.github/workflows/ci-deploy-site.yml
     with:
       environment: ${{ needs.resolve.outputs.env }}
+      from_npm: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.from_npm == 'true' }}
