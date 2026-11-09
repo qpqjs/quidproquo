@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+- release: the site pin drops the committed lockfile before installing the pinned packages from npm
+
 ## 0.6.1
 
 - release: the workflow pushes the bump commit and tag before publishing to npm

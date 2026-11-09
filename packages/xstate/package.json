@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/xstate",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "XState state machines driven by quidproquo stories.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,12 +45,12 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@qpqjs/core": "0.6.1",
+    "@qpqjs/core": "0.6.2",
     "xstate": "^5.19.0"
   },
   "devDependencies": {
-    "@qpqjs/testing": "0.6.1",
-    "@qpqjs/tsconfig": "0.6.1",
+    "@qpqjs/testing": "0.6.2",
+    "@qpqjs/tsconfig": "0.6.2",
     "@types/node": "^22.13.0",
     "typescript": "^5.8.2"
   },

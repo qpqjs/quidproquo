@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/actionprocessor-web",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Action processors that run quidproquo stories in the browser.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,14 +45,14 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@qpqjs/actionprocessor-js": "0.6.1",
-    "@qpqjs/core": "0.6.1",
-    "@qpqjs/web": "0.6.1",
-    "@qpqjs/webserver": "0.6.1"
+    "@qpqjs/actionprocessor-js": "0.6.2",
+    "@qpqjs/core": "0.6.2",
+    "@qpqjs/web": "0.6.2",
+    "@qpqjs/webserver": "0.6.2"
   },
   "devDependencies": {
-    "@qpqjs/testing": "0.6.1",
-    "@qpqjs/tsconfig": "0.6.1",
+    "@qpqjs/testing": "0.6.2",
+    "@qpqjs/tsconfig": "0.6.2",
     "typescript": "^5.8.2"
   },
   "engines": {

@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/webserver",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Routes, apis and web services on top of quidproquo core.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,11 +45,11 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
-    "@qpqjs/core": "0.6.1"
+    "@qpqjs/core": "0.6.2"
   },
   "devDependencies": {
-    "@qpqjs/testing": "0.6.1",
-    "@qpqjs/tsconfig": "0.6.1",
+    "@qpqjs/testing": "0.6.2",
+    "@qpqjs/tsconfig": "0.6.2",
     "typescript": "^5.8.2"
   },
   "engines": {
