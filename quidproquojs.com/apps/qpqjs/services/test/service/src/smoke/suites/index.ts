@@ -7,6 +7,7 @@ export * from './keyValueStoreStream';
 export * from './noop';
 export * from './openApi';
 export * from './parameter';
+export * from './reports';
 export * from './schedule';
 export * from './scopedKeyValueStore';
 export * from './scopedStorageDrive';

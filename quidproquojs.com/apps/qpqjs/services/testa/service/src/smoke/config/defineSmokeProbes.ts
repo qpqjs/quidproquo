@@ -1,6 +1,7 @@
 import { QPQConfig } from 'quidproquo';
 
 import { defineKeyValueStoreSmokeProbe } from '../suites/keyValueStore/config/defineKeyValueStoreSmokeProbe';
+import { defineReportsSmokeProbe } from '../suites/reports/config/defineReportsSmokeProbe';
 import { defineSigningKeySmokeProbe } from '../suites/signingKey/config/defineSigningKeySmokeProbe';
 import { defineStorageDriveSmokeProbe } from '../suites/storageDrive/config/defineStorageDriveSmokeProbe';
 
@@ -9,4 +10,9 @@ import { defineStorageDriveSmokeProbe } from '../suites/storageDrive/config/defi
  * suites/ mirrors the test service suite of the same name and exercises that
  * suite's foreign grant against a resource the test service owns.
  */
-export const defineSmokeProbes = (): QPQConfig => [defineKeyValueStoreSmokeProbe(), defineStorageDriveSmokeProbe(), defineSigningKeySmokeProbe()];
+export const defineSmokeProbes = (): QPQConfig => [
+  defineKeyValueStoreSmokeProbe(),
+  defineStorageDriveSmokeProbe(),
+  defineSigningKeySmokeProbe(),
+  defineReportsSmokeProbe(),
+];

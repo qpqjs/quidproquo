@@ -8,6 +8,7 @@ import { keyValueStoreStreamSmokeSuite } from './keyValueStoreStream/keyValueSto
 import { noopSmokeSuite } from './noop/noopSmokeSuite';
 import { openApiSmokeSuite } from './openApi/openApiSmokeSuite';
 import { parameterSmokeSuite } from './parameter/parameterSmokeSuite';
+import { reportsSmokeSuite } from './reports/reportsSmokeSuite';
 import { scheduleSmokeSuite } from './schedule/scheduleSmokeSuite';
 import { scopedKeyValueStoreSmokeSuite } from './scopedKeyValueStore/scopedKeyValueStoreSmokeSuite';
 import { scopedStorageDriveSmokeSuite } from './scopedStorageDrive/scopedStorageDriveSmokeSuite';
@@ -47,4 +48,5 @@ export const smokeSuites: SmokeSuite[] = [
   emailReceiveSmokeSuite,
   userScriptSmokeSuite,
   securitySmokeSuite,
+  reportsSmokeSuite,
 ];
