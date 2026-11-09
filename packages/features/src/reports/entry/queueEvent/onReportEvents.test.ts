@@ -1,19 +1,5 @@
-import {
-  ConfigActionType,
-  DateActionType,
-  GuidActionType,
-  KeyValueStoreActionType,
-  KvsLogicalOperator,
-  KvsLogicalOperatorType,
-  KvsQueryCondition,
-  KvsQueryOperation,
-  KvsQueryOperationType,
-  LogActionType,
-  LogLevelEnum,
-  QueueEvent,
-  QueueMessage,
-} from '@qpqjs/core';
-import { runStory, throwsError } from '@qpqjs/testing';
+import { ConfigActionType, DateActionType, GuidActionType, LogActionType, LogLevelEnum, QueueEvent, QueueMessage } from '@qpqjs/core';
+import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
@@ -25,84 +11,15 @@ import { REPORT_NAME_GLOBAL } from '../../constants/reportNameGlobal';
 import { ReportMonthEffect } from '../../fold/effects/ReportMonthEffect';
 import { ReportQueuedEvent } from '../../models/ReportQueuedEvent';
 import { ReportsConfig } from '../../models/ReportsConfig';
+import { createReportsMemoryStore } from '../../testing/createReportsMemoryStore';
 import { onReportEvents } from './onReportEvents';
 
-type Row = Record<string, any>;
-
-const EVENTS_STORE = 'docgenReportsEvents';
-const SUMMARY_STORE = 'docgenReports';
 const CONFIG: ReportsConfig = {
   utcOffset: '+10:00',
   financialYearStartMonth: 7,
   scoped: true,
   views: {},
   events: { packBuilt: { allowedDimensions: ['outcome'], maxCellsPerBucket: 50 } },
-};
-
-const matches = (row: Row, operation: KvsQueryOperation): boolean => {
-  if ('conditions' in operation) {
-    const { conditions, operation: logical } = operation as KvsLogicalOperator;
-
-    return logical === KvsLogicalOperatorType.And
-      ? conditions.every((condition) => matches(row, condition))
-      : conditions.some((condition) => matches(row, condition));
-  }
-
-  const { key, operation: type, valueA, valueB } = operation as KvsQueryCondition;
-  const value = row[key];
-
-  switch (type) {
-    case KvsQueryOperationType.Equal:
-      return value === valueA;
-    case KvsQueryOperationType.GreaterThan:
-      return value > (valueA as number);
-    case KvsQueryOperationType.LessThanOrEqual:
-      return value <= (valueA as number);
-    case KvsQueryOperationType.Between:
-      return value >= (valueA as number) && value <= (valueB as number);
-    default:
-      throw new Error(`the in-memory store does not handle ${type}`);
-  }
-};
-
-// A small in-memory key value store: every report store row by store, scope and key, with conditional writes.
-const createMemoryStore = () => {
-  const rows = new Map<string, Row & { store: string; scope?: string }>();
-  const keyOf = (store: string, scope: string | undefined, item: Row): string =>
-    store === SUMMARY_STORE ? `${store}|${scope}|${item.type}|${item.id}` : `${store}|${scope}|${item.pk}|${item.sk}`;
-  const write = (store: string, items: Row[], options?: { ifNotExists?: boolean; scope?: string }) => {
-    if (options?.ifNotExists && items.some((item) => rows.has(keyOf(store, options.scope, item)))) {
-      return throwsError('Conflict', 'slot taken');
-    }
-    items.forEach((item) => rows.set(keyOf(store, options?.scope, item), { ...item, store, scope: options?.scope }));
-    return undefined;
-  };
-
-  const mocks = {
-    [KeyValueStoreActionType.Query]: (action: {
-      payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { scope?: string; sortAscending?: boolean; limit?: number } };
-    }) => {
-      const { keyValueStoreName, keyCondition, options } = action.payload;
-      const found = [...rows.values()]
-        .filter((row) => row.store === keyValueStoreName && row.scope === options?.scope && matches(row, keyCondition))
-        .sort((a, b) => (options?.sortAscending === false ? b.sk - a.sk : a.sk - b.sk));
-
-      return { items: options?.limit ? found.slice(0, options.limit) : found, nextPageKey: undefined };
-    },
-    [KeyValueStoreActionType.Upsert]: (action: {
-      payload: { keyValueStoreName: string; item: Row; options?: { ifNotExists?: boolean; scope?: string } };
-    }) => write(action.payload.keyValueStoreName, [action.payload.item], action.payload.options),
-    [KeyValueStoreActionType.UpsertMany]: (action: {
-      payload: { keyValueStoreName: string; items: Row[]; options?: { ifNotExists?: boolean; scope?: string } };
-    }) => write(action.payload.keyValueStoreName, action.payload.items, action.payload.options),
-  };
-
-  const logRows = (scope?: string) =>
-    [...rows.values()]
-      .filter((row) => row.store === EVENTS_STORE && row.scope === scope)
-      .sort((a, b) => `${a.pk}${a.sk}`.localeCompare(`${b.pk}${b.sk}`));
-
-  return { mocks, rows, logRows };
 };
 
 const rendered = (at: string, dimensions: Record<string, string> = { outcome: 'ok' }): ReportQueuedEvent => ({
@@ -119,7 +36,7 @@ const queueEvent = (id: string, payload: unknown, groupId = 'TENANT#t1/documentR
   message: { type: REPORT_EVENTS_MESSAGE_TYPE, payload },
 });
 
-const deliver = (store: ReturnType<typeof createMemoryStore>, event: QueueEvent<QueueMessage<unknown>>) => {
+const deliver = (store: ReturnType<typeof createReportsMemoryStore>, event: QueueEvent<QueueMessage<unknown>>) => {
   const logs: { logLevel: LogLevelEnum; msg: string }[] = [];
   let guids = 0;
 
@@ -143,7 +60,7 @@ const message = (events: unknown[], type = 'documentRendered') => ({ scope: 'TEN
 
 describe('onReportEvents', () => {
   it("creates the month's document under its derived id on its first event, then appends the stamped events under the message id", () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
     const { handled } = deliver(store, queueEvent('m1', message([rendered('2026-11-08T00:10:00.000Z')])));
     const log = store.logRows('TENANT#t1');
 
@@ -165,7 +82,7 @@ describe('onReportEvents', () => {
   });
 
   it('appends a message SQS delivers again only once, even after later messages and out of order', () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
     const first = queueEvent('m1', message([rendered('2026-11-08T00:10:00.000Z')]));
 
     deliver(store, first);
@@ -182,7 +99,7 @@ describe('onReportEvents', () => {
   });
 
   it('splits a message straddling a month end across both documents', () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
 
     deliver(store, queueEvent('m1', message([rendered('2026-10-31T13:30:00.000Z'), rendered('2026-10-31T14:30:00.000Z')])));
 
@@ -190,7 +107,7 @@ describe('onReportEvents', () => {
   });
 
   it("applies the type's allowed dimensions and caps, and drops malformed events with one warning", () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
     const pack = { ...rendered('2026-11-08T00:10:00.000Z', { outcome: 'ok', userEmail: 'a@b.c' }), type: 'packBuilt' };
     const { logs } = deliver(store, queueEvent('m1', message([pack, { type: 'packBuilt' }], 'packBuilt'), 'TENANT#t1/packBuilt'));
     const append = store.logRows('TENANT#t1')[1]!.data.payload.data;
@@ -202,7 +119,7 @@ describe('onReportEvents', () => {
 
   // Security regression: the FIFO group is the lane one writer owns; a payload naming another scope in it is refused.
   it('refuses a message whose group is not its scope and type, writing nothing', () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
     const { handled, logs } = deliver(store, queueEvent('m1', message([rendered('2026-11-08T00:10:00.000Z')]), 'TENANT#t2/documentRendered'));
 
     expect(handled).toBe(true);
@@ -211,7 +128,7 @@ describe('onReportEvents', () => {
   });
 
   it('folds an unscoped message unscoped', () => {
-    const store = createMemoryStore();
+    const store = createReportsMemoryStore('docgen');
 
     deliver(store, queueEvent('m1', { ...message([rendered('2026-11-08T00:10:00.000Z')]), scope: null }, 'unscoped/documentRendered'));
 
