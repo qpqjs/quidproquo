@@ -1,4 +1,2 @@
-import { ReportBucketKeys } from '../models/ReportBucketKeys';
-
-/** The code of the month document an event belongs to: its type and its local month. */
-export const reportMonthCode = (type: string, bucketKeys: ReportBucketKeys): string => `${type}/${bucketKeys.month}`;
+/** The readable code (and name) of the month document for an event type and local month: `documentRendered/2026-11`. */
+export const reportMonthCode = (type: string, month: string): string => `${type}/${month}`;

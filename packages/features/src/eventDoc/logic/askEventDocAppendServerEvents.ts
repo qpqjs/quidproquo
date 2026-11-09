@@ -47,7 +47,7 @@ export function* askEventDocAppendServerEvents(
           data: input.data,
           metadata: {
             version: input.version,
-            clientMessageId: clientMessageIds[index] ?? '',
+            clientMessageId: input.clientMessageId ?? clientMessageIds[index] ?? '',
             createdBy: actor,
             createdAt: now,
             eventId: base.headEventId + 1 + index,

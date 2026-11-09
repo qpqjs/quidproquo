@@ -1,13 +1,18 @@
-import { qpqCoreUtils } from '@qpqjs/core';
+import { defineModule, qpqCoreUtils } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../../eventDoc/constants/eventDocEventsStoreName';
 import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
+import { EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW } from '../../eventDoc/constants/eventDocRecentClientMessageIdWindow';
 import { reportConfigGlobal } from '../constants/reportConfigGlobal';
 import { reportEventBusName } from '../constants/reportEventBusName';
+import { REPORT_EVENTS_MESSAGE_TYPE } from '../constants/reportEventsMessageType';
 import { REPORT_MONTH_DOC_TYPE } from '../constants/reportMonthDocType';
+import { REPORT_NAME_GLOBAL } from '../constants/reportNameGlobal';
+import { REPORT_QUEUE_BATCH_SIZE } from '../constants/reportQueueBatchSize';
+import { reportQueueName } from '../constants/reportQueueName';
 import { reportStoreName } from '../constants/reportStoreName';
 import { ReportBucket } from '../models/ReportBucket';
 import { ReportCompare } from '../models/ReportCompare';
@@ -21,13 +26,15 @@ const owner = { module: 'template' };
 const views = {
   rendersByKind: { event: 'documentRendered', period: { period: ReportPeriod.Last7Days }, bucket: ReportBucket.Day, groupBy: 'templateKind' },
 } as const;
-const config = defineReports('docgen', {
+// A service declares its module before anything else; the owner-only block opens against it.
+const reports = defineReports('docgen', {
   owner,
   utcOffset: '+10:00',
   views,
   events: { documentRendered: { retentionMonths: 13 } },
   scoped: true,
 });
+const config = [defineModule('template'), reports];
 
 const definingWith =
   (options: Partial<ReportsOptions>, reportName = 'docgen') =>
@@ -74,8 +81,33 @@ describe('defineReports', () => {
     expect(typeof reportMonthEventDoc.foldDocumentState).toBe('function');
   });
 
+  it("declares the folding queue only on the owner's deploy: FIFO, subscribed to the FIFO bus, handing the shared entry its report", () => {
+    const owner = config;
+    const other = [defineModule('pdf'), reports];
+    const [queue] = qpqCoreUtils.getAllQueueConfigs(owner);
+    const runtime = queue?.qpqQueueProcessors[REPORT_EVENTS_MESSAGE_TYPE];
+
+    expect(qpqCoreUtils.getAllQueueConfigs(other)).toEqual([]);
+    expect(queue).toMatchObject({ name: reportQueueName('docgen'), isFifo: true, eventBusSubscriptions: [reportEventBusName('docgen')] });
+    expect(queue!.maxTries).toBeGreaterThan(1);
+    expect(runtime && typeof runtime === 'object' ? [runtime.relativePath, runtime.functionName, runtime.globals] : undefined).toEqual([
+      'reports/entry/queueEvent/onReportEvents',
+      'onReportEvents',
+      { [REPORT_NAME_GLOBAL]: 'docgen' },
+    ]);
+    expect(() => qpqCoreUtils.assertFifoQueueEventBusSubscriptionsAreValid(owner)).not.toThrow();
+  });
+
+  // Every message of a batch SQS redelivers must still be in the month document's dedup window.
+  it('keeps the queue batch within the dedup window', () => {
+    expect(qpqCoreUtils.getAllQueueConfigs(config)[0]!.batchSize).toBe(REPORT_QUEUE_BATCH_SIZE);
+    expect(REPORT_QUEUE_BATCH_SIZE).toBeLessThanOrEqual(EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW);
+  });
+
   it('defaults to +00:00, a July financial year and unscoped', () => {
-    expect(qpqCoreUtils.getGlobalConfigValue<ReportsConfig>(defineReports('kiln', { owner }), reportConfigGlobal('kiln'))).toEqual({
+    expect(
+      qpqCoreUtils.getGlobalConfigValue<ReportsConfig>([defineModule('template'), defineReports('kiln', { owner })], reportConfigGlobal('kiln')),
+    ).toEqual({
       utcOffset: '+00:00',
       financialYearStartMonth: 7,
       scoped: false,

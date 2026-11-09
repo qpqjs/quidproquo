@@ -189,6 +189,14 @@ describe('askEventDocAppendServerEvents', () => {
     ]);
   });
 
+  it("keeps a caller's own clientMessageId and mints the rest", () => {
+    const { mocks } = buildMocks({ heads: [4] });
+
+    const events = runAppend([{ ...INPUTS[0]!, clientMessageId: 'sqs-message-1' }, INPUTS[1]!], STORE, mocks);
+
+    expect(events.map((event) => event.payload.metadata.clientMessageId)).toEqual(['sqs-message-1', 'cmid-1']);
+  });
+
   it('re-reads the head and re-lays the whole run when the batch loses its slots', () => {
     const { mocks, upserts, counts } = buildMocks({ heads: [0, 2], conflicts: 1 });
 

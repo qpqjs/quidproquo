@@ -4,7 +4,6 @@ import { ReportMonthDocument } from '../../models/ReportMonthDocument';
 /** The month document's version-1 initial state: nothing counted. */
 export const createInitialReportMonthDocument = (): ReportMonthDocument => ({
   ...createEventDocInitialDocumentState(1),
-  lastBatchMessageIds: [],
   newestAt: null,
   newestDay: null,
   hourly: {},

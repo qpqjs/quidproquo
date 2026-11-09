@@ -1,7 +1,7 @@
 # Reports: counting things as they happen
 
 **Verdict:** feature
-**Status:** slice 1 built (uncommitted, 9 Nov 2026); slices 2 to 5 not started
+**Status:** slice 1 built and committed (`0672ec91e`); slice 2 built (uncommitted, 9 Nov 2026); slices 3 to 5 not started
 **Branch:** `reports`. Planned from a design conversation with Joe on 6 Nov 2026. No GitHub issue. First consumer is DocGen (the template service), not Kiln.
 **Updated:** 9 Nov 2026, after comparing with Kiln's register query on doccypoccy's `harry-kiln-dashboards` branch: a fixed UTC offset per report (decided 9 Nov: no time zone database, so everything stays pure), more bucket sizes and the register's period names, an answer shaped like the register query's, comparisons with an earlier period, and a minimum and maximum per measure beside the sum (CloudWatch's statistic set). The month EventDoc is renamed from "period document" to "month document", because "period" now means a view's time range, as it does in the register.
 
@@ -46,7 +46,7 @@ Inside the module the word "event" is overloaded, because an EventDoc log also h
 
 Both were weighed. A counter row per bucket, incremented from a stream projector, is what the flow ops monitor does and it scales without a single writer. It loses the raw events (no drill down, no rebuild, no later backfill), its increments are not idempotent under redelivery, and it needs the KVS TTL that the framework does not yet write.
 
-An EventDoc keeps the events, folds deterministically, snapshots so reads stay bounded, and gives a cheap idempotency check (the last batch's queue message ids are in the folded state). Its two costs are one writer per document, which the FIFO message group turns into a feature, and a log that never shrinks, which "one document per event type per month" turns into "destroy old months". The month document is the retention unit. If an event type ever outgrows one writer per tenant, the cells are commutative by construction, so the counter per bucket design is the upgrade path and nothing in the public API changes. (Min and max would need a conditional write per bucket there, not an `ADD`.)
+An EventDoc keeps the events, folds deterministically, snapshots so reads stay bounded, and gives a cheap idempotency check (the document's last accepted `clientMessageId`s are in the folded state, and each append carries its queue message's id). Its two costs are one writer per document, which the FIFO message group turns into a feature, and a log that never shrinks, which "one document per event type per month" turns into "destroy old months". The month document is the retention unit. If an event type ever outgrows one writer per tenant, the cells are commutative by construction, so the counter per bucket design is the upgrade path and nothing in the public API changes. (Min and max would need a conditional write per bucket there, not an `ADD`.)
 
 ### Why the fold does not depend on views
 
@@ -198,10 +198,10 @@ Everywhere (the owner field decides create versus reference):
 
 Owner only, under `defineServiceSettings({ [owner.module]: [...] })`:
 
-- `defineQueue(reportQueueName(name), { '*': consumer entry }, { isFifo: true, batchSize: 10, eventBusSubscriptions: [reportEventBusName(name)] })` (slice 2, with the consumer it points at: a runtime pointer to an entry that does not exist yet would break the owner's bundle). Dead letter queue on by default. `concurrency` not set, since the deploy ignores it; FIFO group ordering serialises writers.
+- `defineQueue(reportQueueName(name), { [REPORT_EVENTS_MESSAGE_TYPE]: onReportEvents with the global REPORT_NAME_GLOBAL }, { isFifo: true, batchSize: 10, maxTries: 5, ttRetryInSeconds: 30, eventBusSubscriptions: [reportEventBusName(name)] })`. The message type is fixed (`qpq/reports/events`) and the event type travels in the payload, because a queue matches processors by message type. `maxTries` is 5 because the default of 1 sends a message that lost a write race straight to the dead letter queue, and a lost message is a lost count; the retry wait is short because a FIFO group waits on it. Dead letter queue on by default. `concurrency` not set, since the deploy ignores it; FIFO group ordering serialises writers.
 - The retention schedule (slice 4).
 
-Returns config only (code standards: `define*` returns config, never spread). The bus and queue are internal: the derived names are the only way to reach them (`reportStoreName` is `${name}Reports`, `reportEventBusName` `${name}ReportEvents`, `reportConfigGlobal` `${name}ReportsConfig`), so a report name is letters and digits only, starting with a letter. The owner is `CrossModuleOwnerWithNoResourceOverride & { module: string }`: names are derived (D4), so no `resourceNameOverride`. `utcOffset` must be `±HH:MM` from -12:00 to +14:00 in whole quarter hours (checked by the pure `getUtcOffsetMinutes`, so config stays pure); `financialYearStartMonth` is 1 to 12, default 7 (July, the register's `REGISTER_FINANCIAL_YEAR_START_MONTH`). Declared views are checked for shape at definition time:
+Returns config only (code standards: `define*` returns config, never spread). The bus and queue are internal: the derived names are the only way to reach them (`reportStoreName` is `${name}Reports`, `reportEventBusName` `${name}ReportEvents`, `reportQueueName` `${name}ReportFold`, `reportConfigGlobal` `${name}ReportsConfig`), so a report name is letters and digits only, starting with a letter. The owner is `CrossModuleOwnerWithNoResourceOverride & { module: string }`: names are derived (D4), so no `resourceNameOverride`. `utcOffset` must be `±HH:MM` from -12:00 to +14:00 in whole quarter hours (checked by the pure `getUtcOffsetMinutes`, so config stays pure); `financialYearStartMonth` is 1 to 12, default 7 (July, the register's `REGISTER_FINANCIAL_YEAR_START_MONTH`). Declared views are checked for shape at definition time:
 
 - `period` is from the enum, and a rolling one has a whole `count` of at least 1 and a unit.
 - `bucket` and `compare` are from their enums.
@@ -214,9 +214,9 @@ They cannot be checked against event types, because those are not declared.
 
 ### Storage
 
-One EventDoc collection per report, one doc type `REPORT_MONTH_DOC_TYPE` (`'reportMonth'`), one document per event type per calendar month in each scope, code `${type}/${yyyy}-${MM}`, name the same. The month is the event's stamped local month: at `+10:00` a render at 23:30 on 31 October (13:30Z) belongs to `documentRendered/2026-10`, not November's document. No `defineEventDocRoutes`: nothing appends to a month document except the consumer, which is the Kiln register's "NO ROUTES" pattern. With `scoped: true` every month document lives in the partition of the scope the events were appended under.
+One EventDoc collection per report, one doc type `REPORT_MONTH_DOC_TYPE` (`'reportMonth'`), one document per event type per calendar month in each scope, id `${type}~${yyyy}-${MM}` (`reportMonthDocId`), code and name `${type}/${yyyy}-${MM}`. The id is derived so the consumer and the read find a month with one key read and never list the collection (`askEventDocGetByCode` lists every document and filters in memory). `~` never appears in an event type, so an id cannot be read two ways, and an id holds no `/` or `#`, which EventDoc uses in blob paths and snapshot keys. The month is the event's stamped local month: at `+10:00` a render at 23:30 on 31 October (13:30Z) belongs to `documentRendered/2026-10`, not November's document. No `defineEventDocRoutes`: nothing appends to a month document except the consumer, which is the Kiln register's "NO ROUTES" pattern. With `scoped: true` every month document lives in the partition of the scope the events were appended under.
 
-One log event type, `APPEND_EVENTS`, carrying `ReportMonthAppendEventsData`: `{ messageIds, limits, events }`, where `messageIds` are the queue messages whose events the append holds, with the events exactly as appended, each with its `at`, `utcOffset` and `bucketKeys` (local hour, day and month) stamped. The limits (`ReportMonthLimits`: `maxCellsPerBucket`, `maxDimensionNames`, `maxMeasureNames`) travel on the log event, resolved by the consumer from the event type's settings, so the fold reads no config: changing a cap applies to batches from then on, and a refold uses each batch's own caps. A batch is whatever one queue consumer invocation received, so the log holds one log event per batch, not one per report event. The log is the complete record: whatever the fold does with an event, the event itself is kept, which is what makes later views and a later backfill possible.
+One log event type, `APPEND_EVENTS`, carrying `ReportMonthAppendEventsData`: `{ limits, events }`, with its `clientMessageId` set to the queue message's id, and the events exactly as appended, each with its `at`, `utcOffset` and `bucketKeys` (local hour, day and month) stamped. The limits (`ReportMonthLimits`: `maxCellsPerBucket`, `maxDimensionNames`, `maxMeasureNames`) travel on the log event, resolved by the consumer from the event type's settings, so the fold reads no config: changing a cap applies to messages from then on, and a refold uses each log event's own caps. The queue runs its handler once per message (a FIFO group's messages one after another), so the log holds one log event per message per month: one per `askReportAppend` call, however many events it carried. The log is the complete record: whatever the fold does with an event, the event itself is kept, which is what makes later views and a later backfill possible.
 
 ### The fold
 
@@ -224,7 +224,6 @@ The document view folds every `APPEND_EVENTS` into (`ReportMonthDocument`, which
 
 ```ts
 type ReportMonthDocument = EventDocDocument & {
-  lastBatchMessageIds: string[];                // the queue message ids of the last append, for the consumer's redelivery check
   newestAt: Nullable<QpqIsoDateTime>;          // the latest event.at folded, never the clock
   newestDay: Nullable<string>;                 // that event's stamped local day, which the hourly trim counts back from
   hourly: Record<string, ReportCells>;         // key yyyy-MM-ddTHH:00, from each event's stamped keys; only newestDay and the day before
@@ -264,23 +263,24 @@ Rules the fold keeps:
 
 ### The bus, the queue and the consumer
 
-**One message group per scope and event type.** `askReportAppend` sets `groupId` to `${scope}/${type}` (scope from `askStorageScopeRead`, `personal` when unscoped) and `deduplicationId` from `askGuidNew`. The scope and the type also travel in the payload, because the consumer runs as the system, not as the appender. The group gives:
+**One message group per scope and event type.** `askReportAppend` sets `groupId` to `${scope}/${type}` (`reportGroupId`; scope from `askStorageScopeRead`, `unscoped` when there is none) and a fresh `deduplicationId`. The scope and the type also travel in the payload. The storage scope is not local context, so it rides the message's session anyway; the payload copy is what the consumer checks against the group and re-enters. The group gives:
 
-- one ordered lane per tenant per event type, one batch in flight at a time, lanes running in parallel;
+- one ordered lane per tenant per event type, its messages handled one at a time, lanes running in parallel;
 - a busy tenant backing up its own lane and nobody else's;
-- a consumer invocation that only ever holds one lane's messages, so it re-enters one scope and touches at most two month documents (a batch straddling a month boundary).
+- exactly one writer for each month document, which is what makes the consumer's create-if-missing safe.
 
 The FIFO per group ceiling, a few hundred messages a second, is therefore the ceiling per tenant per event type, which is where it should sit.
 
-The consumer entry, `onReportEvents`, for one invocation:
+**One message at a time.** A qpq queue runs its handler once per message, not once per batch: `askProcessEventWithGroupOrdering` runs a FIFO batch's messages in order, each as its own story with its own SQS id (`QueueEvent.id`), and reports failures per message. So the consumer appends per message. `onReportEvents` reads the report name from its function global and hands `askReportEventsFold` the message id, the group and the payload:
 
-1. Read the scope and type from the first message; every message in a FIFO batch shares the group, and the consumer asserts it rather than trusting it.
-2. Drop events that fail the shape check, logging one warning per batch with the count and the reason. Return handled without appending if nothing is left.
-3. Group the events by month document (after stamping each event's keys at its offset, the stamped month). Under `askStorageScopeProvide(scope)` and the collection's store context, for each month: `askEventDocGetByCodeOrCreate(code, name, systemActor)`. Get or create is not race safe in general, but one FIFO group has one in flight batch, so it is safe here; the comment on the consumer says why.
-4. `askEventDocDocumentStateLatest(docId, { consistentRead: true })`, then drop this month's events that came from a message in `lastBatchMessageIds`: those were appended by an attempt that failed before SQS deleted its messages. If nothing is left, skip the append and return handled.
-5. `askEventDocAppendServerEvents(docId, [{ type: ReportMonthEffect.AppendEvents, data: { messageIds, limits, events }, version }], systemActor)`, with `messageIds` the ids of the messages whose events remain.
+1. `readReportEventsMessage(payload, groupId)`: the payload must be `{ scope, type, events }` and the group must be the one its scope and type name. Otherwise the message is refused: logged at error and acknowledged, never retried, because a retry would be refused again. A payload cannot fold events into a scope other than the one its lane belongs to.
+2. `buildReportMonthBatches(message, settings)`: each event runs the shape check again (a bus accepts anything) and must be of the message's type; failures are dropped with one warning per message. The rest are cut to the type's `allowedDimensions`, stamped with their local keys (`stampReportEvent`) and split by month document, in month order.
+3. Under the collection's store context and `askStorageScopeProvide(scope)` (or unscoped), for each month (`askReportMonthAppend`):
+   - read the log head; on an empty log, create the document with its derived id (`askEventDocCreate`), as the reports system actor;
+   - otherwise read the log tail (the last `EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW` events, `askReportMonthHoldsMessage`) and stop if this message's id is already there;
+   - `askEventDocAppendServerEvents(docId, [{ type: APPEND_EVENTS, data: { limits, events }, version, clientMessageId: messageId }], REPORT_SYSTEM_ACTOR)`.
 
-Only the last batch can come back: there is one FIFO message group per tenant and event type, and SQS releases a group's next batch only once the current one is deleted. So the month's last append's message ids are all the check needs, and because it compares ids rather than a hash of the batch, it is exact whether SQS redelivers the whole batch, part of it, or the batch plus newer messages (a batch of three that crashed, redelivered with two that arrived since: the three are dropped, the two appended). The check runs per month document, so a batch straddling a month boundary that appended to one month and failed before the other is finished correctly: the first month drops the batch's messages, the second, whose last append is older, appends them. Decided with Joe, 9 Nov 2026, replacing a hash of the message ids that could not see a partial overlap.
+**Counting a redelivered message once.** If the Lambda times out or fails after some messages appended, SQS delivers the whole batch again. Each append carries the SQS message id as its `clientMessageId`, an option slice 2 added to `askEventDocAppendServerEvents` (a server event otherwise gets a minted id). EventDoc's own dedup then does the rest: the fold refuses an event whose `clientMessageId` is among the document's last 10 accepted, and the consumer reads the same window off the log tail so it skips the write too. A batch holds at most 10 messages (`REPORT_QUEUE_BATCH_SIZE`, the FIFO maximum, kept no larger than the window by a test), only the in-flight batch can come back, and only that group writes the document, so every message of a redelivered batch is still in the window. This works per month document, so a message straddling a month end that appended to one month and failed before the other is finished correctly on redelivery. It replaces the batch id and then `lastBatchMessageIds` designs, which assumed one append per batch.
 
 ### The read
 
@@ -367,21 +367,25 @@ Each slice ships on its own and is reviewable alone.
    - **Definition:** a month log folds to its cells and its last batch's message ids; a fold resumed from a snapshot equals one from scratch.
    - **Config:** `defineReports` emits the offset and defaults, a FIFO bus and stores owned by the owner, the snapshot function map, and the dynamic functions with no owner; it refuses a bad report name, `'+10'` and `'+15:00'` as offsets, a financial month of 13, `Hour` on `ThisMonth`, `SameDayLastWeek` on `Today` and a cap of 0.
 
-#### Slice 2: appending and consuming
+#### Slice 2: appending and consuming (built 9 Nov 2026)
 
-Moved here from slice 1, because nothing uses them before this slice: `ReportEventsMessage` (scope, type, events), the shape check, `reportGroupId(scope, type)`, `reportQueueName(name)`, the defaults `maxCellsPerBucket` 200, `maxDimensionNames` 32, `maxMeasureNames` 32, `maxDimensions` 12 and `maxEventBytes` 2 KB, and the owner-only `defineQueue` in `defineReports` with its config test. The shape check also refuses dimension and measure keys named `__proto__`, `constructor` or `prototype`.
-
-10. `packages/features/src/reports/logic/askReportAppend.ts`: takes the report name, one event or a list, and an optional `{ utcOffset }`. In order:
-   - runs the shape check, offset included, so a caller with a malformed event hears about it in its own story, by name;
-   - stamps `at` and the resolved offset;
-   - reads the scope, derives the bus name and sends one bus message with the type as its message type, the group id and a fresh deduplication id.
-
-   The consumer runs the same check again, because a bus accepts anything. A failed send (`Throttled`, `QueueNotFound`, `AccessDenied`) is logged at error with the report name, the event type and the count of events lost, and then dropped rather than failing the caller: a count is a side effect of the thing that happened, and the error log is how the loss stays visible. Decided by Joe, 6 Nov 2026; the comment says so.
-11. `packages/features/src/reports/entry/queueEvent/reportEvents.ts::onReportEvents`: the consumer described above, with `askStorageScopeProvide` and `askEventDocStoreProvide` around the batch.
-12. `packages/features/src/reports/logic/dropReportRedeliveredEvents.ts`: pure, keeps the events whose message id is not in the month's `lastBatchMessageIds`.
-13. Tests:
-    - **Consumer (`runStory`):** a mocked latest state holding every message id of the batch (no append), holding some of them (only the rest appended), and holding the batch while it carries newer messages too (only the newer appended); a fresh document (create then append); a batch straddling a local month boundary (two documents); a batch whose events carry two offsets (each stamped by its own); a batch of wholly malformed events (no append, warning logged); a message whose group disagrees with its payload (refused).
-    - **Append:** `captureRequester` for the message shape, with the offset stamped from the option, then the report, then `+00:00`; `runStory` with the send mocked to throw `Throttled` (an error log, no throw, and the caller's story continues).
+10. `packages/features/src/eventDoc/`: `EventDocServerEventInput` gains an optional `clientMessageId`, which `askEventDocAppendServerEvents` uses in place of a minted one. Additive.
+11. `packages/features/src/systemUsers/`: `REPORT_SYSTEM_USER_ID` (`system-reports`) and `REPORT_SYSTEM_ACTOR`, the actor on every month document.
+12. `packages/features/src/reports/constants/`: `reportQueueName`, `REPORT_EVENTS_MESSAGE_TYPE`, `REPORT_NAME_GLOBAL`, the queue settings `REPORT_QUEUE_BATCH_SIZE` (10), `REPORT_QUEUE_MAX_TRIES` (5) and `REPORT_QUEUE_RETRY_SECONDS` (30), the defaults `REPORT_DEFAULT_MAX_CELLS_PER_BUCKET` (200), `REPORT_DEFAULT_MAX_DIMENSION_NAMES` (32) and `REPORT_DEFAULT_MAX_MEASURE_NAMES` (32), the event bounds `REPORT_MAX_DIMENSIONS_PER_EVENT` (12), `REPORT_MAX_EVENT_BYTES` (2048), `REPORT_EVENT_TYPE_PATTERN` (a letter, then letters, digits, `.`, `_` or `-`, at most 64) and `REPORT_RESERVED_KEYS`, and `REPORT_UNSCOPED_GROUP_KEY`.
+13. `packages/features/src/reports/models/`: `ReportQueuedEvent` (an event as it crosses the bus) and `ReportEventsMessage` (the payload). `types/`: `ReportAppendOptions`, `ReportMonthBatch`, `ReportMonthBatches`, `ReportEventsMessageRead`.
+14. `packages/features/src/reports/logic/`, pure: `reportQueuedEventProblem` (the shape check, with `reportNamesProblem`, `reportMeasuresProblem`, and core's new `isQpqIsoDateTime` guard, the guard form of `getValidQpqIsoDateTime`, which `DateISOSchema` now uses too), `toReportQueuedEvent`, `buildReportEventsMessages`, `reportGroupId`, `reportMonthDocId`, `readReportEventsMessage`, `readReportEventSettings` (own properties only, so an event type named `constructor` reads no settings), `resolveReportMonthLimits`, `keepReportAllowedDimensions`, `stampReportEvent` and `buildReportMonthBatches`. `reportMonthCode` now takes `(type, month)`.
+15. `packages/features/src/reports/logic/`, stories:
+    - `askReportAppend(reportName, eventOrEvents, { utcOffset }?)`: reads the report's global, stamps `at` (`askDateNow`) and the offset (the option, else the report's), runs the shape check and throws `Invalid` in the caller's story on the first problem, then reads the scope and calls `askReportEventsSend`.
+    - `askReportEventsSend`: one bus message per event type. A failed send (`Throttled`, `TopicNotFound`, `AccessDenied`) is logged at error with the report name, the types and the count lost, and dropped rather than failing the caller: a count is a side effect of the thing that happened, and the error log is how the loss stays visible (decided by Joe, 6 Nov 2026).
+    - `askReportEventsFold`, `askReportMonthsAppend`, `askReportMonthAppend` and `askReportMonthHoldsMessage`: the consumer described above.
+16. `packages/features/src/reports/entry/queueEvent/onReportEvents.ts`, and the owner-only queue in `defineReports`.
+17. Tests, each rule checked by breaking it and watching its test fail:
+    - **Shape check and message reader:** every refusal, including a type that could break an id, path or group, a non-ISO `at`, too many dimensions, reserved names, an oversized event, and a group that disagrees with the scope or type (a security regression).
+    - **Batches:** stamping, the split at a month end, dropped events counted with their reason, allowed dimensions, limits with defaults.
+    - **Append (`runStory`):** one message per type in its group, `at` and offset stamping from the option or the report, the unscoped group, `Invalid` thrown with nothing sent, a `Throttled` send logged at error with no throw.
+    - **Consumer (`runStory` over an in-memory key value store):** a fresh month created under its derived id then appended under the message id; a message redelivered after later ones and out of order appended once; a message straddling a month end split across two documents; allowed dimensions and the type's caps applied, malformed events dropped with one warning; a mismatched group refused with nothing written; an unscoped message folded unscoped.
+    - **Definition:** a repeated `clientMessageId` folds once.
+    - **Config:** the queue only on the owner's deploy, FIFO, subscribed to the FIFO bus (`assertFifoQueueEventBusSubscriptionsAreValid` passes), more than one try, the entry's global, and the batch size within the dedup window.
 
 #### Slice 3: reading
 
@@ -423,7 +427,7 @@ Moved here from slice 1: `ReportResolvedPeriod`, `ReportReadResult`, `ReportComp
 ## Security and compliance
 
 - **The append is open, so the discipline sits with the appender.** Any string can be a dimension value, so a user id or an email address can be appended and will then sit in an append-only log for the retention period and be visible to anyone with read on the report. The feature docs say plainly: dimensions are categories, never identifiers. Two guards the plan adds so this is not only a convention: an optional `events.<type>.allowedDimensions` list which, when set, makes the consumer drop any other key for that type (the closed set is opt in per type, not required), and `maxDimensions` and `maxEventBytes` which keep a free text field from being used as a dimension. Worth raising with whoever owns the ISO 27001 records of processing before the first tenant facing stream, because an open append surface is a new place personal data could land.
-- **Tenant scoped.** The message group, the payload, the month documents and the read all carry the scope; the consumer re-enters it exactly as the EventDoc summary projector does. An event appended under one tenant cannot be folded into another's document, and a message whose group and payload disagree is refused.
+- **Tenant scoped.** The message group, the payload, the month documents and the read all carry the scope; the consumer re-enters it exactly as the EventDoc summary projector does. An event appended under one tenant cannot be folded into another's document, and a message whose group and payload disagree is refused and logged (`readReportEventsMessage`, tested as a security regression).
 - **Open bus, closed fold.** Any service with publish rights on the report's bus can append, and any service may subscribe to it by its derived name. Those are deploy permissions to manage like any other. A subscriber other than the module sees raw events, so adding one is a reviewable config change.
 - **Bounded cost.** Hourly 48, daily 31, cells capped, dimension and measure names capped per month, events capped in size and dimension count, one append per batch, one read per month document, at most 24 month documents for each side of a read. No path reads a whole tenant, and one tenant's lane cannot starve another's.
 - **Retention is a destroy, not an expiry.** Month documents are the unit, so "we keep 13 months of render counts" is a sentence the platform can keep, once slice 4 lands. Until then the honest wording is "retained", the same caveat the Kiln design applies to registers.
