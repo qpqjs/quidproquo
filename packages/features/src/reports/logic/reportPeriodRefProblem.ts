@@ -1,5 +1,6 @@
 import { Nullable } from '@qpqjs/core';
 
+import { REPORT_PERIOD_COUNT_MAX } from '../constants/reportPeriodCountMax';
 import { ReportPeriod } from '../models/ReportPeriod';
 import { ReportPeriodUnit } from '../models/ReportPeriodUnit';
 import { isReportRecord } from './isReportRecord';
@@ -18,8 +19,8 @@ export const reportPeriodRefProblem = (periodRef: unknown): Nullable<string> => 
     return reportUnknownKeyProblem(periodRef, ['period']);
   }
 
-  if (typeof periodRef.count !== 'number' || !Number.isInteger(periodRef.count) || periodRef.count < 1) {
-    return 'a rolling period (ReportPeriod.Last) needs a whole count of at least 1';
+  if (typeof periodRef.count !== 'number' || !Number.isInteger(periodRef.count) || periodRef.count < 1 || periodRef.count > REPORT_PERIOD_COUNT_MAX) {
+    return `a rolling period (ReportPeriod.Last) needs a whole count from 1 to ${REPORT_PERIOD_COUNT_MAX}`;
   }
 
   if (!UNITS.includes(periodRef.unit)) {

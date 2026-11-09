@@ -1,7 +1,7 @@
 # Reports: counting things as they happen
 
 **Verdict:** feature
-**Status:** slice 1 built and committed (`0672ec91e`); slice 2 built (uncommitted, 9 Nov 2026); slices 3 to 5 not started
+**Status:** slices 1 and 2 committed (`0672ec91e`, `5075a7183`); slice 3 built (uncommitted, 9 Nov 2026); slices 4 and 5 not started
 **Branch:** `reports`. Planned from a design conversation with Joe on 6 Nov 2026. No GitHub issue. First consumer is DocGen (the template service), not Kiln.
 **Updated:** 9 Nov 2026, after comparing with Kiln's register query on doccypoccy's `harry-kiln-dashboards` branch: a fixed UTC offset per report (decided 9 Nov: no time zone database, so everything stays pure), more bucket sizes and the register's period names, an answer shaped like the register query's, comparisons with an earlier period, and a minimum and maximum per measure beside the sum (CloudWatch's statistic set). The month EventDoc is renamed from "period document" to "month document", because "period" now means a view's time range, as it does in the register.
 
@@ -284,7 +284,7 @@ The FIFO per group ceiling, a few hundred messages a second, is therefore the ce
 
 ### The read
 
-`askReportRead(name, viewNameOrView, options?)`, run under the reader's scope. `options.utcOffset` is the offset to count at, else the report's `utcOffset`, else `+00:00`. DocGen passes the tenant's, the same offset it appends with. A view name resolves through the report's global; an undeclared name throws `ErrorTypeEnum.Invalid` naming it. An ad hoc view gets the same shape checks a declared one gets at definition, at read time. A view naming a dimension no event in the period carried is not an error: it reads as one series of zeros, and `dimensionKeys` on the result says what was there, so a screen can offer the right choices.
+`askReportRead(name, viewNameOrView, options?)`, run under the reader's scope. `options.utcOffset` is the offset to count at, else the report's `utcOffset`, else `+00:00`. DocGen passes the tenant's, the same offset it appends with. A view name resolves through the report's global; an undeclared name throws `ErrorTypeEnum.Invalid` naming it. An ad hoc view gets the same shape checks a declared one gets at definition, at read time. A view naming a dimension no event in the period carried is not an error: it reads with no groups and empty series, and `dimensionKeys` on the result says what was there, so a screen can offer the right choices.
 
 1. **Resolve the period** from `askDateNow` at the offset (plain arithmetic), by the register's rules (`RegisterQueryPeriod`'s comment is the reference, copied, not imported):
    - Weeks start on Monday.
@@ -295,13 +295,13 @@ The FIFO per group ceiling, a few hundred messages a second, is therefore the ce
 
    The result is `{ from, to }` as inclusive local days.
 2. **Work out the month documents** the period touches: one for `ThisMonth`, two for `Last7Days` near a month boundary, twelve for `ThisYear`. A period spanning more than 24 month documents (`REPORT_READ_MAX_MONTHS`) is refused with `ErrorTypeEnum.Invalid`; retention usually bounds it first.
-3. **Read each one**: `askEventDocGetByCode` then `askEventDocDocumentStateLatest` (snapshot seeded, so the fold is the gap since the projector last ran). A missing month is an empty month. These reads work from a non-owning service because the stores are cross module references.
+3. **Read each one**, in parallel, by its derived id (`reportMonthDocId`, no listing): `askEventDocDocumentStateLatest` (snapshot seeded, so the fold is the gap since the projector last ran), in the reader's own scope. A month with no document is an empty month. These reads work from a non-owning service because the stores are cross module references and the month fold is registered in every service.
 4. **Cut into buckets**:
    - `Hour` reads the hourly cells, and is offered only on `Today` and `Yesterday`, which the hourly keys always cover.
    - `Day` reads the daily cells.
    - `Week`, `Month` and `Quarter` add the daily cells up into buckets keyed by their first day (the Monday, the first of the month, the first of the quarter's first month), the same keys `registerQueryBucketKey` writes. A bucket at either end of the period counts only the days inside it, so the first week of "this month by week" may hold only the 1st and 2nd.
    - No `bucket` means no `buckets` on the answer, only the whole period's totals and groups, which is what a gauge or a ranked list wants.
-5. **Collapse the cells** in each bucket: parse each cell key back into its dimension tuple, keep the tuples that match `filter`, and fold each into the bucket's `count`, `sums`, `mins` and `maxes` (adding counts and sums, keeping the smallest and largest). With a `groupBy`, also fold it into the bucket's `series` under that tuple's value.
+5. **Collapse the cells** in each bucket: parse each cell key back into its dimension tuple, keep the tuples that match `filter` (values compared as text, own properties only), and fold each into the bucket's `count`, `sums`, `mins` and `maxes` (adding counts and sums, keeping the smallest and largest). With a `groupBy`, also fold it into the bucket's `series` under that tuple's value. A tuple without the groupBy dimension counts in the totals but no series or group (the register gives it a null group; a report keys series by text, so it has none). An `other` cell's tuples are unknown: it counts toward the totals only when the view has no filter, never toward a series or group, and it sets `truncated`.
 6. **Fill** every bucket of the period, empty ones counted 0, including buckets still to come. An empty bucket has no `mins` or `maxes`, rather than a minimum of 0. As with the register, a chart stops at `now`, which the answer carries, rather than the answer stopping early.
 7. **Totals and groups.** Work out `total`, `sums`, `mins` and `maxes` over the whole period. With a `groupBy`, also work out `groups`, one per value over the whole period:
    - ordered by the view's `measure` sum if it names one, else by count, largest first, with ties broken by value;
@@ -387,22 +387,22 @@ Each slice ships on its own and is reviewable alone.
     - **Definition:** a repeated `clientMessageId` folds once.
     - **Config:** the queue only on the owner's deploy, FIFO, subscribed to the FIFO bus (`assertFifoQueueEventBusSubscriptionsAreValid` passes), more than one try, the entry's global, and the batch size within the dedup window.
 
-#### Slice 3: reading
+#### Slice 3: reading (built 9 Nov 2026)
 
-Moved here from slice 1: `ReportResolvedPeriod`, `ReportReadResult`, `ReportComparisonResult` and `REPORT_READ_MAX_MONTHS` (24). Day arithmetic keeps using `addDaysToTDateIso`; if the period maths repeats its `.slice(0, 10)` in many places, a one-line day wrapper that calls it goes in core then. A weekday helper for week buckets goes in core's `utils/dateTime`.
-
-14. `packages/features/src/reports/logic/askReportRead.ts`, with pure helpers:
-    - `resolveReportView(config, nameOrView)`;
-    - `resolveReportPeriod(now, periodRef, utcOffsetMinutes, financialYearStartMonth)`, `reportComparisonPeriod(period, compare, now)` and `reportPeriodMonths(period)`;
-    - `mergeReportCells`, `collapseReportCells(cells, groupBy, filter)`, `rollUpReportBuckets(daily, bucket, period)`, `fillReportBuckets` and `rankReportGroups(groups, measure, limit)`.
-15. Tests:
-    - **Views:** name resolution and refusal; ad hoc view shape checks.
-    - **Periods:** every period resolved at a month boundary and a year boundary at two offsets, with the register's own examples as the reference ("last 7 days on the 8th is the 2nd to the 8th"); a financial year starting in July; the 24 month cap refused.
-    - **Buckets:** the merge of two months for a 7 day period straddling them; week, month and quarter roll-ups, including part weeks at the period's ends; zero filled gaps, including buckets still to come, with an empty bucket carrying no min or max; mins and maxes merged across two months and under a filter.
-    - **Groups:** groupBy with a filter over full tuple cells; a groupBy over a dimension no event carried (one series of zeros); groups ranked by measure and cut to `groupLimit` with `groupsTotal`.
-    - **Comparison:** hourly and daily, each to the same point; the comparison's groups lined up with the answer's when a value has nothing earlier; `beyondRetention` set.
-    - **Truncation:** `truncated` set when an `other` cell is in the period, or a merged document has `namesCapped`.
-16. Export from `packages/features/src/index.ts`; docs entry in `docs/` describing the feature in the same voice as the EventDoc docs; `breaking-changes.md` untouched (additive).
+14. `packages/core/src/utils/dateTime/`: `addCalendarMonths(day, months)`, a month step on a plain day that clamps to the target month's last day (31 March less a month is 28 February) as the register's does; core's existing `addMonthsToTDateIso` lets a short month overflow into the next (3 March), so it is not used for this and is left as it is. And `getWeekdayFromMonday(day)`.
+15. `packages/features/src/reports/`:
+    - models: `ReportResolvedPeriod` (the period ref, `utcOffset`, `from`, `to`, and on a comparison `until` and `beyondRetention`), `ReportReadBucket`, `ReportReadGroup`, `ReportComparisonResult` and `ReportReadResult`; types: `ReportReadOptions`, `ReportSpan`, `ReportReadPlan`, `ReportViewResolution`, `ReportCollapsedCells`, `ReportPeriodAnswer`; constants: `REPORT_READ_MAX_MONTHS` (24) and `REPORT_PERIOD_COUNT_MAX` (366, the register's rolling cap, now also checked on a declared or ad hoc view).
+    - pure logic, copying the register's rules (`registerQueryPeriodDays`, `shiftRegisterQueryPeriodDays`, `registerQueryPeriodSpan`, `fillRegisterQueryBuckets`, `alignRegisterQueryComparisonGroups`): `resolveReportView`, `resolveReportPeriodDays`, `shiftReportPeriodDays`, `resolveReportComparisonSpan`, `reportSpanMonthCount` and `reportSpanMonths`, `reportSpanDays` and `reportSpanHours`, `reportReadBucketKey` and `fillReportBucketKeys`, `mergeReportCell` and `mergeReportSeries`, `collapseReportCells`, `buildReportPeriodAnswer`, `rankReportGroups`, `alignReportComparisonGroups`, `reportComparisonUntil`, `planReportRead` (the spans, the months each reads, the 24 month cap, the retention cut) and `buildReportReadResult`. Small helpers `addReportDays`, `reportDaysBetween` and `readReportOwnCell`.
+    - stories: `askReportMonthStatesRead` (the month documents in parallel, by derived id) and `askReportRead`.
+    - `testing/`: `createReportsMemoryStore` and `reportsDynamicFunctionsMock`, shared by the consumer and read tests (excluded from the build).
+16. Tests, each rule checked by breaking it and watching its test fail:
+    - **Periods:** every period around a Sunday, the register's "last 7 days on the 8th is the 2nd to the 8th", rolling days, weeks and months, the financial year either side of 1 July and with a January start, a year end.
+    - **Comparison periods:** months shifted by months and the rest by days, the same day last week, the same period last year with 29 February clamped and Monday weeks moved 52 weeks; this month to the 9th against last month to the 9th, 31 March against all of February, a finished period counted whole, today against yesterday cut at the current hour.
+    - **Buckets:** week keys on Mondays with the part week before the 1st, months and quarters, a day's 24 hours or its hours to the last one counted.
+    - **Cells:** totals and series, a filter leaving out the `other` cell, values compared as text, an Object.prototype name never matching.
+    - **Answers (over states folded by the real fold):** renders by kind over the last 7 days (every day drawn, every series in every point, an empty day with no min or max); weeks of this month; this month against last month to the same day with groups ranked by pages and lined up; today against yesterday by the hour with `until`; groups cut to the limit with `groupsTotal`; `truncated` with the other cells still in the total; a comparison past retention read as nothing and flagged; the 24 month cap.
+    - **End to end (`runStory`):** events appended through the consumer and read back through EventDoc and the real month fold across two months, a redelivered message counted once; a declared view by name; another tenant reading none of it (a security regression); Invalid for an unknown view, a bad ad hoc view and an overlong period.
+17. Export from `packages/features/src/index.ts` (through the reports barrel). A docs page for `askReportAppend` and `askReportRead` beside the `defineReports` one in the docs site is still to write; `breaking-changes.md` untouched (additive).
 
 #### Slice 4: retention
 
@@ -452,3 +452,4 @@ Moved here from slice 1: `ReportResolvedPeriod`, `ReportReadResult`, `ReportComp
 3. **Default cell cap.** 200 distinct dimension tuples per hour or day bucket per event type. Generous for categories, tight enough that an identifier used as a dimension shows up as `other` within the first hour. Raise or lower before the first stream if you have a feel for the real cardinalities.
 4. **Which offset DocGen uses.** DocGen passes an offset on every append and read; the framework only needs it to be the same on both sides. For tenants in Sydney, Melbourne, Canberra or Hobart the choice is `+10:00` (exact in winter, an hour out in summer) or `+11:00` (the reverse); for Adelaide `+09:30` or `+10:30`. The proposal is one `+10:00` for the whole app until a tenant elsewhere signs up, later a tenant setting. A tenant whose offset changes keeps its past events on their old days until a backfill moves them.
 5. **Same hour comparisons further back.** Keeping hourly cells for the newest event's local day and the seven days before it, instead of one day, would allow "today against the same day last week" to the same hour, as the register does on an instant. It multiplies the hourly part of the state by four (192 keys instead of 48). The proposal is one day now, refusing `SameDayLastWeek` on `Today`, and widening it if a dashboard asks.
+6. **Events dated in the future.** The hourly trim keeps the newest event's local day and the day before. An event whose `at` is ahead of the clock (a caller passing a future time, or a skewed clock) moves that day forward and can trim yesterday's hours early, so a today against yesterday comparison reads low until the real day catches up. The proposal is for the consumer to drop, with a warning, any event more than a few minutes ahead of its own `askDateNow`.
