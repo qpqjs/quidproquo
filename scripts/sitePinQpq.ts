@@ -8,7 +8,7 @@
 //   --dry-run  print what would change and write nothing
 
 import { execFileSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 const ROOT = join(__dirname, '..');
@@ -115,9 +115,20 @@ const main = (): void => {
 
   writeFileSync(sitePackageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 
-  // `npm install`, not `npm ci`: the committed lockfile describes the file links and no longer
-  // matches. Everything else in the lockfile is kept; only the pinned packages are resolved anew.
-  execFileSync('npm', ['install', '--no-audit', '--no-fund'], { cwd: SITE, stdio: 'inherit' });
+  // `npm install` with every pinned package as an explicit `name@version` spec, not a bare
+  // `npm install` after the rewrite: the committed lockfile still records each package as a link
+  // to `../packages/<x>`, and npm keeps a link whose target's package.json satisfies the new
+  // spec, which it does on a release checkout. Unbuilt, so the install "succeeds" with no bins
+  // and no lib. An explicit spec is a registry spec and replaces the link (checked with npm
+  // 11.12). Everything else in the lockfile is kept.
+  const specs = pinned.map((name) => `${name}@${version}`);
+  execFileSync('npm', ['install', '--no-audit', '--no-fund', '--save-exact', ...specs], { cwd: SITE, stdio: 'inherit' });
+
+  // The one bin the deploy runs. Missing means the packages did not really come from npm.
+  const qpqBin = join(SITE, 'node_modules', '.bin', 'qpq');
+  if (!existsSync(qpqBin)) {
+    throw new Error(`${qpqBin} is missing after the install, so @qpqjs/cli did not come from the registry`);
+  }
 };
 
 if (require.main === module) {

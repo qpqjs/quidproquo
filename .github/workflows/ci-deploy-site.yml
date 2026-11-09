@@ -150,7 +150,9 @@ jobs:
       # docusaurus included, which the web stack packages as an asset.
       # The GitHub environment name doubles as the deployment name in
       # apps/qpqjs/deploy.config.json, which owns account/region/identity.
-      - run: npx qpq go:docker all all --build-only --app qpqjs --deployment ${{ inputs.environment }}
+      # --no-install: `qpq` is an unrelated package on npm, and a missing local
+      # install must fail here rather than run that.
+      - run: npx --no-install qpq go:docker all all --build-only --app qpqjs --deployment ${{ inputs.environment }}
         working-directory: quidproquojs.com
 
       # One tarball for the deploy job: the monorepo libs, so it can run qpq
@@ -233,7 +235,7 @@ jobs:
       # Fully non-interactive deploy of the saved build: all services, all
       # stacks (inf -> api -> web -> views), in parallel via docker. The AWS_*
       # creds set by the step above are passed through to the deploy containers.
-      - run: npx qpq go:docker all all --from-build --app qpqjs --deployment ${{ inputs.environment }}
+      - run: npx --no-install qpq go:docker all all --from-build --app qpqjs --deployment ${{ inputs.environment }}
         working-directory: quidproquojs.com
 
       # Verify the deployment end to end: mint a GitHub OIDC token with the
