@@ -67,8 +67,11 @@ Comments carry no em dashes and never narrate what the code used to do ("used to
 
 ### `qpq/one-export-per-file`
 
-One exported thing per file. Barrels (`index.ts`), declaration files and tests are exempt, and the two sanctioned pairs count as one concept:
-`askXBase` with its `askX` wrapper, and an `XEffect` type with its `XPayload` type. Warns.
+One main export per file, with a few types or constants that belong to it allowed alongside (G1). Barrels (`index.ts`), declaration
+files and tests are exempt, and the two sanctioned pairs count as one concept: `askXBase` with its `askX` wrapper, and an `XEffect` type
+with its `XPayload` type. The rule cannot tell a helper type from a second main export, so it counts: `{ max }` is the export count a
+file may reach before it warns (default 1). The shared config sets 10, so only files well past G1 warn and the rest is left to review.
+Warns.
 
 ### `qpq/filename-matches-export`
 

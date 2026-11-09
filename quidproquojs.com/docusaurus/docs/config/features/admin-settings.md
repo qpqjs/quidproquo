@@ -51,6 +51,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   coldStorageAfterDays?: number;
   services?: string[];
   maintenanceWebsocketApiName?: string;
+  disableAlarms?: boolean;
 }
 ```
 
@@ -60,6 +61,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 | `coldStorageAfterDays` | `number` | – (no transition) | When greater than 0, adds a lifecycle rule transitioning log objects to the `DEEP_COLD_STORAGE` tier after this many days, to cut storage cost for old logs. |
 | `services` | `string[]` | `[]` | The list of service names the admin dashboard should surface, exposed as the `qpq-serviceNames` global. Returned by the `/admin/services` route. |
 | `maintenanceWebsocketApiName` | `string` | `''` | Name of the **application** [WebSocket queue](./web-socket-queue.md) (its `apiName`, not the admin's own socket) that maintenance state broadcasts on. Unset means maintenance mutations skip broadcasting. |
+| `disableAlarms` | `boolean` | `true` | Alarms are off by default. Pass `false` to declare the `admin-notifier` event bus, its `defineNotifyError` and the `admin-alarms` queue. Any `defineNotifyError` opts the service into default alarms on every table, queue and api, and each alarm is billed by CloudWatch. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; marks the log storage drives and key-value stores as deprecated. |
 
 ## What it declares
@@ -73,7 +75,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 - **Maintenance collection** — an [event-doc collection](./event-doc.md) (`defineEventDoc`) mounted at `/maintenance`, admin-authenticated, storing maintenance windows as an append-only update log. Every append re-broadcasts the active maintenance set to every connection on the `maintenanceWebsocketApiName` application WebSocket queue (via its `onAppend` hook); a newly-opened connection gets the same set pre-auth through that queue's `onConnected` sync.
 - **Log chat** — a `defineEventDocAi` instance scoped to `docId` = log correlation id, with two tools (`getLogActions`, `getLogAction`) instead of the log's JSON pasted into the prompt. Runs on `AiModel.ClaudeSonnet46` over the same admin WebSocket connection, not a separate HTTP route.
 - **WebSocket sync** — an admin event bus (`qpq-admin-wsq`), a `defineWebSocketQueue`, and queues that fan out client messages (config sync, mark-log-checked, refresh-metadata) using `WebsocketAdminClientMessageEventType`.
-- **Alarms** — a `defineNotifyError` publishing to an `admin-notifier` event bus, with a queue handling its Error / Timeout / Throttle events.
+- **Alarms** (only when `disableAlarms: false`) — a `defineNotifyError` publishing to an `admin-notifier` event bus, with a queue handling its Error / Timeout / Throttle events.
 - **Globals** — `qpq-serviceNames` and `qpq-log-retention-days`.
 - **Audit sessions** — spreads in [defineAdminSessionEventDoc](./admin-session-event-doc.md) for the admin UI's per-login session document.
 

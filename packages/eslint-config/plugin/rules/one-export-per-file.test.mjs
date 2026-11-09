@@ -16,9 +16,16 @@ ruleTester.run('one-export-per-file', rule, {
     { code: 'export const TenantSetLoadingPayload = 1; export const TenantSetLoadingEffect = 2;', filename: 'TenantSetLoadingEffect.ts' },
     { code: 'export const a = 1; export const b = 2;', filename: 'index.ts' },
     { code: 'export const a = 1; export const b = 2;', filename: 'thing.test.ts' },
+    { code: 'export const a = 1; export const b = 2; export const c = 3;', filename: 'a.ts', options: [{ max: 3 }] },
   ],
   invalid: [
     { code: 'export const a = 1; export const b = 2;', filename: 'a.ts', errors: [{ messageId: 'tooMany' }] },
     { code: 'export const askA = 1; export const askB = 2; export const askC = 3;', filename: 'askA.ts', errors: [{ messageId: 'tooMany' }] },
+    {
+      code: 'export const a = 1; export const b = 2; export const c = 3; export const d = 4;',
+      filename: 'a.ts',
+      options: [{ max: 3 }],
+      errors: [{ messageId: 'tooMany' }],
+    },
   ],
 });

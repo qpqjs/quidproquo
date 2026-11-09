@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features`: `defineAdminSettings` no longer declares the `admin-notifier` bus, its `defineNotifyError` or the `admin-alarms` queue by default, so the default alarms and the admin alarm view are gone. Pass `disableAlarms: false` in the advanced settings to keep them.
+
 ## 0.5.0
 
 - `@qpqjs/config-aws`: `awsNamingUtils.getAppStackName(application, environment, feature, suffix)` is now `getAppStackName(application, environment, suffix, feature?)`, with the optional feature last like the other name builders.
