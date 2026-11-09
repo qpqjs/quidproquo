@@ -11,8 +11,8 @@ name: release
 #   build   - bumps, writes the changelog with Claude, commits and tags locally,
 #             then builds, tests, scaffolds and packs. Cannot publish.
 #   publish - can mint an npm token (trusted publishing, no stored secret) and
-#             installs nothing. Publishes the tarballs, then pushes the bump
-#             commit and tag and makes the GitHub release.
+#             installs nothing. Pushes the bump commit and tag, publishes the
+#             tarballs, then makes the GitHub release.
 #   deploy  - the ordinary site deploy (ci-deploy-site.yml) to production, on
 #             the tag just pushed and pinned to the packages just published,
 #             smoke included. The one deploy that proves what npm serves
@@ -26,8 +26,13 @@ name: release
 # npm's trusted publisher for every package names that environment, so a changed
 # copy of this workflow on another branch cannot publish.
 #
-# If publish fails, use "Re-run failed jobs": it skips versions already on npm,
-# and pushing the same commit again is a no-op.
+# The push comes before the publish so the bump commit and tag are on origin
+# whatever happens to npm. If publish fails, use "Re-run failed jobs": pushing
+# the same commit again is a no-op and the publish skips versions already on
+# npm. A package that needs a fix before it can publish is published by hand
+# from the tag (check it out, npm ci, npm run build, npm publish -w <package>);
+# the next release bumps past the version either way, and a gap in the
+# published versions is harmless.
 on:
   workflow_dispatch:
     inputs:
@@ -163,13 +168,14 @@ jobs:
             exit 1
           fi
 
-      - name: publish to npm
-        run: node ./scripts/releasePublish.mts "$RUNNER_TEMP/release/packages"
-
       # Pushed with the workflow token, which does not start other workflows, so
-      # the bump commit does not set off deploy-site.
+      # the bump commit does not set off deploy-site. Before the publish, so the
+      # commit and tag exist on origin even if npm refuses a package.
       - name: push the bump commit and tag
         run: git push --atomic origin "$(git rev-parse "$VERSION^{commit}"):refs/heads/main" "refs/tags/$VERSION"
+
+      - name: publish to npm
+        run: node ./scripts/releasePublish.mts "$RUNNER_TEMP/release/packages"
 
       - name: make the github release
         env:
