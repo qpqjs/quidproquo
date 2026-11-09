@@ -8,6 +8,7 @@ export * from './mcp';
 export * from './mcpEventDocAi';
 export * from './openApi';
 export * from './permission';
+export * from './reports';
 export * from './routes';
 export * from './systemUsers';
 export * from './tenant';

@@ -19,6 +19,14 @@ describe('defineEventDocSummary', () => {
     expect(qpqCoreUtils.getAllStorageDriveConfigs(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
   });
 
+  it('hands one owner to every store and the drive, so a collection can be referenced from another service', () => {
+    const config = defineEventDocSummary('memos', { owner: { module: 'template' } });
+
+    expect(qpqCoreUtils.getAllKeyValueStoreConfigs(config).map((kvs) => kvs.owner?.module)).toEqual(['template', 'template', 'template']);
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.owner?.module)).toEqual(['template']);
+    expect(qpqCoreUtils.getAllKeyValueStoreConfigs(defineEventDocSummary('memos')).every((kvs) => kvs.owner === undefined)).toBe(true);
+  });
+
   it('hands the projector its store name and snapshot map as config globals', () => {
     const config = defineEventDocSummary('memos', { snapshotFunctions: { memo: 'memos-memo-functions' } });
     const eventsStore = qpqCoreUtils.getAllKeyValueStoreConfigs(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'));

@@ -1,4 +1,4 @@
-import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from '@qpqjs/core';
+import { CrossModuleOwnerWithNoResourceOverride, defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from '@qpqjs/core';
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
@@ -16,6 +16,8 @@ export type EventDocSummaryOptions = {
   // Every store and the drive refuse unscoped calls. Must match the routes' scopeResolver:
   // defineEventDoc derives it; a direct caller with a resolver sets it.
   scoped?: boolean;
+  // The service whose deploy creates the stores and the drive; every other service gets references. Absent: this one.
+  owner?: CrossModuleOwnerWithNoResourceOverride;
 };
 
 /** Summary store, events store (`${name}Events`), snapshots store (`${name}Snap`) and blob drive for a collection. */
@@ -24,11 +26,13 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
+    owner: options?.owner,
   }),
   // pk=modelId, sk=numeric event id. The stream drives the summary projector; coalescing makes one burst one rebuild.
   defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
+    owner: options?.owner,
     onStream: {
       runtime: {
         ...getFeatureEntryQpqFunctionRuntime('eventDoc', 'kvsStream', 'eventDocSummaryProjector::projectEventDocSummary'),
@@ -47,6 +51,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
   defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
+    owner: options?.owner,
   }),
-  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), { scoped: options?.scoped }),
+  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), { scoped: options?.scoped, owner: options?.owner }),
 ];
