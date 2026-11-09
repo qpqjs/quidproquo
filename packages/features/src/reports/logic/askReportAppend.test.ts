@@ -115,6 +115,15 @@ describe('askReportAppend', () => {
     expect(sent).toHaveLength(0);
   });
 
+  it("throws Invalid for an event dated more than five minutes ahead, so a bad `at` is the caller's to hear about", () => {
+    expect(() =>
+      runStory(askReportAppend('docgen', { ...rendered, at: '2026-11-09T06:00:00.000Z' }), {
+        [ConfigActionType.GetGlobal]: CONFIG,
+        [DateActionType.Now]: NOW,
+      }),
+    ).toThrowError(/Invalid: askReportAppend\('docgen'\): at 2026-11-09T06:00:00.000Z is more than 5 minutes after now/);
+  });
+
   it('logs a failed send at error and returns, so the thing being counted never fails because of the count', () => {
     const { logs } = run(askReportAppend('docgen', rendered), throwsError('Throttled', 'slow down'));
 
