@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.3
+
+- release: the npm version watch accepts any served version, and the js-yaml override is gone from the site
+
 ## 0.6.2
 
 - release: the site pin drops the committed lockfile before installing the pinned packages from npm

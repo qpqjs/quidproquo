@@ -1,6 +1,6 @@
 {
   "name": "quidproquo",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Build web applications out of pure functions.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -46,11 +46,11 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
     "typescript": "^5.8.2",
-    "@qpqjs/tsconfig": "0.6.2"
+    "@qpqjs/tsconfig": "0.6.3"
   },
   "dependencies": {
-    "@qpqjs/core": "0.6.2",
-    "@qpqjs/webserver": "0.6.2"
+    "@qpqjs/core": "0.6.3",
+    "@qpqjs/webserver": "0.6.3"
   },
   "engines": {
     "node": ">=24"
