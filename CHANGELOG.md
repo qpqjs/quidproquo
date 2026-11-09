@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+- release: the workflow pushes the bump commit and tag before publishing to npm
+- release: site deploy installs the pinned qpq packages from npm, refuses a missing local qpq, and waits up to 30 minutes for npm
+
 ## 0.6.0
 
 - features: `defineAdminSettings` no longer declares the admin alarms bus and queue by default, so the default alarms are off unless you opt in

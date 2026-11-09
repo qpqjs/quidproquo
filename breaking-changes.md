@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.6.1
+
 ## 0.6.0
 
 - `@qpqjs/features`: `defineAdminSettings` no longer declares the `admin-notifier` bus, its `defineNotifyError` or the `admin-alarms` queue by default, so the default alarms and the admin alarm view are gone. Pass `disableAlarms: false` in the advanced settings to keep them.
