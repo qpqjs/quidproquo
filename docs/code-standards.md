@@ -10,7 +10,7 @@ Contents: [General](#general) · [Actions and requesters](#actions-and-requester
 
 ## General
 
-**G1. One export per file, file named after it.** Two exports are allowed only when they are one concept: an effect and its payload type, or an `askXBase` requester and its short generic wrapper. A state type is type-only in `types/`; its `createInitial<Module>State` is its own file in `logic/`. **lint**
+**G1. One main export per file, file named after it.** A few types or constants may sit at the top of the file when they belong to the main export alone (its options type, its result type, a limit only it reads). Anything another file imports on its own is its own file. The sanctioned pairs stay: an effect and its payload type, or an `askXBase` requester and its short generic wrapper. A state type is type-only in `types/`; its `createInitial<Module>State` is its own file in `logic/`. **lint** (warns past ten exports; under that it is a review point)
 
 ```
 stateUpdaters/setLoading.ts     export const setLoading = ...

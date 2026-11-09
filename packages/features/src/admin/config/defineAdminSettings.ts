@@ -64,6 +64,14 @@ export type QPQConfigAdvancedLogSettings = {
   // The APPLICATION websocket api (defineWebSocketQueue apiName) maintenance
   // state broadcasts on. Unset = maintenance mutations skip broadcasting.
   maintenanceWebsocketApiName?: string;
+
+  // The admin notifier: the `admin-notifier` bus, its `defineNotifyError` and the
+  // `admin-alarms` queue that feeds alarms into the admin log. Off by default (true): the
+  // deploy treats any `defineNotifyError` in a service as opting that service into a default
+  // alarm on every resource (two per table, two per queue, one per api), and CloudWatch bills
+  // each one, so the admin service alone ran to about forty alarms. Pass false to get the
+  // alarms and the admin alarm view back.
+  disableAlarms?: boolean;
 } & QPQConfigAdvancedSettings;
 
 // Retention defaults to undefined (no expiry) unless `logRetentionDays` is set.
@@ -308,23 +316,29 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           },
         ),
 
-        defineEventBus('admin-notifier'),
-        defineNotifyError('admin-notifier', {
-          onAlarm: {
-            publishToEventBus: ['admin-notifier'],
-          },
-        }),
-        defineQueue(
-          'admin-alarms',
-          {
-            [NotifyErrorQueueEvents.Error]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onError'),
-            [NotifyErrorQueueEvents.Timeout]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onTimeout'),
-            [NotifyErrorQueueEvents.Throttle]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onThrottle'),
-          },
-          {
-            eventBusSubscriptions: ['admin-notifier'],
-          },
-        ),
+        // The three travel together: the queue subscribes to the bus, and the notifier is
+        // what routes alarms onto it (and what switches the default resource alarms on).
+        (advancedSettings?.disableAlarms ?? true)
+          ? []
+          : [
+              defineEventBus('admin-notifier'),
+              defineNotifyError('admin-notifier', {
+                onAlarm: {
+                  publishToEventBus: ['admin-notifier'],
+                },
+              }),
+              defineQueue(
+                'admin-alarms',
+                {
+                  [NotifyErrorQueueEvents.Error]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onError'),
+                  [NotifyErrorQueueEvents.Timeout]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onTimeout'),
+                  [NotifyErrorQueueEvents.Throttle]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onThrottle'),
+                },
+                {
+                  eventBusSubscriptions: ['admin-notifier'],
+                },
+              ),
+            ],
 
         defineGlobal(QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL, advancedSettings?.maintenanceWebsocketApiName ?? ''),
         defineGlobal(ADMIN_SERVICE_NAMES_GLOBAL, advancedSettings?.services ?? []),

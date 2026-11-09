@@ -3,7 +3,6 @@ import {
   AwsDataStoreRemovalPolicy,
   defineAwsDataStoreRemovalPolicy,
   defineAwsServiceAccountInfo,
-  defineWafProtection,
   getAwsServiceAccountInfosForDeployments,
 } from '@qpqjs/config-aws';
 import { QPQJS_USER_DIRECTORY, QpqjsServiceEnum, qpqjsServiceNames } from '@qpqjs/constants';
@@ -72,7 +71,8 @@ export const defineQpqjsService = (
     },
   ),
 
-  defineWafProtection(),
+  // No WAF: see bootstrap.qpq.ts. Attaching here needs the bootstrap web ACLs to exist.
+  // defineWafProtection(),
 
   // Module-federation singletons beyond the react and @qpqjs/web defaults.
   defineFrontendBundleOptions({
@@ -108,7 +108,7 @@ export const defineQpqjsService = (
 
   defineAdminSettings(QpqjsServiceEnum.Admin, {
     services: qpqjsServiceNames,
-    coldStorageAfterDays: 90,
+    logRetentionDays: 90,
   }),
 
   // Every service documents itself: reference page at /v1/docs, the generated

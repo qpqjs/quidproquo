@@ -2,13 +2,7 @@
 // domain certificates. The identity plumbing (defineApplication +
 // defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-aws's
 // workspace CDK app; this fragment must not declare its own.
-import {
-  defineAwsGithubDeployRole,
-  defineBootstrapWaf,
-  defineDomainCertificate,
-  WafManagedRuleGroup,
-  WafRuleOverrideAction,
-} from '@qpqjs/config-aws';
+import { defineAwsGithubDeployRole, defineDomainCertificate } from '@qpqjs/config-aws';
 import { QpqjsServiceEnum } from '@qpqjs/constants';
 import { QpqAppDeployContext } from '@qpqjs/deploy-aws';
 import { defineApi, defineDns, defineEmailReceivingDomain, getDeploySettingList, QPQConfig } from 'quidproquo';
@@ -25,15 +19,20 @@ export default ({ region }: QpqAppDeployContext): QPQConfig => [
     repositoryId: 571382961,
   }),
 
-  defineBootstrapWaf({
-    rateLimits: [{ name: 'all-traffic', limit: 2000 }],
-    managedRuleGroups: [WafManagedRuleGroup.common, WafManagedRuleGroup.ipReputation, WafManagedRuleGroup.knownBadInputs, WafManagedRuleGroup.sqli],
-    managedRuleOverrides: {
-      [WafManagedRuleGroup.common]: [
-        { name: 'SizeRestrictions_BODY', action: WafRuleOverrideAction.count }, // Disable the 8kb limit
-      ],
-    },
-  }),
+  // No WAF. The two web ACLs (regional and CloudFront) and their five rules were $20 a month per
+  // environment, 60 percent of the development account's bill, for a site with almost no traffic.
+  // Shield Standard still covers CloudFront and API Gateway against network level floods for free.
+  // Bring it back with `defineBootstrapWaf` here and `defineWafProtection` in defineQpqjsService
+  // (a rate limit alone is one rule, $6 an ACL) if the site ever draws real abuse.
+  // defineBootstrapWaf({
+  //   rateLimits: [{ name: 'all-traffic', limit: 2000 }],
+  //   managedRuleGroups: [WafManagedRuleGroup.common, WafManagedRuleGroup.ipReputation, WafManagedRuleGroup.knownBadInputs, WafManagedRuleGroup.sqli],
+  //   managedRuleOverrides: {
+  //     [WafManagedRuleGroup.common]: [
+  //       { name: 'SizeRestrictions_BODY', action: WafRuleOverrideAction.count }, // Disable the 8kb limit
+  //     ],
+  //   },
+  // }),
 
   defineApi('api'),
 

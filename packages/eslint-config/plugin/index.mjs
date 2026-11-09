@@ -31,7 +31,9 @@ plugin.configs = {
       'qpq/no-history-comments': 'error',
       // Warns until the `| null` cleanup lands (H1 keeps this one out of the error flip).
       'qpq/nullable-over-null': 'warn',
-      'qpq/one-export-per-file': 'warn',
+      // G1 stays the standard, but the warning on every two or three export file was noise
+      // nobody acted on. Only files well past it warn; the rest is for review.
+      'qpq/one-export-per-file': ['warn', { max: 10 }],
       'qpq/filename-matches-export': 'warn',
     },
   },

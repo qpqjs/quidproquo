@@ -1,4 +1,11 @@
-import { GlobalQPQConfigSetting, KeyValueStoreQPQConfigSetting, QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '@qpqjs/core';
+import {
+  GlobalQPQConfigSetting,
+  KeyValueStoreQPQConfigSetting,
+  QPQConfig,
+  QPQConfigSetting,
+  QPQCoreConfigSettingType,
+  QueueQPQConfigSetting,
+} from '@qpqjs/core';
 import { QPQWebServerConfigSettingType, RouteQPQWebServerConfigSetting } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -102,6 +109,34 @@ describe('defineAdminSettings', () => {
 
     expect(kvsNames).toContain(adminSessionStoreName);
     expect(kvsNames).toContain(`${adminSessionStoreName}Events`);
+  });
+
+  it('routes alarms to the admin log through the notifier when alarms are enabled', () => {
+    const logSettings = findLogServiceSettings(defineAdminSettings('log', { disableAlarms: false }), 'log');
+
+    const notifiers = logSettings.filter((s) => s.configSettingType === QPQCoreConfigSettingType.notifyError);
+    const queueNames = logSettings
+      .filter((s) => s.configSettingType === QPQCoreConfigSettingType.queue)
+      .map((s) => (s as QueueQPQConfigSetting).name);
+
+    expect(notifiers).toHaveLength(1);
+    expect(queueNames).toContain('admin-alarms');
+  });
+
+  it('declares no notifier, alarm queue or notifier bus by default', () => {
+    const logSettings = findLogServiceSettings(defineAdminSettings('log'), 'log');
+
+    const notifiers = logSettings.filter((s) => s.configSettingType === QPQCoreConfigSettingType.notifyError);
+    const queueNames = logSettings
+      .filter((s) => s.configSettingType === QPQCoreConfigSettingType.queue)
+      .map((s) => (s as QueueQPQConfigSetting).name);
+    const busNames = logSettings
+      .filter((s) => s.configSettingType === QPQCoreConfigSettingType.eventBus)
+      .map((s) => (s as unknown as { name: string }).name);
+
+    expect(notifiers).toEqual([]);
+    expect(queueNames).not.toContain('admin-alarms');
+    expect(busNames).not.toContain('admin-notifier');
   });
 
   it('mounts the session routes under /v1/admin/session', () => {
