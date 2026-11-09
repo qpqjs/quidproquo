@@ -135,7 +135,7 @@ jobs:
 
       # The site's file: links become the published versions and the site is
       # installed fresh from the registry. Nothing is committed.
-      - name: pin the site to the published packages
+      - name: install the site from npm (pinned to the published packages)
         if: ${{ inputs.from_npm }}
         run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/sitePinQpq.ts
 
@@ -223,7 +223,7 @@ jobs:
       # the @qpqjs/cli that deploys the saved build is the version that
       # synthesised it (the saved build's manifest checks) and nothing resolves
       # from the monorepo. The registry wait already happened in the build job.
-      - name: pin the site to the published packages
+      - name: install the site from npm (pinned to the published packages)
         if: ${{ inputs.from_npm }}
         run: npx --yes "tsx@$(node -p 'require("./package.json").devDependencies.tsx')" ./scripts/sitePinQpq.ts
 
