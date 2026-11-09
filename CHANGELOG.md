@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0
+
+- features: `defineAdminSettings` no longer declares the admin alarms bus and queue by default, so the default alarms are off unless you opt in
+- eslint-config: one-export-per-file is relaxed
+- release: the release workflow deploys the production site on the published npm packages
+
+### Breaking changes
+
+- `defineAdminSettings` drops the default admin alarms, pass `disableAlarms: false` to keep them
+
 ## 0.5.0
 
 - features/core: `askEventDocAuthorise` is the one story that runs a collection's `authorise` hook for routes, mcp calls and websocket chats, and core gains `askValidateSchemaOrThrowError` as the single zod parse-or-throw
