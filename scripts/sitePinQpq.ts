@@ -8,7 +8,7 @@
 //   --dry-run  print what would change and write nothing
 
 import { execFileSync } from 'child_process';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 const ROOT = join(__dirname, '..');
@@ -115,12 +115,15 @@ const main = (): void => {
 
   writeFileSync(sitePackageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 
-  // `npm install` with every pinned package as an explicit `name@version` spec, not a bare
-  // `npm install` after the rewrite: the committed lockfile still records each package as a link
-  // to `../packages/<x>`, and npm keeps a link whose target's package.json satisfies the new
-  // spec, which it does on a release checkout. Unbuilt, so the install "succeeds" with no bins
-  // and no lib. An explicit spec is a registry spec and replaces the link (checked with npm
-  // 11.12). Everything else in the lockfile is kept.
+  // The committed lockfile goes. It describes the file link graph, and that graph is not a
+  // standalone one: the links' own dependencies (express's `qs`, say) resolve from the monorepo
+  // root's node_modules and are not in the site's lockfile at all. Reusing it with the links
+  // swapped for registry packages leaves those dependencies out (the first release deploy died
+  // on `Cannot find module 'qs'`), and keeping the links is worse: npm holds a link whose target
+  // satisfies the new spec, which an unbuilt release checkout does, and installs no lib and no
+  // bins. So: no lockfile, every pinned package as an explicit `name@version` spec, and npm
+  // resolves the whole tree from the registry the way a user's project would.
+  rmSync(join(SITE, 'package-lock.json'), { force: true });
   const specs = pinned.map((name) => `${name}@${version}`);
   execFileSync('npm', ['install', '--no-audit', '--no-fund', '--save-exact', ...specs], { cwd: SITE, stdio: 'inherit' });
 
