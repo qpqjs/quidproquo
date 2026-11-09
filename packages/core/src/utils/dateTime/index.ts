@@ -3,3 +3,4 @@ export * from './getMillisecondsBetween';
 export * from './getQpqIsoDateTimeFromDate';
 export * from './getUtcOffsetMinutes';
 export * from './getValidQpqIsoDateTime';
+export * from './isQpqIsoDateTime';
