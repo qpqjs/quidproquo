@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askLogCreate, AskResponse, askStorageScopeProvide, LogLevelEnum } from '@qpqjs/core';
+import { askConfigGetGlobal, askDateNow, askLogCreate, AskResponse, askStorageScopeProvide, LogLevelEnum } from '@qpqjs/core';
 
 import { askEventDocStoreProvide } from '../../eventDoc/context/askEventDocStoreProvide';
 import { buildEventDocStore } from '../../eventDoc/context/buildEventDocStore';
@@ -28,7 +28,8 @@ export function* askReportEventsFold(reportName: string, messageId: string, grou
   const { message } = read;
   const config = yield* askConfigGetGlobal<ReportsConfig>(reportConfigGlobal(reportName));
   const settings = readReportEventSettings(config, message.type);
-  const batches = buildReportMonthBatches(message, settings);
+  const now = yield* askDateNow();
+  const batches = buildReportMonthBatches(message, now, settings);
 
   if (batches.droppedCount > 0) {
     yield* askLogCreate(

@@ -5,6 +5,7 @@ export * from './reportDefaultMaxDimensionNames';
 export * from './reportDefaultMaxMeasureNames';
 export * from './reportDefaultUtcOffset';
 export * from './reportEventBusName';
+export * from './reportEventMaxAheadMs';
 export * from './reportEventsMessageType';
 export * from './reportEventTypePattern';
 export * from './reportHourlyDaysKept';

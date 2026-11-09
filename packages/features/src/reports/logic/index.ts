@@ -30,6 +30,7 @@ export * from './reportComparisonUntil';
 export * from './reportDaysBetween';
 export * from './reportDimensionsProblem';
 export * from './reportEventSettingsProblem';
+export * from './reportFutureEventProblem';
 export * from './reportGroupId';
 export * from './reportMeasuresProblem';
 export * from './reportMonthCode';
