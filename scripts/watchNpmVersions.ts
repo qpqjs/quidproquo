@@ -1,7 +1,12 @@
 // Polls the npm registry for every public workspace package and redraws a table of
-// local vs published versions until the registry has caught up with this repo.
+// local vs published versions until the registry serves every local version.
 // Registry propagation after `npm publish` can lag by minutes, so this exists to
 // answer "is it there yet?" without hammering the npm website by hand.
+// A package counts as published once its local version is among the versions npm
+// serves, not only when it is `latest`: a deploy pinned to an older release (a
+// branch trial, a rerun after a newer release) must not wait on a tag that will
+// never move back. The table still shows `latest`, since that is what a person
+// polling after a publish wants to see.
 // Pass --once for a single snapshot (exit code 1 if anything is still behind).
 
 import { readFileSync } from 'fs';
@@ -19,7 +24,10 @@ type PackageInfo = {
 };
 
 type PackageStatus = PackageInfo & {
+  // npm's `latest` tag, for the table.
   published: string;
+  // Whether npm serves the local version at all.
+  available: boolean;
   error?: string;
 };
 
@@ -37,7 +45,7 @@ const loadWorkspacePackages = (): PackageInfo[] => {
 
 // The install-v1 accept header returns the abbreviated metadata document, which is a
 // fraction of the size of the full packument and is served from a faster cache tier.
-const fetchPublishedVersion = async (name: string): Promise<string> => {
+const fetchPublished = async (name: string): Promise<{ latest: string; versions: string[] }> => {
   const response = await fetch(`https://registry.npmjs.org/${encodeURIComponent(name)}`, {
     headers: {
       accept: 'application/vnd.npm.install-v1+json',
@@ -46,22 +54,23 @@ const fetchPublishedVersion = async (name: string): Promise<string> => {
   });
 
   if (response.status === 404) {
-    return '(unpublished)';
+    return { latest: '(unpublished)', versions: [] };
   }
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
 
-  const body = (await response.json()) as { 'dist-tags'?: Record<string, string> };
-  return body['dist-tags']?.latest ?? '(no latest tag)';
+  const body = (await response.json()) as { 'dist-tags'?: Record<string, string>; versions?: Record<string, unknown> };
+  return { latest: body['dist-tags']?.latest ?? '(no latest tag)', versions: Object.keys(body.versions ?? {}) };
 };
 
 const fetchStatus = async (pkg: PackageInfo): Promise<PackageStatus> => {
   try {
-    return { ...pkg, published: await fetchPublishedVersion(pkg.name) };
+    const { latest, versions } = await fetchPublished(pkg.name);
+    return { ...pkg, published: latest, available: versions.includes(pkg.version) };
   } catch (error) {
-    return { ...pkg, published: '?', error: error instanceof Error ? error.message : String(error) };
+    return { ...pkg, published: '?', available: false, error: error instanceof Error ? error.message : String(error) };
   }
 };
 
@@ -97,14 +106,14 @@ const render = (statuses: PackageStatus[], attempt: number, startMs: number): vo
   const nameWidth = Math.max(...statuses.map((s) => s.name.length));
   const ordered = [...statuses].sort((a, b) => compareVersions(b.published, a.published) || a.name.localeCompare(b.name));
   const lines = ordered.map((s) => {
-    const matches = s.published === s.version;
+    const matches = s.available;
     const colour = s.error ? RED : matches ? GREEN : YELLOW;
     const mark = s.error ? '!' : matches ? '✓' : '…';
     const detail = s.error ? ` ${DIM}${s.error}${RESET}` : '';
     return `${colour}${mark}${RESET} ${s.name.padEnd(nameWidth)}  local ${s.version}  npm ${colour}${s.published}${RESET}${detail}`;
   });
 
-  const matched = statuses.filter((s) => s.published === s.version).length;
+  const matched = statuses.filter((s) => s.available).length;
   const elapsed = ((Date.now() - startMs) / 1000).toFixed(0);
 
   if (process.stdout.isTTY && !ONCE) {
@@ -125,7 +134,7 @@ const main = async (): Promise<void> => {
     const statuses = await Promise.all(packages.map(fetchStatus));
     render(statuses, attempt, startMs);
 
-    if (statuses.every((s) => s.published === s.version)) {
+    if (statuses.every((s) => s.available)) {
       console.log(`\n${GREEN}All ${statuses.length} packages are live on npm.${RESET}`);
       return;
     }
