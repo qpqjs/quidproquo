@@ -3,7 +3,7 @@ import { type AiModel, type AiStreamPart, AskResponse } from '@qpqjs/core';
 import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import type { EventDocAiChatMessage, EventDocAiMessageSegment } from '../models';
 import { askEventDocAiAppendChatMessage, mergeStreamParts } from '../module';
-import { getEventDocAiStreamUsage } from './getEventDocAiStreamUsage';
+import { askEventDocAiReplyUsage } from './askEventDocAiReplyUsage';
 import { redactEventDocAiChatMessageUsage } from './redactEventDocAiChatMessageUsage';
 import { withEventDocAiStopNotice } from './withEventDocAiStopNotice';
 
@@ -25,9 +25,9 @@ export function* askEventDocAiReplySave(
     return segments;
   }
 
-  // Usage is saved whatever the visibility setting says; the setting only decides what the
-  // browser is shown.
-  const usage = getEventDocAiStreamUsage(assistantParts);
+  // Usage is saved as the client may see it (tokens and the charge, never the platform's cost),
+  // whatever the visibility setting says; the setting only decides whether the browser is shown it.
+  const usage = yield* askEventDocAiReplyUsage(model, assistantParts);
   const assistantMessage: EventDocAiChatMessage = {
     role: 'assistant',
     segments,

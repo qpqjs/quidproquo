@@ -13,3 +13,4 @@ export const EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL = 'eventDocAiSystemProm
 export const EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL = 'eventDocAiTurnContextGenerator';
 export const EVENT_DOC_AI_CACHE_TTL_GLOBAL = 'eventDocAiCacheTtl';
 export const EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL = 'eventDocAiSendUsageToFrontend';
+export const EVENT_DOC_AI_USAGE_REPORT_GLOBAL = 'eventDocAiUsageReport';

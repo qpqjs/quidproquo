@@ -63,9 +63,9 @@ Within a step, text / reasoning / tool-input events arrive as matched `*Start â†
 | Member (`type`) | When it fires |
 | --- | --- |
 | `Start` (`start`) | Once, before anything else â€” the response is starting. |
-| `Finish` (`finish`) | Once, at the very end. Its `usage` is the aggregate across steps and, when caching on Bedrock, carries `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`. |
+| `Finish` (`finish`) | Once, at the very end. Its `usage` is the aggregate across steps and, when caching on Bedrock, carries `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`. On Bedrock it also carries `costMicroUsd`, what the call cost at Bedrock's list price in millionths of a US dollar (see [askAiPrompt](./ask-ai-prompt.md#returns)). |
 | `StartStep` (`start-step`) | A generation step (one round-trip to the model) started. |
-| `FinishStep` (`finish-step`) | The current step ended, with its finish reason and usage. |
+| `FinishStep` (`finish-step`) | The current step ended, with its finish reason and usage (priced like the finish part's on Bedrock), so a stream stopped before `Finish` can still be accounted for by adding its steps up. |
 | `TextStart` / `TextDelta` / `TextEnd` | Beginning / incremental chunk / end of a text block. |
 | `ReasoningStart` / `ReasoningDelta` / `ReasoningEnd` | Beginning / chunk / end of an extended-thinking block. |
 | `ToolInputStart` / `ToolInputDelta` / `ToolInputEnd` | The model is streaming a tool call's (JSON) arguments. |

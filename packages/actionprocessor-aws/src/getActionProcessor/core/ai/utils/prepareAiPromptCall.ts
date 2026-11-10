@@ -1,6 +1,7 @@
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   ActionProcessorList,
+  AiDataRegion,
   AiModel,
   askInlineFunctionExecute,
   createImplementationRuntime,
@@ -30,7 +31,9 @@ type BedrockLanguageModel = ReturnType<BedrockProvider>;
 
 export type PrepareAiPromptCallResult =
   // `kind` names the entry of the calling action's error catalog, since prompt and stream share this step.
-  { error: { kind: 'NotFound' | 'NotImplemented'; message: string } } | { model: BedrockLanguageModel; tools: ToolSet | undefined };
+  | { error: { kind: 'NotFound' | 'NotImplemented'; message: string } }
+  // `region` is where the model's profile runs, which sets its price.
+  | { model: BedrockLanguageModel; region: AiDataRegion; tools: ToolSet | undefined };
 
 export const prepareAiPromptCall = (
   qpqConfig: QPQConfig,
@@ -96,6 +99,7 @@ export const prepareAiPromptCall = (
 
   return {
     model: bedrock(resolved.modelId),
+    region: resolved.region,
     tools: Object.keys(aiTools).length > 0 ? aiTools : undefined,
   };
 };

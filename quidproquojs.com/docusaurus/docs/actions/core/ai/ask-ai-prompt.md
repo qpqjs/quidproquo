@@ -119,7 +119,7 @@ One knob for every model; what it means per model is under `reasoning` above.
 
 ## Returns
 
-`AiPromptActionResult`: `{ text: string; object?: unknown; repairs?: number; usage?: AiStreamUsage }`. `text` is the model's complete response; `object` is the reply parsed and checked against `outputSchema`, and `repairs` is how many repair calls it took (both set only when a schema was given); `usage` is the token usage summed across every step when the provider reports it, with `inputTokens`, `outputTokens`, `totalTokens` and, when caching on Bedrock, `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`.
+`AiPromptActionResult`: `{ text: string; object?: unknown; repairs?: number; usage?: AiStreamUsage }`. `text` is the model's complete response; `object` is the reply parsed and checked against `outputSchema`, and `repairs` is how many repair calls it took (both set only when a schema was given); `usage` is the token usage summed across every step when the provider reports it, with `inputTokens`, `outputTokens`, `totalTokens` and, when caching on Bedrock, `cacheReadInputTokens`, `cacheWriteInputTokens` and `noCacheInputTokens`. On Bedrock it also carries `costMicroUsd`: what the call cost at Bedrock's list price for the model and the region its profile runs in, in millionths of a US dollar, worked out with `getAiUsageAmountMicroUsd`. Cache writes are priced at the hour rate unless every cache point lived five minutes, since Bedrock reports all of a call's writes as one number. With an `outputSchema`, the cost covers every repair call.
 
 ## Errors
 

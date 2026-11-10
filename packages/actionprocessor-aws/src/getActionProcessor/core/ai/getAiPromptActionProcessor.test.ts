@@ -1,4 +1,4 @@
-import { AiActionType, AiCacheTtl, AiModel, askAiPrompt, ErrorTypeEnum } from '@qpqjs/core';
+import { AiActionType, AiCacheTtl, AiDataRegion, AiModel, askAiPrompt, ErrorTypeEnum } from '@qpqjs/core';
 import { invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,6 +9,7 @@ import {
   createCachePrepareStep,
   logAiCacheUsage,
   prepareAiPromptCall,
+  priceBedrockUsage,
   toBedrockReasoningOptions,
   toCacheableSystem,
 } from './utils';
@@ -35,6 +36,7 @@ vi.mock('./utils', async () => ({
   toCacheableSystem: vi.fn((system: string | undefined) => system),
   createCachePrepareStep: vi.fn(() => 'prepare-step'),
   toAiStreamUsage: vi.fn((usage: unknown) => usage),
+  priceBedrockUsage: vi.fn((usage: unknown) => usage),
   logAiCacheUsage: vi.fn(),
   buildAiStopConditions: vi.fn(() => []),
   toBedrockReasoningOptions: vi.fn(() => undefined),
@@ -76,6 +78,7 @@ const totalUsage = { inputTokens: 24281, inputTokenDetails: { noCacheTokens: 12,
 describe('getProcessAiPrompt', () => {
   beforeEach(() => {
     vi.mocked(prepareAiPromptCall).mockReset();
+    vi.mocked(priceBedrockUsage).mockClear();
     vi.mocked(createCachePrepareStep).mockClear();
     vi.mocked(logAiCacheUsage).mockClear();
     vi.mocked(toCacheableSystem).mockReset();
@@ -93,7 +96,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('generates text from a prompt payload and returns the total usage', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: 'hello world', usage: totalUsage });
 
     const [result] = await invoke({ prompt: 'hi', system: 'sys' });
@@ -104,8 +107,23 @@ describe('getProcessAiPrompt', () => {
     expect(logAiCacheUsage).not.toHaveBeenCalled();
   });
 
+  it('prices the usage for the model, the region its profile runs in and the cache lifetime asked for', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, region: AiDataRegion.Global, tools: undefined });
+    vi.mocked(priceBedrockUsage).mockImplementationOnce((usage: object) => ({ ...usage, costMicroUsd: 99 }));
+    generateText.mockResolvedValue({ text: 'ok', usage: totalUsage });
+
+    const [result] = await invoke({ model: AiModel.ClaudeSonnet55, prompt: 'hi', cacheTtl: AiCacheTtl.FiveMinutes });
+
+    expect(result?.usage).toEqual({ ...totalUsage, costMicroUsd: 99 });
+    expect(priceBedrockUsage).toHaveBeenCalledWith(totalUsage, {
+      model: AiModel.ClaudeSonnet55,
+      region: AiDataRegion.Global,
+      cacheTtl: AiCacheTtl.FiveMinutes,
+    });
+  });
+
   it('passes system, caching and the ttl through to toCacheableSystem', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: 'ok', usage: totalUsage });
     vi.mocked(toCacheableSystem).mockReturnValue({
       role: 'system',
@@ -124,7 +142,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('sends the history then the turn context and installs the cache step hook when caching', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: 'ok', usage: totalUsage });
     const messages = [
       { role: 'user', content: 'q1' },
@@ -146,7 +164,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('logs the total cache usage when caching is on', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: 'ok', usage: totalUsage });
 
     const [result] = await invoke({ prompt: 'hi', caching: true });
@@ -156,7 +174,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('maps a thrown Error to a GenericError result', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockRejectedValue(new Error('exploded'));
 
     const [, error] = await invoke({ prompt: 'hi' });
@@ -167,7 +185,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('maps a thrown non-Error to a generic message', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockRejectedValue('weird');
 
     const [, error] = await invoke({ prompt: 'hi' });
@@ -176,7 +194,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('asks for no structured output and returns no object without an output schema', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: 'plain', usage: totalUsage });
 
     const [result] = await invoke({ prompt: 'hi' });
@@ -186,7 +204,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('asks for the output schema and returns the reply as the object when it matches', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     const reply = { applicants: [{ name: 'Jo' }] };
     generateText.mockResolvedValue({ text: '', output: reply, usage: totalUsage });
 
@@ -204,7 +222,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('keeps reasoning settings beside the json tool mode', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     vi.mocked(toBedrockReasoningOptions).mockReturnValueOnce({ bedrock: { reasoningConfig: { type: 'enabled', budgetTokens: 1024 } } } as never);
     generateText.mockResolvedValue({ text: '', output: { applicants: [] }, usage: totalUsage });
 
@@ -218,7 +236,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('refuses a reply with a key the schema does not allow', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: '', output: { applicants: [], total_interest_amount: 5 }, usage: totalUsage });
 
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
@@ -229,7 +247,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('refuses a reply whose list came back as text', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockResolvedValue({ text: '', output: { applicants: '[{"name":"Jo"}]' }, usage: totalUsage });
 
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
@@ -240,7 +258,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('shows a refused reply back to the model with the problems, and returns the repaired one', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     const repaired = { applicants: [{ name: 'Jo' }] };
     generateText
       .mockResolvedValueOnce({ text: '', output: { applicants: [], total_interest_amount: 5 }, usage: { inputTokens: 100, outputTokens: 10 } })
@@ -250,6 +268,12 @@ describe('getProcessAiPrompt', () => {
 
     expect(error).toBeUndefined();
     expect(result).toEqual({ text: '', usage: { inputTokens: 220, outputTokens: 22 }, object: repaired, repairs: 1 });
+    // Priced once, over both calls' tokens.
+    expect(priceBedrockUsage).toHaveBeenCalledTimes(1);
+    expect(priceBedrockUsage).toHaveBeenCalledWith(
+      { inputTokens: 220, outputTokens: 22 },
+      expect.objectContaining({ region: AiDataRegion.Australia }),
+    );
     expect(generateText).toHaveBeenCalledTimes(2);
     expect(generateText.mock.calls[1][0].messages).toEqual([
       { role: 'user', content: 'read this' },
@@ -263,7 +287,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('refuses once the repairs run out, with the last problems', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText
       .mockResolvedValueOnce({ text: '', output: { applicants: 'x' }, usage: totalUsage })
       .mockResolvedValueOnce({ text: '', output: { applicants: [], extra: 1 }, usage: totalUsage })
@@ -278,7 +302,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('refuses a reply that is not JSON at all when no repair is allowed', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     generateText.mockRejectedValue(new FakeNoObjectGeneratedError('No object generated: could not parse the response.', 'Sure! Here it is'));
 
     const [result, error] = await invoke({ prompt: 'hi', outputSchema: loanSchema });
@@ -289,7 +313,7 @@ describe('getProcessAiPrompt', () => {
   });
 
   it('repairs a reply that is not JSON by showing the model its own text, and counts its usage', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     const repaired = { applicants: [] };
     generateText
       .mockRejectedValueOnce(new FakeNoObjectGeneratedError('No object generated.', 'Sure! Here it is: {"applicants": [', { outputTokens: 7 }))

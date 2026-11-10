@@ -1,9 +1,18 @@
 import { AiStreamUsage } from './types/AiStreamUsage';
 
-const USAGE_FIELDS = ['inputTokens', 'outputTokens', 'totalTokens', 'cacheReadInputTokens', 'cacheWriteInputTokens', 'noCacheInputTokens'] as const;
+const USAGE_FIELDS = [
+  'inputTokens',
+  'outputTokens',
+  'totalTokens',
+  'cacheReadInputTokens',
+  'cacheWriteInputTokens',
+  'noCacheInputTokens',
+  'costMicroUsd',
+  'chargeMicroUsd',
+] as const;
 
 /**
- * Adds token usages together field by field, for a chat's cost or a turn that spanned several
+ * Adds token usages (and their costs and charges) together field by field, for a chat's cost or a turn that spanned several
  * executions. A field no usage reported stays undefined rather than becoming zero.
  */
 export const sumAiStreamUsage = (usages: readonly AiStreamUsage[]): AiStreamUsage =>

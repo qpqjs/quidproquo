@@ -12,6 +12,15 @@ describe('sumAiStreamUsage', () => {
     ).toEqual({ inputTokens: 300, outputTokens: 30, totalTokens: 330, cacheReadInputTokens: 270, cacheWriteInputTokens: 20, noCacheInputTokens: 10 });
   });
 
+  it('adds up what the calls cost and what they are charged at', () => {
+    expect(
+      sumAiStreamUsage([
+        { costMicroUsd: 1_500, chargeMicroUsd: 3_000 },
+        { costMicroUsd: 250, chargeMicroUsd: 500 },
+      ]),
+    ).toEqual({ costMicroUsd: 1_750, chargeMicroUsd: 3_500 });
+  });
+
   it('leaves a field undefined when no usage reported it', () => {
     const sum = sumAiStreamUsage([{ inputTokens: 1 }, { inputTokens: 2, outputTokens: 3 }]);
 

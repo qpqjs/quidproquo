@@ -10,5 +10,6 @@ export * from './AiReasoningEffort';
 export * from './askAiGetModelRegions';
 export * from './askAiPrompt';
 export * from './askAiPromptStream';
+export * from './getAiUsageAmountMicroUsd';
 export * from './sumAiStreamUsage';
 export * from './types';

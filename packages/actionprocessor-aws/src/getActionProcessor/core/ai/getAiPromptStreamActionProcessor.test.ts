@@ -1,10 +1,18 @@
-import { AiActionType, AiCacheTtl, AiModel, askAiPromptStream, ErrorTypeEnum } from '@qpqjs/core';
+import { AiActionType, AiCacheTtl, AiDataRegion, AiModel, askAiPromptStream, ErrorTypeEnum } from '@qpqjs/core';
 import { invokeProcessor } from '@qpqjs/testing';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getAiPromptStreamActionProcessor } from './getAiPromptStreamActionProcessor';
-import { buildAiPromptInput, createCachePrepareStep, logAiCacheUsage, mapAiStreamPart, prepareAiPromptCall, toCacheableSystem } from './utils';
+import {
+  buildAiPromptInput,
+  createCachePrepareStep,
+  logAiCacheUsage,
+  mapAiStreamPart,
+  prepareAiPromptCall,
+  priceAiStreamPart,
+  toCacheableSystem,
+} from './utils';
 
 // Echoes the payload so the order history -> turn context is observable in the SDK call.
 const { echoPromptInput } = vi.hoisted(() => ({
@@ -23,6 +31,7 @@ vi.mock('./utils', () => ({
   createDriveFileResolver: vi.fn(() => vi.fn()),
   buildAiPromptInput: vi.fn(echoPromptInput),
   mapAiStreamPart: vi.fn(() => ({ mapped: true })),
+  priceAiStreamPart: vi.fn((part: unknown) => part),
   toCacheableSystem: vi.fn((system: string | undefined) => system),
   createCachePrepareStep: vi.fn(() => 'prepare-step'),
   toAiStreamUsage: vi.fn((usage: unknown) => usage),
@@ -65,6 +74,7 @@ const textDeltaStream = () =>
 describe('getProcessAiPromptStream', () => {
   beforeEach(() => {
     vi.mocked(prepareAiPromptCall).mockReset();
+    vi.mocked(priceAiStreamPart).mockClear();
     vi.mocked(createCachePrepareStep).mockClear();
     vi.mocked(logAiCacheUsage).mockClear();
     vi.mocked(toCacheableSystem).mockReset();
@@ -82,7 +92,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('registers a json-encoded stream and returns its id', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
@@ -97,8 +107,23 @@ describe('getProcessAiPromptStream', () => {
     expect(createCachePrepareStep).not.toHaveBeenCalled();
   });
 
+  it('prices each part for the model, the region its profile runs in and the cache lifetime asked for', async () => {
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Global, tools: undefined });
+    vi.mocked(priceAiStreamPart).mockImplementationOnce((part: object) => ({ ...part, priced: true }) as never);
+    streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
+    const registry = buildRegistry();
+
+    await invoke({ model: AiModel.ClaudeSonnet55, prompt: 'hi', cacheTtl: AiCacheTtl.OneHour }, registry);
+
+    expect(await drain(registry)).toEqual([JSON.stringify({ mapped: true, priced: true })]);
+    expect(priceAiStreamPart).toHaveBeenCalledWith(
+      { mapped: true },
+      { model: AiModel.ClaudeSonnet55, region: AiDataRegion.Global, cacheTtl: AiCacheTtl.OneHour },
+    );
+  });
+
   it('passes system, caching and the ttl through to toCacheableSystem', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     vi.mocked(toCacheableSystem).mockReturnValue({
       role: 'system',
       content: 'sys',
@@ -117,7 +142,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('sends the history then the turn context and installs the cache step hook when caching', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockReturnValue({ stream: (async function* () {})(), usage: Promise.resolve(totalUsage) });
     const messages = [
       { role: 'user', content: 'q1' },
@@ -142,7 +167,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('logs the total cache usage once the stream is fully consumed', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
@@ -154,7 +179,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('does not log cache usage when caching is off', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockReturnValue({ stream: textDeltaStream(), usage: Promise.resolve(totalUsage) });
     const registry = buildRegistry();
 
@@ -165,7 +190,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('warns instead of throwing when the usage is unavailable after a failed stream', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     const unavailable = Promise.reject(new Error('No output generated'));
     unavailable.catch(() => {});
     streamText.mockReturnValue({ stream: textDeltaStream(), usage: unavailable });
@@ -181,7 +206,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('maps a thrown Error to a GenericError result', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockImplementation(() => {
       throw new Error('stream boom');
     });
@@ -194,7 +219,7 @@ describe('getProcessAiPromptStream', () => {
   });
 
   it('maps a thrown non-Error to a generic message', async () => {
-    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
+    vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, region: AiDataRegion.Australia, tools: undefined });
     streamText.mockImplementation(() => {
       throw 'weird';
     });
