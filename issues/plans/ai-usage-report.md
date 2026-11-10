@@ -1,7 +1,7 @@
 # AI usage report: what AI calls cost us and what we charge for them
 
 **Verdict:** feature
-**Status:** slice 1 (framework) built 10 Nov 2026, uncommitted; slice 2 (DocGen) not started
+**Status:** slices 1 (framework) and 2 (DocGen) built 10 Nov 2026, uncommitted; not yet run against real Bedrock
 **Branch:** `reports` (builds on the reports feature). Planned with Joe on 10 Nov 2026. First consumer is DocGen's four AI chats.
 
 ## Summary
@@ -114,6 +114,8 @@ Built 10 Nov 2026. Where it differs from the steps below:
 7. A release, before DocGen can deploy it. Locally DocGen runs against the hand-linked build.
 
 #### Slice 2: DocGen (doccypoccy, branch `reports`)
+
+Built 10 Nov 2026; doccypoccy's `REPORTS_PLAN.md` records what was built. Where it differs: the view is `aiChargeByChatLast30Days`, there is no separate cost and charge view (decision 11), the panel sits on the dashboard above Renders, and step 11 is not done, because the local deployment has no AWS region and so cannot reach Bedrock.
 
 8. `DOCGEN_AI_CHARGE_RATES` in an app package (an `AiModelTokenRates`: US dollars per million tokens, per model, one set for every tenant), `DOCGEN_AI_DEFAULT_CHARGE_RATES` at or above the dearest of them, and `DOCGEN_AI_USAGE_REPORT` passed as `usageReport` to all four chats in the template service's infrastructure.
 9. Views in `DOCGEN_REPORT_VIEWS`: charge this month and last month (the headline and its change), and charge by chat type per day over the last 30 days (a line per chat type, like the renders panel).
