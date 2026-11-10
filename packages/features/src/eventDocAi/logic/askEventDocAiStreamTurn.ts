@@ -8,6 +8,7 @@ import { askEventDocAiContinueHandoff } from './askEventDocAiContinueHandoff';
 import { askEventDocAiPromptStreamOpen } from './askEventDocAiPromptStreamOpen';
 import { askEventDocAiReplySave } from './askEventDocAiReplySave';
 import { askEventDocAiStreamToUi } from './askEventDocAiStreamToUi';
+import { askEventDocAiUsageReport } from './askEventDocAiUsageReport';
 import { askEventDocAiUsageVisible } from './askEventDocAiUsageVisible';
 import { eventDocAiSegmentHasPendingToolUse } from './eventDocAiSegmentHasPendingToolUse';
 import { getEventDocAiFinishPart } from './getEventDocAiFinishPart';
@@ -52,7 +53,10 @@ export function* askEventDocAiStreamTurn(
 
   const { streamHandle, model } = yield* askEventDocAiPromptStreamOpen(docId, history, isContinuation, budgetMs);
 
-  const assistantParts = yield* askEventDocAiStreamToUi(streamHandle, usageVisible);
+  const assistantParts = yield* askEventDocAiStreamToUi(streamHandle);
+
+  // Counted before the reply is saved: the model call was billed whether or not the save works.
+  yield* askEventDocAiUsageReport(model, assistantParts);
 
   const segments = yield* askEventDocAiReplySave(docId, chatId, history, assistantParts, model, usageVisible);
 

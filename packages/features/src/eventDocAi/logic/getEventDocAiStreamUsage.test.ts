@@ -15,7 +15,25 @@ describe('getEventDocAiStreamUsage', () => {
     expect(getEventDocAiStreamUsage(parts)).toEqual(usage);
   });
 
-  it('returns null when the stream never finished', () => {
+  it('adds up the finished steps when the stream itself never finished', () => {
+    const parts: AiStreamPart[] = [
+      { type: AiStreamPartType.FinishStep, finishReason: AiStreamFinishReasonEnum.toolCalls, usage: { inputTokens: 100, costMicroUsd: 40 } },
+      { type: AiStreamPartType.FinishStep, finishReason: AiStreamFinishReasonEnum.toolCalls, usage: { inputTokens: 50, costMicroUsd: 2 } },
+    ];
+
+    expect(getEventDocAiStreamUsage(parts)).toEqual({ inputTokens: 150, costMicroUsd: 42 });
+  });
+
+  it('takes the finish part over the steps, since it already totals them', () => {
+    const parts: AiStreamPart[] = [
+      { type: AiStreamPartType.FinishStep, finishReason: AiStreamFinishReasonEnum.toolCalls, usage: { inputTokens: 100 } },
+      { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage: { inputTokens: 100 } },
+    ];
+
+    expect(getEventDocAiStreamUsage(parts)).toEqual({ inputTokens: 100 });
+  });
+
+  it('returns null when no step finished', () => {
     expect(getEventDocAiStreamUsage([{ type: AiStreamPartType.TextDelta, id: 't', text: 'hi' }])).toBeNull();
   });
 });

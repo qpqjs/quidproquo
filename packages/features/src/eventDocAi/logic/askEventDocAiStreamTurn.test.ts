@@ -4,9 +4,13 @@ import {
   AiStreamFinishReasonEnum,
   AiStreamPartType,
   ConfigActionType,
+  DateActionType,
+  EventBusActionType,
   FileActionType,
+  GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
+  LogActionType,
   StateActionType,
   StreamActionType,
   SystemActionType,
@@ -15,7 +19,8 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
+import { EVENT_DOC_STORAGE_DRIVE_GLOBAL, EVENT_DOC_TYPE_GLOBAL } from '../../eventDoc';
+import { reportConfigGlobal } from '../../reports/constants/reportConfigGlobal';
 import { EVENT_DOC_AI_CONTINUATION_NUDGE } from '../constants/eventDocAiContinuationNudge';
 import { EVENT_DOC_AI_DECLINED_NOTICE } from '../constants/eventDocAiDeclinedNotice';
 import { EVENT_DOC_AI_ERROR_NOTICE } from '../constants/eventDocAiErrorNotice';
@@ -31,9 +36,11 @@ import {
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
   EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL,
+  EVENT_DOC_AI_USAGE_REPORT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiChatMessage } from '../models';
 import { EventDocAiEffect } from '../module/effects/EventDocAiEffect';
+import type { EventDocAiUsageReport } from '../types/EventDocAiUsageReport';
 import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
 
 const baseGlobals: Record<string, unknown> = {
@@ -48,6 +55,14 @@ const baseGlobals: Record<string, unknown> = {
   [EVENT_DOC_AI_CHAT_DRIVE_GLOBAL]: 'chat-drive',
   [EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL]: 'chat-list',
   [EVENT_DOC_STORAGE_DRIVE_GLOBAL]: 'doc-assets',
+  [EVENT_DOC_TYPE_GLOBAL]: 'template',
+  [reportConfigGlobal('docgen')]: { utcOffset: '+10:00', financialYearStartMonth: 7, scoped: true, views: {}, events: {} },
+};
+
+const usageReport: EventDocAiUsageReport = {
+  reportName: 'docgen',
+  chargeRates: { [AiModel.ClaudeSonnet46]: { input: 6, output: 30, cacheRead: 0.6, cacheWriteFiveMinutes: 7.5, cacheWriteOneHour: 12 } },
+  defaultChargeRates: { input: 20, output: 100, cacheRead: 2, cacheWriteFiveMinutes: 25, cacheWriteOneHour: 40 },
 };
 
 const history: EventDocAiChatMessage[] = [
@@ -70,6 +85,7 @@ type DispatchedEffect = { type: EventDocAiEffect; payload: Record<string, unknow
 type TurnOptions = {
   isContinuation?: boolean;
   sendUsageToFrontend?: boolean;
+  usageReport?: EventDocAiUsageReport;
   /** The parts the model streams back; defaults to one text reply that ends normally. */
   parts?: Record<string, unknown>[];
 };
@@ -81,8 +97,13 @@ const defaultParts: Record<string, unknown>[] = [
   { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage },
 ];
 
-const runTurn = ({ isContinuation = false, sendUsageToFrontend, parts = defaultParts }: TurnOptions = {}) => {
-  const globals: Record<string, unknown> = { ...baseGlobals, [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend };
+const runTurn = ({ isContinuation = false, sendUsageToFrontend, usageReport: report, parts = defaultParts }: TurnOptions = {}) => {
+  const globals: Record<string, unknown> = {
+    ...baseGlobals,
+    [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend,
+    [EVENT_DOC_AI_USAGE_REPORT_GLOBAL]: report ?? null,
+  };
+  const counted: { type: string; dimensions: unknown; measures: unknown }[] = [];
   const chunks = [...parts.map((part) => ({ data: JSON.stringify(part) })), { done: true }];
   let promptPayload: Record<string, unknown> | undefined;
   let savedFile: { messages: EventDocAiChatMessage[] } | undefined;
@@ -105,6 +126,13 @@ const runTurn = ({ isContinuation = false, sendUsageToFrontend, parts = defaultP
       savedFile = action.payload.data;
     },
     [KeyValueStoreActionType.Query]: { items: [] },
+    [DateActionType.Now]: '2026-11-10T05:00:00.000Z',
+    [GuidActionType.NewSortableMany]: (action: { payload: { count: number } }) =>
+      Array.from({ length: action.payload.count }, (_, index) => `dedup-${index}`),
+    [EventBusActionType.SendMessage]: (action: { payload: { eventBusMessages: { payload: { events: typeof counted } }[] } }) => {
+      counted.push(...action.payload.eventBusMessages.flatMap((message) => message.payload.events));
+    },
+    [LogActionType.Create]: undefined,
   });
 
   const streamedFinish = dispatched.find(
@@ -113,7 +141,7 @@ const runTurn = ({ isContinuation = false, sendUsageToFrontend, parts = defaultP
   const appendedMessage = dispatched.find((effect) => effect.type === EventDocAiEffect.AppendChatMessage)?.payload.message as
     EventDocAiChatMessage | undefined;
 
-  return { result, promptPayload, savedFile, streamedFinish, appendedMessage };
+  return { result, promptPayload, savedFile, streamedFinish, appendedMessage, counted };
 };
 
 const savedReply: EventDocAiChatMessage = { role: 'assistant', segments: [{ type: 'text', text: 'Done.' }], model: AiModel.ClaudeSonnet46, usage };
@@ -198,10 +226,65 @@ describe('askEventDocAiStreamTurn', () => {
     expect(appendedMessage).toEqual({ role: 'assistant', segments: [{ type: 'text', text: 'Done.' }], model: AiModel.ClaudeSonnet46 });
   });
 
-  it('lets usage through to the browser when the chat asks for it', () => {
+  it('lets usage through on the finalized message when the chat asks for it, never on the live stream', () => {
     const { streamedFinish, appendedMessage } = runTurn({ sendUsageToFrontend: true });
 
-    expect(streamedFinish?.usage).toEqual(usage);
+    expect(streamedFinish?.usage).toEqual({});
     expect(appendedMessage).toEqual(savedReply);
+  });
+
+  it('counts the model call once in the usage report, with the chat type as the source', () => {
+    const { counted } = runTurn({ usageReport });
+
+    expect(counted).toEqual([
+      expect.objectContaining({
+        type: 'aiUsage',
+        dimensions: { model: AiModel.ClaudeSonnet46, source: 'template' },
+        // 20 x 6 + 1,100 x 0.6 + 80 x 12 + 40 x 30, the chat's '1h' cache priced at the hour write rate
+        measures: expect.objectContaining({ inputTokens: 1200, outputTokens: 40, chargeMicroUsd: 120 + 660 + 960 + 1200 }),
+      }),
+    ]);
+  });
+
+  it("charges a model missing from the chat's rates at its default rate", () => {
+    const { counted } = runTurn({ usageReport: { ...usageReport, chargeRates: {} } });
+
+    // 20 x 20 + 1,100 x 2 + 80 x 40 + 40 x 100
+    expect(counted).toEqual([expect.objectContaining({ measures: expect.objectContaining({ chargeMicroUsd: 400 + 2200 + 3200 + 4000 }) })]);
+  });
+
+  it('counts nothing when the chat has no usage report', () => {
+    expect(runTurn().counted).toEqual([]);
+  });
+
+  it('counts a stopped reply by the steps that finished', () => {
+    const { counted } = runTurn({
+      usageReport,
+      parts: [
+        { type: AiStreamPartType.FinishStep, finishReason: AiStreamFinishReasonEnum.toolCalls, usage: { inputTokens: 100, outputTokens: 10 } },
+        { type: AiStreamPartType.FinishStep, finishReason: AiStreamFinishReasonEnum.toolCalls, usage: { inputTokens: 200, outputTokens: 5 } },
+      ],
+    });
+
+    expect(counted).toEqual([expect.objectContaining({ measures: expect.objectContaining({ inputTokens: 300, outputTokens: 15 }) })]);
+  });
+
+  it('saves and shows the reply with its charge, never what it cost the platform, which only the report gets', () => {
+    const pricedUsage = { ...usage, costMicroUsd: 1_234 };
+    // 20 x 6 + 1,100 x 0.6 + 80 x 12 + 40 x 30, the chat's '1h' cache charged at the hour write rate
+    const clientUsage = { ...usage, chargeMicroUsd: 120 + 660 + 960 + 1200 };
+    const { streamedFinish, appendedMessage, savedFile, counted } = runTurn({
+      usageReport,
+      sendUsageToFrontend: true,
+      parts: [
+        { type: AiStreamPartType.TextDelta, id: 'text-1', text: 'Done.' },
+        { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage: pricedUsage },
+      ],
+    });
+
+    expect(streamedFinish?.usage).toEqual({});
+    expect(appendedMessage?.usage).toEqual(clientUsage);
+    expect(savedFile?.messages[savedFile.messages.length - 1]?.usage).toEqual(clientUsage);
+    expect(counted[0]?.measures).toMatchObject({ costMicroUsd: 1_234, chargeMicroUsd: clientUsage.chargeMicroUsd });
   });
 });

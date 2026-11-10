@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { AiModel, defineAi, ErrorTypeEnum } from '@qpqjs/core';
+import { AiDataRegion, AiModel, defineAi, ErrorTypeEnum } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -30,12 +30,12 @@ describe('prepareAiPromptCall', () => {
     expect(createAmazonBedrock).toHaveBeenCalledWith({ region: 'us-test-1' });
   });
 
-  it('returns the resolved model and no tools when aiName is omitted', () => {
+  it('returns the resolved model, the region its profile runs in, and no tools when aiName is omitted', () => {
     const config = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'us-test-1')]);
 
     const result = prepareAiPromptCall(config, { model: AiModel.ClaudeSonnet45 }, ...collaborators);
 
-    expect(result).toEqual({ model: { __model: 'au.anthropic.claude-sonnet-4-5-20250929-v1:0' }, tools: undefined });
+    expect(result).toEqual({ model: { __model: 'au.anthropic.claude-sonnet-4-5-20250929-v1:0' }, region: AiDataRegion.Australia, tools: undefined });
   });
 
   it('errors with NotImplemented for an unsupported model', () => {

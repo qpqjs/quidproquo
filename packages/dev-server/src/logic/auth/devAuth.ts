@@ -48,8 +48,11 @@ export const resolveDevUserDirectory = (userDirectoryName: string, qpqConfig: QP
   return { serviceName, directoryName: key };
 };
 
-// Fixed namespace so userIds stay stable across dev server restarts.
-const devUserIdNamespace = generateUuidV5('@qpqjs/dev-server/user-id', UuidNamespace.url);
+// Fixed namespace so userIds stay stable across dev server restarts. The seed is an identifier, not
+// a package name: every local user, and every record keyed by one, is stored under ids derived from
+// it, so it keeps its pre-rename text (as action type strings keep their @quidproquo-* ids). The
+// @qpqjs rename sweep changed it once and every existing local login became a new, empty user.
+const devUserIdNamespace = generateUuidV5('quidproquo-dev-server/user-id', UuidNamespace.url);
 
 // Derives a deterministic userId from the directory identity and the login, so the
 // same email is always the same user in dev ~ and, like Cognito user pools, the same

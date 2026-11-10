@@ -11,7 +11,7 @@ import {
 
 import { streamText } from 'ai';
 
-import { BedrockCacheSettings } from './types';
+import { BedrockCacheSettings, BedrockPricedCall } from './types';
 import {
   buildAiPromptInput,
   buildAiStopConditions,
@@ -20,6 +20,7 @@ import {
   logAiCacheUsage,
   mapAiStreamPart,
   prepareAiPromptCall,
+  priceAiStreamPart,
   toAiStreamUsage,
   toBedrockReasoningOptions,
   toCacheableSystem,
@@ -40,6 +41,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       );
 
       const cache: BedrockCacheSettings = { model: payload.model, cacheTtl: payload.cacheTtl };
+      const pricedCall: BedrockPricedCall = { model: payload.model, region: prepared.region, cacheTtl: payload.cacheTtl };
 
       const providerOptions = toBedrockReasoningOptions(payload.model, payload.reasoning);
 
@@ -55,6 +57,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
         // streamText swallows errors by default to keep the server alive; surface them to
         // CloudWatch. The same error also reaches the consumer as an Error stream part.
         onError: ({ error }) => {
+          // eslint-disable-next-line no-console
           console.error('AI prompt stream error:', error);
         },
       });
@@ -63,7 +66,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
 
       async function* aiStreamIterator(): AsyncIterableIterator<string> {
         for await (const part of stream) {
-          yield JSON.stringify(mapAiStreamPart(part));
+          yield JSON.stringify(priceAiStreamPart(mapAiStreamPart(part), pricedCall));
         }
 
         if (payload.caching) {
@@ -73,6 +76,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
             // usage rejects (AI_NoOutputGeneratedError) when the stream errored before
             // completing a step. The error part has already been streamed to the consumer;
             // throwing here would replace that real error with the unhelpful wrapper.
+            // eslint-disable-next-line no-console
             console.warn('AI prompt cache usage unavailable:', toErrorMessage(error));
           }
         }

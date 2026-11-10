@@ -1,5 +1,7 @@
 import type { AiCacheTtl, AiModel, AiReasoningEffort, AiToolDefinition, Nullable } from '@qpqjs/core';
 
+import type { EventDocAiUsageReport } from './EventDocAiUsageReport';
+
 export type EventDocAiOptions = {
   // The eventDoc collection this AI works with (chats are scoped per document).
   storeName: string;
@@ -52,8 +54,14 @@ export type EventDocAiOptions = {
   // history, so they outlive a user's pause between messages, and five minutes
   // for the tool loop, which is discarded when the turn ends.
   cacheTtl?: AiCacheTtl;
-  // Whether token usage reaches the browser. Off (the default), the stream's finish
-  // parts, the finalized message and the chat history are sent with usage stripped;
-  // usage is still saved on each assistant message. On, the frontend sees it as is.
+  // Whether usage reaches the browser on the finalized message and the chat history: the
+  // tokens, and the charge when there is a `usageReport`. Off (the default), both are sent
+  // without it; it is still saved on each assistant message. The live stream never carries
+  // usage, and what a call cost the platform is never saved or sent.
   sendUsageToFrontend?: boolean;
+  // Counts every model call in this report, under the chat's scope (the tenant or person the
+  // document belongs to), with its tokens, its cost and its charge at `chargeRates`; the chat's
+  // `type` is the source. Each reply is also saved with its charge. Omitted, the chat counts
+  // nothing and charges nothing.
+  usageReport?: EventDocAiUsageReport;
 };

@@ -30,6 +30,7 @@ import {
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
   EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL,
+  EVENT_DOC_AI_USAGE_REPORT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import { eventDocAiQueueName } from '../constants/eventDocAiQueueName';
 import { buildEventDocAiMethodName } from '../logic';
@@ -68,6 +69,7 @@ export const defineEventDocAi = ({
   maxOutputTokens = 65536,
   cacheTtl = AiCacheTtl.Dynamic,
   sendUsageToFrontend = false,
+  usageReport,
 }: EventDocAiOptions): QPQConfig => {
   const store = buildEventDocStore({ storeName, type, authorise });
   const chatDrive = eventDocAiChatDriveName(storeName);
@@ -91,6 +93,7 @@ export const defineEventDocAi = ({
     [EVENT_DOC_AI_TURN_CONTEXT_GENERATOR_GLOBAL]: turnContextGenerator ?? '',
     [EVENT_DOC_AI_CACHE_TTL_GLOBAL]: cacheTtl,
     [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend,
+    [EVENT_DOC_AI_USAGE_REPORT_GLOBAL]: usageReport ?? null,
   };
 
   const runtime = (entryType: string, functionName: string): QpqFunctionRuntimeAdvanced => ({

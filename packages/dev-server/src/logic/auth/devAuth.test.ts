@@ -53,6 +53,10 @@ describe('createDevUserId', () => {
     expect(createDevUserId(DIRECTORY, 'joe@example.com')).not.toBe(createDevUserId(OTHER_SERVICE_DIRECTORY, 'joe@example.com'));
   });
 
+  it('keeps the ids it has always given, so existing local users and their data stay theirs', () => {
+    expect(createDevUserId(DIRECTORY, 'joe@example.com')).toBe('8b49ff53-186c-5990-9db8-fd95e90d31e7');
+  });
+
   it('returns a v5 UUID', () => {
     expect(createDevUserId(DIRECTORY, 'joe@example.com')).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });

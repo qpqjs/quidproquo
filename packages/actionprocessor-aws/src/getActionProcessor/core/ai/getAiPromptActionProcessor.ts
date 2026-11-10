@@ -12,7 +12,7 @@ import {
 import type { LanguageModelUsage, ModelMessage } from 'ai';
 import { generateText, jsonSchema, NoObjectGeneratedError, Output } from 'ai';
 
-import { BedrockCacheSettings } from './types';
+import { BedrockCacheSettings, BedrockPricedCall } from './types';
 import {
   AiOutputObjectGenerate,
   AiOutputObjectReply,
@@ -23,6 +23,7 @@ import {
   generateAiOutputObject,
   logAiCacheUsage,
   prepareAiPromptCall,
+  priceBedrockUsage,
   toAiStreamUsage,
   toBedrockReasoningOptions,
   toCacheableSystem,
@@ -59,6 +60,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
       );
 
       const cache: BedrockCacheSettings = { model: payload.model, cacheTtl: payload.cacheTtl };
+      const pricedCall: BedrockPricedCall = { model: payload.model, region: prepared.region, cacheTtl: payload.cacheTtl };
 
       const reasoningOptions = toBedrockReasoningOptions(payload.model, payload.reasoning);
       // With a schema, always the forced json tool, never Bedrock's native constrained output: the
@@ -83,7 +85,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
 
       if (!payload.outputSchema) {
         const result = await callModel(input.promptOrMessages);
-        const usage = toAiStreamUsage(result.usage);
+        const usage = priceBedrockUsage(toAiStreamUsage(result.usage), pricedCall);
         if (payload.caching) {
           logAiCacheUsage(usage);
         }
@@ -94,7 +96,8 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiProm
       const generate: AiOutputObjectGenerate = (promptOrMessages) => generateOutputObjectReply(() => callModel(promptOrMessages, output));
 
       const answer = await generateAiOutputObject(generate, input.promptOrMessages, payload.outputSchema, payload.outputRepairAttempts ?? 0);
-      const usage = sumAiStreamUsage(answer.usages);
+      // Priced once over every repair call's tokens; each reply's usage carries no cost of its own.
+      const usage = priceBedrockUsage(sumAiStreamUsage(answer.usages), pricedCall);
       if (payload.caching) {
         logAiCacheUsage(usage);
       }
