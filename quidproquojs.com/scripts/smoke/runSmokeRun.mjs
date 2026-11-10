@@ -15,8 +15,35 @@
 const AUDIENCE = 'qpq-smoke';
 const DEADLINE_MS = 5 * 60 * 1000;
 const POLL_MS = 5 * 1000;
+// GitHub's token service now and then answers 5xx or drops the connection, which
+// would otherwise fail a deploy whose smoke run is passing. Retried after 1s, 2s, 4s.
+const TOKEN_ATTEMPTS = 4;
+const TOKEN_RETRY_MS = 1000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// One request to GitHub's token service: its response, or why it is worth asking
+// again (a 5xx, or no answer at all). A 4xx comes back as a response: the job is
+// not allowed a token, and asking again will not change that.
+const requestToken = async (url, bearer) => {
+  try {
+    const response = await fetch(url, { headers: { Authorization: `bearer ${bearer}` } });
+    return response.status >= 500 ? { retryReason: `${response.status}` } : { response };
+  } catch (error) {
+    return { retryReason: error instanceof Error ? error.message : String(error) };
+  }
+};
+
+const readToken = async (response) => {
+  if (!response.ok) {
+    throw new Error(`token request failed with ${response.status}`);
+  }
+  const body = await response.json();
+  if (!body.value) {
+    throw new Error('token request returned no value');
+  }
+  return body.value;
+};
 
 // OIDC tokens are short-lived (minutes), about as long as the poll deadline,
 // so every request mints a fresh one rather than racing the expiry.
@@ -30,17 +57,18 @@ const mintToken = async () => {
     );
   }
 
-  const response = await fetch(`${tokenRequestUrl}&audience=${AUDIENCE}`, {
-    headers: { Authorization: `bearer ${tokenRequestToken}` },
-  });
-  if (!response.ok) {
-    throw new Error(`token request failed with ${response.status}`);
+  let retryReason = '';
+  for (let attempt = 1; attempt <= TOKEN_ATTEMPTS; attempt += 1) {
+    const result = await requestToken(`${tokenRequestUrl}&audience=${AUDIENCE}`, tokenRequestToken);
+    if (result.response) {
+      return readToken(result.response);
+    }
+    retryReason = result.retryReason;
+    if (attempt < TOKEN_ATTEMPTS) {
+      await sleep(TOKEN_RETRY_MS * 2 ** (attempt - 1));
+    }
   }
-  const body = await response.json();
-  if (!body.value) {
-    throw new Error('token request returned no value');
-  }
-  return body.value;
+  throw new Error(`token request failed with ${retryReason}, ${TOKEN_ATTEMPTS} times`);
 };
 
 const printTests = (log, tests) => {
