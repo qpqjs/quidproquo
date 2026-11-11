@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.7.0
+
 - `@qpqjs/features`: with `sendUsageToFrontend: true`, `defineEventDocAi` no longer sends token usage on the live stream's finish parts. Read it from the finalized message or the chat history instead.
 
 ## 0.6.3

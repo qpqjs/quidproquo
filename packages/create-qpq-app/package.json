@@ -1,6 +1,6 @@
 {
   "name": "create-qpq-app",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Scaffold a new quidproquo app: npx create-qpq-app my-app",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -59,12 +59,12 @@
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
     "@inquirer/prompts": "^8.5.2",
-    "@qpqjs/eslint-config": "0.6.3",
+    "@qpqjs/eslint-config": "0.7.0",
     "prettier": "^3.2.5",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "@qpqjs/tsconfig": "0.6.3",
+    "@qpqjs/tsconfig": "0.7.0",
     "@types/node": "^22.13.13"
   },
   "bin": {

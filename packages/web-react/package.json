@@ -1,6 +1,6 @@
 {
   "name": "@qpqjs/web-react",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "React bindings for quidproquo: runtimes, stores and hooks.",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -45,8 +45,8 @@
   },
   "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "devDependencies": {
-    "@qpqjs/testing": "0.6.3",
-    "@qpqjs/tsconfig": "0.6.3",
+    "@qpqjs/testing": "0.7.0",
+    "@qpqjs/tsconfig": "0.7.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "typescript": "^5.8.2"
@@ -55,11 +55,11 @@
     "react": ">=18.3.1"
   },
   "dependencies": {
-    "@qpqjs/actionprocessor-web": "0.6.3",
-    "@qpqjs/core": "0.6.3",
-    "@qpqjs/features": "0.6.3",
-    "@qpqjs/web": "0.6.3",
-    "@qpqjs/webserver": "0.6.3",
+    "@qpqjs/actionprocessor-web": "0.7.0",
+    "@qpqjs/core": "0.7.0",
+    "@qpqjs/features": "0.7.0",
+    "@qpqjs/web": "0.7.0",
+    "@qpqjs/webserver": "0.7.0",
     "symbol-observable": "^4.0.0"
   },
   "engines": {

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+- reports: `defineReports` with month documents, a report events queue, `askReportRead` and calendar month helpers, plus a smoke suite covering cross service append and read
+- features: report events dated more than five minutes ahead are refused, and the reports docs are written
+- features: ai usage report with bedrock pricing, exposed as `defineEventDocAi` `usageReport`
+
+### Breaking changes
+
+- `defineEventDocAi` no longer sends token usage on live stream finish parts with `sendUsageToFrontend` (read it from the finalized message or chat history)
+
 ## 0.6.3
 
 - release: the npm version watch accepts any served version, and the js-yaml override is gone from the site
