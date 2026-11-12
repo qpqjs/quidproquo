@@ -153,6 +153,32 @@ describe('QpqCoreStorageDriveConstruct lifecycle rules', () => {
     });
   });
 
+  // Cost and retention regression: drive buckets are versioned, so without this an expired file is only
+  // hidden and its bytes are billed forever.
+  it('removes hidden versions a week after they are hidden on a rule with deleteAfterDays', () => {
+    const template = synth(defineStorageDrive('logs', { lifecycleRules: [{ deleteAfterDays: 30 }] }));
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: [Match.objectLike({ Status: 'Enabled', ExpirationInDays: 30, NoncurrentVersionExpiration: { NoncurrentDays: 7 } })],
+      },
+    });
+  });
+
+  it('keeps hidden versions on a rule without deleteAfterDays', () => {
+    const template = synth(
+      defineStorageDrive('archive', {
+        lifecycleRules: [{ transitions: [{ storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE, transitionAfterDays: 30 }] }],
+      }),
+    );
+
+    template.hasResourceProperties('AWS::S3::Bucket', {
+      LifecycleConfiguration: {
+        Rules: [Match.objectLike({ NoncurrentVersionExpiration: Match.absent(), NoncurrentVersionExpirationInDays: Match.absent() })],
+      },
+    });
+  });
+
   it('refuses a transition to the REGULAR tier at synth', () => {
     expect(() =>
       synth(

@@ -19,6 +19,10 @@ import { toRemovalPolicy } from '../../../../utils/toRemovalPolicy';
 import { QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqReadWriteResourceConstructBase } from '../../../base/QpqReadWriteResourceConstructBase';
 
+// How long a version hidden by a delete, an overwrite or deleteAfterDays is kept before S3 removes it
+// for good, on a rule with deleteAfterDays: a week to undo a mistake, then the file is really gone.
+const DELETED_VERSION_RETENTION_DAYS = 7;
+
 export type QpqCoreStorageDriveConstructProps = {
   storageDriveConfig: StorageDriveQPQConfigSetting;
 
@@ -87,6 +91,10 @@ const convertStorageDriveLifecycleRuleToAwsS3LifecycleRule = (lifecycleRule: Sto
   enabled: lifecycleRule.enabled,
   prefix: lifecycleRule.prefix,
   expiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(lifecycleRule.deleteAfterDays) : undefined,
+  // Drive buckets are versioned, so expiring a file only hides it behind a delete marker and the bytes
+  // stay billed. Removing hidden versions is what makes deleteAfterDays a real delete; with Days set on
+  // the expiration, S3 clears the leftover delete markers on its own.
+  noncurrentVersionExpiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(DELETED_VERSION_RETENTION_DAYS) : undefined,
   objectSizeGreaterThan: lifecycleRule.fileSizeGreaterThan,
   objectSizeLessThan: lifecycleRule.fileSizeLessThan,
   transitions: lifecycleRule.transitions?.map(convertStorageDriveTransitionToAwsS3Transition),
