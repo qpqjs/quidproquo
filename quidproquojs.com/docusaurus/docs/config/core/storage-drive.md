@@ -87,6 +87,8 @@ export type StorageDriveTransition = { storageDriveTier: StorageDriveTier } & (
 
 A transition specifies **either** `transitionAfterDays` **or** `transitionDate`, never both (enforced by the type).
 
+On AWS, drive buckets keep old versions of files, so a delete or an overwrite only hides the old copy. A rule with `deleteAfterDays` also removes those hidden copies 7 days after they are hidden, whether a delete, an overwrite or the expiry itself hid them. A file is gone for good at most `deleteAfterDays` + 7 days after it was written. Rules without `deleteAfterDays` keep hidden copies.
+
 ### `StorageDriveTier`
 
 | Tier | Use for | AWS equivalent |
