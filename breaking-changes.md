@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.8.0
+
 - `@qpqjs/deploy-aws`: a storage drive lifecycle rule with `deleteAfterDays` now also removes the old versions a delete, an overwrite or the expiry leaves hidden in the versioned bucket, 7 days after they are hidden, so the delete is permanent as documented. Drive buckets used to keep every hidden version forever, still billed. The first deploy permanently removes hidden versions older than 7 days in those drives, including the admin logs under `defineAdminSettings({ logRetentionDays })`.
 
 ## 0.7.0

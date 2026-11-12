@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+
+- actionprocessor-aws: lambda warmer pings are answered before the event is read
+- deploy-aws: storage drive `deleteAfterDays` also removes the hidden old versions, so deletes are permanent
+- ci: the smoke run retries the github token request on 5xx
+
+### Breaking changes
+
+- storage drive `deleteAfterDays` now also expires hidden versions after 7 days (first deploy permanently removes older ones, including admin logs)
+
 ## 0.7.0
 
 - reports: `defineReports` with month documents, a report events queue, `askReportRead` and calendar month helpers, plus a smoke suite covering cross service append and read
