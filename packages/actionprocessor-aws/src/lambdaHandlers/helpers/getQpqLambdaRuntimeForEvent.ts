@@ -59,6 +59,25 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   return async (event: E, context: Context) => {
     const logger = getLogger(qpqConfig);
 
+    // Checked before anything reads the event: a warmer ping carries none of the fields a real
+    // event of this type does (a service function's storySession, for one).
+    if (isSnsEvent(event)) {
+      const recordsNoWarm = event.Records.filter((record) => !isSnsWarmerRecord(record));
+
+      // A warmer ping arrives as its own single-record SNS event; any warmer
+      // present means this invoke exists only to keep the sandbox warm.
+      if (recordsNoWarm.length !== event.Records.length) {
+        // TODO: @joe-coady: Warm qpq things with dynamic functions
+        // federate in dynamic modules
+        await dynamicModuleLoaderWarmer();
+
+        // Might as well move the logs to permanent storage
+        await logger.moveToPermanentStorage();
+
+        return 'Warmed up!';
+      }
+    }
+
     const resolveStory = createRuntime(
       qpqConfig,
       getStorySession(event),
@@ -80,23 +99,6 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
 
       return result.result;
     };
-
-    if (isSnsEvent(event)) {
-      const recordsNoWarm = event.Records.filter((record) => !isSnsWarmerRecord(record));
-
-      // A warmer ping arrives as its own single-record SNS event; any warmer
-      // present means this invoke exists only to keep the sandbox warm.
-      if (recordsNoWarm.length !== event.Records.length) {
-        // TODO: @joe-coady: Warm qpq things with dynamic functions
-        // federate in dynamic modules
-        await dynamicModuleLoaderWarmer();
-
-        // Might as well move the logs to permanent storage
-        await logger.moveToPermanentStorage();
-
-        return 'Warmed up!';
-      }
-    }
 
     return await processEvent();
   };
