@@ -11,6 +11,7 @@ import { QPQWebServerConfigSettingType, RouteQPQWebServerConfigSetting } from '@
 import { describe, expect, it } from 'vitest';
 
 import { adminSessionStoreName } from '../constants/adminSessionConstants';
+import { WebsocketAdminClientMessageEventType } from '../log/logic/webSocket';
 import { defineAdminSettings } from './defineAdminSettings';
 
 const flattenConfig = (config: QPQConfig): QPQConfigSetting[] => config.flatMap((item) => (Array.isArray(item) ? flattenConfig(item) : [item]));
@@ -137,6 +138,30 @@ describe('defineAdminSettings', () => {
     expect(notifiers).toEqual([]);
     expect(queueNames).not.toContain('admin-alarms');
     expect(busNames).not.toContain('admin-notifier');
+  });
+
+  // A reproject request reaches every service over the admin bus, so every service (not only the log service) has to
+  // handle it, and be able to read which event-doc collections it owns.
+  it('handles a reproject request on every service, with the processor that finds its event doc collections', () => {
+    const settings = flattenConfig(defineAdminSettings('admin'));
+    const adminQueue = settings.find(
+      (s) => s.configSettingType === QPQCoreConfigSettingType.queue && (s as QueueQPQConfigSetting).name === 'qpqadmin-wscfg',
+    ) as QueueQPQConfigSetting;
+    const handler = adminQueue.qpqQueueProcessors[WebsocketAdminClientMessageEventType.EventDocReprojectRequest];
+    const processorSources = settings
+      .filter((s) => s.configSettingType === QPQCoreConfigSettingType.actionProcessors)
+      .map((s) => (s as unknown as { runtime: { relativePath: string; functionName: string } }).runtime);
+
+    expect(typeof handler === 'object' ? [handler.relativePath, handler.functionName] : undefined).toEqual([
+      'entry/queue/onEventDocReprojectRequest',
+      'onEventDocReprojectRequest',
+    ]);
+    expect(processorSources).toContainEqual(
+      expect.objectContaining({
+        relativePath: 'eventDoc/entry/actionProcessor/getEventDocReadOwnedStoreNames',
+        functionName: 'getEventDocReadOwnedStoreNames',
+      }),
+    );
   });
 
   it('mounts the session routes under /v1/admin/session', () => {

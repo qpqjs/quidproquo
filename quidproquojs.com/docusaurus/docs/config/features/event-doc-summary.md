@@ -16,6 +16,8 @@ Declares the **stores** that back an event-document collection, without any rout
 
 Point-in-time recovery is enabled on all tables.
 
+It also declares a **reproject queue** (`<storeName>Reproj`) that rebuilds every document's list view rows from its event log, in pages, one message per document. The admin Config screen has a button that starts it. With an `owner`, the queue is declared for the owner's module only, so the config must name its module first (`defineModule`, usually through `defineApplicationModule`).
+
 - **On AWS:** deploys five DynamoDB tables (via [defineKeyValueStore](../core/key-value-store.md)) and one S3 bucket (via [defineStorageDrive](../core/storage-drive.md)). All physical names are derived from `keyValueStoreName`, so a collection needs only that one name.
 
 ```typescript

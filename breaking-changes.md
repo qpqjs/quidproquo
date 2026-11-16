@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features`: `askEventDocReprojectHead(modelId)` on a document with no events now removes its list view rows, where it did nothing. It also takes an optional second argument, the registered functions name to project with.
+- `@qpqjs/features`: `defineEventDocSummary` now also declares a reproject queue per store (`${storeName}Reproj`), so each event doc collection deploys one more queue. With an `owner`, the queue is declared for the owner's module only, which needs the config to name its module first (`defineModule`, usually through `defineApplicationModule`).
 - `@qpqjs/features`: an event doc collection's summaries now live in a new lists store (`${storeName}Lists`, pk `viewName#type`, sk `id`, the summary nested under `state`), written and read by the same code as every other list view. `defineEventDocSummary` declares it beside the events and snapshots stores. The store under the bare name stays declared and is no longer read or written, so after deploying, every existing document is missing from lists and lookups by id or code until it is reprojected (`askEventDocReprojectHead`). Do not create by code (`askEventDocGetByCodeOrCreate`) until that has run, or it creates a second document with the same code.
 - `@qpqjs/features`: `askEventDocSummaryViewWrite(modelId, view)` is removed. Use `askEventDocListViewWrite(modelId, EVENT_DOC_SUMMARY_VIEW, eventId, view, options?)`.
 - `@qpqjs/features`: `askEventDocDelete(id)` is removed. Use `askEventDocListViewsDelete(id)`, which deletes the summary row and every declared list view's row.

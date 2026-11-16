@@ -101,12 +101,18 @@ const buildHarness = (seed: { summaryRow?: Row; listRows?: Row[]; snapshotRows?:
   const summaryUpdates: KvsUpdate[] = [];
 
   const mocks = {
-    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) => {
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[], Record<string, unknown>?] } }) => {
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return '';
       }
       if (action.payload.functionName === 'getListViewNames') {
         return ['summary', ...(seed.listViewNames ?? [])];
+      }
+      // Folding no events onto a seed is how the projector asks whether the seed still holds every view: the
+      // definition hands the seed back, or null when a view it declares now is missing from it.
+      const [events, seedViews] = action.payload.args;
+      if (events.length === 0 && seedViews) {
+        return (seed.listViewNames ?? []).every((viewName) => viewName in seedViews) ? seedViews : null;
       }
       foldCalls.push(action.payload.functionName);
       return {
@@ -226,6 +232,27 @@ describe('askEventDocProjectAtEvent', () => {
     expect(projected).toEqual(seedSummary);
     expect(summaryUpdates[0]).toContainEqual({ attributePath: 'eventId', action: KvsUpdateActionType.Set, value: 1 });
     expect(rowOf('summary')?.eventId).toBe(1);
+  });
+
+  it('folds from scratch when a seed already at the event lacks a view the definition declares now', () => {
+    const { project, foldCalls, rowOf } = buildHarness({
+      listViewNames: ['overview'],
+      snapshotRows: [
+        {
+          pk: `${DOC_ID}#document`,
+          sk: 1,
+          type: TYPE,
+          data: { type: 'inline', snapshot: { schemaVersion: 1, folded: 2 }, views: ['document', 'summary'] },
+        },
+        { pk: `${DOC_ID}#summary`, sk: 1, type: TYPE, data: { type: 'inline', snapshot: foldEventDocSummary(LOG) } },
+      ],
+    });
+
+    project(1);
+
+    // The seed was written before `overview` existed, so the document is folded again and the new view gets its row.
+    expect(foldCalls).toEqual(['foldSnapshotViews']);
+    expect(rowOf('overview')).toMatchObject({ eventId: 1, state: overviewOf(LOG) });
   });
 
   it('folds from scratch when the seed holds a summary from before it was an ordinary view, with no schema version', () => {

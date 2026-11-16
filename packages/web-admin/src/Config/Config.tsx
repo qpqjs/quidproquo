@@ -7,6 +7,7 @@ import { useOnMount } from '@mui/x-data-grid/internals';
 
 import { useAdminApp, useSessionState } from '../adminApp';
 import { useServiceNames } from '../LogViewer/hooks';
+import { EventDocReprojectButton } from './EventDocReprojectButton';
 
 const drawerWidth = 240;
 
@@ -89,6 +90,8 @@ export function Config() {
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <EventDocReprojectButton />
+
         <Typography gutterBottom variant="h5">
           {selectedService} Service
         </Typography>

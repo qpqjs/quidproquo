@@ -1,10 +1,12 @@
-import { qpqCoreUtils } from '@qpqjs/core';
+import { defineModule, qpqCoreUtils } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
 import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
+import { eventDocReprojectQueueName } from '../constants/eventDocReprojectQueueName';
+import { EventDocReprojectMessageType } from '../models';
 import { defineEventDocSummary } from './defineEventDocSummary';
 
 // Security regression: the four stores of a collection share one scoped flag and keep point in time
@@ -21,7 +23,8 @@ describe('defineEventDocSummary', () => {
   });
 
   it('hands one owner to every store and the drive, so a collection can be referenced from another service', () => {
-    const config = defineEventDocSummary('memos', { owner: { module: 'template' } });
+    // A service declares its module before anything else; the owner-only reproject queue opens against it.
+    const config = [defineModule('template'), defineEventDocSummary('memos', { owner: { module: 'template' } })];
 
     expect(qpqCoreUtils.getAllKeyValueStoreConfigs(config).map((kvs) => kvs.owner?.module)).toEqual(['template', 'template', 'template', 'template']);
     expect(qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.owner?.module)).toEqual(['template']);
@@ -40,6 +43,33 @@ describe('defineEventDocSummary', () => {
     ]);
     // DynamoDB refuses an index name under three characters, which the partition key's own name would be.
     expect(listsStore?.indexes.every((index) => index.name.length >= 3)).toBe(true);
+  });
+
+  it('declares the reproject queue with a walk and a per-document handler, handed the same globals as the projector', () => {
+    const config = defineEventDocSummary('memos', { snapshotFunctions: { memo: 'memos-memo-functions' } });
+    const queue = qpqCoreUtils.getQueueByName(eventDocReprojectQueueName('memos'), config);
+    const globals = { [EVENT_DOC_STORE_NAME_GLOBAL]: 'memos', [EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL]: { memo: 'memos-memo-functions' } };
+
+    const handlers = Object.entries(queue?.qpqQueueProcessors ?? {}).map(([type, runtime]) =>
+      typeof runtime === 'object' ? [type, runtime.relativePath, runtime.functionName, runtime.globals] : [type],
+    );
+
+    expect(handlers).toEqual([
+      [EventDocReprojectMessageType.Walk, 'eventDoc/entry/queueEvent/onEventDocReprojectWalk', 'onEventDocReprojectWalk', globals],
+      [EventDocReprojectMessageType.Document, 'eventDoc/entry/queueEvent/onEventDocReprojectDocument', 'onEventDocReprojectDocument', globals],
+    ]);
+    // A throttled store deserves another go, and nothing subscribes it to a bus: the service sends to it directly.
+    expect(queue!.maxTries).toBeGreaterThan(1);
+    expect(queue!.eventBusSubscriptions).toEqual([]);
+  });
+
+  it("declares the reproject queue only on the owner's deploy, like the stream projector", () => {
+    const owned = defineEventDocSummary('memos', { owner: { module: 'template' } });
+
+    expect(qpqCoreUtils.getAllQueueConfigs([defineModule('template'), owned]).map((queue) => queue.name)).toEqual([
+      eventDocReprojectQueueName('memos'),
+    ]);
+    expect(qpqCoreUtils.getAllQueueConfigs([defineModule('pdf'), owned])).toEqual([]);
   });
 
   it('hands the projector its store name and snapshot map as config globals', () => {
