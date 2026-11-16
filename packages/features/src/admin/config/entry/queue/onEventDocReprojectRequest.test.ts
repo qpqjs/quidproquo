@@ -9,24 +9,42 @@ import { EventDocReprojectMessageType, EventDocReprojectSource } from '../../../
 import { WebSocketQueueQpqAdminEventDocReprojectRequestQueueEvent } from '../../../log/logic/webSocket';
 import { onEventDocReprojectRequest } from './onEventDocReprojectRequest';
 
-describe('onEventDocReprojectRequest', () => {
-  it('starts a walk of every event doc collection this service owns', () => {
-    const sends: { queueName: string; queueMessages: { type: string; payload: unknown }[] }[] = [];
+type Send = { queueName: string; queueMessages: { type: string; payload: unknown }[] };
 
-    const handled = runStory(onEventDocReprojectRequest({} as WebSocketQueueQpqAdminEventDocReprojectRequestQueueEvent), {
-      [EventDocActionType.ReadOwnedStoreNames]: ['envelopes'],
-      [QueueActionType.SendMessage]: (action: { payload: (typeof sends)[number] }) => {
-        sends.push(action.payload);
-        return undefined;
-      },
-    });
+const request = (payload: unknown) => {
+  const sends: Send[] = [];
+
+  const handled = runStory(onEventDocReprojectRequest({ message: { payload } } as WebSocketQueueQpqAdminEventDocReprojectRequestQueueEvent), {
+    [EventDocActionType.ReadOwnedStoreNames]: ['envelopes'],
+    [QueueActionType.SendMessage]: (action: { payload: Send }) => {
+      sends.push(action.payload);
+      return undefined;
+    },
+  });
+
+  return { handled, sends };
+};
+
+const walkFrom = (source: EventDocReprojectSource): Send[] => [
+  {
+    queueName: eventDocReprojectQueueName('envelopes'),
+    queueMessages: [{ type: EventDocReprojectMessageType.Walk, payload: { source, nextPageKey: undefined } }],
+  },
+];
+
+describe('onEventDocReprojectRequest', () => {
+  it('starts a walk of every event doc collection this service owns, from the lists store', () => {
+    const { handled, sends } = request({});
 
     expect(handled).toBe(true);
-    expect(sends).toEqual([
-      {
-        queueName: eventDocReprojectQueueName('envelopes'),
-        queueMessages: [{ type: EventDocReprojectMessageType.Walk, payload: { source: EventDocReprojectSource.Lists, nextPageKey: undefined } }],
-      },
-    ]);
+    expect(sends).toEqual(walkFrom(EventDocReprojectSource.Lists));
+  });
+
+  it('walks the legacy summary stores when the request asks for that source', () => {
+    expect(request({ source: EventDocReprojectSource.LegacySummary }).sends).toEqual(walkFrom(EventDocReprojectSource.LegacySummary));
+  });
+
+  it('falls back to the lists store for a source it does not know', () => {
+    expect(request({ source: 'somewhere-else' }).sends).toEqual(walkFrom(EventDocReprojectSource.Lists));
   });
 });

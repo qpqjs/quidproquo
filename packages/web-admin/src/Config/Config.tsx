@@ -1,4 +1,8 @@
-import { WebsocketAdminClientMessageEventType, WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest } from '@qpqjs/features';
+import {
+  EventDocReprojectSource,
+  WebsocketAdminClientMessageEventType,
+  WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest,
+} from '@qpqjs/features';
 import { useWebsocketSendEvent } from '@qpqjs/web-react';
 
 import React, { useState } from 'react';
@@ -90,7 +94,16 @@ export function Config() {
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <EventDocReprojectButton />
+        <EventDocReprojectButton
+          description="Rebuilds every event doc list row and snapshot, across all services. Documents already up to date are skipped."
+          label="Reproject event docs"
+        />
+        {/* TODO: @joe-coady: remove this button when the legacy summary stores are dropped from defineEventDocSummary. */}
+        <EventDocReprojectButton
+          description="One-off: finds every document in the old summary tables and builds its rows in the lists tables. Do not create by code until it has finished."
+          label="Rebuild from old summary tables"
+          source={EventDocReprojectSource.LegacySummary}
+        />
 
         <Typography gutterBottom variant="h5">
           {selectedService} Service
