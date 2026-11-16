@@ -4,6 +4,7 @@ export * from './eventDocEventsStoreName';
 export * from './eventDocFunctionsName';
 export * from './eventDocGlobalNames';
 export * from './eventDocHeadMovedTopic';
+export * from './eventDocListsNewestFirstIndex';
 export * from './eventDocListsStoreName';
 export * from './eventDocListViewKeySeparator';
 export * from './eventDocPermissions';
