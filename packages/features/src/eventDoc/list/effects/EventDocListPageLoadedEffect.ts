@@ -1,11 +1,11 @@
 import { Effect, Nullable } from '@qpqjs/core';
 
-import { EventDocSummary } from '../../models';
+import { EventDocListRow } from '../types/EventDocListRow';
 import { EventDocListEffect } from './EventDocListEffect';
 
 /** Payload of PageLoaded. */
 export type EventDocListPageLoadedPayload = {
-  items: EventDocSummary[];
+  items: EventDocListRow[];
   nextPageKey: Nullable<string>;
 };
 

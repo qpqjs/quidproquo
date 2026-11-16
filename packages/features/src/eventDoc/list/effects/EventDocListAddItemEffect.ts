@@ -1,11 +1,11 @@
 import { Effect } from '@qpqjs/core';
 
-import { EventDocSummary } from '../../models';
+import { EventDocListRow } from '../types/EventDocListRow';
 import { EventDocListEffect } from './EventDocListEffect';
 
 /** Payload of AddItem. */
 export type EventDocListAddItemPayload = {
-  item: EventDocSummary;
+  item: EventDocListRow;
 };
 
 /** Prepends a newly created item. */

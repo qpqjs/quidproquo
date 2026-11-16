@@ -1,11 +1,12 @@
 import { Nullable } from '@qpqjs/core';
 
-import { EventDocSummary } from '../../models';
 import { EventDocListConfig } from './EventDocListConfig';
+import { EventDocListRow } from './EventDocListRow';
 
 /** A cursor-paged list: `items` is the current page only, and pages are walked (next/previous), not addressed. */
 export type EventDocListState = EventDocListConfig & {
-  items: EventDocSummary[];
+  // Rows of the list view named in the config: summaries unless `listView` says otherwise.
+  items: EventDocListRow[];
   isLoading: boolean;
   error: Nullable<string>;
   // 0-based position in the walk; display only.
