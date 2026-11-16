@@ -9,8 +9,26 @@ import { apiRequestGet, apiRequestPost } from '../../logic';
 
 const collectionPath = `/v1${maintenanceBasePath}`;
 
-export const fetchMaintenanceSummaries = async (apiBaseUrl: string, accessToken?: string): Promise<EventDocSummary[]> =>
-  apiRequestGet<EventDocSummary[]>(collectionPath, apiBaseUrl, accessToken);
+// The list route answers one page at a time ({ items, nextPageKey }), so every page is read: the list shows all
+// maintenances, and sorts and splits them itself.
+export const fetchMaintenanceSummaries = async (apiBaseUrl: string, accessToken?: string): Promise<EventDocSummary[]> => {
+  const summaries: EventDocSummary[] = [];
+  let nextPageKey: string | undefined = undefined;
+
+  do {
+    const query: string = nextPageKey ? `?nextPageKey=${encodeURIComponent(nextPageKey)}` : '';
+    const page: QpqPagedData<EventDocSummary> = await apiRequestGet<QpqPagedData<EventDocSummary>>(
+      `${collectionPath}${query}`,
+      apiBaseUrl,
+      accessToken,
+    );
+
+    summaries.push(...page.items);
+    nextPageKey = page.nextPageKey;
+  } while (nextPageKey);
+
+  return summaries;
+};
 
 export const createMaintenance = async (name: string, code: string, apiBaseUrl: string, accessToken?: string): Promise<EventDocSummary> =>
   apiRequestPost<EventDocSummary>(collectionPath, { name, code }, apiBaseUrl, accessToken);
