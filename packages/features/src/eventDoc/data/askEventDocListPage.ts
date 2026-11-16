@@ -1,31 +1,21 @@
-import { askKeyValueStoreQuery, AskResponse, kvsEqual, kvsNotExists, QpqPagedData } from '@qpqjs/core';
+import { AskResponse, QpqPagedData } from '@qpqjs/core';
 
 import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
-import { EVENT_DOC_LIST_PAGE_SIZE } from '../list/constants/eventDocListPageSize';
+import { EVENT_DOC_SUMMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSummary } from '../models';
-import { askEventDocResolveScope } from './askEventDocResolveScope';
+import { askEventDocListViewPage, EventDocListViewPageOptions } from './askEventDocListViewPage';
+import { toEventDocSummary } from './toEventDocSummary';
 
-export type EventDocListPageOptions = {
-  includeDeleted?: boolean;
-  limit?: number;
-  nextPageKey?: string;
-};
+/** Options for askEventDocListPage. */
+export type EventDocListPageOptions = EventDocListViewPageOptions;
 
 /**
- * One page of the collection, newest first via the (type, updatedAt) index. Soft-deleted rows are removed by a query
- * filter applied after the read, so a page can be short of `limit` with more pages left: page on `nextPageKey`, not count.
- * The index is named because it shares the table's partition key: unnamed, the query would read the table in id order.
+ * One page of the collection's summaries, newest first. A page can be short of `limit` with more pages left (see
+ * askEventDocListViewPage): page on `nextPageKey`, not count.
  */
 export function* askEventDocListPage<T extends EventDocSummary = EventDocSummary>(options?: EventDocListPageOptions): AskResponse<QpqPagedData<T>> {
-  const { storeName, type } = yield* askEventDocStoreReadOrThrow();
-  const scope = yield* askEventDocResolveScope();
+  const { type } = yield* askEventDocStoreReadOrThrow();
+  const page = yield* askEventDocListViewPage(EVENT_DOC_SUMMARY_VIEW, options);
 
-  return yield* askKeyValueStoreQuery<T>(storeName, kvsEqual('type', type), {
-    scope,
-    indexName: 'type',
-    limit: options?.limit ?? EVENT_DOC_LIST_PAGE_SIZE,
-    nextPageKey: options?.nextPageKey,
-    sortAscending: false,
-    filter: options?.includeDeleted ? undefined : kvsNotExists('deletedAt'),
-  });
+  return { ...page, items: page.items.map((row) => toEventDocSummary<T>(row, type)) };
 }

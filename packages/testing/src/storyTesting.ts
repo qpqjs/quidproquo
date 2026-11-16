@@ -98,7 +98,19 @@ const drive = <R>(story: AskResponse<R>): R => {
         next = story.next(getSuccessfulEitherActionResultIfRequired([], action.returnErrors));
         continue;
       }
-      throw new StoryError('TestSetupError', `Unmocked action(s) in batch: ${subActions.map((a) => a.type).join(', ')}. Add them to your mocks.`);
+
+      // Parallel stories that each read an unprovided context at the same step reach here as one batch of reads. They
+      // resolve to the identifiers' defaults, as a lone read does below.
+      const unmocked = subActions.filter((subAction) => subAction.type !== ContextActionType.Read);
+      if (unmocked.length === 0) {
+        const defaults = subActions.map((subAction) =>
+          getSuccessfulEitherActionResultIfRequired(subAction.payload?.contextIdentifier?.defaultValue, subAction.returnErrors),
+        );
+        next = story.next(getSuccessfulEitherActionResultIfRequired(defaults, action.returnErrors));
+        continue;
+      }
+
+      throw new StoryError('TestSetupError', `Unmocked action(s) in batch: ${unmocked.map((a) => a.type).join(', ')}. Add them to your mocks.`);
     }
 
     if (action.type === ErrorActionType.ThrowError) {

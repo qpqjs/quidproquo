@@ -7,6 +7,7 @@ export * from './EventDocRouteName';
 export * from './EventDocRoutesOptions';
 export * from './EventDocStore';
 export * from './EventDocStoredEvent';
+export * from './EventDocStoredListView';
 export * from './EventDocStoredSnapshot';
 export * from './EventDocStoreOptions';
 export * from './EventDocSyncOptions';

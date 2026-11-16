@@ -64,7 +64,7 @@ describe('defineReports', () => {
     const eventsStore = stores.find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName(storeName));
     const runtime = eventsStore?.onStream?.runtime;
 
-    expect(stores).toHaveLength(3);
+    expect(stores).toHaveLength(4);
     expect(stores.every((kvs) => kvs.owner?.module === 'template' && kvs.scoped === true)).toBe(true);
     expect(qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => [drive.owner?.module, drive.scoped])).toEqual([['template', true]]);
     expect(runtime && typeof runtime === 'object' ? runtime.globals?.[EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL] : undefined).toEqual({

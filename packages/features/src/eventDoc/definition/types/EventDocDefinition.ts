@@ -1,6 +1,6 @@
 import { Nullable } from '@qpqjs/core';
 
-import { EventDocEvent, EventDocLink, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
+import { EventDocEvent, EventDocLink, EventDocListViewState, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
 import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
@@ -36,7 +36,19 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // the same reason as getSnapshotCacheKey.
   getServerEventTypes: () => string[];
 
-  // Every projection, typed at the latest version. `summary` is built in: it folds only the reserved lifecycle events.
+  // The views kept as rows in the lists store: `summary` first, then each one named in
+  // EventDocSavedDefinitionConfig.listViews. A member for the same reason as getSnapshotCacheKey.
+  getListViewNames: () => string[];
+
+  // One list view's state after `events`, resumed from `seedState` (a lists store row's state) or from scratch.
+  // Era-pinned, like a snapshot. `trusted` says the events already passed the append gate. Null when the fold cannot
+  // decide acceptance from the view alone (untrusted events on a doc type with its own rules), or the view is not one.
+  foldListView: (viewName: string, events: EventDocEvent[], seedState: unknown, trusted: boolean) => Nullable<EventDocListViewState>;
+
+  // Stored list view states climbed to the latest schema, in order: what a list hands its reader.
+  migrateListViewStates: (viewName: string, states: unknown[]) => unknown[];
+
+  // Every projection, typed at the latest version. `summary` is built in: declared for every doc type at every version.
   views: {
     [K in keyof EventDocLatestViews<TVersions>]: EventDocView<EventDocLatestViews<TVersions>[K]>;
   } & Record<EventDocSummaryViewName, EventDocView<EventDocSummaryView>>;

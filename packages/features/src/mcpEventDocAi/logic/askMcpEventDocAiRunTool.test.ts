@@ -22,7 +22,14 @@ const eventDocAis: McpEventDocAi[] = [
   },
 ];
 
-const plan = { id: 'doc-1', code: 'P1', name: 'Onboarding plan', type: 'plan', updatedAt: '2026-10-12T00:00:00.000Z' };
+// A summary as the lists store holds it: the summary itself sits under `state`.
+const plan = {
+  pk: 'summary#plan',
+  id: 'doc-1',
+  updatedAt: '2026-10-12T00:00:00.000Z',
+  eventId: 0,
+  state: { id: 'doc-1', code: 'P1', name: 'Onboarding plan', updatedAt: '2026-10-12T00:00:00.000Z' },
+};
 
 type ExecuteAction = Action<{ functionName: string; payload: unknown }> & { context?: Record<string, unknown> };
 

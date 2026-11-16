@@ -44,12 +44,12 @@ describe('defineEventDoc', () => {
 
   // Security regression: a collection with a scope resolver must scope every store it declares, so a scoped
   // read or write can never land in an unscoped sibling store or drive; without one, nothing is scoped.
-  it('scopes the summary, events, snapshot stores and blob drive together, keyed on the scope resolver', () => {
+  it('scopes the summary, lists, events, snapshot stores and blob drive together, keyed on the scope resolver', () => {
     const scoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos', scopeResolver: '/entry/scope::askResolveScope' });
     const unscoped = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos' });
 
     const scopedStores = qpqCoreUtils.getAllKeyValueStoreConfigs(scoped);
-    expect(scopedStores).toHaveLength(3);
+    expect(scopedStores).toHaveLength(4);
     expect(scopedStores.every((kvs) => kvs.scoped === true)).toBe(true);
     expect(qpqCoreUtils.getAllStorageDriveConfigs(scoped).map((drive) => drive.scoped)).toEqual([true]);
 

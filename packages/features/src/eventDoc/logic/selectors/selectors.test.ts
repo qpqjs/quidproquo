@@ -3,6 +3,7 @@ import { QpqIsoDateTime } from '@qpqjs/core';
 import { describe, expect, it } from 'vitest';
 
 import { EventDocSummary, EventDocVersion } from '../../models';
+import { createEventDocSummarySeed } from '../../summary/logic/createEventDocSummarySeed';
 import { draftVersion } from './draftVersion';
 import { latestPublished } from './latestPublished';
 import { latestVersion } from './latestVersion';
@@ -14,6 +15,8 @@ const eventId = (n: number): number => n;
 const iso = (s: string): QpqIsoDateTime => s as QpqIsoDateTime;
 
 const model = (versions: EventDocVersion[]): EventDocSummary => ({
+  // The base fields every view carries, at their starting values; the summary's own are set below.
+  ...createEventDocSummarySeed(),
   type: 'template',
   id: 'abc',
   code: 'footer',

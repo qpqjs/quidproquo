@@ -23,7 +23,7 @@ export type EventDocLatestViews<TVersions extends readonly unknown[]> = TVersion
 export type EventDocPrimaryView<TVersions extends readonly unknown[]> =
   EventDocLatestViews<TVersions> extends Record<EventDocPrimaryViewName, infer TView extends EventDocDocument> ? TView : never;
 
-/** The view every event doc has without declaring it: the fold of the reserved lifecycle events. Needs no version entries. */
+/** The view every event doc has without declaring it: who made and changed it and its publish history, declared for it at every version. */
 export const EVENT_DOC_SUMMARY_VIEW = 'summary';
 
 /** The summary view's name as a type. */

@@ -12,8 +12,8 @@ import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
 /**
  * Append an event at head + 1 with a conditional write; a Conflict re-laps by advancing the held state past
  * the winners and validating again, up to EVENT_DOC_APPEND_MAX_RETRIES. Hooks run after the write, outside the retry.
- * A reserved lifecycle event brings the summary row up to date before this returns, so a reader that follows the
- * append sees it; a domain event leaves the row to the stream projector.
+ * Every list view row (the summary and each declared view) is brought up to date before this returns, so a reader that
+ * follows the append sees it; the stream projector rewrites the rows after.
  */
 export function* askEventDocEventAppend(
   modelId: string,
@@ -52,7 +52,7 @@ export function* askEventDocEventAppend(
     contentionText: `Could not append to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - too much concurrent write contention.`,
   });
 
-  const refolded = yield* askEventDocAppendRefold(modelId, [event]);
+  const refolded = yield* askEventDocAppendRefold(modelId, [event], options.validate);
 
   yield* askEventDocAppendHooksRun(modelId, event, refolded);
 

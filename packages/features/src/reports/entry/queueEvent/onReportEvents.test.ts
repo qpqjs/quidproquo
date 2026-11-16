@@ -12,6 +12,7 @@ import { ReportMonthEffect } from '../../fold/effects/ReportMonthEffect';
 import { ReportQueuedEvent } from '../../models/ReportQueuedEvent';
 import { ReportsConfig } from '../../models/ReportsConfig';
 import { createReportsMemoryStore } from '../../testing/createReportsMemoryStore';
+import { reportsDynamicFunctionsMock } from '../../testing/reportsDynamicFunctionsMock';
 import { onReportEvents } from './onReportEvents';
 
 const CONFIG: ReportsConfig = {
@@ -42,6 +43,7 @@ const deliver = (store: ReturnType<typeof createReportsMemoryStore>, event: Queu
 
   const handled = runStory(onReportEvents(event), {
     ...store.mocks,
+    ...reportsDynamicFunctionsMock,
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) =>
       action.payload.globalName === REPORT_NAME_GLOBAL ? 'docgen' : action.payload.globalName === reportConfigGlobal('docgen') ? CONFIG : undefined,
     [DateActionType.Now]: '2026-11-09T06:00:00.000Z',
@@ -74,9 +76,11 @@ describe('onReportEvents', () => {
       limits: { maxCellsPerBucket: 200, maxDimensionNames: 32, maxMeasureNames: 32 },
       events: [{ ...rendered('2026-11-08T00:10:00.000Z'), bucketKeys: { hour: '2026-11-08T10:00', day: '2026-11-08', month: '2026-11' } }],
     });
-    expect([...store.rows.values()].find((row) => row.store === 'docgenReports')).toMatchObject({
+    // The summary row, in the lists store: folded through the appended events before the consumer returned.
+    expect([...store.rows.values()].find((row) => row.store === 'docgenReportsLists')).toMatchObject({
       id: 'documentRendered~2026-11',
-      code: 'documentRendered/2026-11',
+      eventId: 1,
+      state: { id: 'documentRendered~2026-11', code: 'documentRendered/2026-11' },
       scope: 'TENANT#t1',
     });
   });

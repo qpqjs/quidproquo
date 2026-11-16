@@ -3,10 +3,12 @@ import { CrossModuleOwnerWithNoResourceOverride, defineKeyValueStore, defineStor
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
+import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocSummary } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
+import { EventDocStoredListView } from '../types/EventDocStoredListView';
 import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 
 /** Options for defineEventDocSummary. */
@@ -20,7 +22,11 @@ export type EventDocSummaryOptions = {
   owner?: CrossModuleOwnerWithNoResourceOverride;
 };
 
-/** Summary store, events store (`${name}Events`), snapshots store (`${name}Snap`) and blob drive for a collection. */
+/**
+ * The stores and blob drive for a collection: lists (`${name}Lists`, every list view's row per document), events
+ * (`${name}Events`) and snapshots (`${name}Snap`). The store under the bare name is the legacy summary store: it stays
+ * declared so a rebuild can read its rows, and nothing writes to it.
+ */
 export const defineEventDocSummary = (keyValueStoreName: string, options?: EventDocSummaryOptions): QPQConfig => [
   defineKeyValueStore<EventDocSummary>(keyValueStoreName, 'type', ['id'], {
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
@@ -48,6 +54,14 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
 
   // pk=docId#view, sk=the event id the snapshot captures. Defined for every collection so enabling snapshots later
   // is a config change, not a migration.
+  // The index shares the table's partition key, so a list query names it to read newest first.
+  defineKeyValueStore<EventDocStoredListView>(eventDocListsStoreName(keyValueStoreName), 'pk', ['id'], {
+    indexes: [{ partitionKey: 'pk', sortKey: 'updatedAt' }],
+    disablePointInTimeRecovery: false,
+    scoped: options?.scoped,
+    owner: options?.owner,
+  }),
+
   defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,

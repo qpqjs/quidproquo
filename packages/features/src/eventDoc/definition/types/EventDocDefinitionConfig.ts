@@ -5,7 +5,7 @@ import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 import { EventDocEventValidators } from '../../validation/types/EventDocEventValidators';
 import { CoalesceEventType } from '../../workspace/types/CoalesceEventType';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
-import { EventDocPrimaryView } from './EventDocLatestViews';
+import { EventDocLatestViews, EventDocPrimaryView, EventDocPrimaryViewName } from './EventDocLatestViews';
 import { EventDocReferenceCollector } from './EventDocReferenceCollector';
 import { EventDocVersions } from './EventDocVersion';
 
@@ -31,6 +31,11 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
   // (an additive change that needs no schema bump): snapshots filed under any other key are invisible to readers and
   // the log refolds from scratch until the projector writes a fresh one. Omitted = '' (the legacy layout).
   snapshotCacheKey?: string;
+
+  // The declared views that are also list views: each document's latest state of the view is kept as one row in the
+  // lists store, so a list reads a page of them in one query. `summary` is always one and is never named here; the
+  // `document` view cannot be one. Keep a list view small: its row is rewritten on every event.
+  listViews?: readonly Exclude<keyof EventDocLatestViews<TVersions> & string, EventDocPrimaryViewName>[];
 
   // Merged after the reserved rules (SET_CODE/SET_NAME coalesce; lifecycle events never do). Unlisted types append.
   coalesceEventTypes?: CoalesceEventType[];

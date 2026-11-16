@@ -15,6 +15,7 @@ import { runStory, throwsError } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocServerEventInput } from '../models';
@@ -121,6 +122,9 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
         const [, state] = args as [EventDocEvent, { published: boolean }];
         return state.published ? 'document is published' : null;
       }
+      if (functionName === 'getListViewNames') {
+        return [];
+      }
       throw new Error(`unexpected dynamic function ${functionName}`);
     },
 
@@ -133,7 +137,8 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
     }) => {
       const { keyValueStoreName, keyCondition, options } = action.payload;
 
-      if (keyValueStoreName === eventDocSnapshotsStoreName(STORE.storeName)) {
+      // No snapshot to seed from, and no list view row yet: the summary refold after the write folds the log it reads.
+      if (keyValueStoreName === eventDocSnapshotsStoreName(STORE.storeName) || keyValueStoreName === eventDocListsStoreName(STORE.storeName)) {
         return { items: [], nextPageKey: undefined };
       }
 
@@ -150,6 +155,8 @@ const buildMocks = ({ heads = [0], conflicts = 0 }: { heads?: number[]; conflict
       const items = [0, 1, 2].filter((eventId) => eventId > after && eventId <= upTo).map(logRow);
       return { items, nextPageKey: undefined };
     },
+    // The summary row the batch is refolded into once it has landed.
+    [KeyValueStoreActionType.Update]: () => ({}),
     [KeyValueStoreActionType.UpsertMany]: (action: { payload: UpsertManyPayload }) => {
       upserts.push(action.payload);
       if (remainingConflicts > 0) {
@@ -177,8 +184,9 @@ describe('askEventDocAppendServerEvents', () => {
     expect(events.every((event) => event.payload.metadata.createdAt === NOW)).toBe(true);
     expect(events.map((event) => event.payload.metadata.clientMessageId)).toEqual(['cmid-0', 'cmid-1', 'cmid-2']);
 
-    // One clock read, one guid mint, one consistent head read, one write, the whole point of the batch.
-    expect(counts).toEqual({ dateNow: 1, guidMints: 1, headReads: 1, delays: 0, functionCalls: {} });
+    // One clock read, one guid mint, one consistent head read, one write, the whole point of the batch. The only
+    // definition call is the one asking which list views to refold once the batch has landed.
+    expect(counts).toEqual({ dateNow: 1, guidMints: 1, headReads: 1, delays: 0, functionCalls: { getListViewNames: 1 } });
     expect(upserts).toHaveLength(1);
     expect(upserts![0]!.keyValueStoreName).toBe(eventDocEventsStoreName(STORE.storeName));
     expect(upserts![0]!.options?.ifNotExists).toBe(true);
@@ -218,8 +226,9 @@ describe('askEventDocAppendServerEvents', () => {
 
     expect(events.map((event) => event.payload.metadata.eventId)).toEqual([2, 3, 4]);
     expect(upserts).toHaveLength(1);
-    // One fold to resolve the head state, then a validator call and a one-event fold per event.
-    expect(counts.functionCalls).toEqual({ foldDocumentState: 1 + INPUTS.length, validateEvent: INPUTS.length });
+    // One fold to resolve the head state, then a validator call and a one-event fold per event; after the write, one
+    // call asking which list views to refold.
+    expect(counts.functionCalls).toEqual({ foldDocumentState: 1 + INPUTS.length, validateEvent: INPUTS.length, getListViewNames: 1 });
   });
 
   it('with validate, refuses a run carrying a schema version the fold cannot read, writing nothing (#554)', () => {

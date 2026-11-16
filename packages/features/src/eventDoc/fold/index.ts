@@ -10,6 +10,7 @@ export * from './EventDocFoldEffects';
 export * from './EventDocMigration';
 export * from './EventDocMigrations';
 export * from './foldEventDocBase';
+export * from './foldEventDocListView';
 export * from './foldEventDocLiveView';
 export * from './foldEventDocLog';
 export * from './foldEventDocLogStep';

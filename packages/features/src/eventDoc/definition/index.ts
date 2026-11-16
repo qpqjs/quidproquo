@@ -1,3 +1,4 @@
+export * from './assertEventDocListViews';
 export * from './assertEventDocVersions';
 export * from './createEventDocDefinition';
 export * from './createEventDocStateReader';

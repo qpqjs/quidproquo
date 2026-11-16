@@ -117,7 +117,7 @@ const buildMocks = (resolvedScope: string | null) => {
 
     [KeyValueStoreActionType.Update]: createKvsUpdateMock({
       tableFor,
-      keyName: 'type',
+      keyName: 'pk',
       sortKeyName: 'id',
       onScope: (scope) => seenKvsScopes.push(scope),
     }),

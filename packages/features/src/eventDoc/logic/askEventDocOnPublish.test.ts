@@ -110,7 +110,7 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
 
     [KeyValueStoreActionType.Update]: createKvsUpdateMock({
       tableFor: (_scope, storeName) => (tables[storeName] ??= []),
-      keyName: 'type',
+      keyName: 'pk',
       sortKeyName: 'id',
     }),
 
@@ -266,7 +266,7 @@ describe('eventDoc onPublish hook', () => {
 
     // The duplicate does NOT double the version history: the fold drops it on
     // clientMessageId, so the record still shows one published version.
-    const record = (tables[store.storeName] ?? []).find((row) => row.id === summary.id) as { versions: unknown[] };
-    expect(record.versions).toHaveLength(1);
+    const record = (tables[store.listsStoreName] ?? []).find((row) => row.id === summary.id) as { state: { versions: unknown[] } };
+    expect(record.state.versions).toHaveLength(1);
   });
 });

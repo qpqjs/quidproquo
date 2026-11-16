@@ -7,6 +7,7 @@ export const eventDocStoreContext = createLocalContextIdentifier<EventDocStore>(
   storeName: '',
   eventsStoreName: '',
   snapshotsStoreName: '',
+  listsStoreName: '',
   type: '',
   storageDriveName: '',
   syncWebsocketApiNames: [],

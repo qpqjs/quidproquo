@@ -8,6 +8,8 @@ import {
 } from '@qpqjs/core';
 import { throwsError } from '@qpqjs/testing';
 
+import { createKvsUpdateMock, KvsUpdatePayload } from '../../eventDoc/testing/kvsUpdateActionMock';
+
 type Row = Record<string, any>;
 
 const matches = (row: Row, operation: KvsQueryOperation): boolean => {
@@ -42,11 +44,11 @@ const matches = (row: Row, operation: KvsQueryOperation): boolean => {
  * tests that append through the consumer and read back through the real EventDoc read path. `reportName` names the stores.
  */
 export const createReportsMemoryStore = (reportName: string) => {
-  const SUMMARY_STORE = `${reportName}Reports`;
+  const LISTS_STORE = `${reportName}ReportsLists`;
   const EVENTS_STORE = `${reportName}ReportsEvents`;
   const rows = new Map<string, Row & { store: string; scope?: string }>();
   const keyOf = (store: string, scope: string | undefined, item: Row): string =>
-    store === SUMMARY_STORE ? `${store}|${scope}|${item.type}|${item.id}` : `${store}|${scope}|${item.pk}|${item.sk}`;
+    store === LISTS_STORE ? `${store}|${scope}|${item.pk}|${item.id}` : `${store}|${scope}|${item.pk}|${item.sk}`;
   const write = (store: string, items: Row[], options?: { ifNotExists?: boolean; scope?: string }) => {
     if (options?.ifNotExists && items.some((item) => rows.has(keyOf(store, options.scope, item)))) {
       return throwsError('Conflict', 'slot taken');
@@ -65,6 +67,21 @@ export const createReportsMemoryStore = (reportName: string) => {
         .sort((a, b) => (options?.sortAscending === false ? b.sk - a.sk : a.sk - b.sk));
 
       return { items: options?.limit ? found.slice(0, options.limit) : found, nextPageKey: undefined };
+    },
+    // The list view rows are written by guarded updates. The shared mock works on a table, so it is handed this
+    // store's rows for the scope, and a row it creates is filed back under its key.
+    [KeyValueStoreActionType.Update]: (action: { payload: KvsUpdatePayload }) => {
+      const { keyValueStoreName, options } = action.payload;
+      const table: Row[] = [...rows.values()].filter((row) => row.store === keyValueStoreName && row.scope === options?.scope);
+      const known = table.length;
+
+      const updated = createKvsUpdateMock({ tableFor: () => table, keyName: 'pk', sortKeyName: 'id' })(action);
+
+      table.slice(known).forEach((row) => {
+        rows.set(keyOf(keyValueStoreName, options?.scope, row), Object.assign(row, { store: keyValueStoreName, scope: options?.scope }));
+      });
+
+      return updated;
     },
     [KeyValueStoreActionType.Upsert]: (action: {
       payload: { keyValueStoreName: string; item: Row; options?: { ifNotExists?: boolean; scope?: string } };

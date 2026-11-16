@@ -8,6 +8,7 @@ import { askMathRandomNumber } from '@qpqjs/core';
 import { MathActionType } from '@qpqjs/core';
 import { askCatch } from '@qpqjs/core';
 import { askRunParallel } from '@qpqjs/core';
+import { createContextIdentifier, createContextReader } from '@qpqjs/core';
 import { ActionOf } from '@qpqjs/core';
 import { AskResponse, EitherActionResult } from '@qpqjs/core';
 
@@ -73,6 +74,28 @@ describe('runStory', () => {
         [DateActionType.Now]: 'today',
       }),
     ).toEqual([0.1, 'today']);
+  });
+
+  it('resolves unprovided context reads run in parallel to their defaults, as it does a lone one', () => {
+    const colourContext = createContextIdentifier<string>('qpq-test-colour', 'grey');
+    const askColourRead = createContextReader(colourContext);
+
+    function* story(): AskResponse<[string, string]> {
+      return yield* askRunParallel([askColourRead(), askColourRead()]);
+    }
+
+    expect(runStory(story())).toEqual(['grey', 'grey']);
+  });
+
+  it('still reports an unmocked action that shares a batch with a context read', () => {
+    const colourContext = createContextIdentifier<string>('qpq-test-colour', 'grey');
+    const askColourRead = createContextReader(colourContext);
+
+    function* story(): AskResponse<[string, number]> {
+      return yield* askRunParallel([askColourRead(), askMathRandomNumber()]);
+    }
+
+    expect(() => runStory(story())).toThrow(/Unmocked action\(s\) in batch: @quidproquo-core\/Math\/RandomNumber/);
   });
 
   it('wraps mocked values for askCatch automatically', () => {
