@@ -1,5 +1,6 @@
 import {
   AiModel,
+  defineActionProcessors,
   defineDynamicFunctions,
   defineEventBus,
   defineGlobal,
@@ -107,10 +108,20 @@ export const defineAdminSettings = (logServiceName: string, advancedSettings?: Q
           functionName: 'onConfigSyncRequest',
           relativePath: 'entry/queue/webSocket',
         },
+        [WebsocketAdminClientMessageEventType.EventDocReprojectRequest]: {
+          basePath: __dirname,
+          functionName: 'onEventDocReprojectRequest',
+          relativePath: 'entry/queue/onEventDocReprojectRequest',
+        },
       },
       {
         eventBusSubscriptions: [ADMIN_WEBSOCKET_QUEUE_NAME],
       },
+    ),
+
+    // Lets the reproject request above find the event-doc collections this service owns.
+    defineActionProcessors(
+      getFeatureEntryQpqFunctionRuntime('eventDoc', 'actionProcessor', 'getEventDocReadOwnedStoreNames::getEventDocReadOwnedStoreNames'),
     ),
 
     defineWebSocketQueue(ADMIN_WEBSOCKET_QUEUE_NAME, ADMIN_WEBSOCKET_API_NAME, {

@@ -199,6 +199,10 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
         return ['summary'];
       }
       const [events, seedViews] = action.payload.args;
+      // Folding no events onto a seed is how the projector asks whether the seed still holds every view.
+      if (events.length === 0 && seedViews) {
+        return seedViews;
+      }
       foldCalls.push({
         dynamicFunctionsName: action.payload.dynamicFunctionsName,
         member: action.payload.functionName,

@@ -35,16 +35,22 @@ export function* askEventDocProjectAtEvent(modelId: string, eventId: number, fun
   const latestSeed = yield* askEventDocSnapshotSeedLatest(modelId, eventId, snapshotCacheKey);
   const seed = latestSeed && isSeedUsable(latestSeed) ? latestSeed : null;
 
-  // An earlier delivery may have died between the row writes and the snapshot write; rewrite the rows from the seed.
+  // A seed already at the event means the fold is done, as long as it holds every view the definition declares now:
+  // folding no events onto it answers that, and comes back null for a seed from before a view was added. An earlier
+  // delivery may have died between the row writes and the snapshot write, so the rows are rewritten from it.
   if (seed?.eventId === eventId) {
-    yield* askEventDocListViewsProject(modelId, eventId, seed.views, viewNames);
+    const seedViews = yield* functionsCaller.foldSnapshotViews([], seed.views);
 
-    return seed.views[EVENT_DOC_SUMMARY_VIEW] as EventDocSummaryView;
+    if (seedViews) {
+      yield* askEventDocListViewsProject(modelId, eventId, seedViews, viewNames);
+
+      return seedViews[EVENT_DOC_SUMMARY_VIEW] as EventDocSummaryView;
+    }
   }
 
   let snapshotViews: Nullable<EventDocSnapshotViews> = null;
 
-  if (seed) {
+  if (seed && seed.eventId < eventId) {
     const gap = yield* askEventDocEventListAll(modelId, { afterEventId: seed.eventId, upToEventId: eventId, consistentRead: true });
 
     if (gap.length > 0) {

@@ -84,7 +84,7 @@ describe('defineReports', () => {
   it("declares the folding queue only on the owner's deploy: FIFO, subscribed to the FIFO bus, handing the shared entry its report", () => {
     const owner = config;
     const other = [defineModule('pdf'), reports];
-    const [queue] = qpqCoreUtils.getAllQueueConfigs(owner);
+    const queue = qpqCoreUtils.getQueueByName(reportQueueName('docgen'), owner);
     const runtime = queue?.qpqQueueProcessors[REPORT_EVENTS_MESSAGE_TYPE];
 
     expect(qpqCoreUtils.getAllQueueConfigs(other)).toEqual([]);
@@ -100,7 +100,7 @@ describe('defineReports', () => {
 
   // Every message of a batch SQS redelivers must still be in the month document's dedup window.
   it('keeps the queue batch within the dedup window', () => {
-    expect(qpqCoreUtils.getAllQueueConfigs(config)[0]!.batchSize).toBe(REPORT_QUEUE_BATCH_SIZE);
+    expect(qpqCoreUtils.getQueueByName(reportQueueName('docgen'), config)!.batchSize).toBe(REPORT_QUEUE_BATCH_SIZE);
     expect(REPORT_QUEUE_BATCH_SIZE).toBeLessThanOrEqual(EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW);
   });
 
