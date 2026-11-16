@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.9.0
+
 - `@qpqjs/features`: `EventDocListConfig` gains a required field, `listView` (the list view a list reads, `''` for the summary). A host that builds the config sets it. `EventDocListState.items` is now `EventDocListRow[]`, a row of whichever view the list reads: a summary list's rows are still summaries, and a host that needs them typed casts or checks `listView`.
 - `@qpqjs/features`: `askEventDocReprojectHead(modelId)` on a document with no events now removes its list view rows, where it did nothing. It also takes an optional second argument, the registered functions name to project with.
 - `@qpqjs/features`: `defineEventDocSummary` now also declares a reproject queue per store (`${storeName}Reproj`), so each event doc collection deploys one more queue. With an `owner`, the queue is declared for the owner's module only, which needs the config to name its module first (`defineModule`, usually through `defineApplicationModule`).

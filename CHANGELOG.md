@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0
+
+- features: event doc summaries now live in the shared list view store and are written, refolded and deleted like any other list view
+- features: event doc lists can read any list view, not only the summary
+- features: reproject event doc list views from the admin config screen, including a rebuild from the legacy summary tables
+- features: the event doc lists index is named `newestFirst`
+- web-admin: the maintenance list reads every page of the list route
+
+### Breaking changes
+
+- `EventDocListConfig` requires `listView`, and `EventDocListState.items` is now `EventDocListRow[]`
+- event doc summaries moved to a new `${storeName}Lists` store, so existing documents must be reprojected with `askEventDocReprojectHead` after deploy
+- `defineEventDocSummary` declares an extra reproject queue per store (needs a module when `owner` is set)
+- `askEventDocSummaryViewWrite`, `askEventDocDelete`, `askEventDocSummaryRefold` and `applyEventDocSummaryEvent` removed (use the list view equivalents)
+- `askEventDocAppendRefold` takes a `trusted` argument, and `EventDocStore` requires `listsStoreName` (use `buildEventDocStore`)
+- summary views gain the base view fields, and `foldEventDocSummary` now skips events a view can reject
+- old snapshots are no longer used as seeds, and every append now reads and writes the lists store
+- doc type or view names containing `#` now throw
+- `askEventDocReprojectHead` on a document with no events now removes its list view rows
+
 ## 0.8.0
 
 - actionprocessor-aws: lambda warmer pings are answered before the event is read
