@@ -3,6 +3,7 @@ import { CrossModuleOwnerWithNoResourceOverride, defineKeyValueStore, defineStor
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
+import { EVENT_DOC_LISTS_NEWEST_FIRST_INDEX } from '../constants/eventDocListsNewestFirstIndex';
 import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
@@ -56,7 +57,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
   // is a config change, not a migration.
   // The index shares the table's partition key, so a list query names it to read newest first.
   defineKeyValueStore<EventDocStoredListView>(eventDocListsStoreName(keyValueStoreName), 'pk', ['id'], {
-    indexes: [{ partitionKey: 'pk', sortKey: 'updatedAt' }],
+    indexes: [{ name: EVENT_DOC_LISTS_NEWEST_FIRST_INDEX, partitionKey: 'pk', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
     owner: options?.owner,

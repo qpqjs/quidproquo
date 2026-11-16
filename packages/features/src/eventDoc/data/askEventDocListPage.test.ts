@@ -44,7 +44,7 @@ describe('askEventDocListPage', () => {
 
     expect(captured?.keyValueStoreName).toBe(eventDocListsStoreName('content'));
     expect(captured?.keyCondition).toEqual({ key: 'pk', operation: 'Equal', valueA: 'summary#content' });
-    expect(captured?.options).toMatchObject({ indexName: 'pk', sortAscending: false });
+    expect(captured?.options).toMatchObject({ indexName: 'newestFirst', sortAscending: false });
   });
 
   it('hands back each row as a summary with its type, keeping the page cursor', () => {

@@ -35,7 +35,11 @@ describe('defineEventDocSummary', () => {
 
     expect(listsStore?.partitionKey.key).toBe('pk');
     expect(listsStore?.sortKeys.map((sortKey) => sortKey.key)).toEqual(['id']);
-    expect(listsStore?.indexes.map((index) => [index.name, index.partitionKey.key, index.sortKey?.key])).toEqual([['pk', 'pk', 'updatedAt']]);
+    expect(listsStore?.indexes.map((index) => [index.name, index.partitionKey.key, index.sortKey?.key])).toEqual([
+      ['newestFirst', 'pk', 'updatedAt'],
+    ]);
+    // DynamoDB refuses an index name under three characters, which the partition key's own name would be.
+    expect(listsStore?.indexes.every((index) => index.name.length >= 3)).toBe(true);
   });
 
   it('hands the projector its store name and snapshot map as config globals', () => {
