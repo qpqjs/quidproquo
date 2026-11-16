@@ -23,10 +23,11 @@ import { HTTPEvent } from '@qpqjs/webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { eventDocEventsStoreName, eventDocFunctionsName, eventDocStorageDriveName } from '../../eventDoc/constants';
+import { eventDocEventsStoreName, eventDocFunctionsName, eventDocListsStoreName, eventDocStorageDriveName } from '../../eventDoc/constants';
 import { eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode, EventDocSummary } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
+import { buildEventDocSummaryRow } from '../../eventDoc/testing/buildEventDocSummaryRow';
 import { eventDocTransferDiscardedPath, eventDocTransferImportPath } from '../constants/eventDocTransferBundlePath';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants/eventDocTransferDriveName';
 import {
@@ -174,10 +175,10 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
   const tableFor = (storeName: string): Record<string, unknown>[] => (tables[storeName] ??= []);
 
   const seedDoc = (type: string, events: EventDocEvent[], assets: { guid: string; data: QPQBinaryData }[] = []): void => {
-    const summary = { ...foldEventDocSummary(events), type };
+    const summary = foldEventDocSummary(events);
     const storeName = storeNameForType(type);
 
-    tableFor(storeName).push({ ...summary });
+    tableFor(eventDocListsStoreName(storeName)).push({ ...buildEventDocSummaryRow(type, summary) });
     events.forEach((seeded) =>
       tableFor(eventDocEventsStoreName(storeName)).push({ pk: summary.id, sk: seeded.payload.metadata.eventId, data: seeded }),
     );
@@ -280,7 +281,8 @@ const buildEnvironment = (environmentName: string, authorise = ''): TestEnvironm
       callLog.push(`kvs:delete:${keyValueStoreName}`);
       const table = tableFor(keyValueStoreName);
 
-      const index = table.findIndex((row) => (sortKey === undefined ? row.id === key : row.pk === key && row.sk === sortKey));
+      // The events store is keyed pk/sk and the lists store pk/id, so the sort key matches whichever the row carries.
+      const index = table.findIndex((row) => (sortKey === undefined ? row.id === key : row.pk === key && (row.sk === sortKey || row.id === sortKey)));
 
       if (index >= 0) {
         table.splice(index, 1);
@@ -409,8 +411,10 @@ const withoutActorIds = (events: EventDocEvent[]): EventDocEvent[] =>
     payload: { ...event.payload, metadata: { ...event.payload.metadata, createdBy: { ...event.payload.metadata.createdBy, userId: 'ANY' } } },
   }));
 
+// The summary as the lists store holds it, nested under its row's `state`.
 const summaryFor = (environment: TestEnvironment, type: string, docId: string): EventDocSummary =>
-  (environment.tables[storeNameForType(type)] ?? []).find((row) => row.id === docId) as unknown as EventDocSummary;
+  (environment.tables[eventDocListsStoreName(storeNameForType(type))] ?? []).find((row) => row.pk === `summary#${type}` && row.id === docId)
+    ?.state as unknown as EventDocSummary;
 
 describe('askEventDocManifest', () => {
   it('walks references recursively and visits a shared doc exactly once', () => {

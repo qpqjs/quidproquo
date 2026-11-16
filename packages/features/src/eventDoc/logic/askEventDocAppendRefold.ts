@@ -1,18 +1,20 @@
 import { AskResponse, Nullable } from '@qpqjs/core';
 
-import { EventDocEvent, EventDocSummary } from '../models';
-import { askEventDocSummaryRefold } from './askEventDocSummaryRefold';
-import { isEventDocReservedEffect } from './isEventDocReservedEffect';
+import { askEventDocStoreReadOrThrow } from '../context/askEventDocStoreReadOrThrow';
+import { EVENT_DOC_SUMMARY_VIEW } from '../definition/types/EventDocLatestViews';
+import { EventDocEvent, EventDocSummary, EventDocSummaryView } from '../models';
+import { askEventDocListViewsRefold } from './askEventDocListViewsRefold';
 
-// A reserved lifecycle event among the appended ones brings the summary row up to the last event before the
-// append returns, so a reader that follows it sees it; domain events leave the row to the stream projector.
-// Returns the refolded summary, or null when the row was left alone.
-export function* askEventDocAppendRefold(modelId: string, events: EventDocEvent[]): AskResponse<Nullable<EventDocSummary>> {
-  const lastEvent = events[events.length - 1];
+/**
+ * Bring every list view's row up to the last appended event before the append returns, so a reader that follows it
+ * sees it; the stream projector rewrites the rows after. `trusted` says the events passed the append gate. Returns the
+ * refolded summary for the append's hooks, or null when it could not be refolded.
+ */
+export function* askEventDocAppendRefold(modelId: string, events: EventDocEvent[], trusted: boolean): AskResponse<Nullable<EventDocSummary>> {
+  const { type } = yield* askEventDocStoreReadOrThrow();
+  const states = yield* askEventDocListViewsRefold(modelId, events, trusted);
+  const summary = states[EVENT_DOC_SUMMARY_VIEW];
 
-  if (!lastEvent || !events.some((event) => isEventDocReservedEffect(event.type))) {
-    return null;
-  }
-
-  return yield* askEventDocSummaryRefold(modelId, lastEvent.payload.metadata.eventId);
+  // The summary view's fold produced this state, so the cast restates provenance.
+  return summary ? { ...(summary as EventDocSummaryView), type } : null;
 }

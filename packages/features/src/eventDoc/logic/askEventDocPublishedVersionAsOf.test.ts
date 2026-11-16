@@ -15,6 +15,8 @@ import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide, buildEventDocStore } from '../context';
 import { EventDocEvent, EventDocSummary, EventDocVersion } from '../models';
+import { createEventDocSummarySeed } from '../summary/logic/createEventDocSummarySeed';
+import { buildEventDocSummaryRow } from '../testing/buildEventDocSummaryRow';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { askEventDocPublishedVersionAsOf } from './askEventDocPublishedVersionAsOf';
 
@@ -45,6 +47,8 @@ const buildEvent = (index: number): EventDocEvent => ({
 const EVENTS: EventDocEvent[] = [0, 1, 2, 3, 4, 5].map(buildEvent);
 
 const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): EventDocSummary => ({
+  // The base fields every view carries, at their starting values; the summary's own are set below.
+  ...createEventDocSummarySeed(),
   type: 'template',
   id: DOC_ID,
   code: 'tpl-1',
@@ -129,7 +133,7 @@ const resolveAsOf = (summary: EventDocSummary | null, clock: string) => {
           const upTo = skAtOrBefore(action.payload.keyCondition);
           return { items: storedEvents.filter((row) => upTo === undefined || row.sk <= upTo), nextPageKey: undefined };
         }
-        return { items: summary ? [summary] : [], nextPageKey: undefined };
+        return { items: summary ? [buildEventDocSummaryRow(summary.type, summary)] : [], nextPageKey: undefined };
       },
 
       [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) =>

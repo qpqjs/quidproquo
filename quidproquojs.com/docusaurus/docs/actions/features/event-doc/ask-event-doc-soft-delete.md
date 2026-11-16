@@ -82,17 +82,17 @@ The reserved `RESTORE` validator (`requireDeleted`) rejects a `RESTORE` on a doc
 
 ---
 
-## askEventDocDelete
+## askEventDocListViewsDelete
 
-**Hard delete** — permanently removes the document's summary row from the store. This is for internal cleanup/admin only; the public lifecycle uses soft delete (above). It does not touch the event log or the asset bucket, so a hard delete of the summary alone leaves orphaned events/assets — use deliberately.
+**Hard delete** — permanently removes the document's summary row and every declared list view's row from the lists store. This is for internal cleanup/admin only; the public lifecycle uses soft delete (above). It does not touch the event log or the asset bucket, so a hard delete of the rows alone leaves orphaned events/assets — use deliberately.
 
 ```typescript
-function* askEventDocDelete(id: string): AskResponse<void>;
+function* askEventDocListViewsDelete(id: string): AskResponse<void>;
 ```
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `id` | `string` | Id of the document whose summary row to delete. |
+| `id` | `string` | Id of the document whose rows to delete. |
 
 **Returns** `void`.
 

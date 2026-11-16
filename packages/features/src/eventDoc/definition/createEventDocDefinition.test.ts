@@ -340,6 +340,172 @@ describe('createEventDocDefinition secondary views', () => {
   });
 });
 
+// ─── List views ─────────────────────────────────────────────────────────────────────
+
+describe('createEventDocDefinition list views', () => {
+  type MemoStatsState = EventDocDocument & { edits: number };
+
+  const createInitialMemoStatsState = (): MemoStatsState => ({
+    ...createEventDocInitialDocumentState(1),
+    edits: 0,
+  });
+
+  const memoStatsFoldReducer = buildEventDocFoldReducer<MemoStatsState, MemoEffects>(createInitialMemoStatsState, {
+    [MemoEvent.SetBody]: (state) => ({ ...state, edits: state.edits + 1 }),
+  }) as QpqReducer<MemoStatsState, EventDocEvent>;
+
+  const statsV1 = { foldReducer: memoStatsFoldReducer, createInitialViewState: createInitialMemoStatsState };
+
+  const noEmptyBody = {
+    [MemoEvent.SetBody]: (event: EventDocEvent) => ((event.payload.data as { body: string }).body ? null : 'A memo body cannot be empty'),
+  };
+
+  const createListedDefinition = (withRules = false) =>
+    createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [{ version: 1, views: { document: memoDocumentV1, stats: statsV1 } }],
+      listViews: ['stats'],
+      ...(withRules ? { validators: noEmptyBody } : {}),
+      api: memoApi,
+    });
+
+  const INIT = serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0);
+
+  it('names the summary first, then its declared list views', () => {
+    expect(createListedDefinition().getListViewNames()).toEqual(['summary', 'stats']);
+    expect(createMemoDefinition().getListViewNames()).toEqual(['summary']);
+  });
+
+  it('folds the summary through the same call as any list view, resuming from the state it stored', () => {
+    const definition = createListedDefinition();
+
+    const first = definition.foldListView('summary', [INIT, serverEvent(MemoEvent.SetBody, { body: 'one' }, 1)], null, false);
+    const next = definition.foldListView('summary', [serverEvent(EventDocEffect.SetName, { name: 'Renamed' }, 2)], first, false);
+
+    // The base fields every view carries, plus the summary's own: who, the publish history, and the event it is at.
+    expect(first).toMatchObject({
+      id: 'memo-1',
+      name: 'Memo',
+      status: 'draft',
+      createdBy: 'server',
+      versions: [{ version: 1, eventId: 1 }],
+      eventId: 1,
+    });
+    expect(next).toMatchObject({ name: 'Renamed', updatedBy: 'server', versions: [{ version: 1, eventId: 2 }], eventId: 2 });
+    expect(definition.views.summary.fold([INIT, serverEvent(EventDocEffect.SetName, { name: 'Renamed' }, 1)]).name).toBe('Renamed');
+  });
+
+  it('folds a list view from scratch, then resumes it from the state it stored', () => {
+    const definition = createListedDefinition();
+
+    const first = definition.foldListView('stats', [INIT, serverEvent(MemoEvent.SetBody, { body: 'one' }, 1)], null, false) as MemoStatsState;
+    const next = definition.foldListView('stats', [serverEvent(MemoEvent.SetBody, { body: 'two' }, 2)], first, false) as MemoStatsState;
+
+    expect(first).toMatchObject({ id: 'memo-1', name: 'Memo', edits: 1 });
+    expect(next).toMatchObject({ id: 'memo-1', name: 'Memo', edits: 2 });
+  });
+
+  it('skips a repeated event and an edit to a published document, as the full fold would, from the view alone', () => {
+    const definition = createListedDefinition();
+    const edit = serverEvent(MemoEvent.SetBody, { body: 'one' }, 1);
+    const drafted = definition.foldListView('stats', [INIT, edit], null, false) as MemoStatsState;
+
+    const afterRetry = definition.foldListView(
+      'stats',
+      [{ ...edit, payload: { ...edit.payload, metadata: { ...edit.payload.metadata, eventId: 2 } } }],
+      drafted,
+      false,
+    );
+    const published = definition.foldListView(
+      'stats',
+      [serverEvent(EventDocEffect.Publish, { effectiveFrom: '2026-07-19T00:00:00.000Z' }, 3)],
+      drafted,
+      false,
+    );
+    const afterLateEdit = definition.foldListView('stats', [serverEvent(MemoEvent.SetBody, { body: 'late' }, 4)], published, false);
+
+    expect((afterRetry as MemoStatsState).edits).toBe(1);
+    expect((afterLateEdit as MemoStatsState).edits).toBe(1);
+  });
+
+  it('refuses untrusted events on a doc type with its own rules, which read the document, and folds trusted ones', () => {
+    const definition = createListedDefinition(true);
+    const events = [INIT, serverEvent(MemoEvent.SetBody, { body: 'one' }, 1)];
+
+    expect(definition.foldListView('stats', events, null, false)).toBeNull();
+    expect(definition.foldListView('stats', events, null, true)).toMatchObject({ edits: 1 });
+  });
+
+  it('folds nothing for a view that is not a list view', () => {
+    expect(createListedDefinition().foldListView('document', [INIT], null, true)).toBeNull();
+    expect(createListedDefinition().foldListView('nope', [INIT], null, true)).toBeNull();
+  });
+
+  it('climbs stored list view states to the latest schema for a reader', () => {
+    type MemoStatsV2 = MemoStatsState & { label: string };
+
+    const definition = createEventDocDefinition({
+      schemaVersion: 2,
+      versions: [
+        { version: 1, views: { document: memoDocumentV1, stats: statsV1 } },
+        {
+          version: 2,
+          views: {
+            document: { foldReducer: memoFoldReducer, migrateFromPrevious: (state: EventDocDocument) => state },
+            stats: {
+              foldReducer: memoStatsFoldReducer as unknown as QpqReducer<MemoStatsV2, EventDocEvent>,
+              migrateFromPrevious: (state: EventDocDocument) => ({ ...state, label: `${(state as MemoStatsState).edits} edits` }),
+            },
+          },
+        },
+      ],
+      listViews: ['stats'],
+      api: memoApi,
+    });
+
+    const stored = definition.foldListView('stats', [INIT, serverEvent(MemoEvent.SetBody, { body: 'one' }, 1)], null, false);
+
+    // The row holds the state as folded, at version 1; a list hands back the latest shape.
+    expect(stored).toMatchObject({ schemaVersion: 1, edits: 1 });
+    expect(definition.migrateListViewStates('stats', [stored])).toEqual([expect.objectContaining({ schemaVersion: 2, label: '1 edits' })]);
+  });
+
+  it('refuses a list view that is not declared, is the document, is the summary, or is named twice', () => {
+    const define = (listViews: string[]) => () =>
+      createEventDocDefinition({
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1, stats: statsV1 } }],
+        listViews: listViews as 'stats'[],
+        api: memoApi,
+      });
+
+    expect(define(['missing'])).toThrow(/not a declared view/);
+    expect(define(['document'])).toThrow(/cannot be a list view/);
+    expect(define(['summary'])).toThrow(/always a list view/);
+    expect(define(['stats', 'stats'])).toThrow(/named twice/);
+  });
+
+  it('refuses a view name or doc type holding the separator the lists store joins them with', () => {
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1, 'by#status': statsV1 } }],
+        api: memoApi,
+      }),
+    ).toThrow(/Rename it/);
+
+    expect(() =>
+      createEventDocDefinition({
+        storeName: 'memos',
+        type: 'memo#draft',
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+        api: memoApi,
+      }),
+    ).toThrow(/Rename it/);
+  });
+});
+
 describe('createEventDocDefinition validators', () => {
   // Appends no longer validate, so a rule that does not reach the FOLD is a rule nothing
   // applies. These pin that the definition carries them all the way there.

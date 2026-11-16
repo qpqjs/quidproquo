@@ -29,6 +29,7 @@ import {
   EVENT_DOC_TYPE_GLOBAL,
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
 } from '../eventDoc/constants/eventDocGlobalNames';
+import { eventDocListsStoreName } from '../eventDoc/constants/eventDocListsStoreName';
 import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
 import { EventDocEffect, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
@@ -182,6 +183,13 @@ const buildMocks = () => {
       if (action.payload.functionName === 'validateEvent') {
         return tenantRegistryEventDoc.validateEvent(action.payload.args[0], action.payload.args[1]);
       }
+      if (action.payload.functionName === 'getListViewNames') {
+        return tenantRegistryEventDoc.getListViewNames();
+      }
+      if (action.payload.functionName === 'foldListView') {
+        const [viewName, events, seedState, trusted] = action.payload.args as unknown as [string, never, unknown, boolean];
+        return tenantRegistryEventDoc.foldListView(viewName, events, seedState, trusted);
+      }
       throw new Error(`Unexpected dynamic function: ${action.payload.functionName}`);
     },
 
@@ -210,7 +218,7 @@ const buildMocks = () => {
 
     [KeyValueStoreActionType.Update]: createKvsUpdateMock({
       tableFor: (_scope, storeName) => (tables[storeName] ??= []),
-      keyName: 'type',
+      keyName: 'pk',
       sortKeyName: 'id',
     }),
 
@@ -390,9 +398,11 @@ describe('tenant feature', () => {
     const createResponse = runStory(create(httpEvent({ name: 'credit-corp' })), mocks);
     const summary = JSON.parse(createResponse.body!);
 
-    // Soft-delete the summary row directly (the remove route folds to the same shape).
-    const summaryRow = tables![TENANT_EVENTDOC_STORE]!.find((row) => row.id === summary.id)!;
+    // Soft-delete the summary row directly (the remove route folds to the same shape): on the summary itself, and on
+    // the row's own copy that a list filters on.
+    const summaryRow = tables![eventDocListsStoreName(TENANT_EVENTDOC_STORE)]!.find((row) => row.id === summary.id)!;
     summaryRow.deletedAt = '2026-07-11T01:00:00.000Z';
+    (summaryRow.state as Record<string, unknown>).deletedAt = '2026-07-11T01:00:00.000Z';
 
     const listResponse = runStory(list(httpEvent(undefined)), mocks);
     expect(JSON.parse(listResponse.body!)).toEqual([]);

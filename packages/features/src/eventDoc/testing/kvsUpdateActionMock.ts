@@ -51,6 +51,8 @@ const conditionHolds = (row: Row, operation: KvsQueryOperation): boolean => {
       return value === condition.valueA;
     case KvsQueryOperationType.LessThan:
       return value !== undefined && value !== null && value < (condition.valueA as number | string);
+    case KvsQueryOperationType.LessThanOrEqual:
+      return value !== undefined && value !== null && value <= (condition.valueA as number | string);
     default:
       throw new Error(`Test KVS mock does not support update condition: ${condition.operation}`);
   }

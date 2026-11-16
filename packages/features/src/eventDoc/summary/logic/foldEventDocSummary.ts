@@ -1,7 +1,11 @@
+import { foldEventDocListView } from '../../fold/foldEventDocListView';
 import { EventDocEvent, EventDocSummaryView } from '../../models';
-import { applyEventDocSummaryEvent } from './applyEventDocSummaryEvent';
-import { createEventDocSummarySeed } from './createEventDocSummarySeed';
+import { EVENT_DOC_SUMMARY_FOLD_CONFIG } from './eventDocSummaryFoldConfig';
 
-/** Reduce a log into the summary view from scratch. Pass the accepted events, not the raw log; `views.summary` does this. */
+/**
+ * Fold a whole log into the summary view without a doc type's definition, under the rules a view can judge alone
+ * (dedup, version floor, the reserved lifecycle guard). For code that only has the events: a transfer bundle, a
+ * collection with nothing registered.
+ */
 export const foldEventDocSummary = (events: EventDocEvent[]): EventDocSummaryView =>
-  events.reduce(applyEventDocSummaryEvent, createEventDocSummarySeed());
+  foldEventDocListView(EVENT_DOC_SUMMARY_FOLD_CONFIG, events, null, false) as EventDocSummaryView;

@@ -2,11 +2,11 @@ import { Nullable } from '@qpqjs/core';
 
 import { buildEventDocViewFoldConfig } from '../fold/buildEventDocViewFoldConfig';
 import { collectEventDocReferences } from '../fold/collectEventDocReferences';
+import { foldEventDocListView } from '../fold/foldEventDocListView';
 import { foldEventDocLog, foldEventDocLogAccepted, foldEventDocLogAsWritten, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { migrateEventDocDocumentTo } from '../fold/migrateEventDocDocumentTo';
-import { EventDocDocument, EventDocEvent, EventDocSnapshotViews, EventDocSummaryView } from '../models';
-import { applyEventDocSummaryEvent } from '../summary/logic/applyEventDocSummaryEvent';
-import { foldEventDocSummary } from '../summary/logic/foldEventDocSummary';
+import { EventDocDocument, EventDocEvent, EventDocListViewState, EventDocSnapshotViews } from '../models';
+import { withEventDocSummaryView } from '../summary/logic/withEventDocSummaryView';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { withEventDocSchemaVersionCeiling } from '../validation/withEventDocSchemaVersionCeiling';
@@ -17,6 +17,7 @@ import { EventDocDefinition, EventDocUnsavedDefinition, EventDocView } from './t
 import { EventDocSavedDefinitionConfig, EventDocUnsavedDefinitionConfig } from './types/EventDocDefinitionConfig';
 import { EVENT_DOC_PRIMARY_VIEW, EVENT_DOC_SUMMARY_VIEW } from './types/EventDocLatestViews';
 import { EventDocVersions } from './types/EventDocVersion';
+import { assertEventDocListViews } from './assertEventDocListViews';
 import { assertEventDocVersions } from './assertEventDocVersions';
 import { EventDocGenericApi, eventDocGenericApi } from './eventDocGenericApi';
 
@@ -58,6 +59,11 @@ export function createEventDocDefinition(
   const serverEventTypes = [...(config.serverEventTypes ?? [])];
 
   assertEventDocVersions(versions, schemaVersion);
+  assertEventDocListViews(config.listViews ?? [], Object.keys(versions[0].views), type);
+
+  // The summary is declared for every doc type, at every version, and is always a list view.
+  const allVersions = withEventDocSummaryView(versions);
+  const listViewNames: string[] = [EVENT_DOC_SUMMARY_VIEW, ...(config.listViews ?? [])];
 
   // Identity is both-or-neither: config reads {storeName, type} off the definition, and half an identity cannot resolve its stores.
   if (!storeName !== !type) {
@@ -77,43 +83,32 @@ export function createEventDocDefinition(
   // The primary view is the acceptance gate: every other view folds exactly the set it accepted, so views never disagree.
   const primaryFoldConfig = buildEventDocViewFoldConfig(versions, EVENT_DOC_PRIMARY_VIEW, schemaVersion, validators);
 
-  // Every doc gets a summary view: the fold of the reserved lifecycle events only, so it needs no version entries or migrations.
   const views: Record<string, EventDocView<unknown>> = {
-    [EVENT_DOC_SUMMARY_VIEW]: {
-      fold: (events: EventDocEvent[]) => foldEventDocSummary(foldEventDocLogAccepted(events, primaryFoldConfig).accepted),
-    },
+    [EVENT_DOC_PRIMARY_VIEW]: { fold: (events: EventDocEvent[]) => foldEventDocLog(events, primaryFoldConfig) },
   };
 
-  // Shared by the live views and the snapshot fold so the two cannot drift.
+  // Shared by the live views and the snapshot fold so the two cannot drift. The summary is one of these.
   const secondaryFoldConfigs: Record<string, FoldEventDocLogConfig<EventDocDocument>> = {};
 
-  Object.keys(versions[0].views).forEach((viewName) => {
-    if (viewName === EVENT_DOC_SUMMARY_VIEW) {
-      throw new Error(
-        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name, every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
-      );
-    }
-
-    if (viewName === EVENT_DOC_PRIMARY_VIEW) {
-      views[viewName] = { fold: (events: EventDocEvent[]) => foldEventDocLog(events, primaryFoldConfig) };
-      return;
-    }
-
-    // No validators here: the rules ran once on the gate, and a domain rule was never written against this view's shape.
-    const foldConfig = buildEventDocViewFoldConfig(versions, viewName, schemaVersion);
-    secondaryFoldConfigs[viewName] = foldConfig;
-    views[viewName] = {
-      fold: (events: EventDocEvent[]) => foldEventDocLog(foldEventDocLogAccepted(events, primaryFoldConfig).accepted, foldConfig),
-    };
-  });
+  Object.keys(allVersions[0]?.views ?? {})
+    .filter((viewName) => viewName !== EVENT_DOC_PRIMARY_VIEW)
+    .forEach((viewName) => {
+      // No validators here: the rules ran once on the gate, and a domain rule was never written against this view's shape.
+      const foldConfig = buildEventDocViewFoldConfig(allVersions, viewName, schemaVersion);
+      secondaryFoldConfigs[viewName] = foldConfig;
+      views[viewName] = {
+        fold: (events: EventDocEvent[]) => foldEventDocLog(foldEventDocLogAccepted(events, primaryFoldConfig).accepted, foldConfig),
+      };
+    });
 
   // Every view of one log prefix, era-pinned (no climb to latest): what a snapshot stores. With `seedViews` (a previous
   // snapshot), `events` is only the gap since it and every view resumes from its own seed. Returns null when the seed
-  // lacks a current view (one added since it was written); the caller then folds from scratch.
+  // lacks a current view (one added since it was written) or holds one that is not a folded view state (a snapshot
+  // from before the summary was an ordinary view); the caller then folds from scratch.
   const foldSnapshotViews = (events: EventDocEvent[], seedViews?: EventDocSnapshotViews): Nullable<EventDocSnapshotViews> => {
-    const viewNames = [EVENT_DOC_PRIMARY_VIEW, EVENT_DOC_SUMMARY_VIEW, ...Object.keys(secondaryFoldConfigs)];
+    const viewNames = [EVENT_DOC_PRIMARY_VIEW, ...Object.keys(secondaryFoldConfigs)];
 
-    if (seedViews && viewNames.some((viewName) => !(viewName in seedViews))) {
+    if (seedViews && viewNames.some((viewName) => typeof (seedViews[viewName] as Nullable<EventDocDocument>)?.schemaVersion !== 'number')) {
       return null;
     }
 
@@ -123,9 +118,6 @@ export function createEventDocDefinition(
 
     const snapshotViews: EventDocSnapshotViews = {
       [EVENT_DOC_PRIMARY_VIEW]: state,
-      [EVENT_DOC_SUMMARY_VIEW]: seedViews
-        ? accepted.reduce(applyEventDocSummaryEvent, seedViews[EVENT_DOC_SUMMARY_VIEW] as EventDocSummaryView)
-        : foldEventDocSummary(accepted),
     };
 
     Object.entries(secondaryFoldConfigs).forEach(([viewName, foldConfig]) => {
@@ -134,6 +126,25 @@ export function createEventDocDefinition(
     });
 
     return snapshotViews;
+  };
+
+  // A doc type's own rules read the document, so a list view cannot judge untrusted events against them from its row.
+  const hasDomainValidators = Object.keys(config.validators ?? {}).length > 0;
+
+  const foldListView = (viewName: string, events: EventDocEvent[], seedState: unknown, trusted: boolean): Nullable<EventDocListViewState> => {
+    const foldConfig = listViewNames.includes(viewName) ? secondaryFoldConfigs[viewName] : undefined;
+
+    if (!foldConfig || (hasDomainValidators && !trusted)) {
+      return null;
+    }
+
+    return foldEventDocListView(foldConfig, events, seedState, trusted);
+  };
+
+  const migrateListViewStates = (viewName: string, states: unknown[]): unknown[] => {
+    const foldConfig = secondaryFoldConfigs[viewName];
+
+    return foldConfig ? states.map((state) => migrateEventDocDocumentTo(state as EventDocDocument, schemaVersion, foldConfig.migrations)) : states;
   };
 
   // The document view at one point, latest-shaped. `seedState` must be an era-pinned stored state (a snapshot's
@@ -177,6 +188,9 @@ export function createEventDocDefinition(
     validateEvent: withEventDocSchemaVersionCeiling(schemaVersion, domainValidate),
     api: withGenericVerbs(api),
     views,
+    getListViewNames: () => listViewNames,
+    foldListView,
+    migrateListViewStates,
     foldSnapshotViews,
     foldDocumentState,
     references,

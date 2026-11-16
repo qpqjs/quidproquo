@@ -16,6 +16,7 @@ import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
+import { eventDocListsStoreName } from '../../constants/eventDocListsStoreName';
 import { eventDocSnapshotsStoreName } from '../../constants/eventDocSnapshotsStoreName';
 import { EventDocEffect, EventDocEvent, EventDocSnapshotViews } from '../../models';
 import { foldEventDocSummary } from '../../summary';
@@ -52,6 +53,14 @@ const LOG: EventDocEvent[] = [
 ];
 
 type Row = Record<string, unknown>;
+
+const LISTS_STORE = eventDocListsStoreName(STORE);
+
+// The document's summary as the lists store holds it: the row, and the summary nested under its `state`.
+const summaryRowOf = (tables: Record<string, Row[]>): Row | undefined =>
+  (tables[LISTS_STORE] ?? []).find((row) => String(row.pk).startsWith('summary#') && row.id === 'doc-1');
+
+const summaryOf = (tables: Record<string, Row[]>): Row | undefined => summaryRowOf(tables)?.state as Row | undefined;
 
 // Pull one sort-key condition of the given operation out of a query's key condition tree.
 const skCondition = (keyCondition: KvsQueryOperation, operation: KvsQueryOperationType): KvsQueryCondition | undefined => {
@@ -151,7 +160,7 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
       updates.push({ key: action.payload.key, scope: action.payload.options?.scope });
       return createKvsUpdateMock({
         tableFor: (_scope, storeName) => (tables[storeName] ??= []),
-        keyName: 'type',
+        keyName: 'pk',
         sortKeyName: 'id',
       })(action as any);
     },
@@ -186,6 +195,9 @@ const buildMocks = (streamPk: string, type = 'template', options?: { functionsNa
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return snapshotCacheKey;
       }
+      if (action.payload.functionName === 'getListViewNames') {
+        return ['summary'];
+      }
       const [events, seedViews] = action.payload.args;
       foldCalls.push({
         dynamicFunctionsName: action.payload.dynamicFunctionsName,
@@ -217,7 +229,7 @@ describe('projectEventDocSummary', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     expect(record).toBeDefined();
     // SET_NAME is folded, so the projection reflects the log rather than only INIT.
     expect(record!.name).toBe('Renamed');
@@ -233,7 +245,7 @@ describe('projectEventDocSummary', () => {
     expect(updates).toHaveLength(1);
     expect(updates![0]!.scope).toBe('tenant-a');
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     expect(record!.name).toBe('Renamed');
   });
 
@@ -243,7 +255,7 @@ describe('projectEventDocSummary', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined, 'layout')), mocks);
 
-    expect(updates![0]!.key).toBe('layout');
+    expect(updates![0]!.key).toBe('summary#layout');
   });
 
   it('skips a record with no collection type rather than guessing one', () => {
@@ -294,7 +306,7 @@ describe('projectEventDocSummary snapshots', () => {
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     // The fake fold's sentinel, NOT the log's 'Renamed', one incremental fold now
     // feeds both the snapshot set and the queryable record.
     expect(record!.name).toBe('from-fold');
@@ -306,28 +318,38 @@ describe('projectEventDocSummary snapshots', () => {
     // The record starts soft-deleted; the fold's summary view carries no deletedAt (a
     // RESTORE landed), so the attribute must be REMOVED, the list read hides deleted
     // rows by attribute existence, and a stale flag would hide the doc forever.
-    tables[STORE] = [{ type: 'template', id: 'doc-1', name: 'old', deletedAt: '2026-07-01T00:00:00.000Z' }];
+    tables[LISTS_STORE] = [
+      {
+        pk: 'summary#template',
+        id: 'doc-1',
+        updatedAt: '2026-07-01T00:00:00.000Z',
+        deletedAt: '2026-07-01T00:00:00.000Z',
+        eventId: 0,
+        state: { name: 'old', deletedAt: '2026-07-01T00:00:00.000Z' },
+      },
+    ];
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     expect(record!.name).toBe('from-fold');
-    expect('deletedAt' in record!).toBe(false);
+    expect('deletedAt' in summaryRowOf(tables)!).toBe(false);
 
     // And the inverse: a view carrying deletedAt lands it on the row.
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) =>
       action.payload.functionName === 'getSnapshotCacheKey'
         ? ''
-        : {
-            document: {},
-            summary: { ...foldEventDocSummary(action.payload.args[0]), name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
-          };
+        : action.payload.functionName === 'getListViewNames'
+          ? ['summary']
+          : {
+              document: {},
+              summary: { ...foldEventDocSummary(action.payload.args[0]), name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
+            };
     // A fresh event id so the seed-at-event replay skip doesn't short-circuit the fold.
     tables![eventDocEventsStoreName(STORE)]!.push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
     runStory(projectEventDocSummary({ ...streamRecord(undefined), keys: { pk: 'doc-1', sk: eventId(2) } }), mocks);
 
-    const deleted = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
-    expect(deleted!.deletedAt).toBe('2026-07-30T00:00:00.000Z');
+    expect(summaryRowOf(tables)!.deletedAt).toBe('2026-07-30T00:00:00.000Z');
   });
 
   it('folds the PREFIX up to the stream record, not the whole log', () => {
@@ -365,7 +387,7 @@ describe('projectEventDocSummary snapshots', () => {
     expect(foldCalls).toHaveLength(0);
     expect(tables[SNAPSHOTS_STORE]).toBeUndefined();
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     // From the log ('Renamed'), not the registered fold's sentinel ('from-fold').
     expect(record!.name).toBe('Renamed');
   });
@@ -383,8 +405,8 @@ describe('projectEventDocSummary snapshots', () => {
     runStory(projectEventDocSummary({ ...streamRecord(undefined), eventType: KvsStreamEventType.Remove }), mocks);
 
     expect(updates).toHaveLength(0);
-    expect(tables[STORE]).toBeUndefined();
-    expect(deletes).toEqual([{ keyValueStoreName: STORE, key: 'template', sortKey: 'doc-1', options: { scope: undefined } }]);
+    expect(tables[LISTS_STORE]).toBeUndefined();
+    expect(deletes).toEqual([{ keyValueStoreName: LISTS_STORE, key: 'summary#template', sortKey: 'doc-1', options: { scope: undefined } }]);
   });
 
   it('offloads a state over the inline cap to the blob drive, row recording only that', () => {
@@ -392,7 +414,11 @@ describe('projectEventDocSummary snapshots', () => {
 
     // A fold whose document state cannot fit a KVS row.
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) =>
-      action.payload.functionName === 'getSnapshotCacheKey' ? '' : { document: { huge: 'x'.repeat(301 * 1024) } };
+      action.payload.functionName === 'getSnapshotCacheKey'
+        ? ''
+        : action.payload.functionName === 'getListViewNames'
+          ? ['summary']
+          : { document: { huge: 'x'.repeat(301 * 1024) } };
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
@@ -436,8 +462,13 @@ describe('projectEventDocSummary incremental snapshots', () => {
   const FOLD_FN = 'foldTemplateSnapshot';
 
   const seedRowsAt = (sk: number): Row[] => [
-    { pk: 'doc-1#summary', sk, type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
-    { pk: 'doc-1#document', sk, type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
+    { pk: 'doc-1#summary', sk, type: 'template', data: { type: 'inline', snapshot: { schemaVersion: 1, seedSummary: true } } },
+    {
+      pk: 'doc-1#document',
+      sk,
+      type: 'template',
+      data: { type: 'inline', snapshot: { schemaVersion: 1, seedDocument: true }, views: ['document', 'summary'] },
+    },
   ];
 
   it('files every row and offloaded blob under the definition snapshot cache key, and ignores seeds filed under another key', () => {
@@ -448,6 +479,9 @@ describe('projectEventDocSummary incremental snapshots', () => {
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) => {
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return 'k2';
+      }
+      if (action.payload.functionName === 'getListViewNames') {
+        return ['summary'];
       }
       const [events, seedViews] = action.payload.args;
       foldCalls.push({
@@ -493,7 +527,10 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
     expect(foldCalls).toHaveLength(1);
     expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
-    expect(foldCalls![0]!.input.seedViews).toEqual({ document: { seedDocument: true }, summary: { seedSummary: true } });
+    expect(foldCalls![0]!.input.seedViews).toEqual({
+      document: { schemaVersion: 1, seedDocument: true },
+      summary: { schemaVersion: 1, seedSummary: true },
+    });
 
     // The new snapshot lands at the target event, alongside the seed rows.
     const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
@@ -522,7 +559,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
         pk: 'doc-1#document',
         sk: eventId(1),
         type: 'template',
-        data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] },
+        data: { type: 'inline', snapshot: { schemaVersion: 1, seedDocument: true }, views: ['document', 'summary'] },
       },
     ];
 
@@ -531,7 +568,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
     expect(foldCalls).toHaveLength(0);
     expect(upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE)).toHaveLength(0);
 
-    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    const record = summaryOf(tables);
     expect(record!.name).toBe('from-seed');
   });
 
@@ -544,6 +581,9 @@ describe('projectEventDocSummary incremental snapshots', () => {
     mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) => {
       if (action.payload.functionName === 'getSnapshotCacheKey') {
         return '';
+      }
+      if (action.payload.functionName === 'getListViewNames') {
+        return ['summary'];
       }
       const [events, seedViews] = action.payload.args;
       foldCalls.push({
@@ -570,7 +610,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
     // not seeds; the next full fold rewrites them with one.
     const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
-      { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedDocument: true } } },
+      { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { schemaVersion: 1, seedDocument: true } } },
     ];
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
@@ -583,14 +623,17 @@ describe('projectEventDocSummary incremental snapshots', () => {
   it('resolves an offloaded seed state from the blob drive', () => {
     const { mocks, tables, blobs, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
-      { pk: 'doc-1#summary', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
+      { pk: 'doc-1#summary', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { schemaVersion: 1, seedSummary: true } } },
       { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'storageDrive', views: ['document', 'summary'] } },
     ];
-    blobs[`doc-1/snapshots/document/${eventId(0)}`] = JSON.stringify({ offloadedDocument: true });
+    blobs[`doc-1/snapshots/document/${eventId(0)}`] = JSON.stringify({ schemaVersion: 1, offloadedDocument: true });
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
-    expect(foldCalls![0]!.input.seedViews).toEqual({ document: { offloadedDocument: true }, summary: { seedSummary: true } });
+    expect(foldCalls![0]!.input.seedViews).toEqual({
+      document: { schemaVersion: 1, offloadedDocument: true },
+      summary: { schemaVersion: 1, seedSummary: true },
+    });
     expect(foldCalls![0]!.input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
   });
 });

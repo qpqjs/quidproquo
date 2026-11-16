@@ -20,6 +20,7 @@ export * from './EventDocInitData';
 export * from './EventDocLink';
 export * from './EventDocLinkMode';
 export * from './EventDocListItem';
+export * from './EventDocListViewState';
 export * from './EventDocOnAppendInput';
 export * from './EventDocOnPublishInput';
 export * from './EventDocPublishData';

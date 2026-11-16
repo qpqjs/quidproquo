@@ -11,6 +11,7 @@ import {
   EVENT_DOC_SYNC_WEBSOCKET_API_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
 } from '../constants/eventDocGlobalNames';
+import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide } from '../context/askEventDocStoreProvide';
 import { toSyncWebsocketApiNames } from '../context/toSyncWebsocketApiNames';
@@ -40,6 +41,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
       eventsStoreName,
       // Derived from the store name rather than read from a global, so every route resolves it.
       snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
+      listsStoreName: eventDocListsStoreName(storeName),
       type,
       storageDriveName,
       onPublish,

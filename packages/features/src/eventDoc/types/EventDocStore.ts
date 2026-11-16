@@ -3,6 +3,7 @@ export type EventDocStore = {
   storeName: string;
   eventsStoreName: string;
   snapshotsStoreName: string;
+  listsStoreName: string;
   type: string;
   storageDriveName: string;
   // Inline-function names, see EventDocRoutesOptions.

@@ -11,8 +11,8 @@ import { askEventDocSendHeadMoved } from './askEventDocSendHeadMoved';
 /**
  * Append a burst of server-authored events as one conditional transaction claiming head + 1 .. head + n
  * (input order is log order); a Conflict re-laps on a fresh head. Runs no hooks and rejects stores that have them,
- * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt. A batch
- * holding a reserved lifecycle event brings the summary row up to its last event before returning.
+ * rejects Publish events, and skips validation unless `validate: true`. Every event shares one createdAt. Every list
+ * view row is brought up to the batch's last event before returning.
  */
 export function* askEventDocAppendServerEvents(
   modelId: string,
@@ -59,7 +59,7 @@ export function* askEventDocAppendServerEvents(
     contentionText: `Could not append ${inputs.length} events to model ${modelId}: lost the slot race ${EVENT_DOC_APPEND_MAX_RETRIES} times - another writer is on this document.`,
   });
 
-  yield* askEventDocAppendRefold(modelId, events);
+  yield* askEventDocAppendRefold(modelId, events, options.validate);
 
   // One push for the batch, at its last event. Best-effort, as in the single append.
   const lastEvent = events[events.length - 1];

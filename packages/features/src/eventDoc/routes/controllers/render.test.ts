@@ -19,6 +19,8 @@ import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
 import { buildEventDocStore } from '../../context/buildEventDocStore';
 import { buildEventDocStoreGlobals } from '../../globals/buildEventDocStoreGlobals';
 import { EventDocEvent, EventDocRenderInput, EventDocRenderKind, EventDocRenderMode, EventDocSummary, EventDocVersion } from '../../models';
+import { createEventDocSummarySeed } from '../../summary/logic/createEventDocSummarySeed';
+import { buildEventDocSummaryRow } from '../../testing/buildEventDocSummaryRow';
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 import { render } from './render';
 
@@ -69,6 +71,8 @@ const VERSION_1: EventDocVersion = {
 const VERSION_DRAFT: EventDocVersion = { version: 2, eventId: eventId(3) };
 
 const buildSummary = (versions: EventDocVersion[]): EventDocSummary => ({
+  // The base fields every view carries, at their starting values; the summary's own are set below.
+  ...createEventDocSummarySeed(),
   type: 'template',
   id: DOC_ID,
   code: 'tpl-1',
@@ -133,7 +137,7 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
         const sorted = [...matching].sort((a, b) => (a.sk - b.sk) * (ascending ? 1 : -1));
         return { items: sorted.slice(0, action.payload.options?.limit), nextPageKey: undefined };
       }
-      return { items: [buildSummary(versions)], nextPageKey: undefined };
+      return { items: [buildEventDocSummaryRow('template', buildSummary(versions))], nextPageKey: undefined };
     },
     [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
       expect(action.payload.dynamicFunctionsName).toBe(FUNCTIONS_NAME);

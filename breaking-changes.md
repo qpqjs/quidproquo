@@ -5,6 +5,18 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features`: an event doc collection's summaries now live in a new lists store (`${storeName}Lists`, pk `viewName#type`, sk `id`, the summary nested under `state`), written and read by the same code as every other list view. `defineEventDocSummary` declares it beside the events and snapshots stores. The store under the bare name stays declared and is no longer read or written, so after deploying, every existing document is missing from lists and lookups by id or code until it is reprojected (`askEventDocReprojectHead`). Do not create by code (`askEventDocGetByCodeOrCreate`) until that has run, or it creates a second document with the same code.
+- `@qpqjs/features`: `askEventDocSummaryViewWrite(modelId, view)` is removed. Use `askEventDocListViewWrite(modelId, EVENT_DOC_SUMMARY_VIEW, eventId, view, options?)`.
+- `@qpqjs/features`: `askEventDocDelete(id)` is removed. Use `askEventDocListViewsDelete(id)`, which deletes the summary row and every declared list view's row.
+- `@qpqjs/features`: `askEventDocSummaryRefold` is removed. The summary is refolded by the same call as every list view: `askEventDocListViewRefold(modelId, EVENT_DOC_SUMMARY_VIEW, appendedEvents, trusted)`. `askEventDocAppendRefold(modelId, events)` takes a third argument, `trusted` (whether the events passed the append gate).
+- `@qpqjs/features`: the summary is now an ordinary view, declared for every doc type at every version, so `EventDocSummaryView` (and `EventDocSummary`) gain the base fields every view carries: `schemaVersion`, `documentVersion`, `status`, and the optional `deletedBy` and `recentClientMessageIds`. Nothing is removed. A hand-built summary must set them (spread `createEventDocSummarySeed()`), and an unfolded summary now has an empty `id`, `code` and `name` where it had `NO_INIT`.
+- `@qpqjs/features`: `applyEventDocSummaryEvent` is removed, along with the summary state updaters `setSummaryCode`, `setSummaryName`, `deleteSummary` and `restoreSummary` (the base reducer every view shares folds those events). Fold a summary with `foldEventDocSummary(events)`, or through a definition's `views.summary.fold` or `foldListView`.
+- `@qpqjs/features`: `foldEventDocSummary(events)` now skips the events a view can reject on its own (a repeated `clientMessageId`, an event below the document's schema version, an edit to a published or deleted document), where it applied every event it was given.
+- `@qpqjs/features`: a snapshot written before this release holds a summary with no `schemaVersion` and is no longer used as a seed, so each document is folded from the start of its log the first time it is projected.
+- `@qpqjs/features`: every append now brings the summary row up to date before it returns, not only an append of a lifecycle event, so each append adds one read and one write of the lists store.
+- `@qpqjs/features`: `EventDocStore` gains a required `listsStoreName`. Build stores with `buildEventDocStore`, which derives it.
+- `@qpqjs/features`: a doc type or view name holding `#` now throws when its definition is created.
+
 ## 0.8.0
 
 - `@qpqjs/deploy-aws`: a storage drive lifecycle rule with `deleteAfterDays` now also removes the old versions a delete, an overwrite or the expiry leaves hidden in the versioned bucket, 7 days after they are hidden, so the delete is permanent as documented. Drive buckets used to keep every hidden version forever, still billed. The first deploy permanently removes hidden versions older than 7 days in those drives, including the admin logs under `defineAdminSettings({ logRetentionDays })`.

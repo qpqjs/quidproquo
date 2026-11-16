@@ -1,6 +1,6 @@
 import { AskResponse, Nullable } from '@qpqjs/core';
 
-import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult, EventDocSnapshotViews } from '../../models';
+import { EventDocEvent, EventDocLink, EventDocListViewState, EventDocRenderInput, EventDocRenderResult, EventDocSnapshotViews } from '../../models';
 import { EventDocSyncOptions } from '../../types/EventDocSyncOptions';
 
 /**
@@ -19,6 +19,16 @@ export type EventDocFunctions = {
 
   // The event types only server code may append; the client append path refuses them. Absent reads as none.
   getServerEventTypes?: () => string[];
+
+  // The views kept as rows in the lists store, `summary` among them. Absent reads as the summary alone.
+  getListViewNames?: () => string[];
+
+  // One list view's state after `events`, resumed from a stored row's state. Null when it cannot be folded from the
+  // view alone (see EventDocDefinition.foldListView). Invoked by the append path. Absent folds the summary alone.
+  foldListView?: (viewName: string, events: EventDocEvent[], seedState: unknown, trusted: boolean) => Nullable<EventDocListViewState>;
+
+  // Stored list view states climbed to the latest schema. Invoked by the list route. Absent leaves them as stored.
+  migrateListViewStates?: (viewName: string, states: unknown[]) => unknown[];
 
   // Every view of the log prefix, era-pinned: what a snapshot stores. Invoked by the event store's stream projector.
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;

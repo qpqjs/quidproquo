@@ -4,6 +4,7 @@ import { runStory } from '@qpqjs/testing';
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { EventDocFunctions } from '../definition/types/EventDocFunctions';
 import { createEventDocBackend } from './createEventDocBackend';
@@ -43,11 +44,11 @@ describe('createEventDocBackend', () => {
     runStory(backend.askProvideStore(backend.askGetByIdOrThrow('doc-1')), {
       [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) => {
         queriedStores.push(action.payload.keyValueStoreName);
-        return { items: [{ id: 'doc-1', type: 'memo' }], nextPageKey: undefined };
+        return { items: [{ pk: 'summary#memo', id: 'doc-1', eventId: 0, state: { id: 'doc-1' } }], nextPageKey: undefined };
       },
     });
 
-    expect(queriedStores).toEqual(['memos']);
+    expect(queriedStores).toEqual([eventDocListsStoreName('memos')]);
   });
 
   it('carries the definition sync option into the store context, so backend appends push head-moved', () => {
