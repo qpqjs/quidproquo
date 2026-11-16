@@ -10,6 +10,7 @@ export const createInitialEventDocListState = (): EventDocListState => ({
   entityLabel: '',
   editBasePath: '',
   listBasePath: '',
+  listView: '',
   canTransfer: false,
   canCreate: false,
   items: [],

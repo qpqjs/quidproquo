@@ -2,25 +2,38 @@ import { AskResponse, askThrowError, ErrorTypeEnum, Nullable, QpqPagedData } fro
 import { askApiRequest } from '@qpqjs/webserver';
 
 import { EventDocSummary } from '../../models';
+import { EventDocListRow } from '../types/EventDocListRow';
 import { eventDocListCollectionEndpoint } from './eventDocListCollectionEndpoint';
 
-/** GET {basePath}: fetches one page of summaries, newest first. No cursor means the first page. */
-export function* askEventDocListFetch(
+/** Options for askEventDocListFetch. */
+export type EventDocListFetchOptions = {
+  limit?: number;
+  nextPageKey?: Nullable<string>;
+  // The list view to read. Absent or empty means the summary.
+  view?: string;
+};
+
+/**
+ * GET {basePath}: fetches one page of a collection's list view, newest first. No cursor means the first page, and no
+ * view means summaries, which is what the result is typed as unless the caller says otherwise.
+ */
+export function* askEventDocListFetch<TRow extends EventDocListRow = EventDocSummary>(
   serviceName: string,
   basePath: string,
-  options?: { limit?: number; nextPageKey?: Nullable<string> },
-): AskResponse<QpqPagedData<EventDocSummary>> {
+  options?: EventDocListFetchOptions,
+): AskResponse<QpqPagedData<TRow>> {
   const params: Record<string, string> = {};
-
   if (options?.limit !== undefined) {
     params.limit = String(options.limit);
   }
-
   if (options?.nextPageKey) {
     params.nextPageKey = options.nextPageKey;
   }
+  if (options?.view) {
+    params.view = options.view;
+  }
 
-  const response = yield* askApiRequest<QpqPagedData<EventDocSummary>, void>(
+  const response = yield* askApiRequest<QpqPagedData<TRow>, void>(
     serviceName,
     'GET',
     eventDocListCollectionEndpoint(basePath),

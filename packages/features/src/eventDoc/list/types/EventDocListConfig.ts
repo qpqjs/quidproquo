@@ -8,8 +8,11 @@ export type EventDocListConfig = {
   entityLabel: string;
   // Base path the editor is opened against when doc CRUD lives elsewhere than the create route. Empty means basePath.
   editBasePath: string;
-  // Base path the summary list is fetched from when it differs from the create route. Empty means basePath.
+  // Base path the list is fetched from when it differs from the create route. Empty means basePath.
   listBasePath: string;
+  // The list view the rows are read from (see EventDocSavedDefinitionConfig.listViews). Empty means the summary.
+  // What a row then holds, and how it is drawn, is the host's business.
+  listView: string;
   // Whether the collection's service mounts defineEventDocTransfer; Export/Import would 404 otherwise.
   canTransfer: boolean;
   // Whether people create docs from the list (New). False for collections the platform writes itself
