@@ -20,7 +20,11 @@ describe('askCryptoSignJwt', () => {
     // eyJzdWIiOiJjbGllbnQtMSIsImV4cCI6MTcwMDAwMDAwMH0 = {"sub":"client-1","exp":1700000000}
     expect(token).toBe('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbGllbnQtMSIsImV4cCI6MTcwMDAwMDAwMH0.c2ln');
     expect(seen).toEqual([
-      { keyName: 'my-signing-key', message: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbGllbnQtMSIsImV4cCI6MTcwMDAwMDAwMH0' },
+      {
+        keyName: 'my-signing-key',
+        message: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbGllbnQtMSIsImV4cCI6MTcwMDAwMDAwMH0',
+        messageEncoding: 'utf8',
+      },
     ]);
   });
 });

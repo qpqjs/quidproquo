@@ -14,7 +14,7 @@ import { getOrSeedSigningKeyPair } from '../../../logic/signingKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoVerify = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoVerify> => {
-  return async ({ keyName, message, signature }) => {
+  return async ({ keyName, message, signature, messageEncoding }) => {
     const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(keyName, qpqConfig);
     if (!signingKeyConfig) {
       return actionResultError(
@@ -26,12 +26,13 @@ const getProcessCryptoVerify = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
     try {
       const { publicKeyPem } = await getOrSeedSigningKeyPair(devServerConfig.runtimePath, keyName, qpqConfig);
 
-      return actionResult(rs256Verify(publicKeyPem, message, signature));
+      return actionResult(rs256Verify(publicKeyPem, message, signature, messageEncoding));
     } catch (error: unknown) {
       // A malformed signature must be distinguishable from a bad one in dev
       // exactly as it is in prod
       return actionResultErrorFromCaughtError(error, {
         QpqSigningMalformedSignature: (e) => actionResultError(askCryptoVerify.errorType.MalformedSignature, e.message),
+        QpqSigningMalformedMessage: (e) => actionResultError(askCryptoVerify.errorType.MalformedMessage, e.message),
       });
     }
   };

@@ -13,6 +13,9 @@ import {
 import { askSmokeAssert } from '../../../harness/assert/askSmokeAssert';
 
 const PUBLIC_KEY_PEM_HEADER = '-----BEGIN PUBLIC KEY-----';
+// The bytes 31 81 ff 00 a0 as base64: not valid UTF-8, so only a signer that
+// decodes the base64 can sign them.
+const SMOKE_BINARY_MESSAGE_BASE64 = 'MYH/AKA=';
 
 // Every signing-key action against the owned key: kms:Sign (askCryptoSign /
 // askCryptoSignJwt) and kms:GetPublicKey (askCryptoGetPublicKey, and the
@@ -29,6 +32,14 @@ export function* askRunSigningKeyTest(runId: string): AskResponse<void> {
 
   const verified = yield* askCryptoVerify(SMOKE_PROBE_SIGNING_KEY, message, signature);
   yield* askSmokeAssert(verified, 'raw signature did not verify');
+
+  // Binary data travels as base64 and the signature covers the decoded bytes,
+  // so the same string checked as text must not verify.
+  const binarySignature = yield* askCryptoSign(SMOKE_PROBE_SIGNING_KEY, SMOKE_BINARY_MESSAGE_BASE64, 'base64');
+  const binaryVerified = yield* askCryptoVerify(SMOKE_PROBE_SIGNING_KEY, SMOKE_BINARY_MESSAGE_BASE64, binarySignature, 'base64');
+  yield* askSmokeAssert(binaryVerified, 'signature over a base64 message did not verify');
+  const verifiedAsText = yield* askCryptoVerify(SMOKE_PROBE_SIGNING_KEY, SMOKE_BINARY_MESSAGE_BASE64, binarySignature);
+  yield* askSmokeAssert(!verifiedAsText, 'signature over decoded bytes verified against the base64 text');
 
   const now = yield* askGetCurrentEpoch();
 

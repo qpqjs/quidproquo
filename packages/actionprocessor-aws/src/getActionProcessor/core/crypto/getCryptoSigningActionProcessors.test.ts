@@ -38,7 +38,9 @@ describe('signing key action processors (aws)', () => {
 
   describe('askCryptoSign', () => {
     it('resolves the alias, signs via KMS and returns the signature as base64url', async () => {
-      vi.mocked(signWithKey).mockImplementation(async (_alias: any, message: any) => Buffer.from(rs256Sign(privateKeyPem, message), 'base64url'));
+      vi.mocked(signWithKey).mockImplementation(async (_alias: any, message: any) =>
+        Buffer.from(rs256Sign(privateKeyPem, message.toString('utf8')), 'base64url'),
+      );
       const { sign } = await resolveProcessors();
 
       const [signature, error] = await invokeProcessor(sign!, { keyName: 'my-key', message: 'header.payload' });
@@ -46,7 +48,7 @@ describe('signing key action processors (aws)', () => {
       expect(error).toBeUndefined();
       expect(signature).toMatch(/^[A-Za-z0-9_-]+$/);
       expect(rs256Verify(publicKeyPem, 'header.payload', signature!)).toBe(true);
-      expect(signWithKey).toHaveBeenCalledWith(EXPECTED_ALIAS, 'header.payload', 'eu-west-1');
+      expect(signWithKey).toHaveBeenCalledWith(EXPECTED_ALIAS, Buffer.from('header.payload'), 'eu-west-1');
     });
 
     it('returns KeyNotConfigured without touching KMS when the key is not in config', async () => {

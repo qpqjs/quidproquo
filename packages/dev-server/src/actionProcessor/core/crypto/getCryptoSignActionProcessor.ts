@@ -14,7 +14,7 @@ import { getOrSeedSigningKeyPair } from '../../../logic/signingKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoSign> => {
-  return async ({ keyName, message }) => {
+  return async ({ keyName, message, messageEncoding }) => {
     const signingKeyConfig = qpqCoreUtils.getSigningKeyByName(keyName, qpqConfig);
     if (!signingKeyConfig) {
       return actionResultError(
@@ -32,10 +32,13 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
     try {
       const { privateKeyPem } = await getOrSeedSigningKeyPair(devServerConfig.runtimePath, keyName, qpqConfig);
 
-      return actionResult(rs256Sign(privateKeyPem, message));
+      return actionResult(rs256Sign(privateKeyPem, message, messageEncoding));
     } catch (error: unknown) {
-      // No local failure maps to a catalog entry here; anything thrown becomes GenericError.
-      return actionResultErrorFromCaughtError(error);
+      // A message that is not the base64 it claims to be must fail in dev exactly
+      // as it does in prod; anything else thrown becomes GenericError.
+      return actionResultErrorFromCaughtError(error, {
+        QpqSigningMalformedMessage: (e) => actionResultError(askCryptoSign.errorType.MalformedMessage, e.message),
+      });
     }
   };
 };

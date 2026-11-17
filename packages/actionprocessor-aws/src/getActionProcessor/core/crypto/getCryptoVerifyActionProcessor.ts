@@ -18,7 +18,7 @@ import { resolveSigningKeyAlias } from './utils';
 // Verifies locally against the cached public key rather than calling kms:Verify,
 // so the hot path (every authenticated request) costs no KMS round trip.
 const getProcessCryptoVerify = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryptoVerify> => {
-  return async ({ keyName, message, signature }) => {
+  return async ({ keyName, message, signature, messageEncoding }) => {
     const keyAlias = resolveSigningKeyAlias(keyName, qpqConfig);
     if (!keyAlias) {
       return actionResultError(askCryptoVerify.errorType.KeyNotConfigured, signingKeyNotConfiguredMessage(keyName));
@@ -28,11 +28,12 @@ const getProcessCryptoVerify = (qpqConfig: QPQConfig): ProcessorFor<typeof askCr
 
     try {
       const publicKeyPem = await getCachedPublicKey(keyAlias, region);
-      return actionResult(rs256Verify(publicKeyPem, message, signature));
+      return actionResult(rs256Verify(publicKeyPem, message, signature, messageEncoding));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         ...transientErrorMap(),
         QpqSigningMalformedSignature: (e) => actionResultError(askCryptoVerify.errorType.MalformedSignature, e.message),
+        QpqSigningMalformedMessage: (e) => actionResultError(askCryptoVerify.errorType.MalformedMessage, e.message),
         ...kmsSigningErrorMap(askCryptoVerify.errorType, keyName),
       });
     }

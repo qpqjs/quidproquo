@@ -1,4 +1,4 @@
-import { base64UrlEncode } from '@qpqjs/actionprocessor-node';
+import { base64UrlEncode, decodeSigningMessage } from '@qpqjs/actionprocessor-node';
 import { qpqConfigAwsUtils } from '@qpqjs/config-aws';
 import {
   actionResult,
@@ -15,7 +15,7 @@ import { kmsSigningErrorMap, signingKeyNotConfiguredMessage } from './utils';
 import { resolveSigningKeyAlias } from './utils';
 
 const getProcessCryptoSign = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryptoSign> => {
-  return async ({ keyName, message }) => {
+  return async ({ keyName, message, messageEncoding }) => {
     const keyAlias = resolveSigningKeyAlias(keyName, qpqConfig);
     if (!keyAlias) {
       return actionResultError(askCryptoSign.errorType.KeyNotConfigured, signingKeyNotConfiguredMessage(keyName));
@@ -24,10 +24,13 @@ const getProcessCryptoSign = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryp
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
-      const signature = await signWithKey(keyAlias, message, region);
+      const signature = await signWithKey(keyAlias, decodeSigningMessage(message, messageEncoding), region);
       return actionResult(base64UrlEncode(signature));
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, kmsSigningErrorMap(askCryptoSign.errorType, keyName));
+      return actionResultErrorFromCaughtError(error, {
+        QpqSigningMalformedMessage: (e) => actionResultError(askCryptoSign.errorType.MalformedMessage, e.message),
+        ...kmsSigningErrorMap(askCryptoSign.errorType, keyName),
+      });
     }
   };
 };

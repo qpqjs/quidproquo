@@ -5,8 +5,8 @@ import { KMSClient, SignCommand } from '@aws-sdk/client-kms';
 import { createAwsClient } from '../createAwsClient';
 
 // One kms:Sign per call: the private key never leaves KMS, so there is nothing
-// to cache here. Returns the raw signature bytes.
-export const signWithKey = async (keyAlias: string, message: string, region: string): Promise<Buffer> => {
+// to cache here. Takes the exact bytes to sign and returns the raw signature bytes.
+export const signWithKey = async (keyAlias: string, message: Buffer, region: string): Promise<Buffer> => {
   const kmsClient = createAwsClient(KMSClient, {
     region,
   });
@@ -14,7 +14,7 @@ export const signWithKey = async (keyAlias: string, message: string, region: str
   const response = await kmsClient.send(
     new SignCommand({
       KeyId: keyAlias,
-      Message: Buffer.from(message, 'utf8'),
+      Message: message,
       MessageType: 'RAW',
       SigningAlgorithm: RS256_KMS_SIGNING_ALGORITHM,
     }),

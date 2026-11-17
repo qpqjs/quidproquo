@@ -39,6 +39,20 @@ describe('getCryptoVerifyActionProcessor', () => {
     expect(forOther).toBe(false);
   });
 
+  it('verifies a base64 message against its decoded bytes', async () => {
+    vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
+    const processor = await resolveProcessor();
+    const bytes = Buffer.from([0x31, 0x81, 0xff, 0x00]);
+    const signature = sign('sha256', bytes, keyPair.privateKey).toString('base64url');
+
+    const [valid] = await invokeProcessor(processor!, { keyName: 'my-key', message: bytes.toString('base64'), signature, messageEncoding: 'base64' });
+    const [malformed, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'not base64!', signature, messageEncoding: 'base64' });
+
+    expect(valid).toBe(true);
+    expect(malformed).toBeUndefined();
+    expect(error?.errorType).toBe(askCryptoVerify.errorType.MalformedMessage);
+  });
+
   it('fails with MalformedSignature for a signature that is not base64url', async () => {
     vi.mocked(getCachedPublicKey).mockResolvedValue(publicKeyPem);
     const processor = await resolveProcessor();

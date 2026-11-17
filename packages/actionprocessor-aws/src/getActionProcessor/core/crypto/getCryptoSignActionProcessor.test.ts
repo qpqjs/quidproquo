@@ -30,7 +30,27 @@ describe('getCryptoSignActionProcessor', () => {
 
     expect(error).toBeUndefined();
     expect(signature).toBe(Buffer.from('sig').toString('base64url'));
-    expect(signWithKey).toHaveBeenCalledWith('alias/my-key-test-app-test-module-development', 'hello', 'eu-west-1');
+    expect(signWithKey).toHaveBeenCalledWith('alias/my-key-test-app-test-module-development', Buffer.from('hello'), 'eu-west-1');
+  });
+
+  it('hands KMS the decoded bytes of a base64 message', async () => {
+    vi.mocked(signWithKey).mockResolvedValue(Buffer.from('sig'));
+    const processor = await resolveProcessor();
+    const bytes = Buffer.from([0x31, 0x81, 0xff, 0x00]);
+
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: bytes.toString('base64'), messageEncoding: 'base64' });
+
+    expect(error).toBeUndefined();
+    expect(signWithKey).toHaveBeenCalledWith('alias/my-key-test-app-test-module-development', bytes, 'eu-west-1');
+  });
+
+  it('fails with MalformedMessage for a base64 message that is not base64, without touching KMS', async () => {
+    const processor = await resolveProcessor();
+
+    const [, error] = await invokeProcessor(processor!, { keyName: 'my-key', message: 'not base64!', messageEncoding: 'base64' });
+
+    expect(error?.errorType).toBe(askCryptoSign.errorType.MalformedMessage);
+    expect(signWithKey).not.toHaveBeenCalled();
   });
 
   it('fails with KeyNotConfigured for an undeclared key, without touching KMS', async () => {
