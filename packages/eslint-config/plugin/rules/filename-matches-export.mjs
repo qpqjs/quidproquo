@@ -7,8 +7,9 @@ import { isScreaming } from './exports/isScreaming.mjs';
 import { primaryName } from './exports/primaryName.mjs';
 import { screamingToCamel } from './exports/screamingToCamel.mjs';
 
-// A file is named after what it exports (G1); a SCREAMING constant lives in a camelCase
-// file (G8). Only files the one-export rule accepts are checked here.
+// A file is named after what it exports (G1). A SCREAMING constant may keep its exact name
+// (MAX_ITEMS.ts) or take the camelCase one (maxItems.ts); both are fine (G8). Only files
+// the one-export rule accepts are checked here.
 export default {
   meta: {
     type: 'suggestion',
@@ -26,11 +27,11 @@ export default {
         if (names.length === 0 || names.length > 2 || names.includes('default') || names.includes('*')) return;
         if (names.length === 2 && !isAllowedPair(names[0], names[1])) return;
         const name = primaryName(names);
-        const expected = isScreaming(name) ? screamingToCamel(name) : name;
+        const accepted = isScreaming(name) ? [name, screamingToCamel(name)] : [name];
         // Every module extension the config lints, so the plugin's own .mjs files are held to the rule too.
         const base = path.basename(context.filename).replace(/\.[cm]?[jt]sx?$/, '');
-        if (base !== expected) {
-          context.report({ node: program, messageId: 'mismatch', data: { file: path.basename(context.filename), name, expected } });
+        if (!accepted.includes(base)) {
+          context.report({ node: program, messageId: 'mismatch', data: { file: path.basename(context.filename), name, expected: accepted[0] } });
         }
       },
     };

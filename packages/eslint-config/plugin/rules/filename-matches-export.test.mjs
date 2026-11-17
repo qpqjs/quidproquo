@@ -14,6 +14,7 @@ ruleTester.run('filename-matches-export', rule, {
     { code: 'export const askTenantRead = 1;', filename: 'askTenantRead.ts' },
     { code: 'export const askTenantReadBase = 1; export const askTenantRead = 2;', filename: 'askTenantRead.ts' },
     { code: 'export const MAX_ITEMS = 3000;', filename: 'maxItems.ts' },
+    { code: 'export const MAX_ITEMS = 3000;', filename: 'MAX_ITEMS.ts' },
     { code: 'export const a = 1; export const b = 2;', filename: 'anything.ts' },
     { code: 'export default 1;', filename: 'anything.ts' },
     { code: 'export const a = 1;', filename: 'index.ts' },
@@ -21,7 +22,12 @@ ruleTester.run('filename-matches-export', rule, {
   ],
   invalid: [
     { code: 'export const askTenantRead = 1;', filename: 'tenantRead.ts', errors: [{ messageId: 'mismatch' }] },
-    { code: 'export const MAX_ITEMS = 3000;', filename: 'MAX_ITEMS.ts', errors: [{ messageId: 'mismatch' }] },
+    {
+      code: 'export const MAX_ITEMS = 3000;',
+      filename: 'limits.ts',
+      errors: [{ messageId: 'mismatch', data: { file: 'limits.ts', name: 'MAX_ITEMS', expected: 'MAX_ITEMS' } }],
+    },
+    { code: 'export const MAX_ITEMS = 3000;', filename: 'max_items.ts', errors: [{ messageId: 'mismatch' }] },
     { code: 'export const collectExports = 1;', filename: 'exportsOfFile.mjs', errors: [{ messageId: 'mismatch' }] },
   ],
 });
