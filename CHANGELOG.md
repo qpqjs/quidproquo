@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1
+
+- crypto sign and verify take a base64 message encoding, so binary data can be signed and verified
+- eslint-config: constant files may keep the exact SCREAMING name
+
 ## 0.9.0
 
 - features: event doc summaries now live in the shared list view store and are written, refolded and deleted like any other list view

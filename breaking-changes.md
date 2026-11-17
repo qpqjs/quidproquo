@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.9.1
+
 ## 0.9.0
 
 - `@qpqjs/features`: `EventDocListConfig` gains a required field, `listView` (the list view a list reads, `''` for the summary). A host that builds the config sets it. `EventDocListState.items` is now `EventDocListRow[]`, a row of whichever view the list reads: a summary list's rows are still summaries, and a host that needs them typed casts or checks `listView`.
