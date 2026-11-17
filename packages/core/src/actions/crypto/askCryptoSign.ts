@@ -1,6 +1,6 @@
 import { createActionRequester } from '../../logic/actions';
-import { CryptoActionType } from './CryptoActionType';
 import { CryptoMessageEncoding } from './types/CryptoMessageEncoding';
+import { CryptoActionType } from './CryptoActionType';
 
 // Signs `message` with the private half of a signing key (RS256: RSASSA-PKCS1-v1_5
 // over SHA-256) and returns the signature as base64url. RS256 is deterministic, so
