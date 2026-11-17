@@ -1,6 +1,6 @@
 import { createActionRequester } from '../../logic/actions';
-import { CryptoActionType } from './CryptoActionType';
 import { CryptoMessageEncoding } from './types/CryptoMessageEncoding';
+import { CryptoActionType } from './CryptoActionType';
 
 // Verifies a base64url RS256 signature produced by askCryptoSign against
 // `message` using the public half of the signing key. Resolves to false for a
