@@ -5,3 +5,4 @@ export * from './askCryptoSign';
 export * from './askCryptoVerify';
 export * from './CryptoActionType';
 export * from './CryptoContext';
+export * from './types/CryptoMessageEncoding';

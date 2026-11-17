@@ -26,7 +26,10 @@ function* askCryptoVerify(
   keyName: string,
   message: string,
   signature: string,
+  messageEncoding: CryptoMessageEncoding = 'utf8',
 ): AskResponse<boolean>;
+
+type CryptoMessageEncoding = 'utf8' | 'base64';
 ```
 
 ## Parameters
@@ -36,6 +39,7 @@ function* askCryptoVerify(
 | `keyName` | `string` | Name of the signing key, declared with [defineSigningKey](../../../config/core/signing-key.md) (or shared via its `owner` option). |
 | `message` | `string` | The exact string that was signed. |
 | `signature` | `string` | The base64url signature from [askCryptoSign](./ask-crypto-sign.md). |
+| `messageEncoding` | `'utf8' \| 'base64'` | How `message` carries its bytes; must match what it was signed with. `'utf8'` (the default) for text, `'base64'` for binary data passed as standard base64. |
 
 ## Returns
 
@@ -47,6 +51,7 @@ function* askCryptoVerify(
 | --- | --- |
 | `askCryptoVerify.errorType.KeyNotConfigured` | No `defineSigningKey` with that name exists in the service config. |
 | `askCryptoVerify.errorType.MalformedSignature` | `signature` is not base64url. Probable encoding bug at the caller, not an attack; do not treat as `false`. |
+| `askCryptoVerify.errorType.MalformedMessage` | `messageEncoding` is `'base64'` and `message` is not valid base64. Probable encoding bug at the caller. |
 | `askCryptoVerify.errorType.KeyUnavailable` | The key exists in config but is disabled, deleted, or access was denied. |
 | `askCryptoVerify.errorType.Throttled` | The provider rate limit was exceeded; back off and retry. |
 

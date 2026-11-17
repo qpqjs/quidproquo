@@ -13,10 +13,20 @@ describe('askCryptoSign', () => {
     expectGenerator(askCryptoSign('my-signing-key', 'header.payload'))
       .toYield({
         type: CryptoActionType.Sign,
-        payload: { keyName: 'my-signing-key', message: 'header.payload' },
+        payload: { keyName: 'my-signing-key', message: 'header.payload', messageEncoding: 'utf8' },
       })
       .whenGiven(mockSignature)
       .thenReturn(mockSignature);
+  });
+
+  it('carries a base64 message encoding through to the payload, for signing binary data', () => {
+    expectGenerator(askCryptoSign('my-signing-key', 'AAECAw==', 'base64'))
+      .toYield({
+        type: CryptoActionType.Sign,
+        payload: { keyName: 'my-signing-key', message: 'AAECAw==', messageEncoding: 'base64' },
+      })
+      .whenGiven('c2ln')
+      .thenReturn('c2ln');
   });
 
   it('propagates a processor failure as a thrown StoryError', () => {
@@ -32,6 +42,7 @@ describe('askCryptoSign', () => {
   it('lists every error the processor can produce, namespaced by the action type', () => {
     expect(askCryptoSign.errorType).toEqual({
       KeyNotConfigured: `${CryptoActionType.Sign}-KeyNotConfigured`,
+      MalformedMessage: `${CryptoActionType.Sign}-MalformedMessage`,
       KeyUnavailable: `${CryptoActionType.Sign}-KeyUnavailable`,
       Throttled: `${CryptoActionType.Sign}-Throttled`,
     });

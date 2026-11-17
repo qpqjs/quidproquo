@@ -39,6 +39,21 @@ describe('getCryptoSignActionProcessor', () => {
     expect(verify('sha256', Buffer.from('hello'), createPublicKey(pem as string), Buffer.from(String(signature), 'base64url'))).toBe(true);
   });
 
+  it('signs the decoded bytes of a base64 message, and refuses one that is not base64', async () => {
+    const settings = [defineSigningKey('my-key')];
+    const sign = await resolve(getCryptoSignActionProcessor, CryptoActionType.Sign, settings);
+    const getPublicKey = await resolve(getCryptoGetPublicKeyActionProcessor, CryptoActionType.GetPublicKey, settings);
+    const bytes = Buffer.from([0x31, 0x81, 0xff, 0x00]);
+
+    const [signature, error] = await invokeProcessor(sign, { keyName: 'my-key', message: bytes.toString('base64'), messageEncoding: 'base64' });
+    const [pem] = await invokeProcessor(getPublicKey, { keyName: 'my-key' });
+    const [, malformed] = await invokeProcessor(sign, { keyName: 'my-key', message: 'not base64!', messageEncoding: 'base64' });
+
+    expect(error).toBeUndefined();
+    expect(verify('sha256', bytes, createPublicKey(pem as string), Buffer.from(String(signature), 'base64url'))).toBe(true);
+    expect(malformed?.errorType).toBe(askCryptoSign.errorType.MalformedMessage);
+  });
+
   // Security regression: only the owning service holds the private key, as only it holds kms:Sign deployed.
   it('refuses to sign with a key another module owns', async () => {
     const sign = await resolve(getCryptoSignActionProcessor, CryptoActionType.Sign, [

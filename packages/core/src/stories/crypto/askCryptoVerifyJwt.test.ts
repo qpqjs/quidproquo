@@ -33,7 +33,9 @@ describe('askCryptoVerifyJwt', () => {
     const { result, verifyCalls } = run(token);
 
     expect(result).toEqual({ valid: true, claims: { sub: 'client-1', exp: NOW_SECONDS + 60 } });
-    expect(verifyCalls).toEqual([{ keyName: 'my-signing-key', message: token.split('.').slice(0, 2).join('.'), signature: 'c2ln' }]);
+    expect(verifyCalls).toEqual([
+      { keyName: 'my-signing-key', message: token.split('.').slice(0, 2).join('.'), signature: 'c2ln', messageEncoding: 'utf8' },
+    ]);
   });
 
   it('accepts a token with no time claims without reading the clock', () => {
