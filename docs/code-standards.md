@@ -56,7 +56,7 @@ yield* askMapParallel(items, askSendOrNull);
 
 **G7. Comments.** Every export gets a one-to-three-line JSDoc: what it is for and any contract the signature does not express. Inline comments only for what the code cannot say (a workaround, an invariant). Never narrate history ("used to", "moved from"), never restate the code, never use an em dash. **lint** (em dashes, history words; JSDoc as a warning)
 
-**G8. Constants.** One per file, SCREAMING export, camelCase file name, under `constants/`. Resource names, ports, paths, store names and limits are never written inline at a call site.
+**G8. Constants.** One per file, SCREAMING export, under `constants/`. The file takes the export's exact name (`MAX_ITEMS.ts`) or its camelCase form (`maxItems.ts`); keep to one form within a package. Resource names, ports, paths, store names and limits are never written inline at a call site.
 
 ```ts
 // constants/signDevPort.ts

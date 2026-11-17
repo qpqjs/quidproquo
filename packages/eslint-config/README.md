@@ -75,8 +75,8 @@ Warns.
 
 ### `qpq/filename-matches-export`
 
-A file is named after its export; a `SCREAMING_CASE` constant lives in a camelCase file (`MAX_ITEMS` in `maxItems.ts`). Two-export files are named
-after the wrapper or the effect. Warns.
+A file is named after its export. A `SCREAMING_CASE` constant's file takes either its exact name (`MAX_ITEMS.ts`) or the camelCase form
+(`maxItems.ts`). Two-export files are named after the wrapper or the effect. Warns.
 
 Tests live next to the rules (`plugin/rules/*.test.mjs`) and run with the repo's vitest suite: `npx vitest run --project @qpqjs/eslint-config`.
 
