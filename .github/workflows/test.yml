@@ -1,9 +1,13 @@
 name: test
 
-# Pull requests only. Every push already runs these same reusable workflows
-# from deploy-site, so a push trigger here would duplicate the three-version
-# matrix. Pull requests from forks have no push in this repo, which is the one
-# case this still covers.
+# Pull requests from forks only. Every push to a branch in this repo already
+# runs these same reusable workflows from deploy-site, so running them again
+# for that branch's pull request would duplicate the three-version matrix. A
+# fork's push happens in the fork, where deploy-site never runs, so this is the
+# only thing that tests a fork's pull request.
+#
+# The `if` on each job is what skips a pull request from a branch in this repo:
+# the run still appears in the Actions tab, with both jobs skipped.
 on:
   pull_request:
 
@@ -13,7 +17,9 @@ concurrency:
 
 jobs:
   test:
+    if: github.event.pull_request.head.repo.full_name != github.repository
     uses: ./.github/workflows/ci-test.yml
 
   check:
+    if: github.event.pull_request.head.repo.full_name != github.repository
     uses: ./.github/workflows/ci-check.yml

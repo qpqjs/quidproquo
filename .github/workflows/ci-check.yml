@@ -7,8 +7,8 @@ name: ci-check
 #
 # Called once per push by deploy-site.yml, where it is advisory (a style or
 # type slip should block merging to main, not a development deploy), and by
-# test.yml on pull requests, where it is a merge gate. Not a deploy gate, so
-# ci-deploy-site.yml does not call it.
+# test.yml on pull requests from forks, where it is a merge gate. Not a deploy
+# gate, so ci-deploy-site.yml does not call it.
 on:
   workflow_call:
 
