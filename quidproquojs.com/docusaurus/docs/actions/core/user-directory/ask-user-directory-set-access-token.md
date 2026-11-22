@@ -48,6 +48,7 @@ function* askUserDirectorySetAccessToken(
 ## Related
 
 - [askUserDirectoryReadAccessToken](./ask-user-directory-read-access-token.md) — read the token this action sets.
+- [askUserDirectorySetDecodedAccessToken](./ask-user-directory-set-decoded-access-token.md): set an identity your own code verified, with no directory token behind it.
 - [askUserDirectoryDecodeAccessToken](./ask-user-directory-decode-access-token.md) — decode a token without touching the session.
 - [askUserDirectoryAuthenticateUser](./ask-user-directory-authenticate-user.md) — obtain a token to load.
 - [defineUserDirectory](../../../config/core/user-directory.md) — declares the directory.
