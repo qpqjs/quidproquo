@@ -10,7 +10,6 @@ import {
   NetworkActionType,
   PlatformActionType,
   SystemActionType,
-  UserDirectoryActionType,
 } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
@@ -41,7 +40,6 @@ describe('getCoreActionProcessor', () => {
       PlatformActionType.Delay,
       SystemActionType.Batch,
       SystemActionType.GetRuntimeCorrelation,
-      UserDirectoryActionType.SetDecodedAccessToken,
     ];
 
     for (const actionType of expectedActionTypes) {

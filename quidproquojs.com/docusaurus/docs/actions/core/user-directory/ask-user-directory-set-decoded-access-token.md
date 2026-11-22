@@ -8,7 +8,7 @@ description: Make an identity the caller has already verified the current story 
 Stores a `DecodedAccessToken` on the **current story session** as it is, with no token behind it and nothing checked. It is for a principal that no [user directory](../../../config/core/user-directory.md) can decode: one a service authenticates itself, such as a guest holding a session token the service issued. Subsequent [askUserDirectoryReadAccessToken](./ask-user-directory-read-access-token.md) calls then see this identity, whichever directory name they pass.
 
 - **Action type:** `UserDirectoryActionType.SetDecodedAccessToken`
-- **On every runtime:** updates the session. No network call, and no user directory is read.
+- **On every server runtime:** updates the session. It is not available in the browser. No network call, and no user directory is read.
 
 ```typescript
 import { askUserDirectorySetDecodedAccessToken } from '@qpqjs/core';
