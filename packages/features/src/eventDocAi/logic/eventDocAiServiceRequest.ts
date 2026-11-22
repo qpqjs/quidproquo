@@ -25,9 +25,9 @@ export const eventDocAiServiceRequest = <R extends ServiceRequester<any, any>>(
   serviceRequest(requester, function* askEventDocAiServiceHandler(wirePayload: PayloadOf<R> & EventDocAiDocRef) {
     yield* askEventDocResolveActor();
     // Every chat method reads the document on the caller's behalf, so it needs the collection's read permission.
-    yield* askEventDocAiAuthorise(EventDocPermissionAction.read);
-
     const { docId, ...payload } = wirePayload;
+
+    yield* askEventDocAiAuthorise(EventDocPermissionAction.read, docId);
 
     const serviceName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_SERVICE_NAME_GLOBAL);
     const type = yield* askConfigGetGlobal<string>(EVENT_DOC_TYPE_GLOBAL);

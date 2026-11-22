@@ -31,6 +31,19 @@ describe('askEventDocAuthorise', () => {
     expect(run('docs-authorise', false)).toEqual([{ functionName: 'docs-authorise', payload: { storeName: 'docs', action: 'read' } }]);
   });
 
+  it('names the document for a caller that has no event but knows which one it is on', () => {
+    const calls: unknown[] = [];
+
+    runStory(askEventDocAuthorise({ authorise: 'docs-authorise', storeName: 'docs' }, EventDocPermissionAction.read, undefined, 'doc-1'), {
+      [InlineFunctionActionType.Execute]: (action: Action<unknown>) => {
+        calls.push(action.payload);
+        return undefined;
+      },
+    });
+
+    expect(calls).toEqual([{ functionName: 'docs-authorise', payload: { docId: 'doc-1', storeName: 'docs', action: 'read' } }]);
+  });
+
   it('runs nothing for a collection without an authoriser', () => {
     expect(run(undefined, true)).toEqual([]);
     expect(run('', true)).toEqual([]);
