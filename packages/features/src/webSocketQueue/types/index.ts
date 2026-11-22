@@ -10,4 +10,5 @@ export * from './WebSocketQueueEvent';
 export * from './WebSocketQueueEventMessage';
 export * from './WebSocketQueueEventMessageWithCorrelation';
 export * from './WebSocketQueueOnConnectedInput';
+export * from './WebSocketQueueSessionUser';
 export * from './WebSocketQueueTopicAuthoriseInput';

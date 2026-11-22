@@ -83,6 +83,38 @@ describe('askConnectionTryAuthenticate', () => {
       expect(result?.userId).toBe('signer:s1');
     });
 
+    it('makes the principal the session user when the authenticator names one', () => {
+      let stamped: any;
+
+      runStory(askConnectionTryAuthenticate('c1'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [ConfigActionType.GetGlobal]: globals,
+        [KeyValueStoreActionType.Query]: { items: [{ ...baseConnection, accessToken: 'session-1', userId: 'guest:g1' }] },
+        [InlineFunctionActionType.Execute]: { userId: 'guest:g1', sessionUser: { username: 'Ada', exp: 4102444800 } },
+        [UserDirectoryActionType.SetDecodedAccessToken]: (action: any) => {
+          stamped = action.payload.decodedAccessToken;
+        },
+      });
+
+      expect(stamped).toMatchObject({ userId: 'guest:g1', username: 'Ada', exp: 4102444800, wasValid: true });
+    });
+
+    it('sets no session user when the authenticator names none', () => {
+      let stamped = false;
+
+      runStory(askConnectionTryAuthenticate('c1'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [ConfigActionType.GetGlobal]: globals,
+        [KeyValueStoreActionType.Query]: { items: [{ ...baseConnection, accessToken: 'session-1', userId: 'signer:s1' }] },
+        [InlineFunctionActionType.Execute]: { userId: 'signer:s1', scope: 'TENANT#t1' },
+        [UserDirectoryActionType.SetDecodedAccessToken]: () => {
+          stamped = true;
+        },
+      });
+
+      expect(stamped).toBe(false);
+    });
+
     it('propagates the authenticator refusal', () => {
       const run = () =>
         runStory(askConnectionTryAuthenticate('c1'), {

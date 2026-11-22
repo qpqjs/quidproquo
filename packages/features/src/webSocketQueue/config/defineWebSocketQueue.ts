@@ -40,6 +40,8 @@ export type QPQConfigAdvancedWebsocketQueueSettings = {
   // (WebSocketQueueAuthenticateResult) or throws to reject. The scope it returns
   // is final; connectionScopeResolver does not run. For queues whose clients
   // hold a token the owning service validates itself (a signing session, say).
+  // A result that names a `sessionUser` makes the principal the session's user
+  // for the handlers of its messages; without one they run with no user.
   // Mutually exclusive with userDirectoryName.
   connectionAuthenticator?: string;
 } & QPQConfigAdvancedSettings;

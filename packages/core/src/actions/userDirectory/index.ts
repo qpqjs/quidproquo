@@ -16,6 +16,7 @@ export * from './askUserDirectoryRequestEmailVerification';
 export * from './askUserDirectoryRespondToAuthChallenge';
 export * from './askUserDirectoryRevokeRefreshToken';
 export * from './askUserDirectorySetAccessToken';
+export * from './askUserDirectorySetDecodedAccessToken';
 export * from './askUserDirectorySetPassword';
 export * from './askUserDirectorySetUserAttributes';
 export * from './askUserDirectorySignOutUser';

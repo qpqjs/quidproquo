@@ -10,6 +10,7 @@ export enum UserDirectoryActionType {
   ConfirmEmailVerification = '@quidproquo-core/UserDirectory/ConfirmEmailVerification',
   ReadAccessToken = '@quidproquo-core/UserDirectory/ReadAccessToken',
   SetAccessToken = '@quidproquo-core/UserDirectory/SetAccessToken',
+  SetDecodedAccessToken = '@quidproquo-core/UserDirectory/SetDecodedAccessToken',
   DecodeAccessToken = '@quidproquo-core/UserDirectory/DecodeAccessToken',
   RespondToAuthChallenge = '@quidproquo-core/UserDirectory/RespondToAuthChallenge',
   AssociateSoftwareToken = '@quidproquo-core/UserDirectory/AssociateSoftwareToken',

@@ -9,6 +9,7 @@ const coreUserDirectoryActionComponentMap: Record<string, string[]> = {
   [UserDirectoryActionType.ConfirmEmailVerification]: ['askUserDirectoryConfirmEmailVerification', 'code', 'accessToken'],
   [UserDirectoryActionType.ReadAccessToken]: ['askUserDirectoryReadAccessToken', 'userDirectoryName', 'ignoreExpiration'],
   [UserDirectoryActionType.SetAccessToken]: ['askUserDirectorySetAccessToken', 'userDirectoryName', 'accessToken'],
+  [UserDirectoryActionType.SetDecodedAccessToken]: ['askUserDirectorySetDecodedAccessToken', 'decodedAccessToken'],
   [UserDirectoryActionType.DecodeAccessToken]: ['askUserDirectoryDecodeAccessToken', 'userDirectoryName', 'ignoreExpiration', 'accessToken'],
   [UserDirectoryActionType.RespondToAuthChallenge]: ['askUserDirectoryRespondToAuthChallenge', 'userDirectoryName', 'authChallenge'],
   [UserDirectoryActionType.GetUserAttributes]: ['askUserDirectoryGetUserAttributes', 'userDirectoryName', 'username'],
