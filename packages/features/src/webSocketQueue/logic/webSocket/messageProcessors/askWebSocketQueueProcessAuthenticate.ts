@@ -29,6 +29,7 @@ import {
 } from '../../../types';
 import { askWebSocketQueueBroadcastUnknownMessage } from '../askWebSocketQueueBroadcastUnknownMessage';
 import { askWebSocketQueueSendMessage } from '../askWebSocketQueueSendMessage';
+import { askWebSocketQueueSessionUserSet } from '../askWebSocketQueueSessionUserSet';
 import { askWebSocketQueueProcessUnauthenticate } from './askWebSocketQueueProcessUnauthenticate';
 
 export function isWebSocketAuthenticateMessage(
@@ -93,7 +94,9 @@ function* askAuthenticateWithUserDirectory(
   return { userId: decodedAccessToken.userId, scope: scopeResolution.scope };
 }
 
-// The owning service's authenticator owns both the token and the scope; a throw rejects.
+// The owning service's authenticator owns both the token and the scope; a throw rejects. Its principal becomes the
+// session's user when it asks to be one, so the Authenticate message sent on to the event bus carries it, as it does
+// on a user-directory queue.
 function* askAuthenticateWithAuthenticator(
   connectionAuthenticator: string,
   accessToken: string,
@@ -106,7 +109,13 @@ function* askAuthenticateWithAuthenticator(
     }),
   );
 
-  return result.success ? result.result : null;
+  if (!result.success) {
+    return null;
+  }
+
+  yield* askWebSocketQueueSessionUserSet(result.result);
+
+  return result.result;
 }
 
 function* askStoreAuthenticated(connection: Connection, accessToken: string, principal: WebSocketQueueAuthenticateResult): AskResponse<void> {

@@ -321,6 +321,30 @@ describe('askWebSocketQueueProcessAuthenticate', () => {
       expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
     });
 
+    it('makes the principal the session user before the authenticate event is broadcast', () => {
+      const order: string[] = [];
+      let stamped: any;
+
+      runStory(askWebSocketQueueProcessAuthenticate('c1', 'session-1'), {
+        [ContextActionType.Read]: { apiName: 'demo' },
+        [KeyValueStoreActionType.Query]: queryByStore(),
+        [ConfigActionType.GetGlobal]: globals,
+        [InlineFunctionActionType.Execute]: { userId: 'guest:g1', sessionUser: { username: 'Ada', exp: 4102444800 } },
+        [UserDirectoryActionType.SetDecodedAccessToken]: (action: any) => {
+          order.push('sessionUser');
+          stamped = action.payload.decodedAccessToken;
+        },
+        [KeyValueStoreActionType.Upsert]: undefined,
+        [WebsocketActionType.SendMessage]: undefined,
+        [EventBusActionType.SendMessage]: () => {
+          order.push('eventBus');
+        },
+      });
+
+      expect(stamped).toMatchObject({ userId: 'guest:g1', username: 'Ada', exp: 4102444800, wasValid: true });
+      expect(order).toEqual(['sessionUser', 'eventBus']);
+    });
+
     it('hands a scope claim to the authenticator', () => {
       let input: any;
 

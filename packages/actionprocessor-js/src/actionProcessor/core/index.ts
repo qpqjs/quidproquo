@@ -13,3 +13,4 @@ export * from './network';
 export * from './platform';
 export * from './secureToken';
 export * from './system';
+export * from './userDirectory';

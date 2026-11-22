@@ -12,6 +12,7 @@ import { getNetworkActionProcessor } from './network';
 import { getPlatformActionProcessor } from './platform';
 import { getSecureTokenActionProcessor } from './secureToken';
 import { getSystemActionProcessor } from './system';
+import { getUserDirectoryActionProcessor } from './userDirectory';
 
 // customActions is exported but deliberately NOT merged into getCoreActionProcessor:
 // composition roots (dev-server, awslambda) spread it last so user-defined processors
@@ -34,4 +35,5 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getPlatformActionProcessor('js')(qpqConfig, dynamicModuleLoader)),
   ...(await getSecureTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
