@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `@qpqjs/features`: `askEventDocAiAuthorise(action, docId)` takes the document the chat is opened on as a required second argument, and a collection's `authorise` inline function now receives it as `docId` for a websocket chat (`EventDocAuthoriseInput.docId`). `askEventDocAuthorise` gains an optional fourth argument for it.
+
 ## 0.9.1
 
 ## 0.9.0

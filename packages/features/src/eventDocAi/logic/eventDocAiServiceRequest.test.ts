@@ -71,10 +71,10 @@ const run = (authorise: string, authoriseOutcome: 'allow' | 'forbid' = 'allow'):
 // as the routes and the MCP tools do, so a tenant member without the collection's read permission cannot open a
 // chat and have the model read the document for them.
 describe('eventDocAiServiceRequest', () => {
-  it("runs the collection's authoriser for read before the handler", () => {
+  it("runs the collection's authoriser for read on the chat's document before the handler", () => {
     const harness = run('docs-authorise');
 
-    expect(harness.authoriseCalls).toEqual([{ functionName: 'docs-authorise', payload: { storeName: 'docs', action: 'read' } }]);
+    expect(harness.authoriseCalls).toEqual([{ functionName: 'docs-authorise', payload: { docId: 'doc-1', storeName: 'docs', action: 'read' } }]);
     expect(harness.ran).toBe(true);
     expect(harness.sent?.payload.payload.payload).toEqual({ success: true, result: 'chat-1' });
   });
