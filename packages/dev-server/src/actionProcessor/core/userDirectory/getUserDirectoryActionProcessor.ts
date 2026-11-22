@@ -1,3 +1,4 @@
+import { getUserDirectorySetDecodedAccessTokenActionProcessor } from '@qpqjs/actionprocessor-node';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from '@qpqjs/core';
 
 import { ResolvedDevServerConfig } from '../../../types';
@@ -41,6 +42,7 @@ export const getUserDirectoryActionProcessor =
     ...(await getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectoryRespondToAuthChallengeActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectorySetAccessTokenActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getUserDirectorySetDecodedAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectorySetUserAttributesActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
   });

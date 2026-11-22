@@ -1,3 +1,4 @@
+import { getUserDirectorySetDecodedAccessTokenActionProcessor } from '@qpqjs/actionprocessor-node';
 import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -50,6 +51,7 @@ describe('getUserDirectoryActionProcessor', () => {
       getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectoryRespondToAuthChallengeActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetAccessTokenActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader),
+      getUserDirectorySetDecodedAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetUserAttributesActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader),
     ]);

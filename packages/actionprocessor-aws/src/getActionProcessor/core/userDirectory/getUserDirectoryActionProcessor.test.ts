@@ -1,3 +1,4 @@
+import { getUserDirectorySetDecodedAccessTokenActionProcessor } from '@qpqjs/actionprocessor-node';
 import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
 import { buildTestQpqConfig, noopDynamicModuleLoader } from '@qpqjs/testing';
 
@@ -52,6 +53,7 @@ describe('getUserDirectoryActionProcessor', () => {
       getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectoryRespondToAuthChallengeActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader),
+      getUserDirectorySetDecodedAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySetUserAttributesActionProcessor(qpqConfig, dynamicModuleLoader),
       getUserDirectorySignOutUserActionProcessor(qpqConfig, dynamicModuleLoader),
