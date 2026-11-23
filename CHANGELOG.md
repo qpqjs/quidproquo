@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0
+
+- features: a websocket authenticator can name a session user, and the node processor answers the session user action on server runtimes only
+- features: a chat's authoriser is told which document it is on
+- queues default to 5 tries so a busy consumer doesn't dead-letter messages
+
+### Breaking changes
+
+- `defineQueue` `maxTries` defaults to 5 (was 1), so handlers must be safe to repeat or set `maxTries: 1`
+- `askEventDocAiAuthorise` takes a required `docId`, and the collection `authorise` function receives it
+
 ## 0.9.1
 
 - crypto sign and verify take a base64 message encoding, so binary data can be signed and verified

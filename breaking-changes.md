@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.10.0
+
 - `defineQueue`: `maxTries` now defaults to 5 (was 1). A try is used up when a handler fails and also when the provider receives a message but cannot run the consumer (one capped with `maxConcurrentExecutions` that is already busy), so with a single try a message could go to the dead letter queue without its handler ever running. A handler on a queue that does not set `maxTries` may now run up to 5 times for one message, `ttRetryInSeconds` apart, so it must be safe to repeat; pass `maxTries: 1` to keep the old behaviour. The framework's own migrations, seeds and event doc AI chat queues keep a single try.
 - `@qpqjs/features`: `askEventDocAiAuthorise(action, docId)` takes the document the chat is opened on as a required second argument, and a collection's `authorise` inline function now receives it as `docId` for a websocket chat (`EventDocAuthoriseInput.docId`). `askEventDocAuthorise` gains an optional fourth argument for it.
 
