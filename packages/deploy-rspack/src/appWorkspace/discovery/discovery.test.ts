@@ -15,7 +15,11 @@ const mk = (...parts: string[]) => fs.mkdirSync(path.join(root, ...parts), { rec
 
 mk('apps', 'shop', 'services', 'api', 'service', 'src');
 fs.writeFileSync(path.join(root, 'apps', 'shop', 'services', 'api', 'service', 'src', 'infrastructure.ts'), '');
-mk('apps', 'shop', 'services', 'web', 'service');
+mk('apps', 'shop', 'services', 'site', 'service', 'src');
+fs.writeFileSync(path.join(root, 'apps', 'shop', 'services', 'site', 'service', 'src', 'infrastructure.ts'), '');
+mk('apps', 'shop', 'services', 'site', 'views');
+// A service folder with no infrastructure entry, only build output left behind: never a backend.
+mk('apps', 'shop', 'services', 'web', 'service', 'dist');
 mk('apps', 'shop', 'services', 'web', 'views');
 mk('apps', 'shop', 'services', 'notes');
 mk('apps', 'docs');
@@ -30,9 +34,14 @@ describe('workspace discovery', () => {
   });
 
   it('lists service folders, backends, frontends and deployable services', () => {
-    expect(getServiceDirectoryNames(root, 'shop')).toEqual(['api', 'notes', 'web']);
-    expect(getBackendServiceNames(root, 'shop')).toEqual(['api', 'web']);
-    expect(getServiceNamesWithViews(root, 'shop')).toEqual(['web']);
-    expect(getAppServiceNames(root, 'shop')).toEqual(['api']);
+    expect(getServiceDirectoryNames(root, 'shop')).toEqual(['api', 'notes', 'site', 'web']);
+    expect(getBackendServiceNames(root, 'shop')).toEqual(['api', 'site']);
+    expect(getServiceNamesWithViews(root, 'shop')).toEqual(['site']);
+    expect(getAppServiceNames(root, 'shop')).toEqual(['api', 'site']);
+  });
+
+  it('skips a service folder that has no infrastructure entry, even when it has a service folder', () => {
+    expect(getBackendServiceNames(root, 'shop')).not.toContain('web');
+    expect(getServiceNamesWithViews(root, 'shop')).not.toContain('web');
   });
 });

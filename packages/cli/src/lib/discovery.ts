@@ -3,7 +3,6 @@ import {
   getAppsPath,
   getAvailableAppNames,
   getBackendServiceNames,
-  getServiceNamesWithSubdir as getServiceNamesWithSubdirIn,
   getServiceNamesWithViews as getServiceNamesWithViewsIn,
   getServicePath,
 } from '@qpqjs/deploy-rspack';
@@ -18,8 +17,7 @@ export const getServiceDirectory = (appName: string, service: string): string =>
 
 export const getAvailableApps = (): string[] => getAvailableAppNames(getRoot());
 
-export const getServiceNamesWithSubdir = (appName: string, subdir: string): string[] => getServiceNamesWithSubdirIn(getRoot(), appName, subdir);
-
+/** The app's backend services: the ones with an infrastructure entry. A service folder without one is skipped. */
 export const getServiceNames = (appName: string): string[] => getBackendServiceNames(getRoot(), appName);
 
 export const getServiceNamesWithViews = (appName: string): string[] => getServiceNamesWithViewsIn(getRoot(), appName);

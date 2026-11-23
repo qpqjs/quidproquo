@@ -1,4 +1,4 @@
-import { QPQCoreConfigSettingType } from '@qpqjs/core';
+import { QPQCoreConfigSettingType, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -10,5 +10,13 @@ describe('defineSeed', () => {
     const types = config.map((setting) => (setting as { configSettingType: string }).configSettingType);
 
     expect(types).toEqual([QPQCoreConfigSettingType.global, QPQCoreConfigSettingType.deployEvent, QPQCoreConfigSettingType.queue]);
+  });
+
+  it('gives a seed one try, so one that failed part way is never run again by itself', () => {
+    const queue = defineSeed(['/src/seed/users::run']).find(
+      (setting) => (setting as QueueQPQConfigSetting).configSettingType === QPQCoreConfigSettingType.queue,
+    ) as QueueQPQConfigSetting;
+
+    expect(queue.maxTries).toBe(1);
   });
 });
