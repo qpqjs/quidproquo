@@ -1,4 +1,4 @@
-import { DeployEventType, QPQCoreConfigSettingType } from '@qpqjs/core';
+import { DeployEventType, QPQCoreConfigSettingType, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -27,5 +27,13 @@ describe('defineMigration', () => {
       QPQCoreConfigSettingType.deployEvent,
       QPQCoreConfigSettingType.queue,
     ]);
+  });
+
+  it('gives a migration one try, so one that failed part way is never run again by itself', () => {
+    const queue = defineMigration([{ runtime: '/src/migrate::run', deployType: DeployEventType.Api }]).find(
+      (setting) => (setting as QueueQPQConfigSetting).configSettingType === QPQCoreConfigSettingType.queue,
+    ) as QueueQPQConfigSetting;
+
+    expect(queue.maxTries).toBe(1);
   });
 });

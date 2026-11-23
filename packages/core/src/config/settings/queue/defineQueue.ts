@@ -4,6 +4,13 @@ import { QPQConfigAdvancedQueueSettings, QpqQueueProcessors, QueueQPQConfigSetti
 // How long a failed message waits before its next try unless the queue says otherwise.
 const DEFAULT_RETRY_DELAY_IN_SECONDS = 15 * 60;
 
+// How many times a message is tried unless the queue says otherwise. More than one, because a try
+// is used up by more than a handler that throws: a provider can hand a message over and then
+// refuse to run its consumer (a consumer capped with maxConcurrentExecutions that is already
+// busy, say), and that counts as a try too. With a single try such a message goes to the dead
+// letter queue without its handler ever running.
+const DEFAULT_MAX_TRIES = 5;
+
 export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => {
   return {
     configSettingType: QPQCoreConfigSettingType.queue,
@@ -21,7 +28,7 @@ export const defineQueue = (name: string, processors: QpqQueueProcessors, option
 
     concurrency: options?.concurrency ?? 1,
 
-    maxTries: options?.maxTries ?? 1,
+    maxTries: options?.maxTries ?? DEFAULT_MAX_TRIES,
     ttRetryInSeconds: options?.ttRetryInSeconds ?? DEFAULT_RETRY_DELAY_IN_SECONDS,
 
     hasDeadLetterQueue: options?.hasDeadLetterQueue ?? true,

@@ -16,6 +16,16 @@ const processorGlobals = (authorise?: string) => {
   return Object.values(queue.qpqQueueProcessors).map((runtime: any) => runtime.globals[EVENT_DOC_AUTHORISER_GLOBAL]);
 };
 
+describe('defineEventDocAi queue', () => {
+  it('gives a chat step one try, so a failing step is not paid for again and again', () => {
+    const queue = defineEventDocAi(baseOptions).find(
+      (setting) => (setting as QueueQPQConfigSetting).configSettingType === QPQCoreConfigSettingType.queue,
+    ) as QueueQPQConfigSetting;
+
+    expect(queue.maxTries).toBe(1);
+  });
+});
+
 // Security regression: the chat handlers learn the collection's authoriser through their globals; without it the
 // websocket chat path would run ungated while the routes and tools are gated.
 describe('defineEventDocAi authorise', () => {

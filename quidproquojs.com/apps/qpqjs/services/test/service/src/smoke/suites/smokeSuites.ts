@@ -1,4 +1,5 @@
 import { SmokeSuite } from '../harness/types/SmokeSuite';
+import { busyQueueSmokeSuite } from './busyQueue/busyQueueSmokeSuite';
 import { emailReceiveSmokeSuite } from './emailReceive/emailReceiveSmokeSuite';
 import { encryptedResourcesSmokeSuite } from './encryptedResources/encryptedResourcesSmokeSuite';
 import { eventBusSmokeSuite } from './eventBus/eventBusSmokeSuite';
@@ -49,4 +50,5 @@ export const smokeSuites: SmokeSuite[] = [
   userScriptSmokeSuite,
   securitySmokeSuite,
   reportsSmokeSuite,
+  busyQueueSmokeSuite,
 ];

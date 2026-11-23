@@ -119,6 +119,8 @@ export const defineEventDocAi = ({
     defineEventDocAiRegistration({ aiName, serviceName, storeName, type, userDirectoryName }),
     defineQueue(eventDocAiQueueName(storeName), processors, {
       eventBusSubscriptions: [eventBusName],
+      // One try only: every try of a chat step is another paid model call.
+      maxTries: 1,
     }),
     defineServiceFunction(runtime('serviceFunction', 'eventDocAiChatContinue'), {
       functionName: eventDocAiContinueFunctionName(storeName),

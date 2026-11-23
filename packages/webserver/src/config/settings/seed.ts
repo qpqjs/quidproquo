@@ -25,6 +25,8 @@ export const defineSeed = (seeds: QpqFunctionRuntime[]): QPQConfig => {
         maxConcurrentExecutions: 1,
         batchSize: 1,
         concurrency: 1,
+        // One try only: a seed that failed part way must not be run again by itself.
+        maxTries: 1,
       },
     ),
   ];

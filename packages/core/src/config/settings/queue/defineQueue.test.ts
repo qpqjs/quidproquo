@@ -14,7 +14,7 @@ describe('defineQueue', () => {
       batchSize: 0,
       batchWindowInSeconds: 0,
       concurrency: 1,
-      maxTries: 1,
+      maxTries: 5,
       ttRetryInSeconds: 15 * 60,
       hasDeadLetterQueue: true,
       qpqQueueProcessors: processors,
@@ -22,6 +22,14 @@ describe('defineQueue', () => {
       maxConcurrentExecutions: undefined,
       isFifo: false,
     });
+  });
+
+  it('tries a message more than once by default, so a try lost to a busy consumer does not lose the message', () => {
+    expect(defineQueue('Jobs', processors).maxTries).toBeGreaterThan(1);
+  });
+
+  it('honours an explicit single try', () => {
+    expect(defineQueue('Jobs', processors, { maxTries: 1 }).maxTries).toBe(1);
   });
 
   it('honours an explicit zero batching window', () => {

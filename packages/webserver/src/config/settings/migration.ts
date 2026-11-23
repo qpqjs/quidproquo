@@ -63,6 +63,8 @@ export const defineMigration = (migrations: Migration[], options?: QPQConfigAdva
         maxConcurrentExecutions: 1,
         batchSize: 1,
         concurrency: 1,
+        // One try only: a migration that failed part way must not be run again by itself.
+        maxTries: 1,
       },
     ),
   ];
