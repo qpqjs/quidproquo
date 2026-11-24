@@ -1,4 +1,4 @@
-import { CrossModuleOwner, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
+import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import {
   AccountBudgetQPQConfigSetting,
@@ -90,16 +90,24 @@ export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStore
   getDeclaredAwsDataStoreRemovalPolicy(qpqConfig) ?? AwsDataStoreRemovalPolicy.retain;
 
 /**
- * What happens to a storage drive when it leaves the config. The drive's own `deleteOnRemove` wins; without
- * one the declared defineAwsDataStoreRemovalPolicy decides; with neither the drive is destroyed.
+ * The one rule for a store that carries its own `deleteOnRemove`: its own answer wins; without one the declared
+ * defineAwsDataStoreRemovalPolicy decides; with neither the store is destroyed.
  */
-export const getStorageDriveRemovalPolicy = (storageDriveConfig: StorageDriveQPQConfigSetting, qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
-  if (storageDriveConfig.deleteOnRemove !== undefined) {
-    return storageDriveConfig.deleteOnRemove ? AwsDataStoreRemovalPolicy.destroy : AwsDataStoreRemovalPolicy.retain;
+const resolveDeleteOnRemovePolicy = (deleteOnRemove: boolean | undefined, qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
+  if (deleteOnRemove !== undefined) {
+    return deleteOnRemove ? AwsDataStoreRemovalPolicy.destroy : AwsDataStoreRemovalPolicy.retain;
   }
 
   return getDeclaredAwsDataStoreRemovalPolicy(qpqConfig) ?? AwsDataStoreRemovalPolicy.destroy;
 };
+
+/** What happens to a key value store when it leaves the config: its own `deleteOnRemove`, else the declared policy, else destroy. */
+export const getKeyValueStoreRemovalPolicy = (keyValueStoreConfig: KeyValueStoreQPQConfigSetting, qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy =>
+  resolveDeleteOnRemovePolicy(keyValueStoreConfig.deleteOnRemove, qpqConfig);
+
+/** What happens to a storage drive when it leaves the config: its own `deleteOnRemove`, else the declared policy, else destroy. */
+export const getStorageDriveRemovalPolicy = (storageDriveConfig: StorageDriveQPQConfigSetting, qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy =>
+  resolveDeleteOnRemovePolicy(storageDriveConfig.deleteOnRemove, qpqConfig);
 
 export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrganizationQPQConfigSetting[] => {
   const awsOrganizationQPQConfigSettings = qpqCoreUtils.getConfigSettings<AwsOrganizationQPQConfigSetting>(

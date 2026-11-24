@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { defineKeyValueStore, KeyValueStoreQPQConfigSetting, kvsKey } from '@qpqjs/core';
+import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { defineKeyValueStore, KeyValueStoreQPQConfigSetting, kvsKey, QPQConfigSetting } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
@@ -8,8 +8,8 @@ import { describe, expect, it } from 'vitest';
 
 import { QpqCoreKeyValueStoreConstruct } from './QpqCoreKeyValueStoreConstruct';
 
-const synth = (keyValueStoreConfig: KeyValueStoreQPQConfigSetting) => {
-  const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), keyValueStoreConfig]);
+const synth = (keyValueStoreConfig: KeyValueStoreQPQConfigSetting, extraSettings: QPQConfigSetting[] = []) => {
+  const qpqConfig = buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), keyValueStoreConfig, ...extraSettings]);
   const stack = new Stack(new App(), 'test', { env: { account: '123456789012', region: 'ap-southeast-2' } });
 
   new QpqCoreKeyValueStoreConstruct(stack, 'kvs', { qpqConfig, keyValueStoreConfig });
@@ -92,8 +92,8 @@ describe('QpqCoreKeyValueStoreConstruct global secondary indexes', () => {
 // Security regression: a store table is retained with deletion protection, keeps point in time
 // recovery on, bills per request and opens no stream unless a handler is configured.
 describe('QpqCoreKeyValueStoreConstruct table defaults', () => {
-  it('retains the table with deletion protection, point in time recovery and no stream', () => {
-    const template = synth(defineKeyValueStore<Order>('orders', 'id'));
+  it('builds a kept table with deletion protection, point in time recovery and no stream', () => {
+    const template = synth(defineKeyValueStore<Order>('orders', 'id', [], { deleteOnRemove: false }));
 
     template.hasResource('AWS::DynamoDB::Table', {
       DeletionPolicy: 'Retain',
@@ -108,11 +108,58 @@ describe('QpqCoreKeyValueStoreConstruct table defaults', () => {
   });
 
   it('turns point in time recovery off only when the store opts out', () => {
-    const template = synth(defineKeyValueStore<Order>('orders', 'id', [], { disablePointInTimeRecovery: true }));
+    const template = synth(defineKeyValueStore<Order>('orders', 'id', [], { disablePointInTimeRecovery: true, deleteOnRemove: false }));
     const tables = Object.values(template.findResources('AWS::DynamoDB::Table'));
 
     expect((tables[0] as any).Properties.PointInTimeRecoverySpecification).toEqual({ PointInTimeRecoveryEnabled: false });
     expect((tables[0] as any).Properties.DeletionProtectionEnabled).toBe(true);
+  });
+});
+
+// What CloudFormation does with a store's table when the store leaves the config, and whether the table refuses a delete.
+const removalOf = (template: Template) => {
+  const [table] = Object.values(template.findResources('AWS::DynamoDB::Table')) as {
+    DeletionPolicy: string;
+    UpdateReplacePolicy: string;
+    Properties: { DeletionProtectionEnabled: boolean };
+  }[];
+
+  return {
+    deletionPolicy: table!.DeletionPolicy,
+    updateReplacePolicy: table!.UpdateReplacePolicy,
+    deletionProtection: table!.Properties.DeletionProtectionEnabled,
+  };
+};
+
+const keptTable = { deletionPolicy: 'Retain', updateReplacePolicy: 'Retain', deletionProtection: true };
+const deletedTable = { deletionPolicy: 'Delete', updateReplacePolicy: 'Delete', deletionProtection: false };
+
+const retainDataStores = [defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)];
+const destroyDataStores = [defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)];
+
+describe('QpqCoreKeyValueStoreConstruct removal', () => {
+  it('deletes the table when neither the store nor the deployment says what to do', () => {
+    expect(removalOf(synth(defineKeyValueStore<Order>('orders', 'id')))).toEqual(deletedTable);
+  });
+
+  it("follows the deployment's declared policy when the store does not say", () => {
+    expect(removalOf(synth(defineKeyValueStore<Order>('orders', 'id'), retainDataStores))).toEqual(keptTable);
+    expect(removalOf(synth(defineKeyValueStore<Order>('orders', 'id'), destroyDataStores))).toEqual(deletedTable);
+  });
+
+  // The one way to protect a store's rows for certain: nothing else may override it.
+  it('keeps a store marked deleteOnRemove false, whatever the deployment says', () => {
+    const store = defineKeyValueStore<Order>('orders', 'id', [], { deleteOnRemove: false });
+
+    expect(removalOf(synth(store))).toEqual(keptTable);
+    expect(removalOf(synth(store, destroyDataStores))).toEqual(keptTable);
+  });
+
+  it('deletes a store marked deleteOnRemove true, whatever the deployment says', () => {
+    const store = defineKeyValueStore<Order>('orderViews', 'id', [], { deleteOnRemove: true });
+
+    expect(removalOf(synth(store))).toEqual(deletedTable);
+    expect(removalOf(synth(store, retainDataStores))).toEqual(deletedTable);
   });
 });
 

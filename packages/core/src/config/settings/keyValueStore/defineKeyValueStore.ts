@@ -92,6 +92,8 @@ export const defineKeyValueStore = <T extends object = any>(
     cryptoKeyName: options?.cryptoKeyName,
     scoped: options?.scoped ?? false,
 
+    deleteOnRemove: options?.deleteOnRemove,
+
     onStream: options?.onStream,
   };
 };
