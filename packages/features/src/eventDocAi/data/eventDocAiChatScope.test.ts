@@ -3,12 +3,23 @@ import { runStory } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
 
-import { EVENT_DOC_AI_CHAT_DRIVE_GLOBAL, EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL } from '../constants/eventDocAiGlobalNames';
+import {
+  EVENT_DOC_AI_CHAT_BLOBS_DRIVE_GLOBAL,
+  EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL,
+  EVENT_DOC_AI_CHAT_ROWS_STORE_GLOBAL,
+} from '../constants/eventDocAiGlobalNames';
 import { askEventDocAiAttachmentsValidate } from '../logic/askEventDocAiAttachmentsValidate';
-import type { EventDocAiChatSummary } from '../models';
-import { askEventDocAiChatHistoryLoad } from './askEventDocAiChatHistoryLoad';
-import { askEventDocAiChatHistorySave } from './askEventDocAiChatHistorySave';
+import type { EventDocAiChatRow, EventDocAiChatSummary } from '../models';
+import { EventDocAiChatRowDataType } from '../models/EventDocAiChatRowDataType';
+import { EventDocAiChatRowKind } from '../models/EventDocAiChatRowKind';
 import { askEventDocAiChatList } from './askEventDocAiChatList';
+import { askEventDocAiChatRowContentRead } from './askEventDocAiChatRowContentRead';
+import { askEventDocAiChatRowContentUrl } from './askEventDocAiChatRowContentUrl';
+import { askEventDocAiChatRowContentWrite } from './askEventDocAiChatRowContentWrite';
+import { askEventDocAiChatRowGet } from './askEventDocAiChatRowGet';
+import { askEventDocAiChatRowsQueryAll } from './askEventDocAiChatRowsQueryAll';
+import { askEventDocAiChatRowsQueryPage } from './askEventDocAiChatRowsQueryPage';
+import { askEventDocAiChatRowsWrite } from './askEventDocAiChatRowsWrite';
 import { askEventDocAiChatTouch } from './askEventDocAiChatTouch';
 import { askEventDocAiChatUpsert } from './askEventDocAiChatUpsert';
 
@@ -26,23 +37,37 @@ const chat: EventDocAiChatSummary = {
 };
 
 const globals: Record<string, string> = {
-  [EVENT_DOC_AI_CHAT_DRIVE_GLOBAL]: 'chat-drive',
+  [EVENT_DOC_AI_CHAT_BLOBS_DRIVE_GLOBAL]: 'chat-blobs',
   [EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL]: 'chat-list',
+  [EVENT_DOC_AI_CHAT_ROWS_STORE_GLOBAL]: 'chat-rows',
 };
 
-// Exercises every storage site in one pass: history save/load (file write,
-// exists, read), list + touch (queries + upsert), upsert, attachment check.
+const row: EventDocAiChatRow = {
+  sk: 'row-1',
+  messageId: 'row-1',
+  role: 'user',
+  kind: EventDocAiChatRowKind.Text,
+  data: { type: EventDocAiChatRowDataType.Inline, content: 'Hi' },
+};
+
+// Exercises every storage site in one pass: the rows (write, read all, read a page, read one), a row's stored content
+// (write, read, link), the chat list (list, upsert, touch) and the attachment check.
 function* askRunAllChatStorageFns(): AskResponse<void> {
-  yield* askEventDocAiChatHistorySave('doc-1', 'chat-1', []);
-  yield* askEventDocAiChatHistoryLoad('doc-1', 'chat-1');
+  yield* askEventDocAiChatRowsWrite('doc-1', 'chat-1', [row]);
+  yield* askEventDocAiChatRowsQueryAll('doc-1', 'chat-1');
+  yield* askEventDocAiChatRowsQueryPage('doc-1', 'chat-1', { includeUsage: false });
+  yield* askEventDocAiChatRowGet('doc-1', 'chat-1', 'row-1');
+  yield* askEventDocAiChatRowContentWrite('doc-1', 'chat-1', 'row-1', 'a long text');
+  yield* askEventDocAiChatRowContentRead('doc-1', 'chat-1', 'row-1');
+  yield* askEventDocAiChatRowContentUrl('doc-1', 'chat-1', 'row-1');
   yield* askEventDocAiChatList('doc-1');
   yield* askEventDocAiChatUpsert(chat);
   yield* askEventDocAiChatTouch('doc-1', 'chat-1');
   yield* askEventDocAiAttachmentsValidate('doc-drive', 'doc-1', [{ assetId: 'a1', filename: 'a.png', mediaType: 'image/png' }]);
 }
 
-// 8 storage actions total: write, exists, read, query, upsert, query, upsert, exists.
-const EXPECTED_STORAGE_ACTION_COUNT = 8;
+// 12 storage actions total: upsert many, query x3, file write, read, link, query, upsert, query, upsert, exists.
+const EXPECTED_STORAGE_ACTION_COUNT = 12;
 
 const buildMocks = (seenScopes: (string | undefined)[]) => ({
   [ConfigActionType.GetGlobal]: (action: any) => globals[action.payload.globalName] ?? '',
@@ -51,13 +76,21 @@ const buildMocks = (seenScopes: (string | undefined)[]) => ({
     seenScopes.push(action.payload.scope);
     return undefined;
   },
+  [FileActionType.GenerateTemporarySecureUrl]: (action: any) => {
+    seenScopes.push(action.payload.scope);
+    return 'https://files.example/value.json';
+  },
+  [KeyValueStoreActionType.UpsertMany]: (action: any) => {
+    seenScopes.push(action.payload.options?.scope);
+    return undefined;
+  },
   [FileActionType.Exists]: (action: any) => {
     seenScopes.push(action.payload.scope);
     return true;
   },
   [FileActionType.ReadObjectJson]: (action: any) => {
     seenScopes.push(action.payload.scope);
-    return { messages: [] };
+    return { content: 'x' };
   },
   [KeyValueStoreActionType.Query]: (action: any) => {
     seenScopes.push(action.payload.options?.scope);

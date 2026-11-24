@@ -4,3 +4,4 @@ export const EVENT_DOC_AI_METHOD_CHAT_CREATE = 'ChatCreate';
 export const EVENT_DOC_AI_METHOD_CHAT_LIST = 'ChatList';
 export const EVENT_DOC_AI_METHOD_CHAT_HISTORY = 'ChatHistory';
 export const EVENT_DOC_AI_METHOD_CHAT_SEND = 'ChatSend';
+export const EVENT_DOC_AI_METHOD_CHAT_ROW_CONTENT = 'ChatRowContent';
