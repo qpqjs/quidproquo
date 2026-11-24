@@ -15,6 +15,12 @@ describe('askServiceRequest', () => {
     });
   });
 
+  it('carries the time limit when the caller sets one', () => {
+    const { action } = captureRequester(askServiceRequest('billing', 'charge', {}, { timeoutMs: 30_000 }));
+
+    expect(action.payload).toEqual({ serviceName: 'billing', method: 'charge', payload: {}, timeoutMs: 30_000 });
+  });
+
   it('passes the response through', () => {
     const { returned } = captureRequester(askServiceRequest('billing', 'charge', {}), { ok: true });
 

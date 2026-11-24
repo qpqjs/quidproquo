@@ -7,6 +7,7 @@ export const askWebsocketSendMessageBase = createActionRequester<void>()({
   errorTypes: [
     'Throttled', // the websocket service is rate limiting sends
     'Disconnected', // the connection is gone, the message was not delivered
+    'TooLarge', // the message is bigger than a websocket message may be, it was not delivered
   ],
   getPayload: (websocketApiName: string, connectionId: string, payload: unknown) => ({ websocketApiName, connectionId, payload }),
 });

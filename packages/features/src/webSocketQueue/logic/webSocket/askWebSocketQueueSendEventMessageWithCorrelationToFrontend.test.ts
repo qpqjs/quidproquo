@@ -1,4 +1,4 @@
-import { ContextActionType, KeyValueStoreActionType } from '@qpqjs/core';
+import { ContextActionType, KeyValueStoreActionType, LogActionType, LogLevelEnum } from '@qpqjs/core';
 import { runStory, throwsError } from '@qpqjs/testing';
 import { askWebsocketSendMessageBase, WebsocketActionType } from '@qpqjs/webserver';
 
@@ -109,9 +109,10 @@ describe('askWebSocketQueueSendEventMessageWithCorrelationToFrontend', () => {
     ]);
   });
 
-  it('skips a throttled connection without deleting its record or aborting the loop', () => {
+  it('skips a throttled connection without deleting its record or aborting the loop, and logs the lost message', () => {
     const sends: any[] = [];
     const deletes: any[] = [];
+    const logs: any[] = [];
 
     runStory(askWebSocketQueueSendEventMessageWithCorrelationToFrontend(message), {
       [ContextActionType.Read]: { apiName: 'demo' },
@@ -128,9 +129,23 @@ describe('askWebSocketQueueSendEventMessageWithCorrelationToFrontend', () => {
         }
         return undefined;
       },
+      [LogActionType.Create]: (action: any) => {
+        logs.push(action.payload);
+        return undefined;
+      },
     });
 
     expect(sends).toEqual(['a', 'busy', 'b']);
     expect(deletes).toEqual([]);
+    expect(logs).toEqual([
+      expect.objectContaining({
+        logLevel: LogLevelEnum.Warn,
+        data: expect.objectContaining({
+          connectionId: 'busy',
+          messageType: 'some-event',
+          errorType: askWebsocketSendMessageBase.errorType.Throttled,
+        }),
+      }),
+    ]);
   });
 });

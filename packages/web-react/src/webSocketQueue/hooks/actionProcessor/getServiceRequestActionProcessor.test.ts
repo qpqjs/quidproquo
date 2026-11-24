@@ -1,8 +1,8 @@
 import { ActionProcessor, ErrorTypeEnum, Nullable } from '@qpqjs/core';
-import { ServiceActionType } from '@qpqjs/features';
+import { askServiceRequestBase, ServiceActionType } from '@qpqjs/features';
 import { buildTestQpqConfig, invokeProcessor, noopDynamicModuleLoader } from '@qpqjs/testing';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getServiceRequestActionProcessor } from './getServiceRequestActionProcessor';
 
@@ -14,6 +14,8 @@ const resolve = async (sendEvent: Nullable<(event: unknown) => Promise<any>>): P
 };
 
 describe('getServiceRequestActionProcessor', () => {
+  afterEach(() => vi.useRealTimers());
+
   it('sends a correlated service request event and returns the result', async () => {
     const sendEvent = vi.fn().mockResolvedValue({ success: true, result: { ok: true } });
 
@@ -32,6 +34,24 @@ describe('getServiceRequestActionProcessor', () => {
     const result = await invokeProcessor(await resolve(sendEvent), payload);
 
     expect(result).toEqual([undefined, { errorType: ErrorTypeEnum.GenericError, errorText: 'nope', errorStack: 'stack' }]);
+  });
+
+  it('fails with Timeout when a time limit is set and no response arrives', async () => {
+    vi.useFakeTimers();
+    const sendEvent = vi.fn().mockReturnValue(new Promise(() => undefined));
+
+    const pending = invokeProcessor(await resolve(sendEvent), { ...payload, timeoutMs: 30_000 });
+    await vi.advanceTimersByTimeAsync(30_000);
+
+    expect(await pending).toEqual([undefined, expect.objectContaining({ errorType: askServiceRequestBase.errorType.Timeout })]);
+  });
+
+  it('returns the response when it arrives inside the time limit', async () => {
+    const sendEvent = vi.fn().mockResolvedValue({ success: true, result: { ok: true } });
+
+    const result = await invokeProcessor(await resolve(sendEvent), { ...payload, timeoutMs: 30_000 });
+
+    expect(result).toEqual([{ ok: true }]);
   });
 
   it('returns an undefined result when there is no sender', async () => {
