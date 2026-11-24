@@ -1,7 +1,8 @@
 // Per-processor global keys carried on the wsController runtimes (the eventDoc
 // EVENT_DOC_* globals are set alongside these so controllers/tools get the full
 // doc-store context too).
-export const EVENT_DOC_AI_CHAT_DRIVE_GLOBAL = 'eventDocAiChatDrive';
+export const EVENT_DOC_AI_CHAT_BLOBS_DRIVE_GLOBAL = 'eventDocAiChatBlobsDrive';
+export const EVENT_DOC_AI_CHAT_ROWS_STORE_GLOBAL = 'eventDocAiChatRowsStore';
 export const EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL = 'eventDocAiChatListStore';
 export const EVENT_DOC_AI_SERVICE_NAME_GLOBAL = 'eventDocAiServiceName';
 export const EVENT_DOC_AI_NAME_GLOBAL = 'eventDocAiName';

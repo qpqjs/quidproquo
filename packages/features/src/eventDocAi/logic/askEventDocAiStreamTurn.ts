@@ -31,10 +31,10 @@ export type EventDocAiStreamTurnOptions = {
 };
 
 /**
- * Streams one model reply for an already-saved history and folds it in. Stream
+ * Streams one model reply for an already-saved chat and folds it in. Stream
  * parts are transport-only: each is dispatched to the UI as it arrives, then the
- * completed reply is saved as durable segments and dispatched as the finalized
- * message. Hands the turn to a continuation execution (and returns deferred)
+ * completed reply is saved as durable segments and the UI is told to finalize the
+ * reply it streamed. Hands the turn to a continuation execution (and returns deferred)
  * whenever the runtime deadline gets in the way, before or after streaming.
  */
 export function* askEventDocAiStreamTurn(
@@ -53,14 +53,18 @@ export function* askEventDocAiStreamTurn(
 
   const { streamHandle, model } = yield* askEventDocAiPromptStreamOpen(docId, history, isContinuation, budgetMs);
 
-  const assistantParts = yield* askEventDocAiStreamToUi(streamHandle);
+  const assistantParts = yield* askEventDocAiStreamToUi(chatId, streamHandle);
 
   // Counted before the reply is saved: the model call was billed whether or not the save works.
   yield* askEventDocAiUsageReport(model, assistantParts);
 
-  const segments = yield* askEventDocAiReplySave(docId, chatId, history, assistantParts, model, usageVisible);
+  const segments = yield* askEventDocAiReplySave(docId, chatId, assistantParts, model, usageVisible);
 
-  yield* askEventDocAiClearStream();
+  // Finalizing clears the stream. Only a reply with nothing to save is cleared here: a stream left
+  // showing after a send tells the browser its finalize signal was lost, and it reloads the chat.
+  if (segments.length === 0) {
+    yield* askEventDocAiClearStream(chatId);
+  }
 
   yield* askEventDocAiChatTouch(docId, chatId);
 

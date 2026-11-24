@@ -2,11 +2,11 @@ import { askConfigGetGlobal, AskResponse } from '@qpqjs/core';
 
 import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
-import { askEventDocAiChatHistoryLoad } from '../data/askEventDocAiChatHistoryLoad';
-import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import type { EventDocAiAttachment, EventDocAiChatSendResult } from '../models';
 import { makeEventDocAiUserMessage } from '../module';
 import { askEventDocAiAttachmentsValidate } from './askEventDocAiAttachmentsValidate';
+import { askEventDocAiChatMessagesAppend } from './askEventDocAiChatMessagesAppend';
+import { askEventDocAiChatMessagesLoad } from './askEventDocAiChatMessagesLoad';
 import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
 
 /**
@@ -20,14 +20,14 @@ export function* askEventDocAiProcessSend(
   attachments: EventDocAiAttachment[] = [],
 ): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
   // Attachments are doc assets, they live on the collection's storage drive
-  // (uploaded via the eventDoc asset routes), not the chat-history drive.
+  // (uploaded via the eventDoc asset routes), not on a chat drive.
   const docStorageDrive = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
 
   yield* askEventDocAiAttachmentsValidate(docStorageDrive, docId, attachments);
 
-  const history = [...(yield* askEventDocAiChatHistoryLoad(docId, chatId)), makeEventDocAiUserMessage(message, attachments)];
+  yield* askEventDocAiChatMessagesAppend(docId, chatId, [makeEventDocAiUserMessage(message, attachments)]);
 
-  yield* askEventDocAiChatHistorySave(docId, chatId, history);
+  const history = yield* askEventDocAiChatMessagesLoad(docId, chatId);
 
   return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: false, lengthResumes: 0 });
 }

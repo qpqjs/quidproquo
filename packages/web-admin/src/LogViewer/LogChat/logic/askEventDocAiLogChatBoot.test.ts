@@ -16,7 +16,8 @@ const baseMocks = (chats: { chatId: string; updatedAt: string }[], requests: { m
   [ServiceActionType.Request]: (action: { payload: { method: string; payload: unknown } }) => {
     requests.push({ method: action.payload.method, payload: action.payload.payload });
 
-    return action.payload.method.endsWith('ChatList') ? chats : [];
+    // A history request is answered with one page of the chat's rows.
+    return action.payload.method.endsWith('ChatList') ? chats : { rows: [], hasMore: false };
   },
 });
 

@@ -53,14 +53,15 @@ Loads the full message history of one chat.
 ```typescript
 function* askEventDocAiChatHistoryRequest(
   payload: EventDocAiChatHistoryPayload,
-): AskResponse<EventDocAiChatMessage[]>;
+): AskResponse<EventDocAiChatHistoryResult>;
 ```
 
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `payload.chatId` | `string` | The chat to load history for. |
+| `payload.before` | `string` (optional) | A row id. Returns the page of rows just before it; omitted, the newest page. |
 
-**Returns** `EventDocAiChatMessage[]` — every persisted message (`{ role, segments[] }`); an empty array if the chat has no saved history.
+**Returns** `EventDocAiChatHistoryResult`: `{ rows, hasMore }`, one page of the chat's rows (`EventDocAiChatRow[]`), oldest first. Without `before` in the payload it is the newest page; with it, the page just before that row id. `hasMore` says older rows remain. A chat is never returned whole, since a websocket message over 128 KB is not delivered. `askEventDocAiLoadChatRows(chatId, mode)` walks every page for you, and `askEventDocAiSelectChat` uses it.
 
 ## askEventDocAiChatSendRequest
 

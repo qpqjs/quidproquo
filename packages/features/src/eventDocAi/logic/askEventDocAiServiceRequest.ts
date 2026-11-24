@@ -1,6 +1,6 @@
 import { AskResponse } from '@qpqjs/core';
 
-import { askServiceRequest } from '../../webSocketQueue/actions';
+import { askServiceRequest, ServiceRequestOptions } from '../../webSocketQueue/actions';
 import { askEventDocAiRead } from '../context';
 import type { EventDocAiDocRef } from '../models';
 import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
@@ -11,11 +11,20 @@ import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 // never appear in composites or request call sites. The backend wrapper
 // (eventDocAiServiceRequest) strips the docId back off and re-provides it as
 // context around the handler.
-export function* askEventDocAiServiceRequest<TResult, TPayload = unknown>(method: string, payload: TPayload): AskResponse<TResult> {
+export function* askEventDocAiServiceRequest<TResult, TPayload = unknown>(
+  method: string,
+  payload: TPayload,
+  options?: ServiceRequestOptions,
+): AskResponse<TResult> {
   const { serviceName, type, docId } = yield* askEventDocAiRead();
 
-  return yield* askServiceRequest<TResult, TPayload & EventDocAiDocRef>(serviceName, buildEventDocAiMethodName(type, method), {
-    ...payload,
-    docId,
-  });
+  return yield* askServiceRequest<TResult, TPayload & EventDocAiDocRef>(
+    serviceName,
+    buildEventDocAiMethodName(type, method),
+    {
+      ...payload,
+      docId,
+    },
+    options,
+  );
 }

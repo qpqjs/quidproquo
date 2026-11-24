@@ -1,25 +1,29 @@
-import { type AiModel, type AiStreamPart, AskResponse } from '@qpqjs/core';
+import { type AiModel, type AiStreamPart, AiStreamPartType, AskResponse } from '@qpqjs/core';
 
-import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import type { EventDocAiChatMessage, EventDocAiMessageSegment } from '../models';
-import { askEventDocAiAppendChatMessage, mergeStreamParts } from '../module';
+import { askEventDocAiFinalizeStream, mergeStreamParts } from '../module';
+import { askEventDocAiChatMessagesAppend } from './askEventDocAiChatMessagesAppend';
 import { askEventDocAiReplyUsage } from './askEventDocAiReplyUsage';
-import { redactEventDocAiChatMessageUsage } from './redactEventDocAiChatMessageUsage';
+import { isEventDocAiStreamPartForwarded } from './isEventDocAiStreamPartForwarded';
 import { withEventDocAiStopNotice } from './withEventDocAiStopNotice';
 
-// Folds the streamed parts into the durable reply, saves it onto the history and shows
-// the finalized message. Returns the saved segments (empty when there was nothing to save).
+/**
+ * Folds the streamed parts into the durable reply, adds it to the chat and tells the browser to
+ * finalize the reply it streamed. The reply itself is never sent again: it can be too big for one
+ * websocket message. Returns the saved segments (empty when there was nothing to save).
+ */
 export function* askEventDocAiReplySave(
   docId: string,
   chatId: string,
-  history: EventDocAiChatMessage[],
   assistantParts: AiStreamPart[],
   model: AiModel,
   usageVisible: boolean,
 ): AskResponse<EventDocAiMessageSegment[]> {
+  const streamedSegments = mergeStreamParts(assistantParts);
+
   // A turn that failed, was declined, or ended without an answer for a reason this
   // version cannot name saves a notice saying so, so the person is never left with silence.
-  const segments = withEventDocAiStopNotice(mergeStreamParts(assistantParts), assistantParts);
+  const segments = withEventDocAiStopNotice(streamedSegments, assistantParts);
 
   if (segments.length === 0) {
     return segments;
@@ -35,9 +39,17 @@ export function* askEventDocAiReplySave(
     ...(usage ? { usage } : {}),
   };
 
-  yield* askEventDocAiChatHistorySave(docId, chatId, [...history, assistantMessage]);
+  yield* askEventDocAiChatMessagesAppend(docId, chatId, [assistantMessage]);
 
-  yield* askEventDocAiAppendChatMessage(usageVisible ? assistantMessage : redactEventDocAiChatMessageUsage(assistantMessage));
+  yield* askEventDocAiFinalizeStream({
+    chatId,
+    model,
+    ...(usage && usageVisible ? { usage } : {}),
+    // The notice is added here, after the stream, so the browser never streamed it.
+    trailingSegments: segments.slice(streamedSegments.length),
+    // A part that was held back means the browser's copy of the reply has a hole in it.
+    isPartial: !assistantParts.every((part) => part.type === AiStreamPartType.ToolInputDelta || isEventDocAiStreamPartForwarded(part)),
+  });
 
   return segments;
 }
