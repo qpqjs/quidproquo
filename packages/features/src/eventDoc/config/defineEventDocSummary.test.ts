@@ -39,6 +39,28 @@ describe('defineEventDocSummary', () => {
     expect(qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.deleteOnRemove)).toEqual([undefined]);
   });
 
+  // What each store and the drive of a collection does when it leaves the config, by name.
+  const deleteOnRemoveOf = (deleteOnRemove?: boolean) => {
+    const config = defineEventDocSummary('memos', { deleteOnRemove });
+
+    return {
+      ...Object.fromEntries(qpqCoreUtils.getAllKeyValueStoreConfigs(config).map((kvs) => [kvs.keyValueStoreName, kvs.deleteOnRemove])),
+      drive: qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.deleteOnRemove),
+    };
+  };
+
+  const rebuildable = { memos: true, [eventDocListsStoreName('memos')]: true, [eventDocSnapshotsStoreName('memos')]: true };
+
+  it("hands the collection's deleteOnRemove to the events store and the drive, which nothing can rebuild", () => {
+    expect(deleteOnRemoveOf(false)).toEqual({ ...rebuildable, [eventDocEventsStoreName('memos')]: false, drive: [false] });
+    expect(deleteOnRemoveOf(true)).toEqual({ ...rebuildable, [eventDocEventsStoreName('memos')]: true, drive: [true] });
+  });
+
+  // Unset must stay unset so the deployment decides, exactly as it does for a store declared directly.
+  it('leaves the events store and the drive unset when the collection does not say', () => {
+    expect(deleteOnRemoveOf()).toEqual({ ...rebuildable, [eventDocEventsStoreName('memos')]: undefined, drive: [undefined] });
+  });
+
   it('hands one owner to every store and the drive, so a collection can be referenced from another service', () => {
     // A service declares its module before anything else; the owner-only reproject queue opens against it.
     const config = [defineModule('template'), defineEventDocSummary('memos', { owner: { module: 'template' } })];

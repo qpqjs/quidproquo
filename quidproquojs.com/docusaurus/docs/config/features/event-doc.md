@@ -118,6 +118,8 @@ A reference to the module exporting `functions`, usually a relative path string 
 
 The same object [defineEventDocRoutes](./event-doc-routes.md#parameters) takes, minus `storeName`/`type` (read off `functions` instead). See the [defineEventDocRoutes parameter reference](./event-doc-routes.md#parameters) for every field: `basePath`, `routeAuthSettings`, `version`, `onPublish`, `onAppend`, `scopeResolver`, `excludeRoutes`.
 
+It takes one more field, `deleteOnRemove` (`boolean`, optional): whether the collection's documents are deleted for good when the collection leaves the config. It is passed to [defineEventDocSummary](./event-doc-summary.md#options--eventdocsummaryoptions-optional), which hands it to the events store and the asset drive. Left unset, the deployment decides.
+
 ## Examples
 
 ```typescript

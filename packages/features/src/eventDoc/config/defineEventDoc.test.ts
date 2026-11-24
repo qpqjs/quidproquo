@@ -31,6 +31,19 @@ const snapshotFunctionsGlobalOf = (config: ReturnType<typeof defineEventDoc>): R
 };
 
 describe('defineEventDoc', () => {
+  it('passes deleteOnRemove down to the events store and the drive, and leaves it unset when not given', () => {
+    const eventsDeleteOnRemove = (config: ReturnType<typeof defineEventDoc>) =>
+      qpqCoreUtils.getAllKeyValueStoreConfigs(config).find((kvs) => kvs.keyValueStoreName === eventDocEventsStoreName('memos'))?.deleteOnRemove;
+    const driveDeleteOnRemove = (config: ReturnType<typeof defineEventDoc>) =>
+      qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.deleteOnRemove);
+
+    const kept = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos', deleteOnRemove: false });
+    const unset = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos' });
+
+    expect([eventsDeleteOnRemove(kept), driveDeleteOnRemove(kept)]).toEqual([false, [false]]);
+    expect([eventsDeleteOnRemove(unset), driveDeleteOnRemove(unset)]).toEqual([undefined, [undefined]]);
+  });
+
   it('registers the functions object once and wires the snapshot map to its name', () => {
     const config = defineEventDoc(memoFunctions, FUNCTIONS_RUNTIME, { basePath: '/memos' });
 

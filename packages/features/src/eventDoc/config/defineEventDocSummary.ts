@@ -33,6 +33,10 @@ export type EventDocSummaryOptions = {
   scoped?: boolean;
   // The service whose deploy creates the stores and the drive; every other service gets references. Absent: this one.
   owner?: CrossModuleOwnerWithNoResourceOverride;
+  // Whether the collection's documents (its events store and blob drive) are deleted for good when the collection
+  // leaves the config. Unset means the deployment decides, as it does for any store. The stores the events can
+  // rebuild are always deleted, whatever this says.
+  deleteOnRemove?: boolean;
 };
 
 // The queue a reproject of the collection runs on: a walk that finds its documents a page at a time, and one message
@@ -66,8 +70,8 @@ const defineReprojectQueue = (keyValueStoreName: string, options?: EventDocSumma
  * writes to it.
  *
  * The events are the source of truth. The lists, snapshots and legacy summary stores hold only what the events can
- * rebuild, so they are deleted when they leave the config whatever the deployment says. The events store and the blob
- * drive are not marked, so the deployment's policy decides for them: nothing can rebuild them.
+ * rebuild, so they are deleted when they leave the config whatever anything says. The events store and the blob drive
+ * hold what nothing can rebuild, so they take the collection's `deleteOnRemove`, and without one the deployment decides.
  */
 export const defineEventDocSummary = (keyValueStoreName: string, options?: EventDocSummaryOptions): QPQConfig => [
   // TODO: @joe-coady: drop this legacy summary store once every collection is rebuilt into the lists store, and the
@@ -84,6 +88,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
     owner: options?.owner,
+    deleteOnRemove: options?.deleteOnRemove,
     onStream: {
       runtime: {
         ...getFeatureEntryQpqFunctionRuntime('eventDoc', 'kvsStream', 'eventDocSummaryProjector::projectEventDocSummary'),
@@ -115,7 +120,11 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     owner: options?.owner,
     deleteOnRemove: true,
   }),
-  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), { scoped: options?.scoped, owner: options?.owner }),
+  defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), {
+    scoped: options?.scoped,
+    owner: options?.owner,
+    deleteOnRemove: options?.deleteOnRemove,
+  }),
 
   // Owner only, like the stream projector: one service rebuilds a collection's rows and snapshots.
   options?.owner?.module

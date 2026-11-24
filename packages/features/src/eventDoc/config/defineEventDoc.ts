@@ -17,9 +17,16 @@ export const defineEventDoc = (functions: EventDocFunctions, runtime: QpqFunctio
 
   const functionsName = eventDocFunctionsName(storeName, type);
 
+  // deleteOnRemove is about the stores, so the routes are not handed it.
+  const { deleteOnRemove, ...routesOptions } = options;
+
   return [
     defineDynamicFunctions(functionsName, runtime),
-    defineEventDocSummary(storeName, { snapshotFunctions: { [type]: functionsName }, scoped: options.scopeResolver !== undefined }),
-    defineEventDocRoutes({ storeName, type, sync: functions.sync, ...options }),
+    defineEventDocSummary(storeName, {
+      snapshotFunctions: { [type]: functionsName },
+      scoped: options.scopeResolver !== undefined,
+      deleteOnRemove,
+    }),
+    defineEventDocRoutes({ storeName, type, sync: functions.sync, ...routesOptions }),
   ];
 };
