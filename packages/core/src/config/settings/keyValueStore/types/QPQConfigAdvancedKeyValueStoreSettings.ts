@@ -24,6 +24,13 @@ export type QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> = {
   // than hitting the unpartitioned rows. askKeyValueStoreScanAllScopes is exempt.
   scoped?: boolean;
 
+  // Whether taking this store out of the config deletes it and every row in it, for good. Set it to
+  // false on any store whose rows must outlive a mistake in the config: left unset, the deployment
+  // decides, and a deployment that says nothing deletes. It only takes effect once deployed, so a
+  // store deployed as kept must be deployed as deletable before the deploy that removes it. Renaming
+  // a store counts as removing it.
+  deleteOnRemove?: boolean;
+
   // Turn on change data capture, see KvsStreamSettings. Absent means no stream is
   // created at all.
   onStream?: KvsStreamSettings;

@@ -29,6 +29,7 @@ describe('defineKeyValueStore', () => {
       disablePointInTimeRecovery: false,
       cryptoKeyName: undefined,
       scoped: false,
+      deleteOnRemove: undefined,
     });
   });
 
@@ -82,6 +83,13 @@ describe('defineKeyValueStore', () => {
         ],
       }),
     ).toThrow("Key value store 'docs' declares two indexes named 'type'; give one an explicit name");
+  });
+
+  // Unset is its own answer (the deployment decides), so it must not be turned into true or false here.
+  it('leaves deleteOnRemove unset unless given, and carries either answer through', () => {
+    expect(defineKeyValueStore('Users', 'id').deleteOnRemove).toBeUndefined();
+    expect(defineKeyValueStore('Users', 'id', [], { deleteOnRemove: true }).deleteOnRemove).toBe(true);
+    expect(defineKeyValueStore('Users', 'id', [], { deleteOnRemove: false }).deleteOnRemove).toBe(false);
   });
 
   it('refuses a binary index partition key on a scoped store', () => {

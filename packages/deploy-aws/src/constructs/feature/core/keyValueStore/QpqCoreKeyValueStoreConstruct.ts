@@ -75,7 +75,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   constructor(scope: Construct, id: string, props: QpqCoreKeyValueStoreConstructProps) {
     super(scope, id, props);
 
-    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+    // The store's own deleteOnRemove, else the deployment's declared policy, else destroy.
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getKeyValueStoreRemovalPolicy(props.keyValueStoreConfig, props.qpqConfig);
 
     const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
 
@@ -92,7 +93,6 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       partitionKey: convertKvsKeyToDynamodbAttribute(props.keyValueStoreConfig.partitionKey),
       sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
-      // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
       // When retained, deletionProtection also blocks deletes/replacements outright (RETAIN alone only orphans the table).
       removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,

@@ -64,15 +64,20 @@ const defineReprojectQueue = (keyValueStoreName: string, options?: EventDocSumma
  * (`${name}Events`) and snapshots (`${name}Snap`), plus the queue a reproject of it runs on (`${name}Reproj`). The
  * store under the bare name is the legacy summary store: it stays declared so a rebuild can read its rows, and nothing
  * writes to it.
+ *
+ * The events are the source of truth. The lists, snapshots and legacy summary stores hold only what the events can
+ * rebuild, so they are deleted when they leave the config whatever the deployment says. The events store and the blob
+ * drive are not marked, so the deployment's policy decides for them: nothing can rebuild them.
  */
 export const defineEventDocSummary = (keyValueStoreName: string, options?: EventDocSummaryOptions): QPQConfig => [
   // TODO: @joe-coady: drop this legacy summary store once every collection is rebuilt into the lists store, and the
-  // reproject walk's LegacySummary source with it.
+  // reproject walk's LegacySummary source with it. Dropping it deletes its rows, which a rebuild from it still needs.
   defineKeyValueStore<EventDocSummary>(keyValueStoreName, 'type', ['id'], {
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
     owner: options?.owner,
+    deleteOnRemove: true,
   }),
   // pk=modelId, sk=numeric event id. The stream drives the summary projector; coalescing makes one burst one rebuild.
   defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
@@ -99,6 +104,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
     owner: options?.owner,
+    deleteOnRemove: true,
   }),
 
   // pk=docId#view, sk=the event id the snapshot captures. Defined for every collection so enabling snapshots later
@@ -107,6 +113,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
     disablePointInTimeRecovery: false,
     scoped: options?.scoped,
     owner: options?.owner,
+    deleteOnRemove: true,
   }),
   defineStorageDrive(eventDocStorageDriveName(keyValueStoreName), { scoped: options?.scoped, owner: options?.owner }),
 

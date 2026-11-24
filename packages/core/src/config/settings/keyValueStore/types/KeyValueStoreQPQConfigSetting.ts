@@ -20,5 +20,8 @@ export type KeyValueStoreQPQConfigSetting<T extends object = any> = {
   cryptoKeyName?: string;
   scoped: boolean;
 
+  // Unset means the deployment decides.
+  deleteOnRemove?: boolean;
+
   onStream?: KvsStreamSettings;
 } & QPQConfigSetting;

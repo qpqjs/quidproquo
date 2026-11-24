@@ -6,6 +6,7 @@ import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
 import { eventDocListsStoreName } from '../constants/eventDocListsStoreName';
 import { eventDocReprojectQueueName } from '../constants/eventDocReprojectQueueName';
+import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { EventDocReprojectMessageType } from '../models';
 import { defineEventDocSummary } from './defineEventDocSummary';
 
@@ -20,6 +21,22 @@ describe('defineEventDocSummary', () => {
     expect(stores.every((kvs) => kvs.disablePointInTimeRecovery === false)).toBe(true);
     expect(stores.every((kvs) => kvs.scoped === true)).toBe(true);
     expect(qpqCoreUtils.getAllStorageDriveConfigs(defineEventDocSummary('memos', { scoped: true })).map((drive) => drive.scoped)).toEqual([true]);
+  });
+
+  // The events are the source of truth: only what a reproject rebuilds from them may be deleted with the config.
+  it('marks only the stores the events can rebuild as deleted when they leave the config', () => {
+    const config = defineEventDocSummary('memos');
+    const deleteOnRemoveByStore = Object.fromEntries(
+      qpqCoreUtils.getAllKeyValueStoreConfigs(config).map((kvs) => [kvs.keyValueStoreName, kvs.deleteOnRemove]),
+    );
+
+    expect(deleteOnRemoveByStore).toEqual({
+      memos: true,
+      [eventDocEventsStoreName('memos')]: undefined,
+      [eventDocListsStoreName('memos')]: true,
+      [eventDocSnapshotsStoreName('memos')]: true,
+    });
+    expect(qpqCoreUtils.getAllStorageDriveConfigs(config).map((drive) => drive.deleteOnRemove)).toEqual([undefined]);
   });
 
   it('hands one owner to every store and the drive, so a collection can be referenced from another service', () => {

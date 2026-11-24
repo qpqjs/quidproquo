@@ -41,6 +41,7 @@ import {
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
   getDynamoTableNameOverride,
+  getKeyValueStoreRemovalPolicy,
   getLayerProvidedModules,
   getLocalServiceAccountInfo,
   getOwnedAwsAlarmConfigs,
@@ -193,6 +194,40 @@ describe('getDeclaredAwsDataStoreRemovalPolicy', () => {
     const config = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)]);
 
     expect(getDeclaredAwsDataStoreRemovalPolicy(config)).toBe(AwsDataStoreRemovalPolicy.retain);
+  });
+});
+
+describe('getKeyValueStoreRemovalPolicy', () => {
+  const retainConfig = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)]);
+  const destroyConfig = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)]);
+  const silentConfig = buildTestQpqConfig();
+
+  it("takes the store's own answer over everything else", () => {
+    const keep = defineKeyValueStore('events', 'id', [], { deleteOnRemove: false });
+    const remove = defineKeyValueStore('views', 'id', [], { deleteOnRemove: true });
+
+    expect([silentConfig, retainConfig, destroyConfig].map((config) => getKeyValueStoreRemovalPolicy(keep, config))).toEqual([
+      AwsDataStoreRemovalPolicy.retain,
+      AwsDataStoreRemovalPolicy.retain,
+      AwsDataStoreRemovalPolicy.retain,
+    ]);
+    expect([silentConfig, retainConfig, destroyConfig].map((config) => getKeyValueStoreRemovalPolicy(remove, config))).toEqual([
+      AwsDataStoreRemovalPolicy.destroy,
+      AwsDataStoreRemovalPolicy.destroy,
+      AwsDataStoreRemovalPolicy.destroy,
+    ]);
+  });
+
+  it("falls back to the deployment's declared policy when the store does not say", () => {
+    const store = defineKeyValueStore('users', 'id');
+
+    expect(getKeyValueStoreRemovalPolicy(store, retainConfig)).toBe(AwsDataStoreRemovalPolicy.retain);
+    expect(getKeyValueStoreRemovalPolicy(store, destroyConfig)).toBe(AwsDataStoreRemovalPolicy.destroy);
+  });
+
+  // The same rule as a storage drive.
+  it('destroys when neither the store nor the deployment says', () => {
+    expect(getKeyValueStoreRemovalPolicy(defineKeyValueStore('users', 'id'), silentConfig)).toBe(AwsDataStoreRemovalPolicy.destroy);
   });
 });
 
