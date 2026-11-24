@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_STORAGE_DRIVE_GLOBAL, EVENT_DOC_TYPE_GLOBAL } from '../../eventDoc';
 import { reportConfigGlobal } from '../../reports/constants/reportConfigGlobal';
+import { EVENT_DOC_AI_CHAT_NAME_PROMPT } from '../constants/eventDocAiChatNamePrompt';
 import { EVENT_DOC_AI_CONTINUATION_NUDGE } from '../constants/eventDocAiContinuationNudge';
 import { EVENT_DOC_AI_DECLINED_NOTICE } from '../constants/eventDocAiDeclinedNotice';
 import { EVENT_DOC_AI_ERROR_NOTICE } from '../constants/eventDocAiErrorNotice';
@@ -98,6 +99,8 @@ type TurnOptions = {
   usageReport?: EventDocAiUsageReport;
   /** The parts the model streams back; defaults to one text reply that ends normally. */
   parts?: Record<string, unknown>[];
+  /** The chat as the chat list holds it; none by default. */
+  chatInList?: Record<string, unknown>;
 };
 
 // Drives one turn to completion: the model streams a single text reply, then the
@@ -107,7 +110,7 @@ const defaultParts: Record<string, unknown>[] = [
   { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage },
 ];
 
-const runTurn = ({ isContinuation = false, sendUsageToFrontend, usageReport: report, parts = defaultParts }: TurnOptions = {}) => {
+const runTurn = ({ isContinuation = false, sendUsageToFrontend, usageReport: report, parts = defaultParts, chatInList }: TurnOptions = {}) => {
   const globals: Record<string, unknown> = {
     ...baseGlobals,
     [EVENT_DOC_AI_SEND_USAGE_TO_FRONTEND_GLOBAL]: sendUsageToFrontend,
@@ -139,7 +142,8 @@ const runTurn = ({ isContinuation = false, sendUsageToFrontend, usageReport: rep
     [FileActionType.WriteObjectJson]: (action: { payload: { filepath: string } }) => {
       savedBlobs.push(action.payload.filepath);
     },
-    [KeyValueStoreActionType.Query]: { items: [] },
+    [KeyValueStoreActionType.Query]: { items: chatInList ? [chatInList] : [] },
+    [KeyValueStoreActionType.Upsert]: undefined,
     [DateActionType.Now]: '2026-11-10T05:00:00.000Z',
     [GuidActionType.NewSortableMany]: (action: { payload: { count: number } }) =>
       Array.from({ length: action.payload.count }, (_, index) => `dedup-${index}`),
@@ -173,7 +177,7 @@ describe('askEventDocAiStreamTurn', () => {
     expect(promptPayload).toEqual(
       expect.objectContaining({
         model: AiModel.ClaudeSonnet46,
-        system: 'You are the docs assistant.',
+        system: `You are the docs assistant.\n\n${EVENT_DOC_AI_CHAT_NAME_PROMPT}`,
         aiName: 'docs-ai',
         caching: true,
         cacheTtl: '1h',
@@ -295,6 +299,26 @@ describe('askEventDocAiStreamTurn', () => {
     expect(browser.streamSegments).toEqual([]);
     expect(browser.isStreaming).toBe(false);
     expect(browser.isHistoryStale).toBe(false);
+  });
+
+  it('shows the new name in the browser as soon as the model renames the chat, and not for a rename that failed', () => {
+    const renamed = { docId: 'doc-1', chatId: 'chat-1', name: 'Third paragraph', createdAt: 'then', updatedAt: 'then', createdByUserId: 'user-1' };
+    const rename = (output: unknown, toolName = 'setChatName') => [
+      { type: AiStreamPartType.ToolCall, toolCallId: 'call-1', toolName, input: { name: 'Third paragraph' } },
+      { type: AiStreamPartType.ToolResult, toolCallId: 'call-1', toolName, input: { name: 'Third paragraph' }, output },
+      { type: AiStreamPartType.TextDelta, id: 'text-1', text: 'Done.' },
+      { type: AiStreamPartType.Finish, finishReason: AiStreamFinishReasonEnum.stop, usage },
+    ];
+    // The chat is read back from the chat list, which here holds the renamed chat.
+    const upserts = (parts: Record<string, unknown>[]) =>
+      runTurn({ parts, chatInList: renamed })
+        .dispatched.filter((effect) => effect.type === EventDocAiEffect.UpsertChat)
+        .map((effect) => effect.payload.chat);
+
+    expect(upserts(rename({ ok: true }))).toEqual([renamed]);
+    expect(upserts(rename({ error: 'This chat no longer exists.' }))).toEqual([]);
+    // Another tool answering in the same shape is not a rename.
+    expect(upserts(rename({ ok: true }, 'editDocument'))).toEqual([]);
   });
 
   // A stream left showing is how the browser knows its finalize signal was lost, so the server must not wipe it.

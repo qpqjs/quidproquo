@@ -7,6 +7,7 @@ import { makeEventDocAiUserMessage } from '../module';
 import { askEventDocAiAttachmentsValidate } from './askEventDocAiAttachmentsValidate';
 import { askEventDocAiChatMessagesAppend } from './askEventDocAiChatMessagesAppend';
 import { askEventDocAiChatMessagesLoad } from './askEventDocAiChatMessagesLoad';
+import { askEventDocAiProvideChat } from './askEventDocAiProvideChat';
 import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
 
 /**
@@ -29,5 +30,5 @@ export function* askEventDocAiProcessSend(
 
   const history = yield* askEventDocAiChatMessagesLoad(docId, chatId);
 
-  return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: false, lengthResumes: 0 });
+  return yield* askEventDocAiProvideChat(chatId, askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: false, lengthResumes: 0 }));
 }

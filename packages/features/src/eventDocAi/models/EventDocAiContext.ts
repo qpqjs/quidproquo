@@ -7,4 +7,7 @@ export type EventDocAiContext = {
   serviceName: string;
   type: string;
   docId: string;
+  // The chat a turn is running for. Only set while a turn runs on the server, so a tool that acts on the chat
+  // itself reads the trusted id from here. Absent everywhere else.
+  chatId?: string;
 };
