@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `defineStorageDrive`: a drive that leaves the config is now **deleted with every file in it** unless something says to keep it. It used to be kept. The new `deleteOnRemove` option decides for one drive; without it the deployment's `defineAwsDataStoreRemovalPolicy` decides; with neither the drive is deleted. Removing, renaming or replacing a drive, or tearing down its service, all count. Before deploying this version, set `deleteOnRemove: false` on every drive whose files must be kept, or declare `defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)` in the service. The first deploy changes every unmarked bucket to delete on removal and adds the function that empties it. Key value stores, user directories and the other data stores still default to kept.
+
 ## 0.10.0
 
 - `defineQueue`: `maxTries` now defaults to 5 (was 1). A try is used up when a handler fails and also when the provider receives a message but cannot run the consumer (one capped with `maxConcurrentExecutions` that is already busy), so with a single try a message could go to the dead letter queue without its handler ever running. A handler on a queue that does not set `maxTries` may now run up to 5 times for one message, `ttRetryInSeconds` apart, so it must be safe to repeat; pass `maxTries: 1` to keep the old behaviour. The framework's own migrations, seeds and event doc AI chat queues keep a single try.

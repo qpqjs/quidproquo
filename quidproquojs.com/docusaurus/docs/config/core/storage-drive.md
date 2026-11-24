@@ -43,7 +43,28 @@ The name of the drive. This is the name you pass as the `drive` argument to ever
 | `cryptoKeyName` | `string` | | Encrypts the drive with the named [defineCryptoKey](./crypto-key.md) instead of the provider's managed encryption (SSE-S3 on AWS), which applies when omitted. The key must be declared in the same config, owned or via `owner`; a foreign key's owning service must be deployed first, since S3 validates the key when the bucket is created. |
 | `scoped` | `boolean` | `false` | Requires every file action against this drive to carry a scope; a call without one throws `InvalidScopeError`. Incompatible with `copyPath` (`defineStorageDrive` throws at config time if both are set), since seeded content is deployed outside every scope. |
 | `lockedDown` | `boolean` | `false` | Denies object reads to every principal except the owning service's runtime role (listing and bucket management are unaffected). On AWS, the service stack must pass its `serviceRole` to `QpqCoreStorageDriveConstruct`; synth throws if a `lockedDown` drive has no `serviceRole`. |
+| `deleteOnRemove` | `boolean` | – | Whether taking the drive out of the config deletes it and every file in it, for good. Left unset, the deployment decides (on AWS, `defineAwsDataStoreRemovalPolicy`), and a deployment that says nothing **deletes**. Set `false` on any drive whose files must be kept. See [Deleting a drive when it is removed](#deleting-a-drive-when-it-is-removed). |
 | `owner` | `CrossModuleOwner<'storageDriveName'>` | – | Declares that this drive is owned by **another** module/service. Use this to read/write a drive deployed elsewhere: the deploy grants this service IAM access to the foreign drive instead of creating a new bucket. `{ module, application, feature, environment, storageDriveName }` — all optional; unset parts default to the current service. |
+
+## Deleting a drive when it is removed
+
+What happens to a drive's files when the drive leaves the config is decided in this order:
+
+1. The drive's own `deleteOnRemove`, when it is set: `true` deletes, `false` keeps.
+2. Otherwise the deployment's setting (on AWS, `defineAwsDataStoreRemovalPolicy`): `destroy` deletes, `retain` keeps.
+3. Otherwise the drive and its files are **deleted**.
+
+```typescript
+// Files that must survive a mistake in the config.
+defineStorageDrive('contracts', { deleteOnRemove: false });
+
+// Files nobody will miss.
+defineStorageDrive('scratch', { deleteOnRemove: true });
+```
+
+A delete cannot be undone, old versions of files included. Three things count as removing a drive: taking it out of the config, renaming it, and tearing down the whole service. So mark every drive that holds data worth keeping with `deleteOnRemove: false`, or declare `defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)` for the deployment.
+
+The answer only takes effect once it is deployed, because what happens to a removed drive is decided by the last deploy it was part of. A drive last deployed as kept is left behind if it is switched to deletable and removed in the same deploy. Deploy the switch first, then remove the drive in a later deploy.
 
 ## File events (`onEvent`)
 

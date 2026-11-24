@@ -123,7 +123,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
-    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+    // The drive's own deleteOnRemove, else the deployment's declared policy, else destroy.
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getStorageDriveRemovalPolicy(props.storageDriveConfig, props.qpqConfig);
 
     // S3_MANAGED is the floor, not an opt-in: S3 applies SSE-S3 to every bucket anyway,
     // and CDK's UNENCRYPTED member is deprecated for exactly that reason.
@@ -142,7 +143,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       publicReadAccess: false,
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
 
-      // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
+      // A bucket must be empty to be deleted, so a destroyed drive's objects go with it.
       removalPolicy: toRemovalPolicy(dataStoreRemovalPolicy),
       autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
 

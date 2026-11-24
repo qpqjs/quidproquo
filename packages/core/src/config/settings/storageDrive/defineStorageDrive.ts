@@ -26,6 +26,7 @@ export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdva
     cryptoKeyName: options?.cryptoKeyName,
     scoped: options?.scoped ?? false,
     lockedDown: options?.lockedDown ?? false,
+    deleteOnRemove: options?.deleteOnRemove,
 
     owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };

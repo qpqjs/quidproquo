@@ -1,4 +1,4 @@
-import { CrossModuleOwner, Nullable, QPQConfig, qpqCoreUtils } from '@qpqjs/core';
+import { CrossModuleOwner, Nullable, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from '@qpqjs/core';
 
 import {
   AccountBudgetQPQConfigSetting,
@@ -76,13 +76,29 @@ export const getAwsVirtualNetworkSettings = (qpqConfig: QPQConfig, virtualNetwor
   return setting ?? defineAwsVirtualNetworkSettings(virtualNetworkName);
 };
 
-export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
+/** The removal policy the config declares with defineAwsDataStoreRemovalPolicy, or null when it declares none. */
+export const getDeclaredAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): Nullable<AwsDataStoreRemovalPolicy> => {
   const setting = qpqCoreUtils.getConfigSetting<AwsDataStoreRemovalPolicyQPQConfigSetting>(
     qpqConfig,
     QPQAwsConfigSettingType.awsDataStoreRemovalPolicy,
   );
 
-  return setting?.removalPolicy ?? AwsDataStoreRemovalPolicy.retain;
+  return setting?.removalPolicy ?? null;
+};
+
+export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy =>
+  getDeclaredAwsDataStoreRemovalPolicy(qpqConfig) ?? AwsDataStoreRemovalPolicy.retain;
+
+/**
+ * What happens to a storage drive when it leaves the config. The drive's own `deleteOnRemove` wins; without
+ * one the declared defineAwsDataStoreRemovalPolicy decides; with neither the drive is destroyed.
+ */
+export const getStorageDriveRemovalPolicy = (storageDriveConfig: StorageDriveQPQConfigSetting, qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
+  if (storageDriveConfig.deleteOnRemove !== undefined) {
+    return storageDriveConfig.deleteOnRemove ? AwsDataStoreRemovalPolicy.destroy : AwsDataStoreRemovalPolicy.retain;
+  }
+
+  return getDeclaredAwsDataStoreRemovalPolicy(qpqConfig) ?? AwsDataStoreRemovalPolicy.destroy;
 };
 
 export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrganizationQPQConfigSetting[] => {

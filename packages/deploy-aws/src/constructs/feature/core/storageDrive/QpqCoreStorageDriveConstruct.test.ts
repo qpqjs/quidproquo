@@ -1,5 +1,5 @@
-import { defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
-import { defineStorageDrive, QPQConfig, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
+import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy, defineAwsServiceAccountInfo } from '@qpqjs/config-aws';
+import { defineStorageDrive, QPQConfig, QPQConfigSetting, StorageDriveQPQConfigSetting, StorageDriveTier } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { App, aws_iam, Stack } from 'aws-cdk-lib';
@@ -8,18 +8,65 @@ import { describe, expect, it } from 'vitest';
 
 import { QpqCoreStorageDriveConstruct } from './QpqCoreStorageDriveConstruct';
 
-const buildConfig = (storageDriveConfig: StorageDriveQPQConfigSetting): QPQConfig =>
-  buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), storageDriveConfig]);
+const buildConfig = (storageDriveConfig: StorageDriveQPQConfigSetting, extraSettings: QPQConfigSetting[] = []): QPQConfig =>
+  buildTestQpqConfig([defineAwsServiceAccountInfo('123456789012', 'ap-southeast-2'), storageDriveConfig, ...extraSettings]);
 
-const synth = (storageDriveConfig: StorageDriveQPQConfigSetting, withRole: boolean = true) => {
+const synth = (storageDriveConfig: StorageDriveQPQConfigSetting, withRole: boolean = true, extraSettings: QPQConfigSetting[] = []) => {
   const app = new App();
   const stack = new Stack(app, 'inf', { env: { account: '123456789012', region: 'ap-southeast-2' } });
   const serviceRole = withRole ? new aws_iam.Role(stack, 'role', { assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com') }) : undefined;
 
-  new QpqCoreStorageDriveConstruct(stack, 'drive', { qpqConfig: buildConfig(storageDriveConfig), storageDriveConfig, serviceRole });
+  new QpqCoreStorageDriveConstruct(stack, 'drive', {
+    qpqConfig: buildConfig(storageDriveConfig, extraSettings),
+    storageDriveConfig,
+    serviceRole,
+  });
 
   return Template.fromStack(stack);
 };
+
+// What CloudFormation does with each drive's bucket when the drive leaves the config, and whether its objects are emptied first.
+const removalOf = (template: Template) => {
+  const buckets = Object.values(template.findResources('AWS::S3::Bucket')) as { DeletionPolicy: string; UpdateReplacePolicy: string }[];
+
+  return {
+    deletionPolicies: buckets.map((bucket) => bucket.DeletionPolicy),
+    updateReplacePolicies: buckets.map((bucket) => bucket.UpdateReplacePolicy),
+    emptiesObjects: Object.keys(template.findResources('Custom::S3AutoDeleteObjects')).length > 0,
+  };
+};
+
+const kept = { deletionPolicies: ['Retain'], updateReplacePolicies: ['Retain'], emptiesObjects: false };
+const deleted = { deletionPolicies: ['Delete'], updateReplacePolicies: ['Delete'], emptiesObjects: true };
+
+const retainDataStores = [defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)];
+const destroyDataStores = [defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)];
+
+describe('QpqCoreStorageDriveConstruct removal', () => {
+  it('deletes the bucket, emptying it first, when neither the drive nor the deployment says what to do', () => {
+    expect(removalOf(synth(defineStorageDrive('uploads')))).toEqual(deleted);
+  });
+
+  it("follows the deployment's declared policy when the drive does not say", () => {
+    expect(removalOf(synth(defineStorageDrive('uploads'), true, retainDataStores))).toEqual(kept);
+    expect(removalOf(synth(defineStorageDrive('uploads'), true, destroyDataStores))).toEqual(deleted);
+  });
+
+  // The one way to protect a drive's files for certain: nothing else may override it.
+  it('keeps a drive marked deleteOnRemove false, whatever the deployment says', () => {
+    const drive = defineStorageDrive('contracts', { deleteOnRemove: false });
+
+    expect(removalOf(synth(drive))).toEqual(kept);
+    expect(removalOf(synth(drive, true, destroyDataStores))).toEqual(kept);
+  });
+
+  it('deletes a drive marked deleteOnRemove true, whatever the deployment says', () => {
+    const drive = defineStorageDrive('scratch', { deleteOnRemove: true });
+
+    expect(removalOf(synth(drive))).toEqual(deleted);
+    expect(removalOf(synth(drive, true, retainDataStores))).toEqual(deleted);
+  });
+});
 
 describe('QpqCoreStorageDriveConstruct lockedDown', () => {
   it('denies object reads to every principal except the service role', () => {
@@ -90,6 +137,25 @@ describe('QpqCoreStorageDriveConstruct bucket hardening', () => {
     expect((buckets[0] as any).Properties.AccessControl).toBeUndefined();
     const policies = template.findResources('AWS::S3::BucketPolicy');
     const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+    const allowed = statements.filter((statement: any) => statement.Effect !== 'Deny');
+
+    expect(allowed).toHaveLength(1);
+
+    // A drive that is deleted on removal lets one role, the function that empties it, delete and list. Nothing
+    // else is allowed: no wildcard principal and no object read.
+    expect(allowed.map((statement: any) => statement.Principal)).toEqual(
+      allowed.map(() => ({ AWS: { 'Fn::GetAtt': [expect.stringMatching(/^CustomS3AutoDeleteObjects.*Role/), 'Arn'] } })),
+    );
+    expect(allowed.flatMap((statement: any) => [statement.Action].flat())).toEqual(
+      allowed.flatMap(() => ['s3:PutBucketPolicy', 's3:GetBucket*', 's3:List*', 's3:DeleteObject*']),
+    );
+  });
+
+  it('allows nothing at all in the bucket policy of a drive that is kept', () => {
+    const template = synth(defineStorageDrive('uploads', { deleteOnRemove: false }));
+    const policies = template.findResources('AWS::S3::BucketPolicy');
+    const statements = Object.values(policies).flatMap((policy: any) => policy.Properties.PolicyDocument.Statement);
+
     expect(statements.every((statement: any) => statement.Effect === 'Deny')).toBe(true);
   });
 });

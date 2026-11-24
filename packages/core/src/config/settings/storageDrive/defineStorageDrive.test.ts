@@ -16,6 +16,7 @@ describe('defineStorageDrive', () => {
       cryptoKeyName: undefined,
       scoped: false,
       lockedDown: false,
+      deleteOnRemove: undefined,
       owner: undefined,
     });
   });
@@ -31,6 +32,13 @@ describe('defineStorageDrive', () => {
     expect(setting.global).toBe(false);
     expect(setting.cryptoKeyName).toBeUndefined();
     expect(setting.lockedDown).toBe(false);
+  });
+
+  // Unset is its own answer (the deployment decides), so it must not be turned into true or false here.
+  it('leaves deleteOnRemove unset unless given, and carries either answer through', () => {
+    expect(defineStorageDrive('Uploads').deleteOnRemove).toBeUndefined();
+    expect(defineStorageDrive('Uploads', { deleteOnRemove: true }).deleteOnRemove).toBe(true);
+    expect(defineStorageDrive('Uploads', { deleteOnRemove: false }).deleteOnRemove).toBe(false);
   });
 
   it('applies the supplied options', () => {
