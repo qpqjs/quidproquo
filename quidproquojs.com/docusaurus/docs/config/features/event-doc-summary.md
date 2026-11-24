@@ -47,6 +47,7 @@ The collection's base store name. It is used directly as the summary store name 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `snapshotFunctions` | `Record<string, string>` | `{}` | Registered dynamic-functions names (see [defineDynamicFunctions](../core/dynamic-functions.md)) of each collection's `EventDocFunctions` object, keyed by document `type` — keyed because one events table can host several collections and its one stream serves them all. When a row's type has an entry, the stream projector invokes that object's `foldSnapshotViews` with the doc's log prefix (or, once a usable snapshot exists, just the gap since it, plus that snapshot's per-view state as `seedViews`) and writes the folded views to the snapshots store; a type with no entry is not snapshotted. [defineEventDoc](./event-doc.md) threads the single-type case through automatically — call this directly only for a multi-type store. |
+| `deleteOnRemove` | `boolean` | – | Whether the collection's documents are deleted for good when the collection leaves the config. It is handed to the events store and the asset drive, the two things nothing can rebuild. Left unset, they follow the usual rule for a [key value store](../core/key-value-store.md) and a [storage drive](../core/storage-drive.md#deleting-a-drive-when-it-is-removed): the deployment decides, and a deployment that says nothing deletes. The lists, snapshots and legacy summary stores are always deleted when removed, whatever this says, because the events rebuild them. |
 
 ## Examples
 
