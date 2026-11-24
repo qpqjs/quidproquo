@@ -28,6 +28,7 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWeb
         ...transientErrorMap(),
         ThrottlingException: () => actionResultError(askWebsocketSendMessageBase.errorType.Throttled, 'Rate exceeded'),
         GoneException: () => actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists'),
+        PayloadTooLargeException: () => actionResultError(askWebsocketSendMessageBase.errorType.TooLarge, 'Message is too large to send'),
       });
     }
   };

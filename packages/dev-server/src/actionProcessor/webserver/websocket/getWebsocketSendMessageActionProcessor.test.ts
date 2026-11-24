@@ -42,6 +42,15 @@ describe('getWebsocketSendMessageActionProcessor', () => {
     expect(resolveActionResultError(result).errorType).toBe(askWebsocketSendMessageBase.errorType.Disconnected);
   });
 
+  it('answers TooLarge without sending when the message is over the size limit, as AWS does', async () => {
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process!, { connectionId: 'conn-1', payload: { text: 'x'.repeat(128 * 1024) }, websocketApiName });
+
+    expect(resolveActionResultError(result).errorType).toBe(askWebsocketSendMessageBase.errorType.TooLarge);
+    expect(sendMessageToWebSocketConnection).not.toHaveBeenCalled();
+  });
+
   it('returns an errored result when sending throws', async () => {
     (sendMessageToWebSocketConnection as any).mockRejectedValue(new Error('boom'));
     const process = await getProcessor();

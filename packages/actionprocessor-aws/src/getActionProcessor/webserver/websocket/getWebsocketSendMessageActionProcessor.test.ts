@@ -63,4 +63,13 @@ describe('getWebsocketSendMessageActionProcessor', () => {
 
     expect(error?.errorType).toBe(askWebsocketSendMessageBase.errorType.Disconnected);
   });
+
+  it('maps a message over the size limit to a too large error', async () => {
+    vi.mocked(sendMessageToWebSocketConnection).mockRejectedValue(Object.assign(new Error('too big'), { name: 'PayloadTooLargeException' }));
+    const processor = await resolveProcessor();
+
+    const [, error] = await invoke(processor);
+
+    expect(error?.errorType).toBe(askWebsocketSendMessageBase.errorType.TooLarge);
+  });
 });
