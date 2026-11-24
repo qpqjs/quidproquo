@@ -24,5 +24,12 @@ export type QPQConfigAdvancedStorageDriveSettings = {
   // account, humans included, is denied at the bucket; writes and listing are unaffected.
   lockedDown?: boolean;
 
+  // Whether taking this drive out of the config deletes it and every file in it, for good. Set it to
+  // false on any drive whose files must outlive a mistake in the config: left unset, the deployment
+  // decides, and a deployment that says nothing deletes. It only takes effect once deployed, so a
+  // drive deployed as kept must be deployed as deletable before the deploy that removes it. Renaming
+  // a drive counts as removing it.
+  deleteOnRemove?: boolean;
+
   owner?: CrossModuleOwner<'storageDriveName'>;
 } & QPQConfigAdvancedSettings;

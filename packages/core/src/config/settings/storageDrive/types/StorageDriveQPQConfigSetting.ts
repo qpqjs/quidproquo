@@ -14,4 +14,6 @@ export type StorageDriveQPQConfigSetting = {
   cryptoKeyName?: string;
   scoped: boolean;
   lockedDown: boolean;
+  // Unset means the deployment decides.
+  deleteOnRemove?: boolean;
 } & QPQConfigSetting;

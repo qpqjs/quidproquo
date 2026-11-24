@@ -17,7 +17,8 @@ export type AwsDataStoreRemovalPolicyQPQConfigSetting = {
  * clusters, Neptune retains via a final snapshot rather than a live cluster).
  * Defaults to `retain` when not declared, so production data survives a
  * `cdk destroy` / resource replacement; declare `destroy` in dev configs to
- * keep full-teardown behaviour.
+ * keep full-teardown behaviour. Storage drives differ in two ways: a drive's own
+ * `deleteOnRemove` wins over this setting, and a drive with neither is destroyed.
  */
 export const defineAwsDataStoreRemovalPolicy = (removalPolicy: AwsDataStoreRemovalPolicy): AwsDataStoreRemovalPolicyQPQConfigSetting => ({
   configSettingType: QPQAwsConfigSettingType.awsDataStoreRemovalPolicy,

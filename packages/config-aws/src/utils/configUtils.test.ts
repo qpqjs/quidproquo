@@ -1,4 +1,4 @@
-import { defineKeyValueStore } from '@qpqjs/core';
+import { defineKeyValueStore, defineStorageDrive } from '@qpqjs/core';
 import { buildTestQpqConfig } from '@qpqjs/testing';
 
 import { describe, expect, it } from 'vitest';
@@ -37,12 +37,14 @@ import {
   getAwsVirtualNetworkSettings,
   getBootstrapWafConfig,
   getCloudWatchLogRetentionDays,
+  getDeclaredAwsDataStoreRemovalPolicy,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
   getDynamoTableNameOverride,
   getLayerProvidedModules,
   getLocalServiceAccountInfo,
   getOwnedAwsAlarmConfigs,
+  getStorageDriveRemovalPolicy,
   getWafWebAclArnSsmParameterName,
   isLambdaWarmingDisabled,
   isReservedConcurrencyDisabled,
@@ -179,6 +181,51 @@ describe('getAwsDataStoreRemovalPolicy', () => {
     const config = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)]);
 
     expect(getAwsDataStoreRemovalPolicy(config)).toBe(AwsDataStoreRemovalPolicy.destroy);
+  });
+});
+
+describe('getDeclaredAwsDataStoreRemovalPolicy', () => {
+  it('is null when no setting is declared, so a caller can tell "not declared" from "retain"', () => {
+    expect(getDeclaredAwsDataStoreRemovalPolicy(buildTestQpqConfig())).toBeNull();
+  });
+
+  it('returns the declared removal policy', () => {
+    const config = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)]);
+
+    expect(getDeclaredAwsDataStoreRemovalPolicy(config)).toBe(AwsDataStoreRemovalPolicy.retain);
+  });
+});
+
+describe('getStorageDriveRemovalPolicy', () => {
+  const retainConfig = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.retain)]);
+  const destroyConfig = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)]);
+  const silentConfig = buildTestQpqConfig();
+
+  it("takes the drive's own answer over everything else", () => {
+    const keep = defineStorageDrive('contracts', { deleteOnRemove: false });
+    const remove = defineStorageDrive('scratch', { deleteOnRemove: true });
+
+    expect([silentConfig, retainConfig, destroyConfig].map((config) => getStorageDriveRemovalPolicy(keep, config))).toEqual([
+      AwsDataStoreRemovalPolicy.retain,
+      AwsDataStoreRemovalPolicy.retain,
+      AwsDataStoreRemovalPolicy.retain,
+    ]);
+    expect([silentConfig, retainConfig, destroyConfig].map((config) => getStorageDriveRemovalPolicy(remove, config))).toEqual([
+      AwsDataStoreRemovalPolicy.destroy,
+      AwsDataStoreRemovalPolicy.destroy,
+      AwsDataStoreRemovalPolicy.destroy,
+    ]);
+  });
+
+  it("falls back to the deployment's declared policy when the drive does not say", () => {
+    const drive = defineStorageDrive('uploads');
+
+    expect(getStorageDriveRemovalPolicy(drive, retainConfig)).toBe(AwsDataStoreRemovalPolicy.retain);
+    expect(getStorageDriveRemovalPolicy(drive, destroyConfig)).toBe(AwsDataStoreRemovalPolicy.destroy);
+  });
+
+  it('destroys when neither the drive nor the deployment says', () => {
+    expect(getStorageDriveRemovalPolicy(defineStorageDrive('uploads'), silentConfig)).toBe(AwsDataStoreRemovalPolicy.destroy);
   });
 });
 
