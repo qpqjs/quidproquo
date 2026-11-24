@@ -20,5 +20,6 @@ export * from './EventDocAiContext';
 export * from './EventDocAiDocRef';
 export * from './EventDocAiLoadChatRowsMode';
 export * from './EventDocAiMessageSegment';
+export * from './EventDocAiSetChatNameResult';
 export * from './EventDocAiSystemPromptInput';
 export * from './EventDocAiToolUse';

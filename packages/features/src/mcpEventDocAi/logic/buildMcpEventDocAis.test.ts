@@ -4,13 +4,14 @@ import { describe, expect, it } from 'vitest';
 
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
 import { defineEventDocAi } from '../../eventDocAi/config/defineEventDocAi';
+import { buildEventDocAiSetChatNameTool } from '../../eventDocAi/config/logic/buildEventDocAiSetChatNameTool';
 import { buildMcpEventDocAis } from './buildMcpEventDocAis';
 
 const tool = { name: 'describeFlow', description: 'Describe a flow', executor: 'describeFlowFn', inputSchema: {} };
 
 const appConfig: QPQConfig = [
-  defineEventDocRoutes({ storeName: 'mimirPlans', type: 'plan', basePath: '/plans', authorise: 'authoriseFn', scopeResolver: 'scopeFn' }),
-  defineEventDocAi({ storeName: 'mimirPlans', type: 'plan', serviceName: 'mimir', eventBusName: 'bus', userDirectoryName: 'users', tools: [tool] }),
+  defineEventDocRoutes({ storeName: 'plans', type: 'plan', basePath: '/plans', authorise: 'authoriseFn', scopeResolver: 'scopeFn' }),
+  defineEventDocAi({ storeName: 'plans', type: 'plan', serviceName: 'planner', eventBusName: 'bus', userDirectoryName: 'users', tools: [tool] }),
 ];
 
 describe('buildMcpEventDocAis', () => {
@@ -18,8 +19,15 @@ describe('buildMcpEventDocAis', () => {
     const eventDocAis = buildMcpEventDocAis(appConfig);
 
     expect(eventDocAis).toHaveLength(1);
-    expect(eventDocAis[0]).toMatchObject({ aiName: 'mimirPlans-ai', serviceName: 'mimir', type: 'plan', tools: [tool], isCollection: true });
-    expect(eventDocAis![0]!.store).toMatchObject({ storeName: 'mimirPlans', type: 'plan', authorise: 'authoriseFn', scopeResolver: 'scopeFn' });
+    // A chat's own tools, then the one every chat is given to name itself.
+    expect(eventDocAis[0]).toMatchObject({
+      aiName: 'plans-ai',
+      serviceName: 'planner',
+      type: 'plan',
+      tools: [tool, buildEventDocAiSetChatNameTool('plans')],
+      isCollection: true,
+    });
+    expect(eventDocAis![0]!.store).toMatchObject({ storeName: 'plans', type: 'plan', authorise: 'authoriseFn', scopeResolver: 'scopeFn' });
   });
 
   it('falls back to a hookless store when the collection has no routes registered', () => {

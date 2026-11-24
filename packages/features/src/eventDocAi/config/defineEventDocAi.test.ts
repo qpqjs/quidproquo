@@ -1,8 +1,9 @@
-import { QPQCoreConfigSettingType, qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
+import { AiQPQConfigSetting, QPQCoreConfigSettingType, qpqCoreUtils, QueueQPQConfigSetting } from '@qpqjs/core';
 
 import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_AUTHORISER_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
+import { eventDocAiSetChatNameFunctionName } from '../constants/eventDocAiSetChatNameFunctionName';
 import { defineEventDocAi } from './defineEventDocAi';
 
 // create, list, history, send and row content.
@@ -77,5 +78,31 @@ describe('defineEventDocAi stores', () => {
 
     expect(deleteOnRemove(kvsByName())).toEqual({ docsAiChatList: undefined, docsAiChatRows: undefined, docsAiChats: true });
     expect(deleteOnRemove(drivesByName())).toEqual({ docsaichatblobs: undefined, docsaichats: true });
+  });
+});
+
+describe('defineEventDocAi chat naming', () => {
+  const aiTools = (options: Partial<Parameters<typeof defineEventDocAi>[0]> = {}) =>
+    qpqCoreUtils.getConfigSettings<AiQPQConfigSetting>(defineEventDocAi({ ...baseOptions, ...options }), QPQCoreConfigSettingType.ai)[0]!.tools;
+  const ownTool = { name: 'editDocument', description: 'Edit the document', executor: 'editDocumentFn', inputSchema: { type: 'object' } };
+
+  it("gives every chat the setChatName tool, after the chat's own tools", () => {
+    expect(aiTools({ tools: [ownTool] }).map((tool) => tool.name)).toEqual(['editDocument', 'setChatName']);
+  });
+
+  it('declares the function behind the tool, named after the collection', () => {
+    expect(qpqCoreUtils.getAllInlineFunctions(defineEventDocAi(baseOptions)).map((inlineFunction) => inlineFunction.functionName)).toEqual([
+      eventDocAiSetChatNameFunctionName('docs'),
+    ]);
+    expect(aiTools().find((tool) => tool.name === 'setChatName')?.executor).toBe(eventDocAiSetChatNameFunctionName('docs'));
+  });
+
+  // A service often holds several chat collections; no function may be declared twice.
+  it('declares a function per collection for a service with several chat collections', () => {
+    const config = [defineEventDocAi(baseOptions), defineEventDocAi({ ...baseOptions, storeName: 'notes', type: 'note' })];
+    const names = qpqCoreUtils.getAllInlineFunctions(config).map((inlineFunction) => inlineFunction.functionName);
+
+    expect(names).toEqual([eventDocAiSetChatNameFunctionName('docs'), eventDocAiSetChatNameFunctionName('notes')]);
+    expect(new Set(names).size).toBe(names.length);
   });
 });

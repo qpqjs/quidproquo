@@ -1,3 +1,4 @@
+export * from './askEventDocAiChatGet';
 export * from './askEventDocAiChatList';
 export * from './askEventDocAiChatRowContentRead';
 export * from './askEventDocAiChatRowContentUrl';

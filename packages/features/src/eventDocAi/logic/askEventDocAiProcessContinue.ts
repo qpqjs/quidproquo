@@ -3,6 +3,7 @@ import { AskResponse } from '@qpqjs/core';
 import type { ServiceRequestDeferred } from '../../webSocketQueue/logic/service';
 import type { EventDocAiChatSendResult } from '../models';
 import { askEventDocAiChatMessagesLoad } from './askEventDocAiChatMessagesLoad';
+import { askEventDocAiProvideChat } from './askEventDocAiProvideChat';
 import { askEventDocAiStreamTurn } from './askEventDocAiStreamTurn';
 
 /**
@@ -17,5 +18,5 @@ export function* askEventDocAiProcessContinue(
 ): AskResponse<EventDocAiChatSendResult | ServiceRequestDeferred> {
   const history = yield* askEventDocAiChatMessagesLoad(docId, chatId);
 
-  return yield* askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: true, lengthResumes });
+  return yield* askEventDocAiProvideChat(chatId, askEventDocAiStreamTurn(docId, chatId, history, { isContinuation: true, lengthResumes }));
 }

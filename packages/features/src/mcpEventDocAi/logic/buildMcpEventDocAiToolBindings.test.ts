@@ -10,10 +10,10 @@ const schema = { type: 'object', properties: { flowId: { type: 'string' } }, req
 const eventDocAis: McpEventDocAi[] = [
   {
     isCollection: true,
-    aiName: 'mimir',
-    serviceName: 'mimir',
+    aiName: 'planner',
+    serviceName: 'planner',
     type: 'plan',
-    store: buildEventDocStore({ storeName: 'mimirPlans', type: 'plan' }),
+    store: buildEventDocStore({ storeName: 'plans', type: 'plan' }),
     tools: [
       { name: 'describeFlow', description: 'Describe a flow', executor: 'describeFlowFn', inputSchema: schema },
       { name: 'askUser', description: 'Answered by the browser', inputSchema: {} },
@@ -44,7 +44,7 @@ describe('buildMcpEventDocAiToolBindings', () => {
     const second: McpEventDocAi = {
       isCollection: true,
       aiName: 'notes',
-      serviceName: 'mimir',
+      serviceName: 'planner',
       type: 'note',
       store: buildEventDocStore({ storeName: 'notes', type: 'note' }),
       tools: [

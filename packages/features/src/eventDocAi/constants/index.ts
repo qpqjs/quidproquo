@@ -1,5 +1,7 @@
 export * from './eventDocAiChatBlobsDriveName';
 export * from './eventDocAiChatListStoreName';
+export * from './eventDocAiChatNameMaxLength';
+export * from './eventDocAiChatNamePrompt';
 export * from './eventDocAiChatPageMaxBytes';
 export * from './eventDocAiChatPageMaxRows';
 export * from './eventDocAiChatRowContentReadBatchSize';
@@ -18,4 +20,6 @@ export * from './eventDocAiQueueName';
 export * from './eventDocAiRequestTimeoutMs';
 export * from './eventDocAiRetiredChatDriveName';
 export * from './eventDocAiRetiredChatListStoreName';
+export * from './eventDocAiSetChatNameFunctionName';
+export * from './eventDocAiSetChatNameToolName';
 export * from './eventDocAiStreamPartMaxBytes';

@@ -53,7 +53,7 @@ export function* askEventDocAiStreamTurn(
 
   const { streamHandle, model } = yield* askEventDocAiPromptStreamOpen(docId, history, isContinuation, budgetMs);
 
-  const assistantParts = yield* askEventDocAiStreamToUi(chatId, streamHandle);
+  const assistantParts = yield* askEventDocAiStreamToUi(docId, chatId, streamHandle);
 
   // Counted before the reply is saved: the model call was billed whether or not the save works.
   yield* askEventDocAiUsageReport(model, assistantParts);

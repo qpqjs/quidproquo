@@ -3,6 +3,7 @@ import {
   AiModel,
   AiReasoningEffort,
   defineAi,
+  defineInlineFunction,
   defineKeyValueStore,
   defineQueue,
   defineStorageDrive,
@@ -37,6 +38,7 @@ import {
 import { eventDocAiQueueName } from '../constants/eventDocAiQueueName';
 import { eventDocAiRetiredChatDriveName } from '../constants/eventDocAiRetiredChatDriveName';
 import { eventDocAiRetiredChatListStoreName } from '../constants/eventDocAiRetiredChatListStoreName';
+import { eventDocAiSetChatNameFunctionName } from '../constants/eventDocAiSetChatNameFunctionName';
 import { buildEventDocAiMethodName } from '../logic';
 import type { EventDocAiChatSummary } from '../models';
 import {
@@ -48,6 +50,7 @@ import {
 } from '../module';
 import { EventDocAiOptions } from '../types/EventDocAiOptions';
 import type { EventDocAiStoredChatRow } from '../types/EventDocAiStoredChatRow';
+import { buildEventDocAiSetChatNameTool } from './logic/buildEventDocAiSetChatNameTool';
 import { defineEventDocAiRegistration } from './defineEventDocAiRegistration';
 
 // AI chats attached to an eventDoc collection, the AI sibling of defineEventDoc.
@@ -132,7 +135,13 @@ export const defineEventDocAi = ({
     // dropping them deletes them.
     defineKeyValueStore<EventDocAiChatSummary>(eventDocAiRetiredChatListStoreName(storeName), 'docId', ['chatId'], { scoped, deleteOnRemove: true }),
     defineStorageDrive(eventDocAiRetiredChatDriveName(storeName), { scoped, deleteOnRemove: true }),
-    defineAi(aiName, { tools }),
+    // Every chat is given the tool that lets the model name it, after the chat's own tools.
+    defineAi(aiName, { tools: [...tools, buildEventDocAiSetChatNameTool(storeName)] }),
+    // The function behind that tool. It learns which chat list to write from the handler it runs under.
+    defineInlineFunction(
+      { basePath: __dirname, relativePath: '../entry/inlineFunction/qpqEventDocAiSetChatName', functionName: 'qpqEventDocAiSetChatName' },
+      { functionName: eventDocAiSetChatNameFunctionName(storeName) },
+    ),
     defineEventDocAiRegistration({ aiName, serviceName, storeName, type, userDirectoryName }),
     defineQueue(eventDocAiQueueName(storeName), processors, {
       eventBusSubscriptions: [eventBusName],

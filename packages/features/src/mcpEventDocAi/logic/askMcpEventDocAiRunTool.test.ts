@@ -14,10 +14,10 @@ const event = { headers: {} } as unknown as HTTPEvent;
 const eventDocAis: McpEventDocAi[] = [
   {
     isCollection: true,
-    aiName: 'mimir',
-    serviceName: 'mimir',
+    aiName: 'planner',
+    serviceName: 'planner',
     type: 'plan',
-    store: { ...buildEventDocStore({ storeName: 'mimirPlans', type: 'plan' }), authorise: 'authoriseFn' },
+    store: { ...buildEventDocStore({ storeName: 'plans', type: 'plan' }), authorise: 'authoriseFn' },
     tools: [{ name: 'describeFlow', description: 'Describe a flow', executor: 'describeFlowFn', inputSchema: {} }],
   },
 ];
@@ -56,7 +56,7 @@ describe('askMcpEventDocAiRunTool', () => {
 
     expect(executed.map((action) => action.payload!.functionName)).toEqual(['authoriseFn', 'describeFlowFn']);
     expect(toolRun?.payload!.payload).toEqual({ flowId: 'f1' });
-    expect(toolRun?.context).toMatchObject({ 'qpq-event-doc-ai': { serviceName: 'mimir', type: 'plan', docId: 'doc-1' } });
+    expect(toolRun?.context).toMatchObject({ 'qpq-event-doc-ai': { serviceName: 'planner', type: 'plan', docId: 'doc-1' } });
     expect(result).toEqual({ flowId: 'f1', name: 'Intake' });
   });
 
