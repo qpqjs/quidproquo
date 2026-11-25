@@ -39,6 +39,7 @@ vi.mock('./utils', () => ({
   toErrorMessage: vi.fn((error: unknown) => (error instanceof Error ? error.message : String(error))),
   buildAiStopConditions: vi.fn(() => []),
   toBedrockReasoningOptions: vi.fn(() => undefined),
+  withSplitMergedReasoning: vi.fn((model: unknown) => ({ splitsMergedReasoning: model })),
 }));
 
 const streamText = vi.fn();
@@ -104,6 +105,8 @@ describe('getProcessAiPromptStream', () => {
     expect(await drain(registry)).toEqual([JSON.stringify({ mapped: true })]);
     expect(mapAiStreamPart).toHaveBeenCalledWith({ type: 'text-delta' });
     expect(streamText).toHaveBeenCalledWith(expect.objectContaining({ prompt: 'hi', prepareStep: undefined }));
+    // The model is wrapped so each block of its reasoning stays its own part across tool steps.
+    expect(streamText).toHaveBeenCalledWith(expect.objectContaining({ model: { splitsMergedReasoning: {} } }));
     expect(createCachePrepareStep).not.toHaveBeenCalled();
   });
 

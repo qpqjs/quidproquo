@@ -25,6 +25,7 @@ import {
   toBedrockReasoningOptions,
   toCacheableSystem,
   toErrorMessage,
+  withSplitMergedReasoning,
 } from './utils';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPromptStream> => {
@@ -46,7 +47,9 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof ask
       const providerOptions = toBedrockReasoningOptions(payload.model, payload.reasoning);
 
       const { stream, usage } = streamText({
-        model: prepared.model,
+        // Each block of the model's reasoning kept as its own part, so the tool loop sends every
+        // block back as it was written (Bedrock can stream two under one id).
+        model: withSplitMergedReasoning(prepared.model),
         system: toCacheableSystem(payload.system, payload.caching, cache),
         ...input.promptOrMessages,
         tools: prepared.tools,
