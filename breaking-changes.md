@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.11.0
+
 - `@qpqjs/features`: an event doc AI chat now names itself. `defineEventDocAi` gives every chat a `setChatName` tool (declared with its own inline function, `${storeName}AiSetChatName`) and adds a short paragraph to the end of the system prompt telling the model to name the chat on the first message and rename it when the subject clearly changes. The system prompt therefore changes once, which drops any prompt cache built on the old one, and a turn that renames the chat takes one more model step. Do not give a chat a tool of its own named `setChatName`: nothing checks for the clash yet. The tool call shows in the chat like any other.
 
 - `@qpqjs/features`: an event doc AI chat is no longer saved as one file. Its messages are rows in a new store (`${storeName}AiChatRows`, one row per piece of a message), with the content of any row over 64 KB kept on a new drive (`${storeName}aichatblobs`), one file per row. **Every existing chat is lost**: nothing is migrated, and the chat list moves to a new store (`${storeName}AiChatList`) that starts empty. The old chat list store and chat drive (`${storeName}AiChats`) stay declared, unused and marked `deleteOnRemove`, and a later release stops declaring them, which deletes them and the old chat files. Deploy this release to every environment before that one.

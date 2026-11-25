@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.11.0
+
+- features: event doc ai chats are stored as rows, with large content on a drive, and the history loads a page at a time
+- features: event doc ai chats name themselves with a setChatName tool
+- storage drives and key value stores take `deleteOnRemove`, and event doc collections pass it to their events store and drive
+- websocket sends over 128 KB fail with `TooLarge`, and `askServiceRequest` takes a `timeoutMs` and can fail with `Timeout`
+- actionprocessor-aws: each reasoning block stays its own part in ai streams
+
+### Breaking changes
+
+- drives and stores removed from the config are now deleted unless kept (`deleteOnRemove: false` or a retain policy)
+- event doc lists, snapshots and legacy summary stores are deleted on removal, and the collection takes `deleteOnRemove` for the rest
+- event doc ai chats move to a new store and drive, existing chats are lost, and the `ChatHistory` request, state and chat history helpers changed
+- event doc ai chats get a `setChatName` tool and a longer system prompt, so any prompt cache resets
+- `askWebsocketSendMessage` can return `TooLarge`, and the dev server now enforces the 128 KB limit
+- `askServiceRequest` can fail with `Timeout`, and event doc ai chat requests time out after 30 seconds
+
 ## 0.10.0
 
 - features: a websocket authenticator can name a session user, and the node processor answers the session user action on server runtimes only
