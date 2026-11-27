@@ -1,3 +1,4 @@
+export * from './QPQJS_LEGACY_UNSUFFIXED_ROOT_DOMAIN';
 export * from './QpqjsServiceEnum';
 export * from './smokeCrossServiceReportAppendFunctionName';
 export * from './smokeCrossServiceReportReadFunctionName';

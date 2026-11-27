@@ -22,6 +22,18 @@ const getIdentityDomains = (qpqConfig: QPQConfig): { rootDomain: string; identit
   }));
 
 export class QpqWebserverEmailSenderConstruct extends QpqConstructBlock {
+  /**
+   * The id this construct must be created under. An SES identity's physical id is the domain or
+   * address itself, so a changed logical id would fail creation against the identity the stack
+   * already owns. The id therefore never follows the root list: it is fixed, except for an app
+   * with a `legacyUnsuffixedRootDomain`, which was first deployed with that root in the id.
+   *
+   * TODO: remove that exception for version 1 of quidproquo.
+   */
+  public static getConstructId(qpqConfig: QPQConfig): string {
+    return `EmailSender${qpqWebServerUtils.getLegacyUnsuffixedRootDomain(qpqConfig) ?? ''}`;
+  }
+
   constructor(scope: Construct, id: string, props: QpqWebserverEmailSenderConstructProps) {
     super(scope, id, props);
 

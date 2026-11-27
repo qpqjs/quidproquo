@@ -5,7 +5,7 @@ import {
   defineAwsServiceAccountInfo,
   getAwsServiceAccountInfosForDeployments,
 } from '@qpqjs/config-aws';
-import { QPQJS_USER_DIRECTORY, QpqjsServiceEnum, qpqjsServiceNames } from '@qpqjs/constants';
+import { QPQJS_LEGACY_UNSUFFIXED_ROOT_DOMAIN, QPQJS_USER_DIRECTORY, QpqjsServiceEnum, qpqjsServiceNames } from '@qpqjs/constants';
 import { defineAdminSettings, defineAdminUserDirectory, defineOpenApiRoutes } from '@qpqjs/features';
 import {
   defineApi,
@@ -42,7 +42,7 @@ export const defineQpqjsService = (
   defineApplicationVersion(`${execSync('git rev-parse --short HEAD').toString().trim()}-${new Date().toISOString()}`),
 
   // Root domains come from the deployment's ROOT_DOMAINS setting, primary first.
-  defineDns(getDeploySettingList('ROOT_DOMAINS')),
+  defineDns(getDeploySettingList('ROOT_DOMAINS'), { legacyUnsuffixedRootDomain: QPQJS_LEGACY_UNSUFFIXED_ROOT_DOMAIN }),
   // Same domain bootstrap.qpq.ts declares: bootstrap owns the records, a service's
   // defineEmailReceiver resolves its recipients from it.
   defineEmailReceivingDomain('inbox'),

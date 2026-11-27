@@ -8,4 +8,12 @@ import { QPQConfigSetting, QpqPureFunction } from '@qpqjs/core';
 export type DnsQPQWebServerConfigSetting = QPQConfigSetting & {
   rootDomains: string[];
   resolver?: QpqPureFunction;
+
+  /**
+   * The root whose resources keep the unsuffixed names they were first deployed under; see
+   * `QPQConfigAdvancedDnsSettings.legacyUnsuffixedRootDomain`.
+   *
+   * TODO: remove for version 1 of quidproquo.
+   */
+  legacyUnsuffixedRootDomain?: string;
 };
