@@ -24,7 +24,7 @@ export default [
 ```typescript
 function defineDns(
   rootDomains: string | string[],
-  options?: { resolver?: QpqPureFunction },
+  options?: { resolver?: QpqPureFunction; legacyUnsuffixedRootDomain?: string },
 ): DnsQPQWebServerConfigSetting;
 ```
 
@@ -39,6 +39,10 @@ Hostnames are not built here. They come from the app's [domain resolver](../../d
 ### `options.resolver` — `QpqPureFunction` (optional)
 
 A pointer (`{ basePath, relativePath, functionName }`) to the app's `DomainResolver` export. The deploy tooling `require`s it at synth and build time, and the runtime loads it through the dynamic module loader (the pointer is a bundled src entry like a route), so every site resolves hosts the same way: `resolveHosts(qpqConfig, target, resolver)`. Omit it for the default shape.
+
+### `options.legacyUnsuffixedRootDomain` — `string` (optional, to be removed in version 1)
+
+Only for an app first deployed before 0.12.0, when the first root's resources were deployed under unsuffixed names. Set it to that root so those resources keep their names; every other root is named after itself. See [Apps first deployed before 0.12.0](../../domains.md#apps-first-deployed-before-0120). A new app must not set it.
 
 ## Examples
 

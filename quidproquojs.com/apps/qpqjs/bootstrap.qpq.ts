@@ -3,12 +3,12 @@
 // defineAwsServiceAccountInfo) is provided by @qpqjs/deploy-aws's
 // workspace CDK app; this fragment must not declare its own.
 import { defineAwsGithubDeployRole, defineDomainCertificate } from '@qpqjs/config-aws';
-import { QpqjsServiceEnum } from '@qpqjs/constants';
+import { QPQJS_LEGACY_UNSUFFIXED_ROOT_DOMAIN, QpqjsServiceEnum } from '@qpqjs/constants';
 import { QpqAppDeployContext } from '@qpqjs/deploy-aws';
 import { defineApi, defineDns, defineEmailReceivingDomain, getDeploySettingList, QPQConfig } from 'quidproquo';
 
 export default ({ region }: QpqAppDeployContext): QPQConfig => [
-  defineDns(getDeploySettingList('ROOT_DOMAINS')),
+  defineDns(getDeploySettingList('ROOT_DOMAINS'), { legacyUnsuffixedRootDomain: QPQJS_LEGACY_UNSUFFIXED_ROOT_DOMAIN }),
 
   // inbox.<env>.<root>: verified with SES and MX-routed to it, for every defineEmailReceiver.
   defineEmailReceivingDomain('inbox'),

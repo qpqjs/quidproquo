@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- `defineDns`: every root domain's resources are now named after the root, so the root list can be reordered and its first root removed without a resource moving to another CloudFormation logical id. The first root's resources used to be deployed under unsuffixed ids. **An app first deployed before this version must set the new `legacyUnsuffixedRootDomain` option to the root that was first in its list**, in every `defineDns` it declares (the bootstrap config and each service), before deploying this version: `defineDns(roots, { legacyUnsuffixedRootDomain: 'example.com' })`. Without it the deploy fails and rolls back, trying to create api domains, records and email identities that already exist. An app deployed for the first time on this version must not set it. The option will be removed in version 1. `domainScopedId` no longer returns the bare id for the primary root.
+- `@qpqjs/deploy-aws`: the email sender construct's id no longer contains the primary root. It is `EmailSender`, or `EmailSender<root>` for an app with `legacyUnsuffixedRootDomain`, which therefore has to keep that option for as long as it declares an email sender, even after the root itself has left the list.
+
 ## 0.11.0
 
 - `@qpqjs/features`: an event doc AI chat now names itself. `defineEventDocAi` gives every chat a `setChatName` tool (declared with its own inline function, `${storeName}AiSetChatName`) and adds a short paragraph to the end of the system prompt telling the model to name the chat on the first message and rename it when the subject clearly changes. The system prompt therefore changes once, which drops any prompt cache built on the old one, and a turn that renames the chat takes one more model step. Do not give a chat a tool of its own named `setChatName`: nothing checks for the clash yet. The tool call shows in the chat like any other.

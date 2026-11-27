@@ -73,4 +73,25 @@ aws acm list-certificates --region us-east-1 \
 2. Append it to the app's domain constant, which every `defineDns` reads.
 3. Deploy the domain phase (new certificates, api domains), then each service.
 
-The first root keeps the existing CloudFormation logical ids; extra roots get suffixed ones, so adding is purely additive and removing is purely deletes. Reordering the list rebuilds domain resources (aliases, records, api domain names), so do it in a quiet window.
+Every root's resources are named after the root, never after its place in the list, so adding is purely additive, removing is purely deletes and reordering changes no resource. The order only decides the primary.
+
+## Changing an app's domain
+
+1. Add the new root to the list, first if links should use it straight away, and deploy. The app is live on both.
+2. When the old root is no longer needed, remove it from the list and deploy.
+
+Changing the primary moves the things that live on the primary only: the urls baked into emails and web builds, and a user directory's custom domain.
+
+## Apps first deployed before 0.12.0
+
+Before 0.12.0 the first root's resources were deployed under unsuffixed names. An app first deployed that way must say which root that was, or its next deploy fails trying to create resources that already exist:
+
+```typescript
+defineDns(['example.org', 'example.com'], {
+  legacyUnsuffixedRootDomain: 'example.com',
+});
+```
+
+That root keeps its unsuffixed names wherever it sits in the list, and it can be removed from the list like any other. Keep the setting after removing it if the app declares an email sender: the sender's identities are grouped under that root's name, and dropping the setting would try to create them again.
+
+`legacyUnsuffixedRootDomain` will be removed in version 1. An app deployed for the first time on 0.12.0 or later must not set it.

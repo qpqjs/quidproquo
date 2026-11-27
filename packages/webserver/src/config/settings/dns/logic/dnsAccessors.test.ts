@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { defineDns } from '../defineDns';
 import { getDnsConfig } from './getDnsConfig';
+import { getLegacyUnsuffixedRootDomain } from './getLegacyUnsuffixedRootDomain';
 import { getPrimaryRootDomain } from './getPrimaryRootDomain';
 import { getRootDomains } from './getRootDomains';
 import { resolveDnsConfigOrThrow } from './resolveDnsConfigOrThrow';
@@ -23,6 +24,12 @@ describe('dns accessors', () => {
 
     expect(resolveDnsConfigOrThrow(config).rootDomains).toEqual(['a.com', 'b.com']);
     expect(getPrimaryRootDomain(config)).toBe('a.com');
+  });
+
+  it('has no legacy unsuffixed root unless the app names one, which need not be declared any more', () => {
+    expect(getLegacyUnsuffixedRootDomain(buildTestQpqConfig())).toBeNull();
+    expect(getLegacyUnsuffixedRootDomain(buildTestQpqConfig([defineDns(['a.com', 'b.com'])]))).toBeNull();
+    expect(getLegacyUnsuffixedRootDomain(buildTestQpqConfig([defineDns(['b.com'], { legacyUnsuffixedRootDomain: 'a.com' })]))).toBe('a.com');
   });
 
   it('refuses two dns settings in one service', () => {

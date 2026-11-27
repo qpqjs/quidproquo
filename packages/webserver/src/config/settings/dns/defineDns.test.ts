@@ -10,6 +10,7 @@ describe('defineDns', () => {
       uniqueKey: 'example.com',
       rootDomains: ['example.com'],
       resolver: undefined,
+      legacyUnsuffixedRootDomain: undefined,
     });
   });
 
@@ -20,5 +21,9 @@ describe('defineDns', () => {
     expect(setting.uniqueKey).toBe('example.com|example.org');
     expect(setting.rootDomains).toEqual(['example.com', 'example.org']);
     expect(setting.resolver).toEqual(resolver);
+  });
+
+  it('carries the legacy unsuffixed root, declared or not', () => {
+    expect(defineDns(['example.org'], { legacyUnsuffixedRootDomain: 'example.com' }).legacyUnsuffixedRootDomain).toBe('example.com');
   });
 });
